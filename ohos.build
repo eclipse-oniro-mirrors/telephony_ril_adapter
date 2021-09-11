@@ -1,0 +1,35 @@
+{
+    "subsystem": "telephony",
+    "parts": {
+        "ril_adapter": {
+            "module_list": [
+                "//base/telephony/ril_adapter/hril:hril",
+                "//base/telephony/ril_adapter/hril_hdf:hril_hdf",
+                "//base/telephony/ril_adapter/test/unittest:ril_adapter_test",
+                "//base/telephony/ril_adapter/vendor:ril_vendor"
+            ],
+        "inner_kits": [
+            {
+                "type": "so",
+                "name": "//base/telephony/ril_adapter/hril:hril",
+                "header": {
+                    "header_files": [
+                        "hril_types.h",
+                        "hril_sms_parcel.h",
+                        "hril_sim_parcel.h",
+                        "hril_request.h",
+                        "hril_notification.h",
+                        "hril_network_parcel.h",
+                        "hril_modem_parcel.h",
+                        "hril_data_parcel.h",
+                        "hril_call_parcel.h",
+                        "hril.h"
+                    ],
+                    "header_base": "//base/telephony/ril_adapter/interfaces/innerkits"
+                }
+            }
+        ]
+        }
+    }
+}
+
