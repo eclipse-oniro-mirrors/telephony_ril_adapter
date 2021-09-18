@@ -14,7 +14,10 @@
  */
 
 #include "at_call.h"
-#include "vendor_adapter.h"
+#include "hril.h"
+#include "vendor_util.h"
+#include "vendor_report.h"
+#include "at_support.h"
 
 #undef DEFAULT_TIMEOUT
 #define DEFAULT_TIMEOUT 5000
@@ -703,7 +706,7 @@ void ReqGetCallForwarding(ReqDataInfo *requestInfo, int reason)
     char *cmd = NULL;
     int err = HRIL_ERR_SUCCESS;
     ResponseInfo *pResponse = NULL;
-    HRilCFQueryInfo queryInfo;
+    HRilCFQueryInfo queryInfo = {0};
     char *line = NULL;
 
     (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));

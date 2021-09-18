@@ -20,18 +20,18 @@
 #include <memory.h>
 #include <string.h>
 #include <unistd.h>
+
 #include "hdf_base.h"
 #include "hdf_device_desc.h"
-#include "hdf_remote_service.h"
 #include "hdf_load_hdi.h"
-#include "telephony_log_c.h"
+#include "hdf_remote_service.h"
+
 #include "hril.h"
 
 static void *g_dlHandle = NULL;
 static int32_t g_slotId = 0;
 
-extern int32_t DispatchRequest(
-    int32_t slotId, struct HdfDeviceIoClient *client, int32_t cmd, struct HdfSBuf *data, struct HdfSBuf *reply);
+extern int32_t DispatchRequest(int32_t slotId, int32_t cmd, struct HdfSBuf *data);
 extern void HRilRegOps(const HRilOps *g_hrilOps);
 
 extern void OnCallReport(struct ReportInfo reportInfo, const void *response, size_t responseLen);

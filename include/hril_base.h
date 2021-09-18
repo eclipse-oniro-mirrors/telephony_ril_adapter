@@ -18,15 +18,12 @@
 
 #include <securec.h>
 #include <map>
-#include "hril_modem_parcel.h"
-#include "hdf_base.h"
-#include "hdf_device_desc.h"
-#include "hdf_load_hdi.h"
+
 #include "hdf_remote_service.h"
 #include "hdf_sbuf_ipc.h"
-#include "osal_mem.h"
-#include "telephony_log_wrapper.h"
+
 #include "hril_types.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {

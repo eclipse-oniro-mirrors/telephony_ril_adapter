@@ -134,12 +134,18 @@ void HRilSim::GetSimStatus(int32_t slotId, struct HdfSBuf *data)
         return;
     }
     ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_SIM_GET_SIM_STATUS);
-    if (requestInfo == nullptr || simFuncs_ == nullptr) {
+    if (requestInfo == nullptr) {
         TELEPHONY_LOGE("RilAdapter failed to do Create GetSimStatus HRilRequest!");
+        return;
+    }
+    if (simFuncs_ == nullptr) {
+        TELEPHONY_LOGE("HRilCall::GetCallForward simFuncs_ is nullptr!");
+        free(requestInfo);
         return;
     }
 
     simFuncs_->GetSimStatus(requestInfo);
+    free(requestInfo);
 }
 
 int32_t HRilSim::GetSimStatusResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
@@ -181,8 +187,13 @@ void HRilSim::RequestSimIO(int32_t slotId, struct HdfSBuf *data)
     }
     serial = SimIO.serial;
     ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_SIM_IO);
-    if (requestInfo == nullptr || simFuncs_ == nullptr) {
+    if (requestInfo == nullptr) {
         TELEPHONY_LOGE("RilAdapter failed to do Create RequestSimIO HRilRequest!");
+        return;
+    }
+    if (simFuncs_ == nullptr) {
+        TELEPHONY_LOGE("HRilCall::GetCallForward simFuncs_ is nullptr!");
+        free(requestInfo);
         return;
     }
     HRilSimIO rilSimIO = {};
@@ -193,15 +204,18 @@ void HRilSim::RequestSimIO(int32_t slotId, struct HdfSBuf *data)
     rilSimIO.p3 = SimIO.p3;
     if (!ConvertToString(&rilSimIO.data, SimIO.data, requestInfo)) {
         FreeStrings(PATH_POINTER_NUM, rilSimIO.data);
+        free(requestInfo);
         return;
     }
     if (!ConvertToString(&rilSimIO.pathid, SimIO.path, requestInfo)) {
         FreeStrings(PATH_POINTER_NUM, rilSimIO.pathid);
+        free(requestInfo);
         return;
     }
 
     simFuncs_->GetSimIO(requestInfo, &rilSimIO, sizeof(rilSimIO));
     FreeStrings(POINTER_NUM, rilSimIO.data, rilSimIO.pathid);
+    free(requestInfo);
 }
 
 int32_t HRilSim::RequestSimIOResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
@@ -221,12 +235,17 @@ void HRilSim::GetImsi(int32_t slotId, struct HdfSBuf *data)
     }
 
     ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_SIM_GET_IMSI);
-    if (requestInfo == nullptr || simFuncs_ == nullptr) {
+    if (requestInfo == nullptr) {
         TELEPHONY_LOGE("RilAdapter failed to do Create GetImsi HRilRequest!");
         return;
     }
-
+    if (simFuncs_ == nullptr) {
+        TELEPHONY_LOGE("HRilCall::GetCallForward simFuncs_ is nullptr!");
+        free(requestInfo);
+        return;
+    }
     simFuncs_->GetSimImsi(requestInfo);
+    free(requestInfo);
 }
 
 int32_t HRilSim::GetImsiResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
@@ -268,12 +287,18 @@ void HRilSim::GetIccID(int32_t slotId, struct HdfSBuf *data)
     }
 
     ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_SIM_GET_ICCID);
-    if (requestInfo == nullptr || simFuncs_ == nullptr) {
+    if (requestInfo == nullptr) {
         TELEPHONY_LOGE("RilAdapter failed to do Create  GetIccID HRilRequest!");
+        return;
+    }
+    if (simFuncs_ == nullptr) {
+        TELEPHONY_LOGE("HRilCall::GetCallForward simFuncs_ is nullptr!");
+        free(requestInfo);
         return;
     }
 
     simFuncs_->GetSimIccID(requestInfo);
+    free(requestInfo);
 }
 
 int32_t HRilSim::GetIccIDResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
@@ -326,8 +351,13 @@ void HRilSim::GetSimLockStatus(int32_t slotId, struct HdfSBuf *data)
     }
     serial = simClock.serial;
     ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_SIM_GET_LOCK_STATUS);
-    if (requestInfo == nullptr || simFuncs_ == nullptr) {
+    if (requestInfo == nullptr) {
         TELEPHONY_LOGE("RilAdapter failed to do Create GetSimLockStatus HRilRequest!");
+        return;
+    }
+    if (simFuncs_ == nullptr) {
+        TELEPHONY_LOGE("HRilCall::GetCallForward simFuncs_ is nullptr!");
+        free(requestInfo);
         return;
     }
     HRilSimClock rilSimClock = {};
@@ -340,16 +370,19 @@ void HRilSim::GetSimLockStatus(int32_t slotId, struct HdfSBuf *data)
     if (!ConvertToString(&rilSimClock.fac, simClock.fac, requestInfo)) {
         TELEPHONY_LOGE("ConvertToString in GetSimLockStatus is failed!");
         FreeStrings(PATH_POINTER_NUM, rilSimClock.fac);
+        free(requestInfo);
         return;
     }
     if (!ConvertToString(&rilSimClock.passwd, simClock.passwd, requestInfo)) {
         TELEPHONY_LOGE("ConvertToString in GetSimLockStatus is failed!");
         FreeStrings(PATH_POINTER_NUM, rilSimClock.passwd);
+        free(requestInfo);
         return;
     }
 
     simFuncs_->GetSimLockStatus(requestInfo, &rilSimClock, sizeof(rilSimClock));
     FreeStrings(POINTER_NUM, rilSimClock.fac, rilSimClock.passwd);
+    free(requestInfo);
 }
 
 int32_t HRilSim::GetSimLockStatusResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
@@ -408,8 +441,13 @@ void HRilSim::SetSimLock(int32_t slotId, struct HdfSBuf *data)
     }
     serial = simClock.serial;
     ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_SIM_SET_LOCK);
-    if (requestInfo == nullptr || simFuncs_ == nullptr) {
+    if (requestInfo == nullptr) {
         TELEPHONY_LOGE("RilAdapter failed to do Create SetSimLock HRilRequest!");
+        return;
+    }
+    if (simFuncs_ == nullptr) {
+        TELEPHONY_LOGE("HRilCall::GetCallForward simFuncs_ is nullptr!");
+        free(requestInfo);
         return;
     }
 
@@ -417,6 +455,7 @@ void HRilSim::SetSimLock(int32_t slotId, struct HdfSBuf *data)
     if (!ConvertToString(&rilSimClock.fac, simClock.fac, requestInfo)) {
         TELEPHONY_LOGE("ConvertToString in SetSimLock is failed!");
         FreeStrings(PATH_POINTER_NUM, rilSimClock.fac);
+        free(requestInfo);
         return;
     }
     rilSimClock.mode = simClock.mode;
@@ -424,12 +463,14 @@ void HRilSim::SetSimLock(int32_t slotId, struct HdfSBuf *data)
     if (!ConvertToString(&rilSimClock.passwd, simClock.passwd, requestInfo)) {
         TELEPHONY_LOGE("ConvertToString in SetSimLock is failed!");
         FreeStrings(PATH_POINTER_NUM, rilSimClock.passwd);
+        free(requestInfo);
         return;
     }
     rilSimClock.classx = simClock.classx;
 
     simFuncs_->SetSimLock(requestInfo, &rilSimClock, sizeof(rilSimClock));
     FreeStrings(POINTER_NUM, rilSimClock.fac, rilSimClock.passwd);
+    free(requestInfo);
 }
 
 int32_t HRilSim::SetSimLockResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
@@ -459,8 +500,13 @@ void HRilSim::ChangeSimPassword(int32_t slotId, struct HdfSBuf *data)
     }
     serial = simPassword.serial;
     ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_SIM_CHANGE_PASSWD);
-    if (requestInfo == nullptr || simFuncs_ == nullptr) {
+    if (requestInfo == nullptr) {
         TELEPHONY_LOGE("RilAdapter failed to do Create ChangeSimPassword HRilRequest!");
+        return;
+    }
+    if (simFuncs_ == nullptr) {
+        TELEPHONY_LOGE("HRilCall::GetCallForward simFuncs_ is nullptr!");
+        free(requestInfo);
         return;
     }
 
@@ -468,22 +514,26 @@ void HRilSim::ChangeSimPassword(int32_t slotId, struct HdfSBuf *data)
     if (!ConvertToString(&rilSimPassword.fac, simPassword.fac, requestInfo)) {
         TELEPHONY_LOGE("ConvertToString in ChangeSimPassword is failed!");
         FreeStrings(PATH_POINTER_NUM, rilSimPassword.fac);
+        free(requestInfo);
         return;
     }
     if (!ConvertToString(&rilSimPassword.oldPassword, simPassword.oldPassword, requestInfo)) {
         TELEPHONY_LOGE("ConvertToString in ChangeSimPassword is failed!");
         FreeStrings(PATH_POINTER_NUM, rilSimPassword.oldPassword);
+        free(requestInfo);
         return;
     }
     if (!ConvertToString(&rilSimPassword.newPassword, simPassword.newPassword, requestInfo)) {
         TELEPHONY_LOGE("ConvertToString in ChangeSimPassword is failed!");
         FreeStrings(PATH_POINTER_NUM, rilSimPassword.newPassword);
+        free(requestInfo);
         return;
     }
     rilSimPassword.passwordLength = simPassword.passwordLength;
 
     simFuncs_->ChangeSimPassword(requestInfo, &rilSimPassword, sizeof(rilSimPassword));
     FreeStrings(POINTER_NUM, rilSimPassword.fac, rilSimPassword.oldPassword, rilSimPassword.newPassword);
+    free(requestInfo);
 }
 
 int32_t HRilSim::ChangeSimPasswordResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
@@ -517,11 +567,17 @@ void HRilSim::EnterSimPin(int32_t slotId, struct HdfSBuf *data)
     }
 
     ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_SIM_ENTER_PIN);
-    if (requestInfo == nullptr || simFuncs_ == nullptr) {
+    if (requestInfo == nullptr) {
         TELEPHONY_LOGE("RilAdapter failed to do Create EnterSimPin HRilRequest!");
         return;
     }
+    if (simFuncs_ == nullptr) {
+        TELEPHONY_LOGE("HRilCall::GetCallForward simFuncs_ is nullptr!");
+        free(requestInfo);
+        return;
+    }
     simFuncs_->EnterSimPin(requestInfo, pin);
+    free(requestInfo);
 }
 
 int32_t HRilSim::EnterSimPinResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
@@ -554,11 +610,17 @@ void HRilSim::UnlockSimPin(int32_t slotId, struct HdfSBuf *data)
     }
 
     ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_SIM_UNLOCK_PIN);
-    if (requestInfo == nullptr || simFuncs_ == nullptr) {
+    if (requestInfo == nullptr) {
         TELEPHONY_LOGE("RilAdapter failed to do Create UnlockSimPin HRilRequest!");
         return;
     }
+    if (simFuncs_ == nullptr) {
+        TELEPHONY_LOGE("HRilCall::GetCallForward simFuncs_ is nullptr!");
+        free(requestInfo);
+        return;
+    }
     simFuncs_->UnlockSimPin(requestInfo, puk, pin);
+    free(requestInfo);
 }
 
 int32_t HRilSim::UnlockSimPinResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
@@ -577,12 +639,18 @@ void HRilSim::GetSimPinInputTimes(int32_t slotId, struct HdfSBuf *data)
     }
 
     ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_SIM_GET_PIN_INPUT_TIMES);
-    if (requestInfo == nullptr || simFuncs_ == nullptr) {
+    if (requestInfo == nullptr) {
         TELEPHONY_LOGE("RilAdapter failed to do Create GetSimPinInputTimes HRilRequest!");
+        return;
+    }
+    if (simFuncs_ == nullptr) {
+        TELEPHONY_LOGE("HRilCall::GetCallForward simFuncs_ is nullptr!");
+        free(requestInfo);
         return;
     }
 
     simFuncs_->GetSimPinInputTimes(requestInfo);
+    free(requestInfo);
 }
 
 int32_t HRilSim::GetSimPinInputTimesResponse(int32_t slotId, int32_t requestNum,

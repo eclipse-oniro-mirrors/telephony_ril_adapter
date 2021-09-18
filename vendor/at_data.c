@@ -14,7 +14,8 @@
  */
 
 #include "at_data.h"
-#include "vendor_adapter.h"
+
+#include "vendor_report.h"
 
 int ParsePdpCmd(char *str, HRilDataCallResponse *outData)
 {
@@ -55,7 +56,6 @@ int ParsePdpCmd(char *str, HRilDataCallResponse *outData)
     } else {
         goto ERR;
     }
-    TELEPHONY_LOGD("end");
     return HRIL_ERR_SUCCESS;
 
 ERR:

@@ -17,8 +17,7 @@
 
 namespace OHOS {
 namespace Telephony {
-
-enum NetworkParameter {
+enum class NetworkParameter : int32_t {
     ERR_INVALID_RESPONSE_VALUE = 3,
     INVALID_RESPONSE_VALUE = 11,
 };
@@ -105,7 +104,13 @@ void HRilNetwork::GetSignalStrength(int32_t slotId, struct HdfSBuf *data)
         TELEPHONY_LOGE("Create Request is fail");
         return;
     }
+    if (networkFuncs_ == nullptr) {
+        TELEPHONY_LOGE("GetNetworkSearchInformation::networkFuncs_ is nullptr");
+        free(requestInfo);
+        return;
+    }
     networkFuncs_->GetSignalStrength(requestInfo);
+    free(requestInfo);
 }
 
 void HRilNetwork::ExchangeRilRssiToHdf(const void *response, size_t responseLen, Rssi &rssi)
@@ -133,7 +138,6 @@ void HRilNetwork::ExchangeRilRssiToHdf(const void *response, size_t responseLen,
 int32_t HRilNetwork::GetSignalStrengthResponse(int32_t slotId, int32_t requestNum,
     HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    TELEPHONY_LOGD("HRilNetwork::GetSignalStrengthResponse:-->");
     Rssi event = {};
     event.slotId = slotId;
     if (response == nullptr || responseLen != sizeof(HRilRssi)) {
@@ -142,7 +146,6 @@ int32_t HRilNetwork::GetSignalStrengthResponse(int32_t slotId, int32_t requestNu
             responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
         }
     } else {
-        TELEPHONY_LOGD("HRilNetwork::GetSignalStrengthResponse:--> ExchangeRilRssiToHdf ");
         ExchangeRilRssiToHdf(response, responseLen, event);
     }
     return ResponseBuffer(requestNum, &responseInfo, sizeof(responseInfo), &event, sizeof(event));
@@ -160,7 +163,13 @@ void HRilNetwork::GetCsRegStatus(int32_t slotId, struct HdfSBuf *data)
         TELEPHONY_LOGE("Create Request is fail");
         return;
     }
+    if (networkFuncs_ == nullptr) {
+        TELEPHONY_LOGE("GetNetworkSearchInformation::networkFuncs_ is nullptr");
+        free(requestInfo);
+        return;
+    }
     networkFuncs_->GetCsRegStatus(requestInfo);
+    free(requestInfo);
 }
 
 int32_t HRilNetwork::GetCsRegStatusResponse(int32_t slotId, int32_t requestNum,
@@ -201,7 +210,13 @@ void HRilNetwork::GetOperatorInfo(int32_t slotId, struct HdfSBuf *data)
         TELEPHONY_LOGE("Create Request is fail");
         return;
     }
+    if (networkFuncs_ == nullptr) {
+        TELEPHONY_LOGE("GetNetworkSearchInformation::networkFuncs_ is nullptr");
+        free(requestInfo);
+        return;
+    }
     networkFuncs_->GetOperatorInfo(requestInfo);
+    free(requestInfo);
 }
 
 void HRilNetwork::GetNetworkSearchInformation(int32_t slotId, struct HdfSBuf *data)
@@ -212,12 +227,17 @@ void HRilNetwork::GetNetworkSearchInformation(int32_t slotId, struct HdfSBuf *da
         return;
     }
     ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_NETWORK_GET_SEARCH_INFORMATION);
-    if (requestInfo == nullptr || networkFuncs_ == nullptr) {
+    if (requestInfo == nullptr) {
         TELEPHONY_LOGE("GetNetworkSearchInformation::Create Request is fail");
         return;
     }
-    TELEPHONY_LOGD("GetNetworkSearchInformation --->GetNetworkSearchInformation");
+    if (networkFuncs_ == nullptr) {
+        TELEPHONY_LOGE("GetNetworkSearchInformation::networkFuncs_ is nullptr");
+        free(requestInfo);
+        return;
+    }
     networkFuncs_->GetNetworkSearchInformation(requestInfo);
+    free(requestInfo);
 }
 
 void HRilNetwork::GetNetworkSelectionMode(int32_t slotId, struct HdfSBuf *data)
@@ -232,11 +252,18 @@ void HRilNetwork::GetNetworkSelectionMode(int32_t slotId, struct HdfSBuf *data)
         TELEPHONY_LOGE("GetNetworkSelectionMode::Create Request is fail");
         return;
     }
+    if (networkFuncs_ == nullptr) {
+        TELEPHONY_LOGE("GetNetworkSearchInformation::networkFuncs_ is nullptr");
+        free(requestInfo);
+        return;
+    }
     networkFuncs_->GetNetworkSelectionMode(requestInfo);
+    free(requestInfo);
 }
 
 void HRilNetwork::SetNetworkSelectionMode(int32_t slotId, struct HdfSBuf *data)
 {
+    const int32_t POINTER_NUM = 1;
     struct SetNetworkModeInfo setNetworkModeInfo = {};
     MessageParcel *parcel = nullptr;
 
@@ -255,15 +282,23 @@ void HRilNetwork::SetNetworkSelectionMode(int32_t slotId, struct HdfSBuf *data)
         TELEPHONY_LOGE("SetNetworkSelectionMode::Create Request is fail");
         return;
     }
+    if (networkFuncs_ == nullptr) {
+        TELEPHONY_LOGE("GetNetworkSearchInformation::networkFuncs_ is nullptr");
+        free(requestInfo);
+        return;
+    }
     HRiSetNetworkModeInfo setModeInfo = {};
     setModeInfo.selectMode = setNetworkModeInfo.selectMode;
     TELEPHONY_LOGD("setModeInfo = %{public}d", setModeInfo.selectMode);
     if (!ConvertToString(&setModeInfo.oper, setNetworkModeInfo.oper, requestInfo)) {
         TELEPHONY_LOGE("SetNetworkSelectionMode::ConvertToString failed");
+        free(requestInfo);
         return;
     }
     TELEPHONY_LOGD("SetNetworkSelectionMode selectMode:%{public}s", setModeInfo.oper);
     networkFuncs_->SetNetworkSelectionMode(requestInfo, &setModeInfo);
+    FreeStrings(POINTER_NUM, setModeInfo.oper);
+    free(requestInfo);
 }
 
 void HRilNetwork::SetNetworkLocationUpdate(int32_t slotId, struct HdfSBuf *data)
@@ -287,7 +322,7 @@ int32_t HRilNetwork::GetOperatorInfoResponse(int32_t slotId, int32_t requestNum,
 {
     struct OperatorInfoResult operatorInfoResult = {};
     int32_t numStrings = responseLen / sizeof(char *);
-    if (response == nullptr || numStrings != ERR_INVALID_RESPONSE_VALUE) {
+    if (response == nullptr || numStrings != static_cast<int32_t>(NetworkParameter::ERR_INVALID_RESPONSE_VALUE)) {
         if (responseInfo.error == HRilErrType::NONE) {
             responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
         }
@@ -306,7 +341,10 @@ int32_t HRilNetwork::GetOperatorInfoResponse(int32_t slotId, int32_t requestNum,
 int32_t HRilNetwork::NetworkRegStatusUpdated(
     int32_t slotId, int32_t indType, const HRilErrno e, const void *response, size_t responseLen)
 {
-    TELEPHONY_LOGD("NetworkRegStatusUpdated enter");
+    if (serviceCallbackNotify_ == nullptr) {
+        TELEPHONY_LOGE("RilAdapter  serviceCallbackNotify_ is null");
+        return HDF_FAILURE;
+    }
     indType = (int32_t)ConvertIntToRadioNoticeType(indType);
     CsRegStatusInfo csRegResponse = {};
     int32_t numStrings = responseLen / sizeof(char *);
@@ -332,10 +370,6 @@ int32_t HRilNetwork::NetworkRegStatusUpdated(
         HdfSBufRecycle(dataSbuf);
         return HDF_FAILURE;
     }
-    if (serviceCallbackNotify_ == nullptr) {
-        TELEPHONY_LOGE("RilAdapter  serviceCallbackNotify_ is null");
-        return HDF_FAILURE;
-    }
     int32_t ret = serviceCallbackNotify_->dispatcher->Dispatch(
         serviceCallbackNotify_, HNOTI_NETWORK_CS_REG_STATUS_UPDATED, dataSbuf, nullptr);
     if (ret != HDF_SUCCESS) {
@@ -351,7 +385,10 @@ int32_t HRilNetwork::NetworkRegStatusUpdated(
 int32_t HRilNetwork::SignalStrengthUpdated(
     int32_t slotId, int32_t indType, const HRilErrno e, const void *response, size_t responseLen)
 {
-    TELEPHONY_LOGD("SignalStrengthUpdated enter");
+    if (serviceCallbackNotify_ == nullptr) {
+        TELEPHONY_LOGE("RilAdapter serviceCallbackNotify_ is null");
+        return HDF_FAILURE;
+    }
     indType = (int32_t)ConvertIntToRadioNoticeType(indType);
     Rssi rssi = {0};
 
@@ -372,11 +409,6 @@ int32_t HRilNetwork::SignalStrengthUpdated(
         HdfSBufRecycle(dataSbuf);
         return HDF_FAILURE;
     }
-    if (serviceCallbackNotify_ == nullptr) {
-        TELEPHONY_LOGE("RilAdapter serviceCallbackNotify_ is null");
-        return HDF_FAILURE;
-    }
-    TELEPHONY_LOGD("serviceCallbackNotify_->dispatcher->Dispatch");
     int32_t ret = serviceCallbackNotify_->dispatcher->Dispatch(
         serviceCallbackNotify_, HNOTI_NETWORK_SIGNAL_STRENGTH_UPDATED, dataSbuf, nullptr);
     if (ret != HDF_SUCCESS) {
@@ -402,7 +434,13 @@ void HRilNetwork::GetPsRegStatus(int32_t slotId, struct HdfSBuf *data)
         TELEPHONY_LOGE("Create Request is fail");
         return;
     }
+    if (networkFuncs_ == nullptr) {
+        TELEPHONY_LOGE("GetNetworkSearchInformation::networkFuncs_ is nullptr");
+        free(requestInfo);
+        return;
+    }
     networkFuncs_->GetPsRegStatus(requestInfo);
+    free(requestInfo);
 }
 
 int32_t HRilNetwork::GetPsRegStatusResponse(int32_t slotId, int32_t requestNum,
@@ -416,7 +454,8 @@ int32_t HRilNetwork::GetPsRegStatusResponse(int32_t slotId, int32_t requestNum,
         }
     } else {
         int32_t numStrings = responseLen / sizeof(char *);
-        if ((numStrings != HRIL_PS_REG_STATUS_MAX_LEN) && (numStrings != INVALID_RESPONSE_VALUE)) {
+        if ((numStrings != HRIL_PS_REG_STATUS_MAX_LEN) &&
+            (numStrings != static_cast<int32_t>(NetworkParameter::INVALID_RESPONSE_VALUE))) {
             TELEPHONY_LOGE("GetPsRegStatusResponse Invalid response: nullptr");
             if (responseInfo.error == HRilErrType::NONE) {
                 responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
@@ -437,7 +476,6 @@ int32_t HRilNetwork::GetPsRegStatusResponse(int32_t slotId, int32_t requestNum,
 int32_t HRilNetwork::GetNetworkSelectionModeResponse(int32_t slotId, int32_t requestNum,
     HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    TELEPHONY_LOGD("GetNetworkSelectionModeResponse --->");
     struct SetNetworkModeInfo selectModeResultInfo = {};
     if (response == nullptr) {
         if (responseInfo.error == HRilErrType::NONE) {
@@ -451,8 +489,8 @@ int32_t HRilNetwork::GetNetworkSelectionModeResponse(int32_t slotId, int32_t req
     return ResponseMessageParcel(responseInfo, selectModeResultInfo, requestNum);
 }
 
-void HRilNetwork::BuildOperList(AvailableNetworkList &availableNetworkList, HRilRadioResponseInfo &responseInfo,
-    const void *response, size_t responseLen)
+void HRilNetwork::BuildOperatorList(AvailableNetworkList &availableNetworkList,
+    HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     int32_t numStrings = responseLen / sizeof(AvailableOperInfo *);
     if ((response == nullptr && responseLen != 0) || (responseLen % sizeof(AvailableOperInfo *)) != 0) {
@@ -477,7 +515,6 @@ void HRilNetwork::BuildOperList(AvailableNetworkList &availableNetworkList, HRil
             TELEPHONY_LOGD("operInfo.rat:%{public}d", curPtr->rat);
             availableNetworkList.availableNetworkInfo.push_back(operInfo);
         }
-        TELEPHONY_LOGD("BuildOperList--->leave");
     }
 }
 
@@ -487,7 +524,7 @@ int32_t HRilNetwork::GetNetworkSearchInformationResponse(int32_t slotId, int32_t
     TELEPHONY_LOGD("GetNetworkSearchInformationResponse ---> response %{public}p", response);
     AvailableNetworkList availableNetworkList;
     availableNetworkList.itemNum = 0;
-    BuildOperList(availableNetworkList, responseInfo, response, responseLen);
+    BuildOperatorList(availableNetworkList, responseInfo, response, responseLen);
 
     return ResponseMessageParcel(responseInfo, availableNetworkList, requestNum);
 }
@@ -497,7 +534,7 @@ int32_t HRilNetwork::SetNetworkLocationUpdateResponse(int32_t slotId, int32_t re
 {
     LocationUpdateResultInfo locationUpdateResultInfo;
     int32_t numStrings = responseLen / sizeof(char *);
-    if (response == nullptr || numStrings != ERR_INVALID_RESPONSE_VALUE ||
+    if (response == nullptr || numStrings != static_cast<int32_t>(NetworkParameter::ERR_INVALID_RESPONSE_VALUE) ||
         (numStrings != HRIL_PS_REG_STATUS_MAX_LEN)) {
         if (responseInfo.error == HRilErrType::NONE) {
             responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
@@ -514,7 +551,6 @@ int32_t HRilNetwork::SetNetworkLocationUpdateResponse(int32_t slotId, int32_t re
 int32_t HRilNetwork::SetNetworkSelectionModeResponse(int32_t slotId, int32_t requestNum,
     HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    TELEPHONY_LOGD("SetNetworkSelectionModeResponse");
     return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));
 }
 

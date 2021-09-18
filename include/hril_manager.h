@@ -90,9 +90,7 @@ public:
     void OnSmsReport(struct ReportInfo *reportInfo, const void *response, size_t responseLen);
 };
 
-extern "C" int32_t DispatchRequest(int32_t slotId, const struct HdfDeviceIoClient *client, int32_t cmd,
-    struct HdfSBuf *data, const struct HdfSBuf *reply);
-
+extern "C" int32_t DispatchRequest(int32_t slotId, int32_t cmd, struct HdfSBuf *data);
 extern "C" void HRilRegOps(const HRilOps *hrilOps);
 extern "C" void OnCallReport(struct ReportInfo reportInfo, const void *response, size_t responseLen);
 extern "C" void OnDataReport(struct ReportInfo reportInfo, const void *response, size_t responseLen);

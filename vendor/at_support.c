@@ -39,7 +39,6 @@ void AtSetOnUnusual(void (*OnAtUnusual)(void))
 
 int ATStartReadLoop(int fd, OnNotify func)
 {
-    TELEPHONY_LOGD("%{public}s enter", __func__);
     int ret = 0;
     g_atFd = fd;
     g_onNotifyFunc = func;
@@ -56,7 +55,6 @@ int ATStartReadLoop(int fd, OnNotify func)
 
 static void OnReaderClosed(void)
 {
-    TELEPHONY_LOGD("%{public}s enter", __func__);
     if (g_atnUnusual != NULL && g_readerClosed == 0) {
         pthread_mutex_lock(&g_commandmutex);
         g_readerClosed = 1;
@@ -68,7 +66,6 @@ static void OnReaderClosed(void)
 
 void ATCloseReadLoop(void)
 {
-    TELEPHONY_LOGD("%{public}s enter", __func__);
     if (g_atFd >= 0) {
         close(g_atFd);
     }
@@ -81,7 +78,6 @@ void ATCloseReadLoop(void)
 
 void FreeResponseInfo(ResponseInfo *resp)
 {
-    TELEPHONY_LOGD("%{public}s enter", __func__);
     Line *p = NULL;
     if (resp == NULL) {
         TELEPHONY_LOGD("%{public}s enter resp is null", __func__);
@@ -114,23 +110,20 @@ void FreeResponseInfo(ResponseInfo *resp)
 
 void *ReaderLoop(void *s)
 {
-    TELEPHONY_LOGD("%{public}s enter%{public}p", __func__, s);
     while (1) {
         const char *str = NULL;
         const char *pdu = NULL;
         str = ReadResponse(g_atFd);
         if (str == NULL) {
-            TELEPHONY_LOGD("%{public}s enter str is null", __func__);
+            TELEPHONY_LOGI("%{public}s enter str is null", __func__);
             break;
         }
         if (IsSmsNotify(str)) {
-            TELEPHONY_LOGD("new sms notify :%{public}s", str);
             pdu = ReadResponse(g_atFd);
-            TELEPHONY_LOGD("pdu :%{public}s", pdu);
+            TELEPHONY_LOGI("new sms notify :%{public}s, pdu :%{public}s", str, pdu);
         }
         ProcessResponse(str, pdu);
     }
-    TELEPHONY_LOGD("%{public}s end", __func__);
     OnReaderClosed();
     return NULL;
 }
@@ -207,7 +200,6 @@ void AddLinkListNode(const char *s)
 
 int SendCommandLock(const char *command, const char *prefix, long long timeout, ResponseInfo **outResponse)
 {
-    TELEPHONY_LOGD("%{public}s enter, cmd:%{public}s", __func__, command);
     int err;
     if (pthread_equal(g_reader, pthread_self()) != 0) {
         return AT_ERR_INVALID_THREAD;
@@ -245,7 +237,6 @@ int SendCommandLock(const char *command, const char *prefix, long long timeout, 
 
 int SendCommandNetWorksLock(const char *command, const char *prefix, long long timeout, ResponseInfo **outResponse)
 {
-    TELEPHONY_LOGD("%{public}s enter", __func__);
     int err;
     if (pthread_equal(g_reader, pthread_self()) != 0) {
         return AT_ERR_INVALID_THREAD;
@@ -267,7 +258,6 @@ int SendCommandNetWorksLock(const char *command, const char *prefix, long long t
 int SendCommandSmsLock(
     const char *command, const char *smsPdu, const char *prefix, long long timeout, ResponseInfo **outResponse)
 {
-    TELEPHONY_LOGD("%{public}s enter", __func__);
     int err;
     if (pthread_equal(g_reader, pthread_self()) != 0) {
         return AT_ERR_INVALID_THREAD;
@@ -349,18 +339,15 @@ void ClearCurCommand(void)
 
 void SetWatchFunction(void (*WatchFun)(void))
 {
-    TELEPHONY_LOGD("%{public}s enter", __func__);
     g_atWatch = WatchFun;
 }
 
 void SetAtPauseFlag(bool isNeedPause)
 {
-    TELEPHONY_LOGD("%{public}s enter", __func__);
     g_isNeedATPause = isNeedPause;
 }
 
 bool GetAtPauseFlag(void)
 {
-    TELEPHONY_LOGD("%{public}s enter", __func__);
     return g_isNeedATPause;
 }

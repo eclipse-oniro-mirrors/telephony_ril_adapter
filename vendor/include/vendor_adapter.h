@@ -16,18 +16,7 @@
 #ifndef OHOS_VENDOR_ADAPTER_H
 #define OHOS_VENDOR_ADAPTER_H
 
-#include <fcntl.h>
-#include <termios.h>
 #include "hril.h"
-#include "at_call.h"
-#include "at_data.h"
-#include "at_modem.h"
-#include "at_network.h"
-#include "at_sim.h"
-#include "at_sms.h"
-#include "at_support.h"
-#include "vendor_util.h"
-#include "vendor_report.h"
 
 #define SLEEP_TIME 10
 

@@ -18,6 +18,7 @@
 
 #include "hril_base.h"
 #include "hril_data_parcel.h"
+#include "hril_modem_parcel.h"
 
 namespace OHOS {
 namespace Telephony {
