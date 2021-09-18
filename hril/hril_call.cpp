@@ -165,16 +165,19 @@ void HRilCall::Dial(int32_t slotId, struct HdfSBuf *data)
 
     if (!ConvertToString(&dial.address, dialInfo.address, requestInfo)) {
         TELEPHONY_LOGE("RilAdapter failed to do ConvertToString!");
+        free(requestInfo);
         return;
     }
     dial.clir = (int32_t)dialInfo.clir;
     if (callFuncs_ == nullptr) {
         FreeStrings(NUM_POINTERS, dial.address);
         TELEPHONY_LOGE("RilAdapter HRilCall::Dial  callFuncs_ is nullptr!");
+        free(requestInfo);
         return;
     }
     callFuncs_->Dial(requestInfo, &dial, sizeof(HRilDial));
     FreeStrings(NUM_POINTERS, dial.address);
+    free(requestInfo);
 }
 
 void HRilCall::GetCallList(int32_t slotId, struct HdfSBuf *data)
@@ -185,11 +188,17 @@ void HRilCall::GetCallList(int32_t slotId, struct HdfSBuf *data)
         return;
     }
     ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_CALL_GET_CALL_LIST);
-    if (requestInfo == nullptr || callFuncs_ == nullptr) {
+    if (requestInfo == nullptr) {
         TELEPHONY_LOGE("RilAdapter failed to do Create GetCallList HRilRequest!");
         return;
     }
+    if (callFuncs_ == nullptr) {
+        TELEPHONY_LOGE("RilAdapter HRilCall::Dial  callFuncs_ is nullptr!");
+        free(requestInfo);
+        return;
+    }
     callFuncs_->GetCallList(requestInfo, nullptr, 0);
+    free(requestInfo);
 }
 
 void HRilCall::Hangup(int32_t slotId, struct HdfSBuf *data)
@@ -205,11 +214,17 @@ void HRilCall::Hangup(int32_t slotId, struct HdfSBuf *data)
         return;
     }
     ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_CALL_HANGUP);
-    if (requestInfo == nullptr || callFuncs_ == nullptr) {
+    if (requestInfo == nullptr) {
         TELEPHONY_LOGE("RilAdapter failed to do Create Hangup HRilRequest!");
         return;
     }
+    if (callFuncs_ == nullptr) {
+        TELEPHONY_LOGE("RilAdapter HRilCall::Dial  callFuncs_ is nullptr!");
+        free(requestInfo);
+        return;
+    }
     callFuncs_->Hangup(requestInfo, &gsmIndex, sizeof(uint32_t));
+    free(requestInfo);
 }
 
 void HRilCall::Reject(int32_t slotId, struct HdfSBuf *data)
@@ -220,11 +235,17 @@ void HRilCall::Reject(int32_t slotId, struct HdfSBuf *data)
         return;
     }
     ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_CALL_REJECT);
-    if (requestInfo == nullptr || callFuncs_ == nullptr) {
+    if (requestInfo == nullptr) {
         TELEPHONY_LOGE("RilAdapter failed to do Create Reject HRilRequest!");
         return;
     }
+    if (callFuncs_ == nullptr) {
+        TELEPHONY_LOGE("RilAdapter HRilCall::Dial  callFuncs_ is nullptr!");
+        free(requestInfo);
+        return;
+    }
     callFuncs_->Reject(requestInfo, nullptr, 0);
+    free(requestInfo);
 }
 
 void HRilCall::GetClip(int32_t slotId, struct HdfSBuf *data)
@@ -236,11 +257,17 @@ void HRilCall::GetClip(int32_t slotId, struct HdfSBuf *data)
     }
 
     ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_CALL_DEAL_CLIP);
-    if (requestInfo == nullptr || callFuncs_ == nullptr) {
+    if (requestInfo == nullptr) {
         TELEPHONY_LOGE("RilAdapter failed to do Create GetClip HRilRequest!");
         return;
     }
+    if (callFuncs_ == nullptr) {
+        TELEPHONY_LOGE("RilAdapter HRilCall::Dial  callFuncs_ is nullptr!");
+        free(requestInfo);
+        return;
+    }
     callFuncs_->GetClip(requestInfo);
+    free(requestInfo);
 }
 
 void HRilCall::SetClip(int32_t slotId, struct HdfSBuf *data)
@@ -258,11 +285,17 @@ void HRilCall::SetClip(int32_t slotId, struct HdfSBuf *data)
     }
 
     ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_CALL_SET_CLIP);
-    if (requestInfo == nullptr || callFuncs_ == nullptr) {
+    if (requestInfo == nullptr) {
         TELEPHONY_LOGE("RilAdapter failed to do Create SetClip HRilRequest!");
         return;
     }
+    if (callFuncs_ == nullptr) {
+        TELEPHONY_LOGE("RilAdapter HRilCall::Dial  callFuncs_ is nullptr!");
+        free(requestInfo);
+        return;
+    }
     callFuncs_->SetClip(requestInfo, action);
+    free(requestInfo);
 }
 
 void HRilCall::GetClir(int32_t slotId, struct HdfSBuf *data)
@@ -274,11 +307,17 @@ void HRilCall::GetClir(int32_t slotId, struct HdfSBuf *data)
     }
 
     ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_CALL_DEAL_CLIR);
-    if (requestInfo == nullptr || callFuncs_ == nullptr) {
+    if (requestInfo == nullptr) {
         TELEPHONY_LOGE("RilAdapter failed to do Create GetClir HRilRequest!");
         return;
     }
+    if (callFuncs_ == nullptr) {
+        TELEPHONY_LOGE("RilAdapter HRilCall::Dial  callFuncs_ is nullptr!");
+        free(requestInfo);
+        return;
+    }
     callFuncs_->GetClir(requestInfo);
+    free(requestInfo);
 }
 
 void HRilCall::SetClir(int32_t slotId, struct HdfSBuf *data)
@@ -296,11 +335,17 @@ void HRilCall::SetClir(int32_t slotId, struct HdfSBuf *data)
     }
 
     ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_CALL_SET_CLIR);
-    if (requestInfo == nullptr || callFuncs_ == nullptr) {
+    if (requestInfo == nullptr) {
         TELEPHONY_LOGE("RilAdapter failed to do Create SetClir HRilRequest!");
         return;
     }
+    if (callFuncs_ == nullptr) {
+        TELEPHONY_LOGE("RilAdapter HRilCall::Dial  callFuncs_ is nullptr!");
+        free(requestInfo);
+        return;
+    }
     callFuncs_->SetClir(requestInfo, action);
+    free(requestInfo);
 }
 
 void HRilCall::GetCallRestriction(int32_t slotId, struct HdfSBuf *data)
@@ -311,11 +356,6 @@ void HRilCall::GetCallRestriction(int32_t slotId, struct HdfSBuf *data)
         return;
     }
 
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_CALL_GET_CALL_RESTRICTION);
-    if (requestInfo == nullptr || callFuncs_ == nullptr) {
-        TELEPHONY_LOGE("RilAdapter failed to do Create GetCallRestriction HRilRequest!");
-        return;
-    }
     const char *fac = NULL;
     MessageParcel *parcel = nullptr;
     if (SbufToParcel(data, &parcel)) {
@@ -328,7 +368,19 @@ void HRilCall::GetCallRestriction(int32_t slotId, struct HdfSBuf *data)
     }
     fac = parcel->ReadCString();
     TELEPHONY_LOGD("HRilCall::GetCallRestriction fac %{public}s", fac);
+
+    ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_CALL_GET_CALL_RESTRICTION);
+    if (requestInfo == nullptr) {
+        TELEPHONY_LOGE("RilAdapter failed to do Create GetCallRestriction HRilRequest!");
+        return;
+    }
+    if (callFuncs_ == nullptr) {
+        TELEPHONY_LOGE("RilAdapter HRilCall::Dial  callFuncs_ is nullptr!");
+        free(requestInfo);
+        return;
+    }
     callFuncs_->GetCallRestriction(requestInfo, fac);
+    free(requestInfo);
 }
 
 void HRilCall::SetCallRestriction(int32_t slotId, struct HdfSBuf *data)
@@ -339,12 +391,6 @@ void HRilCall::SetCallRestriction(int32_t slotId, struct HdfSBuf *data)
         return;
     }
 
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_CALL_SET_CALL_RESTRICTION);
-    if (requestInfo == nullptr || callFuncs_ == nullptr) {
-        TELEPHONY_LOGE("RilAdapter failed to do Create SetCallRestriction HRilRequest!");
-        return;
-    }
-
     int32_t mode = 0;
     if (!HdfSbufReadInt32(data, &mode)) {
         TELEPHONY_LOGE("SetCallRestriction miss mode parameter");
@@ -352,7 +398,7 @@ void HRilCall::SetCallRestriction(int32_t slotId, struct HdfSBuf *data)
     }
 
     const char *fac = NULL;
-    const char *password = nullptr;
+    const char *code = nullptr;
     MessageParcel *parcel = nullptr;
     if (SbufToParcel(data, &parcel)) {
         TELEPHONY_LOGE("SetCallRestriction failed to do SbufToParcel");
@@ -363,15 +409,21 @@ void HRilCall::SetCallRestriction(int32_t slotId, struct HdfSBuf *data)
         return;
     }
     fac = parcel->ReadCString();
-    password = parcel->ReadCString();
+    code = parcel->ReadCString();
 
-    CallRestrictionInfo info;
-    info.mode = mode;
-    info.fac = fac;
-    info.password = password;
-    password = nullptr;
+    CallRestrictionInfo info = {.fac = fac, .mode = mode, .password = code};
+    ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_CALL_SET_CALL_RESTRICTION);
+    if (requestInfo == nullptr) {
+        TELEPHONY_LOGE("RilAdapter failed to do Create SetCallRestriction HRilRequest!");
+        return;
+    }
+    if (callFuncs_ == nullptr) {
+        TELEPHONY_LOGE("RilAdapter HRilCall::Dial  callFuncs_ is nullptr!");
+        free(requestInfo);
+        return;
+    }
     callFuncs_->SetCallRestriction(requestInfo, info);
-    info.password = nullptr;
+    free(requestInfo);
 }
 
 void HRilCall::StartDtmf(int32_t slotId, struct HdfSBuf *data)
@@ -395,7 +447,7 @@ void HRilCall::StartDtmf(int32_t slotId, struct HdfSBuf *data)
         TELEPHONY_LOGE("HRilCall::StartDtmf parcel is null!");
         return;
     }
-    CallDTMFInfo info;
+    CallDTMFInfo info = {0};
     info.callId = index;
     info.dtmfKey = parcel->ReadCString();
     if (info.dtmfKey == nullptr) {
@@ -404,11 +456,17 @@ void HRilCall::StartDtmf(int32_t slotId, struct HdfSBuf *data)
     }
     TELEPHONY_LOGD("HRilCall::StartDtmf dtmfKey : %{public}s", info.dtmfKey);
     ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_CALL_START_DTMF);
-    if (requestInfo == nullptr || callFuncs_ == nullptr) {
+    if (requestInfo == nullptr) {
         TELEPHONY_LOGE("RilAdapter failed to do Create StartDtmf HRilRequest!");
         return;
     }
+    if (callFuncs_ == nullptr) {
+        TELEPHONY_LOGE("RilAdapter HRilCall::Dial  callFuncs_ is nullptr!");
+        free(requestInfo);
+        return;
+    }
     callFuncs_->StartDtmf(requestInfo, info);
+    free(requestInfo);
 }
 
 void HRilCall::SendDtmf(int32_t slotId, struct HdfSBuf *data)
@@ -447,7 +505,7 @@ void HRilCall::SendDtmf(int32_t slotId, struct HdfSBuf *data)
         TELEPHONY_LOGE("SendDtmf miss stringLength parameter");
         return;
     }
-    CallDTMFInfo info;
+    CallDTMFInfo info = {0};
     info.callId = index;
     info.onLength = onLength;
     info.offLength = offLength;
@@ -464,11 +522,17 @@ void HRilCall::SendDtmf(int32_t slotId, struct HdfSBuf *data)
 void HRilCall::ProcessSendDtmf(int32_t serial, int32_t slotId, CallDTMFInfo &info)
 {
     ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_CALL_SEND_DTMF);
-    if (requestInfo == nullptr || callFuncs_ == nullptr) {
+    if (requestInfo == nullptr) {
         TELEPHONY_LOGE("HRilCall::ProcessSendDtmf failed to do Create SendDtmf HRilRequest!");
         return;
     }
+    if (callFuncs_ == nullptr) {
+        TELEPHONY_LOGE("RilAdapter HRilCall::Dial  callFuncs_ is nullptr!");
+        free(requestInfo);
+        return;
+    }
     callFuncs_->SendDtmf(requestInfo, info);
+    free(requestInfo);
 }
 
 void HRilCall::StopDtmf(int32_t slotId, struct HdfSBuf *data)
@@ -492,7 +556,7 @@ void HRilCall::StopDtmf(int32_t slotId, struct HdfSBuf *data)
         TELEPHONY_LOGE("HRilCall::StopDtmf parcel is null!");
         return;
     }
-    CallDTMFInfo info;
+    CallDTMFInfo info = {0};
     info.callId = index;
     info.dtmfKey = parcel->ReadCString();
     if (info.dtmfKey == nullptr) {
@@ -500,11 +564,17 @@ void HRilCall::StopDtmf(int32_t slotId, struct HdfSBuf *data)
         return;
     }
     ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_CALL_STOP_DTMF);
-    if (requestInfo == nullptr || callFuncs_ == nullptr) {
+    if (requestInfo == nullptr) {
         TELEPHONY_LOGE("RilAdapter failed to do Create StopDtmf HRilRequest!");
         return;
     }
+    if (callFuncs_ == nullptr) {
+        TELEPHONY_LOGE("RilAdapter HRilCall::Dial  callFuncs_ is nullptr!");
+        free(requestInfo);
+        return;
+    }
     callFuncs_->StopDtmf(requestInfo, info);
+    free(requestInfo);
 }
 
 void HRilCall::Answer(int32_t slotId, struct HdfSBuf *data)
@@ -515,11 +585,17 @@ void HRilCall::Answer(int32_t slotId, struct HdfSBuf *data)
         return;
     }
     ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_CALL_ANSWER);
-    if (requestInfo == nullptr || callFuncs_ == nullptr) {
+    if (requestInfo == nullptr) {
         TELEPHONY_LOGE("RilAdapter failed to do Create Answer HRilRequest!");
         return;
     }
+    if (callFuncs_ == nullptr) {
+        TELEPHONY_LOGE("RilAdapter HRilCall::Dial  callFuncs_ is nullptr!");
+        free(requestInfo);
+        return;
+    }
     callFuncs_->Answer(requestInfo, nullptr, 0);
+    free(requestInfo);
 }
 
 void HRilCall::Hold(int32_t slotId, struct HdfSBuf *data)
@@ -536,9 +612,11 @@ void HRilCall::Hold(int32_t slotId, struct HdfSBuf *data)
     }
     if (callFuncs_ == nullptr) {
         TELEPHONY_LOGE("HRilCall::Hold callFuncs_ is nullptr!");
+        free(requestInfo);
         return;
     }
     callFuncs_->Hold(requestInfo);
+    free(requestInfo);
 }
 
 void HRilCall::Active(int32_t slotId, struct HdfSBuf *data)
@@ -556,9 +634,11 @@ void HRilCall::Active(int32_t slotId, struct HdfSBuf *data)
     }
     if (callFuncs_ == nullptr) {
         TELEPHONY_LOGE("HRilCall::Active callFuncs_ is nullptr!");
+        free(requestInfo);
         return;
     }
     callFuncs_->Active(requestInfo);
+    free(requestInfo);
 }
 
 void HRilCall::Swap(int32_t slotId, struct HdfSBuf *data)
@@ -569,11 +649,17 @@ void HRilCall::Swap(int32_t slotId, struct HdfSBuf *data)
         return;
     }
     ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_CALL_SWAP);
-    if (requestInfo == nullptr || callFuncs_ == nullptr) {
+    if (requestInfo == nullptr) {
         TELEPHONY_LOGE("RilAdapter failed to do Create Swap Request!");
         return;
     }
+    if (callFuncs_ == nullptr) {
+        TELEPHONY_LOGE("RilAdapter HRilCall::Dial  callFuncs_ is nullptr!");
+        free(requestInfo);
+        return;
+    }
     callFuncs_->Swap(requestInfo);
+    free(requestInfo);
 }
 
 void HRilCall::Join(int32_t slotId, struct HdfSBuf *data)
@@ -592,11 +678,17 @@ void HRilCall::Join(int32_t slotId, struct HdfSBuf *data)
     }
 
     ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_CALL_JOIN);
-    if (requestInfo == nullptr || callFuncs_ == nullptr) {
+    if (requestInfo == nullptr) {
         TELEPHONY_LOGE("RilAdapter failed to do Create Join Request!");
         return;
     }
+    if (callFuncs_ == nullptr) {
+        TELEPHONY_LOGE("RilAdapter HRilCall::Dial  callFuncs_ is nullptr!");
+        free(requestInfo);
+        return;
+    }
     callFuncs_->Join(requestInfo, callType);
+    free(requestInfo);
 }
 
 void HRilCall::Split(int32_t slotId, struct HdfSBuf *data)
@@ -621,11 +713,17 @@ void HRilCall::Split(int32_t slotId, struct HdfSBuf *data)
     }
 
     ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_CALL_SPLIT);
-    if (requestInfo == nullptr || callFuncs_ == nullptr) {
+    if (requestInfo == nullptr) {
         TELEPHONY_LOGE("RilAdapter failed to do Create Split Request!");
         return;
     }
+    if (callFuncs_ == nullptr) {
+        TELEPHONY_LOGE("RilAdapter HRilCall::Dial  callFuncs_ is nullptr!");
+        free(requestInfo);
+        return;
+    }
     callFuncs_->Split(requestInfo, nThCall, callType);
+    free(requestInfo);
 }
 
 void HRilCall::CallSupplement(int32_t slotId, struct HdfSBuf *data)
@@ -644,11 +742,17 @@ void HRilCall::CallSupplement(int32_t slotId, struct HdfSBuf *data)
     }
 
     ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_CALL_SUPPLEMENT);
-    if (requestInfo == nullptr || callFuncs_ == nullptr) {
+    if (requestInfo == nullptr) {
         TELEPHONY_LOGE("RilAdapter failed to do Create CallSupplement Request!");
         return;
     }
+    if (callFuncs_ == nullptr) {
+        TELEPHONY_LOGE("RilAdapter HRilCall::Dial  callFuncs_ is nullptr!");
+        free(requestInfo);
+        return;
+    }
     callFuncs_->CallSupplement(requestInfo, type);
+    free(requestInfo);
 }
 
 void HRilCall::GetCallWait(int32_t slotId, struct HdfSBuf *data)
@@ -666,9 +770,11 @@ void HRilCall::GetCallWait(int32_t slotId, struct HdfSBuf *data)
     }
     if (callFuncs_ == nullptr) {
         TELEPHONY_LOGE("HRilCall::GetCallWait callFuncs_ is nullptr!");
+        free(requestInfo);
         return;
     }
     callFuncs_->GetCallWait(requestInfo);
+    free(requestInfo);
 }
 
 void HRilCall::SetCallWait(int32_t slotId, struct HdfSBuf *data)
@@ -692,9 +798,11 @@ void HRilCall::SetCallWait(int32_t slotId, struct HdfSBuf *data)
     }
     if (callFuncs_ == nullptr) {
         TELEPHONY_LOGE("HRilCall::SetCallWait callFuncs_ is nullptr!");
+        free(requestInfo);
         return;
     }
     callFuncs_->SetCallWait(requestInfo, operating);
+    free(requestInfo);
 }
 
 void HRilCall::GetCallForward(int32_t slotId, struct HdfSBuf *data)
@@ -718,9 +826,11 @@ void HRilCall::GetCallForward(int32_t slotId, struct HdfSBuf *data)
     }
     if (callFuncs_ == nullptr) {
         TELEPHONY_LOGE("HRilCall::GetCallForward callFuncs_ is nullptr!");
+        free(requestInfo);
         return;
     }
     callFuncs_->GetCallForwarding(requestInfo, reason);
+    free(requestInfo);
 }
 
 void HRilCall::SetCallForward(int32_t slotId, struct HdfSBuf *data)
@@ -750,6 +860,7 @@ void HRilCall::SetCallForward(int32_t slotId, struct HdfSBuf *data)
 
     if (!ConvertToString(&cFInfo.number, callForwardSetInfo.number, requestInfo)) {
         TELEPHONY_LOGE("RilAdapter failed to do ConvertToString!");
+        free(requestInfo);
         return;
     }
     cFInfo.reason = callForwardSetInfo.reason;
@@ -758,10 +869,12 @@ void HRilCall::SetCallForward(int32_t slotId, struct HdfSBuf *data)
     if (callFuncs_ == nullptr) {
         TELEPHONY_LOGE("HRilCall::SetCallForward callFuncs_ is nullptr!");
         FreeStrings(NUM_POINTERS, cFInfo.number);
+        free(requestInfo);
         return;
     }
     callFuncs_->SetCallForwarding(requestInfo, cFInfo);
     FreeStrings(NUM_POINTERS, cFInfo.number);
+    free(requestInfo);
 }
 
 void HRilCall::BuildCallList(
@@ -929,7 +1042,7 @@ int32_t HRilCall::GetCallForwardResponse(int32_t slotId, int32_t requestNum, HRi
     cFQueryResult.status = pCFQueryInfo->status;
     cFQueryResult.classx = pCFQueryInfo->classx;
     cFQueryResult.type = pCFQueryInfo->type;
-    cFQueryResult.number = std::string(pCFQueryInfo->number);
+    cFQueryResult.number = pCFQueryInfo->number == nullptr ? "" : pCFQueryInfo->number;
     return ResponseMessageParcel(responseInfo, cFQueryResult, requestNum);
 }
 

@@ -14,7 +14,9 @@
  */
 
 #include "at_sim.h"
+
 #include "vendor_adapter.h"
+#include "vendor_report.h"
 
 static int GetSimType(void)
 {
@@ -204,10 +206,7 @@ void ReqGetSimIO(const ReqDataInfo *requestInfo, const HRilSimIO *data, size_t d
     struct ReportInfo reportInfo;
     (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
 
-    TELEPHONY_LOGD("enter to [%{public}s]:%{public}d  %{public}zu", __func__, __LINE__, dataLen);
-
     pSim = (HRilSimIO *)data;
-
     asprintf(&cmd, "AT+CRSM=%d,%d,%d,%d,%d,%s,\"%s\"", pSim->command, pSim->fileid, pSim->p1, pSim->p2, pSim->p3,
         (pSim->data == NULL ? "" : pSim->data), pSim->pathid);
     ret = SendCommandLock(cmd, "+CRSM", 0, &pResponse);
@@ -248,8 +247,6 @@ void ReqGetSimImsi(const ReqDataInfo *requestInfo)
     struct ReportInfo reportInfo;
     (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
     char *result = NULL;
-
-    TELEPHONY_LOGD("enter to [%{public}s]:%{public}d", __func__, __LINE__);
     ret = SendCommandLock("AT+CIMI", NULL, 0, &pResponse);
     if (ret != 0 || !pResponse->success) {
         TELEPHONY_LOGE("AT+CIMI send failed");
@@ -285,8 +282,6 @@ void ReqGetSimIccID(const ReqDataInfo *requestInfo)
     char *iccId = NULL;
     struct ReportInfo reportInfo;
     (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
-
-    TELEPHONY_LOGD("enter to [%{public}s]:%{public}d", __func__, __LINE__);
     ret = SendCommandLock("AT+ICCID", "+ICCID", 0, &pResponse);
     if (ret != 0 || !pResponse->success) {
         TELEPHONY_LOGE("AT+ICCID send failed");
@@ -521,8 +516,6 @@ void ReqGetSimPinInputTimes(const ReqDataInfo *requestInfo)
     ResponseInfo *pResponse = NULL;
     struct ReportInfo reportInfo;
     (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
-
-    TELEPHONY_LOGD("enter to [%{public}s]:%{public}d", __func__, __LINE__);
     (void)memset_s(&pinInputTimes, sizeof(pinInputTimes), 0, sizeof(pinInputTimes));
     ret = SendCommandLock("AT^CPIN?", "^CPIN", 0, &pResponse);
     if (ret != 0 || !pResponse->success) {

@@ -15,6 +15,18 @@
 
 #include "vendor_adapter.h"
 
+#include <fcntl.h>
+#include <termios.h>
+
+#include "at_call.h"
+#include "at_data.h"
+#include "at_modem.h"
+#include "at_network.h"
+#include "at_sim.h"
+#include "at_sms.h"
+#include "at_support.h"
+#include "vendor_report.h"
+
 #define DEVICE_PATH "/dev/ttyUSB1"
 #define DEVICE_PATH_DEFAULT "/dev/ttyUSB"
 

@@ -14,13 +14,6 @@
  */
 
 #include "hril_call_parcel.h"
-#include <memory>
-#include <string>
-#include "osal_mem.h"
-#include "hdf_base.h"
-#include "hdf_device_desc.h"
-#include "hdf_load_hdi.h"
-#include "hdf_remote_service.h"
 #include "hril_modem_parcel.h"
 
 namespace OHOS {

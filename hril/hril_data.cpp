@@ -14,7 +14,6 @@
  */
 
 #include "hril_data.h"
-#include "hril_data_parcel.h"
 
 namespace OHOS {
 namespace Telephony {

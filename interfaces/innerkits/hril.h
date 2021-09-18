@@ -532,6 +532,12 @@ typedef struct {
     int pin2Times;
 } HRilPinInputTimes;
 
+typedef struct {
+    int serial;
+    int selectMode;
+    char *oper;
+} HRiSetNetworkModeInfo;
+
 struct HRilReport {
     void (*OnCallReport)(struct ReportInfo reportInfo, const void *data, size_t dataLen);
     void (*OnDataReport)(struct ReportInfo reportInfo, const void *data, size_t dataLen);
@@ -585,7 +591,7 @@ typedef struct {
     void (*GetOperatorInfo)(const ReqDataInfo *requestInfo);
     void (*GetNetworkSearchInformation)(const ReqDataInfo *requestInfo);
     void (*GetNetworkSelectionMode)(const ReqDataInfo *requestInfo);
-    void (*SetNetworkSelectionMode)(const ReqDataInfo *requestInfo, void *data);
+    void (*SetNetworkSelectionMode)(const ReqDataInfo *requestInfo, const HRiSetNetworkModeInfo *data);
 } HRilNetworkReq;
 
 typedef struct {
@@ -694,12 +700,6 @@ typedef struct {
     int status;
     int rat;
 } AvailableOperInfo;
-
-typedef struct {
-    int serial;
-    int selectMode;
-    char *oper;
-} HRiSetNetworkModeInfo;
 
 const HRilOps *RilInitOps(const struct HRilReport *g_ReportOps);
 #endif // OHOS_HRIL_H

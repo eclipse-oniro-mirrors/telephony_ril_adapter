@@ -45,6 +45,10 @@ int32_t RilManagerTest::SendInt32Event(int32_t dispatchId, int32_t value)
 int32_t RilManagerTest::SendStringEvent(int32_t dispatchId, const char *value)
 {
     int32_t status = 0;
+    if (value == nullptr) {
+        TELEPHONY_LOGE("value is nullptr");
+        return status;
+    }
     if (cellularRadio_ != nullptr) {
         OHOS::MessageParcel data;
         OHOS::MessageParcel reply;

@@ -14,6 +14,8 @@
  */
 
 #include "vendor_report.h"
+
+#include "at_sms.h"
 #include "vendor_adapter.h"
 
 extern const struct HRilReport *g_reportOps;

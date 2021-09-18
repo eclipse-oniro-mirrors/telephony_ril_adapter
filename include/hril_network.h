@@ -68,7 +68,7 @@ public:
         int32_t slotId, int32_t indType, HRilErrno e, const void *response, size_t responseLen);
     int32_t SignalStrengthUpdated(
         int32_t slotId, int32_t indType, HRilErrno e, const void *response, size_t responseLen);
-    void BuildOperList(AvailableNetworkList &availableNetworkList, HRilRadioResponseInfo &responseInfo,
+    void BuildOperatorList(AvailableNetworkList &availableNetworkList, HRilRadioResponseInfo &responseInfo,
         const void *response, size_t responseLen);
     bool IsNetworkResponse(uint32_t code);
 

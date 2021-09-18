@@ -14,14 +14,15 @@
  */
 
 #include "at_modem.h"
+#include "vendor_util.h"
+#include "vendor_report.h"
+#include "vendor_adapter.h"
 
 void ReqSetRadioStatus(const ReqDataInfo *requestInfo, int function, int reset)
 {
     int ret = -1;
     struct ReportInfo reportInfo;
     (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
-
-    TELEPHONY_LOGD("enter to [%{public}s]:%{public}d", __func__, __LINE__);
 
     ret = SetRadioState(function, reset);
     if (ret != 0) {
@@ -51,8 +52,6 @@ void ReqGetRadioStatus(const ReqDataInfo *requestInfo)
     ResponseInfo *pResponse = NULL;
     struct ReportInfo reportInfo;
     (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
-
-    TELEPHONY_LOGD("enter to [%{public}s]:%{public}d", __func__, __LINE__);
 
     ret = SendCommandLock("AT+CFUN?", "+CFUN", timeOut, &pResponse);
     if (ret != 0 || !pResponse->success) {

@@ -14,7 +14,12 @@
  */
 
 #include "at_network.h"
+
+#include <signal.h>
+
 #include "vendor_adapter.h"
+#include "vendor_report.h"
+#include "vendor_util.h"
 
 static struct ReportInfo g_reportInfoForOperListToUse;
 
@@ -183,7 +188,6 @@ void ReqGetCsRegStatus(const ReqDataInfo *requestInfo)
     char *response[MAX_REG_INFO_ITEM] = {""};
     const long TIME_OUT = DEFAULT_TIMEOUT;
 
-    TELEPHONY_LOGD("ReqGetCsRegStatus enter");
     ret = SendCommandLock("AT+CREG?", "+CREG:", TIME_OUT, &responseInfo);
     if (responseInfo == NULL) {
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_NULL_POINT, HRIL_RESPONSE, 0);
@@ -228,7 +232,6 @@ void ReqGetPsRegStatus(const ReqDataInfo *requestInfo)
     char *response[MAX_REG_INFO_ITEM] = {""};
     const long TIME_OUT = DEFAULT_TIMEOUT;
 
-    TELEPHONY_LOGD("ReqGetPsRegStatus enter");
     ret = SendCommandLock("AT+CGREG?", "+CGREG:", TIME_OUT, &responseInfo);
     if (responseInfo == NULL) {
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_NULL_POINT, HRIL_RESPONSE, 0);
@@ -282,6 +285,7 @@ void ReqGetOperatorInfo(const ReqDataInfo *requestInfo)
     }
     if (ret != 0 || !responseInfo->success) {
         err = GetResponseErrorCode(responseInfo);
+        TELEPHONY_LOGE("send AT CMD failed!");
     }
     for (i = 0, pLine = responseInfo->head; pLine != NULL; i++, pLine = pLine->next) {
         int skip;
@@ -501,7 +505,25 @@ ERROR:
     return HRIL_ERR_GENERIC_FAILURE;
 }
 
-void RequestSetAutomaticModeForNetworks(const ReqDataInfo *requestInfo, void *data)
+static bool PrepareSetNetworkSelectionMode(char **cmd, const HRiSetNetworkModeInfo *setModeInfo)
+{
+    bool ret = true;
+    TELEPHONY_LOGD("setModeInfo, serial123 = %{public}d", setModeInfo->selectMode);
+    if (setModeInfo->selectMode == 0) {
+        asprintf(cmd, "%s", "AT+COPS=0");
+    } else if (setModeInfo->selectMode == 1) {
+        if (setModeInfo->oper == NULL) {
+            ret = false;
+        } else {
+            asprintf(cmd, "AT+COPS=1,2,%s", setModeInfo->oper);
+        }
+    } else {
+        ret = false;
+    }
+    return ret;
+}
+
+void RequestSetAutomaticModeForNetworks(const ReqDataInfo *requestInfo, const HRiSetNetworkModeInfo *data)
 {
     int err = HRIL_ERR_SUCCESS;
     ResponseInfo *responseInfo = NULL;
@@ -515,12 +537,7 @@ void RequestSetAutomaticModeForNetworks(const ReqDataInfo *requestInfo, void *da
         TELEPHONY_LOGE("SetAutomaticMode HRIL_ERR_NULL_POINT");
         return;
     }
-    TELEPHONY_LOGD("setModeInfo, serial123 = %{public}d", setModeInfo->selectMode);
-    if (setModeInfo->selectMode == 0) {
-        asprintf(&cmd, "%s", "AT+COPS=0");
-    } else if (setModeInfo->selectMode == 1) {
-        asprintf(&cmd, "AT+COPS=1,2,%s", setModeInfo->oper);
-    } else {
+    if (!PrepareSetNetworkSelectionMode(&cmd, setModeInfo)) {
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_PARAMETER, HRIL_RESPONSE, 0);
         OnNetworkReport(reportInfo, NULL, 1);
         TELEPHONY_LOGE("SetAutomaticMode HRIL_ERR_INVALID_PARAMETER");

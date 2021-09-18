@@ -15,9 +15,8 @@
 
 #ifndef OHOS_AT_NETWORK_H
 #define OHOS_AT_NETWORK_H
-#include "hril.h"
 
-#include <signal.h>
+#include "hril.h"
 
 #define MAX_REG_INFO_ITEM 5
 #undef DEFAULT_TIMEOUT
@@ -29,7 +28,7 @@ void ReqGetPsRegStatus(const ReqDataInfo *requestInfo);
 void ReqGetOperatorInfo(const ReqDataInfo *requestInfo);
 void RequestGetNetworkSearchInformation(const ReqDataInfo *requestInfo);
 void RequestQueryNetworkSelectionMode(const ReqDataInfo *requestInfo);
-void RequestSetAutomaticModeForNetworks(const ReqDataInfo *requestInfo, void *data);
+void RequestSetAutomaticModeForNetworks(const ReqDataInfo *requestInfo, const HRiSetNetworkModeInfo *data);
 int ProcessRegStatus(char *s, char **response, int count);
 int ProcessParamSignalStrength(char *result, HRilRssi *hrilRssi);
 int ProcessOperListToUse(char *list);
