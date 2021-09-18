@@ -237,7 +237,6 @@ void HRilNetwork::GetNetworkSearchInformation(int32_t slotId, struct HdfSBuf *da
         return;
     }
     networkFuncs_->GetNetworkSearchInformation(requestInfo);
-    free(requestInfo);
 }
 
 void HRilNetwork::GetNetworkSelectionMode(int32_t slotId, struct HdfSBuf *data)
@@ -315,6 +314,7 @@ void HRilNetwork::SetNetworkLocationUpdate(int32_t slotId, struct HdfSBuf *data)
         return;
     }
     networkFuncs_->GetCsRegStatus(requestInfo);
+    free(requestInfo);
 }
 
 int32_t HRilNetwork::GetOperatorInfoResponse(int32_t slotId, int32_t requestNum,
@@ -435,7 +435,7 @@ void HRilNetwork::GetPsRegStatus(int32_t slotId, struct HdfSBuf *data)
         return;
     }
     if (networkFuncs_ == nullptr) {
-        TELEPHONY_LOGE("GetNetworkSearchInformation::networkFuncs_ is nullptr");
+        TELEPHONY_LOGE("GetPsRegStatus::networkFuncs_ is nullptr");
         free(requestInfo);
         return;
     }
@@ -503,16 +503,18 @@ void HRilNetwork::BuildOperatorList(AvailableNetworkList &availableNetworkList,
         TELEPHONY_LOGD("availableNetworkList.itemNum: %{public}d", numStrings);
         for (int32_t i = 0; i < numStrings; i++) {
             AvailableOperInfo *curPtr = ((AvailableOperInfo **)response)[i];
-            operInfo.status = curPtr->status;
-            TELEPHONY_LOGD("operInfo.status:%{public}d", curPtr->status);
-            operInfo.longName = curPtr->longName;
-            TELEPHONY_LOGD("operInfo.longName:%{public}s", curPtr->longName);
-            operInfo.numeric = curPtr->numeric;
-            TELEPHONY_LOGD("operInfo.numeric:%{public}s", curPtr->numeric);
-            operInfo.shortName = curPtr->shortName;
-            TELEPHONY_LOGD("operInfo.shortName:%{public}s", curPtr->shortName);
-            operInfo.rat = curPtr->rat;
-            TELEPHONY_LOGD("operInfo.rat:%{public}d", curPtr->rat);
+            if (curPtr != nullptr) {
+                operInfo.status = curPtr->status;
+                TELEPHONY_LOGD("operInfo.status:%{public}d", curPtr->status);
+                operInfo.longName = curPtr->longName;
+                TELEPHONY_LOGD("operInfo.longName:%{public}s", curPtr->longName);
+                operInfo.numeric = curPtr->numeric;
+                TELEPHONY_LOGD("operInfo.numeric:%{public}s", curPtr->numeric);
+                operInfo.shortName = curPtr->shortName;
+                TELEPHONY_LOGD("operInfo.shortName:%{public}s", curPtr->shortName);
+                operInfo.rat = curPtr->rat;
+                TELEPHONY_LOGD("operInfo.rat:%{public}d", curPtr->rat);
+            }
             availableNetworkList.availableNetworkInfo.push_back(operInfo);
         }
     }

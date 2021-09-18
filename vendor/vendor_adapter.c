@@ -255,6 +255,7 @@ static int ModemInit(void)
 
 static void *EventListeners(void *param)
 {
+    const int RETRY_TIMEOUT_SEC = 60;
     int ret = -1;
     const char *devicePath = DEVICE_PATH;
     AtSetOnUnusual(AtOnUnusual);
@@ -272,7 +273,7 @@ static void *EventListeners(void *param)
             }
             if (g_fd < 0) {
                 TELEPHONY_LOGE("ril vendorlib,opening AT interface. retrying...");
-                sleep(10);
+                sleep(RETRY_TIMEOUT_SEC);
             }
         }
         g_atStatus = 0;
