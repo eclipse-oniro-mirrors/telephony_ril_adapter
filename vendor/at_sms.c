@@ -14,7 +14,8 @@
  */
 
 #include "at_sms.h"
-#include "vendor_adapter.h"
+#include "vendor_util.h"
+#include "vendor_report.h"
 
 int ProcessCellBroadcast(char *s, HRilCellBroadcastReportInfo *response)
 {
@@ -70,13 +71,13 @@ void ReqSendSms(ReqDataInfo *requestInfo, const void *data, size_t dataLen)
     char *cmd = NULL;
     char *smsPdu = NULL;
     char *result = NULL;
+    const int RESPONSE_SUCCESS = 1;
+    const int RESPONSE_FAIL = -2;
     struct ReportInfo reportInfo;
     (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
     ResponseInfo *responseInfo = NULL;
     HRilSmsResponse response;
     (void)memset_s(&response, sizeof(HRilSmsResponse), 0, sizeof(HRilSmsResponse));
-    TELEPHONY_LOGD("%{public}s enter", __func__);
-
     smsc = ((char **)data)[0];
     if (smsc == NULL) {
         asprintf(&smsc, "00");
@@ -103,14 +104,14 @@ void ReqSendSms(ReqDataInfo *requestInfo, const void *data, size_t dataLen)
         }
         TELEPHONY_LOGD("%{public}s enter, msgRef:%{public}d", __func__, response.msgRef);
     } else {
-        response.msgRef = 1;
+        response.msgRef = RESPONSE_SUCCESS;
     }
     reportInfo = CreateReportInfo(requestInfo, VENDOR_SUCCESS, HRIL_RESPONSE, 0);
     OnSmsReport(reportInfo, &response, sizeof(HRilSmsResponse));
     FreeResponseInfo(responseInfo);
     return;
 ERROR:
-    response.msgRef = -2;
+    response.msgRef = RESPONSE_FAIL;
     reportInfo = CreateReportInfo(requestInfo, AT_ERR_GENERIC, HRIL_RESPONSE, 0);
     OnSmsReport(reportInfo, &response, sizeof(HRilSmsResponse));
     FreeResponseInfo(responseInfo);
@@ -119,7 +120,6 @@ ERROR:
 
 void ReqSendSmsAck(ReqDataInfo *requestInfo, const void *data, size_t dataLen)
 {
-    TELEPHONY_LOGD("%{public}s enter", __func__);
     int ackFlag;
     int err;
     ackFlag = ((int *)data)[0];
@@ -150,8 +150,6 @@ void ReqStorageSms(ReqDataInfo *requestInfo, const void *data, size_t dataLen)
     struct ReportInfo reportInfo;
     (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
     ResponseInfo *responseInfo = NULL;
-    TELEPHONY_LOGD("%{public}s enter", __func__);
-
     msg = ((HRilSmsWriteSms *)data);
     TELEPHONY_LOGD("%{public}s enter, pdu:%{public}s, smsc:%{public}s, status:%{public}d", __func__, msg->pdu,
         msg->smsc, msg->state);
@@ -187,7 +185,6 @@ void ReqDeleteSms(ReqDataInfo *requestInfo, const void *data, size_t dataLen)
     struct ReportInfo reportInfo;
     (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
     ResponseInfo *responseInfo = NULL;
-    TELEPHONY_LOGD("%{public}s enter", __func__);
     if (data == NULL) {
         err = HRIL_ERR_GENERIC_FAILURE;
         goto ERROR;
@@ -221,22 +218,11 @@ void ReqUpdateSms(ReqDataInfo *requestInfo, const void *data, size_t dataLen)
     struct ReportInfo reportInfo;
     (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
     ResponseInfo *responseInfo = NULL;
-    TELEPHONY_LOGD("%{public}s enter", __func__);
     if (data == NULL) {
         err = HRIL_ERR_GENERIC_FAILURE;
         goto ERROR;
     }
     msg = ((HRilSmsWriteSms *)data);
-    TELEPHONY_LOGD("%{public}s enter, pdu:%{public}s, state:%{public}d", __func__, msg->pdu, msg->state);
-
-    asprintf(&cmd, "AT+CMGD=%d", msg->index);
-
-    err = SendCommandLock(cmd, "+CMGD:", 0, &responseInfo);
-    free(cmd);
-    cmd = NULL;
-    if (err != 0 || !responseInfo->success) {
-        goto ERROR;
-    }
 
     asprintf(&cmd, "AT+CMGW=%zu,%d", strlen(msg->pdu) / 2, msg->state);
     asprintf(&smsPdu, "%s", msg->pdu);
@@ -244,6 +230,16 @@ void ReqUpdateSms(ReqDataInfo *requestInfo, const void *data, size_t dataLen)
     err = SendCommandSmsLock(cmd, smsPdu, "+CMGW:", 0, &responseInfo);
     free(cmd);
     free(smsPdu);
+    cmd = NULL;
+    smsPdu = NULL;
+    if (err != 0 || !responseInfo->success) {
+        err = HRIL_ERR_GENERIC_FAILURE;
+        goto ERROR;
+    }
+    asprintf(&cmd, "AT+CMGD=%d", msg->index);
+    err = SendCommandLock(cmd, "+CMGD:", 0, &responseInfo);
+    free(cmd);
+    cmd = NULL;
     if (err != 0 || !responseInfo->success) {
         goto ERROR;
     }
@@ -266,7 +262,6 @@ void ReqSetSmsCenterAddress(ReqDataInfo *requestInfo, const void *data, size_t d
     struct ReportInfo reportInfo;
     (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
     ResponseInfo *responseInfo = NULL;
-    TELEPHONY_LOGD("%{public}s enter", __func__);
     if (data == NULL) {
         err = HRIL_ERR_GENERIC_FAILURE;
         goto ERROR;
@@ -303,7 +298,6 @@ void ReqGetSmsCenterAddress(ReqDataInfo *requestInfo, const void *data, size_t d
     struct ReportInfo reportInfo;
     (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
     ResponseInfo *responseInfo = NULL;
-    TELEPHONY_LOGD("%{public}s enter", __func__);
     err = SendCommandLock("AT+CSCA?", "+CSCA:", 0, &responseInfo);
     if (err != 0 || !responseInfo->success) {
         goto ERROR;
@@ -343,7 +337,6 @@ void ReqSetCellBroadcast(ReqDataInfo *requestInfo, const void *data, size_t data
     struct ReportInfo reportInfo;
     (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
     ResponseInfo *responseInfo = NULL;
-    TELEPHONY_LOGD("%{public}s enter", __func__);
     if (data == NULL) {
         err = HRIL_ERR_GENERIC_FAILURE;
         goto ERROR;

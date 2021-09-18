@@ -17,6 +17,7 @@
 
 #include "hril_hdf.h"
 #include <pthread.h>
+#include "dfx_signal_handler.h"
 #include "telephony_log_c.h"
 
 #define RIL_LIB_PATH "/system/lib/libril_vendor.z.so"
@@ -53,7 +54,7 @@ static int32_t RilAdapterDispatch(
     static pthread_mutex_t dispatchMutex = PTHREAD_MUTEX_INITIALIZER;
     pthread_mutex_lock(&dispatchMutex);
     TELEPHONY_LOGD("RilAdapterDispatch cmd:%{public}d", cmd);
-    ret = DispatchRequest(0, client, cmd, data, reply);
+    ret = DispatchRequest(0, cmd, data);
     pthread_mutex_unlock(&dispatchMutex);
     return ret;
 }
@@ -79,6 +80,7 @@ static int32_t RilAdapterInit(struct HdfDeviceObject *device)
     if (device == NULL) {
         return HDF_ERR_INVALID_OBJECT;
     }
+    DFX_InstallSignalHandler();
     struct HdfSBuf *sbuf = HdfSBufTypedObtain(SBUF_IPC);
     if (sbuf == NULL) {
         TELEPHONY_LOGE("HdfSampleDriverBind, failed to obtain ipc sbuf");
@@ -89,11 +91,11 @@ static int32_t RilAdapterInit(struct HdfDeviceObject *device)
         HdfSBufRecycle(sbuf);
         return HDF_FAILURE;
     }
-    TELEPHONY_LOGD("sbuf IPC obtain test success!");
-    LoadVendor();
     if (sbuf != NULL) {
         HdfSBufRecycle(sbuf);
     }
+    TELEPHONY_LOGD("sbuf IPC obtain test success!");
+    LoadVendor();
     return HDF_SUCCESS;
 }
 

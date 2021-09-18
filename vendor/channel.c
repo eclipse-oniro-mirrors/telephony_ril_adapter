@@ -78,7 +78,6 @@ const char *ReadResponse(int atFd)
     char *processed = NULL;
     char *endEol = NULL;
     char *ret = NULL;
-    TELEPHONY_LOGD("%{public}s enter", __func__);
     // process last response data
     endEol = ProcessLastResponse(&processed);
     while (endEol == NULL) {
@@ -112,7 +111,7 @@ const char *ReadResponse(int atFd)
 
 int WriteATCommand(const char *s, int isPdu, int atFd)
 {
-    TELEPHONY_LOGD("%{public}s enter, cmd:%{public}s", __func__, s);
+    TELEPHONY_LOGD("cmd:%{public}s", s);
     ssize_t ret;
     size_t i = 0;
     size_t len = strlen(s);

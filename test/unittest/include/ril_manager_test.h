@@ -17,15 +17,17 @@
 #define OHOS_RIL_MANAGER_TEST_H
 
 #include <iservmgr_hdi.h>
+
 #include "event_runner.h"
+
 #include "hril_call_parcel.h"
 #include "hril_data_parcel.h"
 #include "hril_modem_parcel.h"
 #include "hril_network_parcel.h"
 #include "hril_sim_parcel.h"
 #include "hril_sms_parcel.h"
-#include "ril_radio_indication_test.h"
 #include "ril_data_profile_test.h"
+#include "ril_radio_indication_test.h"
 
 #define SAMPLE_WRITE_READ 123
 namespace OHOS {
@@ -129,14 +131,9 @@ public:
     static std::atomic_int nextSerialId_;
     static std::unordered_map<int32_t, std::shared_ptr<HRilRequestTest>> requestMap_;
 
-protected:
-    int32_t mPreferredNetworkType_;
-    int32_t mPhoneType_;
-
 private:
     std::shared_ptr<HRilRequestTest> CreateRequest(int request, const AppExecFwk::InnerEvent::Pointer &result);
 
-    std::mutex requestMutex_;
     static constexpr const char *RIL_ADAPTER_SERVICE_NAME = "cellular_radio1";
     static constexpr int PAYLOAD_NUM = 1234;
 };

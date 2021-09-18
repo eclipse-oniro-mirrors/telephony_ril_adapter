@@ -16,9 +16,10 @@
 #ifndef OHOS_VENDOR_UTIL_H
 #define OHOS_VENDOR_UTIL_H
 
-#include <time.h>
 #include <sys/time.h>
+#include <time.h>
 #include <securec.h>
+
 #include "telephony_log_c.h"
 
 #define MAX_RESPONSE_LEN (8 * 1024)

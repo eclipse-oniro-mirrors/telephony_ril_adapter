@@ -16,8 +16,6 @@
 #ifndef OHOS_AT_SIM_H
 #define OHOS_AT_SIM_H
 
-#include <memory.h>
-#include <string.h>
 #include "hril.h"
 
 void ReqGetSimStatus(const ReqDataInfo *requestInfo);

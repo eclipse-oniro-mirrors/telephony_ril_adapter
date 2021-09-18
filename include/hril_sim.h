@@ -24,6 +24,7 @@ namespace Telephony {
 class HRilSim : public HRilBase {
 public:
     HRilSim();
+    ~HRilSim() = default;
     void ProcessSimResponse(int32_t slotId, int32_t code, HRilRadioResponseInfo &responseInfo,
         const void *response, size_t responseLen);
     void ProcessSimRequest(int32_t slotId, int32_t code, struct HdfSBuf *data);

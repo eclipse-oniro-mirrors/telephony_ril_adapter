@@ -30,7 +30,8 @@ int32_t HRilBase::AtoiNullHandleDef(const char *ch, int32_t defaultVal)
 void HRilBase::SendErrorResponse(ReqDataInfo *requestInfo, HRilErrno err)
 {
     if (requestInfo != nullptr) {
-        TELEPHONY_LOGD("SendErrorResponse");
+        TELEPHONY_LOGE("req: [%{public}d,%{public}d,%{public}d], error response: %{public}d", requestInfo->serial,
+            (int32_t)requestInfo->simId, requestInfo->request, err);
     }
 }
 
@@ -112,7 +113,12 @@ uint8_t *HRilBase::ConvertHexStringToBytes(const void *response, size_t length)
     const int32_t SIZE_VALUE = 2;
     const int32_t BIT_NUM = 4;
 
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null!!!");
+        return nullptr;
+    }
     if (length % SIZE_VALUE != 0 || length / SIZE_VALUE <= 0) {
+        TELEPHONY_LOGE("invalid length: %{public}zu", length);
         return nullptr;
     }
     uint8_t *bytes = (uint8_t *)calloc(length / SIZE_VALUE, sizeof(uint8_t));
@@ -120,10 +126,7 @@ uint8_t *HRilBase::ConvertHexStringToBytes(const void *response, size_t length)
         TELEPHONY_LOGE("ConvertHexStringToBytes: cannot allocate memory for bytes string");
         return nullptr;
     }
-    if (response == nullptr) {
-        TELEPHONY_LOGE("response is null!!!");
-        return nullptr;
-    }
+
     uint8_t *hexStr = (uint8_t *)response;
     size_t i = 0;
     while (i < length) {

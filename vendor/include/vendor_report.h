@@ -18,10 +18,11 @@
 
 #include <stddef.h>
 #include <string.h>
-#include "hril.h"
-#include "vendor_util.h"
+
 #include "at_data.h"
 #include "at_network.h"
+#include "hril.h"
+#include "vendor_util.h"
 
 struct ReportInfo CreateReportInfo(
     const ReqDataInfo *requestInfo, unsigned int err, unsigned int type, int notifyId);

@@ -39,7 +39,7 @@ const char *GetRequestStringInfo(int32_t request)
 
 void DispatchModule(int32_t slotId, int32_t cmd, const struct HdfSBuf *data)
 {
-    struct HdfSBuf *dataInfo = (struct HdfSBuf *)data;
+    struct HdfSBuf *dataInfo = const_cast<struct HdfSBuf *>(data);
     int32_t ret = g_manager->Dispatch(slotId, cmd, dataInfo);
     if (ret != HDF_SUCCESS) {
         TELEPHONY_LOGE("HRilManager::Dispatch is failed!");
@@ -56,8 +56,7 @@ void RegisterManagerResponseCallback(HdfRemoteService *serviceCallbackInd)
     g_manager->RegisterModulesResponseCallback(serviceCallbackInd);
 }
 
-extern "C" int32_t DispatchRequest(int32_t slotId, const struct HdfDeviceIoClient *client, int32_t cmd,
-    struct HdfSBuf *data, const struct HdfSBuf *reply)
+extern "C" int32_t DispatchRequest(int32_t slotId, int32_t cmd, struct HdfSBuf *data)
 
 {
     if (data == nullptr) {

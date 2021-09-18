@@ -91,7 +91,6 @@ void HRilSms::SendSms(int32_t slotId, struct HdfSBuf *data)
     struct GsmSmsMessageInfo message;
     MessageParcel *parcel = nullptr;
     const int32_t COUNT_STRINGS_VALUE = 2;
-    TELEPHONY_LOGD("SendSms");
     if (SbufToParcel(data, &parcel)) {
         TELEPHONY_LOGE("RilAdapter failed to do SbufToParcel");
         return;
@@ -115,12 +114,8 @@ void HRilSms::StorageSms(int32_t slotId, struct HdfSBuf *data)
     int len1 = 0;
     int len2 = 0;
     MessageParcel *parcel = nullptr;
-    if (SbufToParcel(data, &parcel)) {
-        TELEPHONY_LOGE("RilAdapter failed to do SbufToParcel");
-        return;
-    }
-    if (parcel == nullptr) {
-        TELEPHONY_LOGE("parcel int StorageSms is nullptr!");
+    if (SbufToParcel(data, &parcel) || parcel == nullptr) {
+        TELEPHONY_LOGE("RilAdapter failed to do SbufToParcel parcel=%{public}p", parcel);
         return;
     }
     if (!message.ReadFromParcel(*parcel)) {
@@ -167,7 +162,7 @@ void HRilSms::StorageSms(int32_t slotId, struct HdfSBuf *data)
 
 void HRilSms::DeleteSms(int32_t slotId, struct HdfSBuf *data)
 {
-    int32_t *p = nullptr;
+    int32_t *pBuff = nullptr;
     int32_t index = 0;
     int32_t serial = 0;
     if (!HdfSbufReadInt32(data, &serial)) {
@@ -182,18 +177,18 @@ void HRilSms::DeleteSms(int32_t slotId, struct HdfSBuf *data)
     if (requestInfo == nullptr) {
         return;
     }
-    RequestWithInts(&p, requestInfo, 1, index);
+    RequestWithInts(&pBuff, requestInfo, 1, index);
     if (smsFuncs_ == nullptr) {
         TELEPHONY_LOGE("smsFuncs_ is nullptr!");
-        if (p != nullptr) {
-            free(p);
+        if (pBuff != nullptr) {
+            free(pBuff);
         }
         free(requestInfo);
         return;
     }
-    smsFuncs_->DeleteSms(requestInfo, p, sizeof(int32_t *));
-    if (p != nullptr) {
-        free(p);
+    smsFuncs_->DeleteSms(requestInfo, pBuff, sizeof(int32_t *));
+    if (pBuff != nullptr) {
+        free(pBuff);
     }
     free(requestInfo);
 }
@@ -204,7 +199,6 @@ void HRilSms::UpdateSms(int32_t slotId, struct HdfSBuf *data)
     HRilSmsWriteSms msg;
     int len = 0;
     MessageParcel *parcel = nullptr;
-    TELEPHONY_LOGD("UpdateSms");
     if (SbufToParcel(data, &parcel)) {
         TELEPHONY_LOGE("RilAdapter failed to do SbufToParcel");
         return;
@@ -340,13 +334,8 @@ void HRilSms::SetCellBroadcast(int32_t slotId, struct HdfSBuf *data)
     int len1 = 0;
     int len2 = 0;
     MessageParcel *parcel = nullptr;
-    TELEPHONY_LOGD("SetCellBroadcast");
-    if (SbufToParcel(data, &parcel)) {
-        TELEPHONY_LOGE("RilAdapter failed to do SbufToParcel");
-        return;
-    }
-    if (parcel == nullptr) {
-        TELEPHONY_LOGE("parcel in SetCellBroadcast is nullptr!");
+    if (SbufToParcel(data, &parcel) || parcel == nullptr) {
+        TELEPHONY_LOGE("RilAdapter failed to do SbufToParcel parcel=%{public}p", parcel);
         return;
     }
     if (!broadcastInfo.ReadFromParcel(*parcel)) {
@@ -382,6 +371,7 @@ void HRilSms::SetCellBroadcast(int32_t slotId, struct HdfSBuf *data)
         TELEPHONY_LOGE("smsFuncs_ is nullptr!");
         free(cellBroadcastInfo.mids);
         free(cellBroadcastInfo.dcss);
+        free(requestInfo);
         return;
     }
     smsFuncs_->SetCellBroadcast(requestInfo, &cellBroadcastInfo, sizeof(HRilServiceCenterAddress));
@@ -402,14 +392,13 @@ bool HRilSms::RequestWithStrings(int32_t serial, int32_t slotId, int32_t request
     if (requestInfo == nullptr) {
         return false;
     }
-    char **p = nullptr;
-    size_t len = sizeof(char *);
-    if (len <= 0 || count <= 0) {
+    char **pBuff = nullptr;
+    if (sizeof(char *) <= 0 || count <= 0) {
         free(requestInfo);
         return false;
     }
-    p = (char **)calloc(count, len);
-    if (p == nullptr) {
+    pBuff = (char **)calloc(count, sizeof(char *));
+    if (pBuff == nullptr) {
         SendErrorResponse(requestInfo, HRIL_ERR_MEMORY_FULL);
         free(requestInfo);
         return false;
@@ -420,13 +409,13 @@ bool HRilSms::RequestWithStrings(int32_t serial, int32_t slotId, int32_t request
     while (i < count) {
         const char *str = va_arg(list, const char *);
         TELEPHONY_LOGD("param：str %{public}s", str);
-        if (!ConvertToString(&p[i], str, requestInfo)) {
+        if (!ConvertToString(&pBuff[i], str, requestInfo)) {
             TELEPHONY_LOGE("ConvertToString in RequestWithStrings is failed!");
             va_end(list);
             for (int32_t j = 0; j < i; j++) {
-                FreeStrings(1, p[j]);
+                FreeStrings(1, pBuff[j]);
             }
-            free(p);
+            free(pBuff);
             free(requestInfo);
             return false;
         }
@@ -438,14 +427,14 @@ bool HRilSms::RequestWithStrings(int32_t serial, int32_t slotId, int32_t request
         free(requestInfo);
         return false;
     }
-    smsFuncs_->SendSms(requestInfo, p, count * sizeof(char *));
-    if (p != nullptr) {
+    smsFuncs_->SendSms(requestInfo, pBuff, count * sizeof(char *));
+    if (pBuff != nullptr) {
         i = 0;
         while (i < count) {
-            FreeStrings(1, p[i]);
+            FreeStrings(1, pBuff[i]);
             i++;
         }
-        free(p);
+        free(pBuff);
     }
     free(requestInfo);
     return true;
@@ -506,14 +495,14 @@ int32_t HRilSms::SendSmsMoreModeResponse(int32_t slotId, int32_t requestNum, HRi
     return ResponseMessageParcel(responseInfo, result, requestNum);
 }
 
-bool HRilSms::RequestWithInts(int **p, ReqDataInfo *requestInfo, int32_t argCount, ...)
+bool HRilSms::RequestWithInts(int **pBuff, ReqDataInfo *requestInfo, int32_t argCount, ...)
 {
     size_t len = sizeof(int32_t);
     if (len <= 0 || argCount <= 0) {
         return false;
     }
-    *p = static_cast<int32_t *>(calloc(argCount, len));
-    if (*p == nullptr) {
+    *pBuff = static_cast<int32_t *>(calloc(argCount, len));
+    if (*pBuff == nullptr) {
         SendErrorResponse(requestInfo, HRIL_ERR_MEMORY_FULL);
         return false;
     }
@@ -521,7 +510,7 @@ bool HRilSms::RequestWithInts(int **p, ReqDataInfo *requestInfo, int32_t argCoun
     va_start(list, argCount);
     int32_t i = 0;
     while (i < argCount) {
-        (*p)[i] = va_arg(list, int32_t);
+        (*pBuff)[i] = va_arg(list, int32_t);
         i++;
     }
     va_end(list);
@@ -530,7 +519,7 @@ bool HRilSms::RequestWithInts(int **p, ReqDataInfo *requestInfo, int32_t argCoun
 
 void HRilSms::SendSmsAck(int32_t slotId, struct HdfSBuf *data)
 {
-    int32_t *p = nullptr;
+    int32_t *pBuff = nullptr;
     struct ModeData mode;
     MessageParcel *parcel = nullptr;
     const int32_t COUNT_INTS_VALUE = 2;
@@ -551,18 +540,18 @@ void HRilSms::SendSmsAck(int32_t slotId, struct HdfSBuf *data)
     if (requestInfo == nullptr) {
         return;
     }
-    RequestWithInts(&p, requestInfo, COUNT_INTS_VALUE, static_cast<int32_t>(mode.result), mode.mode);
+    RequestWithInts(&pBuff, requestInfo, COUNT_INTS_VALUE, static_cast<int32_t>(mode.result), mode.mode);
     if (smsFuncs_ == nullptr) {
         TELEPHONY_LOGE("smsFuncs_ is nullptr!");
-        if (p != nullptr) {
-            free(p);
+        if (pBuff != nullptr) {
+            free(pBuff);
         }
         free(requestInfo);
         return;
     }
-    smsFuncs_->SendSmsAck(requestInfo, p, sizeof(int32_t));
-    if (p != nullptr) {
-        free(p);
+    smsFuncs_->SendSmsAck(requestInfo, pBuff, sizeof(int32_t));
+    if (pBuff != nullptr) {
+        free(pBuff);
     }
     free(requestInfo);
 }
@@ -646,7 +635,6 @@ int32_t HRilSms::SmsStatusReportNotify(
     int32_t slotId, int32_t indType, const HRilErrno e, const void *response, size_t responseLen)
 {
     const int32_t MESSAGE_SIZE = responseLen / 2;
-
     if (response == nullptr || responseLen == 0) {
         TELEPHONY_LOGE("SmsStatusReportNotify: invalid response");
         return HDF_SUCCESS;
@@ -694,9 +682,7 @@ int32_t HRilSms::SmsStatusReportNotify(
         HdfSBufRecycle(dataSbuf);
         return HDF_FAILURE;
     }
-    if (dataSbuf != nullptr) {
-        HdfSBufRecycle(dataSbuf);
-    }
+    HdfSBufRecycle(dataSbuf);
     return HDF_SUCCESS;
 }
 
@@ -767,6 +753,7 @@ int32_t HRilSms::NewSmsNotify(
         temp++;
     }
     free(bytes);
+    bytes = nullptr;
     std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
     if (parcel == nullptr) {
         TELEPHONY_LOGE("parcel in NewSmsNotify is nullptr!");

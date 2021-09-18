@@ -138,7 +138,6 @@ void SkipSpace(char **s)
     while (**s != '\0' && **s == ' ') {
         (*s)++;
     }
-    TELEPHONY_LOGD("%{public}s, param s:%{public}s", __func__, *s);
 }
 
 int NextInt(char **s, int *out)
@@ -148,18 +147,15 @@ int NextInt(char **s, int *out)
     if (*s == NULL || out == NULL) {
         return -1;
     }
-    TELEPHONY_LOGD("%{public}s, param s:%{public}s", __func__, *s);
     SkipSpace(s);
     if (*s == NULL) {
         return -1;
     }
     ret = strsep(s, ",");
-    TELEPHONY_LOGD("strsep: param s:%{public}s", *s);
     while (*s != NULL && **s == ',') {
         (*s)++;
     }
     *out = (int)strtol(ret, &end, HRIL_DEC);
-    TELEPHONY_LOGD("%{public}s, param out:%{public}d", __func__, *out);
 
     if (ret == end) {
         return -1;
@@ -174,18 +170,15 @@ int NextIntFromHex(char **s, int *out)
     if (*s == NULL || out == NULL) {
         return -1;
     }
-    TELEPHONY_LOGD("%{public}s, param s:%{public}s", __func__, *s);
     SkipSpace(s);
     if (*s == NULL) {
         return -1;
     }
     ret = strsep(s, ",");
-    TELEPHONY_LOGD("strsep: param s:%{public}s", *s);
     while (*s != NULL && **s == ',') {
         (*s)++;
     }
     *out = (int)strtol(ret, &end, HRIL_INVALID_HEX_CHAR);
-    TELEPHONY_LOGD("%{public}s, param out:%{public}d", __func__, *out);
 
     if (ret == end) {
         return -1;
@@ -195,8 +188,9 @@ int NextIntFromHex(char **s, int *out)
 
 void SkipNextComma(char **s)
 {
-    if (*s == NULL)
+    if (*s == NULL) {
         return;
+    }
 
     while (**s != '\0' && **s != ',') {
         (*s)++;
@@ -212,7 +206,6 @@ int NextStr(char **s, char **out)
     if (*s == NULL) {
         return -1;
     }
-    TELEPHONY_LOGD("%{public}s, param s:%{public}s", __func__, *s);
     SkipSpace(s);
     if (*s == NULL) {
         return -1;
@@ -223,7 +216,6 @@ int NextStr(char **s, char **out)
     } else {
         *out = strsep(s, ",");
     }
-    TELEPHONY_LOGD("%{public}s, param out:%{public}s", __func__, *out);
     return 0;
 }
 
