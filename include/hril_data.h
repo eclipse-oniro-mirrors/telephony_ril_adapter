@@ -25,6 +25,8 @@ namespace Telephony {
 class HRilData : public HRilBase {
 public:
     HRilData();
+    virtual ~HRilData();
+
     void DeactivatePdpContext(int32_t slotId, struct HdfSBuf *data);
     void ActivatePdpContext(int32_t slotId, struct HdfSBuf *data);
     int32_t ActivatePdpContextResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,

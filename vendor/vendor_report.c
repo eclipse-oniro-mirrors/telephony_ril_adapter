@@ -167,7 +167,9 @@ void OnNotifyOps(const char *s, const char *smsPdu)
     } else if (ReportStrWith(s, "+CBM:") || ReportStrWith(s, "+CSCB:")) {
         ReportCBMOrCSCB(&reportInfo);
     } else if (ReportStrWith(s, "+COPS: (")) {
-        ProcessOperListToUse(strdup(s));
+        char *copsstr = strdup(s);
+        ProcessOperListToUse(copsstr);
+        free(copsstr);
     } else if (ReportStrWith(s, "^SIMST:")) {
         reportInfo.notifyId = HNOTI_SIM_STATUS_CHANGED;
         OnSimReport(reportInfo, NULL, 0);
