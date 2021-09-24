@@ -246,7 +246,7 @@ int SendCommandNetWorksLock(const char *command, const char *prefix, long long t
     TELEPHONY_LOGD("SendCommandNetWorksLock() command %{public}s", command);
     g_prefix = prefix;
     err = SendCommandNoLock(command, timeout, outResponse);
-    TELEPHONY_LOGE("SendCommandNetWorksLock() err = %{public}d", err);
+    TELEPHONY_LOGD("SendCommandNetWorksLock() err = %{public}d", err);
     pthread_mutex_unlock(&g_commandmutex);
     // when timeout to process
     if (err == AT_ERR_TIMEOUT) {

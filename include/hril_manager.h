@@ -60,14 +60,8 @@ pthread_rwlock_t *GetRadioServiceLock();
 
 class HRilManager {
 public:
-    std::unique_ptr<HRilCall> hrilCall_;
-    std::unique_ptr<HRilModem> hrilModem_;
-    std::unique_ptr<HRilNetwork> hrilNetwork_;
-    std::unique_ptr<HRilSim> hrilSim_;
-    std::unique_ptr<HRilSms> hrilSms_;
-    std::unique_ptr<HRilData> hrilData_;
-
     HRilManager();
+    virtual ~HRilManager();
 
     void RegisterCallFuncs(const HRilCallReq *callFuncs);
     void RegisterDataFuncs(const HRilDataReq *dataFuncs);
@@ -88,6 +82,14 @@ public:
     void OnNetworkReport(struct ReportInfo *reportInfo, const void *response, size_t responseLen);
     void OnSimReport(struct ReportInfo *reportInfo, const void *response, size_t responseLen);
     void OnSmsReport(struct ReportInfo *reportInfo, const void *response, size_t responseLen);
+
+private:
+    std::unique_ptr<HRilCall> hrilCall_;
+    std::unique_ptr<HRilModem> hrilModem_;
+    std::unique_ptr<HRilNetwork> hrilNetwork_;
+    std::unique_ptr<HRilSim> hrilSim_;
+    std::unique_ptr<HRilSms> hrilSms_;
+    std::unique_ptr<HRilData> hrilData_;
 };
 
 extern "C" int32_t DispatchRequest(int32_t slotId, int32_t cmd, struct HdfSBuf *data);

@@ -17,45 +17,45 @@
 #include "vendor_util.h"
 #include "vendor_report.h"
 
-int ProcessCellBroadcast(char *s, HRilCellBroadcastReportInfo *response)
+int ProcessCellBroadcast(char *pBuff, HRilCellBroadcastReportInfo *response)
 {
     int ret = 0;
-    char *p = NULL;
+    char *tmp = NULL;
     int count = 0;
-    if (s == NULL || response == NULL) {
+    if (pBuff == NULL || response == NULL) {
         return -1;
     }
-    p = s;
-    while (*p != '\0' && p != NULL) {
-        if (*p == ',') {
+    tmp = pBuff;
+    while (*tmp != '\0' && tmp != NULL) {
+        if (*tmp == ',') {
             count++;
         }
-        p++;
+        tmp++;
     }
-    SkipATPrefix(&s);
+    SkipATPrefix(&pBuff);
     if (count > 1) {
-        ret = NextInt(&s, &response->sn);
+        ret = NextInt(&pBuff, &response->sn);
         if (ret == -1) {
             TELEPHONY_LOGE("sn is null");
         }
-        ret = NextInt(&s, &response->mid);
+        ret = NextInt(&pBuff, &response->mid);
         if (ret == -1) {
             TELEPHONY_LOGE("mid is null");
         }
-        ret = NextInt(&s, &response->page);
+        ret = NextInt(&pBuff, &response->page);
         if (ret == -1) {
             TELEPHONY_LOGE("page is null");
         }
-        ret = NextInt(&s, &response->pages);
+        ret = NextInt(&pBuff, &response->pages);
         if (ret == -1) {
             TELEPHONY_LOGE("pages is null");
         }
-        ret = NextStr(&s, &response->dcs);
+        ret = NextStr(&pBuff, &response->dcs);
         if (ret == -1) {
             TELEPHONY_LOGE("dcs is null");
         }
     } else {
-        ret = NextInt(&s, &response->length);
+        ret = NextInt(&pBuff, &response->length);
         if (ret == -1) {
             TELEPHONY_LOGE("mode is null");
         }

@@ -22,6 +22,7 @@
 #include "vendor_util.h"
 
 static struct ReportInfo g_reportInfoForOperListToUse;
+static pthread_mutex_t g_networkSearchInformationMutex = PTHREAD_MUTEX_INITIALIZER;
 
 int GetResponseErrorCode(ResponseInfo *pResponseInfo)
 {
@@ -343,21 +344,33 @@ static int MoveRightBracket(char **pStr)
 void GetNetworkSearchInformationPause()
 {
     TELEPHONY_LOGD("enter to [%{public}s]:%{public}d", __func__, __LINE__);
+    pthread_mutex_lock(&g_networkSearchInformationMutex);
     g_reportInfoForOperListToUse.error = HRIL_ERR_GENERIC_FAILURE;
     OnNetworkReport(g_reportInfoForOperListToUse, NULL, 0);
     SetAtPauseFlag(false);
+    if (g_reportInfoForOperListToUse.requestInfo != NULL) {
+        free(g_reportInfoForOperListToUse.requestInfo);
+        g_reportInfoForOperListToUse.requestInfo = NULL;
+    }
+    pthread_mutex_unlock(&g_networkSearchInformationMutex);
 }
 
 void PerformTimeOut(int sigFlag)
 {
     if (SIGALRM == sigFlag) {
+        pthread_mutex_lock(&g_networkSearchInformationMutex);
         bool sendFlag = GetAtPauseFlag();
         TELEPHONY_LOGD("enter to [%{public}s]:%{public}d", __func__, __LINE__);
         if (sendFlag) {
             g_reportInfoForOperListToUse.error = HRIL_ERR_GENERIC_FAILURE;
             OnNetworkReport(g_reportInfoForOperListToUse, NULL, 0);
             SetAtPauseFlag(false);
+            if (g_reportInfoForOperListToUse.requestInfo != NULL) {
+                free(g_reportInfoForOperListToUse.requestInfo);
+                g_reportInfoForOperListToUse.requestInfo = NULL;
+            }
         }
+        pthread_mutex_unlock(&g_networkSearchInformationMutex);
     }
     return;
 }
@@ -369,13 +382,17 @@ void RequestGetNetworkSearchInformation(const ReqDataInfo *requestInfo)
     ResponseInfo *responseInfo = NULL;
     const int MINUTE = 60;
     TELEPHONY_LOGD("enter to [%{public}s]:%{public}d", __func__, __LINE__);
-
+    pthread_mutex_lock(&g_networkSearchInformationMutex);
     alarm(0);
-    if (signal(SIGALRM, PerformTimeOut) == SIG_ERR) {
-        TELEPHONY_LOGE("signal is SIG_ERR!");
+    if (g_reportInfoForOperListToUse.requestInfo != NULL) {
+        free(g_reportInfoForOperListToUse.requestInfo);
+        g_reportInfoForOperListToUse.requestInfo = NULL;
     }
-    alarm(MINUTE);
-
+    if (signal(SIGALRM, PerformTimeOut) == SIG_ERR) {
+        TELEPHONY_LOGE("RequestGetNetworkSearchInformation signal PerformTimeOut is SIG_ERR!");
+        pthread_mutex_unlock(&g_networkSearchInformationMutex);
+        return;
+    }
     ret = SendCommandNetWorksLock("AT+COPS=?", "+COPS:", TIME_OUT, &responseInfo);
 
     g_reportInfoForOperListToUse = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
@@ -383,12 +400,22 @@ void RequestGetNetworkSearchInformation(const ReqDataInfo *requestInfo)
         TELEPHONY_LOGE("send AT CMD failed!");
         SetAtPauseFlag(false);
         g_reportInfoForOperListToUse.error = GetResponseErrorCode(responseInfo);
-        OnNetworkReport(g_reportInfoForOperListToUse, NULL, 1);
+        OnNetworkReport(g_reportInfoForOperListToUse, NULL, 0);
         if (responseInfo != NULL) {
             FreeResponseInfo(responseInfo);
         }
+        if (g_reportInfoForOperListToUse.requestInfo != NULL) {
+            free(g_reportInfoForOperListToUse.requestInfo);
+            g_reportInfoForOperListToUse.requestInfo = NULL;
+        }
+        pthread_mutex_unlock(&g_networkSearchInformationMutex);
         return;
     }
+    alarm(MINUTE);
+    if (responseInfo != NULL) {
+        FreeResponseInfo(responseInfo);
+    }
+    pthread_mutex_unlock(&g_networkSearchInformationMutex);
     SetWatchFunction(GetNetworkSearchInformationPause);
 }
 
@@ -441,17 +468,45 @@ int ParseOperListInfo(char *lineinfo, int count, AvailableOperInfo *pOperInfo, A
     return operCount;
 }
 
+static void DealNetworkSearchInformation(int operCount, AvailableOperInfo **ppOperInfo, AvailableOperInfo *pOperInfo)
+{
+    if (operCount == 0) {
+        pthread_mutex_lock(&g_networkSearchInformationMutex);
+        SetAtPauseFlag(false);
+        alarm(0);
+        if (g_reportInfoForOperListToUse.requestInfo != NULL) {
+            g_reportInfoForOperListToUse.error = HRIL_ERR_INVALID_RESPONSE;
+            OnNetworkReport(g_reportInfoForOperListToUse, NULL, 0);
+            free(g_reportInfoForOperListToUse.requestInfo);
+            g_reportInfoForOperListToUse.requestInfo = NULL;
+        }
+        pthread_mutex_unlock(&g_networkSearchInformationMutex);
+    } else {
+        pthread_mutex_lock(&g_networkSearchInformationMutex);
+        SetAtPauseFlag(false);
+        alarm(0);
+        if (g_reportInfoForOperListToUse.requestInfo != NULL) {
+            OnNetworkReport(g_reportInfoForOperListToUse, (void *)ppOperInfo, operCount * sizeof(AvailableOperInfo *));
+            free(g_reportInfoForOperListToUse.requestInfo);
+            g_reportInfoForOperListToUse.requestInfo = NULL;
+        }
+        pthread_mutex_unlock(&g_networkSearchInformationMutex);
+    }
+    if (ppOperInfo == NULL) {
+        free(ppOperInfo);
+    }
+    if (pOperInfo == NULL) {
+        free(pOperInfo);
+    }
+}
+
 int ProcessOperListToUse(char *list)
 {
-    int ret = 0;
     int item = 0;
     int operCount = 0;
     const int UNUSED_ITEM_COUNT = 2;
     AvailableOperInfo *pOperInfo = NULL;
     AvailableOperInfo **ppOperInfo = NULL;
-
-    SetAtPauseFlag(false);
-    alarm(0);
     if (list == NULL) {
         TELEPHONY_LOGD("ProcessOperListToUse result is null");
         goto ERROR;
@@ -467,41 +522,33 @@ int ProcessOperListToUse(char *list)
         goto ERROR;
     }
     line = list;
-    ret = SkipATPrefix(&line);
+    int ret = SkipATPrefix(&line);
     if (ret < 0) {
         goto ERROR;
     }
     item = item - UNUSED_ITEM_COUNT;
     ppOperInfo = (AvailableOperInfo **)malloc(item * sizeof(AvailableOperInfo *));
     if (!ppOperInfo) {
-        TELEPHONY_LOGE("ppOperInfo malloc fail");
         goto ERROR;
     }
     pOperInfo = (AvailableOperInfo *)malloc(item * sizeof(AvailableOperInfo));
     if (!pOperInfo) {
-        TELEPHONY_LOGE("pOperInfo malloc fail");
         goto ERROR;
     }
-
     (void)memset_s(pOperInfo, item * sizeof(AvailableOperInfo), 0, item * sizeof(AvailableOperInfo));
     for (int j = 0; j < item; j++) {
         ppOperInfo[j] = &(pOperInfo[j]);
     }
     operCount = ParseOperListInfo(line, item, pOperInfo, ppOperInfo);
     if (operCount != 0) {
-        OnNetworkReport(g_reportInfoForOperListToUse, (void *)ppOperInfo, operCount * sizeof(AvailableOperInfo *));
+        DealNetworkSearchInformation(operCount, ppOperInfo, pOperInfo);
     } else {
         goto ERROR;
     }
-    free(ppOperInfo);
-    free(pOperInfo);
     return HRIL_ERR_SUCCESS;
 ERROR:
     TELEPHONY_LOGE("RequestGetNetworkSearchInformation Failed");
-    g_reportInfoForOperListToUse.error = HRIL_ERR_INVALID_RESPONSE;
-    OnNetworkReport(g_reportInfoForOperListToUse, NULL, 0);
-    free(ppOperInfo);
-    free(pOperInfo);
+    DealNetworkSearchInformation(operCount, ppOperInfo, pOperInfo);
     return HRIL_ERR_GENERIC_FAILURE;
 }
 

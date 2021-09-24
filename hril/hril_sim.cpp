@@ -168,7 +168,7 @@ int32_t HRilSim::GetSimStatusResponse(int32_t slotId, int32_t requestNum, HRilRa
 
 void HRilSim::RequestSimIO(int32_t slotId, struct HdfSBuf *data)
 {
-    int32_t serial;
+    int32_t serial = 0;
     const int32_t PATH_POINTER_NUM = 1;
     const int32_t POINTER_NUM = 2;
     SimIoRequestInfo SimIO = SimIoRequestInfo();
@@ -203,12 +203,11 @@ void HRilSim::RequestSimIO(int32_t slotId, struct HdfSBuf *data)
     rilSimIO.p2 = SimIO.p2;
     rilSimIO.p3 = SimIO.p3;
     if (!ConvertToString(&rilSimIO.data, SimIO.data, requestInfo)) {
-        FreeStrings(PATH_POINTER_NUM, rilSimIO.data);
         free(requestInfo);
         return;
     }
     if (!ConvertToString(&rilSimIO.pathid, SimIO.path, requestInfo)) {
-        FreeStrings(PATH_POINTER_NUM, rilSimIO.pathid);
+        FreeStrings(PATH_POINTER_NUM, rilSimIO.data);
         free(requestInfo);
         return;
     }
@@ -227,7 +226,7 @@ int32_t HRilSim::RequestSimIOResponse(int32_t slotId, int32_t requestNum, HRilRa
 
 void HRilSim::GetImsi(int32_t slotId, struct HdfSBuf *data)
 {
-    int serial = 0;
+    int32_t serial = 0;
 
     if (!HdfSbufReadInt32(data, &serial)) {
         TELEPHONY_LOGE("miss serial parameter");
@@ -279,7 +278,7 @@ int32_t HRilSim::GetImsiResponse(int32_t slotId, int32_t requestNum, HRilRadioRe
 
 void HRilSim::GetIccID(int32_t slotId, struct HdfSBuf *data)
 {
-    int serial = 0;
+    int32_t serial = 0;
 
     if (!HdfSbufReadInt32(data, &serial)) {
         TELEPHONY_LOGE("miss serial parameter");
@@ -332,7 +331,7 @@ int32_t HRilSim::GetIccIDResponse(int32_t slotId, int32_t requestNum, HRilRadioR
 
 void HRilSim::GetSimLockStatus(int32_t slotId, struct HdfSBuf *data)
 {
-    int32_t serial;
+    int32_t serial = 0;
     const int32_t PATH_POINTER_NUM = 1;
     const int32_t POINTER_NUM = 2;
     SimLockInfo simClock = SimLockInfo();
@@ -377,6 +376,7 @@ void HRilSim::GetSimLockStatus(int32_t slotId, struct HdfSBuf *data)
         TELEPHONY_LOGE("ConvertToString in GetSimLockStatus is failed!");
         FreeStrings(PATH_POINTER_NUM, rilSimClock.passwd);
         free(requestInfo);
+        free(rilSimClock.fac);
         return;
     }
 
@@ -454,7 +454,6 @@ void HRilSim::SetSimLock(int32_t slotId, struct HdfSBuf *data)
     HRilSimClock rilSimClock = {};
     if (!ConvertToString(&rilSimClock.fac, simClock.fac, requestInfo)) {
         TELEPHONY_LOGE("ConvertToString in SetSimLock is failed!");
-        FreeStrings(PATH_POINTER_NUM, rilSimClock.fac);
         free(requestInfo);
         return;
     }
@@ -462,7 +461,7 @@ void HRilSim::SetSimLock(int32_t slotId, struct HdfSBuf *data)
     rilSimClock.status = simClock.status;
     if (!ConvertToString(&rilSimClock.passwd, simClock.passwd, requestInfo)) {
         TELEPHONY_LOGE("ConvertToString in SetSimLock is failed!");
-        FreeStrings(PATH_POINTER_NUM, rilSimClock.passwd);
+        FreeStrings(PATH_POINTER_NUM, rilSimClock.fac);
         free(requestInfo);
         return;
     }
@@ -481,7 +480,7 @@ int32_t HRilSim::SetSimLockResponse(int32_t slotId, int32_t requestNum, HRilRadi
 
 void HRilSim::ChangeSimPassword(int32_t slotId, struct HdfSBuf *data)
 {
-    int32_t serial;
+    int32_t serial = 0;
     const int32_t PATH_POINTER_NUM = 1;
     const int32_t POINTER_NUM = 3;
     SimPasswordInfo simPassword = SimPasswordInfo();
@@ -631,7 +630,7 @@ int32_t HRilSim::UnlockSimPinResponse(int32_t slotId, int32_t requestNum, HRilRa
 
 void HRilSim::GetSimPinInputTimes(int32_t slotId, struct HdfSBuf *data)
 {
-    int serial = 0;
+    int32_t serial = 0;
 
     if (!HdfSbufReadInt32(data, &serial)) {
         TELEPHONY_LOGE("miss serial parameter");
