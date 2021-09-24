@@ -22,6 +22,14 @@ HRilData::HRilData()
     AddHandlerToMap();
 }
 
+HRilData::~HRilData()
+{
+    respMemberFuncMap_.clear();
+    notiMemberFuncMap_.clear();
+    reqMemberFuncMap_.clear();
+    dataFuncs_ = nullptr;
+}
+
 void HRilData::DeactivatePdpContext(int32_t slotId, struct HdfSBuf *data)
 {
     struct UniInfo uInfo;
@@ -60,8 +68,8 @@ void HRilData::ActivatePdpContext(int32_t slotId, struct HdfSBuf *data)
     struct DataCallInfo dataCallInfo;
     HRilDataInfo dataInfo;
     MessageParcel *parcel = nullptr;
-    if (SbufToParcel(data, &parcel)) {
-        TELEPHONY_LOGE("RilAdapter failed to do SbufToParcel");
+    if (SbufToParcel(data, &parcel) || parcel == nullptr) {
+        TELEPHONY_LOGE("RilAdapter failed to do SbufToParcel:");
         return;
     }
     if (!dataCallInfo.ReadFromParcel(*parcel)) {
@@ -91,6 +99,8 @@ void HRilData::ActivatePdpContext(int32_t slotId, struct HdfSBuf *data)
     }
 
     dataFuncs_->ActivatePdpContext(requestInfo, &dataInfo);
+    free(dataInfo.apn);
+    free(dataInfo.type);
     free(requestInfo);
 }
 

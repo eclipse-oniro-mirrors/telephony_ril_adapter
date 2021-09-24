@@ -26,6 +26,6 @@ void ReqUpdateSms(ReqDataInfo *requestInfo, const void *data, size_t dataLen);
 void ReqSetSmsCenterAddress(ReqDataInfo *requestInfo, const void *data, size_t dataLen);
 void ReqGetSmsCenterAddress(ReqDataInfo *requestInfo, const void *data, size_t dataLen);
 void ReqSetCellBroadcast(ReqDataInfo *requestInfo, const void *data, size_t dataLen);
-int ProcessCellBroadcast(char *s, HRilCellBroadcastReportInfo *response);
+int ProcessCellBroadcast(char *pBuff, HRilCellBroadcastReportInfo *response);
 
 #endif // OHOS_AT_SMS_H

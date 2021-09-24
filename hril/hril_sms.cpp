@@ -25,7 +25,7 @@ HRilSms::HRilSms()
 SendSmsResultInfo HRilSms::MakeSendSmsResult(
     HRilRadioResponseInfo &responseInfo, int32_t serial, const void *response, const size_t responseLen)
 {
-    SendSmsResultInfo result;
+    SendSmsResultInfo result = {};
     if (response == nullptr || responseLen != sizeof(HRilSmsResponse)) {
         TELEPHONY_LOGE("Invalid response: response is nullptr");
         if (responseInfo.error == HRilErrType::NONE) {
@@ -403,7 +403,7 @@ bool HRilSms::RequestWithStrings(int32_t serial, int32_t slotId, int32_t request
         free(requestInfo);
         return false;
     }
-    va_list list;
+    va_list list = {};
     va_start(list, count);
     int32_t i = 0;
     while (i < count) {
@@ -424,6 +424,7 @@ bool HRilSms::RequestWithStrings(int32_t serial, int32_t slotId, int32_t request
     va_end(list);
     if (smsFuncs_ == nullptr) {
         TELEPHONY_LOGE("smsFuncs_：is null!");
+        free(pBuff);
         free(requestInfo);
         return false;
     }
@@ -579,7 +580,7 @@ int32_t HRilSms::SendSmsAckResponse(int32_t slotId, int32_t requestNum, HRilRadi
         TELEPHONY_LOGE("dataSbuf in SendSmsAckResponse is nullptr!");
         return HDF_FAILURE;
     }
-    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&responseInfo, sizeof(responseInfo))) {
+    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&responseInfo, sizeof(HRilRadioResponseInfo))) {
         TELEPHONY_LOGE("HdfSbufWriteUnpadBuffer in SendSmsAckResponse is failed!");
         HdfSBufRecycle(dataSbuf);
         return HDF_FAILURE;
