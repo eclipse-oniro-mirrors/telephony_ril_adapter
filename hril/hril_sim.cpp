@@ -168,9 +168,9 @@ int32_t HRilSim::GetSimStatusResponse(int32_t slotId, int32_t requestNum, HRilRa
 
 void HRilSim::RequestSimIO(int32_t slotId, struct HdfSBuf *data)
 {
-    int32_t serial;
-    const int32_t PATH_POINTER_NUM = 1;
-    const int32_t POINTER_NUM = 2;
+    int32_t serial = 0;
+    const int32_t DATA_POINTER_NUM = 1;
+    const int32_t PATH_POINTER_NUM = 2;
     SimIoRequestInfo SimIO = SimIoRequestInfo();
     MessageParcel *parcel = nullptr;
     if (SbufToParcel(data, &parcel)) {
@@ -203,18 +203,17 @@ void HRilSim::RequestSimIO(int32_t slotId, struct HdfSBuf *data)
     rilSimIO.p2 = SimIO.p2;
     rilSimIO.p3 = SimIO.p3;
     if (!ConvertToString(&rilSimIO.data, SimIO.data, requestInfo)) {
-        FreeStrings(PATH_POINTER_NUM, rilSimIO.data);
         free(requestInfo);
         return;
     }
     if (!ConvertToString(&rilSimIO.pathid, SimIO.path, requestInfo)) {
-        FreeStrings(PATH_POINTER_NUM, rilSimIO.pathid);
+        FreeStrings(DATA_POINTER_NUM, rilSimIO.data);
         free(requestInfo);
         return;
     }
 
-    simFuncs_->GetSimIO(requestInfo, &rilSimIO, sizeof(rilSimIO));
-    FreeStrings(POINTER_NUM, rilSimIO.data, rilSimIO.pathid);
+    simFuncs_->GetSimIO(requestInfo, &rilSimIO, sizeof(HRilSimIO));
+    FreeStrings(PATH_POINTER_NUM, rilSimIO.data, rilSimIO.pathid);
     free(requestInfo);
 }
 
@@ -227,7 +226,7 @@ int32_t HRilSim::RequestSimIOResponse(int32_t slotId, int32_t requestNum, HRilRa
 
 void HRilSim::GetImsi(int32_t slotId, struct HdfSBuf *data)
 {
-    int serial = 0;
+    int32_t serial = 0;
 
     if (!HdfSbufReadInt32(data, &serial)) {
         TELEPHONY_LOGE("miss serial parameter");
@@ -261,7 +260,7 @@ int32_t HRilSim::GetImsiResponse(int32_t slotId, int32_t requestNum, HRilRadioRe
         HdfSBufRecycle(dataSbuf);
         return HDF_FAILURE;
     }
-    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&responseInfo, sizeof(responseInfo))) {
+    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&responseInfo, sizeof(HRilRadioResponseInfo))) {
         TELEPHONY_LOGE("HdfSbufWriteUnpadBuffer in GetImsiResponse is failed!");
         HdfSBufRecycle(dataSbuf);
         return HDF_FAILURE;
@@ -279,7 +278,7 @@ int32_t HRilSim::GetImsiResponse(int32_t slotId, int32_t requestNum, HRilRadioRe
 
 void HRilSim::GetIccID(int32_t slotId, struct HdfSBuf *data)
 {
-    int serial = 0;
+    int32_t serial = 0;
 
     if (!HdfSbufReadInt32(data, &serial)) {
         TELEPHONY_LOGE("miss serial parameter");
@@ -314,7 +313,7 @@ int32_t HRilSim::GetIccIDResponse(int32_t slotId, int32_t requestNum, HRilRadioR
         HdfSBufRecycle(dataSbuf);
         return HDF_FAILURE;
     }
-    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&responseInfo, sizeof(responseInfo))) {
+    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&responseInfo, sizeof(HRilRadioResponseInfo))) {
         TELEPHONY_LOGE("HdfSbufWriteUnpadBuffer in GetIccIDResponse is failed!");
         HdfSBufRecycle(dataSbuf);
         return HDF_FAILURE;
@@ -332,9 +331,9 @@ int32_t HRilSim::GetIccIDResponse(int32_t slotId, int32_t requestNum, HRilRadioR
 
 void HRilSim::GetSimLockStatus(int32_t slotId, struct HdfSBuf *data)
 {
-    int32_t serial;
-    const int32_t PATH_POINTER_NUM = 1;
-    const int32_t POINTER_NUM = 2;
+    int32_t serial = 0;
+    const int32_t FAC_POINTER_NUM = 1;
+    const int32_t PASSWORD_POINTER_NUM = 2;
     SimLockInfo simClock = SimLockInfo();
     MessageParcel *parcel = nullptr;
     if (SbufToParcel(data, &parcel)) {
@@ -361,34 +360,31 @@ void HRilSim::GetSimLockStatus(int32_t slotId, struct HdfSBuf *data)
         return;
     }
     HRilSimClock rilSimClock = {};
-    rilSimClock.fac = rilSimClock.fac;
     rilSimClock.mode = simClock.mode;
     rilSimClock.status = simClock.status;
-    rilSimClock.passwd = rilSimClock.passwd;
-    rilSimClock.classx = rilSimClock.classx;
+    rilSimClock.classx = simClock.classx;
 
     if (!ConvertToString(&rilSimClock.fac, simClock.fac, requestInfo)) {
         TELEPHONY_LOGE("ConvertToString in GetSimLockStatus is failed!");
-        FreeStrings(PATH_POINTER_NUM, rilSimClock.fac);
         free(requestInfo);
         return;
     }
     if (!ConvertToString(&rilSimClock.passwd, simClock.passwd, requestInfo)) {
         TELEPHONY_LOGE("ConvertToString in GetSimLockStatus is failed!");
-        FreeStrings(PATH_POINTER_NUM, rilSimClock.passwd);
+        FreeStrings(FAC_POINTER_NUM, rilSimClock.fac);
         free(requestInfo);
         return;
     }
 
-    simFuncs_->GetSimLockStatus(requestInfo, &rilSimClock, sizeof(rilSimClock));
-    FreeStrings(POINTER_NUM, rilSimClock.fac, rilSimClock.passwd);
+    simFuncs_->GetSimLockStatus(requestInfo, &rilSimClock, sizeof(HRilSimClock));
+    FreeStrings(PASSWORD_POINTER_NUM, rilSimClock.fac, rilSimClock.passwd);
     free(requestInfo);
 }
 
 int32_t HRilSim::GetSimLockStatusResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
     const void *response, size_t responseLen)
 {
-    int32_t simLockStatus = *(int *)response;
+    int32_t simLockStatus = *(int32_t *)response;
 
     struct HdfSBuf *dataSbuf = HdfSBufTypedObtain(SBUF_IPC);
     if (dataSbuf == nullptr) {
@@ -402,7 +398,7 @@ int32_t HRilSim::GetSimLockStatusResponse(int32_t slotId, int32_t requestNum, HR
         return HDF_FAILURE;
     }
 
-    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&responseInfo, sizeof(responseInfo))) {
+    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&responseInfo, sizeof(HRilRadioResponseInfo))) {
         TELEPHONY_LOGE("HdfSbufWriteUnpadBuffer in GetSimLockStatusResponse is failed!");
         HdfSBufRecycle(dataSbuf);
         return HDF_FAILURE;
@@ -416,15 +412,14 @@ int32_t HRilSim::GetSimLockStatusResponse(int32_t slotId, int32_t requestNum, HR
     }
 
     HdfSBufRecycle(dataSbuf);
-
     return HDF_SUCCESS;
 }
 
 void HRilSim::SetSimLock(int32_t slotId, struct HdfSBuf *data)
 {
     int32_t serial = 0;
-    const int32_t PATH_POINTER_NUM = 1;
-    const int32_t POINTER_NUM = 2;
+    const int32_t FAC_POINTER_NUM = 1;
+    const int32_t PASSWORD_POINTER_NUM = 2;
     SimLockInfo simClock = SimLockInfo();
     MessageParcel *parcel = nullptr;
     if (SbufToParcel(data, &parcel)) {
@@ -454,7 +449,6 @@ void HRilSim::SetSimLock(int32_t slotId, struct HdfSBuf *data)
     HRilSimClock rilSimClock = {};
     if (!ConvertToString(&rilSimClock.fac, simClock.fac, requestInfo)) {
         TELEPHONY_LOGE("ConvertToString in SetSimLock is failed!");
-        FreeStrings(PATH_POINTER_NUM, rilSimClock.fac);
         free(requestInfo);
         return;
     }
@@ -462,28 +456,29 @@ void HRilSim::SetSimLock(int32_t slotId, struct HdfSBuf *data)
     rilSimClock.status = simClock.status;
     if (!ConvertToString(&rilSimClock.passwd, simClock.passwd, requestInfo)) {
         TELEPHONY_LOGE("ConvertToString in SetSimLock is failed!");
-        FreeStrings(PATH_POINTER_NUM, rilSimClock.passwd);
+        FreeStrings(FAC_POINTER_NUM, rilSimClock.fac);
         free(requestInfo);
         return;
     }
     rilSimClock.classx = simClock.classx;
 
-    simFuncs_->SetSimLock(requestInfo, &rilSimClock, sizeof(rilSimClock));
-    FreeStrings(POINTER_NUM, rilSimClock.fac, rilSimClock.passwd);
+    simFuncs_->SetSimLock(requestInfo, &rilSimClock, sizeof(HRilSimClock));
+    FreeStrings(PASSWORD_POINTER_NUM, rilSimClock.fac, rilSimClock.passwd);
     free(requestInfo);
 }
 
 int32_t HRilSim::SetSimLockResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
     const void *response, size_t responseLen)
 {
-    return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));
+    return ResponseRequestInfo(requestNum, &responseInfo, sizeof(HRilRadioResponseInfo));
 }
 
 void HRilSim::ChangeSimPassword(int32_t slotId, struct HdfSBuf *data)
 {
-    int32_t serial;
-    const int32_t PATH_POINTER_NUM = 1;
-    const int32_t POINTER_NUM = 3;
+    int32_t serial = 0;
+    const int32_t FAC_POINTER_NUM = 1;
+    const int32_t OLDPASSWORD_POINTER_NUM = 2;
+    const int32_t NEWPASSWORD_POINTER_NUM = 3;
     SimPasswordInfo simPassword = SimPasswordInfo();
     MessageParcel *parcel = nullptr;
     if (SbufToParcel(data, &parcel)) {
@@ -513,33 +508,32 @@ void HRilSim::ChangeSimPassword(int32_t slotId, struct HdfSBuf *data)
     HRilSimPassword rilSimPassword = {};
     if (!ConvertToString(&rilSimPassword.fac, simPassword.fac, requestInfo)) {
         TELEPHONY_LOGE("ConvertToString in ChangeSimPassword is failed!");
-        FreeStrings(PATH_POINTER_NUM, rilSimPassword.fac);
         free(requestInfo);
         return;
     }
     if (!ConvertToString(&rilSimPassword.oldPassword, simPassword.oldPassword, requestInfo)) {
         TELEPHONY_LOGE("ConvertToString in ChangeSimPassword is failed!");
-        FreeStrings(PATH_POINTER_NUM, rilSimPassword.oldPassword);
+        FreeStrings(FAC_POINTER_NUM, rilSimPassword.fac);
         free(requestInfo);
         return;
     }
     if (!ConvertToString(&rilSimPassword.newPassword, simPassword.newPassword, requestInfo)) {
         TELEPHONY_LOGE("ConvertToString in ChangeSimPassword is failed!");
-        FreeStrings(PATH_POINTER_NUM, rilSimPassword.newPassword);
+        FreeStrings(OLDPASSWORD_POINTER_NUM, rilSimPassword.fac, rilSimPassword.oldPassword);
         free(requestInfo);
         return;
     }
     rilSimPassword.passwordLength = simPassword.passwordLength;
 
-    simFuncs_->ChangeSimPassword(requestInfo, &rilSimPassword, sizeof(rilSimPassword));
-    FreeStrings(POINTER_NUM, rilSimPassword.fac, rilSimPassword.oldPassword, rilSimPassword.newPassword);
+    simFuncs_->ChangeSimPassword(requestInfo, &rilSimPassword, sizeof(HRilSimPassword));
+    FreeStrings(NEWPASSWORD_POINTER_NUM, rilSimPassword.fac, rilSimPassword.oldPassword, rilSimPassword.newPassword);
     free(requestInfo);
 }
 
 int32_t HRilSim::ChangeSimPasswordResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
     const void *response, size_t responseLen)
 {
-    return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));
+    return ResponseRequestInfo(requestNum, &responseInfo, sizeof(HRilRadioResponseInfo));
 }
 
 void HRilSim::EnterSimPin(int32_t slotId, struct HdfSBuf *data)
@@ -583,7 +577,7 @@ void HRilSim::EnterSimPin(int32_t slotId, struct HdfSBuf *data)
 int32_t HRilSim::EnterSimPinResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
     const void *response, size_t responseLen)
 {
-    return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));
+    return ResponseRequestInfo(requestNum, &responseInfo, sizeof(HRilRadioResponseInfo));
 }
 
 void HRilSim::UnlockSimPin(int32_t slotId, struct HdfSBuf *data)
@@ -626,12 +620,12 @@ void HRilSim::UnlockSimPin(int32_t slotId, struct HdfSBuf *data)
 int32_t HRilSim::UnlockSimPinResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
     const void *response, size_t responseLen)
 {
-    return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));
+    return ResponseRequestInfo(requestNum, &responseInfo, sizeof(HRilRadioResponseInfo));
 }
 
 void HRilSim::GetSimPinInputTimes(int32_t slotId, struct HdfSBuf *data)
 {
-    int serial = 0;
+    int32_t serial = 0;
 
     if (!HdfSbufReadInt32(data, &serial)) {
         TELEPHONY_LOGE("miss serial parameter");
@@ -668,7 +662,7 @@ int32_t HRilSim::GetSimPinInputTimesResponse(int32_t slotId, int32_t requestNum,
         pPinInputTimes->code, pPinInputTimes->times, pPinInputTimes->pukTimes, pPinInputTimes->pinTimes,
         pPinInputTimes->puk2Times, pPinInputTimes->pin2Times);
 
-    SimPinInputTimes pinInputTimesResult;
+    SimPinInputTimes pinInputTimesResult = {};
     pinInputTimesResult.code = pPinInputTimes->code;
     pinInputTimesResult.times = pPinInputTimes->times;
     pinInputTimesResult.pukTimes = pPinInputTimes->pukTimes;

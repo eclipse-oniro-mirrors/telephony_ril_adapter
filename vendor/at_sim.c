@@ -18,10 +18,12 @@
 #include "vendor_adapter.h"
 #include "vendor_report.h"
 
+#define MAX_BUFF_SIZE 500
+
 static int GetSimType(void)
 {
-    int ret;
-    int simType;
+    int ret = 0;
+    int simType = 0;
     ResponseInfo *pResponse = NULL;
     char *pLine = NULL;
 
@@ -53,7 +55,7 @@ static int GetSimType(void)
 static int GetSimState(char *pLine, char *pResult, ResponseInfo *pResponse)
 {
     int status = HRIL_SIM_NOT_INSERTED;
-    int ret;
+    int ret = 0;
 
     ret = SkipATPrefix(&pLine);
     if (ret != 0) {
@@ -81,7 +83,7 @@ static int GetSimState(char *pLine, char *pResult, ResponseInfo *pResponse)
 
 static int ParseSimResponseResult(char *pLine, HRilSimIOResponse *pSimResponse)
 {
-    int err;
+    int err = 0;
 
     err = SkipATPrefix(&pLine);
     if (err != 0) {
@@ -107,7 +109,7 @@ static int ParseSimResponseResult(char *pLine, HRilSimIOResponse *pSimResponse)
 
 static int ParseSimPinInputTimesResult(char *pLine, HRilPinInputTimes *pinInputTimes)
 {
-    int err = -1;
+    int err = HRIL_ERR_GENERIC_FAILURE;
     if (pinInputTimes == NULL) {
         TELEPHONY_LOGE("pinInputTimes is null!!!");
         return err;
@@ -143,15 +145,12 @@ static int ParseSimPinInputTimesResult(char *pLine, HRilPinInputTimes *pinInputT
 
 void ReqGetSimStatus(const ReqDataInfo *requestInfo)
 {
-    int ret;
-    int noSimErrCode = 10;
+    int ret = 0;
     ResponseInfo *pResponse = NULL;
     char *pLine = NULL;
     char *pResult = NULL;
-    struct ReportInfo reportInfo;
-    (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
-    HRilCardState cardState;
-    (void)memset_s(&cardState, sizeof(cardState), 0, sizeof(cardState));
+    struct ReportInfo reportInfo = {0};
+    HRilCardState cardState = {0};
     HRilRadioState radioState = GetRadioState();
 
     if (radioState == HRIL_RADIO_POWER_STATE_UNAVAILABLE || radioState == HRIL_RADIO_POWER_STATE_OFF) {
@@ -172,7 +171,7 @@ void ReqGetSimStatus(const ReqDataInfo *requestInfo)
     cardState.simState = GetSimState(pLine, pResult, pResponse);
     TELEPHONY_LOGD("simType = %{public}u simState = %{public}u", cardState.simType, cardState.simState);
     reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
-    OnSimReport(reportInfo, &cardState, sizeof(cardState));
+    OnSimReport(reportInfo, &cardState, sizeof(HRilCardState));
     FreeResponseInfo(pResponse);
     return;
 
@@ -184,10 +183,10 @@ ERR:
     } else {
         ret = HRIL_ERR_GENERIC_FAILURE;
     }
-    if (ret == noSimErrCode) {
+    if (ret == HRIL_ERR_NO_SIMCARD_INSERTED) {
         cardState.simState = HRIL_SIM_NOT_INSERTED;
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
-        OnSimReport(reportInfo, &cardState, sizeof(cardState));
+        OnSimReport(reportInfo, &cardState, sizeof(HRilCardState));
     } else {
         reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
         OnSimReport(reportInfo, NULL, 0);
@@ -197,20 +196,18 @@ ERR:
 
 void ReqGetSimIO(const ReqDataInfo *requestInfo, const HRilSimIO *data, size_t dataLen)
 {
-    int ret;
+    int ret = 0;
     char *pLine = NULL;
     HRilSimIO *pSim = NULL;
-    HRilSimIOResponse simResponse;
-    char *cmd = NULL;
+    HRilSimIOResponse simResponse = {0};
+    char cmd[MAX_BUFF_SIZE] = {0};
     ResponseInfo *pResponse = NULL;
-    struct ReportInfo reportInfo;
-    (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
+    struct ReportInfo reportInfo = {0};
 
     pSim = (HRilSimIO *)data;
-    asprintf(&cmd, "AT+CRSM=%d,%d,%d,%d,%d,%s,\"%s\"", pSim->command, pSim->fileid, pSim->p1, pSim->p2, pSim->p3,
+    (void)sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CRSM=%d,%d,%d,%d,%d,%s,\"%s\"", pSim->command, pSim->fileid, pSim->p1, pSim->p2, pSim->p3,
         (pSim->data == NULL ? "" : pSim->data), pSim->pathid);
     ret = SendCommandLock(cmd, "+CRSM", 0, &pResponse);
-    free(cmd);
     if (ret != 0 || !pResponse->success) {
         TELEPHONY_LOGE("AT+CRSM send failed");
         goto ERR;
@@ -223,7 +220,7 @@ void ReqGetSimIO(const ReqDataInfo *requestInfo, const HRilSimIO *data, size_t d
         goto ERR;
     }
     reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
-    OnSimReport(reportInfo, &simResponse, sizeof(simResponse));
+    OnSimReport(reportInfo, &simResponse, sizeof(HRilSimIOResponse));
     FreeResponseInfo(pResponse);
     return;
 ERR:
@@ -242,10 +239,9 @@ ERR:
 void ReqGetSimImsi(const ReqDataInfo *requestInfo)
 {
     ResponseInfo *pResponse = NULL;
-    int ret;
+    int ret = 0;
     char *pLine = NULL;
-    struct ReportInfo reportInfo;
-    (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
+    struct ReportInfo reportInfo = {0};
     char *result = NULL;
     ret = SendCommandLock("AT+CIMI", NULL, 0, &pResponse);
     if (ret != 0 || !pResponse->success) {
@@ -277,11 +273,10 @@ ERR:
 void ReqGetSimIccID(const ReqDataInfo *requestInfo)
 {
     ResponseInfo *pResponse = NULL;
-    int ret;
+    int ret = 0;
     char *pLine = NULL;
     char *iccId = NULL;
-    struct ReportInfo reportInfo;
-    (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
+    struct ReportInfo reportInfo = {0};
     ret = SendCommandLock("AT+ICCID", "+ICCID", 0, &pResponse);
     if (ret != 0 || !pResponse->success) {
         TELEPHONY_LOGE("AT+ICCID send failed");
@@ -321,18 +316,16 @@ ERR:
 void ReqGetSimLockStatus(const ReqDataInfo *requestInfo, const HRilSimClock *data, size_t dataLen)
 {
     ResponseInfo *pResponse = NULL;
-    char *cmd = NULL;
+    char cmd[MAX_BUFF_SIZE] = {0};
     int ret = 0;
     char *pLine = NULL;
-    int status = -1;
+    int status = 0;
     HRilSimClock *pSimClck = NULL;
-    struct ReportInfo reportInfo;
-    (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
+    struct ReportInfo reportInfo = {0};
 
     pSimClck = (HRilSimClock *)data;
-    asprintf(&cmd, "AT+CLCK=\"%s\",%d", pSimClck->fac, pSimClck->mode);
+    (void)sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CLCK=\"%s\",%d", pSimClck->fac, pSimClck->mode);
     ret = SendCommandLock(cmd, "+CLCK", 0, &pResponse);
-    free(cmd);
     if (ret != 0 || !pResponse->success) {
         TELEPHONY_LOGE("AT+CLCK send failed  dataLen:%{public}zu", dataLen);
         goto ERR;
@@ -370,17 +363,15 @@ ERR:
 void ReqSetSimLock(const ReqDataInfo *requestInfo, const HRilSimClock *data, size_t dataLen)
 {
     ResponseInfo *pResponse = NULL;
-    char *cmd = NULL;
+    char cmd[MAX_BUFF_SIZE] = {0};
     char *pLine = NULL;
     int ret = 0;
     HRilSimClock *pSimClck = NULL;
-    struct ReportInfo reportInfo;
-    (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
+    struct ReportInfo reportInfo = {0};
 
     pSimClck = (HRilSimClock *)data;
-    asprintf(&cmd, "AT+CLCK=\"%s\",%d,\"%s\"", pSimClck->fac, pSimClck->mode, pSimClck->passwd);
+    (void)sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CLCK=\"%s\",%d,\"%s\"", pSimClck->fac, pSimClck->mode, pSimClck->passwd);
     ret = SendCommandLock(cmd, "+CLCK", 0, &pResponse);
-    free(cmd);
     if (ret != 0 || !pResponse->success) {
         TELEPHONY_LOGE("AT+CLCK send failed  dataLen:%{public}zu", dataLen);
         goto ERR;
@@ -406,18 +397,16 @@ ERR:
 void ReqChangeSimPassword(const ReqDataInfo *requestInfo, const HRilSimPassword *data, size_t dataLen)
 {
     ResponseInfo *pResponse = NULL;
-    char *cmd = NULL;
+    char cmd[MAX_BUFF_SIZE] = {0};
     char *pLine = NULL;
     HRilSimPassword *pSimPassword = NULL;
-    int ret = -1;
-    struct ReportInfo reportInfo;
-    (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
+    int ret = 0;
+    struct ReportInfo reportInfo = {0};
 
     pSimPassword = (HRilSimPassword *)data;
-    asprintf(&cmd, "AT+CPWD=\"%s\",\"%s\",\"%s\"", pSimPassword->fac, pSimPassword->oldPassword,
+    (void)sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CPWD=\"%s\",\"%s\",\"%s\"", pSimPassword->fac, pSimPassword->oldPassword,
         pSimPassword->newPassword);
     ret = SendCommandLock(cmd, "+CPWD", 0, &pResponse);
-    free(cmd);
     if (ret != 0 || !pResponse->success) {
         TELEPHONY_LOGE("AT+CPWD send failed  dataLen:%{public}zu", dataLen);
         goto ERR;
@@ -443,15 +432,13 @@ ERR:
 void ReqEnterSimPin(const ReqDataInfo *requestInfo, const char *pin)
 {
     ResponseInfo *pResponse = NULL;
-    char *cmd = NULL;
-    int ret = -1;
+    char cmd[MAX_BUFF_SIZE] = {0};
+    int ret = 0;
     char *pLine = NULL;
-    struct ReportInfo reportInfo;
-    (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
+    struct ReportInfo reportInfo = {0};
 
-    asprintf(&cmd, "AT+CPIN=\"%s\"", pin);
+    (void)sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CPIN=\"%s\"", pin);
     ret = SendCommandLock(cmd, "+CPIN", 0, &pResponse);
-    free(cmd);
     if (ret != 0 || !pResponse->success) {
         TELEPHONY_LOGE("AT+CPIN send failed");
         goto ERR;
@@ -477,15 +464,13 @@ ERR:
 void ReqUnlockSimPin(const ReqDataInfo *requestInfo, const char *puk, const char *pin)
 {
     ResponseInfo *pResponse = NULL;
-    char *cmd = NULL;
+    char cmd[MAX_BUFF_SIZE] = {0};
     char *pLine = NULL;
-    int ret = -1;
-    struct ReportInfo reportInfo;
-    (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
+    int ret = 0;
+    struct ReportInfo reportInfo = {0};
 
-    asprintf(&cmd, "AT+CPIN=\"%s\",\"%s\"", puk, pin);
+    (void)sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CPIN=\"%s\",\"%s\"", puk, pin);
     ret = SendCommandLock(cmd, "+CPIN", 0, &pResponse);
-    free(cmd);
     if (ret != 0 || !pResponse->success) {
         TELEPHONY_LOGE("AT+CPIN send failed");
         goto ERR;
@@ -510,13 +495,11 @@ ERR:
 
 void ReqGetSimPinInputTimes(const ReqDataInfo *requestInfo)
 {
-    int ret;
+    int ret = 0;
     char *pLine = NULL;
-    HRilPinInputTimes pinInputTimes;
+    HRilPinInputTimes pinInputTimes = {0};
     ResponseInfo *pResponse = NULL;
-    struct ReportInfo reportInfo;
-    (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
-    (void)memset_s(&pinInputTimes, sizeof(pinInputTimes), 0, sizeof(pinInputTimes));
+    struct ReportInfo reportInfo = {0};
     ret = SendCommandLock("AT^CPIN?", "^CPIN", 0, &pResponse);
     if (ret != 0 || !pResponse->success) {
         TELEPHONY_LOGE("AT^CPIN? send failed");
@@ -530,7 +513,7 @@ void ReqGetSimPinInputTimes(const ReqDataInfo *requestInfo)
         goto ERR;
     }
     reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
-    OnSimReport(reportInfo, &pinInputTimes, sizeof(pinInputTimes));
+    OnSimReport(reportInfo, &pinInputTimes, sizeof(HRilPinInputTimes));
     FreeResponseInfo(pResponse);
     return;
 ERR:

@@ -30,6 +30,10 @@ static void LoadVendor(void)
     // functions returned by ril init function in vendor ril
     const HRilOps *ops = NULL;
     rilLibPath = RIL_LIB_PATH;
+    if (rilLibPath == NULL) {
+        TELEPHONY_LOGE("dynamic library path is empty");
+        return;
+    }
 
     TELEPHONY_LOGD("RilInit rilInit start");
     g_dlHandle = dlopen(rilLibPath, RTLD_NOW);

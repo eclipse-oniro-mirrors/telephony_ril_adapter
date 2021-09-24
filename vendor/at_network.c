@@ -22,6 +22,8 @@
 #include "vendor_util.h"
 
 static struct ReportInfo g_reportInfoForOperListToUse;
+static pthread_mutex_t g_networkSearchInformationMutex = PTHREAD_MUTEX_INITIALIZER;
+#define MAX_BUFF_SIZE 500
 
 int GetResponseErrorCode(ResponseInfo *pResponseInfo)
 {
@@ -343,21 +345,33 @@ static int MoveRightBracket(char **pStr)
 void GetNetworkSearchInformationPause()
 {
     TELEPHONY_LOGD("enter to [%{public}s]:%{public}d", __func__, __LINE__);
+    pthread_mutex_lock(&g_networkSearchInformationMutex);
     g_reportInfoForOperListToUse.error = HRIL_ERR_GENERIC_FAILURE;
     OnNetworkReport(g_reportInfoForOperListToUse, NULL, 0);
     SetAtPauseFlag(false);
+    if (g_reportInfoForOperListToUse.requestInfo != NULL) {
+        free(g_reportInfoForOperListToUse.requestInfo);
+        g_reportInfoForOperListToUse.requestInfo = NULL;
+    }
+    pthread_mutex_unlock(&g_networkSearchInformationMutex);
 }
 
 void PerformTimeOut(int sigFlag)
 {
     if (SIGALRM == sigFlag) {
+        pthread_mutex_lock(&g_networkSearchInformationMutex);
         bool sendFlag = GetAtPauseFlag();
         TELEPHONY_LOGD("enter to [%{public}s]:%{public}d", __func__, __LINE__);
         if (sendFlag) {
             g_reportInfoForOperListToUse.error = HRIL_ERR_GENERIC_FAILURE;
             OnNetworkReport(g_reportInfoForOperListToUse, NULL, 0);
             SetAtPauseFlag(false);
+            if (g_reportInfoForOperListToUse.requestInfo != NULL) {
+                free(g_reportInfoForOperListToUse.requestInfo);
+                g_reportInfoForOperListToUse.requestInfo = NULL;
+            }
         }
+        pthread_mutex_unlock(&g_networkSearchInformationMutex);
     }
     return;
 }
@@ -367,15 +381,19 @@ void RequestGetNetworkSearchInformation(const ReqDataInfo *requestInfo)
     int ret = 0;
     const long TIME_OUT = 1000;
     ResponseInfo *responseInfo = NULL;
-    const int MINUTE = 60;
+    const int MINUTE = 120;
     TELEPHONY_LOGD("enter to [%{public}s]:%{public}d", __func__, __LINE__);
-
+    pthread_mutex_lock(&g_networkSearchInformationMutex);
     alarm(0);
-    if (signal(SIGALRM, PerformTimeOut) == SIG_ERR) {
-        TELEPHONY_LOGE("signal is SIG_ERR!");
+    if (g_reportInfoForOperListToUse.requestInfo != NULL) {
+        free(g_reportInfoForOperListToUse.requestInfo);
+        g_reportInfoForOperListToUse.requestInfo = NULL;
     }
-    alarm(MINUTE);
-
+    if (signal(SIGALRM, PerformTimeOut) == SIG_ERR) {
+        TELEPHONY_LOGE("RequestGetNetworkSearchInformation signal PerformTimeOut is SIG_ERR!");
+        pthread_mutex_unlock(&g_networkSearchInformationMutex);
+        return;
+    }
     ret = SendCommandNetWorksLock("AT+COPS=?", "+COPS:", TIME_OUT, &responseInfo);
 
     g_reportInfoForOperListToUse = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
@@ -383,12 +401,22 @@ void RequestGetNetworkSearchInformation(const ReqDataInfo *requestInfo)
         TELEPHONY_LOGE("send AT CMD failed!");
         SetAtPauseFlag(false);
         g_reportInfoForOperListToUse.error = GetResponseErrorCode(responseInfo);
-        OnNetworkReport(g_reportInfoForOperListToUse, NULL, 1);
+        OnNetworkReport(g_reportInfoForOperListToUse, NULL, 0);
         if (responseInfo != NULL) {
             FreeResponseInfo(responseInfo);
         }
+        if (g_reportInfoForOperListToUse.requestInfo != NULL) {
+            free(g_reportInfoForOperListToUse.requestInfo);
+            g_reportInfoForOperListToUse.requestInfo = NULL;
+        }
+        pthread_mutex_unlock(&g_networkSearchInformationMutex);
         return;
     }
+    alarm(MINUTE);
+    if (responseInfo != NULL) {
+        FreeResponseInfo(responseInfo);
+    }
+    pthread_mutex_unlock(&g_networkSearchInformationMutex);
     SetWatchFunction(GetNetworkSearchInformationPause);
 }
 
@@ -441,17 +469,45 @@ int ParseOperListInfo(char *lineinfo, int count, AvailableOperInfo *pOperInfo, A
     return operCount;
 }
 
+static void DealNetworkSearchInformation(int operCount, AvailableOperInfo **ppOperInfo, AvailableOperInfo *pOperInfo)
+{
+    if (operCount == 0) {
+        pthread_mutex_lock(&g_networkSearchInformationMutex);
+        SetAtPauseFlag(false);
+        alarm(0);
+        if (g_reportInfoForOperListToUse.requestInfo != NULL) {
+            g_reportInfoForOperListToUse.error = HRIL_ERR_INVALID_RESPONSE;
+            OnNetworkReport(g_reportInfoForOperListToUse, NULL, 0);
+            free(g_reportInfoForOperListToUse.requestInfo);
+            g_reportInfoForOperListToUse.requestInfo = NULL;
+        }
+        pthread_mutex_unlock(&g_networkSearchInformationMutex);
+    } else {
+        pthread_mutex_lock(&g_networkSearchInformationMutex);
+        SetAtPauseFlag(false);
+        alarm(0);
+        if (g_reportInfoForOperListToUse.requestInfo != NULL) {
+            OnNetworkReport(g_reportInfoForOperListToUse, (void *)ppOperInfo, operCount * sizeof(AvailableOperInfo *));
+            free(g_reportInfoForOperListToUse.requestInfo);
+            g_reportInfoForOperListToUse.requestInfo = NULL;
+        }
+        pthread_mutex_unlock(&g_networkSearchInformationMutex);
+    }
+    if (ppOperInfo == NULL) {
+        free(ppOperInfo);
+    }
+    if (pOperInfo == NULL) {
+        free(pOperInfo);
+    }
+}
+
 int ProcessOperListToUse(char *list)
 {
-    int ret = 0;
     int item = 0;
     int operCount = 0;
     const int UNUSED_ITEM_COUNT = 2;
     AvailableOperInfo *pOperInfo = NULL;
     AvailableOperInfo **ppOperInfo = NULL;
-
-    SetAtPauseFlag(false);
-    alarm(0);
     if (list == NULL) {
         TELEPHONY_LOGD("ProcessOperListToUse result is null");
         goto ERROR;
@@ -467,55 +523,47 @@ int ProcessOperListToUse(char *list)
         goto ERROR;
     }
     line = list;
-    ret = SkipATPrefix(&line);
+    int ret = SkipATPrefix(&line);
     if (ret < 0) {
         goto ERROR;
     }
     item = item - UNUSED_ITEM_COUNT;
     ppOperInfo = (AvailableOperInfo **)malloc(item * sizeof(AvailableOperInfo *));
     if (!ppOperInfo) {
-        TELEPHONY_LOGE("ppOperInfo malloc fail");
         goto ERROR;
     }
     pOperInfo = (AvailableOperInfo *)malloc(item * sizeof(AvailableOperInfo));
     if (!pOperInfo) {
-        TELEPHONY_LOGE("pOperInfo malloc fail");
         goto ERROR;
     }
-
     (void)memset_s(pOperInfo, item * sizeof(AvailableOperInfo), 0, item * sizeof(AvailableOperInfo));
     for (int j = 0; j < item; j++) {
         ppOperInfo[j] = &(pOperInfo[j]);
     }
     operCount = ParseOperListInfo(line, item, pOperInfo, ppOperInfo);
     if (operCount != 0) {
-        OnNetworkReport(g_reportInfoForOperListToUse, (void *)ppOperInfo, operCount * sizeof(AvailableOperInfo *));
+        DealNetworkSearchInformation(operCount, ppOperInfo, pOperInfo);
     } else {
         goto ERROR;
     }
-    free(ppOperInfo);
-    free(pOperInfo);
     return HRIL_ERR_SUCCESS;
 ERROR:
     TELEPHONY_LOGE("RequestGetNetworkSearchInformation Failed");
-    g_reportInfoForOperListToUse.error = HRIL_ERR_INVALID_RESPONSE;
-    OnNetworkReport(g_reportInfoForOperListToUse, NULL, 0);
-    free(ppOperInfo);
-    free(pOperInfo);
+    DealNetworkSearchInformation(operCount, ppOperInfo, pOperInfo);
     return HRIL_ERR_GENERIC_FAILURE;
 }
 
-static bool PrepareSetNetworkSelectionMode(char **cmd, const HRiSetNetworkModeInfo *setModeInfo)
+static bool PrepareSetNetworkSelectionMode(char *cmd, const HRiSetNetworkModeInfo *setModeInfo)
 {
     bool ret = true;
     TELEPHONY_LOGD("setModeInfo, serial123 = %{public}d", setModeInfo->selectMode);
     if (setModeInfo->selectMode == 0) {
-        asprintf(cmd, "%s", "AT+COPS=0");
+        (void)sprintf_s(cmd, MAX_BUFF_SIZE, "%s", "AT+COPS=0");
     } else if (setModeInfo->selectMode == 1) {
         if (setModeInfo->oper == NULL) {
             ret = false;
         } else {
-            asprintf(cmd, "AT+COPS=1,2,%s", setModeInfo->oper);
+            (void)sprintf_s(cmd, MAX_BUFF_SIZE, "AT+COPS=1,2,%s", setModeInfo->oper);
         }
     } else {
         ret = false;
@@ -527,7 +575,9 @@ void RequestSetAutomaticModeForNetworks(const ReqDataInfo *requestInfo, const HR
 {
     int err = HRIL_ERR_SUCCESS;
     ResponseInfo *responseInfo = NULL;
-    char *cmd = NULL;
+    char cmd[MAX_BUFF_SIZE] = {0};
+    char *cmdBuff = cmd;
+
     struct ReportInfo reportInfo;
     (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
     HRiSetNetworkModeInfo *setModeInfo = (HRiSetNetworkModeInfo *)data;
@@ -537,7 +587,7 @@ void RequestSetAutomaticModeForNetworks(const ReqDataInfo *requestInfo, const HR
         TELEPHONY_LOGE("SetAutomaticMode HRIL_ERR_NULL_POINT");
         return;
     }
-    if (!PrepareSetNetworkSelectionMode(&cmd, setModeInfo)) {
+    if (!PrepareSetNetworkSelectionMode(cmdBuff, setModeInfo)) {
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_PARAMETER, HRIL_RESPONSE, 0);
         OnNetworkReport(reportInfo, NULL, 1);
         TELEPHONY_LOGE("SetAutomaticMode HRIL_ERR_INVALID_PARAMETER");
@@ -545,10 +595,6 @@ void RequestSetAutomaticModeForNetworks(const ReqDataInfo *requestInfo, const HR
     }
     TELEPHONY_LOGD("requestSetAutomaticModeForNetworks, cmd = %{public}s", cmd);
     err = SendCommandLock(cmd, NULL, 0, &responseInfo);
-    if (cmd != NULL) {
-        free(cmd);
-        cmd = NULL;
-    }
     if (responseInfo == NULL) {
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_NULL_POINT, HRIL_RESPONSE, 0);
         OnNetworkReport(reportInfo, NULL, 1);

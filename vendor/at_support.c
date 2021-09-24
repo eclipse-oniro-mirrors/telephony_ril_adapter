@@ -223,7 +223,7 @@ int SendCommandLock(const char *command, const char *prefix, long long timeout, 
     TELEPHONY_LOGD("SendCommandLock() command %{public}s", command);
     g_prefix = prefix;
     err = SendCommandNoLock(command, timeout, outResponse);
-    TELEPHONY_LOGE("SendCommandLock() err = %{public}d", err);
+    TELEPHONY_LOGD("SendCommandLock() err = %{public}d", err);
     pthread_mutex_unlock(&g_commandmutex);
     // when timeout to process
     if (err == AT_ERR_TIMEOUT && g_onTimeout != NULL) {
@@ -246,7 +246,7 @@ int SendCommandNetWorksLock(const char *command, const char *prefix, long long t
     TELEPHONY_LOGD("SendCommandNetWorksLock() command %{public}s", command);
     g_prefix = prefix;
     err = SendCommandNoLock(command, timeout, outResponse);
-    TELEPHONY_LOGE("SendCommandNetWorksLock() err = %{public}d", err);
+    TELEPHONY_LOGD("SendCommandNetWorksLock() err = %{public}d", err);
     pthread_mutex_unlock(&g_commandmutex);
     // when timeout to process
     if (err == AT_ERR_TIMEOUT) {
@@ -285,20 +285,15 @@ int SendCommandNoLock(const char *command, long long timeout, ResponseInfo **out
         err = AT_ERR_COMMAND_PENDING;
         goto ERROR;
     }
-    err = WriteATCommand(command, 0, g_atFd);
-    if (err != VENDOR_SUCCESS) {
-        goto ERROR;
-    }
-
     g_response = (ResponseInfo *)calloc(1, sizeof(ResponseInfo));
     if (g_response == NULL) {
         err = AT_ERR_GENERIC;
         goto ERROR;
     }
-    g_response->head = NULL;
-    g_response->result = NULL;
-    g_response->last = NULL;
-
+    err = WriteATCommand(command, 0, g_atFd);
+    if (err != VENDOR_SUCCESS) {
+        goto ERROR;
+    }
     if (timeout != 0) {
         SetWaitTimeout(&time, timeout);
     } else {

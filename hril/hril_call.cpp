@@ -23,6 +23,14 @@ HRilCall::HRilCall()
     AddHandlerToMap();
 }
 
+HRilCall::~HRilCall()
+{
+    respMemberFuncMap_.clear();
+    notiMemberFuncMap_.clear();
+    reqMemberFuncMap_.clear();
+    callFuncs_ = nullptr;
+}
+
 void HRilCall::ProcessCallResponse(
     int32_t slotId, int32_t code, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
@@ -856,8 +864,8 @@ void HRilCall::SetCallForward(int32_t slotId, struct HdfSBuf *data)
         TELEPHONY_LOGE("RilAdapter failed to do Create SetCallForward HRilRequest!");
         return;
     }
-    HRilCFInfo cFInfo = {};
 
+    HRilCFInfo cFInfo = {};
     if (!ConvertToString(&cFInfo.number, callForwardSetInfo.number, requestInfo)) {
         TELEPHONY_LOGE("RilAdapter failed to do ConvertToString!");
         free(requestInfo);
@@ -1042,7 +1050,7 @@ int32_t HRilCall::GetCallForwardResponse(int32_t slotId, int32_t requestNum, HRi
     cFQueryResult.status = pCFQueryInfo->status;
     cFQueryResult.classx = pCFQueryInfo->classx;
     cFQueryResult.type = pCFQueryInfo->type;
-    cFQueryResult.number = pCFQueryInfo->number == nullptr ? "" : pCFQueryInfo->number;
+    cFQueryResult.number = (pCFQueryInfo->number == nullptr) ? "" : pCFQueryInfo->number;
     return ResponseMessageParcel(responseInfo, cFQueryResult, requestNum);
 }
 

@@ -24,6 +24,8 @@ namespace Telephony {
 class HRilCall : public HRilBase {
 public:
     HRilCall();
+    virtual ~HRilCall();
+
     void RegisterCallResponseCallback(HdfRemoteService *serviceCallback);
     void RegisterCallNotifyCallback(HdfRemoteService *serviceCallbackInd);
     void ProcessCallResponse(int32_t slotId, int32_t code, HRilRadioResponseInfo &responseInfo,
