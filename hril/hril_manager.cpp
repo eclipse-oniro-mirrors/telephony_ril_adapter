@@ -458,8 +458,6 @@ HRilManager::HRilManager()
     hrilData_ = std::make_unique<HRilData>();
 }
 
-HRilManager::~HRilManager()
-{
-}
+HRilManager::~HRilManager() {}
 } // namespace Telephony
 } // namespace OHOS

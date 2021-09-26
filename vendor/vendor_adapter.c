@@ -29,6 +29,7 @@
 
 #define DEVICE_PATH "/dev/ttyUSB1"
 #define DEVICE_PATH_DEFAULT "/dev/ttyUSB"
+#define MAX_BUFF_SIZE 500
 
 static HRilRadioState g_radioState = HRIL_RADIO_POWER_STATE_UNAVAILABLE;
 static pthread_mutex_t g_statusMutex = PTHREAD_MUTEX_INITIALIZER;
@@ -125,7 +126,7 @@ HRilRadioState GetRadioState(void)
 
 int SetRadioState(HRilRadioState newState, int rst)
 {
-    char *cmd = NULL;
+    char cmd[MAX_BUFF_SIZE] = {0};
     int err = 0;
     ResponseInfo *pResponse = NULL;
     HRilRadioState oldState;
@@ -148,9 +149,8 @@ int SetRadioState(HRilRadioState newState, int rst)
     pthread_mutex_unlock(&g_statusMutex);
 
     if (oldState != g_radioState) {
-        asprintf(&cmd, "AT+CFUN=%u,%d", newState, rst);
+        (void)sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CFUN=%u,%d", newState, rst);
         err = SendCommandLock(cmd, NULL, timeOut, &pResponse);
-        free(cmd);
         if (err != 0 || !pResponse->success) {
             TELEPHONY_LOGE("AT+CFUN send failed");
             FreeResponseInfo(pResponse);

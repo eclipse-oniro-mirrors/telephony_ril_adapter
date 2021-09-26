@@ -23,6 +23,7 @@
 
 static struct ReportInfo g_reportInfoForOperListToUse;
 static pthread_mutex_t g_networkSearchInformationMutex = PTHREAD_MUTEX_INITIALIZER;
+#define MAX_BUFF_SIZE 500
 
 int GetResponseErrorCode(ResponseInfo *pResponseInfo)
 {
@@ -380,7 +381,7 @@ void RequestGetNetworkSearchInformation(const ReqDataInfo *requestInfo)
     int ret = 0;
     const long TIME_OUT = 1000;
     ResponseInfo *responseInfo = NULL;
-    const int MINUTE = 60;
+    const int MINUTE = 120;
     TELEPHONY_LOGD("enter to [%{public}s]:%{public}d", __func__, __LINE__);
     pthread_mutex_lock(&g_networkSearchInformationMutex);
     alarm(0);
@@ -552,17 +553,17 @@ ERROR:
     return HRIL_ERR_GENERIC_FAILURE;
 }
 
-static bool PrepareSetNetworkSelectionMode(char **cmd, const HRiSetNetworkModeInfo *setModeInfo)
+static bool PrepareSetNetworkSelectionMode(char *cmd, const HRiSetNetworkModeInfo *setModeInfo)
 {
     bool ret = true;
     TELEPHONY_LOGD("setModeInfo, serial123 = %{public}d", setModeInfo->selectMode);
     if (setModeInfo->selectMode == 0) {
-        asprintf(cmd, "%s", "AT+COPS=0");
+        (void)sprintf_s(cmd, MAX_BUFF_SIZE, "%s", "AT+COPS=0");
     } else if (setModeInfo->selectMode == 1) {
         if (setModeInfo->oper == NULL) {
             ret = false;
         } else {
-            asprintf(cmd, "AT+COPS=1,2,%s", setModeInfo->oper);
+            (void)sprintf_s(cmd, MAX_BUFF_SIZE, "AT+COPS=1,2,%s", setModeInfo->oper);
         }
     } else {
         ret = false;
@@ -574,7 +575,9 @@ void RequestSetAutomaticModeForNetworks(const ReqDataInfo *requestInfo, const HR
 {
     int err = HRIL_ERR_SUCCESS;
     ResponseInfo *responseInfo = NULL;
-    char *cmd = NULL;
+    char cmd[MAX_BUFF_SIZE] = {0};
+    char *cmdBuff = cmd;
+
     struct ReportInfo reportInfo;
     (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
     HRiSetNetworkModeInfo *setModeInfo = (HRiSetNetworkModeInfo *)data;
@@ -584,7 +587,7 @@ void RequestSetAutomaticModeForNetworks(const ReqDataInfo *requestInfo, const HR
         TELEPHONY_LOGE("SetAutomaticMode HRIL_ERR_NULL_POINT");
         return;
     }
-    if (!PrepareSetNetworkSelectionMode(&cmd, setModeInfo)) {
+    if (!PrepareSetNetworkSelectionMode(cmdBuff, setModeInfo)) {
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_PARAMETER, HRIL_RESPONSE, 0);
         OnNetworkReport(reportInfo, NULL, 1);
         TELEPHONY_LOGE("SetAutomaticMode HRIL_ERR_INVALID_PARAMETER");
@@ -592,10 +595,6 @@ void RequestSetAutomaticModeForNetworks(const ReqDataInfo *requestInfo, const HR
     }
     TELEPHONY_LOGD("requestSetAutomaticModeForNetworks, cmd = %{public}s", cmd);
     err = SendCommandLock(cmd, NULL, 0, &responseInfo);
-    if (cmd != NULL) {
-        free(cmd);
-        cmd = NULL;
-    }
     if (responseInfo == NULL) {
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_NULL_POINT, HRIL_RESPONSE, 0);
         OnNetworkReport(reportInfo, NULL, 1);
