@@ -48,7 +48,7 @@ SendSmsResultInfo HRilSms::MakeSendSmsResult(
 
 CellBroadcastReportInfo HRilSms::MakeCellBroadcastResult(const void *response, const size_t responseLen)
 {
-    CellBroadcastReportInfo result;
+    CellBroadcastReportInfo result = {};
     if (response == nullptr || responseLen != sizeof(HRilCellBroadcastReportInfo *)) {
         TELEPHONY_LOGE("Invalid response: response is nullptr");
         result.data = std::string("");
@@ -65,21 +65,18 @@ CellBroadcastReportInfo HRilSms::MakeCellBroadcastResult(const void *response, c
             result.data = std::string("");
             TELEPHONY_LOGE("result.data is nullptr");
         } else {
-            TELEPHONY_LOGD("result.data :%{public}s", cellBroadcastReportInfo->data);
             result.data = std::string(cellBroadcastReportInfo->data);
         }
         if (cellBroadcastReportInfo->pdu == nullptr) {
             result.pdu = std::string("");
             TELEPHONY_LOGE("result.pdu is nullptr");
         } else {
-            TELEPHONY_LOGD("result.pdu :%{public}s", cellBroadcastReportInfo->pdu);
             result.pdu = std::string(cellBroadcastReportInfo->pdu);
         }
         if (cellBroadcastReportInfo->dcs == nullptr) {
             result.dcs = std::string("");
             TELEPHONY_LOGE("result.dcs is nullptr");
         } else {
-            TELEPHONY_LOGD("result.dcs :%{public}s", cellBroadcastReportInfo->dcs);
             result.dcs = std::string(cellBroadcastReportInfo->dcs);
         }
     }
@@ -88,7 +85,7 @@ CellBroadcastReportInfo HRilSms::MakeCellBroadcastResult(const void *response, c
 
 void HRilSms::SendSms(int32_t slotId, struct HdfSBuf *data)
 {
-    struct GsmSmsMessageInfo message;
+    struct GsmSmsMessageInfo message = {};
     MessageParcel *parcel = nullptr;
     const int32_t COUNT_STRINGS_VALUE = 2;
     if (SbufToParcel(data, &parcel)) {
@@ -96,7 +93,7 @@ void HRilSms::SendSms(int32_t slotId, struct HdfSBuf *data)
         return;
     }
     if (parcel == nullptr) {
-        TELEPHONY_LOGE("parcel int SendSms is nullptr!");
+        TELEPHONY_LOGE("parcel int32_t SendSms is nullptr!");
         return;
     }
     if (!message.ReadFromParcel(*parcel)) {
@@ -109,10 +106,11 @@ void HRilSms::SendSms(int32_t slotId, struct HdfSBuf *data)
 
 void HRilSms::StorageSms(int32_t slotId, struct HdfSBuf *data)
 {
-    struct GsmSmsMessageInfo message;
-    HRilSmsWriteSms msg;
-    int len1 = 0;
-    int len2 = 0;
+    struct GsmSmsMessageInfo message = {};
+    HRilSmsWriteSms msg = {};
+    size_t pduLen = 0;
+    size_t smscPduLen = 0;
+    const int32_t LEN = 1;
     MessageParcel *parcel = nullptr;
     if (SbufToParcel(data, &parcel) || parcel == nullptr) {
         TELEPHONY_LOGE("RilAdapter failed to do SbufToParcel parcel=%{public}p", parcel);
@@ -127,27 +125,36 @@ void HRilSms::StorageSms(int32_t slotId, struct HdfSBuf *data)
         return;
     }
     msg.state = message.state;
-    len1 = message.pdu.length();
-    msg.pdu = (char *)calloc(len1 + 1, sizeof(char));
+    pduLen = message.pdu.length();
+    if (pduLen == 0) {
+        free(requestInfo);
+        return;
+    }
+    msg.pdu = (char *)calloc(pduLen + LEN, sizeof(char));
     if (msg.pdu == nullptr) {
         TELEPHONY_LOGE("calloc in StorageSms is failed!");
         free(requestInfo);
         return;
     }
-    int ret = (int)strcpy_s(msg.pdu, len1 + 1, message.pdu.c_str());
+    int32_t ret = (int)strcpy_s(msg.pdu, pduLen + LEN, message.pdu.c_str());
     if (ret != 0) {
         TELEPHONY_LOGE("RilAdapter Failed to copy string error!");
     }
-    len2 = message.smscPdu.length();
-    msg.smsc = (char *)calloc(len2 + 1, sizeof(char));
+    smscPduLen = message.smscPdu.length();
+    if (smscPduLen == 0) {
+        free(requestInfo);
+        free(msg.pdu);
+        return;
+    }
+    msg.smsc = (char *)calloc(smscPduLen + LEN, sizeof(char));
     if (msg.smsc == nullptr) {
         TELEPHONY_LOGE("calloc in StorageSms is failed!");
         free(requestInfo);
         free(msg.pdu);
         return;
     }
-    (void)strcpy_s(msg.smsc, len2 + 1, message.smscPdu.c_str());
-    if (smsFuncs_ == nullptr) {
+    int32_t tmp = (int)strcpy_s(msg.smsc, smscPduLen + LEN, message.smscPdu.c_str());
+    if (tmp != 0 || smsFuncs_ == nullptr) {
         TELEPHONY_LOGE("smsFuncs_ is nullptr!");
         free(requestInfo);
         free(msg.pdu);
@@ -165,6 +172,8 @@ void HRilSms::DeleteSms(int32_t slotId, struct HdfSBuf *data)
     int32_t *pBuff = nullptr;
     int32_t index = 0;
     int32_t serial = 0;
+    const int32_t ARG_COUNT = 1;
+
     if (!HdfSbufReadInt32(data, &serial)) {
         TELEPHONY_LOGE("DeleteSms >>> miss serial parameter");
         return;
@@ -177,7 +186,7 @@ void HRilSms::DeleteSms(int32_t slotId, struct HdfSBuf *data)
     if (requestInfo == nullptr) {
         return;
     }
-    RequestWithInts(&pBuff, requestInfo, 1, index);
+    RequestWithInts(&pBuff, requestInfo, ARG_COUNT, index);
     if (smsFuncs_ == nullptr) {
         TELEPHONY_LOGE("smsFuncs_ is nullptr!");
         if (pBuff != nullptr) {
@@ -186,7 +195,7 @@ void HRilSms::DeleteSms(int32_t slotId, struct HdfSBuf *data)
         free(requestInfo);
         return;
     }
-    smsFuncs_->DeleteSms(requestInfo, pBuff, sizeof(int32_t *));
+    smsFuncs_->DeleteSms(requestInfo, pBuff, sizeof(char *));
     if (pBuff != nullptr) {
         free(pBuff);
     }
@@ -195,9 +204,10 @@ void HRilSms::DeleteSms(int32_t slotId, struct HdfSBuf *data)
 
 void HRilSms::UpdateSms(int32_t slotId, struct HdfSBuf *data)
 {
-    struct SmsMessageIOInfo message;
-    HRilSmsWriteSms msg;
-    int len = 0;
+    struct SmsMessageIOInfo message = {};
+    HRilSmsWriteSms msg = {};
+    int32_t len = 0;
+    const int32_t LEN = 1;
     MessageParcel *parcel = nullptr;
     if (SbufToParcel(data, &parcel)) {
         TELEPHONY_LOGE("RilAdapter failed to do SbufToParcel");
@@ -217,16 +227,20 @@ void HRilSms::UpdateSms(int32_t slotId, struct HdfSBuf *data)
     }
     len = message.pdu.size();
     msg.state = message.state;
-    msg.pdu = (char *)calloc(len + 1, sizeof(char));
+    if (len == 0) {
+        free(requestInfo);
+        return;
+    }
+    msg.pdu = (char *)calloc(len + LEN, sizeof(char));
     if (msg.pdu == nullptr) {
         TELEPHONY_LOGE("calloc in UpdateSms is failed!");
         free(requestInfo);
         return;
     }
     msg.index = message.index;
-    int ret = (int)strcpy_s(msg.pdu, message.pdu.size() + 1, message.pdu.c_str());
+    int32_t ret = (int)strcpy_s(msg.pdu, message.pdu.size() + LEN, message.pdu.c_str());
     if (ret != 0 || smsFuncs_ == nullptr) {
-        TELEPHONY_LOGE("updateSms failed!");
+        TELEPHONY_LOGE("smsFuncs failed!");
         free(requestInfo);
         free(msg.pdu);
         return;
@@ -259,7 +273,7 @@ void HRilSms::GetSmsCenterAddress(int32_t slotId, struct HdfSBuf *data)
 int32_t HRilSms::GetSmsCenterAddressResponse(int32_t slotId, int32_t requestNum,
     HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    ServiceCenterAddress result;
+    ServiceCenterAddress result = {};
 
     if (response == nullptr || responseLen != sizeof(HRilServiceCenterAddress *)) {
         TELEPHONY_LOGE("Invalid response: response is nullptr");
@@ -276,16 +290,16 @@ int32_t HRilSms::GetSmsCenterAddressResponse(int32_t slotId, int32_t requestNum,
         } else {
             result.address = std::string(address->address);
         }
-        TELEPHONY_LOGD("result address:%{public}s, tosca:%{public}d", result.address.c_str(), result.tosca);
     }
     return ResponseMessageParcel(responseInfo, result, requestNum);
 }
 
 void HRilSms::SetSmsCenterAddress(int32_t slotId, struct HdfSBuf *data)
 {
-    struct ServiceCenterAddress serCenterAddress;
-    HRilServiceCenterAddress address;
-    int len = 0;
+    struct ServiceCenterAddress serCenterAddress = {};
+    HRilServiceCenterAddress address = {};
+    int32_t len = 0;
+    const int32_t LEN = 1;
     MessageParcel *parcel = nullptr;
     TELEPHONY_LOGD("SetSmsCenterAddress");
     if (SbufToParcel(data, &parcel)) {
@@ -306,15 +320,23 @@ void HRilSms::SetSmsCenterAddress(int32_t slotId, struct HdfSBuf *data)
     }
     len = strlen(serCenterAddress.address.c_str());
     address.tosca = serCenterAddress.tosca;
-    address.address = (char *)calloc(len + 1, sizeof(char));
+    if (len == 0) {
+        free(requestInfo);
+        return;
+    }
+    address.address = (char *)calloc(len + LEN, sizeof(char));
     if (address.address == nullptr) {
         TELEPHONY_LOGE("calloc in SetSmsCenterAddress is failed!");
         free(requestInfo);
         return;
     }
-    int ret = (int)strcpy_s(address.address, serCenterAddress.address.size() + 1, serCenterAddress.address.c_str());
+    int32_t ret =
+        (int)strcpy_s(address.address, serCenterAddress.address.size() + LEN, serCenterAddress.address.c_str());
     if (ret != 0) {
         TELEPHONY_LOGE("RilAdapter Failed to copy string error!");
+        free(requestInfo);
+        free(address.address);
+        return;
     }
     smsFuncs_->SetSmsCenterAddress(requestInfo, &address, sizeof(HRilServiceCenterAddress));
     free(address.address);
@@ -324,15 +346,16 @@ void HRilSms::SetSmsCenterAddress(int32_t slotId, struct HdfSBuf *data)
 int32_t HRilSms::SetSmsCenterAddressResponse(int32_t slotId, int32_t requestNum,
     HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));
+    return ResponseRequestInfo(requestNum, &responseInfo, sizeof(HRilRadioResponseInfo));
 }
 
 void HRilSms::SetCellBroadcast(int32_t slotId, struct HdfSBuf *data)
 {
-    struct CellBroadcastInfo broadcastInfo;
-    HRilCellBroadcastInfo cellBroadcastInfo;
-    int len1 = 0;
-    int len2 = 0;
+    struct CellBroadcastInfo broadcastInfo = {};
+    HRilCellBroadcastInfo cellBroadcastInfo = {};
+    size_t midsLen = 0;
+    size_t dcssLen = 0;
+    const int32_t LEN = 1;
     MessageParcel *parcel = nullptr;
     if (SbufToParcel(data, &parcel) || parcel == nullptr) {
         TELEPHONY_LOGE("RilAdapter failed to do SbufToParcel parcel=%{public}p", parcel);
@@ -347,27 +370,38 @@ void HRilSms::SetCellBroadcast(int32_t slotId, struct HdfSBuf *data)
         return;
     }
     cellBroadcastInfo.mode = broadcastInfo.mode;
-    len1 = broadcastInfo.mids.size();
-    cellBroadcastInfo.mids = (char *)calloc(len1 + 1, sizeof(char));
+    midsLen = broadcastInfo.mids.size();
+    if (midsLen == 0) {
+        free(requestInfo);
+        return;
+    }
+    cellBroadcastInfo.mids = (char *)calloc(midsLen + LEN, sizeof(char));
     if (cellBroadcastInfo.mids == nullptr) {
         TELEPHONY_LOGE("calloc in SetCellBroadcast is failed!");
         free(requestInfo);
         return;
     }
-    int ret = (int)strcpy_s(cellBroadcastInfo.mids, broadcastInfo.mids.size() + 1, broadcastInfo.mids.c_str());
+    int32_t ret = (int)strcpy_s(cellBroadcastInfo.mids, broadcastInfo.mids.size() + LEN, broadcastInfo.mids.c_str());
     if (ret != 0) {
         TELEPHONY_LOGE("RilAdapter Failed to copy string error!");
+        free(requestInfo);
+        free(cellBroadcastInfo.mids);
+        return;
     }
-    len2 = broadcastInfo.dcss.size();
-    cellBroadcastInfo.dcss = (char *)calloc(len1 + 1, sizeof(char));
+    dcssLen = broadcastInfo.dcss.size();
+    if (dcssLen == 0) {
+        free(requestInfo);
+        return;
+    }
+    cellBroadcastInfo.dcss = (char *)calloc(dcssLen + LEN, sizeof(char));
     if (cellBroadcastInfo.dcss == nullptr) {
         TELEPHONY_LOGE("calloc in SetCellBroadcast is failed!");
         free(cellBroadcastInfo.mids);
         free(requestInfo);
         return;
     }
-    (void)strcpy_s(cellBroadcastInfo.dcss, broadcastInfo.dcss.size() + 1, broadcastInfo.dcss.c_str());
-    if (smsFuncs_ == nullptr) {
+    int32_t tmp = (int)strcpy_s(cellBroadcastInfo.dcss, broadcastInfo.dcss.size() + LEN, broadcastInfo.dcss.c_str());
+    if (tmp != 0 || smsFuncs_ == nullptr) {
         TELEPHONY_LOGE("smsFuncs_ is nullptr!");
         free(cellBroadcastInfo.mids);
         free(cellBroadcastInfo.dcss);
@@ -383,20 +417,20 @@ void HRilSms::SetCellBroadcast(int32_t slotId, struct HdfSBuf *data)
 int32_t HRilSms::SetCellBroadcastResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
     const void *response, size_t responseLen)
 {
-    return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));
+    return ResponseRequestInfo(requestNum, &responseInfo, sizeof(HRilRadioResponseInfo));
 }
 
 bool HRilSms::RequestWithStrings(int32_t serial, int32_t slotId, int32_t request, int32_t count, ...)
 {
+    if (smsFuncs_ == nullptr || count <= 0) {
+        return false;
+    }
+    const int32_t ARG_COUNTS = 1;
     ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, request);
     if (requestInfo == nullptr) {
         return false;
     }
     char **pBuff = nullptr;
-    if (sizeof(char *) <= 0 || count <= 0) {
-        free(requestInfo);
-        return false;
-    }
     pBuff = (char **)calloc(count, sizeof(char *));
     if (pBuff == nullptr) {
         SendErrorResponse(requestInfo, HRIL_ERR_MEMORY_FULL);
@@ -413,7 +447,7 @@ bool HRilSms::RequestWithStrings(int32_t serial, int32_t slotId, int32_t request
             TELEPHONY_LOGE("ConvertToString in RequestWithStrings is failed!");
             va_end(list);
             for (int32_t j = 0; j < i; j++) {
-                FreeStrings(1, pBuff[j]);
+                FreeStrings(ARG_COUNTS, pBuff[j]);
             }
             free(pBuff);
             free(requestInfo);
@@ -422,17 +456,11 @@ bool HRilSms::RequestWithStrings(int32_t serial, int32_t slotId, int32_t request
         i++;
     }
     va_end(list);
-    if (smsFuncs_ == nullptr) {
-        TELEPHONY_LOGE("smsFuncs_：is null!");
-        free(pBuff);
-        free(requestInfo);
-        return false;
-    }
     smsFuncs_->SendSms(requestInfo, pBuff, count * sizeof(char *));
     if (pBuff != nullptr) {
         i = 0;
         while (i < count) {
-            FreeStrings(1, pBuff[i]);
+            FreeStrings(ARG_COUNTS, pBuff[i]);
             i++;
         }
         free(pBuff);
@@ -452,24 +480,24 @@ int32_t HRilSms::SendSmsResponse(int32_t slotId, int32_t requestNum, HRilRadioRe
 int32_t HRilSms::StorageSmsResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
     const void *response, size_t responseLen)
 {
-    return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));
+    return ResponseRequestInfo(requestNum, &responseInfo, sizeof(HRilRadioResponseInfo));
 }
 
 int32_t HRilSms::DeleteSmsResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
     const void *response, size_t responseLen)
 {
-    return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));
+    return ResponseRequestInfo(requestNum, &responseInfo, sizeof(HRilRadioResponseInfo));
 }
 
 int32_t HRilSms::UpdateSmsResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
     const void *response, size_t responseLen)
 {
-    return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));
+    return ResponseRequestInfo(requestNum, &responseInfo, sizeof(HRilRadioResponseInfo));
 }
 
 void HRilSms::SendSmsMoreMode(int32_t slotId, struct HdfSBuf *data)
 {
-    struct GsmSmsMessageInfo message;
+    struct GsmSmsMessageInfo message = {};
     MessageParcel *parcel = nullptr;
     const int32_t COUNT_STRINGS_VALUE = 2;
     if (SbufToParcel(data, &parcel)) {
@@ -496,7 +524,7 @@ int32_t HRilSms::SendSmsMoreModeResponse(int32_t slotId, int32_t requestNum, HRi
     return ResponseMessageParcel(responseInfo, result, requestNum);
 }
 
-bool HRilSms::RequestWithInts(int **pBuff, ReqDataInfo *requestInfo, int32_t argCount, ...)
+bool HRilSms::RequestWithInts(int32_t **pBuff, ReqDataInfo *requestInfo, int32_t argCount, ...)
 {
     size_t len = sizeof(int32_t);
     if (len <= 0 || argCount <= 0) {
@@ -507,7 +535,7 @@ bool HRilSms::RequestWithInts(int **pBuff, ReqDataInfo *requestInfo, int32_t arg
         SendErrorResponse(requestInfo, HRIL_ERR_MEMORY_FULL);
         return false;
     }
-    va_list list;
+    va_list list = {};
     va_start(list, argCount);
     int32_t i = 0;
     while (i < argCount) {
@@ -521,7 +549,7 @@ bool HRilSms::RequestWithInts(int **pBuff, ReqDataInfo *requestInfo, int32_t arg
 void HRilSms::SendSmsAck(int32_t slotId, struct HdfSBuf *data)
 {
     int32_t *pBuff = nullptr;
-    struct ModeData mode;
+    struct ModeData mode = {};
     MessageParcel *parcel = nullptr;
     const int32_t COUNT_INTS_VALUE = 2;
 
@@ -587,6 +615,7 @@ int32_t HRilSms::SendSmsAckResponse(int32_t slotId, int32_t requestNum, HRilRadi
     }
     if (serviceCallback_ == nullptr) {
         TELEPHONY_LOGE("serviceCallback_ is nullptr!");
+        HdfSBufRecycle(dataSbuf);
         return HDF_FAILURE;
     }
     int32_t ret = serviceCallback_->dispatcher->Dispatch(serviceCallback_, requestNum, dataSbuf, nullptr);
@@ -617,10 +646,6 @@ int32_t HRilSms::DataSbuf(HdfSBuf *dataSbuf, uint8_t *bytes, int32_t indType)
         HdfSBufRecycle(dataSbuf);
         return HDF_FAILURE;
     }
-    if (serviceCallbackNotify_ == nullptr) {
-        TELEPHONY_LOGE("serviceCallbackNotify_ is nullptr!");
-        return HDF_FAILURE;
-    }
     int32_t ret =
         serviceCallbackNotify_->dispatcher->Dispatch(serviceCallbackNotify_, HNOTI_SMS_NEW_SMS, dataSbuf, nullptr);
     if (ret != HDF_SUCCESS) {
@@ -645,7 +670,7 @@ int32_t HRilSms::SmsStatusReportNotify(
         TELEPHONY_LOGE("ConvertHexStringToBytes in SmsStatusReportNotify is failed!");
         return HDF_FAILURE;
     }
-    SmsMessageInfo smsMessageInfo;
+    SmsMessageInfo smsMessageInfo = {};
     smsMessageInfo.size = MESSAGE_SIZE;
     smsMessageInfo.indicationType = static_cast<int32_t>(ConvertIntToRadioNoticeType(indType));
     uint8_t *temp = bytes;
@@ -745,7 +770,7 @@ int32_t HRilSms::NewSmsNotify(
         TELEPHONY_LOGE("NewSmsNotify: ConvertHexStringToBytes failed");
         return HDF_FAILURE;
     }
-    SmsMessageInfo smsMessageInfo;
+    SmsMessageInfo smsMessageInfo = {};
     smsMessageInfo.size = NEW_SMS_SIZE;
     smsMessageInfo.indicationType = indType;
     uint8_t *temp = bytes;

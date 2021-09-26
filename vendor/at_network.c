@@ -17,12 +17,12 @@
 
 #include <signal.h>
 
-#include "vendor_adapter.h"
 #include "vendor_report.h"
 #include "vendor_util.h"
 
 static struct ReportInfo g_reportInfoForOperListToUse;
 static pthread_mutex_t g_networkSearchInformationMutex = PTHREAD_MUTEX_INITIALIZER;
+#define MAX_BUFF_SIZE 500
 
 int GetResponseErrorCode(ResponseInfo *pResponseInfo)
 {
@@ -104,7 +104,7 @@ int ProcessParamSignalStrength(char *result, HRilRssi *hrilRssi)
     int tmp;
 
     if (err < 0) {
-        TELEPHONY_LOGE("skip failed: [%{public}s]", result);
+        TELEPHONY_LOGE("skip failed: [%{public}p]", result);
         return err;
     }
     TELEPHONY_LOGD("ProcessParamSignalStrength  enter -->, result %{public}s", result);
@@ -266,7 +266,6 @@ void ReqGetPsRegStatus(const ReqDataInfo *requestInfo)
 
 void ReqGetOperatorInfo(const ReqDataInfo *requestInfo)
 {
-    int ret;
     int err = HRIL_ERR_SUCCESS;
     struct ReportInfo reportInfo;
     (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
@@ -274,11 +273,10 @@ void ReqGetOperatorInfo(const ReqDataInfo *requestInfo)
     char *result = NULL;
     const int numCount = 3;
     char *response[numCount] = {"", "", ""};
-    Line *pLine = NULL;
-    int i = 0;
     const long TIME_OUT = DEFAULT_TIMEOUT;
 
-    ret = SendCommandLock("AT+COPS=3,2;+COPS?;+COPS=3,1;+COPS?;+COPS=3,0;+COPS?", "+COPS:", TIME_OUT, &responseInfo);
+    int ret =
+        SendCommandLock("AT+COPS=3,2;+COPS?;+COPS=3,1;+COPS?;+COPS=3,0;+COPS?", "+COPS:", TIME_OUT, &responseInfo);
     if (responseInfo == NULL) {
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_NULL_POINT, HRIL_RESPONSE, 0);
         OnNetworkReport(reportInfo, NULL, 0);
@@ -288,7 +286,8 @@ void ReqGetOperatorInfo(const ReqDataInfo *requestInfo)
         err = GetResponseErrorCode(responseInfo);
         TELEPHONY_LOGE("send AT CMD failed!");
     }
-    for (i = 0, pLine = responseInfo->head; pLine != NULL; i++, pLine = pLine->next) {
+    Line *pLine = responseInfo->head;
+    for (int i = 0; pLine != NULL; i++, pLine = pLine->next) {
         int skip;
         result = pLine->data;
         SkipATPrefix(&result);
@@ -377,10 +376,9 @@ void PerformTimeOut(int sigFlag)
 
 void RequestGetNetworkSearchInformation(const ReqDataInfo *requestInfo)
 {
-    int ret = 0;
     const long TIME_OUT = 1000;
     ResponseInfo *responseInfo = NULL;
-    const int MINUTE = 60;
+    const int MINUTE = 120;
     TELEPHONY_LOGD("enter to [%{public}s]:%{public}d", __func__, __LINE__);
     pthread_mutex_lock(&g_networkSearchInformationMutex);
     alarm(0);
@@ -393,7 +391,7 @@ void RequestGetNetworkSearchInformation(const ReqDataInfo *requestInfo)
         pthread_mutex_unlock(&g_networkSearchInformationMutex);
         return;
     }
-    ret = SendCommandNetWorksLock("AT+COPS=?", "+COPS:", TIME_OUT, &responseInfo);
+    int ret = SendCommandNetWorksLock("AT+COPS=?", "+COPS:", TIME_OUT, &responseInfo);
 
     g_reportInfoForOperListToUse = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
     if ((ret != 0 && ret != AT_ERR_WAITING) || (responseInfo != NULL && !responseInfo->success)) {
@@ -421,14 +419,13 @@ void RequestGetNetworkSearchInformation(const ReqDataInfo *requestInfo)
 
 int ParseOperListInfo(char *lineinfo, int count, AvailableOperInfo *pOperInfo, AvailableOperInfo **ppOperInfo)
 {
-    int ret = 0;
     int state = 0;
     int rat = 0;
     int operCount = 0;
     char *line = lineinfo;
     int item = count;
     for (int i = 0; i < item && operCount < item; i++) {
-        ret = MoveLeftBracket(&line);
+        int ret = MoveLeftBracket(&line);
         if (ret < 0) {
             break;
         }
@@ -468,7 +465,8 @@ int ParseOperListInfo(char *lineinfo, int count, AvailableOperInfo *pOperInfo, A
     return operCount;
 }
 
-static void DealNetworkSearchInformation(int operCount, AvailableOperInfo **ppOperInfo, AvailableOperInfo *pOperInfo)
+static void DealNetworkSearchInformation(
+    int operCount, AvailableOperInfo **ppOperInfo, AvailableOperInfo *pOperInfo)
 {
     if (operCount == 0) {
         pthread_mutex_lock(&g_networkSearchInformationMutex);
@@ -552,17 +550,17 @@ ERROR:
     return HRIL_ERR_GENERIC_FAILURE;
 }
 
-static bool PrepareSetNetworkSelectionMode(char **cmd, const HRiSetNetworkModeInfo *setModeInfo)
+static bool PrepareSetNetworkSelectionMode(char *cmd, const HRiSetNetworkModeInfo *setModeInfo)
 {
     bool ret = true;
     TELEPHONY_LOGD("setModeInfo, serial123 = %{public}d", setModeInfo->selectMode);
     if (setModeInfo->selectMode == 0) {
-        asprintf(cmd, "%s", "AT+COPS=0");
+        (void)sprintf_s(cmd, MAX_BUFF_SIZE, "%s", "AT+COPS=0");
     } else if (setModeInfo->selectMode == 1) {
         if (setModeInfo->oper == NULL) {
             ret = false;
         } else {
-            asprintf(cmd, "AT+COPS=1,2,%s", setModeInfo->oper);
+            (void)sprintf_s(cmd, MAX_BUFF_SIZE, "AT+COPS=1,2,%s", setModeInfo->oper);
         }
     } else {
         ret = false;
@@ -572,9 +570,10 @@ static bool PrepareSetNetworkSelectionMode(char **cmd, const HRiSetNetworkModeIn
 
 void RequestSetAutomaticModeForNetworks(const ReqDataInfo *requestInfo, const HRiSetNetworkModeInfo *data)
 {
-    int err = HRIL_ERR_SUCCESS;
     ResponseInfo *responseInfo = NULL;
-    char *cmd = NULL;
+    char cmd[MAX_BUFF_SIZE] = {0};
+    char *cmdBuff = cmd;
+
     struct ReportInfo reportInfo;
     (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
     HRiSetNetworkModeInfo *setModeInfo = (HRiSetNetworkModeInfo *)data;
@@ -584,18 +583,14 @@ void RequestSetAutomaticModeForNetworks(const ReqDataInfo *requestInfo, const HR
         TELEPHONY_LOGE("SetAutomaticMode HRIL_ERR_NULL_POINT");
         return;
     }
-    if (!PrepareSetNetworkSelectionMode(&cmd, setModeInfo)) {
+    if (!PrepareSetNetworkSelectionMode(cmdBuff, setModeInfo)) {
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_PARAMETER, HRIL_RESPONSE, 0);
         OnNetworkReport(reportInfo, NULL, 1);
         TELEPHONY_LOGE("SetAutomaticMode HRIL_ERR_INVALID_PARAMETER");
         return;
     }
     TELEPHONY_LOGD("requestSetAutomaticModeForNetworks, cmd = %{public}s", cmd);
-    err = SendCommandLock(cmd, NULL, 0, &responseInfo);
-    if (cmd != NULL) {
-        free(cmd);
-        cmd = NULL;
-    }
+    int err = SendCommandLock(cmd, NULL, 0, &responseInfo);
     if (responseInfo == NULL) {
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_NULL_POINT, HRIL_RESPONSE, 0);
         OnNetworkReport(reportInfo, NULL, 1);
@@ -618,7 +613,6 @@ void RequestSetAutomaticModeForNetworks(const ReqDataInfo *requestInfo, const HR
 
 void RequestQueryNetworkSelectionMode(const ReqDataInfo *requestInfo)
 {
-    int ret = 0;
     const long TIME_OUT = DEFAULT_TIMEOUT;
     int err = HRIL_ERR_SUCCESS;
     ResponseInfo *responseInfo = NULL;
@@ -626,7 +620,7 @@ void RequestQueryNetworkSelectionMode(const ReqDataInfo *requestInfo)
     struct ReportInfo reportInfo;
     (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
 
-    ret = SendCommandLock("AT+COPS?", "+COPS:", TIME_OUT, &responseInfo);
+    int ret = SendCommandLock("AT+COPS?", "+COPS:", TIME_OUT, &responseInfo);
     if (responseInfo == NULL) {
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
         OnNetworkReport(reportInfo, NULL, 0);
