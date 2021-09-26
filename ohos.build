@@ -5,7 +5,6 @@
             "module_list": [
                 "//base/telephony/ril_adapter/hril:hril",
                 "//base/telephony/ril_adapter/hril_hdf:hril_hdf",
-                "//base/telephony/ril_adapter/test/unittest:ril_adapter_test",
                 "//base/telephony/ril_adapter/vendor:ril_vendor"
             ],
         "inner_kits": [

@@ -17,6 +17,8 @@
 
 #include "vendor_report.h"
 
+#define MAX_BUFF_SIZE 500
+
 int ParsePdpCmd(char *str, HRilDataCallResponse *outData)
 {
     char *pStr = NULL;
@@ -183,9 +185,9 @@ static void BuildDataInfoList(int *validCount, int dataNum, ResponseInfo *respon
         }
         pDataCall->state = 0;
         pDataCall->type = strdup(dataCGDCONT.type);
-        pDataCall->address = (strlen(dataCGDCONT.address) != 0) ? strdup(dataCGDCONT.address) : "192.168.64.100";
+        pDataCall->address = (strlen(dataCGDCONT.address) != 0) ? strdup(dataCGDCONT.address) : "";
         pDataCall->netPortName = strdup(PPP_TTY_PATH);
-        pDataCall->dns = strdup("8.8.8.8 114.114.114.114");
+        pDataCall->dns = "";
         pDataCall++;
         count++;
     }
@@ -228,11 +230,8 @@ void FreeDataCallResponse(HRilDataCallResponse *pDcrs, int size)
         return;
     }
     for (i = 0; i < size; i++) {
-        if (pDcrs[i].dns != NULL) {
-            free(pDcrs[i].dns);
-        }
         if (pDcrs[i].address != NULL) {
-            if (strncmp(pDcrs[i].address, "192.168.64.100", strlen("192.168.64.100")))
+            if (strlen(pDcrs[i].address) != 0)
                 free(pDcrs[i].address);
         }
         if (pDcrs[i].netPortName != NULL) {
@@ -310,7 +309,7 @@ void ReqActivatePdpContext(const ReqDataInfo *requestInfo, const HRilDataInfo *d
 {
     int ret;
     int err = HRIL_ERR_SUCCESS;
-    char *cmd = NULL;
+    char cmd[MAX_BUFF_SIZE] = {0};
     struct ReportInfo reportInfo;
     ResponseInfo *pResponse = NULL;
     const HRilDataInfo *pDataInfo = data;
@@ -326,7 +325,7 @@ void ReqActivatePdpContext(const ReqDataInfo *requestInfo, const HRilDataInfo *d
     }
 
     (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
-    asprintf(&cmd, "AT+CGDCONT=1,\"%s\",\"%s\"", pDataInfo->type, pDataInfo->apn);
+    (void)sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CGDCONT=1,\"%s\",\"%s\"", pDataInfo->type, pDataInfo->apn);
     ret = SendCommandLock(cmd, NULL, 0, &pResponse);
     if (ret != 0 || !pResponse->success) {
         errInfo = GetReportErrorInfo(pResponse);
@@ -335,7 +334,6 @@ void ReqActivatePdpContext(const ReqDataInfo *requestInfo, const HRilDataInfo *d
         TELEPHONY_LOGE("send AT CMD failed!, ret:%{public}d", errInfo.errorNo);
         goto REPORT_ERR;
     }
-    free(cmd);
     FreeResponseInfo(pResponse);
 
     ret = SendCommandLock("AT+CGACT=1,1", NULL, 0, &pResponse);
@@ -361,7 +359,7 @@ void ReqDeactivatePdpContext(const ReqDataInfo *requestInfo, const HRilDataInfo 
 {
     int ret;
     int err = HRIL_ERR_SUCCESS;
-    char *cmd = NULL;
+    char cmd[MAX_BUFF_SIZE] = {0};
     struct ReportInfo reportInfo;
     (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
     ResponseInfo *pResponse = NULL;
@@ -377,16 +375,14 @@ void ReqDeactivatePdpContext(const ReqDataInfo *requestInfo, const HRilDataInfo 
         goto REPORT_ERR;
     }
 
-    asprintf(&cmd, "AT+CGACT=0,%d", pDataInfo->cid);
+    (void)sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CGACT=0,%d", pDataInfo->cid);
     ret = SendCommandLock(cmd, NULL, 0, &pResponse);
     if (ret != 0 || !pResponse->success) {
-        free(cmd);
         errInfo = GetReportErrorInfo(pResponse);
         err = errInfo.errorNo;
         TELEPHONY_LOGE("send AT CMD failed!, ret:%{public}d", errInfo.errorNo);
         goto REPORT_ERR;
     }
-    free(cmd);
     FreeResponseInfo(pResponse);
     PdpContextListUpdated(requestInfo);
     return;

@@ -1050,7 +1050,7 @@ int32_t HRilCall::GetCallForwardResponse(int32_t slotId, int32_t requestNum, HRi
     cFQueryResult.status = pCFQueryInfo->status;
     cFQueryResult.classx = pCFQueryInfo->classx;
     cFQueryResult.type = pCFQueryInfo->type;
-    cFQueryResult.number = pCFQueryInfo->number == nullptr ? "" : pCFQueryInfo->number;
+    cFQueryResult.number = (pCFQueryInfo->number == nullptr) ? "" : pCFQueryInfo->number;
     return ResponseMessageParcel(responseInfo, cFQueryResult, requestNum);
 }
 

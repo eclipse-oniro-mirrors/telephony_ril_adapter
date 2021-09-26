@@ -19,6 +19,7 @@
 #include "vendor_adapter.h"
 
 extern const struct HRilReport *g_reportOps;
+#define MAX_BUFF_SIZE 500
 
 void OnModemReport(struct ReportInfo reportInfo, const void *response, size_t responseLen)
 {
@@ -96,8 +97,7 @@ static void ReportCBMOrCSCB(struct ReportInfo *reportInfo)
         return;
     }
 
-    char *tmp = NULL;
-    asprintf(&tmp,
+    const char *tempData = (
         "01a41f51101102ea3030a830ea30a230e130fc30eb914d4fe130c630b930c8000d000a305330"
         "8c306f8a669a137528306e30e130c330bb30fc30b8306730593002000d000aff0800320030003"
         "10033002f00310031002f003252ea300037002000310035003a00340034ff09000d000aff0830"
@@ -107,20 +107,11 @@ static void ReportCBMOrCSCB(struct ReportInfo *reportInfo)
     reportInfo->notifyId = HNOTI_CELL_BROADCAST_REPORT;
     int ret = ProcessCellBroadcast("+CBM:100", &response);
     if (ret > 1) {
-        asprintf(&response.data, "%s", tmp);
+        response.data = (char *)tempData;
     } else {
-        asprintf(&response.pdu, "%s", tmp);
+        response.pdu = (char *)tempData;
     }
     OnSmsReport(*reportInfo, (void *)&response, sizeof(HRilCellBroadcastReportInfo *));
-    free(tmp);
-    if (response.data != NULL) {
-        free(response.data);
-        response.data = NULL;
-    }
-    if (response.pdu != NULL) {
-        free(response.pdu);
-        response.pdu = NULL;
-    }
 }
 
 void OnNotifyOps(const char *s, const char *smsPdu)
