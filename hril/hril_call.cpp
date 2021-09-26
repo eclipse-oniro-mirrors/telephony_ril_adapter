@@ -375,7 +375,7 @@ void HRilCall::GetCallRestriction(int32_t slotId, struct HdfSBuf *data)
         return;
     }
     fac = parcel->ReadCString();
-    TELEPHONY_LOGD("HRilCall::GetCallRestriction fac %{public}s", fac);
+    TELEPHONY_LOGD("HRilCall::GetCallRestriction fac %{public}p", fac);
 
     ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_CALL_GET_CALL_RESTRICTION);
     if (requestInfo == nullptr) {
@@ -462,7 +462,6 @@ void HRilCall::StartDtmf(int32_t slotId, struct HdfSBuf *data)
         TELEPHONY_LOGE("StartDtmf miss dtmfKey parameter");
         return;
     }
-    TELEPHONY_LOGD("HRilCall::StartDtmf dtmfKey : %{public}s", info.dtmfKey);
     ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_CALL_START_DTMF);
     if (requestInfo == nullptr) {
         TELEPHONY_LOGE("RilAdapter failed to do Create StartDtmf HRilRequest!");
@@ -523,7 +522,6 @@ void HRilCall::SendDtmf(int32_t slotId, struct HdfSBuf *data)
         TELEPHONY_LOGE("SendDtmf miss dtmfKey parameter");
         return;
     }
-    TELEPHONY_LOGD("HRilCall::SendDtmf  data length : %{public}d,dtmfKey : %{public}s", stringLength, info.dtmfKey);
     ProcessSendDtmf(serial, slotId, info);
 }
 
@@ -1050,7 +1048,7 @@ int32_t HRilCall::GetCallForwardResponse(int32_t slotId, int32_t requestNum, HRi
     cFQueryResult.status = pCFQueryInfo->status;
     cFQueryResult.classx = pCFQueryInfo->classx;
     cFQueryResult.type = pCFQueryInfo->type;
-    cFQueryResult.number = pCFQueryInfo->number == nullptr ? "" : pCFQueryInfo->number;
+    cFQueryResult.number = (pCFQueryInfo->number == nullptr) ? "" : pCFQueryInfo->number;
     return ResponseMessageParcel(responseInfo, cFQueryResult, requestNum);
 }
 

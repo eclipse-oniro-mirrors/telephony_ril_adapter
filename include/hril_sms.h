@@ -72,7 +72,7 @@ public:
     int32_t SendSmsMoreModeResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
         const void *response, size_t responseLen);
 
-    bool RequestWithInts(int **p, ReqDataInfo *requestInfo, int32_t argCount, ...);
+    bool RequestWithInts(int32_t **p, ReqDataInfo *requestInfo, int32_t argCount, ...);
 
     void SendSmsAck(int32_t slotId, struct HdfSBuf *data);
     int32_t SendSmsAckResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,

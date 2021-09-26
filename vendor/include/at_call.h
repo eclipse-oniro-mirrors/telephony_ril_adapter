@@ -23,6 +23,12 @@ typedef enum {
     SET_CALL_WAITING,
 } CallWaitingReqType;
 
+typedef enum {
+    CALL_CLIR_SUBSCRIPTION_DEFUALT, /* subscription default */
+    CALL_CLIR_INVOCATION, /* invocation */
+    CALL_CLIR_SUPPRESSION, /* suppression */
+} CallClirType;
+
 void ReqGetCallList(ReqDataInfo *requestInfo, const void *data, size_t dataLen);
 void ReqDial(ReqDataInfo *requestInfo, const void *data, size_t dataLen);
 void ReqHangup(ReqDataInfo *requestInfo, const void *data, size_t dataLen);
