@@ -398,8 +398,8 @@ void ReqSendDtmf(ReqDataInfo *requestInfo, CallDTMFInfo info)
     }
 
     for (stringLength = 0; stringLength < info.stringLength; stringLength++) {
-        (void)sprintf_s(
-            cmd, MAX_BUFF_SIZE, "AT^DTMF=%d,%c,%d,%d", info.callId, info.dtmfKey[stringLength], info.onLength, info.offLength);
+        (void)sprintf_s(cmd, MAX_BUFF_SIZE, "AT^DTMF=%d,%c,%d,%d", info.callId, info.dtmfKey[stringLength],
+            info.onLength, info.offLength);
         err = SendCommandLock(cmd, NULL, 0, &pResponse);
         if (err != HRIL_ERR_SUCCESS || (pResponse != NULL && pResponse->success == 0)) {
             TELEPHONY_LOGE("ReqSendDtmf send failed");
@@ -544,7 +544,7 @@ void ReqCallSupplement(ReqDataInfo *requestInfo, int type)
     switch (type) {
         case TYPE_HANG_UP_HOLD_WAIT: {
             TELEPHONY_LOGD("ReqCallSupplement hang up all holding or waiting call");
-            (void)sprintf_s(cmd, MAX_BUFF_SIZE,"AT+CHLD=0");
+            (void)sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CHLD=0");
             break;
         }
         case TYPE_HANG_UP_ACTIVE: {
@@ -672,10 +672,9 @@ void ReqSetCallForwarding(ReqDataInfo *requestInfo, HRilCFInfo info)
         numType = NUM_S;
     }
 
-    TELEPHONY_LOGD(
-        "classx: [%{public}d], reason:[%{public}d], mode: [%{public}d]", info.classx, info.reason, info.mode);
     TELEPHONY_LOGD("ReqSetCallForwarding cmd");
-    (void)sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CCFC=%d,%d,\"%s\",%d,%d", info.reason, info.mode, info.number, numType, info.classx);
+    (void)sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CCFC=%d,%d,\"%s\",%d,%d", info.reason, info.mode, info.number, numType,
+        info.classx);
     err = SendCommandLock(cmd, NULL, 0, &pResponse);
     if (err != 0) {
         TELEPHONY_LOGE("CCFC send failed");
@@ -701,7 +700,7 @@ void ReqGetCallForwarding(ReqDataInfo *requestInfo, int reason)
 
     (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
     if (reason > CALL_FORWARD_REASON_ALL_CCF) {
-        TELEPHONY_LOGE("ReqGetCallForwarding call forwarding parameter err!!");
+        TELEPHONY_LOGE("call forwarding parameter err!!");
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_PARAMETER, HRIL_RESPONSE, 0);
         OnCallReport(reportInfo, NULL, 0);
         return;
@@ -724,16 +723,15 @@ void ReqGetCallForwarding(ReqDataInfo *requestInfo, int reason)
                 NextStr(&line, &queryInfo.number);
                 NextInt(&line, &queryInfo.type);
                 TELEPHONY_LOGD(
-                    "ReqGetCallForwarding pResponse status: %{public}d, class: %{public}d, number:"
-                    "%{public}s, type: %{public}d ",
-                    queryInfo.status, queryInfo.classx, queryInfo.number, queryInfo.type);
+                    "pResponse status: %{public}d, class: %{public}d, type: %{public}d ",
+                    queryInfo.status, queryInfo.classx, queryInfo.type);
             } else {
-                TELEPHONY_LOGE("ERROR: ReqGetCallForwarding pResponse->head is null");
+                TELEPHONY_LOGE("ERROR: pResponse->head is null");
                 err = HRIL_ERR_GENERIC_FAILURE;
             }
         }
     } else {
-        TELEPHONY_LOGE("ERROR: ReqGetCallForwarding pResponse is null");
+        TELEPHONY_LOGE("ERROR: pResponse is null");
         err = HRIL_ERR_GENERIC_FAILURE;
     }
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);

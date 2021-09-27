@@ -139,7 +139,6 @@ static int ParseSimPinInputTimesResult(char *pLine, HRilPinInputTimes *pinInputT
     if (err != 0) {
         return err;
     }
-
     return 0;
 }
 
@@ -202,11 +201,14 @@ void ReqGetSimIO(const ReqDataInfo *requestInfo, const HRilSimIO *data, size_t d
     HRilSimIOResponse simResponse = {0};
     char cmd[MAX_BUFF_SIZE] = {0};
     ResponseInfo *pResponse = NULL;
-    struct ReportInfo reportInfo = {0};
-
+    struct ReportInfo reportInfo = {};
     pSim = (HRilSimIO *)data;
-    (void)sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CRSM=%d,%d,%d,%d,%d,%s,\"%s\"", pSim->command, pSim->fileid, pSim->p1, pSim->p2, pSim->p3,
-        (pSim->data == NULL ? "" : pSim->data), pSim->pathid);
+    ret = sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CRSM=%d,%d,%d,%d,%d,%s,\"%s\"", pSim->command, pSim->fileid, pSim->p1,
+        pSim->p2, pSim->p3, (pSim->data == NULL ? "" : pSim->data), pSim->pathid);
+    if (ret < 0) {
+        TELEPHONY_LOGE("sprintf_s failed, err = %{public}d\n", ret);
+        goto ERR;
+    }
     ret = SendCommandLock(cmd, "+CRSM", 0, &pResponse);
     if (ret != 0 || !pResponse->success) {
         TELEPHONY_LOGE("AT+CRSM send failed");
@@ -324,7 +326,11 @@ void ReqGetSimLockStatus(const ReqDataInfo *requestInfo, const HRilSimClock *dat
     struct ReportInfo reportInfo = {0};
 
     pSimClck = (HRilSimClock *)data;
-    (void)sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CLCK=\"%s\",%d", pSimClck->fac, pSimClck->mode);
+    ret = sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CLCK=\"%s\",%d", pSimClck->fac, pSimClck->mode);
+    if (ret < 0) {
+        TELEPHONY_LOGE("sprintf_s failed, err = %{public}d\n", ret);
+        goto ERR;
+    }
     ret = SendCommandLock(cmd, "+CLCK", 0, &pResponse);
     if (ret != 0 || !pResponse->success) {
         TELEPHONY_LOGE("AT+CLCK send failed  dataLen:%{public}zu", dataLen);
@@ -370,7 +376,12 @@ void ReqSetSimLock(const ReqDataInfo *requestInfo, const HRilSimClock *data, siz
     struct ReportInfo reportInfo = {0};
 
     pSimClck = (HRilSimClock *)data;
-    (void)sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CLCK=\"%s\",%d,\"%s\"", pSimClck->fac, pSimClck->mode, pSimClck->passwd);
+    ret =
+        sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CLCK=\"%s\",%d,\"%s\"", pSimClck->fac, pSimClck->mode, pSimClck->passwd);
+    if (ret < 0) {
+        TELEPHONY_LOGE("sprintf_s failed, err = %{public}d\n", ret);
+        goto ERR;
+    }
     ret = SendCommandLock(cmd, "+CLCK", 0, &pResponse);
     if (ret != 0 || !pResponse->success) {
         TELEPHONY_LOGE("AT+CLCK send failed  dataLen:%{public}zu", dataLen);
@@ -404,8 +415,12 @@ void ReqChangeSimPassword(const ReqDataInfo *requestInfo, const HRilSimPassword 
     struct ReportInfo reportInfo = {0};
 
     pSimPassword = (HRilSimPassword *)data;
-    (void)sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CPWD=\"%s\",\"%s\",\"%s\"", pSimPassword->fac, pSimPassword->oldPassword,
-        pSimPassword->newPassword);
+    ret = sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CPWD=\"%s\",\"%s\",\"%s\"", pSimPassword->fac,
+        pSimPassword->oldPassword, pSimPassword->newPassword);
+    if (ret < 0) {
+        TELEPHONY_LOGE("sprintf_s failed, err = %{public}d\n", ret);
+        goto ERR;
+    }
     ret = SendCommandLock(cmd, "+CPWD", 0, &pResponse);
     if (ret != 0 || !pResponse->success) {
         TELEPHONY_LOGE("AT+CPWD send failed  dataLen:%{public}zu", dataLen);
@@ -437,7 +452,11 @@ void ReqEnterSimPin(const ReqDataInfo *requestInfo, const char *pin)
     char *pLine = NULL;
     struct ReportInfo reportInfo = {0};
 
-    (void)sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CPIN=\"%s\"", pin);
+    ret = sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CPIN=\"%s\"", pin);
+    if (ret < 0) {
+        TELEPHONY_LOGE("sprintf_s failed, err = %{public}d\n", ret);
+        goto ERR;
+    }
     ret = SendCommandLock(cmd, "+CPIN", 0, &pResponse);
     if (ret != 0 || !pResponse->success) {
         TELEPHONY_LOGE("AT+CPIN send failed");
@@ -469,7 +488,11 @@ void ReqUnlockSimPin(const ReqDataInfo *requestInfo, const char *puk, const char
     int ret = 0;
     struct ReportInfo reportInfo = {0};
 
-    (void)sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CPIN=\"%s\",\"%s\"", puk, pin);
+    ret = sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CPIN=\"%s\",\"%s\"", puk, pin);
+    if (ret < 0) {
+        TELEPHONY_LOGE("sprintf_s failed, err = %{public}d\n", ret);
+        goto ERR;
+    }
     ret = SendCommandLock(cmd, "+CPIN", 0, &pResponse);
     if (ret != 0 || !pResponse->success) {
         TELEPHONY_LOGE("AT+CPIN send failed");

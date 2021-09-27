@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include "ril_manager_test.h"
 #include "ril_radio_response_test.h"
 #include "telephony_log_wrapper.h"
 
@@ -146,7 +147,7 @@ DataProfileDataInfo RilManagerTest::ConvertToHalDataProfile(RilDataProfileTest d
     dataProfileDataInfo.roamingProtocol = dpi.roamingProtocol;
     dataProfileDataInfo.verType = dpi.verType;
     dataProfileDataInfo.userName = dpi.userName;
-    dataProfileDataInfo.password = dpi.pwdCode;
+    dataProfileDataInfo.password = dpi.password;
     dataProfileDataInfo.profileId = dpi.profileId;
     dataProfileDataInfo.apn = dpi.apn;
     dataProfileDataInfo.protocol = dpi.protocol;

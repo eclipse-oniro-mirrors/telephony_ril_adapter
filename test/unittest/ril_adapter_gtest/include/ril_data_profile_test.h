@@ -21,9 +21,9 @@ namespace Telephony {
 class RilDataProfileTest {
 public:
     RilDataProfileTest(int profileId, std::string apn, std::string protocol, int verType, std::string userName,
-        std::string pwdCode, std::string roamingProtocol)
+        std::string password, std::string roamingProtocol)
         : profileId(profileId), apn(apn), protocol(protocol), verType(verType), userName(userName),
-          pwdCode(pwdCode), roamingProtocol(roamingProtocol)
+          password(password), roamingProtocol(roamingProtocol)
     {}
 
     virtual ~RilDataProfileTest() = default;
@@ -34,7 +34,7 @@ public:
     std::string protocol;
     int verType;
     std::string userName;
-    std::string pwdCode;
+    std::string password;
     std::string roamingProtocol;
 };
 } // namespace Telephony

@@ -81,7 +81,7 @@ int ParseReportError(char *str)
         }
     }
     if (ret != HRIL_ERR_SUCCESS) {
-        TELEPHONY_LOGE("report failed: [%{public}s],ret=%{public}d", pStr, ret);
+        TELEPHONY_LOGE("report failed: [%{public}p],ret=%{public}d", pStr, ret);
     }
     return ret;
 }
@@ -172,7 +172,7 @@ static void BuildDataInfoList(int *validCount, int dataNum, ResponseInfo *respon
         (void)memset_s(&dataCGDCONT, sizeof(HRilDataCallResponse), 0, sizeof(HRilDataCallResponse));
         ret = ParsePdpCmd(pLine->data, &dataCGDCONT);
         if (ret != 0) {
-            TELEPHONY_LOGE("parser pdp command failed: [%{public}s],ret=%{public}d", pLine->data, ret);
+            TELEPHONY_LOGE("parser pdp command failed: [%{public}p],ret=%{public}d", pLine->data, ret);
             continue;
         }
         for (i = 0; i < dataCallNum; i++) {

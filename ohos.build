@@ -27,6 +27,9 @@
                     "header_base": "//base/telephony/ril_adapter/interfaces/innerkits"
                 }
             }
+        ],
+        "test_list": [
+            "//base/telephony/ril_adapter/test:unittest"
         ]
         }
     }
