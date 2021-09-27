@@ -79,8 +79,7 @@ void OnSimReport(struct ReportInfo reportInfo, const void *response, size_t resp
 struct ReportInfo CreateReportInfo(
     const ReqDataInfo *requestInfo, unsigned int err, unsigned int type, int notifyId)
 {
-    struct ReportInfo reportInfo;
-    (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
+    struct ReportInfo reportInfo = {};
 
     reportInfo.requestInfo = (ReqDataInfo *)requestInfo;
     reportInfo.notifyId = notifyId;
@@ -97,8 +96,8 @@ static void ReportCBMOrCSCB(struct ReportInfo *reportInfo)
         return;
     }
 
-    const char *tempData = (
-        "01a41f51101102ea3030a830ea30a230e130fc30eb914d4fe130c630b930c8000d000a305330"
+    const char *tempData =
+        ("01a41f51101102ea3030a830ea30a230e130fc30eb914d4fe130c630b930c8000d000a305330"
         "8c306f8a669a137528306e30e130c330bb30fc30b8306730593002000d000aff0800320030003"
         "10033002f00310031002f003252ea300037002000310035003a00340034ff09000d000aff0830"
         "a830ea30a25e02ff0900000000000000000000000000000000000000"

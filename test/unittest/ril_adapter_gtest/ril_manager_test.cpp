@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include "ril_manager_test.h"
 #include "ril_radio_response_test.h"
 #include "telephony_log_wrapper.h"
 
@@ -33,8 +34,8 @@ int32_t RilManagerTest::SendInt32Event(int32_t dispatchId, int32_t value)
 {
     int32_t status = 0;
     if (cellularRadio_ != nullptr) {
-        OHOS::MessageParcel data;
-        OHOS::MessageParcel reply;
+        OHOS::MessageParcel data = {};
+        OHOS::MessageParcel reply = {};
         data.WriteInt32(value);
         OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
         status = cellularRadio_->SendRequest(dispatchId, data, reply, option);
@@ -50,8 +51,8 @@ int32_t RilManagerTest::SendStringEvent(int32_t dispatchId, const char *value)
         return status;
     }
     if (cellularRadio_ != nullptr) {
-        OHOS::MessageParcel data;
-        OHOS::MessageParcel reply;
+        OHOS::MessageParcel data = {};
+        OHOS::MessageParcel reply = {};
         data.WriteCString(value);
         OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
         status = cellularRadio_->SendRequest(dispatchId, data, reply, option);
@@ -63,7 +64,7 @@ int32_t RilManagerTest::SendBufferEvent(int32_t dispatchId, OHOS::MessageParcel 
 {
     int32_t status = 0;
     if (cellularRadio_ != nullptr) {
-        OHOS::MessageParcel reply;
+        OHOS::MessageParcel reply = {};
         OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
         status = cellularRadio_->SendRequest(dispatchId, eventData, reply, option);
     }
@@ -75,8 +76,8 @@ int32_t RilManagerTest::SendCommonBufferEvent(int32_t dispatchId, const void *ev
     int32_t status = 0;
     const int32_t INCREMENT_VALUE = 1;
     if (cellularRadio_ != nullptr) {
-        OHOS::MessageParcel data;
-        OHOS::MessageParcel reply;
+        OHOS::MessageParcel data = {};
+        OHOS::MessageParcel reply = {};
         data.WriteBuffer(eventData, (dataLength + INCREMENT_VALUE));
         OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
         status = cellularRadio_->SendRequest(dispatchId, data, reply, option);
@@ -92,10 +93,10 @@ void RilManagerTest::SetCellularRadioIndication()
         if (callback == nullptr) {
             return;
         }
-        OHOS::MessageParcel data;
-        OHOS::MessageParcel reply;
+        OHOS::MessageParcel data = {};
+        OHOS::MessageParcel reply = {};
         data.WriteRemoteObject(callback.get());
-        OHOS::MessageOption option;
+        OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
         cellularRadio_->SendRequest(RilManagerTest::HRIL_ADAPTER_RADIO_INDICATION, data, reply, option);
     }
 }
@@ -108,10 +109,10 @@ void RilManagerTest::SetCellularRadioResponse()
         if (callback == nullptr) {
             return;
         }
-        OHOS::MessageParcel data;
-        OHOS::MessageParcel reply;
+        OHOS::MessageParcel data = {};
+        OHOS::MessageParcel reply = {};
         data.WriteRemoteObject(callback.release());
-        OHOS::MessageOption option;
+        OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
         cellularRadio_->SendRequest(RilManagerTest::HRIL_ADAPTER_RADIO_RESPONSE, data, reply, option);
     }
 }
@@ -146,7 +147,7 @@ DataProfileDataInfo RilManagerTest::ConvertToHalDataProfile(RilDataProfileTest d
     dataProfileDataInfo.roamingProtocol = dpi.roamingProtocol;
     dataProfileDataInfo.verType = dpi.verType;
     dataProfileDataInfo.userName = dpi.userName;
-    dataProfileDataInfo.password = dpi.pwdCode;
+    dataProfileDataInfo.password = dpi.password;
     dataProfileDataInfo.profileId = dpi.profileId;
     dataProfileDataInfo.apn = dpi.apn;
     dataProfileDataInfo.protocol = dpi.protocol;
@@ -191,7 +192,7 @@ void RilManagerTest::RequestSimIO(int32_t command, int32_t fileid, int32_t p1, i
             TELEPHONY_LOGE("RilManagerTest::CreateRequest is null ");
             return;
         }
-        OHOS::MessageParcel wData;
+        OHOS::MessageParcel wData = {};
         SimIoRequestInfo iccIoRequestInfo;
         iccIoRequestInfo.serial = request->serialId_;
         iccIoRequestInfo.command = command;
@@ -220,7 +221,7 @@ void RilManagerTest::GetImsi(std::string aid, const AppExecFwk::InnerEvent::Poin
         UniInfo imsi;
         imsi.serial = request->serialId_;
         imsi.strTmp = ConvertNullToEmptyString(aid);
-        OHOS::MessageParcel wData;
+        OHOS::MessageParcel wData = {};
         if (!imsi.Marshalling(wData)) {
             TELEPHONY_LOGE("ERROR : GetImsi --> imsi.Marshalling(wData) failed !!!");
             return;
@@ -259,7 +260,7 @@ void RilManagerTest::RilCmDial(std::string address, int32_t clirMode, const AppE
     TELEPHONY_LOGD("RilCmDial ");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_CALL_DIAL, result);
-        OHOS::MessageParcel wData;
+        OHOS::MessageParcel wData = {};
         DialInfo dialInfo;
         dialInfo.address = ConvertNullToEmptyString(address);
         dialInfo.clir = clirMode;
@@ -287,11 +288,11 @@ void RilManagerTest::Hangup(int32_t gsmIndex, const AppExecFwk::InnerEvent::Poin
     TELEPHONY_LOGD("Hangup  Request ");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_CALL_HANGUP, result);
-        OHOS::MessageParcel data;
-        OHOS::MessageParcel reply;
+        OHOS::MessageParcel data = {};
+        OHOS::MessageParcel reply = {};
         data.WriteInt32(request->serialId_);
         data.WriteInt32(gsmIndex);
-        OHOS::MessageOption option;
+        OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
         cellularRadio_->SendRequest(HREQ_CALL_HANGUP, data, reply, option);
     } else {
         TELEPHONY_LOGE("Hangup  cellularRadio_ == nullptr");
@@ -339,11 +340,11 @@ void RilManagerTest::RilCmJoin(int32_t callType, const AppExecFwk::InnerEvent::P
     TELEPHONY_LOGD("RilCmJoin  Request ");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_CALL_JOIN, result);
-        OHOS::MessageParcel data;
-        OHOS::MessageParcel reply;
+        OHOS::MessageParcel data = {};
+        OHOS::MessageParcel reply = {};
         data.WriteInt32(request->serialId_);
         data.WriteInt32(callType);
-        OHOS::MessageOption option;
+        OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
         cellularRadio_->SendRequest(HREQ_CALL_JOIN, data, reply, option);
     } else {
         TELEPHONY_LOGE("RilCmJoin  cellularRadio_ == nullptr");
@@ -355,12 +356,12 @@ void RilManagerTest::RilCmSplit(int32_t nThCall, int32_t callType, const AppExec
     TELEPHONY_LOGD("RilCmSplit  Request ");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_CALL_SPLIT, result);
-        OHOS::MessageParcel data;
-        OHOS::MessageParcel reply;
+        OHOS::MessageParcel data = {};
+        OHOS::MessageParcel reply = {};
         data.WriteInt32(request->serialId_);
         data.WriteInt32(nThCall);
         data.WriteInt32(callType);
-        OHOS::MessageOption option;
+        OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
         cellularRadio_->SendRequest(HREQ_CALL_SPLIT, data, reply, option);
     } else {
         TELEPHONY_LOGE("RilCmSplit  cellularRadio_ == nullptr");
@@ -412,7 +413,7 @@ void RilManagerTest::SendSms(std::string smscPdu, std::string pdu,
 {
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_SMS_SEND_SMS, response);
-        OHOS::MessageParcel data;
+        OHOS::MessageParcel data = {};
         GsmSmsMessageInfo mGsmSmsMessageInfo = ConstructGsmSendSmsRilRequest(smscPdu, pdu);
         mGsmSmsMessageInfo.serial = request->serialId_;
         if (!mGsmSmsMessageInfo.Marshalling(data)) {
@@ -429,7 +430,7 @@ void RilManagerTest::SendSmsMoreMode(std::string smscPdu, std::string pdu,
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_SMS_SEND_SMS_MORE_MODE, response);
         /* Do not log function arg for privacy */
-        OHOS::MessageParcel data;
+        OHOS::MessageParcel data = {};
         GsmSmsMessageInfo mGsmSmsMessageInfo = ConstructGsmSendSmsRilRequest(smscPdu, pdu);
         mGsmSmsMessageInfo.serial = request->serialId_;
         if (!mGsmSmsMessageInfo.Marshalling(data)) {
@@ -452,12 +453,12 @@ void RilManagerTest::SetRadioStatus(int fan, int rst, const AppExecFwk::InnerEve
 {
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_MODEM_SET_RADIO_STATUS, result);
-        OHOS::MessageParcel data;
-        OHOS::MessageParcel reply;
+        OHOS::MessageParcel data = {};
+        OHOS::MessageParcel reply = {};
         data.WriteInt32(request->serialId_);
         data.WriteInt32(fan);
         data.WriteInt32(rst);
-        OHOS::MessageOption option;
+        OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
         cellularRadio_->SendRequest(HREQ_MODEM_SET_RADIO_STATUS, data, reply, option);
     } else {
         TELEPHONY_LOGE("SetRadioStatus  cellularRadio_ == nullptr");
@@ -468,7 +469,7 @@ void RilManagerTest::SendSmsAck(bool success, int32_t cause, const AppExecFwk::I
 {
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_SMS_SEND_SMS_ACK, response);
-        OHOS::MessageParcel wData;
+        OHOS::MessageParcel wData = {};
         UniInfo mUniversalInfo;
         mUniversalInfo.serial = request->serialId_;
         mUniversalInfo.flag = success;
@@ -493,7 +494,7 @@ void RilManagerTest::ActivatePdpContext(int32_t radioTechnology, RilDataProfileT
         dataCallInfo.dataProfileInfo = ConvertToHalDataProfile(dataProfile);
         dataCallInfo.roamingAllowed = allowRoaming;
         dataCallInfo.isRoaming = isRoaming;
-        OHOS::MessageParcel wData;
+        OHOS::MessageParcel wData = {};
         if (!dataCallInfo.Marshalling(wData)) {
             TELEPHONY_LOGE("ERROR : ActivatePdpContext --> dataCallInfo.Marshalling(wData) failed !!!");
             return;
@@ -514,7 +515,7 @@ void RilManagerTest::DeactivatePdpContext(
         uniInfo.serial = request->serialId_;
         uniInfo.gsmIndex = ci;
         uniInfo.arg1 = reason;
-        OHOS::MessageParcel wData;
+        OHOS::MessageParcel wData = {};
         if (!uniInfo.Marshalling(wData)) {
             TELEPHONY_LOGE("ERROR : DeactivatePdpContext --> uniInfo.Marshalling(wData) failed !!!");
             return;

@@ -23,7 +23,7 @@
 namespace OHOS {
 namespace Telephony {
 const int NUM_CIRCLES = 4;
-class RilUnitTest : public testing::Test {
+class RilAdapterUnitTest : public testing::Test {
 public:
     // execute before first testcase
     static void SetUpTestCase();
@@ -73,7 +73,8 @@ public:
 
     std::unique_ptr<RilManagerTest> mRilManager_;
     int slotId_;
-    using RilManagerAndResponseTestFun = void (RilUnitTest::*)(const OHOS::AppExecFwk::InnerEvent::Pointer &event);
+    using RilManagerAndResponseTestFun = void (RilAdapterUnitTest::*)(
+        const OHOS::AppExecFwk::InnerEvent::Pointer &event);
     std::map<uint32_t, RilManagerAndResponseTestFun> memberFuncMap_;
 };
 } // namespace Telephony

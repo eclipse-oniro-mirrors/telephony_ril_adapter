@@ -111,7 +111,7 @@ const char *ReadResponse(int atFd)
 
 int WriteATCommand(const char *s, int isPdu, int atFd)
 {
-    TELEPHONY_LOGD("cmd:%{public}s", s);
+    TELEPHONY_LOGD("cmd:%{public}p", s);
     ssize_t ret;
     size_t i = 0;
     size_t len = strlen(s);

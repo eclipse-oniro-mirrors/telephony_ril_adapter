@@ -81,7 +81,7 @@ int ParseReportError(char *str)
         }
     }
     if (ret != HRIL_ERR_SUCCESS) {
-        TELEPHONY_LOGE("report failed: [%{public}s],ret=%{public}d", pStr, ret);
+        TELEPHONY_LOGE("report failed: [%{public}p],ret=%{public}d", pStr, ret);
     }
     return ret;
 }
@@ -165,14 +165,13 @@ static void BuildDataInfoList(int *validCount, int dataNum, ResponseInfo *respon
     Line *pLine = NULL;
     ResponseInfo *pResponse = response;
     HRilDataCallResponse *pDataCall = *ppDcr;
-    HRilDataCallResponse dataCGDCONT;
+    HRilDataCallResponse dataCGDCONT = {};
 
     dataCallNum = dataNum;
     for (pLine = pResponse->head; pLine != NULL; pLine = pLine->next) {
-        (void)memset_s(&dataCGDCONT, sizeof(HRilDataCallResponse), 0, sizeof(HRilDataCallResponse));
         ret = ParsePdpCmd(pLine->data, &dataCGDCONT);
         if (ret != 0) {
-            TELEPHONY_LOGE("parser pdp command failed: [%{public}s],ret=%{public}d", pLine->data, ret);
+            TELEPHONY_LOGE("parser pdp command failed: [%{public}p],ret=%{public}d", pLine->data, ret);
             continue;
         }
         for (i = 0; i < dataCallNum; i++) {
@@ -247,8 +246,7 @@ void FreeDataCallResponse(HRilDataCallResponse *pDcrs, int size)
 void DataReportMessage(
     const ReqDataInfo *requestInfo, ModemReportErrorInfo errInfo, HRilDataCallResponse *pDataCalls, int validNum)
 {
-    struct ReportInfo reportInfo;
-    (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
+    struct ReportInfo reportInfo = {};
     if (requestInfo != NULL) {
         /* Report results */
         reportInfo = CreateReportInfo((void *)requestInfo, errInfo.errorNo, HRIL_RESPONSE, 0);
@@ -310,7 +308,7 @@ void ReqActivatePdpContext(const ReqDataInfo *requestInfo, const HRilDataInfo *d
     int ret;
     int err = HRIL_ERR_SUCCESS;
     char cmd[MAX_BUFF_SIZE] = {0};
-    struct ReportInfo reportInfo;
+    struct ReportInfo reportInfo = {};
     ResponseInfo *pResponse = NULL;
     const HRilDataInfo *pDataInfo = data;
     ModemReportErrorInfo errInfo = {
@@ -324,7 +322,6 @@ void ReqActivatePdpContext(const ReqDataInfo *requestInfo, const HRilDataInfo *d
         goto REPORT_ERR;
     }
 
-    (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
     (void)sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CGDCONT=1,\"%s\",\"%s\"", pDataInfo->type, pDataInfo->apn);
     ret = SendCommandLock(cmd, NULL, 0, &pResponse);
     if (ret != 0 || !pResponse->success) {
@@ -357,11 +354,10 @@ REPORT_ERR:
 
 void ReqDeactivatePdpContext(const ReqDataInfo *requestInfo, const HRilDataInfo *data)
 {
-    int ret;
+    int ret = 0;
     int err = HRIL_ERR_SUCCESS;
     char cmd[MAX_BUFF_SIZE] = {0};
-    struct ReportInfo reportInfo;
-    (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
+    struct ReportInfo reportInfo = {};
     ResponseInfo *pResponse = NULL;
     const HRilDataInfo *pDataInfo = data;
     ModemReportErrorInfo errInfo = {
