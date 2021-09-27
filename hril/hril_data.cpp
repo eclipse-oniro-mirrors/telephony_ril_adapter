@@ -33,7 +33,7 @@ HRilData::~HRilData()
 void HRilData::DeactivatePdpContext(int32_t slotId, struct HdfSBuf *data)
 {
     struct UniInfo uInfo;
-    HRilDataInfo dataInfo;
+    HRilDataInfo dataInfo = {};
     MessageParcel *parcel = nullptr;
 
     if (data == nullptr) {
@@ -48,7 +48,6 @@ void HRilData::DeactivatePdpContext(int32_t slotId, struct HdfSBuf *data)
         TELEPHONY_LOGE("RilAdapter failed to do ReadFromParcel!");
         return;
     }
-    TELEPHONY_LOGD("DeactivatePdpContext: serial %{public}d on %{public}d", uInfo.serial, uInfo.flag);
     ReqDataInfo *requestInfo = CreateHRilRequest(uInfo.serial, slotId, HREQ_DATA_DEACTIVATE_PDP_CONTEXT);
     if (requestInfo == nullptr || dataFuncs_ == nullptr) {
         TELEPHONY_LOGE("RilAdapter failed to do Create HRilRequest! requestInfo=%{public}p", requestInfo);
@@ -66,7 +65,7 @@ void HRilData::DeactivatePdpContext(int32_t slotId, struct HdfSBuf *data)
 void HRilData::ActivatePdpContext(int32_t slotId, struct HdfSBuf *data)
 {
     struct DataCallInfo dataCallInfo;
-    HRilDataInfo dataInfo;
+    HRilDataInfo dataInfo = {};
     MessageParcel *parcel = nullptr;
     if (SbufToParcel(data, &parcel) || parcel == nullptr) {
         TELEPHONY_LOGE("RilAdapter failed to do SbufToParcel:");
@@ -312,7 +311,7 @@ void HRilData::AddHandlerToMap()
 {
     // Notification
     notiMemberFuncMap_[HNOTI_DATA_PDP_CONTEXT_LIST_UPDATED] = &HRilData::PdpContextListUpdated;
-    // response
+    // Response
     respMemberFuncMap_[HREQ_DATA_ACTIVATE_PDP_CONTEXT] = &HRilData::ActivatePdpContextResponse;
     respMemberFuncMap_[HREQ_DATA_DEACTIVATE_PDP_CONTEXT] = &HRilData::DeactivatePdpContextResponse;
     // ReqFunc
