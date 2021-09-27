@@ -24,10 +24,10 @@ ohos_unittest("tel_ril_adapter_gtest") {
   module_out_path = part_name + "/" + test_module
 
   sources = [
+    "ril_adapter_unit_test.cpp",
     "ril_manager_test.cpp",
     "ril_radio_indication_test.cpp",
     "ril_radio_response_test.cpp",
-    "ril_unit_test.cpp",
   ]
 
   include_dirs = [

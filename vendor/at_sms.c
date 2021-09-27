@@ -17,7 +17,9 @@
 #include "vendor_util.h"
 #include "vendor_report.h"
 
-#define MAX_BUFF_SIZE 500
+static const int MAX_BUFF_SIZE = 500;
+static const int DATA_LENGTH = 1;
+static const int CMD_LENGTH = 2;
 
 int ProcessCellBroadcast(char *pBuff, HRilCellBroadcastReportInfo *response)
 {
@@ -61,7 +63,7 @@ int ProcessCellBroadcast(char *pBuff, HRilCellBroadcastReportInfo *response)
     } else {
         ret = NextInt(&pBuff, &response->length);
         if (ret == BUFF_IS_NULL) {
-            TELEPHONY_LOGE("mode is null");
+            TELEPHONY_LOGE("length is null");
         }
     }
     return count;
@@ -78,7 +80,6 @@ void ReqSendSms(ReqDataInfo *requestInfo, const void *data, size_t dataLen)
     char *result = NULL;
     const int RESPONSE_SUCCESS = 1;
     const int RESPONSE_FAIL = -2;
-    const int LEN = 1;
     struct ReportInfo reportInfo = {};
     ResponseInfo *responseInfo = NULL;
     HRilSmsResponse response = {};
@@ -88,10 +89,8 @@ void ReqSendSms(ReqDataInfo *requestInfo, const void *data, size_t dataLen)
         (void)sprintf_s(smscTemp, MAX_BUFF_SIZE, "00");
         smsc = smscTemp;
     }
-    pdu = ((const char **)data)[LEN];
-    (void)memset_s(&response, sizeof(response), 0, sizeof(response));
-    TELEPHONY_LOGD("%{public}s enter, smsc:%{public}s, pdu:%{public}s", __func__, smsc, pdu);
-    (void)sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CMGS=%zu", strlen(pdu) / 2);
+    pdu = ((const char **)data)[DATA_LENGTH];
+    (void)sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CMGS=%zu", strlen(pdu) / CMD_LENGTH);
     (void)sprintf_s(smsPdu, MAX_BUFF_SIZE, "%s%s", smsc, pdu);
 
     err = SendCommandSmsLock(cmd, smsPdu, "+CMGS:", 0, &responseInfo);
@@ -151,9 +150,7 @@ void ReqStorageSms(ReqDataInfo *requestInfo, const void *data, size_t dataLen)
     HRilSmsWriteSms *msg = NULL;
     char cmd[MAX_BUFF_SIZE] = {0};
     char smsPdu[MAX_BUFF_SIZE] = {0};
-    struct ReportInfo reportInfo;
-    (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
-
+    struct ReportInfo reportInfo = {};
     ResponseInfo *responseInfo = NULL;
     msg = ((HRilSmsWriteSms *)data);
     TELEPHONY_LOGD("%{public}s enter, pdu:%{public}s, smsc:%{public}s, status:%{public}d", __func__, msg->pdu,
@@ -162,8 +159,16 @@ void ReqStorageSms(ReqDataInfo *requestInfo, const void *data, size_t dataLen)
         strcpy_s(msg->smsc, strlen("00"), "00");
     }
 
-    (void)sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CMGW=%zu,%d", strlen(msg->pdu) / 2, msg->state);
-    (void)sprintf_s(smsPdu, MAX_BUFF_SIZE, "%s%s", msg->smsc, msg->pdu);
+    err = sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CMGW=%zu,%d", strlen(msg->pdu) / CMD_LENGTH, msg->state);
+    if (err < 0) {
+        TELEPHONY_LOGE("sprintf_s failed, err = %{public}d\n", err);
+        goto ERROR;
+    }
+    err = sprintf_s(smsPdu, MAX_BUFF_SIZE, "%s%s", msg->smsc, msg->pdu);
+    if (err < 0) {
+        TELEPHONY_LOGE("sprintf_s failed, err = %{public}d\n", err);
+        goto ERROR;
+    }
 
     err = SendCommandSmsLock(cmd, smsPdu, "+CMGW:", 0, &responseInfo);
     if (err != 0 || responseInfo->success == 0) {
@@ -183,11 +188,10 @@ ERROR:
 
 void ReqDeleteSms(ReqDataInfo *requestInfo, const void *data, size_t dataLen)
 {
-    int err;
-    int index;
+    int err = 0;
+    int index = 0;
     char cmd[MAX_BUFF_SIZE] = {0};
-    struct ReportInfo reportInfo;
-    (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
+    struct ReportInfo reportInfo = {};
     ResponseInfo *responseInfo = NULL;
     if (data == NULL) {
         err = HRIL_ERR_GENERIC_FAILURE;
@@ -218,8 +222,7 @@ void ReqUpdateSms(ReqDataInfo *requestInfo, const void *data, size_t dataLen)
     HRilSmsWriteSms *msg = NULL;
     char cmd[MAX_BUFF_SIZE] = {0};
     char smsPdu[MAX_BUFF_SIZE] = {0};
-    struct ReportInfo reportInfo;
-    (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
+    struct ReportInfo reportInfo = {};
     ResponseInfo *responseInfo = NULL;
     if (data == NULL) {
         err = HRIL_ERR_GENERIC_FAILURE;
@@ -227,7 +230,7 @@ void ReqUpdateSms(ReqDataInfo *requestInfo, const void *data, size_t dataLen)
     }
     msg = ((HRilSmsWriteSms *)data);
 
-    (void)sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CMGW=%zu,%d", strlen(msg->pdu) / 2, msg->state);
+    (void)sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CMGW=%zu,%d", strlen(msg->pdu) / CMD_LENGTH, msg->state);
     (void)sprintf_s(smsPdu, MAX_BUFF_SIZE, "%s", msg->pdu);
 
     err = SendCommandSmsLock(cmd, smsPdu, "+CMGW:", 0, &responseInfo);
@@ -256,16 +259,13 @@ void ReqSetSmsCenterAddress(ReqDataInfo *requestInfo, const void *data, size_t d
     int err = 0;
     HRilServiceCenterAddress *address = NULL;
     char cmd[MAX_BUFF_SIZE] = {0};
-    struct ReportInfo reportInfo;
-    (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
+    struct ReportInfo reportInfo = {};
     ResponseInfo *responseInfo = NULL;
     if (data == NULL) {
         err = HRIL_ERR_GENERIC_FAILURE;
         goto ERROR;
     }
     address = ((HRilServiceCenterAddress *)data);
-    TELEPHONY_LOGD(
-        "%{public}s enter, address:%{public}s, tosca:%{public}d", __func__, address->address, address->tosca);
     if (address->tosca == 0) {
         (void)sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CSCA=\"%s\"", address->address);
     } else {
@@ -290,7 +290,6 @@ void ReqGetSmsCenterAddress(ReqDataInfo *requestInfo, const void *data, size_t d
 {
     int err = 0;
     const int NEXTSTRERR = -1;
-    const int LEN = 1;
     char *result = NULL;
     HRilServiceCenterAddress response = {};
     struct ReportInfo reportInfo = {};
@@ -308,13 +307,12 @@ void ReqGetSmsCenterAddress(ReqDataInfo *requestInfo, const void *data, size_t d
         SkipATPrefix(&result);
         err = NextStr(&result, &response.address);
         if (err == NEXTSTRERR) {
-            (void)strcpy_s(response.address, strlen("") + LEN, "");
+            (void)strcpy_s(response.address, strlen("") + DATA_LENGTH, "");
         }
         err = NextInt(&result, &response.tosca);
         if (err == NEXTSTRERR) {
             response.tosca = 0;
         }
-        TELEPHONY_LOGD("result[address:%{public}s, tosca:%{public}d]", response.address, response.tosca);
     }
     reportInfo = CreateReportInfo(requestInfo, VENDOR_SUCCESS, HRIL_RESPONSE, 0);
     OnSmsReport(reportInfo, &response, sizeof(HRilServiceCenterAddress *));
@@ -331,8 +329,7 @@ void ReqSetCellBroadcast(ReqDataInfo *requestInfo, const void *data, size_t data
     int err = 0;
     HRilCellBroadcastInfo *cellBroadcast = NULL;
     char cmd[MAX_BUFF_SIZE] = {0};
-    struct ReportInfo reportInfo;
-    (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
+    struct ReportInfo reportInfo = {};
     ResponseInfo *responseInfo = NULL;
     if (data == NULL) {
         err = HRIL_ERR_GENERIC_FAILURE;
@@ -344,7 +341,8 @@ void ReqSetCellBroadcast(ReqDataInfo *requestInfo, const void *data, size_t data
     if (strcmp(cellBroadcast->mids, "") && !strcmp(cellBroadcast->dcss, "")) {
         (void)sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CSCB=%d,\"%s\"", cellBroadcast->mode, cellBroadcast->mids);
     } else if (strcmp(cellBroadcast->dcss, "") && strcmp(cellBroadcast->dcss, "")) {
-        (void)sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CSCB=%d,\"%s\",\"%s\"", cellBroadcast->mode, cellBroadcast->mids, cellBroadcast->dcss);
+        (void)sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CSCB=%d,\"%s\",\"%s\"", cellBroadcast->mode, cellBroadcast->mids,
+            cellBroadcast->dcss);
     } else if (strcmp(cellBroadcast->dcss, "") && !strcmp(cellBroadcast->mids, "")) {
         (void)sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CSCB=%d,,\"%s\"", cellBroadcast->mode, cellBroadcast->dcss);
     } else {
