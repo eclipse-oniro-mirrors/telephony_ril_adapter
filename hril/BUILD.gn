@@ -70,7 +70,7 @@ ohos_shared_library("hril") {
     "//base/telephony/core_service/common:libtelephony_common",
     "//drivers/adapter/uhdf2/host:libhdf_host",
     "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
-    "//drivers/adapter/uhdf2/osal:libhdf_utils",
+    "//drivers/adapter/uhdf2/utils:libhdf_utils",
   ]
   external_deps = [ "ipc:ipc_core" ]
 
