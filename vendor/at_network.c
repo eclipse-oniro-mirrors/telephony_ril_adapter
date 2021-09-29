@@ -41,17 +41,18 @@ int GetResponseErrorCode(ResponseInfo *pResponseInfo)
     return ret;
 }
 
-int ProcessRegStatus(char *s, char **response, int count)
+int ProcessRegStatus(const char *s, char **response, int count)
 {
-    int ret = HRIL_ERR_SUCCESS;
-    if (s == NULL) {
+    char *str = (char *)s;
+    if (str == NULL) {
         TELEPHONY_LOGE("ProcessRegStatus result is null");
         return HRIL_ERR_NULL_POINT;
     } else {
-        TELEPHONY_LOGD("result: %{public}s", s);
-        SkipATPrefix(&s);
+        TELEPHONY_LOGD("result: %{public}s", str);
+        int ret = HRIL_ERR_SUCCESS;
+        SkipATPrefix(&str);
         for (int i = 0; i < count; i++) {
-            ret = NextStr(&s, &response[i]);
+            ret = NextStr(&str, &response[i]);
             TELEPHONY_LOGD("result[%{public}d]: %{public}s", i, response[i]);
             if (ret == -1) {
                 response[i] = 0;
@@ -62,88 +63,90 @@ int ProcessRegStatus(char *s, char **response, int count)
     }
 }
 
-static void ParseGetGsmSignalStrength(char *line, HRilRssi *hrilRssi)
+static void ParseGetGsmSignalStrength(const char *line, HRilRssi *hrilRssi)
 {
-    if (line == NULL || hrilRssi == NULL) {
+    char *lineStr = (char *)line;
+    if (lineStr == NULL || hrilRssi == NULL) {
         TELEPHONY_LOGE("line or hrilRssi is null!!!");
         return;
     }
-    NextInt(&line, &hrilRssi->gwRssi.rxlev);
-    NextInt(&line, &hrilRssi->gwRssi.ber);
+    NextInt(&lineStr, &hrilRssi->gwRssi.rxlev);
+    NextInt(&lineStr, &hrilRssi->gwRssi.ber);
 }
 
-static void ParseGetLteSignalStrength(char *line, HRilRssi *hrilRssi)
+static void ParseGetLteSignalStrength(const char *line, HRilRssi *hrilRssi)
 {
-    if (line == NULL || hrilRssi == NULL) {
+    char *lineStr = (char *)line;
+    if (lineStr == NULL || hrilRssi == NULL) {
         TELEPHONY_LOGE("line or hrilRssi is null!!!");
         return;
     }
-    NextInt(&line, &hrilRssi->lte.rxlev);
-    NextInt(&line, &hrilRssi->lte.rsrq);
-    NextInt(&line, &hrilRssi->lte.rsrp);
-    NextInt(&line, &hrilRssi->lte.snr);
+    NextInt(&lineStr, &hrilRssi->lte.rxlev);
+    NextInt(&lineStr, &hrilRssi->lte.rsrq);
+    NextInt(&lineStr, &hrilRssi->lte.rsrp);
+    NextInt(&lineStr, &hrilRssi->lte.snr);
 }
 
-static void ParseGetWcdmaSignalStrength(char *line, HRilRssi *hrilRssi)
+static void ParseGetWcdmaSignalStrength(const char *line, HRilRssi *hrilRssi)
 {
-    if (line == NULL || hrilRssi == NULL) {
+    char *lineStr = (char *)line;
+    if (lineStr == NULL || hrilRssi == NULL) {
         TELEPHONY_LOGE("line or hrilRssi is null!!!");
         return;
     }
-    NextInt(&line, &hrilRssi->wcdma.rxlev);
-    NextInt(&line, &hrilRssi->wcdma.ecio);
-    NextInt(&line, &hrilRssi->wcdma.rscp);
-    NextInt(&line, &hrilRssi->wcdma.ber);
+    NextInt(&lineStr, &hrilRssi->wcdma.rxlev);
+    NextInt(&lineStr, &hrilRssi->wcdma.ecio);
+    NextInt(&lineStr, &hrilRssi->wcdma.rscp);
+    NextInt(&lineStr, &hrilRssi->wcdma.ber);
 }
 
-int ProcessParamSignalStrength(char *result, HRilRssi *hrilRssi)
+int ProcessParamSignalStrength(const char *result, HRilRssi *hrilRssi)
 {
-    int err;
+    char *resultStr = (char *)result;
     char *c = NULL;
-    err = SkipATPrefix(&result);
-    int tmp;
+    int err = SkipATPrefix(&resultStr);
+    int tmp = 0;
 
     if (err < 0) {
-        TELEPHONY_LOGE("skip failed: [%{public}p]", result);
+        TELEPHONY_LOGE("skip failed: [%{public}s]", resultStr);
         return err;
     }
-    TELEPHONY_LOGD("ProcessParamSignalStrength  enter -->, result %{public}s", result);
+    TELEPHONY_LOGD("ProcessParamSignalStrength  enter -->, result %{public}s", resultStr);
 
-    err = NextInt(&result, &tmp);
-    TELEPHONY_LOGD("ProcessParamSignalStrength  enter -->, result %{public}s", result);
+    err = NextInt(&resultStr, &tmp);
+    TELEPHONY_LOGD("ProcessParamSignalStrength  enter -->, result %{public}s", resultStr);
     if (err < 0) {
         TELEPHONY_LOGE("read failed: %{public}d", err);
         return err;
     }
-    err = NextInt(&result, &tmp);
-    TELEPHONY_LOGD("ProcessParamSignalStrength  enter -->, result %{public}s", result);
+    err = NextInt(&resultStr, &tmp);
+    TELEPHONY_LOGD("ProcessParamSignalStrength  enter -->, result %{public}s", resultStr);
     if (err < 0) {
         TELEPHONY_LOGE("read failed: %{public}d", err);
         return err;
     }
-    err = NextStr(&result, &c);
-    TELEPHONY_LOGD("ProcessParamSignalStrength  enter -->, result %{public}s", result);
+    err = NextStr(&resultStr, &c);
+    TELEPHONY_LOGD("ProcessParamSignalStrength  enter -->, result %{public}s", resultStr);
     if (err < 0) {
         TELEPHONY_LOGE("read failed: %{public}d", err);
         return err;
     }
 
     if (!strcmp(c, "GSM")) {
-        TELEPHONY_LOGD("ProcessParamSignalStrength  enter GSM-->, result %{public}s", result);
-        ParseGetGsmSignalStrength(result, hrilRssi);
+        TELEPHONY_LOGD("ProcessParamSignalStrength  enter GSM-->, result %{public}s", resultStr);
+        ParseGetGsmSignalStrength(resultStr, hrilRssi);
     } else if (!strcmp(c, "LTE")) {
-        TELEPHONY_LOGD("ProcessParamSignalStrength  enter LTE-->, result %{public}s", result);
-        ParseGetLteSignalStrength(result, hrilRssi);
+        TELEPHONY_LOGD("ProcessParamSignalStrength  enter LTE-->, result %{public}s", resultStr);
+        ParseGetLteSignalStrength(resultStr, hrilRssi);
     } else if (!strcmp(c, "WCDMA")) {
-        TELEPHONY_LOGD("ProcessParamSignalStrength  enter WCDMA-->, result %{public}s", result);
-        ParseGetWcdmaSignalStrength(result, hrilRssi);
+        TELEPHONY_LOGD("ProcessParamSignalStrength  enter WCDMA-->, result %{public}s", resultStr);
+        ParseGetWcdmaSignalStrength(resultStr, hrilRssi);
     }
     return 0;
 }
 
 void ReqGetSignalStrength(const ReqDataInfo *requestInfo)
 {
-    int ret;
     int err = HRIL_ERR_SUCCESS;
     struct ReportInfo reportInfo;
     const long TIME_OUT = DEFAULT_TIMEOUT;
@@ -151,7 +154,7 @@ void ReqGetSignalStrength(const ReqDataInfo *requestInfo)
     ResponseInfo *responseInfo = NULL;
     char *result = NULL;
     TELEPHONY_LOGD("enter to [%{public}s]:%{public}d", __func__, __LINE__);
-    ret = SendCommandLock("AT^HCSQ?", "^HCSQ:", TIME_OUT, &responseInfo);
+    int ret = SendCommandLock("AT^HCSQ?", "^HCSQ:", TIME_OUT, &responseInfo);
     if (responseInfo == NULL) {
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_NULL_POINT, HRIL_RESPONSE, 0);
         OnNetworkReport(reportInfo, NULL, 0);
@@ -179,7 +182,6 @@ void ReqGetSignalStrength(const ReqDataInfo *requestInfo)
 
 void ReqGetCsRegStatus(const ReqDataInfo *requestInfo)
 {
-    int ret;
     int err = HRIL_ERR_SUCCESS;
     struct ReportInfo reportInfo;
     (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
@@ -189,7 +191,7 @@ void ReqGetCsRegStatus(const ReqDataInfo *requestInfo)
     char *response[MAX_REG_INFO_ITEM] = {""};
     const long TIME_OUT = DEFAULT_TIMEOUT;
 
-    ret = SendCommandLock("AT+CREG?", "+CREG:", TIME_OUT, &responseInfo);
+    int ret = SendCommandLock("AT+CREG?", "+CREG:", TIME_OUT, &responseInfo);
     if (responseInfo == NULL) {
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_NULL_POINT, HRIL_RESPONSE, 0);
         OnNetworkReport(reportInfo, NULL, 0);
@@ -223,7 +225,6 @@ void ReqGetCsRegStatus(const ReqDataInfo *requestInfo)
 
 void ReqGetPsRegStatus(const ReqDataInfo *requestInfo)
 {
-    int ret;
     int err = HRIL_ERR_SUCCESS;
     struct ReportInfo reportInfo;
     (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
@@ -233,7 +234,7 @@ void ReqGetPsRegStatus(const ReqDataInfo *requestInfo)
     char *response[MAX_REG_INFO_ITEM] = {""};
     const long TIME_OUT = DEFAULT_TIMEOUT;
 
-    ret = SendCommandLock("AT+CGREG?", "+CGREG:", TIME_OUT, &responseInfo);
+    int ret = SendCommandLock("AT+CGREG?", "+CGREG:", TIME_OUT, &responseInfo);
     if (responseInfo == NULL) {
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_NULL_POINT, HRIL_RESPONSE, 0);
         OnNetworkReport(reportInfo, NULL, 0);
@@ -340,7 +341,7 @@ static int MoveRightBracket(char **pStr)
     return 0;
 }
 
-void GetNetworkSearchInformationPause()
+void GetNetworkSearchInformationPause(void)
 {
     TELEPHONY_LOGD("enter to [%{public}s]:%{public}d", __func__, __LINE__);
     pthread_mutex_lock(&g_networkSearchInformationMutex);
@@ -417,12 +418,12 @@ void RequestGetNetworkSearchInformation(const ReqDataInfo *requestInfo)
     SetWatchFunction(GetNetworkSearchInformationPause);
 }
 
-int ParseOperListInfo(char *lineinfo, int count, AvailableOperInfo *pOperInfo, AvailableOperInfo **ppOperInfo)
+int ParseOperListInfo(const char *lineInfo, int count, AvailableOperInfo *pOperInfo, AvailableOperInfo **ppOperInfo)
 {
     int state = 0;
     int rat = 0;
     int operCount = 0;
-    char *line = lineinfo;
+    char *line = (char *)lineInfo;
     int item = count;
     for (int i = 0; i < item && operCount < item; i++) {
         int ret = MoveLeftBracket(&line);
@@ -484,7 +485,8 @@ static void DealNetworkSearchInformation(
         SetAtPauseFlag(false);
         alarm(0);
         if (g_reportInfoForOperListToUse.requestInfo != NULL) {
-            OnNetworkReport(g_reportInfoForOperListToUse, (void *)ppOperInfo, operCount * sizeof(AvailableOperInfo *));
+            OnNetworkReport(
+                g_reportInfoForOperListToUse, (void *)ppOperInfo, operCount * sizeof(AvailableOperInfo *));
             free(g_reportInfoForOperListToUse.requestInfo);
             g_reportInfoForOperListToUse.requestInfo = NULL;
         }
@@ -498,7 +500,7 @@ static void DealNetworkSearchInformation(
     }
 }
 
-int ProcessOperListToUse(char *list)
+int ProcessOperListToUse(const char *list)
 {
     int item = 0;
     int operCount = 0;
@@ -509,7 +511,7 @@ int ProcessOperListToUse(char *list)
         TELEPHONY_LOGD("ProcessOperListToUse result is null");
         goto ERROR;
     }
-    char *line = list;
+    char *line = (char *)list;
     while (*line != '\0') {
         if (*line == ')') {
             item++;
@@ -519,7 +521,7 @@ int ProcessOperListToUse(char *list)
     if (item <= UNUSED_ITEM_COUNT) {
         goto ERROR;
     }
-    line = list;
+    line = (char *)list;
     int ret = SkipATPrefix(&line);
     if (ret < 0) {
         goto ERROR;

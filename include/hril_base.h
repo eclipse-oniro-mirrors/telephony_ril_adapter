@@ -29,6 +29,9 @@ namespace OHOS {
 namespace Telephony {
 #define HRIL_NOTIFICATION_TYPE 1
 
+// Max malloc memory size
+#define MALLOC_MAX_SIZE (1024 * 1024)
+
 using RespCmdInfo = struct RespCmdInfo;
 using namespace std;
 extern "C" const char *GetRequestStringInfo(int32_t request);

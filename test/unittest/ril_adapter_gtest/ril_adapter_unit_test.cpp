@@ -214,7 +214,7 @@ void RilAdapterUnitTest::SetRilLocationUpdateForNetworksTest(const OHOS::AppExec
     TELEPHONY_LOGD("RilAdapterUnitTest::SetRilLocationUpdateForNetworksTest -->");
     mRilManager_->SetNetworkLocationUpdate(result);
     TELEPHONY_LOGD(
-        "RilAdapterUnitTest::SetRilLocationUpdateForNetworksTest --> SetRilLocationUpdateForNetworksTest finished");
+        "RilAdapterUnitTest::SetRilLocationUpdateForNetworksTest --> finished");
 }
 
 void RilAdapterUnitTest::GetRilCmOperatorTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
