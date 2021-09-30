@@ -39,7 +39,7 @@ ohos_shared_library("ril_vendor") {
   ]
   deps = [
     "//base/telephony/core_service/common:libtelephony_common",
-    "//drivers/adapter/uhdf2/osal:libhdf_utils",
+    "//drivers/adapter/uhdf2/utils:libhdf_utils",
   ]
 
   if (is_standard_system) {

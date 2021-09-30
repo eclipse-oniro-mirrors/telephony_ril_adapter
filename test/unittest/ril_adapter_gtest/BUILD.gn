@@ -48,7 +48,7 @@ ohos_unittest("tel_ril_adapter_gtest") {
     "//base/telephony/core_service/common:libtelephony_common",
     "//drivers/adapter/uhdf2/host:libhdf_host",
     "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
-    "//drivers/adapter/uhdf2/osal:libhdf_utils",
+    "//drivers/adapter/uhdf2/utils:libhdf_utils",
     "//third_party/googletest:gtest_main",
   ]
 
