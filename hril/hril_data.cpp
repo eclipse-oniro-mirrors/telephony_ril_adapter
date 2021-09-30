@@ -33,7 +33,7 @@ HRilData::~HRilData()
 void HRilData::DeactivatePdpContext(int32_t slotId, struct HdfSBuf *data)
 {
     struct UniInfo uInfo;
-    HRilDataInfo dataInfo;
+    HRilDataInfo dataInfo = {};
     MessageParcel *parcel = nullptr;
 
     if (data == nullptr) {
@@ -65,7 +65,7 @@ void HRilData::DeactivatePdpContext(int32_t slotId, struct HdfSBuf *data)
 void HRilData::ActivatePdpContext(int32_t slotId, struct HdfSBuf *data)
 {
     struct DataCallInfo dataCallInfo;
-    HRilDataInfo dataInfo;
+    HRilDataInfo dataInfo = {};
     MessageParcel *parcel = nullptr;
     if (SbufToParcel(data, &parcel) || parcel == nullptr) {
         TELEPHONY_LOGE("RilAdapter failed to do SbufToParcel:");

@@ -79,8 +79,7 @@ void OnSimReport(struct ReportInfo reportInfo, const void *response, size_t resp
 struct ReportInfo CreateReportInfo(
     const ReqDataInfo *requestInfo, unsigned int err, unsigned int type, int notifyId)
 {
-    struct ReportInfo reportInfo;
-    (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
+    struct ReportInfo reportInfo = {};
 
     reportInfo.requestInfo = (ReqDataInfo *)requestInfo;
     reportInfo.notifyId = notifyId;

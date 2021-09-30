@@ -72,7 +72,7 @@ static int CallCmdCLCC(const char *lineCmd, HRilCallInfo *outCall)
 void ReqGetCallList(ReqDataInfo *requestInfo, const void *data, size_t dataLen)
 {
     int ret = -1;
-    struct ReportInfo reportInfo;
+    struct ReportInfo reportInfo = {};
     Line *pLine = NULL;
     ResponseInfo *pResponse = NULL;
     HRilCallInfo *pCalls = NULL;
@@ -82,7 +82,6 @@ void ReqGetCallList(ReqDataInfo *requestInfo, const void *data, size_t dataLen)
     int i = 0;
     int err = HRIL_ERR_SUCCESS;
 
-    (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
     ret = SendCommandLock("AT+CLCC", "+CLCC:", DEFAULT_TIMEOUT, &pResponse);
     if (ret != VENDOR_SUCCESS) {
         TELEPHONY_LOGE("AT+CLCC send failed, data=%{public}p", data);
@@ -102,7 +101,6 @@ void ReqGetCallList(ReqDataInfo *requestInfo, const void *data, size_t dataLen)
     }
     ppCalls = (HRilCallInfo **)malloc(callNum * sizeof(HRilCallInfo *));
     pCalls = (HRilCallInfo *)malloc(callNum * sizeof(HRilCallInfo));
-    (void)memset_s(pCalls, callNum * sizeof(HRilCallInfo), 0, callNum * sizeof(HRilCallInfo));
 
     for (i = 0; i < callNum; i++) {
         ppCalls[i] = &(pCalls[i]);
@@ -131,10 +129,9 @@ void ReqDial(ReqDataInfo *requestInfo, const void *data, size_t dataLen)
     const char *clir = NULL;
     int ret;
     int err = HRIL_ERR_SUCCESS;
-    struct ReportInfo reportInfo;
+    struct ReportInfo reportInfo = {};
     ResponseInfo *pResponse = NULL;
 
-    (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
     if (data == NULL) {
         TELEPHONY_LOGE("data is null!!!");
         err = HRIL_ERR_INVALID_PARAMETER;
@@ -181,9 +178,8 @@ void ReqHangup(ReqDataInfo *requestInfo, const void *data, size_t dataLen)
     int err = HRIL_ERR_SUCCESS;
     char cmd[MAX_BUFF_SIZE] = {0};
     ResponseInfo *pResponse = NULL;
-    struct ReportInfo reportInfo;
+    struct ReportInfo reportInfo = {};
 
-    (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
     if (data == NULL) {
         TELEPHONY_LOGE("data is null!!!");
         err = HRIL_ERR_INVALID_PARAMETER;
@@ -206,12 +202,11 @@ void ReqHangup(ReqDataInfo *requestInfo, const void *data, size_t dataLen)
 
 void ReqReject(ReqDataInfo *requestInfo, const void *data, size_t dataLen)
 {
-    struct ReportInfo reportInfo;
+    struct ReportInfo reportInfo = {};
     ResponseInfo *pResponse = NULL;
     int ret;
     int err = HRIL_ERR_SUCCESS;
 
-    (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
     ret = SendCommandLock("ATH", NULL, 0, &pResponse);
     if (ret != 0 || pResponse->success == 0) {
         TELEPHONY_LOGE("ATH send failed: %{public}p", data);
@@ -227,10 +222,9 @@ void ReqAnswer(ReqDataInfo *requestInfo, const void *data, size_t dataLen)
 {
     int ret;
     int err = HRIL_ERR_SUCCESS;
-    struct ReportInfo reportInfo;
+    struct ReportInfo reportInfo = {};
     ResponseInfo *pResponse = NULL;
 
-    (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
     ret = SendCommandLock("ATA", NULL, 0, &pResponse);
     if (ret != 0 || (pResponse != NULL && pResponse->success == 0)) {
         TELEPHONY_LOGE("ATA send failed, data=%{public}p", data);
@@ -245,13 +239,11 @@ void ReqAnswer(ReqDataInfo *requestInfo, const void *data, size_t dataLen)
 // Calling line identification presentation
 void ReqGetClip(ReqDataInfo *requestInfo)
 {
-    struct ReportInfo reportInfo;
-    HRilGetClipResult result;
+    struct ReportInfo reportInfo = {};
+    HRilGetClipResult result = {};
     int err = HRIL_ERR_SUCCESS;
     ResponseInfo *pResponse = NULL;
 
-    (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
-    (void)memset_s(&result, sizeof(HRilGetClipResult), 0, sizeof(HRilGetClipResult));
     err = SendCommandLock("AT+CLIP?", "+CLIP", 0, &pResponse);
     if (err == 0 && pResponse != NULL) {
         if (pResponse->success == 0) {
@@ -282,12 +274,11 @@ void ReqGetClip(ReqDataInfo *requestInfo)
 
 void ReqSetClip(ReqDataInfo *requestInfo, int action)
 {
-    struct ReportInfo reportInfo;
+    struct ReportInfo reportInfo = {};
     char cmd[MAX_BUFF_SIZE] = {0};
     int err = HRIL_ERR_SUCCESS;
     ResponseInfo *pResponse = NULL;
 
-    (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
     (void)sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CLIP=%d", action);
     err = SendCommandLock(cmd, NULL, 0, &pResponse);
     if (err == 0 && pResponse != NULL) {
@@ -306,13 +297,11 @@ void ReqSetClip(ReqDataInfo *requestInfo, int action)
 
 void ReqGetClir(ReqDataInfo *requestInfo)
 {
-    struct ReportInfo reportInfo;
-    HRilGetCallClirResult result;
+    struct ReportInfo reportInfo = {};
+    HRilGetCallClirResult result = {};
     int err = HRIL_ERR_SUCCESS;
     ResponseInfo *pResponse = NULL;
 
-    (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
-    (void)memset_s(&reportInfo, sizeof(HRilGetCallClirResult), 0, sizeof(HRilGetCallClirResult));
     err = SendCommandLock("AT+CLIR?", "+CLIR", 0, &pResponse);
     if (err == HRIL_ERR_SUCCESS && pResponse != NULL) {
         if (pResponse->success == 0) {
@@ -344,12 +333,11 @@ void ReqGetClir(ReqDataInfo *requestInfo)
 
 void ReqSetClir(ReqDataInfo *requestInfo, int action)
 {
-    struct ReportInfo reportInfo;
+    struct ReportInfo reportInfo = {};
     char cmd[MAX_BUFF_SIZE] = {0};
     int err = HRIL_ERR_SUCCESS;
     ResponseInfo *pResponse = NULL;
 
-    (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
     (void)sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CLIR=%d", action);
     err = SendCommandLock(cmd, NULL, 0, &pResponse);
     if (err != HRIL_ERR_SUCCESS || (pResponse != NULL && pResponse->success == 0)) {
@@ -364,12 +352,11 @@ void ReqSetClir(ReqDataInfo *requestInfo, int action)
 
 void ReqStartDtmf(ReqDataInfo *requestInfo, CallDTMFInfo info)
 {
-    struct ReportInfo reportInfo;
+    struct ReportInfo reportInfo = {};
     char cmd[MAX_BUFF_SIZE] = {0};
     int err = HRIL_ERR_SUCCESS;
     ResponseInfo *pResponse = NULL;
 
-    (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
     (void)sprintf_s(cmd, MAX_BUFF_SIZE, "AT^DTMF=%d,%c,1,0", info.callId, info.dtmfKey[0]);
     err = SendCommandLock(cmd, NULL, 0, &pResponse);
     if (err != HRIL_ERR_SUCCESS || (pResponse != NULL && pResponse->success == 0)) {
@@ -383,13 +370,12 @@ void ReqStartDtmf(ReqDataInfo *requestInfo, CallDTMFInfo info)
 
 void ReqSendDtmf(ReqDataInfo *requestInfo, CallDTMFInfo info)
 {
-    struct ReportInfo reportInfo;
+    struct ReportInfo reportInfo = {};
     char cmd[MAX_BUFF_SIZE] = {0};
     int err = HRIL_ERR_SUCCESS;
     ResponseInfo *pResponse = NULL;
     int stringLength = 0;
 
-    (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
     if (info.dtmfKey == NULL) {
         err = HRIL_ERR_NULL_POINT;
         reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
@@ -414,12 +400,11 @@ void ReqSendDtmf(ReqDataInfo *requestInfo, CallDTMFInfo info)
 
 void ReqStopDtmf(ReqDataInfo *requestInfo, CallDTMFInfo info)
 {
-    struct ReportInfo reportInfo;
+    struct ReportInfo reportInfo = {};
     char cmd[MAX_BUFF_SIZE] = {0};
     int err = HRIL_ERR_SUCCESS;
     ResponseInfo *pResponse = NULL;
 
-    (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
     (void)sprintf_s(cmd, MAX_BUFF_SIZE, "AT^DTMF=%d,%c,0,0", info.callId, info.dtmfKey[0]);
     err = SendCommandLock(cmd, NULL, 0, &pResponse);
     if (err != HRIL_ERR_SUCCESS || (pResponse != NULL && pResponse->success == 0)) {
@@ -433,12 +418,11 @@ void ReqStopDtmf(ReqDataInfo *requestInfo, CallDTMFInfo info)
 
 static void HoldAndActiveAtSend(ReqDataInfo *requestInfo)
 {
-    struct ReportInfo reportInfo;
+    struct ReportInfo reportInfo = {};
     int ret;
     int err = HRIL_ERR_SUCCESS;
     ResponseInfo *pResponse = NULL;
 
-    (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
     ret = SendCommandLock("AT+CHLD=2", NULL, 0, &pResponse);
     if (ret != 0 || (pResponse != NULL && pResponse->success == 0)) {
         TELEPHONY_LOGE("ATA send failed");
@@ -468,12 +452,11 @@ void ReqSwap(ReqDataInfo *requestInfo)
 void ReqJoin(ReqDataInfo *requestInfo, int callType)
 {
     char cmd[MAX_BUFF_SIZE] = {0};
-    struct ReportInfo reportInfo;
+    struct ReportInfo reportInfo = {};
     int ret = 0;
     int count = 3;
     int err = HRIL_ERR_SUCCESS;
 
-    (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
     /* call type
      * 0: Voice call
      * 1: Video call: send one-way video, two-way voice
@@ -501,13 +484,12 @@ void ReqJoin(ReqDataInfo *requestInfo, int callType)
 void ReqSplit(ReqDataInfo *requestInfo, int nThCall, int callType)
 {
     char cmd[MAX_BUFF_SIZE] = {0};
-    struct ReportInfo reportInfo;
+    struct ReportInfo reportInfo = {};
     int ret = 0;
     int count = 3;
     int err = HRIL_ERR_SUCCESS;
     ResponseInfo *pResponse = NULL;
 
-    (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
     // Make sure that party is in a valid range.
     // (Note: The Telephony middle layer imposes a range of 1 to 7.
     // It's sufficient for us to just make sure it's single digit.)
@@ -535,12 +517,11 @@ void ReqSplit(ReqDataInfo *requestInfo, int nThCall, int callType)
 void ReqCallSupplement(ReqDataInfo *requestInfo, int type)
 {
     char cmd[MAX_BUFF_SIZE] = {0};
-    struct ReportInfo reportInfo;
+    struct ReportInfo reportInfo = {};
     int ret = 0;
     int err = HRIL_ERR_SUCCESS;
     ResponseInfo *pResponse = NULL;
 
-    (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
     switch (type) {
         case TYPE_HANG_UP_HOLD_WAIT: {
             TELEPHONY_LOGD("ReqCallSupplement hang up all holding or waiting call");
@@ -581,15 +562,13 @@ void ReqCallSupplement(ReqDataInfo *requestInfo, int type)
 
 void ReqGetCallWait(ReqDataInfo *requestInfo)
 {
-    struct ReportInfo reportInfo;
+    struct ReportInfo reportInfo = {};
     int err = HRIL_ERR_SUCCESS;
     ResponseInfo *pResponse = NULL;
-    HRilCallWaitResult hrilCallWaitResult;
+    HRilCallWaitResult hrilCallWaitResult = {};
     char *line = NULL;
     const long timeout = 80000;
 
-    (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
-    (void)memset_s(&hrilCallWaitResult, sizeof(HRilCallWaitResult), -1, sizeof(HRilCallWaitResult));
     err = SendCommandLock("AT+CCWA=1,2,1", "+CCWA:", timeout, &pResponse);
     if (err != 0) {
         TELEPHONY_LOGE("ReqGetCallWait return, CCWA send failed");
@@ -626,13 +605,12 @@ void ReqGetCallWait(ReqDataInfo *requestInfo)
 
 void ReqSetCallWait(ReqDataInfo *requestInfo, int active)
 {
-    struct ReportInfo reportInfo;
+    struct ReportInfo reportInfo = {};
     char cmd[MAX_BUFF_SIZE] = {0};
     int err = HRIL_ERR_SUCCESS;
     ResponseInfo *pResponse = NULL;
     const long timeout = 80000;
 
-    (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
     (void)sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CCWA=1,%d,1", active);
     err = SendCommandLock(cmd, NULL, timeout, &pResponse);
     if (err != 0) {
@@ -655,10 +633,9 @@ void ReqSetCallForwarding(ReqDataInfo *requestInfo, HRilCFInfo info)
     const int NUM_S = 129;
     int err = HRIL_ERR_SUCCESS;
     ResponseInfo *pResponse = NULL;
-    struct ReportInfo reportInfo;
+    struct ReportInfo reportInfo = {};
     char cmd[MAX_BUFF_SIZE] = {0};
 
-    (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
     if (info.reason > CALL_FORWARD_REASON_ALL_CCF && info.mode > CALL_FORWARD_MODE_ERASURE) {
         TELEPHONY_LOGE("ReqSetCallForwarding call forwarding parameter err!!");
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_PARAMETER, HRIL_RESPONSE, 0);
@@ -691,14 +668,13 @@ void ReqSetCallForwarding(ReqDataInfo *requestInfo, HRilCFInfo info)
 
 void ReqGetCallForwarding(ReqDataInfo *requestInfo, int reason)
 {
-    struct ReportInfo reportInfo;
+    struct ReportInfo reportInfo = {};
     char cmd[MAX_BUFF_SIZE] = {0};
     int err = HRIL_ERR_SUCCESS;
     ResponseInfo *pResponse = NULL;
     HRilCFQueryInfo queryInfo = {0};
     char *line = NULL;
 
-    (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
     if (reason > CALL_FORWARD_REASON_ALL_CCF) {
         TELEPHONY_LOGE("call forwarding parameter err!!");
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_PARAMETER, HRIL_RESPONSE, 0);
@@ -742,14 +718,13 @@ void ReqGetCallForwarding(ReqDataInfo *requestInfo, int reason)
 void ReqGetCallRestriction(ReqDataInfo *requestInfo, const char *fac)
 {
     long long timeOut = 5000;
-    struct ReportInfo reportInfo;
+    struct ReportInfo reportInfo = {};
     int err = HRIL_ERR_SUCCESS;
     ResponseInfo *pResponse = NULL;
-    HRilCallRestrictionResult result;
+    HRilCallRestrictionResult result = {};
     char *line = NULL;
     char cmd[MAX_BUFF_SIZE] = {0};
 
-    (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
     (void)sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CLCK=\"%s\",2", fac);
     err = SendCommandLock(cmd, "+CLCK:", timeOut, &pResponse);
     if (err != 0) {
@@ -784,12 +759,11 @@ void ReqGetCallRestriction(ReqDataInfo *requestInfo, const char *fac)
 void ReqSetCallRestriction(ReqDataInfo *requestInfo, CallRestrictionInfo info)
 {
     long long timeOut = 5000;
-    struct ReportInfo reportInfo;
+    struct ReportInfo reportInfo = {};
     char cmd[MAX_BUFF_SIZE] = {0};
     int err = HRIL_ERR_SUCCESS;
     ResponseInfo *pResponse = NULL;
 
-    (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
     (void)sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CLCK=\"%s\",%d,\"%s\"", info.fac, info.mode, info.password);
     err = SendCommandLock(cmd, NULL, timeOut, &pResponse);
     if (err != 0) {

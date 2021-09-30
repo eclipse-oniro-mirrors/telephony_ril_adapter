@@ -288,7 +288,7 @@ void HRilManager::OnCallReport(struct ReportInfo *reportInfo, const void *respon
     }
     switch (reportInfo->type) {
         case (int32_t)ReportType::HRIL_RESPONSE: {
-            ReqDataInfo *reqInfo;
+            ReqDataInfo *reqInfo = nullptr;
             HRilSimId simId = HRIL_SIM_1;
             reqInfo = (ReqDataInfo *)reportInfo->requestInfo;
             simId = reqInfo->simId;
@@ -316,7 +316,7 @@ void HRilManager::OnDataReport(struct ReportInfo *reportInfo, const void *respon
     }
     switch (reportInfo->type) {
         case (int32_t)ReportType::HRIL_RESPONSE: {
-            ReqDataInfo *reqInfo;
+            ReqDataInfo *reqInfo = nullptr;
             HRilSimId simId = HRIL_SIM_1;
             reqInfo = (ReqDataInfo *)reportInfo->requestInfo;
             simId = reqInfo->simId;
@@ -344,7 +344,7 @@ void HRilManager::OnModemReport(struct ReportInfo *reportInfo, const void *respo
     }
     switch (reportInfo->type) {
         case (int32_t)ReportType::HRIL_RESPONSE: {
-            ReqDataInfo *reqInfo;
+            ReqDataInfo *reqInfo = nullptr;
             HRilSimId simId = HRIL_SIM_1;
             reqInfo = (ReqDataInfo *)reportInfo->requestInfo;
             simId = reqInfo->simId;
@@ -372,7 +372,7 @@ void HRilManager::OnNetworkReport(struct ReportInfo *reportInfo, const void *res
     }
     switch (reportInfo->type) {
         case (int32_t)ReportType::HRIL_RESPONSE: {
-            ReqDataInfo *reqInfo;
+            ReqDataInfo *reqInfo = nullptr;
             HRilSimId simId = HRIL_SIM_1;
             reqInfo = (ReqDataInfo *)reportInfo->requestInfo;
             simId = reqInfo->simId;
@@ -400,7 +400,7 @@ void HRilManager::OnSimReport(struct ReportInfo *reportInfo, const void *respons
     }
     switch (reportInfo->type) {
         case (int32_t)ReportType::HRIL_RESPONSE: {
-            ReqDataInfo *reqInfo;
+            ReqDataInfo *reqInfo = nullptr;
             HRilSimId simId = HRIL_SIM_1;
             reqInfo = (ReqDataInfo *)reportInfo->requestInfo;
             simId = reqInfo->simId;
@@ -428,7 +428,7 @@ void HRilManager::OnSmsReport(ReportInfo *reportInfo, const void *response, size
     }
     switch (reportInfo->type) {
         case (int32_t)ReportType::HRIL_RESPONSE: {
-            ReqDataInfo *reqInfo;
+            ReqDataInfo *reqInfo = nullptr;
             HRilSimId simId = HRIL_SIM_1;
             reqInfo = (ReqDataInfo *)reportInfo->requestInfo;
             simId = reqInfo->simId;
