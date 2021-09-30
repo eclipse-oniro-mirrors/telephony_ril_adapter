@@ -29,11 +29,12 @@ void ReqGetOperatorInfo(const ReqDataInfo *requestInfo);
 void RequestGetNetworkSearchInformation(const ReqDataInfo *requestInfo);
 void RequestQueryNetworkSelectionMode(const ReqDataInfo *requestInfo);
 void RequestSetAutomaticModeForNetworks(const ReqDataInfo *requestInfo, const HRiSetNetworkModeInfo *data);
-int ProcessRegStatus(char *s, char **response, int count);
-int ProcessParamSignalStrength(char *result, HRilRssi *hrilRssi);
-int ProcessOperListToUse(char *list);
+int ProcessRegStatus(const char *s, char **response, int count);
+int ProcessParamSignalStrength(const char *result, HRilRssi *hrilRssi);
+int ProcessOperListToUse(const char *list);
 void PerformTimeOut(int sigFlag);
-int ParseOperListInfo(char *lineinfo, int count, AvailableOperInfo *pOperInfo, AvailableOperInfo **ppOperInfo);
-void GetNetworkSearchInformationPause();
+int ParseOperListInfo(
+    const char *lineInfo, int count, AvailableOperInfo *pOperInfo, AvailableOperInfo **ppOperInfo);
+void GetNetworkSearchInformationPause(void);
 
 #endif

@@ -34,10 +34,10 @@
 static HRilRadioState g_radioState = HRIL_RADIO_POWER_STATE_UNAVAILABLE;
 static pthread_mutex_t g_statusMutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t g_statusCond = PTHREAD_COND_INITIALIZER;
-static pthread_t g_eventListeners;
+static pthread_t g_eventListeners = 0;
 static int g_fd = -1;
 static int g_atStatus = 0;
-const struct HRilReport *g_reportOps;
+const struct HRilReport *g_reportOps = NULL;
 
 static const HRilCallReq g_callReqOps = {
     .GetCallList = ReqGetCallList,
@@ -132,7 +132,7 @@ int SetRadioState(HRilRadioState newState, int rst)
     HRilRadioState oldState;
     const int timeOut = 10000;
     (void)memset_s(&oldState, sizeof(HRilRadioState), 0, sizeof(HRilRadioState));
-    struct ReportInfo reportInfo;
+    struct ReportInfo reportInfo = {};
     (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
     if (g_atStatus > 0) {
         newState = HRIL_RADIO_POWER_STATE_UNAVAILABLE;
@@ -244,8 +244,7 @@ static int ModemInit(void)
 
     sleep(SLEEP_TIME);
     TELEPHONY_LOGD("enter to : ModemInit OnModemReport %{public}d", g_radioState);
-    struct ReportInfo reportInfo;
-    (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
+    struct ReportInfo reportInfo = {};
     reportInfo.notifyId = HNOTI_MODEM_RADIO_STATE_UPDATED;
     reportInfo.type = HRIL_NOTIFICATION;
     reportInfo.error = HRIL_ERR_SUCCESS;

@@ -503,7 +503,8 @@ void HRilSim::ChangeSimPassword(int32_t slotId, struct HdfSBuf *data)
     }
     rilSimPassword.passwordLength = simPassword.passwordLength;
     simFuncs_->ChangeSimPassword(requestInfo, &rilSimPassword, sizeof(HRilSimPassword));
-    FreeStrings(NEW_PASSWORD_POINTER_NUM, rilSimPassword.fac, rilSimPassword.oldPassword, rilSimPassword.newPassword);
+    FreeStrings(
+        NEW_PASSWORD_POINTER_NUM, rilSimPassword.fac, rilSimPassword.oldPassword, rilSimPassword.newPassword);
     free(requestInfo);
 }
 
