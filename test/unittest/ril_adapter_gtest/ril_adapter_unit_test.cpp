@@ -169,7 +169,7 @@ void RilAdapterUnitTest::RilCmSplitCallTest(const OHOS::AppExecFwk::InnerEvent::
                        * 3: Video call: two-way video, two-way voice
                        */
 
-    TELEPHONY_LOGD("RilAdapterUnitTest::RilCmJoinCallTest -->");
+    TELEPHONY_LOGD("RilAdapterUnitTest::RilCmSplitCallTest -->");
 
     std::cout << "please enter the call split number:";
     std::cin >> nThCall;
@@ -213,8 +213,7 @@ void RilAdapterUnitTest::SetRilLocationUpdateForNetworksTest(const OHOS::AppExec
 {
     TELEPHONY_LOGD("RilAdapterUnitTest::SetRilLocationUpdateForNetworksTest -->");
     mRilManager_->SetNetworkLocationUpdate(result);
-    TELEPHONY_LOGD(
-        "RilAdapterUnitTest::SetRilLocationUpdateForNetworksTest --> finished");
+    TELEPHONY_LOGD("RilAdapterUnitTest::SetRilLocationUpdateForNetworksTest --> finished");
 }
 
 void RilAdapterUnitTest::GetRilCmOperatorTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
@@ -312,78 +311,290 @@ void RilAdapterUnitTest::OnInitInterface()
     memberFuncMap_[HREQ_DATA_DEACTIVATE_PDP_CONTEXT] = &RilAdapterUnitTest::DeactivateRilCmDataCallTest;
 }
 
-void RilAdapterUnitTest::SetSlotId(int slotId)
-{
-    slotId_ = slotId;
-}
-
-static void PrintMenu()
-{
-    cout << "---->CALL------------------------------------------------------------" << endl;
-    cout << HREQ_CALL_GET_CALL_LIST << "---->RilAdapterUnitTest::GetRilCmCurrentCallsTest " << endl;
-    cout << HREQ_CALL_DIAL << "---->RilAdapterUnitTest::RilCmDialTest " << endl;
-    cout << HREQ_CALL_REJECT << "---->RilAdapterUnitTest::RilCmRejectCallTest " << endl;
-    cout << HREQ_CALL_HANGUP << "---->RilAdapterUnitTest::HangupRilCmConnectionTest " << endl;
-    cout << HREQ_CALL_ANSWER << "---->RilAdapterUnitTest::AcceptRilCmCallTest " << endl;
-    cout << HREQ_CALL_HOLD << "---->RilAdapterUnitTest::RilCmHoldCallTest " << endl;
-    cout << HREQ_CALL_ACTIVE << "---->RilAdapterUnitTest::RilCmActiveCallTest " << endl;
-    cout << HREQ_CALL_SWAP << "---->RilAdapterUnitTest::RilCmSwapCallTest " << endl;
-    cout << HREQ_CALL_JOIN << "---->RilAdapterUnitTest::RilCmJoinCallTest " << endl;
-    cout << HREQ_CALL_SPLIT << "---->RilAdapterUnitTest::RilCmSplitCallTest " << endl;
-    cout << "---->NETWORK----------------------------------------------------------" << endl;
-    cout << HREQ_NETWORK_GET_SIGNAL_STRENGTH << "---->RilAdapterUnitTest::GetRilCmSignalIntensityTest " << endl;
-    cout << HREQ_NETWORK_GET_OPERATOR_INFO << "---->RilAdapterUnitTest::GetRilCmOperatorTest " << endl;
-    cout << HREQ_NETWORK_GET_CS_REG_STATUS << "---->RilAdapterUnitTest::GetRilCmCsRegStatusTest " << endl;
-    cout << HREQ_NETWORK_GET_PS_REG_STATUS << "---->RilAdapterUnitTest::GetRilCmPsRegStatusTest " << endl;
-    cout << "---->SIM----------------------------------------------------------" << endl;
-    cout << HREQ_SIM_IO << "---->RilAdapterUnitTest::IccRilCmIoForAppTest " << endl;
-    cout << HREQ_SIM_GET_IMSI << "---->RilAdapterUnitTest::GetRilCmImsiForAppTest " << endl;
-    cout << HREQ_SIM_GET_SIM_STATUS << "---->RilAdapterUnitTest::GetRilCmIccCardStatusTest " << endl;
-    cout << "---->DATA----------------------------------------------------------" << endl;
-    cout << HREQ_DATA_ACTIVATE_PDP_CONTEXT << "---->RilAdapterUnitTest::SetupRilCmDataCallTest " << endl;
-    cout << HREQ_DATA_DEACTIVATE_PDP_CONTEXT << "---->RilAdapterUnitTest::DeactivateRilCmDataCallTest " << endl;
-    cout << "---->SMS----------------------------------------------------------" << endl;
-    cout << HREQ_SMS_SEND_SMS << "---->RilAdapterUnitTest::SendRilCmSmsTest " << endl;
-    cout << HREQ_SMS_SEND_SMS_MORE_MODE << "---->RilAdapterUnitTest::SendRilCmSmsMoreModeTest " << endl;
-    cout << HREQ_SMS_IMS_SEND_SMS << "---->RilAdapterUnitTest::SendRilCmImsGsmSmsTest " << endl;
-    cout << HREQ_MODEM_SET_RADIO_STATUS << "---->RilAdapterUnitTest::SetRilCmRadioPowerTest " << endl;
-    cout << HREQ_MODEM_EXIT << "---->exit " << endl;
-}
-
-HWTEST_F(RilAdapterUnitTest, RilAdapterUnitTest_0100, Function | MediumTest | Level3)
+HWTEST_F(RilAdapterUnitTest, Telephony_RilAdapter_GetRilCmCurrentCallsTest_0100, Function | MediumTest | Level3)
 {
     static std::shared_ptr<AppExecFwk::EventRunner> runner;
     static std::shared_ptr<RilAdapterUnitTest::DemoHandler> handler;
-    cout << "---->Test Enter";
-    SetSlotId(0);
     OnInit();
     runner = OHOS::AppExecFwk::EventRunner::Create("DemoHandler");
     handler = make_shared<RilAdapterUnitTest::DemoHandler>(runner);
-    EXPECT_GT(handler, nullptr);
 
-    int32_t mWhat = 1;
-    bool loopFlag = true;
-    OnInitInterface();
-    while (loopFlag) {
-        PrintMenu();
-        std::cin >> mWhat;
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_GET_CALL_LIST);
+    event->SetOwner(handler);
+    GetRilCmCurrentCallsTest(event);
+}
 
-        if (mWhat == 1000) {
-            break;
-        }
+HWTEST_F(RilAdapterUnitTest, Telephony_RilAdapter_RilCmDialTest_0100, Function | MediumTest | Level3)
+{
+    static std::shared_ptr<AppExecFwk::EventRunner> runner;
+    static std::shared_ptr<RilAdapterUnitTest::DemoHandler> handler;
+    OnInit();
+    runner = OHOS::AppExecFwk::EventRunner::Create("DemoHandler");
+    handler = make_shared<RilAdapterUnitTest::DemoHandler>(runner);
 
-        if (mWhat < 0 || mWhat > HREQ_MODEM_SET_RADIO_STATUS) {
-            cout << "<<<<----------------------------------->>>" << endl;
-            cout << "---->Input value error, please retry!!" << endl;
-            cout << "<<<<----------------------------------->>>" << endl;
-            continue;
-        }
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_GET_CALL_LIST);
+    event->SetOwner(handler);
+    RilCmDialTest(event);
+}
 
-        auto event = OHOS::AppExecFwk::InnerEvent::Get(mWhat);
-        event->SetOwner(handler);
-        OnProcessInput(mWhat, event);
-    }
-    cout << "---->Test end" << endl;
+HWTEST_F(RilAdapterUnitTest, Telephony_RilAdapter_RilCmRejectCallTest_0100, Function | MediumTest | Level3)
+{
+    static std::shared_ptr<AppExecFwk::EventRunner> runner;
+    static std::shared_ptr<RilAdapterUnitTest::DemoHandler> handler;
+    OnInit();
+    runner = OHOS::AppExecFwk::EventRunner::Create("DemoHandler");
+    handler = make_shared<RilAdapterUnitTest::DemoHandler>(runner);
+
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_GET_CALL_LIST);
+    event->SetOwner(handler);
+    RilCmRejectCallTest(event);
+}
+
+HWTEST_F(RilAdapterUnitTest, Telephony_RilAdapter_HangupRilCmConnectionTest_0100, Function | MediumTest | Level3)
+{
+    static std::shared_ptr<AppExecFwk::EventRunner> runner;
+    static std::shared_ptr<RilAdapterUnitTest::DemoHandler> handler;
+    OnInit();
+    runner = OHOS::AppExecFwk::EventRunner::Create("DemoHandler");
+    handler = make_shared<RilAdapterUnitTest::DemoHandler>(runner);
+
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_GET_CALL_LIST);
+    event->SetOwner(handler);
+    HangupRilCmConnectionTest(event);
+}
+
+HWTEST_F(RilAdapterUnitTest, Telephony_RilAdapter_AcceptRilCmCallTest_0100, Function | MediumTest | Level3)
+{
+    static std::shared_ptr<AppExecFwk::EventRunner> runner;
+    static std::shared_ptr<RilAdapterUnitTest::DemoHandler> handler;
+    OnInit();
+    runner = OHOS::AppExecFwk::EventRunner::Create("DemoHandler");
+    handler = make_shared<RilAdapterUnitTest::DemoHandler>(runner);
+
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_GET_CALL_LIST);
+    event->SetOwner(handler);
+    AcceptRilCmCallTest(event);
+}
+
+HWTEST_F(RilAdapterUnitTest, Telephony_RilAdapter_RilCmHoldCallTest_0100, Function | MediumTest | Level3)
+{
+    static std::shared_ptr<AppExecFwk::EventRunner> runner;
+    static std::shared_ptr<RilAdapterUnitTest::DemoHandler> handler;
+    OnInit();
+    runner = OHOS::AppExecFwk::EventRunner::Create("DemoHandler");
+    handler = make_shared<RilAdapterUnitTest::DemoHandler>(runner);
+
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_GET_CALL_LIST);
+    event->SetOwner(handler);
+    RilCmHoldCallTest(event);
+}
+
+HWTEST_F(RilAdapterUnitTest, Telephony_RilAdapter_RilCmActiveCallTest_0100, Function | MediumTest | Level3)
+{
+    static std::shared_ptr<AppExecFwk::EventRunner> runner;
+    static std::shared_ptr<RilAdapterUnitTest::DemoHandler> handler;
+    OnInit();
+    runner = OHOS::AppExecFwk::EventRunner::Create("DemoHandler");
+    handler = make_shared<RilAdapterUnitTest::DemoHandler>(runner);
+
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_GET_CALL_LIST);
+    event->SetOwner(handler);
+    RilCmActiveCallTest(event);
+}
+
+HWTEST_F(RilAdapterUnitTest, Telephony_RilAdapter_RilCmSwapCallTest_0100, Function | MediumTest | Level3)
+{
+    static std::shared_ptr<AppExecFwk::EventRunner> runner;
+    static std::shared_ptr<RilAdapterUnitTest::DemoHandler> handler;
+    OnInit();
+    runner = OHOS::AppExecFwk::EventRunner::Create("DemoHandler");
+    handler = make_shared<RilAdapterUnitTest::DemoHandler>(runner);
+
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_GET_CALL_LIST);
+    event->SetOwner(handler);
+    RilCmSwapCallTest(event);
+}
+
+HWTEST_F(RilAdapterUnitTest, Telephony_RilAdapter_RilCmJoinCallTest_0100, Function | MediumTest | Level3)
+{
+    static std::shared_ptr<AppExecFwk::EventRunner> runner;
+    static std::shared_ptr<RilAdapterUnitTest::DemoHandler> handler;
+    OnInit();
+    runner = OHOS::AppExecFwk::EventRunner::Create("DemoHandler");
+    handler = make_shared<RilAdapterUnitTest::DemoHandler>(runner);
+
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_GET_CALL_LIST);
+    event->SetOwner(handler);
+    RilCmJoinCallTest(event);
+}
+
+HWTEST_F(RilAdapterUnitTest, Telephony_RilAdapter_RilCmSplitCallTest_0100, Function | MediumTest | Level3)
+{
+    static std::shared_ptr<AppExecFwk::EventRunner> runner;
+    static std::shared_ptr<RilAdapterUnitTest::DemoHandler> handler;
+    OnInit();
+    runner = OHOS::AppExecFwk::EventRunner::Create("DemoHandler");
+    handler = make_shared<RilAdapterUnitTest::DemoHandler>(runner);
+
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_GET_CALL_LIST);
+    event->SetOwner(handler);
+    RilCmSplitCallTest(event);
+}
+
+HWTEST_F(RilAdapterUnitTest, Telephony_RilAdapter_GetRilCmSignalIntensityTest_0100, Function | MediumTest | Level3)
+{
+    static std::shared_ptr<AppExecFwk::EventRunner> runner;
+    static std::shared_ptr<RilAdapterUnitTest::DemoHandler> handler;
+    OnInit();
+    runner = OHOS::AppExecFwk::EventRunner::Create("DemoHandler");
+    handler = make_shared<RilAdapterUnitTest::DemoHandler>(runner);
+
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_GET_CALL_LIST);
+    event->SetOwner(handler);
+    GetRilCmSignalIntensityTest(event);
+}
+
+HWTEST_F(RilAdapterUnitTest, Telephony_RilAdapter_GetRilCmOperatorTest_0100, Function | MediumTest | Level3)
+{
+    static std::shared_ptr<AppExecFwk::EventRunner> runner;
+    static std::shared_ptr<RilAdapterUnitTest::DemoHandler> handler;
+    OnInit();
+    runner = OHOS::AppExecFwk::EventRunner::Create("DemoHandler");
+    handler = make_shared<RilAdapterUnitTest::DemoHandler>(runner);
+
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_GET_CALL_LIST);
+    event->SetOwner(handler);
+    GetRilCmOperatorTest(event);
+}
+
+HWTEST_F(RilAdapterUnitTest, Telephony_RilAdapter_GetRilCmCsRegStatusTest_0100, Function | MediumTest | Level3)
+{
+    static std::shared_ptr<AppExecFwk::EventRunner> runner;
+    static std::shared_ptr<RilAdapterUnitTest::DemoHandler> handler;
+    OnInit();
+    runner = OHOS::AppExecFwk::EventRunner::Create("DemoHandler");
+    handler = make_shared<RilAdapterUnitTest::DemoHandler>(runner);
+
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_GET_CALL_LIST);
+    event->SetOwner(handler);
+    GetRilCmCsRegStatusTest(event);
+}
+
+HWTEST_F(RilAdapterUnitTest, Telephony_RilAdapter_GetRilCmPsRegStatusTest_0100, Function | MediumTest | Level3)
+{
+    static std::shared_ptr<AppExecFwk::EventRunner> runner;
+    static std::shared_ptr<RilAdapterUnitTest::DemoHandler> handler;
+    OnInit();
+    runner = OHOS::AppExecFwk::EventRunner::Create("DemoHandler");
+    handler = make_shared<RilAdapterUnitTest::DemoHandler>(runner);
+
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_GET_CALL_LIST);
+    event->SetOwner(handler);
+    GetRilCmPsRegStatusTest(event);
+}
+
+HWTEST_F(RilAdapterUnitTest, Telephony_RilAdapter_IccRilCmIoForAppTest_0100, Function | MediumTest | Level3)
+{
+    static std::shared_ptr<AppExecFwk::EventRunner> runner;
+    static std::shared_ptr<RilAdapterUnitTest::DemoHandler> handler;
+    OnInit();
+    runner = OHOS::AppExecFwk::EventRunner::Create("DemoHandler");
+    handler = make_shared<RilAdapterUnitTest::DemoHandler>(runner);
+
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_GET_CALL_LIST);
+    event->SetOwner(handler);
+    IccRilCmIoForAppTest(event);
+}
+
+HWTEST_F(RilAdapterUnitTest, Telephony_RilAdapter_GetRilCmImsiForAppTest_0100, Function | MediumTest | Level3)
+{
+    static std::shared_ptr<AppExecFwk::EventRunner> runner;
+    static std::shared_ptr<RilAdapterUnitTest::DemoHandler> handler;
+    OnInit();
+    runner = OHOS::AppExecFwk::EventRunner::Create("DemoHandler");
+    handler = make_shared<RilAdapterUnitTest::DemoHandler>(runner);
+
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_GET_CALL_LIST);
+    event->SetOwner(handler);
+    GetRilCmImsiForAppTest(event);
+}
+
+HWTEST_F(RilAdapterUnitTest, Telephony_RilAdapter_GetRilCmIccCardStatusTest_0100, Function | MediumTest | Level3)
+{
+    static std::shared_ptr<AppExecFwk::EventRunner> runner;
+    static std::shared_ptr<RilAdapterUnitTest::DemoHandler> handler;
+    OnInit();
+    runner = OHOS::AppExecFwk::EventRunner::Create("DemoHandler");
+    handler = make_shared<RilAdapterUnitTest::DemoHandler>(runner);
+
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_GET_CALL_LIST);
+    event->SetOwner(handler);
+    GetRilCmIccCardStatusTest(event);
+}
+
+HWTEST_F(RilAdapterUnitTest, Telephony_RilAdapter_SetupRilCmDataCallTest_0100, Function | MediumTest | Level3)
+{
+    static std::shared_ptr<AppExecFwk::EventRunner> runner;
+    static std::shared_ptr<RilAdapterUnitTest::DemoHandler> handler;
+    OnInit();
+    runner = OHOS::AppExecFwk::EventRunner::Create("DemoHandler");
+    handler = make_shared<RilAdapterUnitTest::DemoHandler>(runner);
+
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_GET_CALL_LIST);
+    event->SetOwner(handler);
+    SetupRilCmDataCallTest(event);
+}
+
+HWTEST_F(RilAdapterUnitTest, Telephony_RilAdapter_DeactivateRilCmDataCallTest_0100, Function | MediumTest | Level3)
+{
+    static std::shared_ptr<AppExecFwk::EventRunner> runner;
+    static std::shared_ptr<RilAdapterUnitTest::DemoHandler> handler;
+    OnInit();
+    runner = OHOS::AppExecFwk::EventRunner::Create("DemoHandler");
+    handler = make_shared<RilAdapterUnitTest::DemoHandler>(runner);
+
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_GET_CALL_LIST);
+    event->SetOwner(handler);
+    DeactivateRilCmDataCallTest(event);
+}
+
+HWTEST_F(RilAdapterUnitTest, Telephony_RilAdapter_SendRilCmSmsTest_0100, Function | MediumTest | Level3)
+{
+    static std::shared_ptr<AppExecFwk::EventRunner> runner;
+    static std::shared_ptr<RilAdapterUnitTest::DemoHandler> handler;
+    OnInit();
+    runner = OHOS::AppExecFwk::EventRunner::Create("DemoHandler");
+    handler = make_shared<RilAdapterUnitTest::DemoHandler>(runner);
+
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_GET_CALL_LIST);
+    event->SetOwner(handler);
+    SendRilCmSmsTest(event);
+}
+
+HWTEST_F(RilAdapterUnitTest, Telephony_RilAdapter_SendRilCmSmsMoreModeTest_0100, Function | MediumTest | Level3)
+{
+    static std::shared_ptr<AppExecFwk::EventRunner> runner;
+    static std::shared_ptr<RilAdapterUnitTest::DemoHandler> handler;
+    OnInit();
+    runner = OHOS::AppExecFwk::EventRunner::Create("DemoHandler");
+    handler = make_shared<RilAdapterUnitTest::DemoHandler>(runner);
+
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_GET_CALL_LIST);
+    event->SetOwner(handler);
+    SendRilCmSmsMoreModeTest(event);
+}
+
+HWTEST_F(RilAdapterUnitTest, Telephony_RilAdapter_SetRilCmRadioPowerTest_0100, Function | MediumTest | Level3)
+{
+    static std::shared_ptr<AppExecFwk::EventRunner> runner;
+    static std::shared_ptr<RilAdapterUnitTest::DemoHandler> handler;
+    OnInit();
+    runner = OHOS::AppExecFwk::EventRunner::Create("DemoHandler");
+    handler = make_shared<RilAdapterUnitTest::DemoHandler>(runner);
+
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_GET_CALL_LIST);
+    event->SetOwner(handler);
+    SetRilCmRadioPowerTest(event);
 }
 } // namespace Telephony
 } // namespace OHOS

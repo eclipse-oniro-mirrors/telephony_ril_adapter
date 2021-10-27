@@ -23,7 +23,7 @@ static const int CMD_LENGTH = 2;
 
 int ProcessCellBroadcast(char *pBuff, HRilCellBroadcastReportInfo *response)
 {
-    int ret = 0;
+    int ret;
     char *tmp = NULL;
     int count = 0;
     const int TMP_INDEX = 1;
@@ -71,7 +71,6 @@ int ProcessCellBroadcast(char *pBuff, HRilCellBroadcastReportInfo *response)
 
 void ReqSendSms(ReqDataInfo *requestInfo, const void *data, size_t dataLen)
 {
-    int err = 0;
     char *smsc = NULL;
     char smscTemp[MAX_BUFF_SIZE] = {0};
     const char *pdu = NULL;
@@ -93,7 +92,7 @@ void ReqSendSms(ReqDataInfo *requestInfo, const void *data, size_t dataLen)
     (void)sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CMGS=%zu", strlen(pdu) / CMD_LENGTH);
     (void)sprintf_s(smsPdu, MAX_BUFF_SIZE, "%s%s", smsc, pdu);
 
-    err = SendCommandSmsLock(cmd, smsPdu, "+CMGS:", 0, &responseInfo);
+    int err = SendCommandSmsLock(cmd, smsPdu, "+CMGS:", 0, &responseInfo);
     if (err != 0 || !responseInfo->success) {
         goto ERROR;
     }
@@ -123,10 +122,9 @@ ERROR:
 
 void ReqSendSmsAck(ReqDataInfo *requestInfo, const void *data, size_t dataLen)
 {
-    int ackFlag = 0;
-    int err = 0;
+    int err;
     const int ACK_SUCCESS = 1;
-    ackFlag = ((int *)data)[0];
+    int ackFlag = ((int *)data)[0];
     struct ReportInfo reportInfo = {};
     if (ackFlag == ACK_SUCCESS) {
         err = SendCommandLock("AT+CNMA=1", NULL, 0, NULL);
@@ -146,7 +144,6 @@ ERROR:
 
 void ReqStorageSms(ReqDataInfo *requestInfo, const void *data, size_t dataLen)
 {
-    int err = 0;
     HRilSmsWriteSms *msg = NULL;
     char cmd[MAX_BUFF_SIZE] = {0};
     char smsPdu[MAX_BUFF_SIZE] = {0};
@@ -159,7 +156,7 @@ void ReqStorageSms(ReqDataInfo *requestInfo, const void *data, size_t dataLen)
         strcpy_s(msg->smsc, strlen("00"), "00");
     }
 
-    err = sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CMGW=%zu,%d", strlen(msg->pdu) / CMD_LENGTH, msg->state);
+    int err = sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CMGW=%zu,%d", strlen(msg->pdu) / CMD_LENGTH, msg->state);
     if (err < 0) {
         TELEPHONY_LOGE("sprintf_s failed, err = %{public}d\n", err);
         goto ERROR;
@@ -188,8 +185,7 @@ ERROR:
 
 void ReqDeleteSms(ReqDataInfo *requestInfo, const void *data, size_t dataLen)
 {
-    int err = 0;
-    int index = 0;
+    int err;
     char cmd[MAX_BUFF_SIZE] = {0};
     struct ReportInfo reportInfo = {};
     ResponseInfo *responseInfo = NULL;
@@ -197,7 +193,7 @@ void ReqDeleteSms(ReqDataInfo *requestInfo, const void *data, size_t dataLen)
         err = HRIL_ERR_GENERIC_FAILURE;
         goto ERROR;
     }
-    index = ((int *)data)[0];
+    int index = ((int *)data)[0];
     TELEPHONY_LOGD("%{public}s enter, index:%{public}d", __func__, index);
     (void)sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CMGD=%d", index);
 
@@ -218,7 +214,7 @@ ERROR:
 
 void ReqUpdateSms(ReqDataInfo *requestInfo, const void *data, size_t dataLen)
 {
-    int err = 0;
+    int err;
     HRilSmsWriteSms *msg = NULL;
     char cmd[MAX_BUFF_SIZE] = {0};
     char smsPdu[MAX_BUFF_SIZE] = {0};
@@ -256,7 +252,7 @@ ERROR:
 
 void ReqSetSmsCenterAddress(ReqDataInfo *requestInfo, const void *data, size_t dataLen)
 {
-    int err = 0;
+    int err;
     HRilServiceCenterAddress *address = NULL;
     char cmd[MAX_BUFF_SIZE] = {0};
     struct ReportInfo reportInfo = {};
@@ -288,13 +284,12 @@ ERROR:
 
 void ReqGetSmsCenterAddress(ReqDataInfo *requestInfo, const void *data, size_t dataLen)
 {
-    int err = 0;
     const int NEXTSTRERR = -1;
     char *result = NULL;
     HRilServiceCenterAddress response = {};
     struct ReportInfo reportInfo = {};
     ResponseInfo *responseInfo = NULL;
-    err = SendCommandLock("AT+CSCA?", "+CSCA:", 0, &responseInfo);
+    int err = SendCommandLock("AT+CSCA?", "+CSCA:", 0, &responseInfo);
     if (err != 0 || !responseInfo->success) {
         goto ERROR;
     }
@@ -326,7 +321,7 @@ ERROR:
 
 void ReqSetCellBroadcast(ReqDataInfo *requestInfo, const void *data, size_t dataLen)
 {
-    int err = 0;
+    int err;
     HRilCellBroadcastInfo *cellBroadcast = NULL;
     char cmd[MAX_BUFF_SIZE] = {0};
     struct ReportInfo reportInfo = {};

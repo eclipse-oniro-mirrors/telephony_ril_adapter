@@ -22,7 +22,6 @@
 
 namespace OHOS {
 namespace Telephony {
-const int NUM_CIRCLES = 4;
 class RilAdapterUnitTest : public testing::Test {
 public:
     // execute before first testcase
@@ -61,18 +60,17 @@ public:
     void DeactivateRilCmDataCallTest(const AppExecFwk::InnerEvent::Pointer &result);
     void OnProcessInput(int32_t what, const OHOS::AppExecFwk::InnerEvent::Pointer &event);
     void OnInitInterface();
-    void SetSlotId(int slotId);
 
     class DemoHandler : public AppExecFwk::EventHandler {
     public:
-        DemoHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner) : AppExecFwk::EventHandler(runner) {}
+        explicit DemoHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner) :
+		    AppExecFwk::EventHandler(runner) {}
         ~DemoHandler() {}
 
         void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
     };
 
     std::unique_ptr<RilManagerTest> mRilManager_;
-    int slotId_;
     using RilManagerAndResponseTestFun = void (RilAdapterUnitTest::*)(
         const OHOS::AppExecFwk::InnerEvent::Pointer &event);
     std::map<uint32_t, RilManagerAndResponseTestFun> memberFuncMap_;
