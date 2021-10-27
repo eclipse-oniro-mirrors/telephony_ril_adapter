@@ -63,8 +63,8 @@ public:
 
     class DemoHandler : public AppExecFwk::EventHandler {
     public:
-        explicit DemoHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner) :
-		    AppExecFwk::EventHandler(runner) {}
+        explicit DemoHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner) : AppExecFwk::EventHandler(runner)
+        {}
         ~DemoHandler() {}
 
         void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
