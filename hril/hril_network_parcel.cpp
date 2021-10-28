@@ -14,8 +14,6 @@
  */
 
 #include "hril_network_parcel.h"
-#include <memory>
-#include <string>
 #include "hril_modem_parcel.h"
 
 namespace OHOS {

@@ -98,6 +98,7 @@ static const HRilNetworkReq g_networkReqOps = {
     .GetNetworkSearchInformation = RequestGetNetworkSearchInformation,
     .GetNetworkSelectionMode = RequestQueryNetworkSelectionMode,
     .SetNetworkSelectionMode = RequestSetAutomaticModeForNetworks,
+    .GetSlotIMEI = RequestGetSlotIMEI,
 };
 
 static const HRilDataReq g_dataReqOps = {

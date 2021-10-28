@@ -592,6 +592,7 @@ typedef struct {
     void (*GetNetworkSearchInformation)(const ReqDataInfo *requestInfo);
     void (*GetNetworkSelectionMode)(const ReqDataInfo *requestInfo);
     void (*SetNetworkSelectionMode)(const ReqDataInfo *requestInfo, const HRiSetNetworkModeInfo *data);
+    void (*GetSlotIMEI)(const ReqDataInfo *requestInfo);
 } HRilNetworkReq;
 
 typedef struct {

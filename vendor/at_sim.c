@@ -22,12 +22,11 @@
 
 static int GetSimType(void)
 {
-    int ret = 0;
-    int simType = 0;
+    int simType;
     ResponseInfo *pResponse = NULL;
     char *pLine = NULL;
 
-    ret = SendCommandLock("AT^CARDMODE", "^CARDMODE:", 0, &pResponse);
+    int ret = SendCommandLock("AT^CARDMODE", "^CARDMODE:", 0, &pResponse);
     if (pResponse == NULL) {
         TELEPHONY_LOGE("GetSimType pResponse is NULL");
         return HRIL_UNKNOWN;
@@ -55,9 +54,8 @@ static int GetSimType(void)
 static int GetSimState(char *pLine, char *pResult, ResponseInfo *pResponse)
 {
     int status = HRIL_SIM_NOT_INSERTED;
-    int ret = 0;
 
-    ret = SkipATPrefix(&pLine);
+    int ret = SkipATPrefix(&pLine);
     if (ret != 0) {
         return HRIL_SIM_NOT_READY;
     }
@@ -83,9 +81,7 @@ static int GetSimState(char *pLine, char *pResult, ResponseInfo *pResponse)
 
 static int ParseSimResponseResult(char *pLine, HRilSimIOResponse *pSimResponse)
 {
-    int err = 0;
-
-    err = SkipATPrefix(&pLine);
+    int err = SkipATPrefix(&pLine);
     if (err != 0) {
         return err;
     }
@@ -144,7 +140,6 @@ static int ParseSimPinInputTimesResult(char *pLine, HRilPinInputTimes *pinInputT
 
 void ReqGetSimStatus(const ReqDataInfo *requestInfo)
 {
-    int ret = 0;
     ResponseInfo *pResponse = NULL;
     char *pLine = NULL;
     char *pResult = NULL;
@@ -159,7 +154,7 @@ void ReqGetSimStatus(const ReqDataInfo *requestInfo)
 
     TELEPHONY_LOGD("enter to [%{public}s]:%{public}d", __func__, __LINE__);
     cardState.simType = GetSimType();
-    ret = SendCommandLock("AT+CPIN?", "+CPIN:", 0, &pResponse);
+    int ret = SendCommandLock("AT+CPIN?", "+CPIN:", 0, &pResponse);
     if (ret != 0 || !pResponse->success) {
         TELEPHONY_LOGE("AT+CPIN? send failed");
         goto ERR;
@@ -195,7 +190,6 @@ ERR:
 
 void ReqGetSimIO(const ReqDataInfo *requestInfo, const HRilSimIO *data, size_t dataLen)
 {
-    int ret = 0;
     char *pLine = NULL;
     HRilSimIO *pSim = NULL;
     HRilSimIOResponse simResponse = {0};
@@ -203,8 +197,8 @@ void ReqGetSimIO(const ReqDataInfo *requestInfo, const HRilSimIO *data, size_t d
     ResponseInfo *pResponse = NULL;
     struct ReportInfo reportInfo = {};
     pSim = (HRilSimIO *)data;
-    ret = sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CRSM=%d,%d,%d,%d,%d,%s,\"%s\"", pSim->command, pSim->fileid, pSim->p1,
-        pSim->p2, pSim->p3, (pSim->data == NULL ? "" : pSim->data), pSim->pathid);
+    int ret = sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CRSM=%d,%d,%d,%d,%d,%s,\"%s\"", pSim->command, pSim->fileid,
+        pSim->p1, pSim->p2, pSim->p3, (pSim->data == NULL ? "" : pSim->data), pSim->pathid);
     if (ret < 0) {
         TELEPHONY_LOGE("sprintf_s failed, err = %{public}d\n", ret);
         goto ERR;
@@ -241,11 +235,10 @@ ERR:
 void ReqGetSimImsi(const ReqDataInfo *requestInfo)
 {
     ResponseInfo *pResponse = NULL;
-    int ret = 0;
     char *pLine = NULL;
     struct ReportInfo reportInfo = {0};
     char *result = NULL;
-    ret = SendCommandLock("AT+CIMI", NULL, 0, &pResponse);
+    int ret = SendCommandLock("AT+CIMI", NULL, 0, &pResponse);
     if (ret != 0 || !pResponse->success) {
         TELEPHONY_LOGE("AT+CIMI send failed");
         goto ERR;
@@ -275,11 +268,10 @@ ERR:
 void ReqGetSimIccID(const ReqDataInfo *requestInfo)
 {
     ResponseInfo *pResponse = NULL;
-    int ret = 0;
     char *pLine = NULL;
     char *iccId = NULL;
     struct ReportInfo reportInfo = {0};
-    ret = SendCommandLock("AT+ICCID", "+ICCID", 0, &pResponse);
+    int ret = SendCommandLock("AT+ICCID", "+ICCID", 0, &pResponse);
     if (ret != 0 || !pResponse->success) {
         TELEPHONY_LOGE("AT+ICCID send failed");
         goto ERR;
@@ -319,14 +311,13 @@ void ReqGetSimLockStatus(const ReqDataInfo *requestInfo, const HRilSimClock *dat
 {
     ResponseInfo *pResponse = NULL;
     char cmd[MAX_BUFF_SIZE] = {0};
-    int ret = 0;
     char *pLine = NULL;
     int status = 0;
     HRilSimClock *pSimClck = NULL;
     struct ReportInfo reportInfo = {0};
 
     pSimClck = (HRilSimClock *)data;
-    ret = sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CLCK=\"%s\",%d", pSimClck->fac, pSimClck->mode);
+    int ret = sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CLCK=\"%s\",%d", pSimClck->fac, pSimClck->mode);
     if (ret < 0) {
         TELEPHONY_LOGE("sprintf_s failed, err = %{public}d\n", ret);
         goto ERR;
@@ -371,12 +362,11 @@ void ReqSetSimLock(const ReqDataInfo *requestInfo, const HRilSimClock *data, siz
     ResponseInfo *pResponse = NULL;
     char cmd[MAX_BUFF_SIZE] = {0};
     char *pLine = NULL;
-    int ret = 0;
     HRilSimClock *pSimClck = NULL;
     struct ReportInfo reportInfo = {0};
 
     pSimClck = (HRilSimClock *)data;
-    ret =
+    int ret =
         sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CLCK=\"%s\",%d,\"%s\"", pSimClck->fac, pSimClck->mode, pSimClck->passwd);
     if (ret < 0) {
         TELEPHONY_LOGE("sprintf_s failed, err = %{public}d\n", ret);
@@ -411,11 +401,10 @@ void ReqChangeSimPassword(const ReqDataInfo *requestInfo, const HRilSimPassword 
     char cmd[MAX_BUFF_SIZE] = {0};
     char *pLine = NULL;
     HRilSimPassword *pSimPassword = NULL;
-    int ret = 0;
     struct ReportInfo reportInfo = {0};
 
     pSimPassword = (HRilSimPassword *)data;
-    ret = sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CPWD=\"%s\",\"%s\",\"%s\"", pSimPassword->fac,
+    int ret = sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CPWD=\"%s\",\"%s\",\"%s\"", pSimPassword->fac,
         pSimPassword->oldPassword, pSimPassword->newPassword);
     if (ret < 0) {
         TELEPHONY_LOGE("sprintf_s failed, err = %{public}d\n", ret);
@@ -448,11 +437,10 @@ void ReqEnterSimPin(const ReqDataInfo *requestInfo, const char *pin)
 {
     ResponseInfo *pResponse = NULL;
     char cmd[MAX_BUFF_SIZE] = {0};
-    int ret = 0;
     char *pLine = NULL;
     struct ReportInfo reportInfo = {0};
 
-    ret = sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CPIN=\"%s\"", pin);
+    int ret = sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CPIN=\"%s\"", pin);
     if (ret < 0) {
         TELEPHONY_LOGE("sprintf_s failed, err = %{public}d\n", ret);
         goto ERR;
@@ -485,10 +473,9 @@ void ReqUnlockSimPin(const ReqDataInfo *requestInfo, const char *puk, const char
     ResponseInfo *pResponse = NULL;
     char cmd[MAX_BUFF_SIZE] = {0};
     char *pLine = NULL;
-    int ret = 0;
     struct ReportInfo reportInfo = {0};
 
-    ret = sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CPIN=\"%s\",\"%s\"", puk, pin);
+    int ret = sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CPIN=\"%s\",\"%s\"", puk, pin);
     if (ret < 0) {
         TELEPHONY_LOGE("sprintf_s failed, err = %{public}d\n", ret);
         goto ERR;
@@ -518,12 +505,11 @@ ERR:
 
 void ReqGetSimPinInputTimes(const ReqDataInfo *requestInfo)
 {
-    int ret = 0;
     char *pLine = NULL;
     HRilPinInputTimes pinInputTimes = {0};
     ResponseInfo *pResponse = NULL;
     struct ReportInfo reportInfo = {0};
-    ret = SendCommandLock("AT^CPIN?", "^CPIN", 0, &pResponse);
+    int ret = SendCommandLock("AT^CPIN?", "^CPIN", 0, &pResponse);
     if (ret != 0 || !pResponse->success) {
         TELEPHONY_LOGE("AT^CPIN? send failed");
         goto ERR;

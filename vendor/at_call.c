@@ -698,8 +698,7 @@ void ReqGetCallForwarding(ReqDataInfo *requestInfo, int reason)
                 NextInt(&line, &queryInfo.classx);
                 NextStr(&line, &queryInfo.number);
                 NextInt(&line, &queryInfo.type);
-                TELEPHONY_LOGD(
-                    "pResponse status: %{public}d, class: %{public}d, type: %{public}d ",
+                TELEPHONY_LOGD("pResponse status: %{public}d, class: %{public}d, type: %{public}d ",
                     queryInfo.status, queryInfo.classx, queryInfo.type);
             } else {
                 TELEPHONY_LOGE("ERROR: pResponse->head is null");
