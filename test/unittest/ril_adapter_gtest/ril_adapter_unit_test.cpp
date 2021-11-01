@@ -15,7 +15,9 @@
 
 #include "ril_adapter_unit_test.h"
 
+#include <fcntl.h>
 #include <iostream>
+
 #include "telephony_log_wrapper.h"
 
 using namespace std;
@@ -29,6 +31,9 @@ const int32_t FILEID = 2;
 const int32_t P1 = 4;
 const int32_t P2 = 5;
 const int32_t P3 = 6;
+const int32_t CALL_TYPE = 1;
+const int32_t val = 10;
+const int32_t phoneNumLen = 11;
 
 void RilAdapterUnitTest::SetUpTestCase()
 {
@@ -99,13 +104,10 @@ void RilAdapterUnitTest::RilCmDialByUusInfoTest(const OHOS::AppExecFwk::InnerEve
 
 void RilAdapterUnitTest::RilCmDialTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
 {
-    std::string phoneNum;
+    std::string phoneNum = GetRandPhoneNum(phoneNumLen);
     int32_t clirMode; /* Calling Line Identification Restriction . From TS 27.007 V3.4.0 (2000-03) */
 
     TELEPHONY_LOGD("RilAdapterUnitTest::RilCmDialTest -->");
-
-    std::cout << "please enter the phone number:";
-    std::cin >> phoneNum;
     clirMode = 0; // use subscription default value
 
     mRilManager_->RilCmDial(phoneNum, clirMode, result);
@@ -152,9 +154,7 @@ void RilAdapterUnitTest::RilCmJoinCallTest(const OHOS::AppExecFwk::InnerEvent::P
 
     TELEPHONY_LOGD("RilAdapterUnitTest::RilCmJoinCallTest -->");
 
-    std::cout << "please enter the call type:";
-    std::cin >> callType;
-
+    callType = CALL_TYPE;
     mRilManager_->RilCmJoin(callType, result);
     TELEPHONY_LOGD("RilAdapterUnitTest::RilCmJoinCallTest --> RilCmJoinCallTest finished");
 }
@@ -171,12 +171,8 @@ void RilAdapterUnitTest::RilCmSplitCallTest(const OHOS::AppExecFwk::InnerEvent::
 
     TELEPHONY_LOGD("RilAdapterUnitTest::RilCmSplitCallTest -->");
 
-    std::cout << "please enter the call split number:";
-    std::cin >> nThCall;
-
-    std::cout << "please enter the call type:";
-    std::cin >> callType;
-
+    nThCall = 1;
+    callType = CALL_TYPE;
     mRilManager_->RilCmSplit(nThCall, callType, result);
     TELEPHONY_LOGD("RilAdapterUnitTest::RilCmSplitCallTest --> RilCmSplitCallTest finished");
 }
@@ -309,6 +305,33 @@ void RilAdapterUnitTest::OnInitInterface()
     memberFuncMap_[HREQ_NETWORK_GET_PS_REG_STATUS] = &RilAdapterUnitTest::GetRilCmPsRegStatusTest;
     memberFuncMap_[HREQ_DATA_ACTIVATE_PDP_CONTEXT] = &RilAdapterUnitTest::SetupRilCmDataCallTest;
     memberFuncMap_[HREQ_DATA_DEACTIVATE_PDP_CONTEXT] = &RilAdapterUnitTest::DeactivateRilCmDataCallTest;
+}
+
+int32_t RilAdapterUnitTest::GetRandNum()
+{
+    int32_t r = 0;
+    int fd = open("/dev/random", O_RDONLY);
+    if (fd > 0) {
+        read(fd, &r, sizeof(int32_t));
+    }
+    close(fd);
+    return r;
+}
+
+std::string RilAdapterUnitTest::GetRandPhoneNum(const int len)
+{
+    char c;
+    int32_t idx;
+    int32_t rtv = 0;
+    std::string str;
+
+    for (idx = 0; idx < len; idx ++) {
+        rtv = GetRandNum() % val;
+        c = static_cast<char>(rtv);
+        str.push_back(c);
+    }
+
+    return str;
 }
 
 HWTEST_F(RilAdapterUnitTest, Telephony_RilAdapter_GetRilCmCurrentCallsTest_0100, Function | MediumTest | Level3)

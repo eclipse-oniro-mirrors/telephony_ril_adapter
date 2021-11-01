@@ -60,6 +60,8 @@ public:
     void DeactivateRilCmDataCallTest(const AppExecFwk::InnerEvent::Pointer &result);
     void OnProcessInput(int32_t what, const OHOS::AppExecFwk::InnerEvent::Pointer &event);
     void OnInitInterface();
+    int32_t GetRandNum();
+    std::string GetRandPhoneNum(const int len);
 
     class DemoHandler : public AppExecFwk::EventHandler {
     public:
