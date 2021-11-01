@@ -323,9 +323,7 @@ std::string RilAdapterUnitTest::GetRandPhoneNum(const int len)
     char c;
     int32_t idx;
     int32_t rtv = 0;
-    std::string str; 
-	
-	
+    std::string str;
 
     for (idx = 0; idx < len; idx ++) {
         rtv = GetRandNum() % val;
