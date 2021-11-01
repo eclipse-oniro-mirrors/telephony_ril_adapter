@@ -42,8 +42,6 @@ typedef struct {
 
 typedef void (*OnNotify)(const char *s, const char *s1); // onNotify
 
-void AddLinkListNode(const char *s);
-
 int ATStartReadLoop(int fd, OnNotify func); // at_open
 
 void ATCloseReadLoop(void); // at_close
@@ -51,10 +49,6 @@ void ATCloseReadLoop(void); // at_close
 void AtSetOnUnusual(void (*OnAtUnusual)(void));
 
 void FreeResponseInfo(ResponseInfo *resp); // free ResponseResult
-
-void *ReaderLoop(void *s); // readLoop
-
-void ProcessResponse(const char *s, const char *pdu); // process response
 
 int SendCommandLock(const char *command, const char *prefix, long long timeout, ResponseInfo **outResponse);
 
@@ -64,8 +58,6 @@ int SendCommandSmsLock(
     const char *command, const char *smsPdu, const char *prefix, long long timeout, ResponseInfo **outResponse);
 
 int SendCommandNoLock(const char *command, long long timeout, ResponseInfo **outResponse);
-
-void ClearCurCommand(void);
 
 void SetWatchFunction(void (*WatchFun)(void));
 

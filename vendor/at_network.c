@@ -663,3 +663,44 @@ ERROR:
     OnNetworkReport(reportInfo, NULL, 0);
     FreeResponseInfo(responseInfo);
 }
+
+void RequestGetSlotIMEI(const ReqDataInfo *requestInfo)
+{
+    const long TIME_OUT = DEFAULT_TIMEOUT;
+    int err = HRIL_ERR_SUCCESS;
+    ResponseInfo *responseInfo = NULL;
+
+    struct ReportInfo reportInfo;
+    (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
+    TELEPHONY_LOGD("enter to [%{public}s]:%{public}d", __func__, __LINE__);
+    int ret = SendCommandLock("AT+CGSN", NULL, TIME_OUT, &responseInfo);
+    if (responseInfo == NULL) {
+        err = HRIL_ERR_NULL_POINT;
+        goto ERROR;
+        return;
+    }
+    if (ret != 0 || !responseInfo->success) {
+        err = GetResponseErrorCode(responseInfo);
+        TELEPHONY_LOGE("send AT CMD failed!");
+        goto ERROR;
+    }
+    if (responseInfo->head == NULL) {
+        err = HRIL_ERR_INVALID_RESPONSE;
+        goto ERROR;
+    }
+    char *imeiSn = responseInfo->head->data;
+    if ((imeiSn == NULL) || (strlen(imeiSn) == 0)) {
+        err = HRIL_ERR_INVALID_RESPONSE;
+        goto ERROR;
+    }
+    reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
+    OnNetworkReport(reportInfo, imeiSn, sizeof(char *));
+    FreeResponseInfo(responseInfo);
+    return;
+ERROR:
+    reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
+    OnNetworkReport(reportInfo, NULL, 0);
+    if (responseInfo != NULL) {
+        FreeResponseInfo(responseInfo);
+    }
+}

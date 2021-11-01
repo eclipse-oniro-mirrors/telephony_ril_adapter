@@ -20,17 +20,28 @@
 static int g_atFd = -1;
 static OnNotify g_onNotifyFunc = NULL;
 
-static ResponseInfo *g_response = NULL;
-const char *g_smsPdu = NULL;
-static bool g_isNeedATPause = false;
-static const char *g_prefix = NULL;
+static volatile ResponseInfo *g_response = NULL;
+static volatile const char *g_smsPdu = NULL;
+static volatile bool g_isNeedATPause = false;
+static volatile const char *g_prefix = NULL;
 static pthread_mutex_t g_commandmutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t g_commandcond = PTHREAD_COND_INITIALIZER;
-static int g_readerClosed = 0;
+static volatile int g_readerClosed = 0;
 static pthread_t g_reader;
 static void (*g_onTimeout)(void) = NULL;
 static void (*g_atnUnusual)(void) = NULL;
 static void (*g_atWatch)(void) = NULL;
+
+// reader close
+static void OnReaderClosed(void);
+// process response
+static void ProcessResponse(const char *responseLine, const char *pdu);
+// add item to list
+static void AddLinkListNode(const char *responseLine);
+// thread function: readLoop
+static void *ReaderLoop(void *s);
+// clear command memory
+static void ClearCurCommand(void);
 
 void AtSetOnUnusual(void (*OnAtUnusual)(void))
 {
@@ -53,15 +64,17 @@ int ATStartReadLoop(int fd, OnNotify func)
     return VENDOR_SUCCESS;
 }
 
-static void OnReaderClosed(void)
+void OnReaderClosed(void)
 {
+    pthread_mutex_lock(&g_commandmutex);
     if (g_atnUnusual != NULL && g_readerClosed == 0) {
-        pthread_mutex_lock(&g_commandmutex);
         g_readerClosed = 1;
         pthread_cond_signal(&g_commandcond);
         pthread_mutex_unlock(&g_commandmutex);
         g_atnUnusual();
+        return;
     }
+    pthread_mutex_unlock(&g_commandmutex);
 }
 
 void ATCloseReadLoop(void)
@@ -128,67 +141,68 @@ void *ReaderLoop(void *s)
     return NULL;
 }
 
-void ProcessResponse(const char *s, const char *pdu)
+void ProcessResponse(const char *responseLine, const char *pdu)
 {
-    if (s == NULL) {
+    if (responseLine == NULL) {
         TELEPHONY_LOGE("%{public}s enter s is null", __func__);
         return;
     }
-    TELEPHONY_LOGD("processLine line = %{public}s", s);
+    TELEPHONY_LOGD("processLine line = %{public}s", responseLine);
 
+    int isPrefix = ReportStrWith(responseLine, (const char*)g_prefix);
+    pthread_mutex_lock(&g_commandmutex);
     if (g_response == NULL) {
         if (g_onNotifyFunc != NULL) {
-            g_onNotifyFunc(s, pdu);
+            pthread_mutex_unlock(&g_commandmutex);
+
+            g_onNotifyFunc(responseLine, pdu);
+            return;
         }
-    } else if (IsResponseError(s)) {
-        pthread_mutex_lock(&g_commandmutex);
+    } else if (IsResponseError(responseLine)) {
         if (g_response != NULL) {
             g_response->success = 0;
-            g_response->result = strdup(s);
+            g_response->result = strdup(responseLine);
         }
         pthread_cond_signal(&g_commandcond);
-        pthread_mutex_unlock(&g_commandmutex);
-    } else if (IsResponseSuccess(s)) {
-        pthread_mutex_lock(&g_commandmutex);
+    } else if (IsResponseSuccess(responseLine)) {
         if (g_response != NULL) {
             g_response->success = 1;
-            g_response->result = strdup(s);
+            g_response->result = strdup(responseLine);
         }
         pthread_cond_signal(&g_commandcond);
-        pthread_mutex_unlock(&g_commandmutex);
-    } else if (IsSms(s) && g_smsPdu != NULL) {
-        pthread_mutex_lock(&g_commandmutex);
+    } else if (IsSms(responseLine) && g_smsPdu != NULL) {
         if (g_response != NULL) {
-            g_response->result = strdup(s);
+            g_response->result = strdup(responseLine);
         }
-        WriteATCommand(g_smsPdu, 1, g_atFd);
-        pthread_mutex_unlock(&g_commandmutex);
+        WriteATCommand((const char *)g_smsPdu, 1, g_atFd);
     } else {
-        if ((isdigit(s[0]) || ReportStrWith(s, g_prefix)) && g_smsPdu == NULL) {
-            pthread_mutex_lock(&g_commandmutex);
-            AddLinkListNode(s);
-            pthread_mutex_unlock(&g_commandmutex);
-        } else if (g_smsPdu != NULL && ReportStrWith(s, g_prefix)) {
-            pthread_mutex_lock(&g_commandmutex);
-            AddLinkListNode(s);
-            pthread_mutex_unlock(&g_commandmutex);
+        if (((isdigit(responseLine[0]) || isPrefix) && g_smsPdu == NULL) || (g_smsPdu != NULL && isPrefix)) {
+            AddLinkListNode(responseLine);
         } else {
             if (g_onNotifyFunc != NULL) {
-                g_onNotifyFunc(s, pdu);
+                pthread_mutex_unlock(&g_commandmutex);
+
+                g_onNotifyFunc(responseLine, pdu);
+                return;
             }
         }
     }
+    pthread_mutex_unlock(&g_commandmutex);
 }
 
-void AddLinkListNode(const char *s)
+void AddLinkListNode(const char *responseLine)
 {
-    Line *line;
-    line = (Line *)malloc(sizeof(Line));
+    if (g_response == NULL) {
+        TELEPHONY_LOGE("response is null");
+        return;
+    }
+
+    Line *line = (Line *)malloc(sizeof(Line));
     if (line == NULL) {
         TELEPHONY_LOGE("malloc memory error");
         return;
     }
-    line->data = strdup(s);
+    line->data = strdup(responseLine);
     line->next = NULL;
     if (g_response->last != NULL) {
         g_response->last->next = line;
@@ -200,31 +214,32 @@ void AddLinkListNode(const char *s)
 
 int SendCommandLock(const char *command, const char *prefix, long long timeout, ResponseInfo **outResponse)
 {
+    const char *atCmd = "AT";
     int err;
     if (pthread_equal(g_reader, pthread_self()) != 0) {
         return AT_ERR_INVALID_THREAD;
     }
+
+    TELEPHONY_LOGD("command %{public}s, NeedATPause:%{public}d, atCmd:%{public}s",
+        command, g_isNeedATPause, atCmd);
+    pthread_mutex_lock(&g_commandmutex);
     if (g_isNeedATPause) {
-        const char *atCmd = "AT";
         pthread_cond_signal(&g_commandcond);
-        TELEPHONY_LOGD("SendCommandLock() NeedATPause :%{public}d", g_isNeedATPause);
-        pthread_mutex_lock(&g_commandmutex);
-        TELEPHONY_LOGD("SendCommandLock() atCmd %{public}s", command);
         err = SendCommandNoLock(atCmd, timeout, outResponse);
-        TELEPHONY_LOGE("SendCommandLock() err = %{public}d", err);
-        pthread_mutex_unlock(&g_commandmutex);
+        if (err != 0) {
+            TELEPHONY_LOGE("err = %{public}d", err);
+        }
+
         if (g_atWatch != NULL) {
             g_atWatch();
         }
         g_isNeedATPause = false;
         alarm(0);
     }
-    pthread_mutex_lock(&g_commandmutex);
-    TELEPHONY_LOGD("SendCommandLock() command %{public}s", command);
     g_prefix = prefix;
     err = SendCommandNoLock(command, timeout, outResponse);
-    TELEPHONY_LOGD("SendCommandLock() err = %{public}d", err);
     pthread_mutex_unlock(&g_commandmutex);
+    TELEPHONY_LOGD("err = %{public}d", err);
     // when timeout to process
     if (err == AT_ERR_TIMEOUT && g_onTimeout != NULL) {
         g_onTimeout();
@@ -241,13 +256,13 @@ int SendCommandNetWorksLock(const char *command, const char *prefix, long long t
     if (pthread_equal(g_reader, pthread_self()) != 0) {
         return AT_ERR_INVALID_THREAD;
     }
-    g_isNeedATPause = true;
-    pthread_mutex_lock(&g_commandmutex);
     TELEPHONY_LOGD("SendCommandNetWorksLock() command %{public}s", command);
+    pthread_mutex_lock(&g_commandmutex);
+    g_isNeedATPause = true;
     g_prefix = prefix;
     err = SendCommandNoLock(command, timeout, outResponse);
-    TELEPHONY_LOGD("SendCommandNetWorksLock() err = %{public}d", err);
     pthread_mutex_unlock(&g_commandmutex);
+    TELEPHONY_LOGD("SendCommandNetWorksLock() err = %{public}d", err);
     // when timeout to process
     if (err == AT_ERR_TIMEOUT) {
         err = AT_ERR_WAITING;
@@ -262,13 +277,13 @@ int SendCommandSmsLock(
     if (pthread_equal(g_reader, pthread_self()) != 0) {
         return AT_ERR_INVALID_THREAD;
     }
-    pthread_mutex_lock(&g_commandmutex);
     TELEPHONY_LOGD("SendCommandSmsLock() command %{public}s", command);
+    pthread_mutex_lock(&g_commandmutex);
     g_prefix = prefix;
     g_smsPdu = smsPdu;
     err = SendCommandNoLock(command, timeout, outResponse);
-    TELEPHONY_LOGD("SendCommandSmsLock() err = %{public}d", err);
     pthread_mutex_unlock(&g_commandmutex);
+    TELEPHONY_LOGD("SendCommandSmsLock() err = %{public}d", err);
     // when timeout to process
     if (err == AT_ERR_TIMEOUT && g_onTimeout != NULL) {
         g_onTimeout();
@@ -307,9 +322,9 @@ int SendCommandNoLock(const char *command, long long timeout, ResponseInfo **out
         }
     }
     if (outResponse == NULL) {
-        FreeResponseInfo(g_response);
+        FreeResponseInfo((ResponseInfo *)g_response);
     } else {
-        *outResponse = g_response;
+        *outResponse = (ResponseInfo *)g_response;
     }
     g_response = NULL;
     if (g_readerClosed > 0) {
@@ -326,7 +341,7 @@ ERROR:
 void ClearCurCommand(void)
 {
     if (g_response != NULL) {
-        FreeResponseInfo(g_response);
+        FreeResponseInfo((ResponseInfo *)g_response);
     }
     g_response = NULL;
     g_prefix = NULL;
@@ -339,7 +354,9 @@ void SetWatchFunction(void (*WatchFun)(void))
 
 void SetAtPauseFlag(bool isNeedPause)
 {
+    pthread_mutex_lock(&g_commandmutex);
     g_isNeedATPause = isNeedPause;
+    pthread_mutex_unlock(&g_commandmutex);
 }
 
 bool GetAtPauseFlag(void)

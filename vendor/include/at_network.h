@@ -29,6 +29,7 @@ void ReqGetOperatorInfo(const ReqDataInfo *requestInfo);
 void RequestGetNetworkSearchInformation(const ReqDataInfo *requestInfo);
 void RequestQueryNetworkSelectionMode(const ReqDataInfo *requestInfo);
 void RequestSetAutomaticModeForNetworks(const ReqDataInfo *requestInfo, const HRiSetNetworkModeInfo *data);
+void RequestGetSlotIMEI(const ReqDataInfo *requestInfo);
 int ProcessRegStatus(const char *s, char **response, int count);
 int ProcessParamSignalStrength(const char *result, HRilRssi *hrilRssi);
 int ProcessOperListToUse(const char *list);

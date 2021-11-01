@@ -42,6 +42,7 @@ void HRilNetwork::AddHandlerToMap()
     reqMemberFuncMap_[HREQ_NETWORK_GET_SELECTION_MODE] = &HRilNetwork::GetNetworkSelectionMode;
     reqMemberFuncMap_[HREQ_NETWORK_SET_SELECTION_MODE] = &HRilNetwork::SetNetworkSelectionMode;
     reqMemberFuncMap_[HREQ_NETWORK_SET_LOCATION_UPDATE] = &HRilNetwork::SetNetworkLocationUpdate;
+    reqMemberFuncMap_[HREQ_NETWORK_GET_SLOT_IMEI] = &HRilNetwork::GetSlotIMEI;
 
     // Response
     respMemberFuncMap_[HREQ_NETWORK_GET_SIGNAL_STRENGTH] = &HRilNetwork::GetSignalStrengthResponse;
@@ -52,6 +53,7 @@ void HRilNetwork::AddHandlerToMap()
     respMemberFuncMap_[HREQ_NETWORK_GET_SELECTION_MODE] = &HRilNetwork::GetNetworkSelectionModeResponse;
     respMemberFuncMap_[HREQ_NETWORK_SET_SELECTION_MODE] = &HRilNetwork::SetNetworkSelectionModeResponse;
     respMemberFuncMap_[HREQ_NETWORK_SET_LOCATION_UPDATE] = &HRilNetwork::SetNetworkLocationUpdateResponse;
+    respMemberFuncMap_[HREQ_NETWORK_GET_SLOT_IMEI] = &HRilNetwork::GetSlotIMEIResponse;
 }
 
 void HRilNetwork::ProcessNetworkResponse(
@@ -317,6 +319,26 @@ void HRilNetwork::SetNetworkLocationUpdate(int32_t slotId, struct HdfSBuf *data)
     free(requestInfo);
 }
 
+void HRilNetwork::GetSlotIMEI(int32_t slotId, struct HdfSBuf *data)
+{
+    if (networkFuncs_ == nullptr) {
+        TELEPHONY_LOGE("GetSlotIMEI::networkFuncs_ is nullptr");
+        return;
+    }
+    int32_t serial = 0;
+    if (!HdfSbufReadInt32(data, &serial)) {
+        TELEPHONY_LOGE("GetSlotIMEI::miss serial parameter");
+        return;
+    }
+    ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_NETWORK_GET_SLOT_IMEI);
+    if (requestInfo == nullptr) {
+        TELEPHONY_LOGE("GetSlotIMEI::Create Request is fail");
+        return;
+    }
+    networkFuncs_->GetSlotIMEI(requestInfo);
+    free(requestInfo);
+}
+
 int32_t HRilNetwork::GetOperatorInfoResponse(int32_t slotId, int32_t requestNum,
     HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
@@ -554,6 +576,38 @@ int32_t HRilNetwork::SetNetworkSelectionModeResponse(int32_t slotId, int32_t req
     HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));
+}
+
+int32_t HRilNetwork::GetSlotIMEIResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
+    const void *response, size_t responseLen)
+{
+    struct HdfSBuf *dataSbuf = HdfSBufTypedObtain(SBUF_IPC);
+    if (dataSbuf == nullptr) {
+        TELEPHONY_LOGE("dataSbuf is nullptr!");
+        return HDF_FAILURE;
+    }
+    if (!HdfSbufWriteString(dataSbuf, (const char *)response)) {
+        TELEPHONY_LOGE("HdfSbufWriteString in GetIccIDResponse is failed!");
+        HdfSBufRecycle(dataSbuf);
+        return HDF_FAILURE;
+    }
+    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&responseInfo, sizeof(responseInfo))) {
+        TELEPHONY_LOGE("HdfSbufWriteUnpadBuffer in GetIccIDResponse is failed!");
+        HdfSBufRecycle(dataSbuf);
+        return HDF_FAILURE;
+    }
+    if (serviceCallback_ == nullptr) {
+        HdfSBufRecycle(dataSbuf);
+        return HDF_FAILURE;
+    }
+    int32_t ret = serviceCallback_->dispatcher->Dispatch(serviceCallback_, requestNum, dataSbuf, nullptr);
+    if (ret != HDF_SUCCESS) {
+        HdfSBufRecycle(dataSbuf);
+        return HDF_FAILURE;
+    }
+    HdfSBufRecycle(dataSbuf);
+
+    return HDF_SUCCESS;
 }
 
 bool HRilNetwork::IsNetworkResponse(uint32_t code)

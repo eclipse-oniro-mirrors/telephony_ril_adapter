@@ -47,6 +47,7 @@ public:
 
     void SetNetworkSelectionMode(int32_t slotId, struct HdfSBuf *data);
     void SetNetworkLocationUpdate(int32_t slotId, struct HdfSBuf *data);
+    void GetSlotIMEI(int32_t slotId, struct HdfSBuf *data);
 
     int32_t GetSignalStrengthResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
         const void *response, size_t responseLen);
@@ -62,6 +63,8 @@ public:
         HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t SetNetworkSelectionModeResponse(int32_t slotId, int32_t requestNum,
         HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t GetSlotIMEIResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
+        const void *response, size_t responseLen);
     int32_t SetNetworkLocationUpdateResponse(int32_t slotId, int32_t requestNum,
         HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t NetworkRegStatusUpdated(
