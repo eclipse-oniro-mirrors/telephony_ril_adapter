@@ -197,7 +197,7 @@ void ReqGetSimIO(const ReqDataInfo *requestInfo, const HRilSimIO *data, size_t d
     ResponseInfo *pResponse = NULL;
     struct ReportInfo reportInfo = {};
     pSim = (HRilSimIO *)data;
-    int ret = sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CRSM=%d,%d,%d,%d,%d,%s,\"%s\"", pSim->command, pSim->fileid,
+    int ret = sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CRSM=%d,%d,%d,%d,%d,\"%s\",\"%s\"", pSim->command, pSim->fileid,
         pSim->p1, pSim->p2, pSim->p3, (pSim->data == NULL ? "" : pSim->data), pSim->pathid);
     if (ret < 0) {
         TELEPHONY_LOGE("sprintf_s failed, err = %{public}d\n", ret);
