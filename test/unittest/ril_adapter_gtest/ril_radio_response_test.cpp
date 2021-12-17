@@ -14,9 +14,12 @@
  */
 
 #include "ril_radio_response_test.h"
+
+#include "hril_request.h"
 #include "telephony_log_wrapper.h"
 
-using namespace OHOS::Telephony;
+namespace OHOS {
+namespace Telephony {
 RilRadioResponseTest::RilRadioResponseTest(RilManagerTest *mRilManager) : IPCObjectStub(std::u16string(u""))
 {
     mRilManager_ = mRilManager;
@@ -25,13 +28,13 @@ RilRadioResponseTest::RilRadioResponseTest(RilManagerTest *mRilManager) : IPCObj
 RilRadioResponseTest::~RilRadioResponseTest() {}
 
 int32_t RilRadioResponseTest::OnRemoteRequest(
-    uint32_t code, OHOS::MessageParcel &data, OHOS::MessageParcel &reply, OHOS::MessageOption &option)
+    uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     switch (code) {
         case HREQ_SIM_GET_SIM_STATUS:
             OnResponseGetSimState(data);
             break;
-        case HREQ_NETWORK_GET_CURRENT_CELL_INFORMATION:
+        case HREQ_NETWORK_GET_CURRENT_CELL_INFO:
             OnResponseGetRilCurrentCellInfo(data);
             break;
         default:
@@ -40,9 +43,9 @@ int32_t RilRadioResponseTest::OnRemoteRequest(
     return 0;
 }
 
-void RilRadioResponseTest::OnResponseGetSimState(OHOS::MessageParcel &data)
+void RilRadioResponseTest::OnResponseGetSimState(MessageParcel &data)
 {
-    TELEPHONY_LOGD("RilRadioResponseTest::OnResponseGetSimState --> ");
+    TELEPHONY_LOGI("RilRadioResponseTest::OnResponseGetSimState --> ");
     std::unique_ptr<CardStatusInfo> cardStatusInfo = std::make_unique<CardStatusInfo>();
     if (cardStatusInfo == nullptr) {
         return;
@@ -59,9 +62,9 @@ void RilRadioResponseTest::OnResponseGetSimState(OHOS::MessageParcel &data)
     }
 }
 
-void RilRadioResponseTest::OnResponseGetRilCurrentCellInfo(OHOS::MessageParcel &data)
+void RilRadioResponseTest::OnResponseGetRilCurrentCellInfo(MessageParcel &data)
 {
-    TELEPHONY_LOGD("RilRadioResponseTest::OnResponseGetRilCurrentCellInfo --> ");
+    TELEPHONY_LOGI("RilRadioResponseTest::OnResponseGetRilCurrentCellInfo --> ");
     std::unique_ptr<CurrentCellInfo> currentCellInfo = std::make_unique<CurrentCellInfo>();
     if (currentCellInfo == nullptr) {
         return;
@@ -79,9 +82,9 @@ void RilRadioResponseTest::OnResponseGetRilCurrentCellInfo(OHOS::MessageParcel &
     }
 }
 
-void RilRadioResponseTest::OnResponseGetCurrentCalls(OHOS::MessageParcel &data)
+void RilRadioResponseTest::OnResponseGetCurrentCalls(MessageParcel &data)
 {
-    TELEPHONY_LOGD("RilRadioResponseTest OnResponseGetCurrentCalls -->");
+    TELEPHONY_LOGI("RilRadioResponseTest OnResponseGetCurrentCalls -->");
     std::unique_ptr<CallInfoList> callInfo = std::unique_ptr<CallInfoList>();
     callInfo.get()->ReadFromParcel(data);
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
@@ -92,7 +95,7 @@ void RilRadioResponseTest::OnResponseGetCurrentCalls(OHOS::MessageParcel &data)
     }
 }
 
-void RilRadioResponseTest::DialResponse(OHOS::MessageParcel &data)
+void RilRadioResponseTest::DialResponse(MessageParcel &data)
 {
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
@@ -102,9 +105,9 @@ void RilRadioResponseTest::DialResponse(OHOS::MessageParcel &data)
     }
 }
 
-void RilRadioResponseTest::GetImsiResponse(OHOS::MessageParcel &data)
+void RilRadioResponseTest::GetImsiResponse(MessageParcel &data)
 {
-    TELEPHONY_LOGD("RilRadioResponseTest::GetImsiResponse --> ");
+    TELEPHONY_LOGI("RilRadioResponseTest::GetImsiResponse --> ");
     const char *buffer = data.ReadCString();
     if (buffer == nullptr) {
         TELEPHONY_LOGE("ERROR : GetImsiResponse --> data.ReadCString() failed !!!");
@@ -123,7 +126,7 @@ void RilRadioResponseTest::GetImsiResponse(OHOS::MessageParcel &data)
     }
 }
 
-void RilRadioResponseTest::OnResponseHangupCall(OHOS::MessageParcel &data)
+void RilRadioResponseTest::OnResponseHangupCall(MessageParcel &data)
 {
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
@@ -133,7 +136,7 @@ void RilRadioResponseTest::OnResponseHangupCall(OHOS::MessageParcel &data)
     }
 }
 
-void RilRadioResponseTest::OnResponseRejectCall(OHOS::MessageParcel &data)
+void RilRadioResponseTest::OnResponseRejectCall(MessageParcel &data)
 {
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
@@ -143,7 +146,7 @@ void RilRadioResponseTest::OnResponseRejectCall(OHOS::MessageParcel &data)
     }
 }
 
-void RilRadioResponseTest::OnResponseHoldCall(OHOS::MessageParcel &data)
+void RilRadioResponseTest::OnResponseHoldCall(MessageParcel &data)
 {
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
@@ -151,10 +154,10 @@ void RilRadioResponseTest::OnResponseHoldCall(OHOS::MessageParcel &data)
         TELEPHONY_LOGE("RilRadioResponseTest OnResponseHoldCall read spBuffer failed");
         return;
     }
-    TELEPHONY_LOGD("RilRadioResponseTest OnResponseHoldCall back");
+    TELEPHONY_LOGI("RilRadioResponseTest OnResponseHoldCall back");
 }
 
-void RilRadioResponseTest::OnResponseActiveCall(OHOS::MessageParcel &data)
+void RilRadioResponseTest::OnResponseActiveCall(MessageParcel &data)
 {
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
@@ -163,10 +166,10 @@ void RilRadioResponseTest::OnResponseActiveCall(OHOS::MessageParcel &data)
         return;
     }
 
-    TELEPHONY_LOGD("RilRadioResponseTest OnResponseActiveCall back ");
+    TELEPHONY_LOGI("RilRadioResponseTest OnResponseActiveCall back ");
 }
 
-void RilRadioResponseTest::OnResponseJoinCall(OHOS::MessageParcel &data)
+void RilRadioResponseTest::OnResponseJoinCall(MessageParcel &data)
 {
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
@@ -175,10 +178,10 @@ void RilRadioResponseTest::OnResponseJoinCall(OHOS::MessageParcel &data)
         return;
     }
 
-    TELEPHONY_LOGD("OnResponseJoinCall OnResponseJoinCall back ");
+    TELEPHONY_LOGI("OnResponseJoinCall OnResponseJoinCall back ");
 }
 
-void RilRadioResponseTest::OnResponseSplitCall(OHOS::MessageParcel &data)
+void RilRadioResponseTest::OnResponseSplitCall(MessageParcel &data)
 {
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
@@ -187,10 +190,10 @@ void RilRadioResponseTest::OnResponseSplitCall(OHOS::MessageParcel &data)
         return;
     }
 
-    TELEPHONY_LOGD("OnResponseSplitCall OnResponseSplitCall back ");
+    TELEPHONY_LOGI("OnResponseSplitCall OnResponseSplitCall back ");
 }
 
-void RilRadioResponseTest::OnResponseSwapCall(OHOS::MessageParcel &data)
+void RilRadioResponseTest::OnResponseSwapCall(MessageParcel &data)
 {
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
@@ -199,12 +202,12 @@ void RilRadioResponseTest::OnResponseSwapCall(OHOS::MessageParcel &data)
         return;
     }
 
-    TELEPHONY_LOGD("RilRadioResponseTest OnResponseSwapCall back ");
+    TELEPHONY_LOGI("RilRadioResponseTest OnResponseSwapCall back ");
 }
 
-void RilRadioResponseTest::OnResponseGetSignalQuality(OHOS::MessageParcel &data)
+void RilRadioResponseTest::OnResponseGetSignalQuality(MessageParcel &data)
 {
-    TELEPHONY_LOGD("RilRadioResponseTest OnResponseGetSignalQuality ");
+    TELEPHONY_LOGI("RilRadioResponseTest OnResponseGetSignalQuality ");
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
     if (spBuffer == nullptr) {
@@ -213,9 +216,9 @@ void RilRadioResponseTest::OnResponseGetSignalQuality(OHOS::MessageParcel &data)
     }
 }
 
-void RilRadioResponseTest::OnResponseGetIccIOState(OHOS::MessageParcel &data)
+void RilRadioResponseTest::OnResponseGetIccIOState(MessageParcel &data)
 {
-    TELEPHONY_LOGD("RilRadioResponseTest::OnResponseGetIccIOState --> ");
+    TELEPHONY_LOGI("RilRadioResponseTest::OnResponseGetIccIOState --> ");
     std::unique_ptr<IccIoResultInfo> iccIoResult = std::make_unique<IccIoResultInfo>();
     if (iccIoResult == nullptr) {
         return;
@@ -224,7 +227,7 @@ void RilRadioResponseTest::OnResponseGetIccIOState(OHOS::MessageParcel &data)
         TELEPHONY_LOGE("OnResponseGetIccIOState --> iccIoResult.ReadFromParcel(data) failed !!!");
         return;
     }
-    TELEPHONY_LOGD("OnResponseGetIccIOState --> iccIoResult.ReadFromParcel(data) success.");
+    TELEPHONY_LOGI("OnResponseGetIccIOState --> iccIoResult.ReadFromParcel(data) success.");
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
     if (spBuffer == nullptr) {
@@ -233,9 +236,9 @@ void RilRadioResponseTest::OnResponseGetIccIOState(OHOS::MessageParcel &data)
     }
 }
 
-void RilRadioResponseTest::OnResponseGetCsRegStatus(OHOS::MessageParcel &data)
+void RilRadioResponseTest::OnResponseGetCsRegStatus(MessageParcel &data)
 {
-    TELEPHONY_LOGD("RilRadioResponseTest::OnResponseGetCsRegStatus start ");
+    TELEPHONY_LOGI("RilRadioResponseTest::OnResponseGetCsRegStatus start ");
     std::unique_ptr<CsRegStatusInfo> mCsRegStatusInfo = std::make_unique<CsRegStatusInfo>();
     if (mCsRegStatusInfo == nullptr) {
         TELEPHONY_LOGE("RilAdapter %{public}s: failed to obtain CsRegStatusInfo", __func__);
@@ -250,9 +253,9 @@ void RilRadioResponseTest::OnResponseGetCsRegStatus(OHOS::MessageParcel &data)
     }
 }
 
-void RilRadioResponseTest::OnResponseGetNetworkRegistrationState(OHOS::MessageParcel &data)
+void RilRadioResponseTest::OnResponseGetNetworkRegistrationState(MessageParcel &data)
 {
-    TELEPHONY_LOGD("RilRadioResponseTest::OnResponseGetNetworkRegistrationState start, but need struct");
+    TELEPHONY_LOGI("RilRadioResponseTest::OnResponseGetNetworkRegistrationState start, but need struct");
     std::unique_ptr<PsRegStatusResultInfo> psRegStateResult = std::make_unique<PsRegStatusResultInfo>();
     if (psRegStateResult == nullptr) {
         return;
@@ -266,9 +269,9 @@ void RilRadioResponseTest::OnResponseGetNetworkRegistrationState(OHOS::MessagePa
     }
 }
 
-void RilRadioResponseTest::OnResponseGetCurrentOperator(OHOS::MessageParcel &data)
+void RilRadioResponseTest::OnResponseGetCurrentOperator(MessageParcel &data)
 {
-    TELEPHONY_LOGD("RilRadioResponseTest OnResponseGetCurrentOperator ");
+    TELEPHONY_LOGI("RilRadioResponseTest OnResponseGetCurrentOperator ");
     std::unique_ptr<OperatorInfoResult> mOperatorInfo = std::make_unique<OperatorInfoResult>();
     if (mOperatorInfo == nullptr) {
         return;
@@ -282,18 +285,18 @@ void RilRadioResponseTest::OnResponseGetCurrentOperator(OHOS::MessageParcel &dat
     }
 }
 
-void RilRadioResponseTest::SetRadioStatusResponse(OHOS::MessageParcel &data)
+void RilRadioResponseTest::SetRadioStateResponse(MessageParcel &data)
 {
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
     if (spBuffer == nullptr) {
-        TELEPHONY_LOGE("RilRadioResponseTest SetRadioStatusResponse read spBuffer failed");
+        TELEPHONY_LOGE("RilRadioResponseTest SetRadioStateResponse read spBuffer failed");
         return;
     }
-    TELEPHONY_LOGD("SetRadioStatusResponse");
+    TELEPHONY_LOGI("SetRadioStateResponse");
 }
 
-void RilRadioResponseTest::SendSmsResponse(OHOS::MessageParcel &data)
+void RilRadioResponseTest::SendSmsResponse(MessageParcel &data)
 {
     std::unique_ptr<SendSmsResultInfo> mSendSmsResultInfo = std::make_unique<SendSmsResultInfo>();
     if (mSendSmsResultInfo == nullptr) {
@@ -308,7 +311,7 @@ void RilRadioResponseTest::SendSmsResponse(OHOS::MessageParcel &data)
     }
 }
 
-void RilRadioResponseTest::SendSmsMoreModeResponse(OHOS::MessageParcel &data)
+void RilRadioResponseTest::SendSmsMoreModeResponse(MessageParcel &data)
 {
     std::unique_ptr<SendSmsResultInfo> mSendSmsResultInfo = std::make_unique<SendSmsResultInfo>();
     if (mSendSmsResultInfo == nullptr) {
@@ -323,9 +326,9 @@ void RilRadioResponseTest::SendSmsMoreModeResponse(OHOS::MessageParcel &data)
     }
 }
 
-void RilRadioResponseTest::ActivatePdpContextResponse(OHOS::MessageParcel &data)
+void RilRadioResponseTest::ActivatePdpContextResponse(MessageParcel &data)
 {
-    TELEPHONY_LOGD("RilRadioResponseTest::ActivatePdpContextResponse --> ");
+    TELEPHONY_LOGI("RilRadioResponseTest::ActivatePdpContextResponse --> ");
     std::unique_ptr<SetupDataCallResultInfo> setupDataCallResultInfo = std::make_unique<SetupDataCallResultInfo>();
     if (setupDataCallResultInfo == nullptr) {
         return;
@@ -335,7 +338,7 @@ void RilRadioResponseTest::ActivatePdpContextResponse(OHOS::MessageParcel &data)
             "ERROR : ActivatePdpContextResponse --> setupDataCallResultInfo.ReadFromParcel(data) failed !!!");
         return;
     }
-    TELEPHONY_LOGD("ActivatePdpContextResponse --> setupDataCallResultInfo.ReadFromParcel(data) success");
+    TELEPHONY_LOGI("ActivatePdpContextResponse --> setupDataCallResultInfo.ReadFromParcel(data) success");
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
     if (spBuffer == nullptr) {
@@ -344,7 +347,7 @@ void RilRadioResponseTest::ActivatePdpContextResponse(OHOS::MessageParcel &data)
     }
 }
 
-void RilRadioResponseTest::OnResponseAcceptRilCmCall(OHOS::MessageParcel &data)
+void RilRadioResponseTest::OnResponseAcceptRilCmCall(MessageParcel &data)
 {
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
@@ -354,9 +357,9 @@ void RilRadioResponseTest::OnResponseAcceptRilCmCall(OHOS::MessageParcel &data)
     }
 }
 
-void RilRadioResponseTest::OnResponseDeactivateDataCall(OHOS::MessageParcel &data)
+void RilRadioResponseTest::OnResponseDeactivateDataCall(MessageParcel &data)
 {
-    TELEPHONY_LOGD("RilRadioResponseTest::OnResponseDeactivateDataCall --> ");
+    TELEPHONY_LOGI("RilRadioResponseTest::OnResponseDeactivateDataCall --> ");
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
     if (spBuffer == nullptr) {
@@ -365,7 +368,7 @@ void RilRadioResponseTest::OnResponseDeactivateDataCall(OHOS::MessageParcel &dat
     }
 }
 
-void RilRadioResponseTest::OnResponseSendNewMessageAckCdma(OHOS::MessageParcel &data)
+void RilRadioResponseTest::OnResponseSendNewMessageAckCdma(MessageParcel &data)
 {
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
@@ -375,7 +378,7 @@ void RilRadioResponseTest::OnResponseSendNewMessageAckCdma(OHOS::MessageParcel &
     }
 }
 
-void RilRadioResponseTest::OnResponseSetInitialApn(OHOS::MessageParcel &data)
+void RilRadioResponseTest::OnResponseSetInitialApn(MessageParcel &data)
 {
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
@@ -385,7 +388,7 @@ void RilRadioResponseTest::OnResponseSetInitialApn(OHOS::MessageParcel &data)
     }
 }
 
-void RilRadioResponseTest::OnResponseGetImsRegistrationState(OHOS::MessageParcel &data)
+void RilRadioResponseTest::OnResponseGetImsRegistrationState(MessageParcel &data)
 {
     UniInfo mUniversalInfo;
     std::unique_ptr<UniInfo> mUniInfo = std::make_unique<UniInfo>();
@@ -401,9 +404,9 @@ void RilRadioResponseTest::OnResponseGetImsRegistrationState(OHOS::MessageParcel
     }
 }
 
-void RilRadioResponseTest::OnResponseSendImsSms(OHOS::MessageParcel &data)
+void RilRadioResponseTest::OnResponseSendImsSms(MessageParcel &data)
 {
-    TELEPHONY_LOGD("RilRadioResponseTest OnResponseSendImsSms ");
+    TELEPHONY_LOGI("RilRadioResponseTest OnResponseSendImsSms ");
     std::unique_ptr<SendSmsResultInfo> mSendSmsResultInfo = std::make_unique<SendSmsResultInfo>();
     if (mSendSmsResultInfo == nullptr) {
         return;
@@ -417,9 +420,9 @@ void RilRadioResponseTest::OnResponseSendImsSms(OHOS::MessageParcel &data)
     }
 }
 
-void RilRadioResponseTest::OnResponseSetDataCallAllowed(OHOS::MessageParcel &data)
+void RilRadioResponseTest::OnResponseSetDataCallAllowed(MessageParcel &data)
 {
-    TELEPHONY_LOGD("RilRadioResponseTest::OnResponseSetDataCallAllowed --> ");
+    TELEPHONY_LOGI("RilRadioResponseTest::OnResponseSetDataCallAllowed --> ");
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
     if (spBuffer == nullptr) {
@@ -428,9 +431,9 @@ void RilRadioResponseTest::OnResponseSetDataCallAllowed(OHOS::MessageParcel &dat
     }
 }
 
-void RilRadioResponseTest::OnResponseSetModemDataProfile(OHOS::MessageParcel &data)
+void RilRadioResponseTest::OnResponseSetModemDataProfile(MessageParcel &data)
 {
-    TELEPHONY_LOGD("RilRadioResponseTest::OnResponseSetModemDataProfile --> ");
+    TELEPHONY_LOGI("RilRadioResponseTest::OnResponseSetModemDataProfile --> ");
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
     if (spBuffer == nullptr) {
@@ -439,7 +442,7 @@ void RilRadioResponseTest::OnResponseSetModemDataProfile(OHOS::MessageParcel &da
     }
 }
 
-void RilRadioResponseTest::OnResponsePullRadioLceData(OHOS::MessageParcel &data)
+void RilRadioResponseTest::OnResponsePullRadioLceData(MessageParcel &data)
 {
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
@@ -449,7 +452,7 @@ void RilRadioResponseTest::OnResponsePullRadioLceData(OHOS::MessageParcel &data)
     }
 }
 
-void RilRadioResponseTest::OnRequestGetNetworkSelectionModeTest(OHOS::MessageParcel &data)
+void RilRadioResponseTest::OnRequestGetNetworkSelectionModeTest(MessageParcel &data)
 {
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
@@ -458,7 +461,7 @@ void RilRadioResponseTest::OnRequestGetNetworkSelectionModeTest(OHOS::MessagePar
         return;
     }
 }
-void RilRadioResponseTest::OnRequestGetNetworkSearchInformationTest(OHOS::MessageParcel &data)
+void RilRadioResponseTest::OnRequestGetNetworkSearchInformationTest(MessageParcel &data)
 {
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
@@ -468,7 +471,7 @@ void RilRadioResponseTest::OnRequestGetNetworkSearchInformationTest(OHOS::Messag
     }
 }
 
-void RilRadioResponseTest::OnRequestSetNetworkSelectionModeTest(OHOS::MessageParcel &data)
+void RilRadioResponseTest::OnRequestSetNetworkSelectionModeTest(MessageParcel &data)
 {
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
@@ -477,3 +480,27 @@ void RilRadioResponseTest::OnRequestSetNetworkSelectionModeTest(OHOS::MessagePar
         return;
     }
 }
+
+void RilRadioResponseTest::OnRequestSetUssdCusdTest(MessageParcel &data)
+{
+    TELEPHONY_LOGI("RilRadioResponseTest::OnRequestSetUssdCusdTest --> ");
+    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
+    const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("ERROR : OnRequestSetUssdCusdTest --> data.ReadBuffer(readSpSize) failed !!!");
+        return;
+    }
+}
+
+void RilRadioResponseTest::OnRequestGetUssdCusdTest(MessageParcel &data)
+{
+    TELEPHONY_LOGI("RilRadioResponseTest::OnRequestGetUssdCusdTest --> ");
+    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
+    const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("ERROR : OnRequestGetUssdCusdTest --> data.ReadBuffer(readSpSize) failed !!!");
+        return;
+    }
+}
+} // namespace Telephony
+} // namespace OHOS

@@ -19,17 +19,17 @@
 #include <ipc_object_stub.h>
 #include <securec.h>
 
+#include "ril_manager_test.h"
+
 namespace OHOS {
 namespace Telephony {
-class RilManagerTest;
-
 class RilRadioIndicationTest : public OHOS::IPCObjectStub {
 public:
     RilRadioIndicationTest(RilManagerTest *mRilManager);
     ~RilRadioIndicationTest();
 
-    int OnRemoteRequest(uint32_t code, OHOS::MessageParcel &data, OHOS::MessageParcel &reply,
-        OHOS::MessageOption &option) override;
+    int OnRemoteRequest(
+        uint32_t code, OHOS::MessageParcel &data, OHOS::MessageParcel &reply, OHOS::MessageOption &option) override;
     void RadioStateChange(OHOS::MessageParcel &data);
     void CallStateChgInd(OHOS::MessageParcel &data);
     void NetworkStateNotify(OHOS::MessageParcel &data);

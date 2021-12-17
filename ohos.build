@@ -3,14 +3,16 @@
     "parts": {
         "ril_adapter": {
             "module_list": [
-                "//base/telephony/ril_adapter/hril:hril",
-                "//base/telephony/ril_adapter/hril_hdf:hril_hdf",
-                "//base/telephony/ril_adapter/vendor:ril_vendor"
+                "//base/telephony/ril_adapter/interfaces/innerkits:hril_innerkits",
+                "//base/telephony/ril_adapter/services/hril:hril",
+                "//base/telephony/ril_adapter/services/hril_hdf:hril_hdf",
+                "//base/telephony/ril_adapter/test/unittest:ril_adapter_test",
+                "//base/telephony/ril_adapter/services/vendor:ril_vendor"
             ],
         "inner_kits": [
             {
                 "type": "so",
-                "name": "//base/telephony/ril_adapter/hril:hril",
+                "name": "//base/telephony/ril_adapter/interfaces/innerkits:hril_innerkits",
                 "header": {
                     "header_files": [
                         "hril_types.h",
@@ -22,9 +24,10 @@
                         "hril_modem_parcel.h",
                         "hril_data_parcel.h",
                         "hril_call_parcel.h",
-                        "hril.h"
+                        "hril.h",
+                        "hril_enum.h"
                     ],
-                    "header_base": "//base/telephony/ril_adapter/interfaces/innerkits"
+                    "header_base": "//base/telephony/ril_adapter/interfaces/innerkits/include"
                 }
             }
         ],
@@ -34,4 +37,3 @@
         }
     }
 }
-

@@ -54,7 +54,8 @@ public:
     void SetRilCmRadioPowerTest(const AppExecFwk::InnerEvent::Pointer &result);
     void AcknowledgeRilCmLastIncomingGsmSmsTest(const AppExecFwk::InnerEvent::Pointer &result);
     void SetupRilCmDataCallTest(const AppExecFwk::InnerEvent::Pointer &result);
-    void SetRilLocationUpdateForNetworksTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void GetRilCmCellInfoListTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void GetRilCurrentCellInfoTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void DeactivateRilCmDataCallTest(const AppExecFwk::InnerEvent::Pointer &result);
     void OnProcessInput(int32_t what, const OHOS::AppExecFwk::InnerEvent::Pointer &event);
     void OnInitInterface();
@@ -68,7 +69,7 @@ public:
     };
 
     std::unique_ptr<RilManagerTest> mRilManager_;
-    int phoneID_;
+    int slotId_;
     using RilManagerAndResponseTestFun = void (RilUnitTest::*)(const OHOS::AppExecFwk::InnerEvent::Pointer &event);
     std::map<uint32_t, RilManagerAndResponseTestFun> memberFuncMap_;
 };
