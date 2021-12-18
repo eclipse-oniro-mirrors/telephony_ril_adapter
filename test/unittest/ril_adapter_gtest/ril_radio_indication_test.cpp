@@ -13,11 +13,14 @@
  * limitations under the License.
  */
 
+#include "ril_radio_indication_test.h"
+
+#include "hril_notification.h"
 #include "ril_manager_test.h"
 #include "telephony_log_wrapper.h"
 
-using namespace OHOS::Telephony;
-
+namespace OHOS {
+namespace Telephony {
 RilRadioIndicationTest::RilRadioIndicationTest(RilManagerTest *mRilManager) : IPCObjectStub(std::u16string(u""))
 {
     mRilManager_ = mRilManager;
@@ -26,138 +29,118 @@ RilRadioIndicationTest::RilRadioIndicationTest(RilManagerTest *mRilManager) : IP
 RilRadioIndicationTest::~RilRadioIndicationTest() {}
 
 int32_t RilRadioIndicationTest::OnRemoteRequest(
-    uint32_t code, OHOS::MessageParcel &data, OHOS::MessageParcel &reply, OHOS::MessageOption &option)
+    uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     const int32_t DEFAULT_VALUE = 1;
     switch (code) {
         case HNOTI_MODEM_RADIO_STATE_UPDATED:
-            RadioStateChange(data);
-            break;
+            RadioStateUpdated(data);
+            return 0;
         case HNOTI_CALL_STATE_UPDATED:
-            CallStateChgInd(data);
-            break;
+            CallStateUpdated(data);
+            return 0;
         case HNOTI_NETWORK_CS_REG_STATUS_UPDATED:
             NetworkStateNotify(data);
-            break;
+            return 0;
         case HNOTI_SMS_NEW_SMS:
             NewSmsNotify(data);
-            break;
+            return 0;
+        case HNOTI_SMS_NEW_CDMA_SMS:
+            NewCdmaSmsNotify(data);
+            return 0;
         case HNOTI_SMS_STATUS_REPORT:
             SmsStatusReportNotify(data);
-            break;
+            return 0;
+        case HNOTI_SMS_NEW_SMS_STORED_ON_SIM:
+            NewSmsStoredOnSimNotify(data);
+            return 0;
+        case HNOTI_NETWORK_SIGNAL_STRENGTH_UPDATED:
+            SignalStrengthUpdated(data);
+            return 0;
         default:
-            break;
+            return DEFAULT_VALUE;
     }
-    return DEFAULT_VALUE;
 }
 
-void RilRadioIndicationTest::RadioStateChange(OHOS::MessageParcel &data)
+void RilRadioIndicationTest::RadioStateUpdated(MessageParcel &data)
 {
-    (void)data;
+    int32_t radioState = data.ReadInt32();
+    int32_t indicationType = data.ReadInt32();
+    TELEPHONY_LOGI(
+        "func :%{public}s indicationType: %{public}d state:%{public}d", __func__, indicationType, radioState);
 }
 
-void RilRadioIndicationTest::CallStateChgInd(OHOS::MessageParcel &data)
+void RilRadioIndicationTest::CallStateUpdated(MessageParcel &data)
 {
     int32_t indicationType = data.ReadInt32();
-    TELEPHONY_LOGD("func :%{public}s indicationType: %{public}d", __func__, indicationType);
+    TELEPHONY_LOGI("func :%{public}s indicationType: %{public}d", __func__, indicationType);
 }
 
-void RilRadioIndicationTest::NetworkStateNotify(OHOS::MessageParcel &data)
+void RilRadioIndicationTest::NetworkStateNotify(MessageParcel &data)
 {
     int32_t indicationType = data.ReadInt32();
-    TELEPHONY_LOGD("func :%{public}s indicationType: %{public}d", __func__, indicationType);
+    TELEPHONY_LOGI("func :%{public}s indicationType: %{public}d", __func__, indicationType);
 }
 
-void RilRadioIndicationTest::NewSmsNotify(OHOS::MessageParcel &data)
+void RilRadioIndicationTest::NewSmsNotify(MessageParcel &data)
 {
-    TELEPHONY_LOGD("NewSmsNotify");
-    std::unique_ptr<SmsMessageInfo> smsMessage = std::make_unique<SmsMessageInfo>();
-    if (smsMessage == nullptr) {
+    std::unique_ptr<SmsMessageInfo> smsMessageInfo = std::make_unique<SmsMessageInfo>();
+    if (smsMessageInfo == nullptr) {
         return;
     }
-    smsMessage.get()->ReadFromParcel(data);
-    int32_t indicationType = smsMessage->indicationType;
-    TELEPHONY_LOGD("func :%{public}s indicationType: %{public}d", __func__, indicationType);
+    smsMessageInfo.get()->ReadFromParcel(data);
+    int32_t indicationType = smsMessageInfo->indicationType;
+    TELEPHONY_LOGI("func :%{public}s indicationType: %{public}d", __func__, indicationType);
 }
 
-void RilRadioIndicationTest::SmsStatusReportNotify(OHOS::MessageParcel &data)
+void RilRadioIndicationTest::NewCdmaSmsNotify(MessageParcel &data)
 {
-    TELEPHONY_LOGD("SmsStatusReportNotify");
+    std::unique_ptr<SmsMessageInfo> smsMessageInfo = std::make_unique<SmsMessageInfo>();
+    if (smsMessageInfo == nullptr) {
+        return;
+    }
+    smsMessageInfo.get()->ReadFromParcel(data);
+    int32_t indicationType = smsMessageInfo->indicationType;
+    TELEPHONY_LOGI("func :%{public}s indicationType: %{public}d", __func__, indicationType);
+}
+
+void RilRadioIndicationTest::SmsStatusReportNotify(MessageParcel &data)
+{
     std::unique_ptr<SmsMessageInfo> smsMessageInfo = std::make_unique<SmsMessageInfo>();
     if (smsMessageInfo == nullptr) {
         return;
     }
     smsMessageInfo.get()->ReadFromParcel(data);
     int32_t indicationType = smsMessageInfo.get()->indicationType;
-    TELEPHONY_LOGD("func :%{public}s indicationType: %{public}d", __func__, indicationType);
+    TELEPHONY_LOGI("func :%{public}s indicationType: %{public}d", __func__, indicationType);
 }
 
-void RilRadioIndicationTest::NewSmsStoredOnSimNotify(OHOS::MessageParcel &data)
+void RilRadioIndicationTest::NewSmsStoredOnSimNotify(MessageParcel &data)
 {
-    TELEPHONY_LOGD("RilRadioIndicationTest::NewSmsStoredOnSimNotify --> ");
     data.ReadInt32();
     int32_t indicationType = data.ReadInt32();
-    TELEPHONY_LOGD("func :%{public}s indicationType: %{public}d", __func__, indicationType);
+    TELEPHONY_LOGI("func :%{public}s indicationType: %{public}d", __func__, indicationType);
 }
 
-void RilRadioIndicationTest::GetSignalStrength(OHOS::MessageParcel &data)
+void RilRadioIndicationTest::SignalStrengthUpdated(MessageParcel &data)
 {
     size_t readSize = sizeof(struct Rssi);
     const uint8_t *buffer = data.ReadBuffer(readSize);
     if (buffer == nullptr) {
-        TELEPHONY_LOGE("GetSignalStrength MessageParcel read buffer failed");
+        TELEPHONY_LOGE("SignalStrengthUpdated MessageParcel read buffer failed");
         return;
     }
     const struct Rssi *rssi = reinterpret_cast<const struct Rssi *>(buffer);
     int32_t indicationType = data.ReadInt32();
-    TELEPHONY_LOGD("func :%{public}s indicationType: %{public}d", __func__, indicationType);
+    TELEPHONY_LOGI("func :%{public}s indicationType: %{public}d", __func__, indicationType);
     struct std::unique_ptr<Rssi> mSignalStrength = std::make_unique<Rssi>();
     if (mSignalStrength == nullptr) {
         return;
     }
-    errno_t err = memcpy_s(mSignalStrength.get(), readSize, rssi, readSize);
-    if (err != EOK) {
-        TELEPHONY_LOGE("GetSignalStrength memcpy_s failed");
-    }
-}
-
-void RilRadioIndicationTest::ChangedDataCallList(OHOS::MessageParcel &data)
-{
-    std::unique_ptr<SetupDataCallResultInfo> setupDataCallResultInfo = std::make_unique<SetupDataCallResultInfo>();
-    if (setupDataCallResultInfo == nullptr) {
+    if (memcpy_s(mSignalStrength.get(), readSize, rssi, readSize) != EOK) {
+        TELEPHONY_LOGE("SignalStrengthUpdated memcpy_s failed");
         return;
     }
-    setupDataCallResultInfo.get()->ReadFromParcel(data);
-    const size_t READ_SP_SIZE = sizeof(struct HRilRadioResponseInfo);
-    const uint8_t *SP_BUFFER = data.ReadBuffer(READ_SP_SIZE);
-    if (SP_BUFFER == nullptr) {
-        TELEPHONY_LOGE("RilRadioResponseTest ChangedDataCallList read SP_BUFFER failed");
-        return;
-    }
-    int32_t indicationType = data.ReadInt32();
-    TELEPHONY_LOGD("func :%{public}s indicationType: %{public}d", __func__, indicationType);
 }
-
-void RilRadioIndicationTest::ChangedSimState(OHOS::MessageParcel &data)
-{
-    TELEPHONY_LOGD("RilRadioIndicationTest::ChangedSimState --> ");
-    int32_t indicationType = data.ReadInt32();
-    if (mRilManager_ == nullptr) {
-        TELEPHONY_LOGE("mRilManager_ is null!");
-        return;
-    }
-    TELEPHONY_LOGD("func :%{public}s indicationType: %{public}d", __func__, indicationType);
-}
-
-void RilRadioIndicationTest::ConnectedReturnRilVersion(OHOS::MessageParcel &data)
-{
-    int32_t indicationType = data.ReadInt32();
-    TELEPHONY_LOGD("func :%{public}s indicationType: %{public}d", __func__, indicationType);
-    auto mResult_ = AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
-}
-
-void RilRadioIndicationTest::ChangedImsNetworkState(OHOS::MessageParcel &data)
-{
-    int32_t indicationType = data.ReadInt32();
-    TELEPHONY_LOGD("func :%{public}s indicationType: %{public}d", __func__, indicationType);
-}
+} // namespace Telephony
+} // namespace OHOS

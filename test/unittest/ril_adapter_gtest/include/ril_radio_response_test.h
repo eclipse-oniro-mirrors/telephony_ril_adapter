@@ -16,6 +16,8 @@
 #ifndef OHOS_RIL_RADIO_RESPONSE_test_H
 #define OHOS_RIL_RADIO_RESPONSE_test_H
 
+#include <iservice_registry.h>
+
 #include "ril_manager_test.h"
 
 namespace OHOS {
@@ -25,47 +27,49 @@ struct Tmp1 {
     int32_t status;
 };
 
-class RilRadioResponseTest : public OHOS::IPCObjectStub {
+class RilRadioResponseTest : public IPCObjectStub {
 public:
     RilRadioResponseTest(RilManagerTest *mRilManager);
     ~RilRadioResponseTest();
 
-    int OnRemoteRequest(uint32_t code, OHOS::MessageParcel &data, OHOS::MessageParcel &reply,
-        OHOS::MessageOption &option) override;
-    void OnResponseGetSimState(OHOS::MessageParcel &data);
-    void OnResponseGetCurrentCalls(OHOS::MessageParcel &data);
-    void OnResponseGetRilCurrentCellInfo(OHOS::MessageParcel &data);
-    void DialResponse(OHOS::MessageParcel &data);
-    void GetImsiResponse(OHOS::MessageParcel &data);
-    void OnResponseHangupCall(OHOS::MessageParcel &data);
-    void OnResponseRejectCall(OHOS::MessageParcel &data);
-    void OnResponseHoldCall(OHOS::MessageParcel &data);
-    void OnResponseActiveCall(OHOS::MessageParcel &data);
-    void OnResponseSwapCall(OHOS::MessageParcel &data);
-    void OnResponseJoinCall(OHOS::MessageParcel &data);
-    void OnResponseSplitCall(OHOS::MessageParcel &data);
-    void OnResponseGetLastCallErrorCode(OHOS::MessageParcel &data);
-    void OnResponseGetSignalQuality(OHOS::MessageParcel &data);
-    void OnResponseGetCsRegStatus(OHOS::MessageParcel &data);
-    void OnResponseGetNetworkRegistrationState(OHOS::MessageParcel &data);
-    void OnResponseGetCurrentOperator(OHOS::MessageParcel &data);
-    void SetRadioStatusResponse(OHOS::MessageParcel &data);
-    void SendSmsResponse(OHOS::MessageParcel &data);
-    void SendSmsMoreModeResponse(OHOS::MessageParcel &data);
-    void ActivatePdpContextResponse(OHOS::MessageParcel &data);
-    void OnResponseGetIccIOState(OHOS::MessageParcel &data);
-    void OnResponseAcceptRilCmCall(OHOS::MessageParcel &data);
-    void OnResponseDeactivateDataCall(OHOS::MessageParcel &data);
-    void OnResponseSendNewMessageAckCdma(OHOS::MessageParcel &data);
-    void OnResponseSetInitialApn(OHOS::MessageParcel &data);
-    void OnResponseGetImsRegistrationState(OHOS::MessageParcel &data);
-    void OnResponseSendImsSms(OHOS::MessageParcel &data);
-    void OnResponseSetDataCallAllowed(OHOS::MessageParcel &data);
-    void OnResponseSetModemDataProfile(OHOS::MessageParcel &data);
-    void OnResponsePullRadioLceData(OHOS::MessageParcel &data);
-    void OnRequestGetNetworkSelectionModeTest(OHOS::MessageParcel &data);
-    void OnRequestGetNetworkSearchInformationTest(OHOS::MessageParcel &data);
-    void OnRequestSetNetworkSelectionModeTest(OHOS::MessageParcel &data);
+    int OnRemoteRequest(
+        uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
+    void OnResponseGetSimState(MessageParcel &data);
+    void OnResponseGetCurrentCalls(MessageParcel &data);
+    void OnResponseGetRilCurrentCellInfo(MessageParcel &data);
+    void DialResponse(MessageParcel &data);
+    void GetImsiResponse(MessageParcel &data);
+    void OnResponseHangupCall(MessageParcel &data);
+    void OnResponseRejectCall(MessageParcel &data);
+    void OnResponseHoldCall(MessageParcel &data);
+    void OnResponseActiveCall(MessageParcel &data);
+    void OnResponseSwapCall(MessageParcel &data);
+    void OnResponseJoinCall(MessageParcel &data);
+    void OnResponseSplitCall(MessageParcel &data);
+    void OnResponseGetLastCallErrorCode(MessageParcel &data);
+    void OnResponseGetSignalQuality(MessageParcel &data);
+    void OnResponseGetCsRegStatus(MessageParcel &data);
+    void OnResponseGetNetworkRegistrationState(MessageParcel &data);
+    void OnResponseGetCurrentOperator(MessageParcel &data);
+    void SetRadioStateResponse(MessageParcel &data);
+    void SendSmsResponse(MessageParcel &data);
+    void SendSmsMoreModeResponse(MessageParcel &data);
+    void ActivatePdpContextResponse(MessageParcel &data);
+    void OnResponseGetIccIOState(MessageParcel &data);
+    void OnResponseAcceptRilCmCall(MessageParcel &data);
+    void OnResponseDeactivateDataCall(MessageParcel &data);
+    void OnResponseSendNewMessageAckCdma(MessageParcel &data);
+    void OnResponseSetInitialApn(MessageParcel &data);
+    void OnResponseGetImsRegistrationState(MessageParcel &data);
+    void OnResponseSendImsSms(MessageParcel &data);
+    void OnResponseSetDataCallAllowed(MessageParcel &data);
+    void OnResponseSetModemDataProfile(MessageParcel &data);
+    void OnResponsePullRadioLceData(MessageParcel &data);
+    void OnRequestGetNetworkSelectionModeTest(MessageParcel &data);
+    void OnRequestGetNetworkSearchInformationTest(MessageParcel &data);
+    void OnRequestSetNetworkSelectionModeTest(MessageParcel &data);
+    void OnRequestSetUssdCusdTest(MessageParcel &data);
+    void OnRequestGetUssdCusdTest(MessageParcel &data);
 
 private:
     RilManagerTest *mRilManager_;

@@ -1,0 +1,55 @@
+# Copyright (C) 2021 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+RIL_ADAPTER = "//base/telephony"
+RIL_VENDOR = "//base/telephony/ril_adapter/services/vendor/src"
+
+ohos_shared_library("ril_vendor") {
+  sources = [
+    "$RIL_VENDOR/at_call.c",
+    "$RIL_VENDOR/at_data.c",
+    "$RIL_VENDOR/at_modem.c",
+    "$RIL_VENDOR/at_network.c",
+    "$RIL_VENDOR/at_sim.c",
+    "$RIL_VENDOR/at_sms.c",
+    "$RIL_VENDOR/at_support.c",
+    "$RIL_VENDOR/channel.c",
+    "$RIL_VENDOR/vendor_adapter.c",
+    "$RIL_VENDOR/vendor_report.c",
+    "$RIL_VENDOR/vendor_util.c",
+  ]
+  include_dirs = [
+    "$RIL_ADAPTER/ril_adapter/services/vendor/include",
+    "$RIL_ADAPTER/ril_adapter/interfaces/innerkits/include",
+    "include",
+  ]
+  defines = [
+    "LOG_TAG = \"Rilvendor\"",
+    "LOG_DOMAIN = 0xD002B01",
+  ]
+  deps = [
+    "//base/startup/syspara_lite/interfaces/innerkits/native/syspara:syspara",
+    "//base/telephony/core_service/utils:libtelephony_common",
+    "//drivers/adapter/uhdf2/utils:libhdf_utils",
+  ]
+
+  if (is_standard_system) {
+    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+
+  part_name = "ril_adapter"
+  subsystem_name = "telephony"
+}

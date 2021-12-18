@@ -19,29 +19,27 @@
 #include <ipc_object_stub.h>
 #include <securec.h>
 
+#include "ril_manager_test.h"
+
 namespace OHOS {
 namespace Telephony {
-class RilManagerTest;
-
-class RilRadioIndicationTest : public OHOS::IPCObjectStub {
+class RilRadioIndicationTest : public IPCObjectStub {
 public:
     RilRadioIndicationTest(RilManagerTest *mRilManager);
     ~RilRadioIndicationTest();
 
-    int OnRemoteRequest(uint32_t code, OHOS::MessageParcel &data, OHOS::MessageParcel &reply,
-        OHOS::MessageOption &option) override;
-    void RadioStateChange(OHOS::MessageParcel &data);
-    void CallStateChgInd(OHOS::MessageParcel &data);
-    void NetworkStateNotify(OHOS::MessageParcel &data);
-    void NewSmsNotify(OHOS::MessageParcel &data);
-    void SmsStatusReportNotify(OHOS::MessageParcel &data);
-    void NewSmsStoredOnSimNotify(OHOS::MessageParcel &data);
-    void GetSignalStrength(OHOS::MessageParcel &data);
-    void ChangedDataCallList(OHOS::MessageParcel &data);
-    void UpdatedSimFile(OHOS::MessageParcel &data);
-    void ChangedSimState(OHOS::MessageParcel &data);
-    void ConnectedReturnRilVersion(OHOS::MessageParcel &data);
-    void ChangedImsNetworkState(OHOS::MessageParcel &data);
+    int OnRemoteRequest(
+        uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
+
+private:
+    void RadioStateUpdated(MessageParcel &data);
+    void CallStateUpdated(MessageParcel &data);
+    void NetworkStateNotify(MessageParcel &data);
+    void NewSmsNotify(MessageParcel &data);
+    void NewCdmaSmsNotify(MessageParcel &data);
+    void SmsStatusReportNotify(MessageParcel &data);
+    void NewSmsStoredOnSimNotify(MessageParcel &data);
+    void SignalStrengthUpdated(MessageParcel &data);
 
 private:
     RilManagerTest *mRilManager_;

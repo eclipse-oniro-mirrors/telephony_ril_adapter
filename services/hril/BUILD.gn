@@ -1,0 +1,94 @@
+# Copyright (C) 2021 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//base/telephony/core_service/telephony.gni")
+import("//build/ohos.gni")
+import("//drivers/adapter/uhdf2/uhdf.gni")
+
+RIL_ADAPTER = "//base/telephony"
+RIL_HRIL = "//base/telephony/ril_adapter/services/hril/src"
+
+config("telephony_sim_config") {
+  if (defined(sim_slot_num)) {
+    defines = [ "SIM_SLOT_NUM = $sim_slot_num" ]
+    if (sim_slot_num > 1) {
+      defines += [ "MULTI_SIM_SLOT_SUPPORT" ]
+    }
+  } else {
+    defines = [ "SIM_SLOT_NUM = 1" ]
+  }
+}
+
+config("hril_config") {
+  # header file path
+  include_dirs = [ "$RIL_ADAPTER/ril_adapter/interfaces/innerkits/include" ]
+
+  cflags = []
+  if (is_double_framework) {
+    cflags = [ "-DCONFIG_DUAL_FRAMEWORK" ]
+  }
+  if (target_cpu == "arm") {
+    cflags += [ "-DBINDER_IPC_32BIT" ]
+  }
+  if (is_standard_system) {
+    cflags += [ "-DCONFIG_STANDARD_SYSTEM" ]
+  }
+  if (defined(build_public_version) && build_public_version) {
+    cflags += [ "-DBUILD_PUBLIC_VERSION" ]
+  }
+}
+
+ohos_shared_library("hril") {
+  configs = [ ":telephony_sim_config" ]
+  sources = [
+    "$RIL_HRIL/hril_base.cpp",
+    "$RIL_HRIL/hril_call.cpp",
+    "$RIL_HRIL/hril_data.cpp",
+    "$RIL_HRIL/hril_manager.cpp",
+    "$RIL_HRIL/hril_modem.cpp",
+    "$RIL_HRIL/hril_network.cpp",
+    "$RIL_HRIL/hril_sim.cpp",
+    "$RIL_HRIL/hril_sms.cpp",
+  ]
+  include_dirs = [
+    "$RIL_ADAPTER/ril_adapter/services/hril/include",
+    "//drivers/adapter/uhdf2/include/hdi",
+    "//third_party/json/include",
+  ]
+  public_configs = [ ":hril_config" ]
+  defines = [
+    "TELEPHONY_LOG_TAG = \"Hril\"",
+    "LOG_DOMAIN = 0xD002B01",
+  ]
+  deps = [
+    "//base/telephony/core_service/utils:libtelephony_common",
+    "//base/telephony/ril_adapter/interfaces/innerkits:hril_innerkits",
+    "//drivers/adapter/uhdf2/host:libhdf_host",
+    "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
+    "//drivers/adapter/uhdf2/utils:libhdf_utils",
+  ]
+  external_deps = [ "ipc:ipc_core" ]
+
+  public_deps = [ "//utils/native/base:utils" ]
+
+  if (is_standard_system) {
+    external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
+  } else {
+    external_deps += [ "hilog:libhilog" ]
+  }
+
+  #install_images = [ "vendor" ]
+
+  part_name = "ril_adapter"
+  subsystem_name = "telephony"
+}

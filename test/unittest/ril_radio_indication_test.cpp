@@ -13,6 +13,9 @@
  * limitations under the License.
  */
 
+#include "ril_radio_indication_test.h"
+
+#include "hril_notification.h"
 #include "ril_manager_test.h"
 #include "telephony_log_wrapper.h"
 
@@ -59,45 +62,42 @@ void RilRadioIndicationTest::RadioStateChange(OHOS::MessageParcel &data)
 void RilRadioIndicationTest::CallStateChgInd(OHOS::MessageParcel &data)
 {
     int32_t indicationType = data.ReadInt32();
-    TELEPHONY_LOGD("func :%{public}s indicationType: %{public}d", __func__, indicationType);
+    TELEPHONY_LOGI("func :%{public}s indicationType: %{public}d", __func__, indicationType);
 }
 
 void RilRadioIndicationTest::NetworkStateNotify(OHOS::MessageParcel &data)
 {
     int32_t indicationType = data.ReadInt32();
-    TELEPHONY_LOGD("func :%{public}s indicationType: %{public}d", __func__, indicationType);
+    TELEPHONY_LOGI("func :%{public}s indicationType: %{public}d", __func__, indicationType);
 }
 
 void RilRadioIndicationTest::NewSmsNotify(OHOS::MessageParcel &data)
 {
-    TELEPHONY_LOGD("NewSmsNotify");
-    std::unique_ptr<SmsMessageInfo> smsMessage = std::make_unique<SmsMessageInfo>();
-    if (smsMessage == nullptr) {
+    std::unique_ptr<SmsMessageInfo> smsMessageInfo = std::make_unique<SmsMessageInfo>();
+    if (smsMessageInfo == nullptr) {
         return;
     }
-    smsMessage.get()->ReadFromParcel(data);
-    int32_t indicationType = smsMessage->indicationType;
-    TELEPHONY_LOGD("func :%{public}s indicationType: %{public}d", __func__, indicationType);
+    smsMessageInfo.get()->ReadFromParcel(data);
+    int32_t indicationType = smsMessageInfo->indicationType;
+    TELEPHONY_LOGI("func :%{public}s indicationType: %{public}d", __func__, indicationType);
 }
 
 void RilRadioIndicationTest::SmsStatusReportNotify(OHOS::MessageParcel &data)
 {
-    TELEPHONY_LOGD("SmsStatusReportNotify");
     std::unique_ptr<SmsMessageInfo> smsMessageInfo = std::make_unique<SmsMessageInfo>();
     if (smsMessageInfo == nullptr) {
         return;
     }
     smsMessageInfo.get()->ReadFromParcel(data);
     int32_t indicationType = smsMessageInfo.get()->indicationType;
-    TELEPHONY_LOGD("func :%{public}s indicationType: %{public}d", __func__, indicationType);
+    TELEPHONY_LOGI("func :%{public}s indicationType: %{public}d", __func__, indicationType);
 }
 
 void RilRadioIndicationTest::NewSmsStoredOnSimNotify(OHOS::MessageParcel &data)
 {
-    TELEPHONY_LOGD("RilRadioIndicationTest::NewSmsStoredOnSimNotify --> ");
     data.ReadInt32();
     int32_t indicationType = data.ReadInt32();
-    TELEPHONY_LOGD("func :%{public}s indicationType: %{public}d", __func__, indicationType);
+    TELEPHONY_LOGI("func :%{public}s indicationType: %{public}d", __func__, indicationType);
 }
 
 void RilRadioIndicationTest::GetSignalStrength(OHOS::MessageParcel &data)
@@ -110,14 +110,14 @@ void RilRadioIndicationTest::GetSignalStrength(OHOS::MessageParcel &data)
     }
     const struct Rssi *rssi = reinterpret_cast<const struct Rssi *>(buffer);
     int32_t indicationType = data.ReadInt32();
-    TELEPHONY_LOGD("func :%{public}s indicationType: %{public}d", __func__, indicationType);
+    TELEPHONY_LOGI("func :%{public}s indicationType: %{public}d", __func__, indicationType);
     struct std::unique_ptr<Rssi> mSignalStrength = std::make_unique<Rssi>();
     if (mSignalStrength == nullptr) {
         return;
     }
-    errno_t err = memcpy_s(mSignalStrength.get(), readSize, rssi, readSize);
-    if (err != EOK) {
+    if (memcpy_s(mSignalStrength.get(), readSize, rssi, readSize) != EOK) {
         TELEPHONY_LOGE("GetSignalStrength memcpy_s failed");
+        return;
     }
 }
 
@@ -135,29 +135,28 @@ void RilRadioIndicationTest::ChangedDataCallList(OHOS::MessageParcel &data)
         return;
     }
     int32_t indicationType = data.ReadInt32();
-    TELEPHONY_LOGD("func :%{public}s indicationType: %{public}d", __func__, indicationType);
+    TELEPHONY_LOGI("func :%{public}s indicationType: %{public}d", __func__, indicationType);
 }
 
 void RilRadioIndicationTest::ChangedSimState(OHOS::MessageParcel &data)
 {
-    TELEPHONY_LOGD("RilRadioIndicationTest::ChangedSimState --> ");
     int32_t indicationType = data.ReadInt32();
     if (mRilManager_ == nullptr) {
         TELEPHONY_LOGE("mRilManager_ is null!");
         return;
     }
-    TELEPHONY_LOGD("func :%{public}s indicationType: %{public}d", __func__, indicationType);
+    TELEPHONY_LOGI("func :%{public}s indicationType: %{public}d", __func__, indicationType);
 }
 
 void RilRadioIndicationTest::ConnectedReturnRilVersion(OHOS::MessageParcel &data)
 {
     int32_t indicationType = data.ReadInt32();
-    TELEPHONY_LOGD("func :%{public}s indicationType: %{public}d", __func__, indicationType);
+    TELEPHONY_LOGI("func :%{public}s indicationType: %{public}d", __func__, indicationType);
     auto mResult_ = AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
 }
 
 void RilRadioIndicationTest::ChangedImsNetworkState(OHOS::MessageParcel &data)
 {
     int32_t indicationType = data.ReadInt32();
-    TELEPHONY_LOGD("func :%{public}s indicationType: %{public}d", __func__, indicationType);
+    TELEPHONY_LOGI("func :%{public}s indicationType: %{public}d", __func__, indicationType);
 }

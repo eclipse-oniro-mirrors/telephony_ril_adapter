@@ -16,6 +16,8 @@
 #ifndef OHOS_RIL_RADIO_RESPONSE_test_H
 #define OHOS_RIL_RADIO_RESPONSE_test_H
 
+#include <ipc_object_stub.h>
+
 #include "ril_manager_test.h"
 
 namespace OHOS {
@@ -30,8 +32,8 @@ public:
     RilRadioResponseTest(RilManagerTest *mRilManager);
     ~RilRadioResponseTest();
 
-    int OnRemoteRequest(uint32_t code, OHOS::MessageParcel &data, OHOS::MessageParcel &reply,
-        OHOS::MessageOption &option) override;
+    int OnRemoteRequest(
+        uint32_t code, OHOS::MessageParcel &data, OHOS::MessageParcel &reply, OHOS::MessageOption &option) override;
     void OnResponseGetSimState(OHOS::MessageParcel &data);
     void OnResponseGetCurrentCalls(OHOS::MessageParcel &data);
     void OnResponseGetRilCurrentCellInfo(OHOS::MessageParcel &data);
@@ -49,7 +51,7 @@ public:
     void OnResponseGetCsRegStatus(OHOS::MessageParcel &data);
     void OnResponseGetNetworkRegistrationState(OHOS::MessageParcel &data);
     void OnResponseGetCurrentOperator(OHOS::MessageParcel &data);
-    void SetRadioStatusResponse(OHOS::MessageParcel &data);
+    void SetRadioStateResponse(OHOS::MessageParcel &data);
     void SendSmsResponse(OHOS::MessageParcel &data);
     void SendSmsMoreModeResponse(OHOS::MessageParcel &data);
     void ActivatePdpContextResponse(OHOS::MessageParcel &data);

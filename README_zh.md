@@ -16,13 +16,13 @@ RIL Adapter模块主要包括厂商库加载，业务接口实现以及事件调
 ## 目录<a name="section122mcpsimp"></a>
 ```
 base/telephony/ril_adapter
-├─ hril							   # hri层的各个业务模块接口实现
-├─ hril_hdf						   # HDF服务
+├─ hril                            # hri层的各个业务模块接口实现
+├─ hril_hdf                        # HDF服务
 ├─ include                         # 头文件存放目录
-├─ interfaces					   # 对应提供上层各业务内部接口
+├─ interfaces                      # 对应提供上层各业务内部接口
 │  └─ innerkits
 ├─ test                            # 单元测试相关代码
-│  ├─ mock                            
+│  ├─ mock
 │  └─ unittest                     # 单元测试代码
 └─ vendor                          # 厂商库代码
 │  └─ include
@@ -39,10 +39,8 @@ ril\_adapter不对外暴露接口，可通过核心服务调用。
 
 ## 相关仓<a name="section279mcpsimp"></a>
 
+电话服务子系统
 
-[电话服务子系统](https://gitee.com/openharmony/docs/blob/master/zh-cn/readme/%E7%94%B5%E8%AF%9D%E6%9C%8D%E5%8A%A1%E5%AD%90%E7%B3%BB%E7%BB%9F.md)
+telephony_ril_adapter
 
-**telephony_ril_adapter**
-
-[telephony_core_service](https://gitee.com/openharmony/telephony_core_service/blob/master/README_zh.md)
-
+telephony_core_service
