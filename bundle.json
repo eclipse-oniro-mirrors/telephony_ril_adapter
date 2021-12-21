@@ -1,0 +1,60 @@
+{
+    "name": "@ohos/telephony_ril_adapter",
+    "version": "",
+    "description": "支持不同类型通话的音频通道、优先级等冲突策略管理，提供通话管理相关API供应用使用",
+    "homePage": "https://gitee.com/openharmony",
+    "license": "Apache V2",
+    "repository": "https://gitee.com/openharmony/telephony_ril_adapter",
+    "domain": "os",
+    "language": "",
+    "publishAs": "code-segment",
+    "private": false,
+    "scripts": {},
+    "tags": [
+        "base"
+    ],
+    "keywords": [
+        "telephony",
+        "ril",
+        "adapter"
+    ],
+    "envs": [],
+    "dirs": [],
+    "author": {
+        "name": "",
+        "email": "",
+        "url": ""
+    },
+    "contributors": [
+        {
+            "name": "",
+            "email": "",
+            "url": ""
+        }
+    ],
+    "segment": {
+        "destPath": "base/telephony/ril_adapter"
+    },
+    "component": {
+        "name": "ril_adapter",
+        "subsystem": "telephony",
+        "syscap": [
+            "SystemCapability.Telephony.DCall"
+        ],
+        "features": [],
+        "adated_system_type": [
+            "standard"
+        ],
+        "rom": "",
+        "ram": "",
+        "deps": {
+            "components": [],
+            "third_party": []
+        },
+        "build": {
+            "sub_component": [],
+            "inner_kits": [],
+            "test": []
+        }
+    }
+}
