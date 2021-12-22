@@ -354,7 +354,6 @@ REPORT_ERR:
 
 void ReqDeactivatePdpContext(const ReqDataInfo *requestInfo, const HRilDataInfo *data)
 {
-    int ret = 0;
     int err = HRIL_ERR_SUCCESS;
     char cmd[MAX_BUFF_SIZE] = {0};
     struct ReportInfo reportInfo = {};
@@ -372,7 +371,7 @@ void ReqDeactivatePdpContext(const ReqDataInfo *requestInfo, const HRilDataInfo 
     }
 
     (void)sprintf_s(cmd, MAX_BUFF_SIZE, "AT+CGACT=0,%d", pDataInfo->cid);
-    ret = SendCommandLock(cmd, NULL, 0, &pResponse);
+    int ret = SendCommandLock(cmd, NULL, 0, &pResponse);
     if (ret != 0 || !pResponse->success) {
         errInfo = GetReportErrorInfo(pResponse);
         err = errInfo.errorNo;
