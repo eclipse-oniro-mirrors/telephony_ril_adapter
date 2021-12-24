@@ -1,7 +1,7 @@
 {
     "name": "@ohos/telephony_ril_adapter",
     "version": "",
-    "description": "支持不同类型通话的音频通道、优先级等冲突策略管理，提供通话管理相关API供应用使用",
+    "description": "蜂窝通信modem接口适配层，负责与modem通信。",
     "homePage": "https://gitee.com/openharmony",
     "license": "Apache V2",
     "repository": "https://gitee.com/openharmony/telephony_ril_adapter",
@@ -39,10 +39,10 @@
         "name": "ril_adapter",
         "subsystem": "telephony",
         "syscap": [
-            "SystemCapability.Telephony.DCall"
+            "SystemCapability.Telephony.CoreService"
         ],
         "features": [],
-        "adated_system_type": [
+        "adapted_system_type": [
             "standard"
         ],
         "rom": "",
