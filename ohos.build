@@ -6,7 +6,6 @@
                 "//base/telephony/ril_adapter/interfaces/innerkits:hril_innerkits",
                 "//base/telephony/ril_adapter/services/hril:hril",
                 "//base/telephony/ril_adapter/services/hril_hdf:hril_hdf",
-                "//base/telephony/ril_adapter/test/unittest:ril_adapter_test",
                 "//base/telephony/ril_adapter/services/vendor:ril_vendor"
             ],
         "inner_kits": [
