@@ -1,0 +1,60 @@
+{
+    "name": "@ohos/telephony_ril_adapter",
+    "version": "",
+    "description": "蜂窝通信modem接口适配层，负责与modem通信。",
+    "homePage": "https://gitee.com/openharmony",
+    "license": "Apache V2",
+    "repository": "https://gitee.com/openharmony/telephony_ril_adapter",
+    "domain": "os",
+    "language": "",
+    "publishAs": "code-segment",
+    "private": false,
+    "scripts": {},
+    "tags": [
+        "base"
+    ],
+    "keywords": [
+        "telephony",
+        "ril",
+        "adapter"
+    ],
+    "envs": [],
+    "dirs": [],
+    "author": {
+        "name": "",
+        "email": "",
+        "url": ""
+    },
+    "contributors": [
+        {
+            "name": "",
+            "email": "",
+            "url": ""
+        }
+    ],
+    "segment": {
+        "destPath": "base/telephony/ril_adapter"
+    },
+    "component": {
+        "name": "ril_adapter",
+        "subsystem": "telephony",
+        "syscap": [
+            "SystemCapability.Telephony.CoreService"
+        ],
+        "features": [],
+        "adapted_system_type": [
+            "standard"
+        ],
+        "rom": "",
+        "ram": "",
+        "deps": {
+            "components": [],
+            "third_party": []
+        },
+        "build": {
+            "sub_component": [],
+            "inner_kits": [],
+            "test": []
+        }
+    }
+}
