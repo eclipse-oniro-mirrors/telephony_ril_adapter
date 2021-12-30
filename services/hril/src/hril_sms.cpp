@@ -62,8 +62,11 @@ void HRilSms::MakeCdmaSmsInfo(HRilCdmaSmsMessageInfo &msg, const CdmaSmsMessageI
     msg.address.type = message.address.type;
     msg.address.plan = message.address.plan;
     msg.address.number = message.address.number;
-    (void)memcpy_s(msg.bytes, HRIL_MAX_CDMA_ADDRESS_LEN, message.address.bytes, HRIL_MAX_CDMA_ADDRESS_LEN);
-
+    int32_t ret = memcpy_s(msg.bytes, HRIL_MAX_CDMA_ADDRESS_LEN, message.address.bytes, HRIL_MAX_CDMA_ADDRESS_LEN);
+    if (ret != 0) {
+        TELEPHONY_LOGE("memcpy_s Return Failed!");
+        return;
+    }
     msg.subAddress.type = message.subAddress.type;
     msg.subAddress.odd = message.subAddress.odd;
     msg.subAddress.number = message.subAddress.number;
@@ -83,7 +86,11 @@ void HRilSms::MakeCdmaSmsInfo(CdmaSmsMessageInfo &msg, const HRilCdmaSmsMessageI
     msg.address.type = message.address.type;
     msg.address.plan = message.address.plan;
     msg.address.number = message.address.number;
-    (void)memcpy_s(msg.bytes, HRIL_MAX_CDMA_ADDRESS_LEN, message.address.bytes, HRIL_MAX_CDMA_ADDRESS_LEN);
+    int32_t ret = memcpy_s(msg.bytes, HRIL_MAX_CDMA_ADDRESS_LEN, message.address.bytes, HRIL_MAX_CDMA_ADDRESS_LEN);
+    if (ret != 0) {
+        TELEPHONY_LOGE("memcpy_s Return Failed!");
+        return;
+    }
 
     msg.subAddress.type = message.subAddress.type;
     msg.subAddress.odd = message.subAddress.odd;
@@ -195,7 +202,6 @@ void HRilSms::AddSimMessage(int32_t slotId, struct HdfSBuf *data)
     }
     struct GsmSmsMessageInfo message = {};
     HRilSmsWriteSms msg = {};
-    int32_t pduLen = 0;
     int32_t smscPduLen = 0;
     const int POINTER_NUM = 2;
     const int MSG_INDEX = -1;
@@ -209,7 +215,7 @@ void HRilSms::AddSimMessage(int32_t slotId, struct HdfSBuf *data)
     }
     msg.state = message.state;
     msg.index = MSG_INDEX;
-    pduLen = message.pdu.length();
+    int32_t pduLen = message.pdu.length();
     int32_t len = pduLen + 1;
     if (len <= 0) {
         return;
@@ -218,7 +224,9 @@ void HRilSms::AddSimMessage(int32_t slotId, struct HdfSBuf *data)
     if (msg.pdu == nullptr) {
         return;
     }
-    (void)(int32_t) strcpy_s(msg.pdu, pduLen + 1, message.pdu.c_str());
+    if (strcpy_s(msg.pdu, pduLen + 1, message.pdu.c_str()) != 0) {
+        return;
+    }
     smscPduLen = message.smscPdu.length() + 1;
     if (smscPduLen <= 0) {
         return;
@@ -306,7 +314,11 @@ void HRilSms::UpdateSimMessage(int32_t slotId, struct HdfSBuf *data)
         return;
     }
     msg.index = message.index;
-    (void)strcpy_s(msg.pdu, message.pdu.size() + 1, message.pdu.c_str());
+    if (strcpy_s(msg.pdu, message.pdu.size() + 1, message.pdu.c_str()) != 0) {
+        TELEPHONY_LOGE("strcpy_s return failed!");
+        free(requestInfo);
+        return;
+    }
     smsFuncs_->UpdateSimMessage(requestInfo, &msg, sizeof(HRilSmsWriteSms));
     free(msg.pdu);
     free(requestInfo);
@@ -407,6 +419,23 @@ int32_t HRilSms::SetSmscAddrResponse(int32_t slotId, int32_t requestNum, HRilRad
     return ResponseRequestInfo(requestNum, &responseInfo, sizeof(HRilRadioResponseInfo));
 }
 
+static void SetCBConfigJudge(HRilCBConfigInfo &cellBroadcastInfo, CBConfigInfo &broadcastInfo, int32_t midsLen)
+{
+    cellBroadcastInfo.mode = broadcastInfo.mode;
+    midsLen = broadcastInfo.mids.size() + 1;
+    if (midsLen <= 0) {
+        return;
+    }
+    cellBroadcastInfo.mids = (char *)calloc(midsLen, sizeof(char));
+    if (cellBroadcastInfo.mids == nullptr) {
+        return;
+    }
+    if (strcpy_s(cellBroadcastInfo.mids, broadcastInfo.mids.size() + 1, broadcastInfo.mids.c_str()) != 0) {
+        free(cellBroadcastInfo.mids);
+        return;
+    }
+}
+
 void HRilSms::SetCBConfig(int32_t slotId, struct HdfSBuf *data)
 {
     if (smsFuncs_ == nullptr) {
@@ -427,16 +456,7 @@ void HRilSms::SetCBConfig(int32_t slotId, struct HdfSBuf *data)
         TELEPHONY_LOGE("RilAdapter failed to do ReadFromParcel!");
         return;
     }
-    cellBroadcastInfo.mode = broadcastInfo.mode;
-    midsLen = broadcastInfo.mids.size() + 1;
-    if (midsLen <= 0) {
-        return;
-    }
-    cellBroadcastInfo.mids = (char *)calloc(midsLen, sizeof(char));
-    if (cellBroadcastInfo.mids == nullptr) {
-        return;
-    }
-    (void)strcpy_s(cellBroadcastInfo.mids, broadcastInfo.mids.size() + 1, broadcastInfo.mids.c_str());
+    SetCBConfigJudge(cellBroadcastInfo, broadcastInfo, midsLen);
     dcssLen = broadcastInfo.dcss.size() + 1;
     if (dcssLen <= 0) {
         free(cellBroadcastInfo.mids);
