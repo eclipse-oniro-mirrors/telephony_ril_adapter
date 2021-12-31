@@ -34,7 +34,7 @@ static struct HRilReport g_reportOps = {
     OnSmsReport
 };
 
-static int GetVendorLibPath(char *path)
+static int GetVendorLibPath(char *path, int length)
 {
     int code = GetParameter(RIL_VENDOR_LIB_PATH, "", path, PARAMETER_SIZE);
     if (code <= 0) {
@@ -53,7 +53,8 @@ static void LoadVendor(void)
     // functions returned by ril init function in vendor ril
     const HRilOps *ops = NULL;
 
-    if (GetVendorLibPath(vendorLibPath) == HDF_SUCCESS) {
+    int length = sizeof(vendorLibPath) / sizeof(vendorLibPath[0]);
+    if (GetVendorLibPath(vendorLibPath, length) == HDF_SUCCESS) {
         rilLibPath = vendorLibPath;
     } else {
         rilLibPath = g_modem_list[MODEM_INDEX].path;

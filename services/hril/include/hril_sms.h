@@ -94,7 +94,6 @@ private:
     void MakeCdmaSmsInfo(CdmaSmsMessageInfo &msg, const HRilCdmaSmsMessageInfo &message);
     bool IsSmsResponse(uint32_t code);
     bool IsSmsNotification(uint32_t code);
-
     using RespFunc = int32_t (HRilSms::*)(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
         const void *response, size_t responseLen);
     using NotiFunc = int32_t (HRilSms::*)(

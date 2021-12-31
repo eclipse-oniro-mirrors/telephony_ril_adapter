@@ -188,7 +188,7 @@ static int32_t ReqGetSimIOFDN(HRilSimIO *pSim, ResponseInfo **ppResponse, size_t
     }
     int32_t ret = SendCommandLock(cmdCheck, "+CLCK", 0, ppResponse);
     if (ret != 0 || (ppResponse != NULL && !(*ppResponse)->success)) {
-        TELEPHONY_LOGE("AT+CLCK=\"fd\",%{public}d,%{public}s fail", 1, pSim->pin2);
+        TELEPHONY_LOGE("AT+CLCK failed");
         return VENDOR_FAIL;
     }
 
@@ -201,7 +201,7 @@ static int32_t ReqGetSimIOFDN(HRilSimIO *pSim, ResponseInfo **ppResponse, size_t
     }
     ret = SendCommandLock(cmdActive, "+CRSM", 0, ppResponse);
     if (ret != 0 || (ppResponse != NULL && !(*ppResponse)->success)) {
-        TELEPHONY_LOGE("send failed  dataLen:%{public}zu", dataLen);
+        TELEPHONY_LOGE("send failed ");
         return VENDOR_FAIL;
     }
 
@@ -212,10 +212,11 @@ static int32_t ReqGetSimIOFDN(HRilSimIO *pSim, ResponseInfo **ppResponse, size_t
     }
     ret = SendCommandLock(cmdClose, "+CLCK", 0, ppResponse);
     if (ret != 0 || (ppResponse != NULL && !(*ppResponse)->success)) {
-        TELEPHONY_LOGE("AT+CLCK=\"fd\",%{public}d,%{public}s fail", 0, pSim->pin2);
+        TELEPHONY_LOGE("AT+CLCK failed");
         return VENDOR_FAIL;
     }
-    return HRIL_ERR_SUCCESS;
+    TELEPHONY_LOGE("HRIL_ERR_SUCCESS return");
+    return (int32_t)HRIL_ERR_SUCCESS;
 }
 
 static void HandlerSimIOResult(ResponseInfo *pResponse, HRilSimIOResponse *simResponse,
@@ -238,9 +239,10 @@ static void HandlerSimIOResult(ResponseInfo *pResponse, HRilSimIOResponse *simRe
     }
     reportInfo = CreateReportInfo(requestInfo, *ret, HRIL_RESPONSE, 0);
     if (simResponse == NULL) {
+        TELEPHONY_LOGE("simResponse is NULL");
         OnSimReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
     } else {
-        OnSimReport(HRIL_SIM_SLOT_1, reportInfo, (const uint8_t *)&simResponse, sizeof(HRilSimIOResponse));
+        OnSimReport(HRIL_SIM_SLOT_1, reportInfo, (const uint8_t *)simResponse, sizeof(HRilSimIOResponse));
     }
 
     FreeResponseInfo(pResponse);
@@ -258,10 +260,13 @@ void ReqGetSimIO(const ReqDataInfo *requestInfo, const HRilSimIO *data, size_t d
 
     if (pSim->pin2 != NULL && pSim->fileid == FILEID) {
         ret = ReqGetSimIOFDN(pSim, &pResponse, dataLen);
+        TELEPHONY_LOGE("ReqGetSimIOFDN call over");
         if (ret != HRIL_ERR_SUCCESS || !pResponse->success) {
+            TELEPHONY_LOGE("FDN is failed");
             HandlerSimIOResult(pResponse, NULL, requestInfo, pLine, &ret);
             return;
         } else {
+            TELEPHONY_LOGE("FDN is success");
             HandlerSimIOResult(pResponse, &simResponse, requestInfo, pLine, &ret);
             return;
         }
@@ -287,7 +292,7 @@ void ReqGetSimIO(const ReqDataInfo *requestInfo, const HRilSimIO *data, size_t d
         return;
     }
     reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
-    OnSimReport(HRIL_SIM_SLOT_1, reportInfo, (const uint8_t *)&simResponse, sizeof(simResponse));
+    OnSimReport(HRIL_SIM_SLOT_1, reportInfo, (const uint8_t *)&simResponse, sizeof(HRilSimIOResponse));
     FreeResponseInfo(pResponse);
 }
 

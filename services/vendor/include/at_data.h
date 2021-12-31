@@ -27,9 +27,9 @@
 
 #define DEFAULT_MEM_NMEMB 1
 
-#define MAX_CID 20
-#define MIN_CID 0
-#define MAX_PDP_NUM 9
+#define MAX_CID 11 // GU is 1~16 (currently only 11 is supported, and it can be expanded to 16 in the future).
+#define MIN_CID 1 // GU is 1~16 (currently only 11 is supported, and it can be expanded to 16 in the future).
+#define MAX_PDP_NUM 11
 
 #define ACTIVATE 1
 #define DEACTIVATE 0

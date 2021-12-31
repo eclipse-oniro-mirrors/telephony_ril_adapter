@@ -23,17 +23,17 @@
 #include "hril_notification.h"
 #include "vendor_report.h"
 
-static void OnDataReportErrorMessages(const ReqDataInfo *requestInfo, uint32_t err, ResponseInfo *pResponse)
+static int32_t OnDataReportErrorMessages(const ReqDataInfo *requestInfo, int32_t err, ResponseInfo *pResponse)
 {
-    uint32_t errorNo = HRIL_ERR_SUCCESS;
+    int32_t errorNo = HRIL_ERR_SUCCESS;
     struct ReportInfo reportInfo;
     ModemReportErrorInfo errInfo = {
         .errorNo = HRIL_ERR_SUCCESS,
         .errType = HRIL_REPORT_ERR_TYPE_NONE
     };
     errInfo = GetReportErrorInfo(pResponse);
-    errorNo = (err != HRIL_ERR_SUCCESS) ? err : errInfo.errorNo;
     FreeResponseInfo(pResponse);
+    errorNo = (err != HRIL_ERR_SUCCESS) ? err : errInfo.errorNo;
     if (requestInfo != NULL) {
         reportInfo = CreateReportInfo(requestInfo, errorNo, HRIL_RESPONSE, 0);
     } else {
@@ -41,6 +41,7 @@ static void OnDataReportErrorMessages(const ReqDataInfo *requestInfo, uint32_t e
     }
     reportInfo.modemErrInfo = errInfo;
     OnDataReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+    return errorNo;
 }
 
 int ParsePdpCmd(char *str, HRilDataCallResponse *outData)
@@ -330,25 +331,35 @@ static int IsStrEqual(const char *src1, const char *src2)
 static int QuerySupportCID(const PDNInfo *pdnInfos, int32_t pdnSize, const char *apn, const char *ipType)
 {
     int32_t i;
-    int cid = INT_DEFAULT_VALUE;
+    int32_t j;
+    int32_t isUsedCid = 0;
+    int32_t cid = INT_DEFAULT_VALUE;
     if (pdnInfos == NULL) {
         return cid;
     }
 
-    for (i = 0; i < pdnSize; i++) {
-        if (IsStrEqual(apn, pdnInfos[i].apn)) {
-            cid = pdnInfos[i].cid;
+    for (j = 0; j < pdnSize; j++) {
+        if (IsStrEqual(apn, pdnInfos[j].apn)) {
+            cid = pdnInfos[j].cid;
             break;
         }
     }
-    if (cid < 0) {
-        for (i = MIN_CID; i < MAX_CID; i++) {
-            if (pdnInfos[i].cid != i) {
+    if (cid > 0) {
+        return cid;
+    }
+    for (i = MIN_CID; i <= MAX_CID; i++) {
+        isUsedCid = 0;
+        for (j = 0; j < pdnSize; j++) {
+            if (pdnInfos[j].cid == i) {
+                isUsedCid = 1;
                 break;
             }
         }
-        cid = i;
+        if (isUsedCid == 1) {
+            break;
+        }
     }
+    cid = i;
     return cid;
 }
 
@@ -364,14 +375,16 @@ static int GetNeedActivateCid(const char *apn, const char *ipType)
         {DEFAULT_CID, "", ""},
         {DEFAULT_CID, "", ""},
         {DEFAULT_CID, "", ""},
+        {DEFAULT_CID, "", ""},
+        {DEFAULT_CID, "", ""},
         {DEFAULT_CID, "", ""}
     };
 
     if (!QueryAllSupportPDNInfos(pdnInfos)) {
         cid = QuerySupportCID(pdnInfos, MAX_PDP_NUM, apn, ipType);
     }
-    if (cid < 0) {
-        cid = 0;
+    if (cid <= 0) {
+        cid = MIN_CID;
     }
     return cid;
 }
@@ -503,8 +516,8 @@ static int SendCmdCGDCONT(int cid, const ReqDataInfo *requestInfo, const HRilDat
     ret = SendCommandLock(cmd, NULL, 0, &pResponse);
     if (ret != 0 || !pResponse->success) {
         err = (ret != HRIL_ERR_SUCCESS) ? ret : err;
-        TELEPHONY_LOGE("cmd send failed, err:%{public}d", err);
-        OnDataReportErrorMessages(requestInfo, err, pResponse);
+        ret = OnDataReportErrorMessages(requestInfo, err, pResponse);
+        TELEPHONY_LOGE("cmd send failed, err:%{public}d", ret);
         return ret;
     }
     FreeResponseInfo(pResponse);
@@ -527,8 +540,8 @@ static int SendCmdNDISDUP(int cid, int activate, const ReqDataInfo *requestInfo)
     ret = SendCommandLock(cmd, NULL, 0, &pResponse);
     if ((ret != HRIL_ERR_SUCCESS) || !pResponse->success) {
         err = (ret != HRIL_ERR_SUCCESS) ? ret : err;
-        TELEPHONY_LOGE("cmd send failed, err:%{public}d", err);
-        OnDataReportErrorMessages(requestInfo, err, pResponse);
+        ret = OnDataReportErrorMessages(requestInfo, err, pResponse);
+        TELEPHONY_LOGE("cmd send failed, err:%{public}d", ret);
         return ret;
     }
     FreeResponseInfo(pResponse);
