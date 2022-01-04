@@ -16,7 +16,7 @@ RIL Adapter模块主要包括厂商库加载，业务接口实现以及事件调
 ## 目录<a name="section122mcpsimp"></a>
 ```
 base/telephony/ril_adapter
-├─ hril                            # hri层的各个业务模块接口实现
+├─ hril                            # hril层的各个业务模块接口实现
 ├─ hril_hdf                        # HDF服务
 ├─ include                         # 头文件存放目录
 ├─ interfaces                      # 对应提供上层各业务内部接口
