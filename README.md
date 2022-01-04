@@ -16,7 +16,7 @@ The RIL Adapter module provides functions such as vendor library loading, servic
 ## Directory Structure<a name="section122mcpsimp"></a>
 ```
 base/telephony/ril_adapter
-├─ hril							   # Implementation of each business module interface of the hri layer
+├─ hril							   # Implementation of each business module interface of the hril layer
 ├─ hril_hdf						   # HDF service
 ├─ include                         # Header files
 ├─ interfaces					   # Internal APIs for upper-layer services
