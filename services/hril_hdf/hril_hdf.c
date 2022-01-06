@@ -84,6 +84,7 @@ static int32_t RilAdapterDispatch(
 {
     int32_t ret;
     static pthread_mutex_t dispatchMutex = PTHREAD_MUTEX_INITIALIZER;
+    TELEPHONY_LOGI("RilAdapterDispatch cmd:%{public}d", cmd);
     pthread_mutex_lock(&dispatchMutex);
     ret = DispatchRequest(SLOTID, cmd, data);
     pthread_mutex_unlock(&dispatchMutex);
