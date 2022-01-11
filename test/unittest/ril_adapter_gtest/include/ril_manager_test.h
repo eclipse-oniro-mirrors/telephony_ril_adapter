@@ -97,6 +97,7 @@ public:
     void GetSimStatus(const AppExecFwk::InnerEvent::Pointer &result);
     void SetUssdCusd(std::string str, const AppExecFwk::InnerEvent::Pointer &result);
     void GetUssdCusd(const AppExecFwk::InnerEvent::Pointer &result);
+    void GetLinkBandwidthInfo(const int32_t cid, const AppExecFwk::InnerEvent::Pointer &result);
 
     static const int INVALID_WAKELOCK = -1;
     static const int FOR_WAKELOCK = 0;

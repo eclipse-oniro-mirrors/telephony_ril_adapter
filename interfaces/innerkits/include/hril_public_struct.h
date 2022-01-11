@@ -13,11 +13,27 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_CHANNEL_H
-#define OHOS_CHANNEL_H
+#ifndef OHOS_RIL_PUBLIC_STRUCT_H
+#define OHOS_RIL_PUBLIC_STRUCT_H
 
-// readLine from modem device
-const char *ReadResponse(int atFd);
-// writeLine to modem device
-int WriteATCommand(const char *s, int isPdu, int atFd);
-#endif // OHOS_CHANNEL_H
+#include "hril_enum.h"
+
+typedef struct ReqDataInfo {
+    int serial;
+    int request;
+    HRilSimSlotId slotId;
+} ReqDataInfo;
+
+typedef struct ModemReportErrorInfo {
+    int errorNo;
+    ReportErrorType errType;
+} ModemReportErrorInfo;
+
+struct ReportInfo {
+    ReqDataInfo *requestInfo;
+    int notifyId;
+    ReportType type;
+    HRilErrNumber error;
+    ModemReportErrorInfo modemErrInfo;
+};
+#endif // OHOS_RIL_PUBLIC_STRUCT_H

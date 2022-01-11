@@ -21,7 +21,6 @@ ohos_shared_library("hril_hdf") {
     "LOG_TAG = \"RilAdapterInit\"",
     "LOG_DOMAIN = 0xD002B01",
     "MODULE_NAME = \"hril_hdf\"",
-    "SLOTID = 0",
   ]
   sources = [ "hril_hdf.c" ]
   include_dirs = [
@@ -31,8 +30,8 @@ ohos_shared_library("hril_hdf") {
     "$RIL_ADAPTER/ril_adapter/interfaces/innerkits/include",
     "include",
   ]
+  public_deps = [ "//third_party/eudev:libudev" ]
   deps = [
-    "$RIL_ADAPTER/ril_adapter/interfaces/innerkits:hril_innerkits",
     "$RIL_ADAPTER/ril_adapter/services/hril:hril",
     "//base/hiviewdfx/faultloggerd/interfaces/innerkits/signal_handler:dfx_signalhandler",
     "//base/startup/syspara_lite/interfaces/innerkits/native/syspara:syspara",

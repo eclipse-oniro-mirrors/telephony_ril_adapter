@@ -28,29 +28,21 @@
 
 #include "hril.h"
 
-#define MODEM_INDEX 0
-
-static struct {
-    const char *name;
-    const char *type;
-    const char *path;
-    const int slotIdNum;
-} g_modem_list[] = {
-    {"meig_slm790", "atmodem", "/system/lib/libril_vendor.z.so", 1},
-    {"unisoc_xx", "atmodem", "/system/lib/libril_vendor_unisoc_xx.z.so", 2}
-};
-
 static void *g_dlHandle = NULL;
 
 extern int32_t DispatchRequest(int32_t slotId, int32_t cmd, struct HdfSBuf *data);
 extern void HRilRegOps(const HRilOps *g_hrilOps);
 
-extern void OnCallReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen);
-extern void OnDataReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen);
-extern void OnModemReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen);
+extern void OnCallReport(
+    int32_t slotId, const struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen);
+extern void OnDataReport(
+    int32_t slotId, const struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen);
+extern void OnModemReport(
+    int32_t slotId, const struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen);
 extern void OnNetworkReport(
-    int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen);
-extern void OnSimReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen);
-extern void OnSmsReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen);
-extern int32_t IsLoadedVendorLib(void);
+    int32_t slotId, const struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen);
+extern void OnSimReport(
+    int32_t slotId, const struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen);
+extern void OnSmsReport(
+    int32_t slotId, const struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen);
 #endif // OHOS_RIL_ADAPTER_RIL_INIT_H

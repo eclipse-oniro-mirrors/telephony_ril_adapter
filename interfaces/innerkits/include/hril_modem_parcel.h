@@ -33,6 +33,23 @@ struct UniInfo : public HrilBaseParcel {
     std::shared_ptr<UniInfo> UnMarshalling(Parcel &parcel);
     void Dump(std::string, int32_t);
 };
+
+struct VoiceRadioTechnology : public HrilBaseParcel {
+    HRilSrvStatus srvStatus;
+    HRilSrvDomain srvDomain;
+    HRilRoamStatus roamStatus;
+    HRilSimStatus simStatus;
+    HRilSimLockStatus lockStatus;
+    HRilSysMode sysMode;
+    std::string sysModeName;
+    HRilRadioTech actType;
+    std::string actName;
+    int64_t flag;
+    bool ReadFromParcel(Parcel &parcel);
+    virtual bool Marshalling(Parcel &parcel) const override;
+    std::shared_ptr<VoiceRadioTechnology> UnMarshalling(Parcel &parcel);
+    void Dump(std::string, int32_t);
+};
 } // namespace Telephony
 } // namespace OHOS
 #endif // OHOS_RIL_COMMON_PARCEL_H

@@ -17,18 +17,19 @@
 
 #include <iostream>
 
-#include "hril_request.h"
 #include "telephony_log_wrapper.h"
+
+#include "hril_request.h"
 
 using namespace testing::ext;
 namespace OHOS {
 namespace Telephony {
 const int32_t CI = 1;
 const int32_t REASON = 2;
-const int32_t FILEID = 2;
-const int32_t P1 = 4;
-const int32_t P2 = 5;
-const int32_t P3 = 6;
+const int32_t REQUESTINFO_FILEID = 2;
+const int32_t REQUESTINFO_P1 = 4;
+const int32_t REQUESTINFO_P2 = 5;
+const int32_t REQUESTINFO_P3 = 6;
 
 void RilUnitTest::SetUp() {}
 
@@ -50,8 +51,8 @@ void RilUnitTest::OnInit()
     std::shared_ptr<AppExecFwk::EventRunner> runner = OHOS::AppExecFwk::EventRunner::Create("DemoHandler");
     handler_ = std::make_shared<RilUnitTest::DemoHandler>(runner);
 
-    const int32_t CDMA_SUBSCRIPTION = 1;
-    mRilManager_ = std::make_unique<RilManagerTest>(0, CDMA_SUBSCRIPTION);
+    const int32_t cdmaSubscription = 1;
+    mRilManager_ = std::make_unique<RilManagerTest>(0, cdmaSubscription);
     if (mRilManager_ == nullptr) {
         return;
     }
@@ -99,6 +100,9 @@ void RilUnitTest::AddRequestToMap()
     memberFuncMap_[HREQ_SMS_SEND_SMS_ACK] = &RilUnitTest::SendSmsAckTest;
     memberFuncMap_[HREQ_DATA_ACTIVATE_PDP_CONTEXT] = &RilUnitTest::ActivatePdpContextTest;
     memberFuncMap_[HREQ_DATA_DEACTIVATE_PDP_CONTEXT] = &RilUnitTest::DeactivatePdpContextTest;
+    memberFuncMap_[HREQ_CALL_SET_USSD_CUSD] = &RilUnitTest::SetUssdCusdTest;
+    memberFuncMap_[HREQ_CALL_GET_USSD_CUSD] = &RilUnitTest::GetUssdCusdTest;
+    memberFuncMap_[HREQ_DATA_GET_LINK_BANDWIDTH_INFO] = &RilUnitTest::GetLinkBandwidthInfoTest;
 }
 
 void RilUnitTest::GetCallListTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
@@ -113,11 +117,11 @@ void RilUnitTest::GetSimIOTest(const OHOS::AppExecFwk::InnerEvent::Pointer &resu
     TELEPHONY_LOGI("RilUnitTest::GetSimIOTest -->");
     SimIoRequestInfo requestInfo;
     requestInfo.command = 1;
-    requestInfo.fileId = FILEID;
+    requestInfo.fileId = REQUESTINFO_FILEID;
     requestInfo.path = "ReadIccFile";
-    requestInfo.p1 = P1;
-    requestInfo.p2 = P2;
-    requestInfo.p3 = P3;
+    requestInfo.p1 = REQUESTINFO_P1;
+    requestInfo.p2 = REQUESTINFO_P2;
+    requestInfo.p3 = REQUESTINFO_P3;
     requestInfo.data = "7";
 
     mRilManager_->GetSimIO(requestInfo, result);
@@ -322,6 +326,28 @@ void RilUnitTest::DemoHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointe
     event->GetInnerEventId();
 }
 
+void RilUnitTest::SetUssdCusdTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::SetUssdCusdTest -->");
+    mRilManager_->SetUssdCusd("12345678", result);
+    TELEPHONY_LOGI("RilUnitTest::SetUssdCusdTest --> SetUssdCusdTest finished");
+}
+
+void RilUnitTest::GetUssdCusdTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::GetUssdCusdTest -->");
+    mRilManager_->GetUssdCusd(result);
+    TELEPHONY_LOGI("RilUnitTest::GetUssdCusdTest --> GetUssdCusdTest finished");
+}
+
+void RilUnitTest::GetLinkBandwidthInfoTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::GetLinkBandwidthInfoTest -->");
+    int32_t cid = 1;
+    mRilManager_->GetLinkBandwidthInfo(cid, result);
+    TELEPHONY_LOGI("RilUnitTest::GetLinkBandwidthInfoTest --> GetLinkBandwidthInfoTest finished");
+}
+
 HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetCallListTest_0100, Function | MediumTest | Level3)
 {
     OnInit();
@@ -504,6 +530,30 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetRilCmRadioPowerTest_0100, Function
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_MODEM_SET_RADIO_STATUS);
     event->SetOwner(GetHandler());
     OnProcessTest(HREQ_MODEM_SET_RADIO_STATUS, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetUssdCusdTest_0100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_SET_USSD_CUSD);
+    event->SetOwner(GetHandler());
+    OnProcessTest(HREQ_CALL_SET_USSD_CUSD, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetUssdCusdTest_0100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_GET_USSD_CUSD);
+    event->SetOwner(GetHandler());
+    OnProcessTest(HREQ_CALL_GET_USSD_CUSD, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetLinkBandwidthInfoTest_0100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_DATA_GET_LINK_BANDWIDTH_INFO);
+    event->SetOwner(GetHandler());
+    OnProcessTest(HREQ_DATA_GET_LINK_BANDWIDTH_INFO, event);
 }
 } // namespace Telephony
 } // namespace OHOS

@@ -62,6 +62,43 @@ std::shared_ptr<GsmSmsMessageInfo> GsmSmsMessageInfo::UnMarshalling(Parcel &parc
     return param;
 }
 
+bool SendCdmaSmsMessageInfo::ReadFromParcel(Parcel &parcel)
+{
+    if (!ReadBaseInt32(parcel, serial)) {
+        return false;
+    }
+    if (!ReadBaseString(parcel, smscPdu)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, state)) {
+        return false;
+    };
+    return true;
+}
+
+bool SendCdmaSmsMessageInfo::Marshalling(Parcel &parcel) const
+{
+    if (!WriteBaseInt32(parcel, serial)) {
+        return false;
+    }
+    if (!WriteBaseString(parcel, smscPdu)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, state)) {
+        return false;
+    };
+    return true;
+}
+
+std::shared_ptr<SendCdmaSmsMessageInfo> SendCdmaSmsMessageInfo::UnMarshalling(Parcel &parcel)
+{
+    std::shared_ptr<SendCdmaSmsMessageInfo> param = std::make_shared<SendCdmaSmsMessageInfo>();
+    if (param == nullptr || !param->ReadFromParcel(parcel)) {
+        param = nullptr;
+    }
+    return param;
+}
+
 bool SmsMessageIOInfo::ReadFromParcel(Parcel &parcel)
 {
     if (!ReadBaseInt32(parcel, serial)) {
@@ -523,6 +560,49 @@ bool SmsMessageInfo::Marshalling(Parcel &parcel) const
 std::shared_ptr<SmsMessageInfo> SmsMessageInfo::UnMarshalling(Parcel &parcel)
 {
     std::shared_ptr<SmsMessageInfo> param = std::make_shared<SmsMessageInfo>();
+    if (param == nullptr || !param->ReadFromParcel(parcel)) {
+        param = nullptr;
+    }
+    return param;
+}
+
+bool CdmaSmsInfo::ReadFromParcel(Parcel &parcel)
+{
+    if (!ReadBaseInt32(parcel, indicationType)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, msgRef)) {
+        return false;
+    }
+    if (!ReadBaseString(parcel, pdu)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, errCode)) {
+        return false;
+    }
+    return true;
+}
+
+bool CdmaSmsInfo::Marshalling(Parcel &parcel) const
+{
+    if (!WriteBaseInt32(parcel, indicationType)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, msgRef)) {
+        return false;
+    }
+    if (!WriteBaseString(parcel, pdu)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, errCode)) {
+        return false;
+    }
+    return true;
+}
+
+std::shared_ptr<CdmaSmsInfo> CdmaSmsInfo::UnMarshalling(Parcel &parcel)
+{
+    std::shared_ptr<CdmaSmsInfo> param = std::make_shared<CdmaSmsInfo>();
     if (param == nullptr || !param->ReadFromParcel(parcel)) {
         param = nullptr;
     }

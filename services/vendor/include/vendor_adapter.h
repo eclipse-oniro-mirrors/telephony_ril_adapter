@@ -24,5 +24,4 @@
 HRilRadioState GetRadioState(void);
 // set radio state
 int SetRadioState(HRilRadioState newState, int rst);
-
 #endif // OHOS_VENDOR_ADAPTER_H

@@ -15,9 +15,10 @@
 
 #include "ril_radio_indication_test.h"
 
-#include "hril_notification.h"
 #include "ril_manager_test.h"
 #include "telephony_log_wrapper.h"
+
+#include "hril_notification.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -37,7 +38,7 @@ int32_t RilRadioIndicationTest::OnRemoteRequest(
             RadioStateUpdated(data);
             return 0;
         case HNOTI_CALL_STATE_UPDATED:
-            CallStateUpdated(data);
+            CallStateChgInd(data);
             return 0;
         case HNOTI_NETWORK_CS_REG_STATUS_UPDATED:
             NetworkStateNotify(data);
@@ -70,7 +71,7 @@ void RilRadioIndicationTest::RadioStateUpdated(MessageParcel &data)
         "func :%{public}s indicationType: %{public}d state:%{public}d", __func__, indicationType, radioState);
 }
 
-void RilRadioIndicationTest::CallStateUpdated(MessageParcel &data)
+void RilRadioIndicationTest::CallStateChgInd(MessageParcel &data)
 {
     int32_t indicationType = data.ReadInt32();
     TELEPHONY_LOGI("func :%{public}s indicationType: %{public}d", __func__, indicationType);
@@ -84,6 +85,7 @@ void RilRadioIndicationTest::NetworkStateNotify(MessageParcel &data)
 
 void RilRadioIndicationTest::NewSmsNotify(MessageParcel &data)
 {
+    TELEPHONY_LOGI("NewSmsNotify");
     std::unique_ptr<SmsMessageInfo> smsMessageInfo = std::make_unique<SmsMessageInfo>();
     if (smsMessageInfo == nullptr) {
         return;
@@ -106,6 +108,7 @@ void RilRadioIndicationTest::NewCdmaSmsNotify(MessageParcel &data)
 
 void RilRadioIndicationTest::SmsStatusReportNotify(MessageParcel &data)
 {
+    TELEPHONY_LOGI("SmsStatusReportNotify");
     std::unique_ptr<SmsMessageInfo> smsMessageInfo = std::make_unique<SmsMessageInfo>();
     if (smsMessageInfo == nullptr) {
         return;
@@ -117,6 +120,7 @@ void RilRadioIndicationTest::SmsStatusReportNotify(MessageParcel &data)
 
 void RilRadioIndicationTest::NewSmsStoredOnSimNotify(MessageParcel &data)
 {
+    TELEPHONY_LOGI("RilRadioIndicationTest::NewSmsStoredOnSimNotify --> ");
     data.ReadInt32();
     int32_t indicationType = data.ReadInt32();
     TELEPHONY_LOGI("func :%{public}s indicationType: %{public}d", __func__, indicationType);

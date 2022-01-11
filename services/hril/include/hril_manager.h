@@ -16,25 +16,27 @@
 #ifndef OHOS_HRIL_MANAGER_H
 #define OHOS_HRIL_MANAGER_H
 
+#include <list>
+#include <mutex>
+#include <unordered_map>
+
 #include "hril_call.h"
 #include "hril_data.h"
 #include "hril_modem.h"
 #include "hril_network.h"
 #include "hril_sim.h"
 #include "hril_sms.h"
-#include "hril_request.h"
 
 namespace OHOS {
 namespace Telephony {
 static void *g_lastNITZTimeData = nullptr;
 static size_t g_lastNITZTimeDataSize;
-typedef struct RespCmdInfo RespCmdInfo;
 
 typedef enum WakeMonitorType { DONT_WAKE, WAKE } WakeMonitorType;
 typedef struct {
     int32_t request;
     int32_t (*respFunc)(
-        int32_t slotId, int32_t responseType, HRilErrno e, const uint8_t *response, size_t responseLen);
+        int32_t slotId, int32_t responseType, HRilErrNumber e, const uint8_t *response, size_t responseLen);
     WakeMonitorType wakeType;
 } UnsolResponseInfo;
 
@@ -44,7 +46,6 @@ typedef enum : int32_t {
 } RegisterState;
 
 static int32_t rilRegisterStatus = 0;
-static int32_t vendorLibLoadStatus = 0;
 
 static HRilOps g_callBacks = {
     0,
@@ -60,10 +61,15 @@ static pthread_rwlock_t g_radioServiceRwLock = PTHREAD_RWLOCK_INITIALIZER;
 
 pthread_rwlock_t *GetRadioServiceLock();
 
-class HRilManager {
+class HRilManager : public IHRilReporter, public std::enable_shared_from_this<HRilManager> {
 public:
     HRilManager();
     virtual ~HRilManager();
+
+    virtual int32_t ReportToParent(int32_t requestNum, const HdfSBuf *dataSbuf) override;
+    virtual int32_t NotifyToParent(int32_t requestNum, const HdfSBuf *dataSbuf) override;
+    virtual ReqDataInfo *CreateHRilRequest(int32_t serial, int32_t slotId, int32_t request) override;
+    virtual void ReleaseHRilRequest(int32_t request, ReqDataInfo *requestInfo) override;
 
     void RegisterCallFuncs(const HRilCallReq *callFuncs);
     void RegisterDataFuncs(const HRilDataReq *dataFuncs);
@@ -92,6 +98,11 @@ private:
     std::unique_ptr<HRilSim> hrilSim_;
     std::unique_ptr<HRilSms> hrilSms_;
     std::unique_ptr<HRilData> hrilData_;
+
+    const struct HdfRemoteService *serviceCallback_ = nullptr;
+    const struct HdfRemoteService *serviceCallbackNotify_ = nullptr;
+    std::unordered_map<int32_t, std::list<ReqDataInfo *>> requestList_;
+    std::mutex requestListLock_;
 };
 
 #ifdef __cplusplus

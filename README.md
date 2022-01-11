@@ -8,39 +8,43 @@
 
 ## Introduction<a name="section117mcpsimp"></a>
 
-The RIL Adapter module provides functions such as vendor library loading, service interface implementation, and event scheduling and management. This module shields the differences of modems from different vendors to provide a unified interface for the telephony service layer. It communicates with the telephony service layer by registering a Hardware Driver Foundation \(HDF\) service.
+The RIL Adapter module provides functions such as vendor library loading, service interface implementation, and event scheduling and management. The module shields the differences of modems supplied by different vendors to provide a unified interface for the telephony service layer. It communicates with the telephony service layer by registering a Hardware Driver Foundation \(HDF\) service.
 
 **Figure  1**  Architecture of the RIL Adapter module<a name="fig1675210296494"></a>
 ![](figures/en-us_architecture-of-the-ril-adapter-module.png)
 
 ## Directory Structure<a name="section122mcpsimp"></a>
-```
+
+```shell
 base/telephony/ril_adapter
-├─ hril							   # Implementation of each business module interface of the hril layer
-├─ hril_hdf						   # HDF service
-├─ include                         # Header files
-├─ interfaces					   # Internal APIs for upper-layer services
-│  └─ innerkits
-├─ test                            # Test code
-│  ├─ mock                            
-│  └─ unittest                     # Unit test code
-└─ vendor                          # Vendor library code
-│  └─ include
+├── adapter                             # Vendor lib code
+│   ├── include
+│   └── test                            # Test code of vendor lib
+├── figures                             # Resource file of readme
+├── interfaces                          # Provide internal interfaces for each business
+│   └── innerkits
+├── services                            # Service
+│   ├── hril_hdf                        # HDF service
+│   ├── include                         # Header files
+│   └── src                             # Implementation of each business module interface of the hri layer
+└── test                                # Test code
+    ├── mock
+    └── unittest                        # Unit test code
 ```
 
 ## Constraints<a name="section126mcpsimp"></a>
 
--   Software constraints: The RIL Adapter must work with the telephony core service (core\_service), and an interworking interface needs to be implemented by the modem vendor lib.
--   Hardware constraints: The device must be equipped with a modem capable of independent cellular communication.
+-   In terms of software, the RIL Adapter needs to work with the telephony core service \(core\_service\) and an interworking interface needs to be implemented by the modem vendor lib.
+-   In terms of hardware, the device must be equipped with a modem capable of independent cellular communication.
 
 ## Usage Guidelines<a name="section264mcpsimp"></a>
 
-RIL Adapter does not provide external APIs. It can only be called through the telephony core service.
+The RIL Adapter does not provide external APIs and can only be called by the telephony core service.
 
 ## Repositories Involved<a name="section279mcpsimp"></a>
 
-Telephony subsystem
+[Telephony](https://gitee.com/openharmony/docs/blob/master/en/readme/telephony.md)
 
-telephony_ril_adapter
+**telephony_ril_adapter**
 
-telephony_core_service
+[telephony_core_service](https://gitee.com/openharmony/telephony_core_service/blob/master/README.md)

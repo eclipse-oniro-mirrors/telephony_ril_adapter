@@ -13,15 +13,11 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_AT_MODEM_H
-#define OHOS_AT_MODEM_H
+#ifndef OHOS_VENDOR_CHANNEL_H
+#define OHOS_VENDOR_CHANNEL_H
 
-#include "vendor_adapter.h"
-
-void ReqSetRadioState(const ReqDataInfo *requestInfo, int function, int reset);
-void ReqGetRadioState(const ReqDataInfo *requestInfo);
-void ReqGetImei(const ReqDataInfo *requestInfo);
-void ReqGetMeid(const ReqDataInfo *requestInfo);
-void ReqGetVoiceRadioTechnology(const ReqDataInfo *requestInfo);
-int ProcessVoiceRadioInfo(const char *s, const HRilVoiceRadioInfo *hrilVoiceRadioInfo);
-#endif // OHOS_AT_MODEM_H
+// readLine from modem device
+const char *ReadResponse(int atFd);
+// writeLine to modem device
+int WriteATCommand(const char *s, int isPdu, int atFd);
+#endif // OHOS_CHANNEL_H

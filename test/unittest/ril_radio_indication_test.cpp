@@ -15,9 +15,10 @@
 
 #include "ril_radio_indication_test.h"
 
-#include "hril_notification.h"
 #include "ril_manager_test.h"
 #include "telephony_log_wrapper.h"
+
+#include "hril_notification.h"
 
 using namespace OHOS::Telephony;
 
@@ -44,6 +45,9 @@ int32_t RilRadioIndicationTest::OnRemoteRequest(
             break;
         case HNOTI_SMS_NEW_SMS:
             NewSmsNotify(data);
+            break;
+        case HNOTI_SMS_NEW_CDMA_SMS:
+            NewCdmaSmsNotify(data);
             break;
         case HNOTI_SMS_STATUS_REPORT:
             SmsStatusReportNotify(data);
@@ -73,6 +77,7 @@ void RilRadioIndicationTest::NetworkStateNotify(OHOS::MessageParcel &data)
 
 void RilRadioIndicationTest::NewSmsNotify(OHOS::MessageParcel &data)
 {
+    TELEPHONY_LOGI("NewSmsNotify");
     std::unique_ptr<SmsMessageInfo> smsMessageInfo = std::make_unique<SmsMessageInfo>();
     if (smsMessageInfo == nullptr) {
         return;
@@ -82,8 +87,21 @@ void RilRadioIndicationTest::NewSmsNotify(OHOS::MessageParcel &data)
     TELEPHONY_LOGI("func :%{public}s indicationType: %{public}d", __func__, indicationType);
 }
 
+void RilRadioIndicationTest::NewCdmaSmsNotify(OHOS::MessageParcel &data)
+{
+    TELEPHONY_LOGI("NewCdmaSmsNotify");
+    std::unique_ptr<CdmaSmsInfo> smsMessageInfo = std::make_unique<CdmaSmsInfo>();
+    if (smsMessageInfo == nullptr) {
+        return;
+    }
+    smsMessageInfo.get()->ReadFromParcel(data);
+    int32_t indicationType = data.ReadInt32();
+    TELEPHONY_LOGI("func :%{public}s indicationType: %{public}d", __func__, indicationType);
+}
+
 void RilRadioIndicationTest::SmsStatusReportNotify(OHOS::MessageParcel &data)
 {
+    TELEPHONY_LOGI("SmsStatusReportNotify");
     std::unique_ptr<SmsMessageInfo> smsMessageInfo = std::make_unique<SmsMessageInfo>();
     if (smsMessageInfo == nullptr) {
         return;
@@ -95,6 +113,7 @@ void RilRadioIndicationTest::SmsStatusReportNotify(OHOS::MessageParcel &data)
 
 void RilRadioIndicationTest::NewSmsStoredOnSimNotify(OHOS::MessageParcel &data)
 {
+    TELEPHONY_LOGI("RilRadioIndicationTest::NewSmsStoredOnSimNotify --> ");
     data.ReadInt32();
     int32_t indicationType = data.ReadInt32();
     TELEPHONY_LOGI("func :%{public}s indicationType: %{public}d", __func__, indicationType);
@@ -140,6 +159,7 @@ void RilRadioIndicationTest::ChangedDataCallList(OHOS::MessageParcel &data)
 
 void RilRadioIndicationTest::ChangedSimState(OHOS::MessageParcel &data)
 {
+    TELEPHONY_LOGI("RilRadioIndicationTest::ChangedSimState --> ");
     int32_t indicationType = data.ReadInt32();
     if (mRilManager_ == nullptr) {
         TELEPHONY_LOGE("mRilManager_ is null!");

@@ -20,8 +20,8 @@
 #include <string.h>
 
 #include "at_data.h"
+#include "at_modem.h"
 #include "at_network.h"
-#include "hril.h"
 #include "vendor_util.h"
 
 struct ReportInfo CreateReportInfo(const ReqDataInfo *requestInfo, unsigned int err, unsigned int type, int notifyId);
@@ -32,6 +32,8 @@ void OnDataReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *r
 void OnSimReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen);
 void OnSmsReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen);
 void OnNetworkReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen);
+void OnTimerCallbackHandler(HRilCallbackFun callback, const uint8_t *args, uint64_t triggerTime);
 void OnNotifyOps(const char *s, const char *smsPdu);
 void OnNotifyNetWorksOps(const char *s, const char *infoStr);
+bool OnNotifyStkOps(const char *s, const char *infoStr);
 #endif // OHOS_VENDOR_REPORT_H

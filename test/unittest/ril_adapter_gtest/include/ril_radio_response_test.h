@@ -70,6 +70,7 @@ public:
     void OnRequestSetNetworkSelectionModeTest(MessageParcel &data);
     void OnRequestSetUssdCusdTest(MessageParcel &data);
     void OnRequestGetUssdCusdTest(MessageParcel &data);
+    void OnRequestGetLinkBandwidthInfoTest(MessageParcel &data);
 
 private:
     RilManagerTest *mRilManager_;

@@ -17,6 +17,7 @@
 #define OHOS_VENDOR_UTIL_H
 
 #include <sys/time.h>
+
 #include <securec.h>
 #include <time.h>
 
@@ -61,6 +62,10 @@ void SkipSpace(char **s);
 
 int NextInt(char **s, int *out);
 
+int NextIntNotSkipNextComma(char **s, int *out);
+
+int NextIntByRightBracket(char **s, int *out);
+
 int NextIntFromHex(char **s, int *out);
 
 int NextStr(char **s, char **out);
@@ -76,4 +81,8 @@ uint64_t NextULongFromHex(char **s, uint64_t *out);
 ModemReportErrorInfo GetReportErrorInfo(const ResponseInfo *response);
 
 ModemReportErrorInfo InitModemReportErrorInfo(void);
+
+int ConvertCharToInt(const char *s);
+
+int FindCommaCharNum(const char *srcStr);
 #endif // OHOS_VENDOR_UTIL_H

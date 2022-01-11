@@ -23,13 +23,13 @@ namespace OHOS {
 namespace Telephony {
 class HRilNetwork : public HRilBase {
 public:
-    HRilNetwork();
-    ~HRilNetwork() = default;
+    HRilNetwork(IHRilReporter &hrilReporter);
+    virtual ~HRilNetwork() = default;
 
     void ProcessNetworkResponse(
         int32_t slotId, int32_t code, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     void ProcessNetworkRequest(int32_t slotId, int32_t code, struct HdfSBuf *data);
-    void ProcessNetworkNotify(int32_t slotId, int32_t notifyType, const struct ReportInfo *reportInfo,
+    void ProcessNetworkNotify(int32_t slotId, const struct ReportInfo *reportInfo,
         const void *response, size_t responseLen);
 
     void GetImsRegStatus(int32_t slotId, struct HdfSBuf *data);
@@ -54,9 +54,12 @@ public:
 
     void SetPreferredNetwork(int32_t slotId, struct HdfSBuf *data);
     void GetPreferredNetwork(int32_t slotId, struct HdfSBuf *data);
-    void GetImei(int32_t slotId, struct HdfSBuf *data);
     void SetPsAttachStatus(int32_t slotId, struct HdfSBuf *data);
     void GetPsAttachStatus(int32_t slotId, struct HdfSBuf *data);
+    void GetRadioCapability(int32_t slotId, struct HdfSBuf *data);
+    void SetRadioCapability(int32_t slotId, struct HdfSBuf *data);
+    void GetPhysicalChannelConfig(int32_t slotId, struct HdfSBuf *data);
+    void SetLocateUpdates(int32_t slotId, struct HdfSBuf *data);
 
     int32_t GetImsRegStatusResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
         const void *response, size_t responseLen);
@@ -78,47 +81,60 @@ public:
         const void *response, size_t responseLen);
     int32_t GetPreferredNetworkResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
         const void *response, size_t responseLen);
-    int32_t GetImeiResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
-        const void *response, size_t responseLen);
     int32_t SetPsAttachStatusResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
         const void *response, size_t responseLen);
     int32_t GetPsAttachStatusResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
+        const void *response, size_t responseLen);
+    int32_t GetRadioCapabilityResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
+        const void *response, size_t responseLen);
+    int32_t SetRadioCapabilityResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
         const void *response, size_t responseLen);
     int32_t GetNeighboringCellInfoListResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
         const void *response, size_t responseLen);
     int32_t GetCurrentCellInfoResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
         const void *response, size_t responseLen);
-    int32_t NetworkRegStatusUpdated(
-        int32_t slotId, int32_t indType, HRilErrno e, const void *response, size_t responseLen);
+    int32_t GetPhysicalChannelConfigResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
+        const void *response, size_t responseLen);
+    int32_t SetLocateUpdatesResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
+        const void *response, size_t responseLen);
+    int32_t NetworkCsRegStatusUpdated(
+        int32_t slotId, int32_t indType, HRilErrNumber e, const void *response, size_t responseLen);
+    int32_t NetworkPsRegStatusUpdated(
+        int32_t slotId, int32_t indType, HRilErrNumber e, const void *response, size_t responseLen);
     int32_t SignalStrengthUpdated(
-        int32_t slotId, int32_t indType, HRilErrno e, const void *response, size_t responseLen);
+        int32_t slotId, int32_t indType, HRilErrNumber e, const void *response, size_t responseLen);
     void BuildOperatorList(AvailableNetworkList &availableNetworkList, HRilRadioResponseInfo &responseInfo,
         const void *response, size_t responseLen);
     int32_t NetworkTimeUpdated(
-        int32_t slotId, int32_t indType, HRilErrno e, const void *response, size_t responseLen);
+        int32_t slotId, int32_t indType, HRilErrNumber e, const void *response, size_t responseLen);
     int32_t NetworkTimeZoneUpdated(
-        int32_t slotId, int32_t indType, HRilErrno e, const void *response, size_t responseLen);
+        int32_t slotId, int32_t indType, HRilErrNumber e, const void *response, size_t responseLen);
     int32_t NetworkImsRegStatusUpdated(
-        int32_t slotId, int32_t indType, HRilErrno e, const void *response, size_t responseLen);
-    bool IsNetworkResponse(uint32_t code);
-    bool IsNetworkNotification(uint32_t code);
-    bool IsNetworkRespOrNotify(uint32_t code);
+        int32_t slotId, int32_t indType, HRilErrNumber e, const void *response, size_t responseLen);
+    int32_t NetworkPhyChnlCfgUpdated(
+        int32_t slotId, int32_t indType, const HRilErrNumber e, const void *response, size_t responseLen);
     void RegisterNetworkFuncs(const HRilNetworkReq *networkFuncs);
-    void ExchangeRilRssiToHdf(const void *response, size_t responseLen, Rssi &rssi);
+    bool IsNetworkRespOrNotify(uint32_t code);
 
 private:
     void AddHandlerToMap();
+    void ExchangeRilRssiToHdf(const void *response, size_t responseLen, Rssi &rssi);
     void BuildCellInfo(
         CurrentCellInfo &cellInfo, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     void BuildCellList(CellListNearbyInfo &cellInfoList, HRilRadioResponseInfo &responseInfo, const void *response,
         size_t responseLen);
     void FillCellInfo(CurrentCellInfo &cellInfo, const CurrentCellInfoVendor *cellInfoVendor);
+    void FillCellInfoType(CurrentCellInfo &cellInfo, const CurrentCellInfoVendor *hrilCellInfoVendor);
     void FillCellNearbyInfo(CellNearbyInfo &cellInfo, const CellInfo *cellPtr);
+    void FillCellNearbyInfoTdscdma(CellNearbyInfo &cellInfo, const CellInfo *hrilCellPtr);
+    void FillCellNearbyInfoCdma(CellNearbyInfo &cellInfo, const CellInfo *hrilCellPtr);
     using RespFunc = int32_t (HRilNetwork::*)(int32_t slotId, int32_t requestNum,
         HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     using NotiFunc = int32_t (HRilNetwork::*)(
-        int32_t slotId, int32_t notifyType, HRilErrno e, const void *response, size_t responseLen);
+        int32_t slotId, int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
     using ReqFunc = void (HRilNetwork::*)(int32_t slotId, struct HdfSBuf *data);
+    bool IsNetworkResponse(uint32_t code);
+    bool IsNetworkNotification(uint32_t code);
 
     std::map<uint32_t, NotiFunc> notiMemberFuncMap_;
     std::map<uint32_t, RespFunc> respMemberFuncMap_;

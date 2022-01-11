@@ -23,21 +23,32 @@ namespace OHOS {
 namespace Telephony {
 class HRilModem : public HRilBase {
 public:
-    HRilModem();
-
-    ~HRilModem() = default;
+    HRilModem(IHRilReporter &hrilReporter);
+    virtual ~HRilModem() = default;
 
     void SetRadioState(int32_t slotId, struct HdfSBuf *data);
+    void GetRadioState(int32_t slotId, struct HdfSBuf *data);
+    void GetImei(int32_t slotId, struct HdfSBuf *data);
+    void GetMeid(int32_t slotId, struct HdfSBuf *data);
+    void GetVoiceRadioTechnology(int32_t slotId, struct HdfSBuf *data);
     int32_t SetRadioStateResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
         const void *response, size_t responseLen);
-    void GetRadioState(int32_t slotId, struct HdfSBuf *data);
     int32_t GetRadioStateResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
         const void *response, size_t responseLen);
-    int32_t RadioStateUpdated(int32_t slotId, int32_t indType, HRilErrno e, const void *response, size_t responseLen);
+    int32_t GetImeiResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
+        const void *response, size_t responseLen);
+    int32_t GetMeidResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
+        const void *response, size_t responseLen);
+    int32_t GetVoiceRadioTechnologyResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
+        const void *response, size_t responseLen);
+    int32_t RadioStateUpdated(
+        int32_t slotId, int32_t indType, HRilErrNumber e, const void *response, size_t responseLen);
+    int32_t VoiceRadioTechUpdated(
+        int32_t slotId, int32_t indType, HRilErrNumber e, const void *response, size_t responseLen);
     void AddHandlerToMap();
     void ProcessModemResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
         const void *response, size_t responseLen);
-    void ProcessModemNotify(int32_t slotId, int32_t notifyType, const struct ReportInfo *reportInfo,
+    void ProcessModemNotify(int32_t slotId, const struct ReportInfo *reportInfo,
         const void *response, size_t responseLen);
     void ProcessCommonRequest(int32_t slotId, int32_t code, struct HdfSBuf *data);
     bool IsModemRespOrNotify(uint32_t code);
@@ -49,7 +60,7 @@ private:
     using RespFunc = int32_t (HRilModem::*)(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
         const void *response, size_t responseLen);
     using NotiFunc = int32_t (HRilModem::*)(
-        int32_t slotId, int32_t notifyType, HRilErrno e, const void *response, size_t responseLen);
+        int32_t slotId, int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
     using ReqFunc = void (HRilModem::*)(int32_t slotId, struct HdfSBuf *data);
     std::map<uint32_t, ReqFunc> reqMemberFuncMap_;
     std::map<uint32_t, NotiFunc> notiMemberFuncMap_;

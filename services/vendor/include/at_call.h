@@ -16,7 +16,11 @@
 #ifndef OHOS_AT_CALL_H
 #define OHOS_AT_CALL_H
 
-#include "hril.h"
+#include <stdlib.h>
+
+#include "securec.h"
+
+#include "hril_vendor_call_defs.h"
 
 typedef enum {
     GET_CALL_WAITING,
@@ -63,6 +67,12 @@ void ReqGetCallPreferenceMode(const ReqDataInfo *requestInfo);
 void ReqSetCallPreferenceMode(const ReqDataInfo *requestInfo, int mode);
 void ReqGetLteImsSwitchStatus(const ReqDataInfo *requestInfo);
 void ReqSetLteImsSwitchStatus(const ReqDataInfo *requestInfo, int active);
+void ReqSetUssdCusd(const ReqDataInfo *requestInfo, const char *str);
+void ReqGetUssdCusd(const ReqDataInfo *requestInfo);
+void ReqGetMute(const ReqDataInfo *requestInfo);
+void ReqSetMute(const ReqDataInfo *requestInfo, int mute);
+void ReqGetEmergencyCallList(const ReqDataInfo *requestInfo);
+void ReqGetCallFailReason(const ReqDataInfo *requestInfo);
 
 void ReportImsServiceStatusInfo(const char *str);
 void ReportCallStatusInfo(const char *str);
@@ -71,6 +81,10 @@ void ReportCallConnectInfo(const char *str);
 void ReportCallCringInfo(const char *str);
 void ReportCallWaitingInfo(const char *str);
 void ReportCallStatusUpdate(const char *str);
+void ReportSrvccStatusUpdate(const char *str);
+void ReportCsChannelInfo(const char *str);
 void CallReportInfoProcess(const char *str);
 int IsCallNoticeCmd(const char *str);
+void ReportCallUssdCusdNotice(const char *str);
+void ReportEmergencyNumberList(const char *str);
 #endif // OHOS_AT_CALL_H

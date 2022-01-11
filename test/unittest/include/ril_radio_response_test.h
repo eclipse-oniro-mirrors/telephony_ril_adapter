@@ -17,9 +17,7 @@
 #define OHOS_RIL_RADIO_RESPONSE_test_H
 
 #include <ipc_object_stub.h>
-
 #include "ril_manager_test.h"
-
 namespace OHOS {
 namespace Telephony {
 struct Tmp1 {
@@ -68,6 +66,9 @@ public:
     void OnRequestGetNetworkSelectionModeTest(OHOS::MessageParcel &data);
     void OnRequestGetNetworkSearchInformationTest(OHOS::MessageParcel &data);
     void OnRequestSetNetworkSelectionModeTest(OHOS::MessageParcel &data);
+    void OnRequestSetUssdCusdTest(OHOS::MessageParcel &data);
+    void OnRequestGetUssdCusdTest(OHOS::MessageParcel &data);
+    void OnRequestGetLinkBandwidthInfoTest(OHOS::MessageParcel &data);
 
 private:
     RilManagerTest *mRilManager_;

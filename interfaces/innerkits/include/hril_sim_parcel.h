@@ -51,6 +51,7 @@ struct SimIoRequestInfo : public HrilBaseParcel {
                        * "select by path from MF" as defined in  ETSI TS 102 221 [60] */
     int32_t serial;
     std::string pin2;
+    std::string aid;
     bool ReadFromParcel(Parcel &parcel);
     virtual bool Marshalling(Parcel &parcel) const override;
     std::shared_ptr<SimIoRequestInfo> UnMarshalling(Parcel &parcel);
@@ -134,6 +135,51 @@ struct SimPinInputTimes : public HrilBaseParcel {
     bool ReadFromParcel(Parcel &parcel);
     virtual bool Marshalling(Parcel &parcel) const override;
     std::shared_ptr<SimPinInputTimes> UnMarshalling(Parcel &parcel);
+    void Dump(std::string, int32_t);
+};
+
+struct SimProtocolRequest : public HrilBaseParcel {
+    int32_t serial;
+    int32_t phase;
+    int32_t protocol;
+    int32_t slotId;
+    bool ReadFromParcel(Parcel &parcel);
+    virtual bool Marshalling(Parcel &parcel) const override;
+    std::shared_ptr<SimProtocolRequest> UnMarshalling(Parcel &parcel);
+    void Dump(std::string, int32_t);
+};
+
+struct SimProtocolResponse : public HrilBaseParcel {
+    int32_t phase;
+    int32_t result;
+    int32_t slotId;
+    bool ReadFromParcel(Parcel &parcel);
+    virtual bool Marshalling(Parcel &parcel) const override;
+    std::shared_ptr<SimProtocolResponse> UnMarshalling(Parcel &parcel);
+    void Dump(std::string, int32_t);
+};
+
+struct ApduSimIORequestInfo : public HrilBaseParcel {
+    int32_t serial;
+    int32_t chanId;
+    int32_t type;
+    int32_t instruction;
+    int32_t p1;
+    int32_t p2;
+    int32_t p3;
+    std::string data;
+    bool ReadFromParcel(Parcel &parcel);
+    virtual bool Marshalling(Parcel &parcel) const override;
+    std::shared_ptr<ApduSimIORequestInfo> UnMarshalling(Parcel &parcel);
+    void Dump(std::string, int32_t);
+};
+
+struct LockStatusResp : public HrilBaseParcel {
+    int32_t result;
+    int32_t remain;
+    bool ReadFromParcel(Parcel &parcel);
+    virtual bool Marshalling(Parcel &parcel) const override;
+    std::shared_ptr<LockStatusResp> UnMarshalling(Parcel &parcel);
     void Dump(std::string, int32_t);
 };
 } // namespace Telephony

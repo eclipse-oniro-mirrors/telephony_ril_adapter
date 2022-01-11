@@ -27,8 +27,9 @@
 #include "at_sim.h"
 #include "at_sms.h"
 #include "at_support.h"
-#include "hril_notification.h"
 #include "vendor_report.h"
+
+#include "hril_notification.h"
 
 #define DEVICE_PATH "/dev/ttyUSB0"
 #define DEVICE_PATH_DEFAULT "/dev/ttyUSB"
@@ -73,6 +74,12 @@ static const HRilCallReq g_callReqOps = {
     .SetCallPreferenceMode = ReqSetCallPreferenceMode,
     .GetLteImsSwitchStatus = ReqGetLteImsSwitchStatus,
     .SetLteImsSwitchStatus = ReqSetLteImsSwitchStatus,
+    .SetUssdCusd = ReqSetUssdCusd,
+    .GetUssdCusd = ReqGetUssdCusd,
+    .GetMute = ReqGetMute,
+    .SetMute = ReqSetMute,
+    .GetEmergencyCallList = ReqGetEmergencyCallList,
+    .GetCallFailReason = ReqGetCallFailReason,
 };
 
 static const HRilSimReq g_simReqOps = {
@@ -89,6 +96,15 @@ static const HRilSimReq g_simReqOps = {
     .UnlockPuk2 = ReqUnlockPuk2,
     .GetSimPin2InputTimes = ReqGetSimPin2InputTimes,
     .SetActiveSim = ReqSetActiveSim,
+    .SendTerminalResponseCmd = ReqSendTerminalResponseCmd,
+    .SendEnvelopeCmd = ReqSendEnvelopeCmd,
+    .StkControllerIsReady = ReqStkControllerIsReady,
+    .StkCmdCallSetup = ReqStkCmdCallSetup,
+    .SetRadioProtocol = ReqSetRadioProtocol,
+    .OpenLogicalSimIO = ReqOpenLogicalSimIO,
+    .CloseLogicalSimIO = ReqCloseLogicalSimIO,
+    .TransmitApduSimIO = ReqTransmitApduSimIO,
+    .UnlockSimLock = ReqUnlockSimLock,
 };
 
 static const HRilSmsReq g_smsReqOps = {
@@ -105,6 +121,9 @@ static const HRilSmsReq g_smsReqOps = {
     .GetCBConfig = ReqGetCBConfig,
     .GetCdmaCBConfig = ReqGetCdmaCBConfig,
     .SetCdmaCBConfig = ReqSetCdmaCBConfig,
+    .AddCdmaSimMessage = ReqAddCdmaSimMessage,
+    .DelCdmaSimMessage = ReqDelCdmaSimMessage,
+    .UpdateCdmaSimMessage = ReqUpdateCdmaSimMessage,
 };
 
 static const HRilNetworkReq g_networkReqOps = {
@@ -113,7 +132,6 @@ static const HRilNetworkReq g_networkReqOps = {
     .GetCsRegStatus = ReqGetCsRegStatus,
     .GetPsRegStatus = ReqGetPsRegStatus,
     .GetOperatorInfo = ReqGetOperatorInfo,
-    .GetImei = ReqGetImei,
     .SetPsAttachStatus = ReqSetPsAttachStatus,
     .GetPsAttachStatus = ReqGetPsAttachStatus,
     .GetNetworkSearchInformation = ReqGetNetworkSearchInformation,
@@ -123,17 +141,27 @@ static const HRilNetworkReq g_networkReqOps = {
     .GetPreferredNetwork = ReqGetPreferredNetwork,
     .GetCellInfoList = ReqGetCellInfoList,
     .GetCurrentCellInfo = ReqGetCurrentCellInfo,
+    .GetRadioCapability = ReqGetRadioCapability,
+    .SetRadioCapability = ReqSetRadioCapability,
+    .GetPhysicalChannelConfig = ReqGetPhysicalChannelConfig,
+    .SetLocateUpdates = ReqSetLocateUpdates,
 };
 
 static const HRilDataReq g_dataReqOps = {
+    .SetInitApnInfo = ReqSetInitApnInfo,
     .ActivatePdpContext = ReqActivatePdpContext,
     .DeactivatePdpContext = ReqDeactivatePdpContext,
     .GetPdpContextList = ReqGetPdpContextList,
+    .GetLinkBandwidthInfo = ReqGetLinkBandwidthInfo,
+    .SetLinkBandwidthReportingRule = ReqSetLinkBandwidthReportingRule,
 };
 
 static const HRilModemReq g_modemReqOps = {
     .SetRadioState = ReqSetRadioState,
     .GetRadioState = ReqGetRadioState,
+    .GetImei = ReqGetImei,
+    .GetMeid = ReqGetMeid,
+    .GetVoiceRadioTechnology = ReqGetVoiceRadioTechnology,
 };
 
 HRilOps g_hrilOps = {
@@ -189,7 +217,7 @@ int SetRadioState(HRilRadioState newState, int rst)
     reportInfo.notifyId = HNOTI_MODEM_RADIO_STATE_UPDATED;
     reportInfo.type = HRIL_NOTIFICATION;
     reportInfo.error = HRIL_ERR_SUCCESS;
-    OnModemReport(HRIL_SIM_SLOT_1, reportInfo, (const uint8_t *)&g_radioState, sizeof(HRilRadioState));
+    OnModemReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&g_radioState, sizeof(HRilRadioState));
     return 0;
 }
 
@@ -274,13 +302,16 @@ static int ModemInit(void)
     SendCommandLock("AT^TIME=1", NULL, 0, NULL);
     /* Set to open network time zone reporting */
     SendCommandLock("AT+CTZR=1", NULL, 0, NULL);
+    /* Enabled SRVCC status to report actively: This command complies with the 3GPP TS 27.007 protocol. */
+    SendCommandLock("AT+CIREP=1", NULL, 0, NULL);
 
     sleep(SLEEP_TIME);
+    TELEPHONY_LOGI("enter to : ModemInit OnModemReport %{public}d", g_radioState);
     struct ReportInfo reportInfo = {0};
     reportInfo.notifyId = HNOTI_MODEM_RADIO_STATE_UPDATED;
     reportInfo.type = HRIL_NOTIFICATION;
     reportInfo.error = HRIL_ERR_SUCCESS;
-    OnModemReport(HRIL_SIM_SLOT_1, reportInfo, (const uint8_t *)&g_radioState, sizeof(HRilRadioState));
+    OnModemReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&g_radioState, sizeof(HRilRadioState));
     return err;
 }
 
@@ -338,5 +369,6 @@ const HRilOps *RilInitOps(const struct HRilReport *reportOps)
     if (g_hrilOps.smsOps == NULL) {
         TELEPHONY_LOGE("g_hrilOps.smsOps is null");
     }
+    TELEPHONY_LOGI("g_hrilOps.smsOps:%{public}p", g_hrilOps.smsOps);
     return &g_hrilOps;
 }

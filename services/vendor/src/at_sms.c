@@ -17,17 +17,15 @@
 
 #include "vendor_report.h"
 
-static int32_t g_responseSuccess = 1;
-static int32_t g_responseFail = -2;
 static int32_t g_cmdLength = 2;
 
 int32_t ProcessCellBroadcast(char *pBuff, HRilCBConfigReportInfo *response)
 {
-    int32_t ret;
     char *tmp = NULL;
+    int32_t ret;
     int32_t count = 0;
+
     if (pBuff == NULL || response == NULL) {
-        TELEPHONY_LOGE("pBuff or response is null");
         return -1;
     }
     tmp = pBuff;
@@ -68,7 +66,7 @@ int32_t ProcessCellBroadcast(char *pBuff, HRilCBConfigReportInfo *response)
     return count;
 }
 
-static void HandlerGsmSmsResult(HRilSmsResponse *response, struct ReportInfo *reportInfo,
+static void HandlerSmsResult(HRilSmsResponse *response, struct ReportInfo *reportInfo,
     const ReqDataInfo *requestInfo, int32_t *err, ResponseInfo *responseInfo)
 {
     char *pLine = NULL;
@@ -82,14 +80,14 @@ static void HandlerGsmSmsResult(HRilSmsResponse *response, struct ReportInfo *re
         *err = HRIL_ERR_INVALID_RESPONSE;
     }
     *reportInfo = CreateReportInfo(requestInfo, *err, HRIL_RESPONSE, 0);
-    OnSmsReport(HRIL_SIM_SLOT_1, *reportInfo, NULL, 0);
+    OnSmsReport(HRIL_SIM_SLOT_0, *reportInfo, NULL, 0);
     FreeResponseInfo(responseInfo);
 }
 
 static void HandleResult(int32_t *err, char *result, const ResponseInfo *responseInfo, HRilSmsResponse *response)
 {
-    if (responseInfo == NULL || response == NULL) {
-        TELEPHONY_LOGE("responseInfo or response is NULL");
+    if (response == NULL) {
+        TELEPHONY_LOGE("response is NULL");
         return;
     }
     if (responseInfo->head != NULL) {
@@ -100,28 +98,29 @@ static void HandleResult(int32_t *err, char *result, const ResponseInfo *respons
             TELEPHONY_LOGE("NextInt in ReqSendGsmSms is failed!");
         }
     } else {
-        response->msgRef = g_responseSuccess;
+        response->msgRef = 1;
     }
 }
 
 void ReqSendGsmSms(const ReqDataInfo *requestInfo, const char *const *data, size_t dataLen)
 {
-    int32_t err;
     char *smsc = NULL;
     char smscTemp[MAX_CMD_LENGTH] = {0};
     const char *pdu = NULL;
     char cmd[MAX_CMD_LENGTH] = {0};
     char smsPdu[MAX_CMD_LENGTH] = {0};
     char *result = NULL;
+    int32_t err;
     struct ReportInfo reportInfo = {0};
     ResponseInfo *responseInfo = NULL;
     HRilSmsResponse response = {0};
     smsc = ((char **)data)[0];
+
     if (smsc == NULL) {
         err = GenerateCommand(smscTemp, MAX_CMD_LENGTH, "%s", "00");
         if (err < 0) {
             TELEPHONY_LOGE("GenerateCommand failed, err = %{public}d\n", err);
-            HandlerGsmSmsResult(&response, &reportInfo, requestInfo, &err, responseInfo);
+            HandlerSmsResult(&response, &reportInfo, requestInfo, &err, responseInfo);
         }
         smsc = smscTemp;
     }
@@ -129,24 +128,23 @@ void ReqSendGsmSms(const ReqDataInfo *requestInfo, const char *const *data, size
     err = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CMGS=%d", strlen(pdu) / g_cmdLength);
     if (err < 0) {
         TELEPHONY_LOGE("GenerateCommand failed, err = %{public}d\n", err);
-        HandlerGsmSmsResult(&response, &reportInfo, requestInfo, &err, responseInfo);
+        HandlerSmsResult(&response, &reportInfo, requestInfo, &err, responseInfo);
         return;
     }
     err = GenerateCommand(smsPdu, MAX_CMD_LENGTH, "%s%s", smsc, pdu);
     if (err < 0) {
         TELEPHONY_LOGE("GenerateCommand failed, err = %{public}d\n", err);
-        HandlerGsmSmsResult(&response, &reportInfo, requestInfo, &err, responseInfo);
+        HandlerSmsResult(&response, &reportInfo, requestInfo, &err, responseInfo);
         return;
     }
     err = SendCommandSmsLock(cmd, smsPdu, "+CMGS:", 0, &responseInfo);
     if (err != 0 || (responseInfo != NULL && !responseInfo->success)) {
-        TELEPHONY_LOGE("responseInfo fail!");
-        HandlerGsmSmsResult(&response, &reportInfo, requestInfo, &err, responseInfo);
+        HandlerSmsResult(&response, &reportInfo, requestInfo, &err, responseInfo);
         return;
     }
     HandleResult(&err, result, responseInfo, &response);
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-    OnSmsReport(HRIL_SIM_SLOT_1, reportInfo, (const uint8_t *)&response, sizeof(HRilSmsResponse));
+    OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&response, sizeof(HRilSmsResponse));
     FreeResponseInfo(responseInfo);
 }
 
@@ -154,8 +152,13 @@ void ReqSendSmsAck(const ReqDataInfo *requestInfo, const int32_t *data, size_t d
 {
     int32_t ackFlag;
     int32_t err;
-    ackFlag = ((int32_t *)data)[0];
     struct ReportInfo reportInfo = {0};
+    if (data == NULL) {
+        reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_RESPONSE, HRIL_RESPONSE, 0);
+        OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+        return;
+    }
+    ackFlag = ((int32_t *)data)[0];
     if (ackFlag == 1) {
         err = SendCommandLock("AT+CNMA=1", NULL, 0, NULL);
     } else if (ackFlag == 0) {
@@ -165,28 +168,40 @@ void ReqSendSmsAck(const ReqDataInfo *requestInfo, const int32_t *data, size_t d
         err = HRIL_ERR_GENERIC_FAILURE;
     }
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-    OnSmsReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+    OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
 }
 
-void ReqSendCdmaSms(const ReqDataInfo *requestInfo, const HRilCdmaSmsMessageInfo *data, size_t dataLen)
+void ReqSendCdmaSms(const ReqDataInfo *requestInfo, const char *data, size_t dataLen)
 {
-    int32_t err;
     char *result = NULL;
-    struct ReportInfo reportInfo = {0};
+    char *msg = NULL;
+    int32_t err;
     ResponseInfo *responseInfo = NULL;
+    struct ReportInfo reportInfo = {0};
     HRilSmsResponse response = {0};
+
     if (data == NULL) {
-        TELEPHONY_LOGE("data is  null!");
-        err = HRIL_ERR_GENERIC_FAILURE;
+        reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
+        OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+        FreeResponseInfo(responseInfo);
+        return;
     }
+    msg = (char *)data;
     responseInfo = (ResponseInfo *)calloc(1, sizeof(ResponseInfo));
     if (responseInfo == NULL) {
         err = HRIL_ERR_GENERIC_FAILURE;
     }
+    err = SendCommandLock("AT+COPS?", "COPS?", 0, &responseInfo);
     if (err != 0 || (responseInfo != NULL && !responseInfo->success)) {
-        response.msgRef = g_responseFail;
+        TELEPHONY_LOGE("AT+COPS? send failed");
+        HandlerSmsResult(&response, &reportInfo, requestInfo, &err, responseInfo);
+        return;
+    }
+    err = SendCommandLock("AT$QCMGF=0", "$QCMGF=0", 0, &responseInfo);
+    if (err != 0 || (responseInfo == NULL && !responseInfo->success)) {
+        response.msgRef = HRIL_ERR_GENERIC_FAILURE;
         reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-        OnSmsReport(HRIL_SIM_SLOT_1, reportInfo, (const uint8_t *)&response, sizeof(HRilSmsResponse));
+        OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
         FreeResponseInfo(responseInfo);
         return;
     }
@@ -195,10 +210,10 @@ void ReqSendCdmaSms(const ReqDataInfo *requestInfo, const HRilCdmaSmsMessageInfo
         SkipATPrefix(&result);
         NextInt(&result, &response.msgRef);
     } else {
-        response.msgRef = g_responseSuccess;
+        response.msgRef = 1;
     }
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-    OnSmsReport(HRIL_SIM_SLOT_1, reportInfo, (const uint8_t *)&response, sizeof(HRilSmsResponse));
+    OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&response, sizeof(HRilSmsResponse));
     FreeResponseInfo(responseInfo);
 }
 
@@ -206,32 +221,38 @@ void ReqSendCdmaSmsAck(const ReqDataInfo *requestInfo, const char *data, size_t 
 {
     int32_t err = HRIL_ERR_SUCCESS;
     struct ReportInfo reportInfo = {0};
+    TELEPHONY_LOGE("data=%{public}p dataLen=%{public}zu", data, dataLen);
     if (err > 0) {
-        TELEPHONY_LOGE("vendor config is fail!");
         reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-        OnSmsReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+        OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
         return;
     }
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-    OnSmsReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+    OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
 }
 
 static void SimMessageError(
     struct ReportInfo *reportInfo, const ReqDataInfo *requestInfo, int32_t *err, ResponseInfo *responseInfo)
 {
     *reportInfo = CreateReportInfo(requestInfo, *err, HRIL_RESPONSE, 0);
-    OnSmsReport(HRIL_SIM_SLOT_1, *reportInfo, NULL, 0);
+    OnSmsReport(HRIL_SIM_SLOT_0, *reportInfo, NULL, 0);
     FreeResponseInfo(responseInfo);
 }
 
 static void WriteSimMessage(const ReqDataInfo *requestInfo, const HRilSmsWriteSms *data, size_t dataLen)
 {
-    int32_t err;
-    HRilSmsWriteSms *msg = NULL;
     char cmd[MAX_CMD_LENGTH] = {0};
     char smsPdu[MAX_CMD_LENGTH] = {0};
-    struct ReportInfo reportInfo = {0};
+    int32_t err;
+    HRilSmsWriteSms *msg = NULL;
     ResponseInfo *responseInfo = NULL;
+    struct ReportInfo reportInfo = {0};
+    if (data == NULL) {
+        reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
+        OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+        FreeResponseInfo(responseInfo);
+        return;
+    }
     msg = ((HRilSmsWriteSms *)data);
     if (msg->smsc == NULL || (strcmp(msg->smsc, "") == 0)) {
         strcpy_s(msg->smsc, strlen("00"), "00");
@@ -251,24 +272,29 @@ static void WriteSimMessage(const ReqDataInfo *requestInfo, const HRilSmsWriteSm
     err = SendCommandSmsLock(cmd, smsPdu, "+CMGW:", 0, &responseInfo);
     memset_s(cmd, MAX_CMD_LENGTH, 0, MAX_CMD_LENGTH);
     if (err != 0 || (responseInfo != NULL && !responseInfo->success)) {
-        TELEPHONY_LOGE("responseInfo fail!");
         err = HRIL_ERR_GENERIC_FAILURE;
         SimMessageError(&reportInfo, requestInfo, &err, responseInfo);
         return;
     }
     reportInfo = CreateReportInfo(requestInfo, VENDOR_SUCCESS, HRIL_RESPONSE, 0);
-    OnSmsReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+    OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
     FreeResponseInfo(responseInfo);
 }
 
 static void UpdateSimMessage(const ReqDataInfo *requestInfo, const HRilSmsWriteSms *data, size_t dataLen)
 {
-    int32_t err;
-    HRilSmsWriteSms *msg = NULL;
     char cmd[MAX_CMD_LENGTH] = {0};
     char smsPdu[MAX_CMD_LENGTH] = {0};
-    struct ReportInfo reportInfo = {0};
+    int32_t err;
+    HRilSmsWriteSms *msg = NULL;
     ResponseInfo *responseInfo = NULL;
+    struct ReportInfo reportInfo = {0};
+    if (data == NULL) {
+        reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
+        OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+        FreeResponseInfo(responseInfo);
+        return;
+    }
     msg = ((HRilSmsWriteSms *)data);
     err = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CMGW=%zu,%d", strlen(msg->pdu) / g_cmdLength, msg->state);
     if (err < 0) {
@@ -301,21 +327,19 @@ static void UpdateSimMessage(const ReqDataInfo *requestInfo, const HRilSmsWriteS
         return;
     }
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-    OnSmsReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+    OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
     FreeResponseInfo(responseInfo);
 }
 
 void ReqWriteSimMessage(const ReqDataInfo *requestInfo, const HRilSmsWriteSms *data, size_t dataLen)
 {
-    int32_t err;
     HRilSmsWriteSms *msg = NULL;
-    struct ReportInfo reportInfo = {0};
     ResponseInfo *responseInfo = NULL;
+    struct ReportInfo reportInfo = {0};
+
     if (data == NULL) {
-        TELEPHONY_LOGE("data is  null!");
-        err = HRIL_ERR_GENERIC_FAILURE;
-        reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-        OnSmsReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+        reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
+        OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
         FreeResponseInfo(responseInfo);
         return;
     }
@@ -329,16 +353,15 @@ void ReqWriteSimMessage(const ReqDataInfo *requestInfo, const HRilSmsWriteSms *d
 
 void ReqDelSimMessage(const ReqDataInfo *requestInfo, const int32_t *data, size_t dataLen)
 {
+    char cmd[MAX_CMD_LENGTH] = {0};
     int32_t err;
     int32_t index;
-    char cmd[MAX_CMD_LENGTH] = {0};
-    struct ReportInfo reportInfo = {0};
     ResponseInfo *responseInfo = NULL;
+    struct ReportInfo reportInfo = {0};
+
     if (data == NULL) {
-        TELEPHONY_LOGE("data is  null!");
-        err = HRIL_ERR_GENERIC_FAILURE;
-        reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-        OnSmsReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+        reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
+        OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
         FreeResponseInfo(responseInfo);
         return;
     }
@@ -347,7 +370,7 @@ void ReqDelSimMessage(const ReqDataInfo *requestInfo, const int32_t *data, size_
     if (err < 0) {
         TELEPHONY_LOGE("GenerateCommand failed, err = %{public}d\n", err);
         reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-        OnSmsReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+        OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
         FreeResponseInfo(responseInfo);
         return;
     }
@@ -356,27 +379,26 @@ void ReqDelSimMessage(const ReqDataInfo *requestInfo, const int32_t *data, size_
     if (err != 0 || (responseInfo != NULL && !responseInfo->success)) {
         err = HRIL_ERR_GENERIC_FAILURE;
         reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-        OnSmsReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+        OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
         FreeResponseInfo(responseInfo);
         return;
     }
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-    OnSmsReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+    OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
     FreeResponseInfo(responseInfo);
 }
 
 void ReqSetSmscAddr(const ReqDataInfo *requestInfo, const HRilServiceCenterAddress *data, size_t dataLen)
 {
+    char cmd[MAX_CMD_LENGTH] = {0};
     int32_t err;
     HRilServiceCenterAddress *address = NULL;
-    char cmd[MAX_CMD_LENGTH] = {0};
-    struct ReportInfo reportInfo = {0};
     ResponseInfo *responseInfo = NULL;
+    struct ReportInfo reportInfo = {0};
+
     if (data == NULL) {
-        TELEPHONY_LOGE("data is  null!");
-        err = HRIL_ERR_GENERIC_FAILURE;
-        reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-        OnSmsReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+        reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
+        OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
         FreeResponseInfo(responseInfo);
         return;
     }
@@ -390,7 +412,7 @@ void ReqSetSmscAddr(const ReqDataInfo *requestInfo, const HRilServiceCenterAddre
     if (err < 0) {
         TELEPHONY_LOGE("GenerateCommand failed, err = %{public}d\n", err);
         reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-        OnSmsReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+        OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
         FreeResponseInfo(responseInfo);
         return;
     }
@@ -398,27 +420,28 @@ void ReqSetSmscAddr(const ReqDataInfo *requestInfo, const HRilServiceCenterAddre
     if (err != 0 || (responseInfo != NULL && !responseInfo->success)) {
         err = HRIL_ERR_GENERIC_FAILURE;
         reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-        OnSmsReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+        OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
         FreeResponseInfo(responseInfo);
         return;
     }
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-    OnSmsReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+    OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
     FreeResponseInfo(responseInfo);
 }
 
 void ReqGetSmscAddr(const ReqDataInfo *requestInfo)
 {
-    int32_t err;
     char *result = NULL;
+    int32_t err;
+    ResponseInfo *responseInfo = NULL;
     HRilServiceCenterAddress response;
     struct ReportInfo reportInfo = {0};
-    ResponseInfo *responseInfo = NULL;
+
     err = SendCommandLock("AT+CSCA?", "+CSCA:", 0, &responseInfo);
     if (err != 0 || (responseInfo != NULL && !responseInfo->success)) {
         err = HRIL_ERR_GENERIC_FAILURE;
         reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-        OnSmsReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+        OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
         FreeResponseInfo(responseInfo);
         return;
     }
@@ -441,27 +464,28 @@ void ReqGetSmscAddr(const ReqDataInfo *requestInfo)
         }
     }
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-    OnSmsReport(HRIL_SIM_SLOT_1, reportInfo, (const uint8_t *)&response, sizeof(HRilServiceCenterAddress));
+    OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&response, sizeof(HRilServiceCenterAddress));
     FreeResponseInfo(responseInfo);
 }
 
 void ReqGetCBConfig(const ReqDataInfo *requestInfo)
 {
+    char *line = NULL;
     int32_t err;
+    ResponseInfo *responseInfo = NULL;
     HRilCBConfigInfo cellBroadcast = {0};
     struct ReportInfo reportInfo = {0};
-    char *line = NULL;
-    ResponseInfo *responseInfo = NULL;
+
     err = SendCommandLock("AT+CSCB?", "+CSCB:", 0, &responseInfo);
     if (err != 0 || (responseInfo != NULL && !responseInfo->success)) {
         reportInfo = CreateReportInfo(requestInfo, AT_ERR_GENERIC, HRIL_RESPONSE, 0);
-        OnSmsReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+        OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
         FreeResponseInfo(responseInfo);
         return;
     }
     if (responseInfo->head == NULL) {
         reportInfo = CreateReportInfo(requestInfo, AT_ERR_GENERIC, HRIL_RESPONSE, 0);
-        OnSmsReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+        OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
         FreeResponseInfo(responseInfo);
         return;
     }
@@ -469,56 +493,51 @@ void ReqGetCBConfig(const ReqDataInfo *requestInfo)
     SkipATPrefix(&line);
     err = NextInt(&line, &cellBroadcast.mode);
     if (err > 0) {
-        TELEPHONY_LOGE("vendor config is fail!");
         reportInfo = CreateReportInfo(requestInfo, AT_ERR_GENERIC, HRIL_RESPONSE, 0);
-        OnSmsReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+        OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
         FreeResponseInfo(responseInfo);
         return;
     }
     err = NextStr(&line, &cellBroadcast.mids);
     if (err > 0) {
-        TELEPHONY_LOGE("vendor config is fail!");
         reportInfo = CreateReportInfo(requestInfo, AT_ERR_GENERIC, HRIL_RESPONSE, 0);
-        OnSmsReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+        OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
         FreeResponseInfo(responseInfo);
         return;
     }
     err = NextStr(&line, &cellBroadcast.dcss);
     if (err > 0) {
-        TELEPHONY_LOGE("vendor config is fail!");
         reportInfo = CreateReportInfo(requestInfo, AT_ERR_GENERIC, HRIL_RESPONSE, 0);
-        OnSmsReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+        OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
         FreeResponseInfo(responseInfo);
         return;
     }
     reportInfo = CreateReportInfo(requestInfo, VENDOR_SUCCESS, HRIL_RESPONSE, 0);
-    OnSmsReport(HRIL_SIM_SLOT_1, reportInfo, (const uint8_t *)&cellBroadcast, sizeof(HRilCBConfigInfo));
+    OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&cellBroadcast, sizeof(HRilCBConfigInfo));
     FreeResponseInfo(responseInfo);
 }
 
 void ReqSetCBConfig(const ReqDataInfo *requestInfo, const HRilCBConfigInfo *data, size_t dataLen)
 {
-    int32_t err;
-    HRilCBConfigInfo *cellBroadcast = NULL;
     char cmd[MAX_CMD_LENGTH] = {0};
-    struct ReportInfo reportInfo = {0};
+    int32_t err;
+    int32_t ret;
+    HRilCBConfigInfo *cellBroadcast = NULL;
     ResponseInfo *responseInfo = NULL;
+    struct ReportInfo reportInfo = {0};
+
     if (data == NULL) {
-        TELEPHONY_LOGE("data is  null!");
-        err = HRIL_ERR_GENERIC_FAILURE;
-        reportInfo = CreateReportInfo(requestInfo, AT_ERR_GENERIC, HRIL_RESPONSE, 0);
-        OnSmsReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+        reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
+        OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
         FreeResponseInfo(responseInfo);
         return;
     }
     cellBroadcast = ((HRilCBConfigInfo *)data);
-    int ret;
-
     if (strcmp(cellBroadcast->mids, "") && !strcmp(cellBroadcast->dcss, "")) {
         ret = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CSCB=%d,\"%s\"", cellBroadcast->mode, cellBroadcast->mids);
     } else if (strcmp(cellBroadcast->mids, "") && strcmp(cellBroadcast->dcss, "")) {
-        ret = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CSCB=%d,\"%s\",\"%s\"", cellBroadcast->mode,
-            cellBroadcast->mids, cellBroadcast->dcss);
+        ret = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CSCB=%d,\"%s\",\"%s\"",
+            cellBroadcast->mode, cellBroadcast->mids, cellBroadcast->dcss);
     } else if (strcmp(cellBroadcast->dcss, "") && !strcmp(cellBroadcast->mids, "")) {
         ret = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CSCB=%d,,\"%s\"", cellBroadcast->mode, cellBroadcast->dcss);
     } else {
@@ -527,61 +546,57 @@ void ReqSetCBConfig(const ReqDataInfo *requestInfo, const HRilCBConfigInfo *data
     if (ret < 0) {
         TELEPHONY_LOGE("GenerateCommand failed, err = %{public}d\n", ret);
         reportInfo = CreateReportInfo(requestInfo, AT_ERR_GENERIC, HRIL_RESPONSE, 0);
-        OnSmsReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+        OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
         FreeResponseInfo(responseInfo);
         return;
     }
-
     err = SendCommandLock(cmd, "+CSCB:", 0, &responseInfo);
     if (err != 0 || (responseInfo != NULL && !responseInfo->success)) {
         err = HRIL_ERR_GENERIC_FAILURE;
         reportInfo = CreateReportInfo(requestInfo, AT_ERR_GENERIC, HRIL_RESPONSE, 0);
-        OnSmsReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+        OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
         FreeResponseInfo(responseInfo);
         return;
     }
-
     reportInfo = CreateReportInfo(requestInfo, VENDOR_SUCCESS, HRIL_RESPONSE, 0);
-    OnSmsReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+    OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
     FreeResponseInfo(responseInfo);
 }
 
 void ReqGetCdmaCBConfig(const ReqDataInfo *requestInfo)
 {
-    int32_t err;
-    HRilCdmaCBConfigInfo cdmaCBConfig = {0};
-    struct ReportInfo reportInfo = {0};
+    char checked = '0';
     char lineBuff[MAX_CMD_LENGTH] = {0};
     char *line = lineBuff;
-    ResponseInfo *responseInfo = NULL;
-    err = HRIL_ERR_SUCCESS;
+    int32_t err = HRIL_ERR_SUCCESS;
     int32_t service = 1;
     int32_t language = 1;
-    char checked = '0';
-    int32_t ret = GenerateCommand(lineBuff, MAX_CMD_LENGTH, "test:%d,%d,%c", service, language, checked);
+    ResponseInfo *responseInfo = NULL;
+    HRilCdmaCBConfigInfo cdmaCBConfig = {0};
+    struct ReportInfo reportInfo = {0};
+
+    int32_t ret = GenerateCommand(lineBuff, MAX_CMD_LENGTH, "AT:%d,%d,%c", service, language, checked);
     if (ret < 0) {
         TELEPHONY_LOGE("GenerateCommand failed, err = %{public}d\n", ret);
         reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-        OnSmsReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+        OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
         FreeResponseInfo(responseInfo);
         return;
     }
     SkipATPrefix(&line);
     err = NextInt(&line, &cdmaCBConfig.service);
     if (err > 0) {
-        TELEPHONY_LOGE("vendor config is fail!");
         err = HRIL_ERR_GENERIC_FAILURE;
         reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-        OnSmsReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+        OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
         FreeResponseInfo(responseInfo);
         return;
     }
     err = NextInt(&line, &cdmaCBConfig.language);
     if (err > 0) {
-        TELEPHONY_LOGE("vendor config is fail!");
         err = HRIL_ERR_GENERIC_FAILURE;
         reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-        OnSmsReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+        OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
         FreeResponseInfo(responseInfo);
         return;
     }
@@ -590,13 +605,13 @@ void ReqGetCdmaCBConfig(const ReqDataInfo *requestInfo)
     if (err > 0 || tmp == NULL || tmp[0] == '\0') {
         err = HRIL_ERR_GENERIC_FAILURE;
         reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-        OnSmsReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+        OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
         FreeResponseInfo(responseInfo);
         return;
     }
     cdmaCBConfig.checked = tmp[0];
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-    OnSmsReport(HRIL_SIM_SLOT_1, reportInfo, (const uint8_t *)&cdmaCBConfig, sizeof(HRilCdmaCBConfigInfo));
+    OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&cdmaCBConfig, sizeof(HRilCdmaCBConfigInfo));
     FreeResponseInfo(responseInfo);
 }
 
@@ -604,19 +619,127 @@ void ReqSetCdmaCBConfig(const ReqDataInfo *requestInfo, const HRilCdmaCBConfigIn
 {
     int32_t err;
     HRilCdmaCBConfigInfo *cdmaCBConfig = NULL;
-    struct ReportInfo reportInfo = {0};
     ResponseInfo *responseInfo = NULL;
+    struct ReportInfo reportInfo = {0};
+
+    if (data == NULL) {
+        reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
+        OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+        FreeResponseInfo(responseInfo);
+        return;
+    }
     cdmaCBConfig = ((HRilCdmaCBConfigInfo *)data);
     int32_t size = dataLen / sizeof(HRilCdmaCBConfigInfo);
     if (size <= 0) {
         err = HRIL_ERR_GENERIC_FAILURE;
         reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-        OnSmsReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+        OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
         FreeResponseInfo(responseInfo);
         return;
     }
     err = HRIL_ERR_SUCCESS;
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-    OnSmsReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+    OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+    FreeResponseInfo(responseInfo);
+}
+
+void ReqAddCdmaSimMessage(const ReqDataInfo *requestInfo, const HRilSmsWriteSms *data, size_t dataLen)
+{
+    char cmd[MAX_CMD_LENGTH] = {0};
+    int32_t err;
+    HRilSmsWriteSms *cdmaMsg = NULL;
+    ResponseInfo *responseInfo = NULL;
+    struct ReportInfo reportInfo = {0};
+    if (data == NULL) {
+        reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
+        OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+        FreeResponseInfo(responseInfo);
+        return;
+    }
+    cdmaMsg = ((HRilSmsWriteSms *)data);
+    err = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CPMS=%d,%d%s", cdmaMsg->index, cdmaMsg->state, cdmaMsg->pdu);
+    if (err < 0) {
+        TELEPHONY_LOGE("GenerateCommand failed, err = %{public}d\n", err);
+        reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
+        OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+        FreeResponseInfo(responseInfo);
+        return;
+    }
+    err = SendCommandLock(cmd, "+CPMS:", 0, &responseInfo);
+    if (err != 0 || (responseInfo != NULL && !responseInfo->success)) {
+        err = HRIL_ERR_GENERIC_FAILURE;
+        SimMessageError(&reportInfo, requestInfo, &err, responseInfo);
+        return;
+    }
+    reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
+    OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+    FreeResponseInfo(responseInfo);
+}
+
+void ReqDelCdmaSimMessage(const ReqDataInfo *requestInfo, const int32_t *data, size_t dataLen)
+{
+    char cmd[MAX_CMD_LENGTH] = {0};
+    int32_t err;
+    int32_t index;
+    ResponseInfo *responseInfo = NULL;
+    struct ReportInfo reportInfo = {0};
+    if (data == NULL) {
+        reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
+        OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+        FreeResponseInfo(responseInfo);
+        return;
+    }
+    index = ((int32_t *)data)[0];
+    err = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CMGD=%d", index);
+    if (err < 0) {
+        TELEPHONY_LOGE("GenerateCommand failed, err = %{public}d\n", err);
+        reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
+        OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+        FreeResponseInfo(responseInfo);
+        return;
+    }
+    err = SendCommandLock(cmd, "+CMGD:", 0, &responseInfo);
+    if (err != 0 || (responseInfo != NULL && !responseInfo->success)) {
+        err = HRIL_ERR_GENERIC_FAILURE;
+        reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
+        OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+        FreeResponseInfo(responseInfo);
+        return;
+    }
+    reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
+    OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+    FreeResponseInfo(responseInfo);
+}
+
+void ReqUpdateCdmaSimMessage(const ReqDataInfo *requestInfo, const HRilSmsWriteSms *data, size_t dataLen)
+{
+    char cmd[MAX_CMD_LENGTH] = {0};
+    int32_t err;
+    HRilSmsWriteSms *cdmaMsg = NULL;
+    ResponseInfo *responseInfo = NULL;
+    struct ReportInfo reportInfo = {0};
+    if (data == NULL) {
+        reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
+        OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+        FreeResponseInfo(responseInfo);
+        return;
+    }
+    cdmaMsg = ((HRilSmsWriteSms *)data);
+    err = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CPMS=%d,%d%s", cdmaMsg->index, cdmaMsg->state, cdmaMsg->pdu);
+    if (err < 0) {
+        TELEPHONY_LOGE("GenerateCommand failed, err = %{public}d\n", err);
+        reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
+        OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+        FreeResponseInfo(responseInfo);
+        return;
+    }
+    err = SendCommandLock(cmd, "+CPMS:", 0, &responseInfo);
+    if (err != 0 || (responseInfo != NULL && !responseInfo->success)) {
+        err = HRIL_ERR_GENERIC_FAILURE;
+        SimMessageError(&reportInfo, requestInfo, &err, responseInfo);
+        return;
+    }
+    reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
+    OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
     FreeResponseInfo(responseInfo);
 }

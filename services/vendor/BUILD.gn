@@ -24,8 +24,8 @@ ohos_shared_library("ril_vendor") {
     "$RIL_VENDOR/at_sim.c",
     "$RIL_VENDOR/at_sms.c",
     "$RIL_VENDOR/at_support.c",
-    "$RIL_VENDOR/channel.c",
     "$RIL_VENDOR/vendor_adapter.c",
+    "$RIL_VENDOR/vendor_channel.c",
     "$RIL_VENDOR/vendor_report.c",
     "$RIL_VENDOR/vendor_util.c",
   ]

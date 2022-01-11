@@ -176,6 +176,109 @@ std::shared_ptr<CallInfoList> CallInfoList::UnMarshalling(Parcel &parcel)
 
 void CallInfoList::Dump(std::string, int32_t) {}
 
+bool Emergencyinfo::ReadFromParcel(Parcel &parcel)
+{
+    if (!ReadBaseInt32(parcel, index)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, total)) {
+        return false;
+    }
+    if (!ReadBaseString(parcel, eccNum)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, category)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, simpresent)) {
+        return false;
+    }
+    if (!ReadBaseString(parcel, mcc)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, abnormalService)) {
+        return false;
+    }
+    return true;
+}
+
+bool Emergencyinfo::Marshalling(Parcel &parcel) const
+{
+    if (!WriteBaseInt32(parcel, index)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, total)) {
+        return false;
+    }
+    if (!WriteBaseString(parcel, eccNum)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, category)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, simpresent)) {
+        return false;
+    }
+    if (!WriteBaseString(parcel, mcc)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, abnormalService)) {
+        return false;
+    }
+    return true;
+}
+
+std::shared_ptr<Emergencyinfo> Emergencyinfo::UnMarshalling(Parcel &parcel)
+{
+    std::shared_ptr<Emergencyinfo> param = std::make_shared<Emergencyinfo>();
+    if (param == nullptr || !param->ReadFromParcel(parcel)) {
+        param = nullptr;
+    }
+    return param;
+}
+
+void Emergencyinfo::Dump(std::string, int32_t) {}
+
+bool EmergencyInfoList::ReadFromParcel(Parcel &parcel)
+{
+    if (!ReadBaseInt32(parcel, callSize)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, flag)) {
+        return false;
+    }
+    calls.resize(callSize);
+    for (int32_t i = 0; i < callSize; i++) {
+        calls[i].ReadFromParcel(parcel);
+    }
+    return true;
+}
+
+bool EmergencyInfoList::Marshalling(Parcel &parcel) const
+{
+    if (!WriteBaseInt32(parcel, callSize)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, flag)) {
+        return false;
+    }
+    for (int32_t i = 0; i < callSize; i++) {
+        calls[i].Marshalling(parcel);
+    }
+    return true;
+}
+
+std::shared_ptr<EmergencyInfoList> EmergencyInfoList::UnMarshalling(Parcel &parcel)
+{
+    std::shared_ptr<EmergencyInfoList> param = std::make_shared<EmergencyInfoList>();
+    if (param == nullptr || !param->ReadFromParcel(parcel)) {
+        return nullptr;
+    }
+    return param;
+}
+
+void EmergencyInfoList::Dump(std::string, int32_t) {}
+
 bool UusData::ReadFromParcel(Parcel &parcel)
 {
     if (!ReadBaseInt32(parcel, uusDcs)) {
@@ -742,5 +845,137 @@ std::shared_ptr<CallImsServiceStatus> CallImsServiceStatus::UnMarshalling(Parcel
 }
 
 void CallImsServiceStatus::Dump(std::string, int32_t) {}
+
+bool UssdCusdInfo::ReadFromParcel(Parcel &parcel)
+{
+    if (!ReadBaseInt32(parcel, n)) {
+        return false;
+    }
+    if (!ReadBaseString(parcel, str)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, dcs)) {
+        return false;
+    }
+    return true;
+}
+
+bool UssdCusdInfo::Marshalling(Parcel &parcel) const
+{
+    if (!WriteBaseInt32(parcel, n)) {
+        return false;
+    }
+    if (!WriteBaseString(parcel, str)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, dcs)) {
+        return false;
+    }
+    return true;
+}
+
+std::shared_ptr<UssdCusdInfo> UssdCusdInfo::UnMarshalling(Parcel &parcel)
+{
+    std::shared_ptr<UssdCusdInfo> param = std::make_shared<UssdCusdInfo>();
+    if (param == nullptr || !param->ReadFromParcel(parcel)) {
+        param = nullptr;
+    }
+    return param;
+}
+
+void UssdCusdInfo::Dump(std::string, int32_t) {}
+
+bool UssdCusdNoticeInfo::ReadFromParcel(Parcel &parcel)
+{
+    if (!ReadBaseInt32(parcel, m)) {
+        return false;
+    }
+    if (!ReadBaseString(parcel, str)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, dcs)) {
+        return false;
+    }
+    return true;
+}
+
+bool UssdCusdNoticeInfo::Marshalling(Parcel &parcel) const
+{
+    if (!WriteBaseInt32(parcel, m)) {
+        return false;
+    }
+    if (!WriteBaseString(parcel, str)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, dcs)) {
+        return false;
+    }
+    return true;
+}
+
+std::shared_ptr<UssdCusdNoticeInfo> UssdCusdNoticeInfo::UnMarshalling(Parcel &parcel)
+{
+    std::shared_ptr<UssdCusdNoticeInfo> param = std::make_shared<UssdCusdNoticeInfo>();
+    if (param == nullptr || !param->ReadFromParcel(parcel)) {
+        param = nullptr;
+    }
+    return param;
+}
+
+void UssdCusdNoticeInfo::Dump(std::string, int32_t) {}
+
+bool SrvccStatus::ReadFromParcel(Parcel &parcel)
+{
+    if (!ReadBaseInt32(parcel, status)) {
+        return false;
+    }
+    return true;
+}
+
+bool SrvccStatus::Marshalling(Parcel &parcel) const
+{
+    if (!WriteBaseInt32(parcel, status)) {
+        return false;
+    }
+    return true;
+}
+
+std::shared_ptr<SrvccStatus> SrvccStatus::UnMarshalling(Parcel &parcel)
+{
+    std::shared_ptr<SrvccStatus> param = std::make_shared<SrvccStatus>();
+    if (param == nullptr || !param->ReadFromParcel(parcel)) {
+        param = nullptr;
+    }
+    return param;
+}
+
+void SrvccStatus::Dump(std::string, int32_t) {}
+
+bool RingbackVoice::ReadFromParcel(Parcel &parcel)
+{
+    if (!ReadBaseInt32(parcel, status)) {
+        return false;
+    }
+    return true;
+}
+
+bool RingbackVoice::Marshalling(Parcel &parcel) const
+{
+    if (!WriteBaseInt32(parcel, status)) {
+        return false;
+    }
+    return true;
+}
+
+std::shared_ptr<RingbackVoice> RingbackVoice::UnMarshalling(Parcel &parcel)
+{
+    std::shared_ptr<RingbackVoice> param = std::make_shared<RingbackVoice>();
+    if (param == nullptr || !param->ReadFromParcel(parcel)) {
+        param = nullptr;
+    }
+    return param;
+}
+
+void RingbackVoice::Dump(std::string, int32_t) {}
 } // namespace Telephony
 } // namespace OHOS

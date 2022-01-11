@@ -23,25 +23,25 @@ namespace OHOS {
 namespace Telephony {
 class HRilSim : public HRilBase {
 public:
-    HRilSim();
-    ~HRilSim() = default;
+    HRilSim(IHRilReporter &hrilReporter);
+    virtual ~HRilSim() = default;
+
     void ProcessSimRequest(int32_t slotId, int32_t code, struct HdfSBuf *data);
-    void ProcessSimResponse(
-        int32_t slotId, int32_t code, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
-    void ProcessSimNotify(int32_t slotId, int32_t notifyType, const struct ReportInfo *reportInfo,
+    void ProcessSimResponse(int32_t slotId, int32_t code, HRilRadioResponseInfo &responseInfo,
+        const void *response, size_t responseLen);
+    void ProcessSimNotify(int32_t slotId, const struct ReportInfo *reportInfo,
         const void *response, size_t responseLen);
     bool IsSimRespOrNotify(uint32_t code);
-    bool IsSimResponse(uint32_t code);
-    bool IsSimNotification(uint32_t code);
     void RegisterSimFuncs(const HRilSimReq *simFuncs);
 
 private:
     void AddHandlerToMap();
+
     void GetSimIO(int32_t slotId, struct HdfSBuf *data);
     void GetSimStatus(int32_t slotId, struct HdfSBuf *data);
     void GetImsi(int32_t slotId, struct HdfSBuf *data);
-    void SetSimLock(int32_t slotId, struct HdfSBuf *data);
     void GetSimLockStatus(int32_t slotId, struct HdfSBuf *data);
+    void SetSimLock(int32_t slotId, struct HdfSBuf *data);
     void ChangeSimPassword(int32_t slotId, struct HdfSBuf *data);
     void UnlockPin(int32_t slotId, struct HdfSBuf *data);
     void UnlockPuk(int32_t slotId, struct HdfSBuf *data);
@@ -50,6 +50,15 @@ private:
     void UnlockPuk2(int32_t slotId, struct HdfSBuf *data);
     void GetSimPin2InputTimes(int32_t slotId, struct HdfSBuf *data);
     void SetActiveSim(int32_t slotId, struct HdfSBuf *data);
+    void SendTerminalResponseCmd(int32_t slotId, struct HdfSBuf *data);
+    void SendEnvelopeCmd(int32_t slotId, struct HdfSBuf *data);
+    void StkControllerIsReady(int32_t slotId, struct HdfSBuf *data);
+    void StkCmdCallSetup(int32_t slotId, struct HdfSBuf *data);
+    void SetRadioProtocol(int32_t slotId, struct HdfSBuf *data);
+    void OpenLogicalSimIO(int32_t slotId, struct HdfSBuf *data);
+    void CloseLogicalSimIO(int32_t slotId, struct HdfSBuf *data);
+    void TransmitApduSimIO(int32_t slotId, struct HdfSBuf *data);
+    void UnlockSimLock(int32_t slotld, struct HdfSBuf *data);
 
     int32_t GetSimIOResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
         const void *response, size_t responseLen);
@@ -57,9 +66,9 @@ private:
         const void *response, size_t responseLen);
     int32_t GetImsiResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
         const void *response, size_t responseLen);
-    int32_t SetSimLockResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
-        const void *response, size_t responseLen);
     int32_t GetSimLockStatusResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
+        const void *response, size_t responseLen);
+    int32_t SetSimLockResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
         const void *response, size_t responseLen);
     int32_t ChangeSimPasswordResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
         const void *response, size_t responseLen);
@@ -77,20 +86,48 @@ private:
         const void *response, size_t responseLen);
     int32_t SetActiveSimResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
         const void *response, size_t responseLen);
-    IccIoResultInfo ProcessIccIoResponse(
-        HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t SendTerminalResponseCmdResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
+        const void *response, size_t responseLen);
+    int32_t SendEnvelopeCmdResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
+        const void *response, size_t responseLen);
+    int32_t StkControllerIsReadyResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
+        const void *response, size_t responseLen);
+    int32_t StkCmdCallSetupResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
+        const void *response, size_t responseLen);
+    int32_t SetRadioProtocolResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
+        const void *response, size_t responseLen);
+    int32_t OpenLogicalSimIOResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
+        const void *response, size_t responseLen);
+    int32_t CloseLogicalSimIOResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
+        const void *response, size_t responseLen);
+    int32_t TransmitApduSimIOResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
+        const void *response, size_t responseLen);
+    int32_t UnlockSimLockResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
+        const void *response, size_t responseLen);
+    IccIoResultInfo ProcessIccIoResponse(HRilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen);
+
     int32_t SimStateUpdated(
-        int32_t slotId, int32_t notifyType, const HRilErrno e, const void *response, size_t responseLen);
+        int32_t slotId, int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen);
+    int32_t StkSessionEndNotify(
+        int32_t slotId, int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen);
+    int32_t StkProactiveCommandNotify(
+        int32_t slotId, int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen);
+    int32_t StkAlphaNotify(
+        int32_t slotId, int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen);
 
 private:
+    bool IsSimResponse(uint32_t code);
+    bool IsSimNotification(uint32_t code);
+    using ReqFunc = void (HRilSim::*)(int32_t slotId, struct HdfSBuf *data);
     using RespFunc = int32_t (HRilSim::*)(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
         const void *response, size_t responseLen);
     using NotiFunc = int32_t (HRilSim::*)(
-        int32_t slotId, int32_t notifyType, HRilErrno e, const void *response, size_t responseLen);
-    using ReqFunc = void (HRilSim::*)(int32_t slotId, struct HdfSBuf *data);
+        int32_t slotId, int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
+
+    std::map<uint32_t, ReqFunc> reqMemberFuncMap_;
     std::map<uint32_t, RespFunc> respMemberFuncMap_;
     std::map<uint32_t, NotiFunc> notiMemberFuncMap_;
-    std::map<uint32_t, ReqFunc> reqMemberFuncMap_;
     const HRilSimReq *simFuncs_ = nullptr;
 };
 } // namespace Telephony

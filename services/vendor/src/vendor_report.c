@@ -17,10 +17,12 @@
 
 #include "at_call.h"
 #include "at_sms.h"
-#include "hril_notification.h"
 #include "vendor_adapter.h"
 
+#include "hril_notification.h"
+
 static const struct HRilReport *g_reportOps = NULL;
+static const size_t ZERO_RESPONSE_LEN = 0;
 
 void OnModemReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen)
 {
@@ -119,16 +121,72 @@ static void ReportCBMOrCSCB(struct ReportInfo *reportInfo)
     } else {
         response.pdu = (char *)tempData;
     }
-    OnSmsReport(HRIL_SIM_SLOT_1, *reportInfo, (const uint8_t *)&response, sizeof(HRilCBConfigReportInfo));
+    OnSmsReport(HRIL_SIM_SLOT_0, *reportInfo, (const uint8_t *)&response, sizeof(HRilCBConfigReportInfo));
+}
+
+static void SmsStatus(const char *smsPdu, struct ReportInfo *reportInfo)
+{
+    if (smsPdu == NULL || reportInfo == NULL) {
+        TELEPHONY_LOGE("reportInfo is NULL");
+        return;
+    }
+    HRilSmsResponse smsResponse = {};
+    smsResponse.pdu = (char *)smsPdu;
+    int size = (smsPdu != NULL) ? strlen(smsPdu) : 0;
+    reportInfo->notifyId = HNOTI_SMS_STATUS_REPORT;
+    OnSmsReport(HRIL_SIM_SLOT_0, *reportInfo, (const uint8_t *)&smsResponse, size);
+}
+
+static void ReportInfoInit(struct ReportInfo *reportInfo)
+{
+    if (reportInfo == NULL) {
+        TELEPHONY_LOGE("reportInfo is NULL");
+        return;
+    }
+    reportInfo->error = HRIL_ERR_SUCCESS;
+    reportInfo->type = HRIL_NOTIFICATION;
+}
+
+static int CdmaSmsNotifyMock(const char *s, HRilSmsResponse *smsResponse)
+{
+    char *testDataStr = ("0101020004081300031008d00106102c2870e1420801c00c01c0");
+    char *testDataTmp =
+        ("0000021002040602448d159e240601fc081b0003200010010910461c58d8b266a9180306211024102051080100");
+    if (ReportStrWith(s, "+CMMS:")) {
+        smsResponse->pdu = testDataTmp;
+    } else if (ReportStrWith(s, "+CSDH:")) {
+        smsResponse->pdu = testDataStr;
+    } else {
+        return 0;
+    }
+    return HNOTI_SMS_NEW_CDMA_SMS;
+}
+
+static int WapPushNotifyMock(const char *s, HRilSmsResponse *smsResponse)
+{
+    char *testDataStr =
+        ("0891683108200105f04408a0015608860104216092902512236e0605040b8423f0120601ae020"
+         "56a0045c60c033231312e3133362e3130372e37382f646f776e2e7068703f703d413063303026"
+         "733d383500080103e68e8ce68fa1e882a1e5b882e58588e69cbaefbc8ce6aca2e8bf8ee4bdbfe"
+         "794a8e6898be69cbae8af81e588b8e38082000101");
+    char *testDataTmp =
+        ("0041000B915121551532F400042E0B05040B84C0020003F001010A060403B0"
+         "81EA02066A008509036D6F62696C65746964696E67732E636F6D2F0001");
+    if (ReportStrWith(s, "+CMGF:")) {
+        smsResponse->pdu = testDataStr;
+    } else if (ReportStrWith(s, "+CSMP:")) {
+        smsResponse->pdu = testDataTmp;
+    } else {
+        return 0;
+    }
+    return HNOTI_SMS_NEW_SMS;
 }
 
 void OnNotifyOps(const char *s, const char *smsPdu)
 {
     char *str = NULL;
     struct ReportInfo reportInfo = {0};
-    reportInfo.error = HRIL_ERR_SUCCESS;
-    reportInfo.type = HRIL_NOTIFICATION;
-
+    ReportInfoInit(&reportInfo);
     if (GetRadioState() == HRIL_RADIO_POWER_STATE_UNAVAILABLE) {
         return;
     }
@@ -136,12 +194,12 @@ void OnNotifyOps(const char *s, const char *smsPdu)
     if (IsCallNoticeCmd(s)) {
         CallReportInfoProcess(s);
     } else if (ReportStrWith(s, "+CMT:")) {
+        HRilSmsResponse smsResponse = {};
+        smsResponse.pdu = (char *)smsPdu;
         reportInfo.notifyId = HNOTI_SMS_NEW_SMS;
-        OnSmsReport(HRIL_SIM_SLOT_1, reportInfo, (const uint8_t *)smsPdu, strlen(smsPdu));
+        OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&smsResponse, sizeof(HRilSmsResponse));
     } else if (ReportStrWith(s, "+CDS:")) {
-        int size = (smsPdu != NULL) ? strlen(smsPdu) : 0;
-        reportInfo.notifyId = HNOTI_SMS_STATUS_REPORT;
-        OnSmsReport(HRIL_SIM_SLOT_1, reportInfo, (const uint8_t *)smsPdu, size);
+        SmsStatus(smsPdu, &reportInfo);
     } else if (ReportStrWith(s, "+CBM:") || ReportStrWith(s, "+CSCB:")) {
         ReportCBMOrCSCB(&reportInfo);
         ReportCBMOrCSCB(&reportInfo); // The test requires sending two
@@ -151,11 +209,153 @@ void OnNotifyOps(const char *s, const char *smsPdu)
         free(copsStr);
     } else if (ReportStrWith(s, "^SIMST:")) {
         reportInfo.notifyId = HNOTI_SIM_STATUS_CHANGED;
-        OnSimReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+        OnSimReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+    } else if (OnNotifyStkOps(s, str)) {
+        TELEPHONY_LOGI("STK notify completed.");
     } else {
+        HRilSmsResponse response = {0};
+        if ((reportInfo.notifyId = CdmaSmsNotifyMock(s, &response)) > 0) {
+            OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&response, sizeof(HRilSmsResponse));
+        }
+        if ((reportInfo.notifyId = WapPushNotifyMock(s, &response)) > 0) {
+            OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&response, sizeof(HRilSmsResponse));
+        }
         OnNotifyNetWorksOps(s, str);
     }
     free(str);
+}
+
+static int ParseStkResponseStr(const char *s, char **cmdResponseInfo)
+{
+    char *str = (char *)s;
+    if (str == NULL) {
+        TELEPHONY_LOGE("ProcessStkNotify, s or cmdResponse param is null");
+        return HRIL_ERR_NULL_POINT;
+    }
+    int err = SkipATPrefix(&str);
+    if (err != VENDOR_SUCCESS) {
+        TELEPHONY_LOGE("ProcessStkNotify, invalid response");
+        return HRIL_ERR_INVALID_RESPONSE;
+    }
+    err = NextStr(&str, cmdResponseInfo);
+    TELEPHONY_LOGI("ParseStkResponseStr, cmdResponse: %{public}s", *cmdResponseInfo);
+    if (err != 0) {
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    return VENDOR_SUCCESS;
+}
+
+bool OnNotifyStkOps(const char *s, const char *strInfo)
+{
+    bool isStkNotify = true;
+    struct ReportInfo reportInfo = {0};
+    reportInfo.error = HRIL_ERR_SUCCESS;
+    reportInfo.type = HRIL_NOTIFICATION;
+    if (ReportStrWith(s, "SoftwareVersion:")) {
+        reportInfo.notifyId = HNOTI_SIM_STK_SESSION_END_NOTIFY;
+        OnSimReport(HRIL_SIM_SLOT_0, reportInfo, NULL, ZERO_RESPONSE_LEN);
+    } else if (ReportStrWith(s, "HardwareVersion:")) {
+        reportInfo.notifyId = HNOTI_SIM_STK_PROACTIVE_CMD_NOTIFY;
+        char *cmdResponse = (char *)strInfo;
+        int ret = ParseStkResponseStr(s, &cmdResponse);
+        if (ret != VENDOR_SUCCESS) {
+            reportInfo.error = ret;
+        }
+        if (cmdResponse == NULL) {
+            TELEPHONY_LOGE("cmdResponse is NULL");
+            OnSimReport(HRIL_SIM_SLOT_0, reportInfo, NULL, ZERO_RESPONSE_LEN);
+        } else {
+            TELEPHONY_LOGI("OnNotifyStkOps, cmdResponse: %{public}s", cmdResponse);
+            OnSimReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)cmdResponse, sizeof(char));
+        }
+    } else if (ReportStrWith(s, "+CGMM:")) {
+        reportInfo.notifyId = HNOTI_SIM_STK_ALPHA_NOTIFY;
+        OnSimReport(HRIL_SIM_SLOT_0, reportInfo, NULL, ZERO_RESPONSE_LEN);
+    } else {
+        isStkNotify = false;
+    }
+    return isStkNotify;
+}
+
+static void OnCsRegStatusNotify(struct ReportInfo reportInfo, int ret, char *str, const char *s)
+{
+    reportInfo.notifyId = HNOTI_NETWORK_CS_REG_STATUS_UPDATED;
+    HRilRegStatusInfo regStatusInfo;
+    ret = ProcessRegStatus(str, &regStatusInfo);
+    if (ret == 0) {
+        OnNetworkReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)(&regStatusInfo), sizeof(HRilRegStatusInfo));
+    } else {
+        TELEPHONY_LOGW("CREG notify str format  unexpected: %{public}s", s);
+    }
+}
+
+static void RadioTurnNotify(struct ReportInfo reportInfo, char *str)
+{
+    HRilRadioState radioState = HRIL_RADIO_POWER_STATE_UNAVAILABLE;
+    if (ReportStrWith(str, "^RADIO: 1")) {
+        radioState = HRIL_RADIO_POWER_STATE_ON;
+    } else if (ReportStrWith(str, "^RADIO: 0")) {
+        radioState = HRIL_RADIO_POWER_STATE_OFF;
+    } else {
+        TELEPHONY_LOGW("^RADIO notify str format  unexpected: %{public}s", str);
+    }
+    if (radioState != HRIL_RADIO_POWER_STATE_UNAVAILABLE) {
+        reportInfo.error = HRIL_ERR_SUCCESS;
+        reportInfo.type = HRIL_NOTIFICATION;
+        reportInfo.notifyId = HNOTI_MODEM_RADIO_STATE_UPDATED;
+        OnModemReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&radioState, sizeof(HRilRadioState));
+    }
+}
+
+static void OnPsRegStatusNotify(struct ReportInfo reportInfo, int ret, char *str, const char *s)
+{
+    reportInfo.notifyId = HNOTI_NETWORK_PS_REG_STATUS_UPDATED;
+    HRilRegStatusInfo regStatusInfo;
+    ret = ProcessRegStatus(str, &regStatusInfo);
+    if (ret == 0) {
+        OnNetworkReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)(&regStatusInfo), sizeof(HRilRegStatusInfo));
+    } else {
+        TELEPHONY_LOGW("CGREG notify str format  unexpected: %{public}s", s);
+    }
+}
+
+static void OnNotifyNetWorksOpsJudgeTwo(
+    struct ReportInfo reportInfo, const char *infoStr, char *responseData[MAX_REG_INFO_ITEM])
+{
+    reportInfo.notifyId = HNOTI_NETWORK_TIME_UPDATED;
+    char *time[DEFAULT_INDEX] = {""};
+    if (GenerateCommand((char *)time, DEFAULT_INDEX, "^TIME:\"20%s", infoStr + DEFAULT_ADD_NUM) < 0) {
+        TELEPHONY_LOGE("GenerateCommand is failed!");
+        OnNetworkReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)responseData, MAX_REG_INFO_ITEM * sizeof(char));
+        return;
+    }
+    TELEPHONY_LOGW("Report TIME: %{public}s", (char *)time);
+    OnNetworkReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)time, MAX_REG_INFO_ITEM * sizeof(char));
+}
+
+static void SignalStrengthNotify(struct ReportInfo reportInfo, int ret, char *str, const char *s)
+{
+    HRilRssi response = {0};
+    reportInfo.notifyId = HNOTI_NETWORK_SIGNAL_STRENGTH_UPDATED;
+    TELEPHONY_LOGI("start report SignalStrengthNotify ");
+    ret = ProcessParamSignalStrengthNotify(str, &response);
+    if (ret == 0) {
+        OnNetworkReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)(&response), sizeof(HRilRssi));
+    } else {
+        TELEPHONY_LOGW("HCSQ notify str format  unexpected: %{public}s", s);
+    }
+}
+
+static void VoiceRadioInfoNotify(struct ReportInfo reportInfo, int ret, char *str, const char *s)
+{
+    HRilVoiceRadioInfo voiceRadioInfo = {0};
+    ret = ProcessVoiceRadioInfo(str, &voiceRadioInfo);
+    if (ret != 0) {
+        TELEPHONY_LOGE("ProcessVoiceRadioInfo format  unexpected: %{public}s", s);
+        return;
+    }
+    reportInfo.notifyId = HNOTI_MODEM_VOICE_TECH_UPDATED;
+    OnModemReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)(&voiceRadioInfo), sizeof(HRilVoiceRadioInfo));
 }
 
 void OnNotifyNetWorksOps(const char *s, const char *infoStr)
@@ -166,44 +366,34 @@ void OnNotifyNetWorksOps(const char *s, const char *infoStr)
     struct ReportInfo reportInfo = {0};
     reportInfo.error = HRIL_ERR_SUCCESS;
     reportInfo.type = HRIL_NOTIFICATION;
-    if (ReportStrWith(s, "+CREG:") || ReportStrWith(s, "+CGREG:")) {
-        reportInfo.notifyId = HNOTI_NETWORK_CS_REG_STATUS_UPDATED;
-        HRilRegStatusInfo regStatusInfo;
-        ret = ProcessRegStatus(str, &regStatusInfo);
-        if (ret == 0) {
-            OnNetworkReport(
-                HRIL_SIM_SLOT_1, reportInfo, (const uint8_t *)(&regStatusInfo), sizeof(HRilRegStatusInfo));
-        } else {
-            TELEPHONY_LOGW("CREG or CGREG notify str format  unexpected: %{public}s", s);
-        }
+    if (ReportStrWith(s, "+CREG:")) {
+        OnCsRegStatusNotify(reportInfo, ret, str, s);
+    } else if (ReportStrWith(s, "+CGREG:")) {
+        OnPsRegStatusNotify(reportInfo, ret, str, s);
     } else if (ReportStrWith(s, "^TIME:")) {
-        reportInfo.notifyId = HNOTI_NETWORK_TIME_UPDATED;
-        char *time[DEFAULT_INDEX] = {""};
-        int32_t tmp = GenerateCommand((char *)time, DEFAULT_INDEX, "^TIME:\"20%s", infoStr + DEFAULT_ADD_NUM);
-        if (tmp < 0) {
-            TELEPHONY_LOGE("GenerateCommand is failed!");
-            OnNetworkReport(
-                HRIL_SIM_SLOT_1, reportInfo, (const uint8_t *)responseData, MAX_REG_INFO_ITEM * sizeof(char));
-            return;
-        }
-        OnNetworkReport(HRIL_SIM_SLOT_1, reportInfo, (const uint8_t *)time, MAX_REG_INFO_ITEM * sizeof(char));
+        OnNotifyNetWorksOpsJudgeTwo(reportInfo, infoStr, responseData);
     } else if (ReportStrWith(s, "+CTZV:")) {
         reportInfo.notifyId = HNOTI_NETWORK_TIME_ZONE_UPDATED;
-        OnNetworkReport(HRIL_SIM_SLOT_1, reportInfo, (const uint8_t *)responseData, MAX_REG_INFO_ITEM * sizeof(char));
+        OnNetworkReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)responseData, MAX_REG_INFO_ITEM * sizeof(char));
     } else if (ReportStrWith(s, "^HCSQ:")) {
-        HRilRssi response = {0};
-        reportInfo.notifyId = HNOTI_NETWORK_SIGNAL_STRENGTH_UPDATED;
-        ret = ProcessParamSignalStrengthNotify(str, &response);
-        OnNetworkReport(HRIL_SIM_SLOT_1, reportInfo, (const uint8_t *)&response, sizeof(HRilRssi));
+        SignalStrengthNotify(reportInfo, ret, str, s);
+    } else if (ReportStrWith(s, "^RADIO:")) {
+        RadioTurnNotify(reportInfo, str);
+    } else if (ReportStrWith(s, "^PHYCHLCFG:")) {
+        ProcessPhyChnlCfgNotify(reportInfo, str);
+    } else if (ReportStrWith(s, "^SYSINFOEX:")) {
+        VoiceRadioInfoNotify(reportInfo, ret, str, s);
     } else if (ReportStrWith(s, "+CIREGU:")) {
         HRilImsRegStatusInfo imsRegStatusInfo;
         reportInfo.notifyId = HNOTI_NETWORK_IMS_REG_STATUS_UPDATED;
         ret = ProcessImsRegStatus(str, &imsRegStatusInfo, MAX_IMS_REG_INFO_ITEM);
         if (ret == 0) {
             OnNetworkReport(
-                HRIL_SIM_SLOT_1, reportInfo, (const uint8_t *)(&imsRegStatusInfo), sizeof(HRilImsRegStatusInfo));
+                HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)(&imsRegStatusInfo), sizeof(HRilImsRegStatusInfo));
         } else {
             TELEPHONY_LOGW("CIREGU notify str format  unexpected: %{public}s", s);
         }
+    } else {
+        TELEPHONY_LOGW("enter to  is unrecognized command: %{public}s", s);
     }
 }

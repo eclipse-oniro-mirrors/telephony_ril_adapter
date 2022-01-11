@@ -28,31 +28,18 @@
 
 namespace OHOS {
 namespace Telephony {
-#define HRIL_NOTIFICATION_TYPE 1
-
-using RespCmdInfo = struct RespCmdInfo;
-using namespace std;
-extern "C" const char *GetRequestStringInfo(int32_t request);
-
-typedef struct RespCmdInfo {
-    int32_t request;
-    int32_t (*respFunc)(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
-        const void *response, size_t responseLen);
-} RespCmdInfo;
-
-typedef struct {
-    int32_t request;
-    void (*requestFunction)(int32_t slotId, struct HdfSBuf *data);
-} ReqCmdInfo;
-
-ReqDataInfo *CreateHRilRequest(int32_t serial, int32_t slotId, int32_t request);
+class IHRilReporter {
+public:
+    virtual int32_t ReportToParent(int32_t requestNum, const HdfSBuf *dataSbuf) = 0;
+    virtual int32_t NotifyToParent(int32_t requestNum, const HdfSBuf *dataSbuf) = 0;
+    virtual ReqDataInfo *CreateHRilRequest(int32_t serial, int32_t slotId, int32_t request) = 0;
+    virtual void ReleaseHRilRequest(int32_t request, ReqDataInfo *requestInfo) = 0;
+};
 
 class HRilBase {
 public:
-    void RegisterResponseCallback(const HdfRemoteService *serviceCallback);
-    void RegisterNotifyCallback(const HdfRemoteService *serviceCallbackInd);
-
-    void SendErrorResponse(const ReqDataInfo *requestInfo, HRilErrno err);
+    HRilBase(IHRilReporter &hrilReporter) : hrilReporter_(hrilReporter) { }
+    virtual ~HRilBase() { }
 
     int32_t ResponseBuffer(
         int32_t requestNum, const void *responseInfo, uint32_t reqLen, const void *event, uint32_t eventLen);
@@ -62,35 +49,35 @@ public:
     HRilNotiType ConvertIntToRadioNoticeType(int32_t indicationType);
     uint8_t ConvertHexCharToInt(uint8_t c);
     uint8_t *ConvertHexStringToBytes(const void *response, size_t responseLen);
-    bool ConvertToString(char **dest, const std::string &src, const ReqDataInfo *requestInfo);
+    bool ConvertToString(char **dest, const std::string &src);
     void FreeStrings(int32_t argCounts, ...);
 
     template<typename T>
-    int32_t ResponseMessageParcel(HRilRadioResponseInfo &responseInfo, T &data, int32_t requestNum)
+    int32_t ResponseMessageParcel(const HRilRadioResponseInfo &responseInfo, const T &data, int32_t requestNum)
     {
         struct HdfSBuf *dataSbuf;
         std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
         if (parcel == nullptr) {
-            return HDF_FAILURE;
+            return HRIL_ERR_NULL_POINT;
         }
         data.Marshalling(*parcel.get());
         dataSbuf = ParcelToSbuf(parcel.get());
         if (dataSbuf == nullptr) {
-            return HDF_FAILURE;
+            return HRIL_ERR_NULL_POINT;
         }
         if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&responseInfo, sizeof(responseInfo))) {
             HdfSBufRecycle(dataSbuf);
-            return HDF_FAILURE;
+            return HRIL_ERR_GENERIC_FAILURE;
         }
         int32_t ret = ServiceDispatcher(requestNum, dataSbuf);
-        if (ret != HDF_SUCCESS) {
+        if (ret != HRIL_ERR_SUCCESS) {
             HdfSBufRecycle(dataSbuf);
-            return HDF_FAILURE;
+            return HRIL_ERR_GENERIC_FAILURE;
         }
         if (dataSbuf != nullptr) {
             HdfSBufRecycle(dataSbuf);
         }
-        return HDF_SUCCESS;
+        return HRIL_ERR_SUCCESS;
     }
 
     template<typename T>
@@ -101,18 +88,18 @@ public:
 
         dataSbuf = ParcelToSbuf(parcel.get());
         if (dataSbuf == nullptr) {
-            return HDF_FAILURE;
+            return HRIL_ERR_NULL_POINT;
         }
         data.Marshalling(*parcel.get());
-        int32_t ret = ServiceDispatcher(requestNum, dataSbuf);
-        if (ret != HDF_SUCCESS) {
+        int32_t ret = ServiceNotifyDispatcher(requestNum, dataSbuf);
+        if (ret != HRIL_ERR_SUCCESS) {
             HdfSBufRecycle(dataSbuf);
-            return HDF_FAILURE;
+            return HRIL_ERR_GENERIC_FAILURE;
         }
         if (dataSbuf != nullptr) {
             HdfSBufRecycle(dataSbuf);
         }
-        return HDF_SUCCESS;
+        return HRIL_ERR_SUCCESS;
     }
 
     int32_t ConvertHexStringToInt(char **response, int32_t index, int32_t length);
@@ -130,15 +117,22 @@ public:
         SafeFrees(ms...);
     }
 
+    inline char *StringToCString(const std::string &src)
+    {
+        return static_cast<char*>(const_cast<char*>(src.c_str()));
+    }
+
 protected:
     // normal dispatcher
     int32_t ServiceDispatcher(int32_t requestNum, const HdfSBuf *dataSbuf);
     // notify dispatcher
     int32_t ServiceNotifyDispatcher(int32_t requestNum, const HdfSBuf *dataSbuf);
 
+    // create request event
+    ReqDataInfo *CreateHRilRequest(int32_t serial, int32_t slotId, int32_t request);
+
 private:
-    const struct HdfRemoteService *serviceCallback_ = nullptr;
-    const struct HdfRemoteService *serviceCallbackNotify_ = nullptr;
+    IHRilReporter &hrilReporter_;
 };
 } // namespace Telephony
 } // namespace OHOS

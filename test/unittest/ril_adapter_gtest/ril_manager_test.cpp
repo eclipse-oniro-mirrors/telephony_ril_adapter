@@ -15,10 +15,11 @@
 
 #include "ril_manager_test.h"
 
-#include "hril_request.h"
 #include "ril_radio_indication_test.h"
 #include "ril_radio_response_test.h"
 #include "telephony_log_wrapper.h"
+
+#include "hril_request.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -537,6 +538,48 @@ void RilManagerTest::RilProcessResponseDone(
     }
     if (responseInfo.error == HRilErrType::NONE) {
         TELEPHONY_LOGI("RilProcessResponseDone success");
+    }
+}
+
+void RilManagerTest::SetUssdCusd(std::string str, const AppExecFwk::InnerEvent::Pointer &result)
+{
+    if (cellularRadio_ != nullptr) {
+        std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_CALL_SET_USSD_CUSD, result);
+        MessageParcel data;
+        MessageParcel reply;
+        data.WriteInt32(request->serialId_);
+        data.WriteCString(str.c_str());
+        MessageOption option = {MessageOption::TF_ASYNC};
+        cellularRadio_->SendRequest(HREQ_CALL_SET_USSD_CUSD, data, reply, option);
+    } else {
+        TELEPHONY_LOGE("SetUssdCusd  cellularRadio_ == nullptr");
+    }
+}
+
+void RilManagerTest::GetUssdCusd(const AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilManagerTest::GetUssdCusd -->");
+    if (cellularRadio_ != nullptr) {
+        std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_CALL_GET_USSD_CUSD, result);
+        SendInt32Event(HREQ_CALL_GET_USSD_CUSD, request->serialId_);
+    } else {
+        TELEPHONY_LOGE("ERROR : GetUssdCusd --> cellularRadio_ == nullptr !!!");
+    }
+}
+
+void RilManagerTest::GetLinkBandwidthInfo(const int32_t cid, const AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilManagerTest::GetLinkBandwidthInfo -->");
+    if (cellularRadio_ != nullptr) {
+        std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_DATA_GET_LINK_BANDWIDTH_INFO, result);
+        MessageParcel data;
+        MessageParcel reply;
+        data.WriteInt32(request->serialId_);
+        data.WriteInt32(cid);
+        MessageOption option = {MessageOption::TF_ASYNC};
+        cellularRadio_->SendRequest(HREQ_DATA_GET_LINK_BANDWIDTH_INFO, data, reply, option);
+    } else {
+        TELEPHONY_LOGE("ERROR : GetLinkBandwidthInfo --> cellularRadio_ == nullptr !!!");
     }
 }
 } // namespace Telephony

@@ -20,28 +20,108 @@
 #include "securec.h"
 
 #include "at_support.h"
-#include "hril_notification.h"
 #include "vendor_report.h"
+
+#include "hril_notification.h"
+
+static int32_t ConvertPdpFailReason(int32_t errorCode)
+{
+    int32_t modemErrorCode = errorCode;
+    int32_t errNo;
+    switch (modemErrorCode) {
+        case PDP_CME_ERR_USER_VERIFICATION:
+        case PDP_CME_ERR_INCORRECT_PASSWORD:
+            errNo = HRIL_PDP_ERR_USER_VERIFICATION;
+            break;
+        case PDP_CME_ERR_INCORRECT_PARAMETERS:
+        case PDP_CME_ERR_OPERATOR_DETERMINED_BARRING:
+            errNo = HRIL_PDP_ERR_OPERATOR_DETERMINED_BARRING;
+            break;
+        case PDP_CME_ERR_SHORTAGE_RESOURCES:
+            errNo = HRIL_PDP_ERR_SHORTAGE_RESOURCES;
+            break;
+        case PDP_CME_ERR_MISSING_OR_UNKNOWN_APN:
+            errNo = HRIL_PDP_ERR_MISSING_OR_UNKNOWN_APN;
+            break;
+        case PDP_CME_ERR_UNKNOWN_PDP_ADDR_OR_TYPE:
+            errNo = HRIL_PDP_ERR_UNKNOWN_PDP_ADDR_OR_TYPE;
+            break;
+        case PDP_CME_ERR_ACTIVATION_REJECTED_GGSN:
+            errNo = HRIL_PDP_ERR_ACTIVATION_REJECTED_GGSN;
+            break;
+        case PDP_CME_ERR_SERVICE_ACTIVATION_REJECTED_UNSPECIFIED:
+            errNo = HRIL_PDP_ERR_ACTIVATION_REJECTED_UNSPECIFIED;
+            break;
+        case PDP_CME_ERR_SERVICE_OPTION_NOT_SUPPORTED:
+            errNo = HRIL_PDP_ERR_SERVICE_OPTION_NOT_SUPPORTED;
+            break;
+        case PDP_CME_ERR_SERVICE_OPTION_NOT_SUBSCRIBED:
+            errNo = HRIL_PDP_ERR_REQUESTED_SERVICE_OPTION_NOT_SUBSCRIBED;
+            break;
+        case PDP_CME_ERR_SERVICE_OPTION_TEMPORARILY_OUT_OF_ORDER:
+            errNo = HRIL_PDP_ERR_SERVICE_OPTION_TEMPORARILY_OUT_OF_ORDER;
+            break;
+        case PDP_CME_ERR_NSAPI_ALREADY_USED:
+            errNo = HRIL_PDP_ERR_NSAPI_ALREADY_USED;
+            break;
+        case PDP_CME_ERR_PROTOCOL_ERRORS:
+            errNo = HRIL_PDP_ERR_PROTOCOL_ERRORS;
+            break;
+        default:
+            errNo = HRIL_PDP_ERR_UNKNOWN;
+            break;
+    }
+    return errNo;
+}
 
 static int32_t OnDataReportErrorMessages(const ReqDataInfo *requestInfo, int32_t err, ResponseInfo *pResponse)
 {
     int32_t errorNo = HRIL_ERR_SUCCESS;
-    struct ReportInfo reportInfo;
-    ModemReportErrorInfo errInfo = {
-        .errorNo = HRIL_ERR_SUCCESS,
-        .errType = HRIL_REPORT_ERR_TYPE_NONE
-    };
+    struct ReportInfo reportInfo = {};
+    ModemReportErrorInfo errInfo = {};
+
     errInfo = GetReportErrorInfo(pResponse);
-    FreeResponseInfo(pResponse);
+    if (err != HRIL_ERR_SUCCESS) {
+        if (err == AT_ERR_CHANNEL_CLOSED) {
+            err = HRIL_ERR_MODEM_DEVICE_CLOSE;
+        } else {
+            err = HRIL_ERR_CMD_SEND_FAILURE;
+        }
+    }
     errorNo = (err != HRIL_ERR_SUCCESS) ? err : errInfo.errorNo;
+    FreeResponseInfo(pResponse);
     if (requestInfo != NULL) {
         reportInfo = CreateReportInfo(requestInfo, errorNo, HRIL_RESPONSE, 0);
     } else {
         reportInfo = CreateReportInfo(requestInfo, errorNo, HRIL_NOTIFICATION, HNOTI_DATA_PDP_CONTEXT_LIST_UPDATED);
     }
     reportInfo.modemErrInfo = errInfo;
-    OnDataReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+    OnDataReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
     return errorNo;
+}
+
+static int32_t OnDataReportPdpErrorMessages(const ReqDataInfo *requestInfo, int32_t err, ResponseInfo *pResponse)
+{
+    struct ReportInfo reportInfo = {};
+    HRilDataCallResponse pDataCall = {};
+    ModemReportErrorInfo errInfo = {};
+
+    errInfo = GetReportErrorInfo(pResponse);
+    FreeResponseInfo(pResponse);
+    if (err != HRIL_ERR_SUCCESS) {
+        if (err == AT_ERR_CHANNEL_CLOSED) {
+            err = HRIL_ERR_MODEM_DEVICE_CLOSE;
+        } else {
+            err = HRIL_ERR_CMD_SEND_FAILURE;
+        }
+    }
+    reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
+    reportInfo.modemErrInfo = errInfo;
+    pDataCall.reason = ConvertPdpFailReason(errInfo.errorNo);
+    pDataCall.retryTime = INT_DEFAULT_VALUE;
+    pDataCall.cid = INT_DEFAULT_VALUE;
+    OnDataReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&pDataCall, sizeof(HRilDataCallResponse));
+    return (err != HRIL_ERR_SUCCESS) ? err : errInfo.errorNo;
 }
 
 int ParsePdpCmd(char *str, HRilDataCallResponse *outData)
@@ -63,6 +143,7 @@ int ParsePdpCmd(char *str, HRilDataCallResponse *outData)
         if (NextInt(&pStr, &outData->active) < 0) {
             return HRIL_ERR_NULL_POINT;
         }
+        outData->reason = HRIL_PDP_ERR_RETRY;
     } else if (ReportStrWith(str, "+CGDCONT:")) {
         if (SkipATPrefix(&pStr) < 0) {
             return HRIL_ERR_NULL_POINT;
@@ -85,7 +166,12 @@ static HRilDataCallResponse *CreatDataCallResponseAndInit(int count)
     HRilDataCallResponse *newDcr = NULL;
 
     size = count * sizeof(HRilDataCallResponse);
-    newDcr = (HRilDataCallResponse *)calloc(DEFAULT_MEM_NMEMB, size);
+    if (size <= 0) {
+        TELEPHONY_LOGE("param is error, size=%{public}d", size);
+        return newDcr;
+    }
+    newDcr = (HRilDataCallResponse *)malloc(size);
+    (void)memset_s(newDcr, size, 0, size);
     return newDcr;
 }
 
@@ -95,15 +181,13 @@ static ModemReportErrorInfo SendInquireCGACT(int *outDataNum, HRilDataCallRespon
     int dataCallNum = 0;
     Line *pLine = NULL;
     ResponseInfo *pResponse = NULL;
-    ModemReportErrorInfo errInfo = {
-        .errorNo = HRIL_ERR_SUCCESS,
-        .errType = HRIL_REPORT_ERR_TYPE_NONE
-    };
+    ModemReportErrorInfo errInfo = {};
 
     ret = SendCommandLock("AT+CGACT?", "+CGACT:", 0, &pResponse);
     if (ret != 0 || !pResponse->success) {
         errInfo = GetReportErrorInfo(pResponse);
-        TELEPHONY_LOGE("send AT CMD failed! ret:%{public}d", ret ? ret : errInfo.errorNo);
+        errInfo.errorNo = (ret != HRIL_ERR_SUCCESS) ? ret : errInfo.errorNo;
+        TELEPHONY_LOGE("send AT CMD failed! ret:%{public}d", errInfo.errorNo);
         FreeResponseInfo(pResponse);
         return errInfo;
     }
@@ -197,14 +281,12 @@ static ModemReportErrorInfo GetLinkInformation(int activeIndex, HRilDataCallResp
     char *lineStr = NULL;
     Line *pLine = NULL;
     ResponseInfo *pResponse = NULL;
-    ModemReportErrorInfo errInfo = {
-        .errorNo = HRIL_ERR_SUCCESS,
-        .errType = HRIL_REPORT_ERR_TYPE_NONE
-    };
+    ModemReportErrorInfo errInfo = {};
 
     ret = SendCommandLock("AT^DHCP?", "^DHCP:", 0, &pResponse);
     if (ret != 0 || !pResponse->success) {
         errInfo = GetReportErrorInfo(pResponse);
+        errInfo.errorNo = (ret != HRIL_ERR_SUCCESS) ? ret : errInfo.errorNo;
         TELEPHONY_LOGE("send AT CMD failed! ret:%{public}d", errInfo.errorNo);
         FreeResponseInfo(pResponse);
         return errInfo;
@@ -230,6 +312,7 @@ static ModemReportErrorInfo GetLinkInformation(int activeIndex, HRilDataCallResp
     (*ppDcr)[activeIndex].dns = strdup(readBuf);
     NextULongFromHex(&lineStr, &addr); // secondary DNS server
     FreeResponseInfo(pResponse);
+    (*ppDcr)[activeIndex].reason = HRIL_PDP_ERR_NONE;
     return errInfo;
 }
 
@@ -237,14 +320,12 @@ static ModemReportErrorInfo SendInquireCGDCONT(int *validCount, int dataNum, HRi
 {
     int ret;
     ResponseInfo *pResponse = NULL;
-    ModemReportErrorInfo errInfo = {
-        .errorNo = HRIL_ERR_SUCCESS,
-        .errType = HRIL_REPORT_ERR_TYPE_NONE
-    };
+    ModemReportErrorInfo errInfo = {};
 
     ret = SendCommandLock("AT+CGDCONT?", "+CGDCONT:", 0, &pResponse);
     if (ret != 0 || !pResponse->success) {
         errInfo = GetReportErrorInfo(pResponse);
+        errInfo.errorNo = (ret != HRIL_ERR_SUCCESS) ? ret : errInfo.errorNo;
         TELEPHONY_LOGE("send AT CMD failed! ret:%{public}d", errInfo.errorNo);
         FreeResponseInfo(pResponse);
         return errInfo;
@@ -266,17 +347,19 @@ static int QueryAllSupportPDNInfos(PDNInfo *pdnInfo)
 {
     char *pStr = NULL;
     int ret = -1;
+    int err = HRIL_ERR_SUCCESS;
     Line *pLine = NULL;
     PDNInfo *pdns = pdnInfo;
     ResponseInfo *pResponse = NULL;
+    ModemReportErrorInfo errInfo = {};
+
     ret = SendCommandLock("AT+CGDCONT?", "+CGDCONT:", 0, &pResponse);
     if (ret != 0 || !pResponse->success) {
-        if (!pResponse->success) {
-            ret = HRIL_ERR_GENERIC_FAILURE;
-        }
-        TELEPHONY_LOGE("send AT CMD failed! ret:%{public}d", ret);
+        errInfo = GetReportErrorInfo(pResponse);
+        errInfo.errorNo = (ret != HRIL_ERR_SUCCESS) ? ret : errInfo.errorNo;
+        TELEPHONY_LOGE("send AT CMD failed! ret:%{public}d", err);
         FreeResponseInfo(pResponse);
-        return ret;
+        return err;
     }
 
     for (pLine = pResponse->head; pLine != NULL; pLine = pLine->next) {
@@ -427,7 +510,7 @@ static void DataReportMessage(int cid, const ReqDataInfo *requestInfo, ModemRepo
         reportInfo.modemErrInfo = errInfo;
         if ((cid == DEFAULT_CID) || (pDataCalls == NULL)) {
             OnDataReport(
-                HRIL_SIM_SLOT_1, reportInfo, (const uint8_t *)pDataCalls, validNum * sizeof(HRilDataCallResponse));
+                HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)pDataCalls, validNum * sizeof(HRilDataCallResponse));
             FreeDataCallResponse(pDataCalls, validNum);
             return;
         }
@@ -436,7 +519,7 @@ static void DataReportMessage(int cid, const ReqDataInfo *requestInfo, ModemRepo
                 break;
             }
         }
-        OnDataReport(HRIL_SIM_SLOT_1, reportInfo, (const uint8_t *)&pDataCalls[index], sizeof(HRilDataCallResponse));
+        OnDataReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&pDataCalls[index], sizeof(HRilDataCallResponse));
     } else {
         /* Change notice */
         reportInfo.requestInfo = NULL;
@@ -445,7 +528,7 @@ static void DataReportMessage(int cid, const ReqDataInfo *requestInfo, ModemRepo
         reportInfo.notifyId = HNOTI_DATA_PDP_CONTEXT_LIST_UPDATED;
         reportInfo.type = HRIL_NOTIFICATION;
         OnDataReport(
-            HRIL_SIM_SLOT_1, reportInfo, (const uint8_t *)pDataCalls, validNum * sizeof(HRilDataCallResponse));
+            HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)pDataCalls, validNum * sizeof(HRilDataCallResponse));
     }
     FreeDataCallResponse(pDataCalls, validNum);
 }
@@ -456,10 +539,7 @@ static void InquirePdpContextList(int cid, const ReqDataInfo *requestInfo)
     int queryCount = 0;
     int dataCallNum = 0;
     HRilDataCallResponse *pDataCalls = NULL;
-    ModemReportErrorInfo errInfo = {
-        .errorNo = HRIL_ERR_SUCCESS,
-        .errType = HRIL_REPORT_ERR_TYPE_NONE
-    };
+    ModemReportErrorInfo errInfo = {};
 
     do {
         errInfo = SendInquireCGACT(&dataCallNum, &pDataCalls);
@@ -507,16 +587,17 @@ static int SendCmdCGDCONT(int cid, const ReqDataInfo *requestInfo, const HRilDat
     char cmd[MAX_CMD_LENGTH] = {0};
     ResponseInfo *pResponse = NULL;
 
-    ret = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CGDCONT=%d,\"%s\",\"%s\"", cid, pDataInfo->type, pDataInfo->apn);
+    ret = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CGDCONT=%d,\"%s\",\"%s\",\"\",0,0",
+        cid, pDataInfo->type, pDataInfo->apn);
     if (ret < 0) {
         TELEPHONY_LOGE("GenerateCommand is failed!");
-        OnDataReportErrorMessages(requestInfo, HRIL_ERR_GENERIC_FAILURE, NULL);
+        OnDataReportPdpErrorMessages(requestInfo, HRIL_ERR_GENERIC_FAILURE, NULL);
         return ret;
     }
     ret = SendCommandLock(cmd, NULL, 0, &pResponse);
     if (ret != 0 || !pResponse->success) {
         err = (ret != HRIL_ERR_SUCCESS) ? ret : err;
-        ret = OnDataReportErrorMessages(requestInfo, err, pResponse);
+        ret = OnDataReportPdpErrorMessages(requestInfo, err, pResponse);
         TELEPHONY_LOGE("cmd send failed, err:%{public}d", ret);
         return ret;
     }
@@ -534,13 +615,13 @@ static int SendCmdNDISDUP(int cid, int activate, const ReqDataInfo *requestInfo)
     ret = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT^NDISDUP=%d,%d", cid, activate);
     if (ret < 0) {
         TELEPHONY_LOGE("GenerateCommand is failed!");
-        OnDataReportErrorMessages(requestInfo, HRIL_ERR_GENERIC_FAILURE, NULL);
+        OnDataReportPdpErrorMessages(requestInfo, HRIL_ERR_GENERIC_FAILURE, NULL);
         return ret;
     }
     ret = SendCommandLock(cmd, NULL, 0, &pResponse);
     if ((ret != HRIL_ERR_SUCCESS) || !pResponse->success) {
         err = (ret != HRIL_ERR_SUCCESS) ? ret : err;
-        ret = OnDataReportErrorMessages(requestInfo, err, pResponse);
+        ret = OnDataReportPdpErrorMessages(requestInfo, err, pResponse);
         TELEPHONY_LOGE("cmd send failed, err:%{public}d", ret);
         return ret;
     }
@@ -591,11 +672,11 @@ void ReqActivatePdpContext(const ReqDataInfo *requestInfo, const HRilDataInfo *d
 
     if (pDataInfo == NULL) {
         TELEPHONY_LOGE("data is null!!!");
-        OnDataReportErrorMessages(requestInfo, HRIL_ERR_INVALID_PARAMETER, NULL);
+        OnDataReportPdpErrorMessages(requestInfo, HRIL_ERR_INVALID_PARAMETER, NULL);
         return;
     }
     if (RouteUp() != HRIL_ERR_SUCCESS) {
-        OnDataReportErrorMessages(requestInfo, HRIL_ERR_GENERIC_FAILURE, NULL);
+        OnDataReportPdpErrorMessages(requestInfo, HRIL_ERR_GENERIC_FAILURE, NULL);
         return;
     }
     cid = GetNeedActivateCid(pDataInfo->apn, pDataInfo->type);
@@ -613,10 +694,7 @@ void ReqActivatePdpContext(const ReqDataInfo *requestInfo, const HRilDataInfo *d
 void ReqDeactivatePdpContext(const ReqDataInfo *requestInfo, const HRilDataInfo *data)
 {
     const HRilDataInfo *pDataInfo = data;
-    ModemReportErrorInfo errInfo = {
-        .errorNo = HRIL_ERR_SUCCESS,
-        .errType = HRIL_REPORT_ERR_TYPE_NONE
-    };
+    ModemReportErrorInfo errInfo = {};
 
     if (pDataInfo == NULL) {
         TELEPHONY_LOGE("data is null!!!");
@@ -637,4 +715,170 @@ void ReqDeactivatePdpContext(const ReqDataInfo *requestInfo, const HRilDataInfo 
 void ReqGetPdpContextList(const ReqDataInfo *requestInfo)
 {
     InquirePdpContextList(DEFAULT_CID, requestInfo);
+}
+
+static int32_t SetDataProfileInfo(int32_t cid, const ReqDataInfo *requestInfo, const HRilDataInfo *pDataInfo)
+{
+    int ret;
+    int err = HRIL_ERR_SUCCESS;
+    char cmd[MAX_CMD_LENGTH] = {0};
+    ResponseInfo *pResponse = NULL;
+
+    ret = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CGDCONT=%d,\"%s\",\"%s\",\"\",0,0",
+        cid, pDataInfo->type, pDataInfo->apn);
+    if (ret < 0) {
+        TELEPHONY_LOGE("GenerateCommand is failed!");
+        OnDataReportErrorMessages(requestInfo, HRIL_ERR_GENERIC_FAILURE, NULL);
+        return ret;
+    }
+    ret = SendCommandLock(cmd, NULL, 0, &pResponse);
+    if (ret != 0 || !pResponse->success) {
+        err = (ret != HRIL_ERR_SUCCESS) ? ret : err;
+        ret = OnDataReportErrorMessages(requestInfo, err, pResponse);
+        TELEPHONY_LOGE("cmd send failed, err:%{public}d", err);
+        return ret;
+    }
+    FreeResponseInfo(pResponse);
+    if ((pDataInfo->verType >= VERIFY_TYPE_MIN) && (pDataInfo->verType <= VERIFY_TYPE_MAX)) {
+        ret = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT^AUTHDATA=%d,%d,\"\",\"%s\",\"%s\"",
+            cid, pDataInfo->verType, pDataInfo->password, pDataInfo->userName);
+        if (ret < 0) {
+            TELEPHONY_LOGE("GenerateCommand is failed!");
+            OnDataReportErrorMessages(requestInfo, HRIL_ERR_GENERIC_FAILURE, NULL);
+            return ret;
+        }
+        ret = SendCommandLock(cmd, NULL, 0, &pResponse);
+        if (ret != 0 || !pResponse->success) {
+            err = (ret != HRIL_ERR_SUCCESS) ? ret : err;
+            ret = OnDataReportErrorMessages(requestInfo, err, pResponse);
+            TELEPHONY_LOGE("cmd send failed, err:%{public}d", err);
+            return ret;
+        }
+        FreeResponseInfo(pResponse);
+    }
+    return HRIL_ERR_SUCCESS;
+}
+
+void ReqSetInitApnInfo(const ReqDataInfo *requestInfo, const HRilDataInfo *data)
+{
+    int cid = INT_DEFAULT_VALUE;
+    struct ReportInfo reportInfo = {};
+    const HRilDataInfo *pDataInfo = data;
+    ModemReportErrorInfo errInfo = {};
+
+    if (pDataInfo == NULL) {
+        TELEPHONY_LOGE("data is null!!!");
+        OnDataReportErrorMessages(requestInfo, HRIL_ERR_INVALID_PARAMETER, NULL);
+        return;
+    }
+    cid = GetNeedActivateCid(pDataInfo->apn, pDataInfo->type);
+    if (SetDataProfileInfo(cid, requestInfo, pDataInfo) != HRIL_ERR_SUCCESS) {
+        TELEPHONY_LOGE("Set data profile info is failed!");
+        return;
+    }
+    reportInfo = CreateReportInfo(requestInfo, errInfo.errorNo, HRIL_RESPONSE, 0);
+    reportInfo.modemErrInfo = errInfo;
+    OnDataReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+}
+
+void ReqSetLinkBandwidthReportingRule(const ReqDataInfo *requestInfo, const HRilLinkBandwidthReportingRule *data)
+{
+    struct ReportInfo reportInfo = {};
+    const HRilLinkBandwidthReportingRule *linkBandwidthRule = data;
+    ModemReportErrorInfo errInfo = {};
+
+    if (linkBandwidthRule == NULL) {
+        TELEPHONY_LOGE("data is null!!!");
+        OnDataReportErrorMessages(requestInfo, HRIL_ERR_INVALID_PARAMETER, NULL);
+        return;
+    }
+    TELEPHONY_LOGI("rat:%{public}d, delayMs:%{public}d", linkBandwidthRule->rat, linkBandwidthRule->delayMs);
+    reportInfo = CreateReportInfo(requestInfo, errInfo.errorNo, HRIL_RESPONSE, 0);
+    reportInfo.modemErrInfo = errInfo;
+    OnDataReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+}
+
+static int32_t CallCmdC5GQOSRDP(const char *lineCmd, HRilLinkBandwidthInfo *outCall)
+{
+    char *pLine = (char *)lineCmd;
+    if (pLine == NULL || outCall == NULL) {
+        TELEPHONY_LOGE("pLine or outCall is null.");
+        return HRIL_ERR_NULL_POINT;
+    }
+    if (SkipATPrefix(&pLine) < 0) {
+        return HRIL_ERR_NULL_POINT;
+    }
+    if (NextInt(&pLine, &outCall->cid) < 0) {
+        return HRIL_ERR_NULL_POINT;
+    }
+    if (NextInt(&pLine, &outCall->qi) < 0) {
+        return HRIL_ERR_NULL_POINT;
+    }
+    if (NextInt(&pLine, &outCall->dlGfbr) < 0) {
+        return HRIL_ERR_NULL_POINT;
+    }
+    if (NextInt(&pLine, &outCall->ulGfbr) < 0) {
+        return HRIL_ERR_NULL_POINT;
+    }
+    if (NextInt(&pLine, &outCall->dlMfbr) < 0) {
+        return HRIL_ERR_NULL_POINT;
+    }
+    if (NextInt(&pLine, &outCall->ulMfbr) < 0) {
+        return HRIL_ERR_NULL_POINT;
+    }
+    if (NextInt(&pLine, &outCall->ulSambr) < 0) {
+        return HRIL_ERR_NULL_POINT;
+    }
+    if (NextInt(&pLine, &outCall->dlSambr) < 0) {
+        return HRIL_ERR_NULL_POINT;
+    }
+    if (NextInt(&pLine, &outCall->averagingWindow) < 0) {
+        return HRIL_ERR_NULL_POINT;
+    }
+    return HRIL_ERR_SUCCESS;
+}
+
+void ReqGetLinkBandwidthInfo(const ReqDataInfo *requestInfo, const int cid)
+{
+    int ret;
+    char *line = NULL;
+    int err = HRIL_ERR_SUCCESS;
+    HRilLinkBandwidthInfo uplinkAndDownlinkBandwidth = {0};
+    struct ReportInfo reportInfo;
+    ResponseInfo *pResponse = NULL;
+    ModemReportErrorInfo errInfo = {};
+    char cmd[MAX_CMD_LENGTH] = {0};
+
+    errInfo = InitModemReportErrorInfo();
+    ret = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+C5GQOSRDP=%d", cid);
+    if (ret < 0) {
+        TELEPHONY_LOGE("GenerateCommand is failed!");
+        OnDataReportErrorMessages(requestInfo, HRIL_ERR_GENERIC_FAILURE, NULL);
+        return;
+    }
+    ret = SendCommandLock(cmd, "+C5GQOSRDP:", 0, &pResponse);
+    if (ret || (pResponse != NULL && !pResponse->success)) {
+        err = ret ? ret : err;
+        TELEPHONY_LOGE("cmd send failed, err:%{public}d", err);
+        OnDataReportErrorMessages(requestInfo, err, pResponse);
+        return;
+    }
+    if (pResponse->head) {
+        line = pResponse->head->data;
+        ret = CallCmdC5GQOSRDP(line, &uplinkAndDownlinkBandwidth);
+        if (ret != 0) {
+            TELEPHONY_LOGE("Parse C5GQOSRDP data is fail. ret:%{public}d", ret);
+            return;
+        }
+        TELEPHONY_LOGI(
+            "+C5GQOSRDP:%{public}d, %{public}d", uplinkAndDownlinkBandwidth.cid, uplinkAndDownlinkBandwidth.qi);
+    } else {
+        TELEPHONY_LOGE("ERROR: pResponse->head is null");
+        err = HRIL_ERR_GENERIC_FAILURE;
+    }
+    reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
+    reportInfo.modemErrInfo = errInfo;
+    OnDataReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&uplinkAndDownlinkBandwidth,
+        sizeof(HRilLinkBandwidthInfo));
+    FreeResponseInfo(pResponse);
 }

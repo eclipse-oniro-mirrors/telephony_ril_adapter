@@ -14,7 +14,7 @@
  */
 
 #include "at_support.h"
-#include "channel.h"
+#include "vendor_channel.h"
 #include "vendor_util.h"
 
 static int g_atFd = -1;
@@ -117,6 +117,7 @@ void FreeResponseInfo(ResponseInfo *resp)
 
 void ReaderLoop(void)
 {
+    TELEPHONY_LOGI("%{public}s enter", __func__);
     g_readerClosed = 0;
     while (1) {
         const char *str = NULL;
@@ -127,7 +128,9 @@ void ReaderLoop(void)
             break;
         }
         if (IsSmsNotify(str)) {
+            TELEPHONY_LOGI("new sms notify :%{public}s", str);
             pdu = ReadResponse(g_atFd);
+            TELEPHONY_LOGI("pdu :%{public}s", pdu);
         }
         ProcessResponse(str, pdu);
     }
@@ -153,6 +156,7 @@ void ProcessResponse(const char *responseLine, const char *pdu)
         return;
     }
 
+    TELEPHONY_LOGI("processLine line = %{public}s", responseLine);
     int isPrefix = ReportStrWith(responseLine, (const char *)g_prefix);
     pthread_mutex_lock(&g_commandmutex);
     if (g_response == NULL) {
@@ -220,12 +224,13 @@ int SendCommandLock(const char *command, const char *prefix, long long timeout, 
         return AT_ERR_INVALID_THREAD;
     }
 
+    TELEPHONY_LOGI("command %{public}s, NeedATPause:%{public}d, atCmd:%{public}s", command, g_isNeedATPause, atCmd);
     pthread_mutex_lock(&g_commandmutex);
     if (g_isNeedATPause) {
         pthread_cond_signal(&g_commandcond);
         err = SendCommandNoLock(atCmd, timeout, outResponse);
         if (err != 0) {
-            TELEPHONY_LOGE("NeedATPause err = %{public}d cmd:%{public}s", err, command);
+            TELEPHONY_LOGI("NeedATPause err = %{public}d cmd:%{public}s", err, command);
         }
         if (g_atWatch != NULL) {
             g_atWatch();
@@ -236,12 +241,12 @@ int SendCommandLock(const char *command, const char *prefix, long long timeout, 
     g_prefix = prefix;
     err = SendCommandNoLock(command, timeout, outResponse);
     pthread_mutex_unlock(&g_commandmutex);
-    TELEPHONY_LOGE("err = %{public}d, cmd:%{public}s", err, command);
+    TELEPHONY_LOGI("err = %{public}d, cmd:%{public}s", err, command);
     // when timeout to process
     if (err == AT_ERR_TIMEOUT && g_onTimeout != NULL) {
         g_onTimeout();
     } else if (err == AT_ERR_GENERIC) {
-        TELEPHONY_LOGE("OnReaderClosed() err = %{public}d", err);
+        TELEPHONY_LOGI("OnReaderClosed() err = %{public}d", err);
         OnReaderClosed();
     }
     return err;
@@ -259,7 +264,7 @@ int SendCommandNetWorksLock(const char *command, const char *prefix, long long t
     g_prefix = prefix;
     err = SendCommandNoLock(command, timeout, outResponse);
     pthread_mutex_unlock(&g_commandmutex);
-    TELEPHONY_LOGE("err = %{public}d, cmd:%{public}s", err, command);
+    TELEPHONY_LOGI("err = %{public}d, cmd:%{public}s", err, command);
     // when timeout to process
     if (err == AT_ERR_TIMEOUT) {
         err = AT_ERR_WAITING;
@@ -280,7 +285,7 @@ int SendCommandSmsLock(
     g_smsPdu = smsPdu;
     err = SendCommandNoLock(command, timeout, outResponse);
     pthread_mutex_unlock(&g_commandmutex);
-    TELEPHONY_LOGE("err = %{public}d, cmd:%{public}s", err, command);
+    TELEPHONY_LOGI("err = %{public}d, cmd:%{public}s", err, command);
     // when timeout to process
     if (err == AT_ERR_TIMEOUT && g_onTimeout != NULL) {
         g_onTimeout();
@@ -288,11 +293,8 @@ int SendCommandSmsLock(
     return err;
 }
 
-int SendCommandNoLock(const char *command, long long timeout, ResponseInfo **outResponse)
+static int GresponseJudgeWhetherIsempty(int err)
 {
-    long long defaultTimeout = 50000;
-    int err = 0;
-    struct timespec time;
     if (g_response != NULL) {
         err = AT_ERR_COMMAND_PENDING;
         TELEPHONY_LOGE("g_response is not null, so the command cannot be sent.");
@@ -306,13 +308,24 @@ int SendCommandNoLock(const char *command, long long timeout, ResponseInfo **out
         ClearCurCommand();
         return err;
     }
+    err = VENDOR_SUCCESS;
+    return err;
+}
+
+int SendCommandNoLock(const char *command, long long timeout, ResponseInfo **outResponse)
+{
+    long long defaultTimeOut = DEFAULT_LONG_TIMEOUT;
+    int err = 0;
+    struct timespec time;
+
+    GresponseJudgeWhetherIsempty(err);
     err = WriteATCommand(command, 0, g_atFd);
     if (err != VENDOR_SUCCESS) {
         TELEPHONY_LOGE("send AT cmd is fail, err:%{public}d.", err);
         ClearCurCommand();
         return err;
     }
-    SetWaitTimeout(&time, (timeout != 0) ? timeout : defaultTimeout);
+    SetWaitTimeout(&time, (timeout != 0) ? timeout : defaultTimeOut);
     while (g_response->result == NULL && g_readerClosed == 0) {
         err = pthread_cond_timedwait(&g_commandcond, &g_commandmutex, &time);
         if (err == ETIMEDOUT) {

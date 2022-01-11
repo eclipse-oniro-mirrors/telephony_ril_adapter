@@ -108,6 +108,13 @@ public:
         bool allowRoaming, const AppExecFwk::InnerEvent::Pointer &response);
     void DeactivatePdpContext(int32_t ci, int32_t reason, const AppExecFwk::InnerEvent::Pointer &response);
     void GetSimStatus(const AppExecFwk::InnerEvent::Pointer &result);
+    void SetUssdCusd(std::string str, const AppExecFwk::InnerEvent::Pointer &result);
+    void GetUssdCusd(const AppExecFwk::InnerEvent::Pointer &result);
+    void OpenLogicalSimIO(std::string appID, int32_t p2, const AppExecFwk::InnerEvent::Pointer &response);
+    void CloseLogicalSimIO(int chanID, const AppExecFwk::InnerEvent::Pointer &response);
+    void TransmitApduSimIO(ApduSimIORequestInfo reqInfo, const AppExecFwk::InnerEvent::Pointer &response);
+    void UnlockSimLock(int32_t lockType, std::string passward, const AppExecFwk::InnerEvent::Pointer &response);
+    void GetLinkBandwidthInfo(const int32_t cid, const AppExecFwk::InnerEvent::Pointer &result);
 
     static const int INVALID_WAKELOCK = -1;
     static const int FOR_WAKELOCK = 0;

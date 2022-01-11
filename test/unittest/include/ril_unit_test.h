@@ -58,6 +58,13 @@ public:
     void GetRilCurrentCellInfoTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void DeactivateRilCmDataCallTest(const AppExecFwk::InnerEvent::Pointer &result);
     void OnProcessInput(int32_t what, const OHOS::AppExecFwk::InnerEvent::Pointer &event);
+    void SetUssdCusdTest(const AppExecFwk::InnerEvent::Pointer &result);
+    void GetUssdCusdTest(const AppExecFwk::InnerEvent::Pointer &result);
+    void OpenLogicalSimIO(const AppExecFwk::InnerEvent::Pointer &result);
+    void CloseLogicalSimIO(const AppExecFwk::InnerEvent::Pointer &result);
+    void TransmitApduSimIO(const AppExecFwk::InnerEvent::Pointer &result);
+    void UnlockSimLock(const AppExecFwk::InnerEvent::Pointer &result);
+    void GetLinkBandwidthInfoTest(const AppExecFwk::InnerEvent::Pointer &result);
     void OnInitInterface();
 
     class DemoHandler : public AppExecFwk::EventHandler {
