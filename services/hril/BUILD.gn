@@ -63,7 +63,9 @@ ohos_shared_library("hril") {
   include_dirs = [
     "$RIL_ADAPTER/ril_adapter/services/hril/include",
     "//drivers/adapter/uhdf2/include/hdi",
+    "$RIL_ADAPTER/ril_adapter/interfaces/innerkits/include",
     "//third_party/json/include",
+    "include",
   ]
   public_configs = [ ":hril_config" ]
   defines = [
@@ -71,13 +73,21 @@ ohos_shared_library("hril") {
     "LOG_DOMAIN = 0xD002B01",
   ]
   deps = [
+    "//base/miscservices/time/services:time_service",
+    "//base/notification/ans_standard/frameworks/wantagent:wantagent_innerkits",
     "//base/telephony/core_service/utils:libtelephony_common",
-    "//base/telephony/ril_adapter/interfaces/innerkits:hril_innerkits",
+    "//base/telephony/ril_adapter/frameworks:hril_innerkits",
     "//drivers/adapter/uhdf2/host:libhdf_host",
     "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
     "//drivers/adapter/uhdf2/utils:libhdf_utils",
+    "//foundation/distributedschedule/dmsfwk/services/dtbschedmgr:distributedschedsvr",
   ]
-  external_deps = [ "ipc:ipc_core" ]
+  external_deps = [
+    "aafwk_standard:want",
+    "ipc:ipc_core",
+    "safwk:system_ability_fwk",
+    "samgr_standard:samgr_proxy",
+  ]
 
   public_deps = [ "//utils/native/base:utils" ]
 

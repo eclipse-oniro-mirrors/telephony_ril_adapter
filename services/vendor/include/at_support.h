@@ -22,6 +22,8 @@
 
 #include "telephony_log_c.h"
 
+#define DEFAULT_LONG_TIMEOUT 50000
+
 typedef struct Line {
     struct Line *next;
     char *data;
@@ -64,4 +66,5 @@ void SetWatchFunction(void (*WatchFun)(void));
 
 void SetAtPauseFlag(bool isNeedPause);
 bool GetAtPauseFlag(void);
+
 #endif // OHOS_AT_SUPPORT_H

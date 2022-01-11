@@ -39,7 +39,7 @@ ohos_unittest("tel_ril_adapter_gtest") {
     "include",
   ]
   deps = [
-    "$RIL_ADAPTER/ril_adapter/interfaces/innerkits:hril_innerkits",
+    "$RIL_ADAPTER/ril_adapter/frameworks:hril_innerkits",
     "$RIL_ADAPTER/ril_adapter/services/hril:hril",
     "$RIL_ADAPTER/ril_adapter/services/hril_hdf:hril_hdf",
     "$RIL_ADAPTER/ril_adapter/services/vendor:ril_vendor",

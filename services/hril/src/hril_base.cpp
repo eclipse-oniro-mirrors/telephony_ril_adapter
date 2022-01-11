@@ -17,38 +17,30 @@
 
 namespace OHOS {
 namespace Telephony {
-void HRilBase::SendErrorResponse(const ReqDataInfo *requestInfo, HRilErrno err)
-{
-    if (requestInfo != nullptr) {
-        TELEPHONY_LOGE("req: [%{public}d,%{public}d,%{public}d], error response: %{public}d", requestInfo->serial,
-            (int32_t)requestInfo->slotId, requestInfo->request, err);
-    }
-}
-
 int32_t HRilBase::ResponseBuffer(
     int32_t requestNum, const void *responseInfo, uint32_t reqLen, const void *event, uint32_t eventLen)
 {
     struct HdfSBuf *dataSbuf = HdfSBufTypedObtain(SBUF_IPC);
     if (dataSbuf == nullptr) {
-        return HDF_FAILURE;
+        return HRIL_ERR_NULL_POINT;
     }
     if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)responseInfo, reqLen)) {
         HdfSBufRecycle(dataSbuf);
-        return HDF_FAILURE;
+        return HRIL_ERR_GENERIC_FAILURE;
     }
     if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)event, eventLen)) {
         HdfSBufRecycle(dataSbuf);
-        return HDF_FAILURE;
+        return HRIL_ERR_GENERIC_FAILURE;
     }
     int32_t ret = ServiceDispatcher(requestNum, dataSbuf);
-    if (ret != HDF_SUCCESS) {
+    if (ret != HRIL_ERR_SUCCESS) {
         HdfSBufRecycle(dataSbuf);
-        return HDF_FAILURE;
+        return HRIL_ERR_GENERIC_FAILURE;
     }
     if (dataSbuf != nullptr) {
         HdfSBufRecycle(dataSbuf);
     }
-    return HDF_SUCCESS;
+    return HRIL_ERR_SUCCESS;
 }
 
 int32_t HRilBase::ResponseInt32(int32_t requestNum, const void *responseInfo, uint32_t reqLen, uint32_t value)
@@ -56,62 +48,63 @@ int32_t HRilBase::ResponseInt32(int32_t requestNum, const void *responseInfo, ui
     struct HdfSBuf *dataSbuf = HdfSBufTypedObtain(SBUF_IPC);
     if (dataSbuf == nullptr) {
         TELEPHONY_LOGE("Get dataSbuf is nullptr.");
-        return HDF_FAILURE;
+        return HRIL_ERR_NULL_POINT;
     }
     if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)responseInfo, reqLen)) {
         HdfSBufRecycle(dataSbuf);
-        return HDF_FAILURE;
+        return HRIL_ERR_GENERIC_FAILURE;
     }
     if (!HdfSbufWriteInt32(dataSbuf, value)) {
         HdfSBufRecycle(dataSbuf);
         TELEPHONY_LOGE("HdfSbufWriteInt32 is fail.");
-        return HDF_FAILURE;
+        return HRIL_ERR_GENERIC_FAILURE;
     }
     int32_t ret = ServiceDispatcher(requestNum, dataSbuf);
-    if (ret != HDF_SUCCESS) {
+    TELEPHONY_LOGI("ret:%{public}d value:%{public}d ", ret, value);
+    if (ret != HRIL_ERR_SUCCESS) {
         HdfSBufRecycle(dataSbuf);
-        return HDF_FAILURE;
+        return HRIL_ERR_GENERIC_FAILURE;
     }
     if (dataSbuf != nullptr) {
         HdfSBufRecycle(dataSbuf);
     }
-    return HDF_SUCCESS;
+    return HRIL_ERR_SUCCESS;
 }
 
 int32_t HRilBase::ResponseRequestInfo(int32_t requestNum, const void *responseInfo, uint32_t reqLen)
 {
     struct HdfSBuf *dataSbuf = HdfSBufTypedObtain(SBUF_IPC);
     if (dataSbuf == nullptr) {
-        return HDF_FAILURE;
+        return HRIL_ERR_NULL_POINT;
     }
     if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)responseInfo, reqLen)) {
         HdfSBufRecycle(dataSbuf);
-        return HDF_FAILURE;
+        return HRIL_ERR_GENERIC_FAILURE;
     }
     int32_t ret = ServiceDispatcher(requestNum, dataSbuf);
-    if (ret != HDF_SUCCESS) {
+    if (ret != HRIL_ERR_SUCCESS) {
         HdfSBufRecycle(dataSbuf);
-        return HDF_FAILURE;
+        return HRIL_ERR_GENERIC_FAILURE;
     }
     if (dataSbuf != nullptr) {
         HdfSBufRecycle(dataSbuf);
     }
-    return HDF_SUCCESS;
+    return HRIL_ERR_SUCCESS;
 }
 
 int32_t HRilBase::ConvertHexStringToInt(char **response, int32_t index, int32_t length)
 {
     const int32_t hexBase = HRIL_INVALID_HEX_CHAR;
     if ((response == nullptr) || (length <= index) || (response[index] == nullptr)) {
-        return HDF_FAILURE;
+        return HRIL_ERR_GENERIC_FAILURE;
     }
     return strtol(response[index], nullptr, hexBase);
 }
 
 HRilNotiType HRilBase::ConvertIntToRadioNoticeType(int32_t indicationType)
 {
-    return (indicationType == HRIL_NOTIFICATION_TYPE) ? (HRilNotiType::HRIL_NOTIFICATION) :
-                                                        (HRilNotiType::HRIL_NO_DEFINE);
+    return (indicationType == (int32_t)ReportType::HRIL_NOTIFICATION)
+        ? (HRilNotiType::HRIL_NOTIFICATION) : (HRilNotiType::HRIL_NO_DEFINE);
 }
 
 uint8_t HRilBase::ConvertHexCharToInt(uint8_t ch)
@@ -161,7 +154,7 @@ uint8_t *HRilBase::ConvertHexStringToBytes(const void *response, size_t length)
     return bytes;
 }
 
-bool HRilBase::ConvertToString(char **dest, const std::string &srcStr, const ReqDataInfo *requestInfo)
+bool HRilBase::ConvertToString(char **dest, const std::string &srcStr)
 {
     size_t size = srcStr.size();
     if (size == 0) {
@@ -175,7 +168,7 @@ bool HRilBase::ConvertToString(char **dest, const std::string &srcStr, const Req
 
     *dest = (char *)calloc(len, sizeof(char));
     if (*dest == nullptr) {
-        SendErrorResponse(requestInfo, HRIL_ERR_MEMORY_FULL);
+        TELEPHONY_LOGE("ConvertToString malloc fail");
         return false;
     }
     (void)strncpy_s(*dest, len, reinterpret_cast<const char *>(srcStr.c_str()), size);
@@ -197,36 +190,19 @@ void HRilBase::FreeStrings(int32_t argCounts, ...)
     va_end(list);
 }
 
-void HRilBase::RegisterResponseCallback(const HdfRemoteService *serviceCallback)
-{
-    serviceCallback_ = serviceCallback;
-}
-
-void HRilBase::RegisterNotifyCallback(const HdfRemoteService *serviceCallbackInd)
-{
-    serviceCallbackNotify_ = serviceCallbackInd;
-}
-
 int32_t HRilBase::ServiceDispatcher(int32_t requestNum, const HdfSBuf *dataSbuf)
 {
-    if (serviceCallback_ != nullptr && serviceCallback_->dispatcher != nullptr) {
-        return serviceCallback_->dispatcher->Dispatch(
-            const_cast<HdfRemoteService *>(serviceCallback_), requestNum, const_cast<HdfSBuf *>(dataSbuf), nullptr);
-    } else {
-        TELEPHONY_LOGE("it is null, serviceCallback_=%{public}p", serviceCallback_);
-        return HDF_FAILURE;
-    }
+    return hrilReporter_.ReportToParent(requestNum, dataSbuf);
 }
 
 int32_t HRilBase::ServiceNotifyDispatcher(int32_t requestNum, const HdfSBuf *dataSbuf)
 {
-    if (serviceCallbackNotify_ != nullptr && serviceCallbackNotify_->dispatcher != nullptr) {
-        return serviceCallbackNotify_->dispatcher->Dispatch(const_cast<HdfRemoteService *>(serviceCallbackNotify_),
-            requestNum, const_cast<HdfSBuf *>(dataSbuf), nullptr);
-    } else {
-        TELEPHONY_LOGE("it is null, serviceCallbackNotify_=%{public}p", serviceCallback_);
-        return HDF_FAILURE;
-    }
+    return hrilReporter_.NotifyToParent(requestNum, dataSbuf);
+}
+
+ReqDataInfo *HRilBase::CreateHRilRequest(int32_t serial, int32_t slotId, int32_t request)
+{
+    return hrilReporter_.CreateHRilRequest(serial, slotId, request);
 }
 } // namespace Telephony
 } // namespace OHOS

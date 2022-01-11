@@ -14,9 +14,16 @@
  */
 
 #ifndef OHOS_AT_SIM_H
-#define OHOS_AT_SIM_H
 
-#include "hril.h"
+#include <ctype.h>
+#include <stddef.h>
+#include <stdlib.h>
+
+#include "securec.h"
+
+#include "hril_vendor_sim_defs.h"
+
+#define OHOS_AT_SIM_H
 
 void ReqGetSimStatus(const ReqDataInfo *requestInfo);
 void ReqGetSimIO(const ReqDataInfo *requestInfo, const HRilSimIO *data, size_t dataLen);
@@ -31,4 +38,13 @@ void ReqUnlockPin2(const ReqDataInfo *requestInfo, const char *pin2);
 void ReqUnlockPuk2(const ReqDataInfo *requestInfo, const char *puk2, const char *pin2);
 void ReqGetSimPin2InputTimes(const ReqDataInfo *requestInfo);
 void ReqSetActiveSim(const ReqDataInfo *requestInfo, int32_t index, int32_t enable);
+void ReqSendTerminalResponseCmd(const ReqDataInfo *requestInfo, const char *strCmd);
+void ReqSendEnvelopeCmd(const ReqDataInfo *requestInfo, const char *strCmd);
+void ReqStkControllerIsReady(const ReqDataInfo *requestInfo);
+void ReqStkCmdCallSetup(const ReqDataInfo *requestInfo, int flagAccept);
+void ReqSetRadioProtocol(const ReqDataInfo *requestInfo, const HRilSimProtocolRequest *data, size_t dataLen);
+void ReqOpenLogicalSimIO(const ReqDataInfo *requestInfo, const char *appID, int32_t p2);
+void ReqCloseLogicalSimIO(const ReqDataInfo *requestInfo, int chanID);
+void ReqTransmitApduSimIO(const ReqDataInfo *requestInfo, HRilApduSimIO *data, size_t dataLen);
+void ReqUnlockSimLock(const ReqDataInfo *requestInfo, int32_t lockType, const char *passward);
 #endif // OHOS_AT_SIM_H

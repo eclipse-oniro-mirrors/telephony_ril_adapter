@@ -15,15 +15,19 @@
 
 #include "hril_hdf.h"
 
+#include <stdlib.h>
+#include <libudev.h>
 #include <pthread.h>
 
 #include "dfx_signal_handler.h"
 #include "parameter.h"
 
+#include "modem_config.h"
 #include "telephony_log_c.h"
 
 #define RIL_VENDOR_LIB_PATH "persist.sys.radio.vendorlib.path"
 #define PARAMETER_SIZE 256
+#define BASE_HEX 16
 
 static struct HRilReport g_reportOps = {
     OnCallReport,
@@ -34,7 +38,7 @@ static struct HRilReport g_reportOps = {
     OnSmsReport
 };
 
-static int GetVendorLibPath(char *path, int length)
+static int GetVendorLibPath(char *path)
 {
     int code = GetParameter(RIL_VENDOR_LIB_PATH, "", path, PARAMETER_SIZE);
     if (code <= 0) {
@@ -42,6 +46,70 @@ static int GetVendorLibPath(char *path, int length)
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
+}
+
+static UsbDeviceInfo *GetPresetInformation(const char *vId, const char *pId)
+{
+    char *out = NULL;
+    UsbDeviceInfo *uDevInfo = NULL;
+    int32_t idVendor = (int32_t)strtol(vId, &out, BASE_HEX);
+    int32_t idProduct = (int32_t)strtol(pId, &out, BASE_HEX);
+    for (uint32_t i = 0; i < sizeof(g_usbModemVendorInfo) / sizeof(UsbDeviceInfo); i++) {
+        if (g_usbModemVendorInfo[i].idVendor == idVendor && g_usbModemVendorInfo[i].idProduct == idProduct) {
+            TELEPHONY_LOGI("list index:%{public}d", i);
+            uDevInfo = &g_usbModemVendorInfo[i];
+            break;
+        }
+    }
+    return uDevInfo;
+}
+
+static UsbDeviceInfo *GetUsbDeviceInfo(void)
+{
+    struct udev *udev;
+    struct udev_enumerate *enumerate;
+    struct udev_list_entry *devices, *dev_list_entry;
+    struct udev_device *dev;
+    UsbDeviceInfo *uDevInfo = NULL;
+
+    udev = udev_new();
+    if (udev == NULL) {
+        TELEPHONY_LOGE("Can't create udev");
+        return uDevInfo;
+    }
+    enumerate = udev_enumerate_new(udev);
+    if (enumerate == NULL) {
+        TELEPHONY_LOGE("Can't create enumerate");
+        return uDevInfo;
+    }
+    udev_enumerate_add_match_subsystem(enumerate, "tty");
+    udev_enumerate_scan_devices(enumerate);
+    devices = udev_enumerate_get_list_entry(enumerate);
+    udev_list_entry_foreach(dev_list_entry, devices) {
+        const char *path = udev_list_entry_get_name(dev_list_entry);
+        if (path == NULL) {
+            continue;
+        }
+        dev = udev_device_new_from_syspath(udev, path);
+        if (dev == NULL) {
+            continue;
+        }
+        dev = udev_device_get_parent_with_subsystem_devtype(dev, "usb", "usb_device");
+        if (!dev) {
+            TELEPHONY_LOGE("Unable to find parent usb device.");
+            return uDevInfo;
+        }
+        const char *cIdVendor = udev_device_get_sysattr_value(dev, "idVendor");
+        const char *cIdProduct = udev_device_get_sysattr_value(dev, "idProduct");
+        uDevInfo = GetPresetInformation(cIdVendor, cIdProduct);
+        udev_device_unref(dev);
+        if (uDevInfo != NULL) {
+            break;
+        }
+    }
+    udev_enumerate_unref(enumerate);
+    udev_unref(udev);
+    return uDevInfo;
 }
 
 static void LoadVendor(void)
@@ -53,17 +121,21 @@ static void LoadVendor(void)
     // functions returned by ril init function in vendor ril
     const HRilOps *ops = NULL;
 
-    int length = sizeof(vendorLibPath) / sizeof(vendorLibPath[0]);
-    if (GetVendorLibPath(vendorLibPath, length) == HDF_SUCCESS) {
+    UsbDeviceInfo *uDevInfo = GetUsbDeviceInfo();
+    if (GetVendorLibPath(vendorLibPath) == HDF_SUCCESS) {
         rilLibPath = vendorLibPath;
+    } else if (uDevInfo != NULL) {
+        rilLibPath = uDevInfo->libPath;
     } else {
-        rilLibPath = g_modem_list[MODEM_INDEX].path;
+        TELEPHONY_LOGI("use default vendor lib.");
+        rilLibPath = g_usbModemVendorInfo[DEFAULT_MODE_INDEX].libPath;
     }
     if (rilLibPath == NULL) {
         TELEPHONY_LOGE("dynamic library path is empty");
         return;
     }
 
+    TELEPHONY_LOGI("RilInit LoadVendor start with rilLibPath:%{public}s", rilLibPath);
     g_dlHandle = dlopen(rilLibPath, RTLD_NOW);
     if (g_dlHandle == NULL) {
         TELEPHONY_LOGE("dlopen %{public}s is fail. %{public}s", rilLibPath, dlerror());
@@ -76,6 +148,7 @@ static void LoadVendor(void)
         return;
     }
     ops = rilInitOps(&g_reportOps);
+    TELEPHONY_LOGI("RilInit completed");
     HRilRegOps(ops);
 }
 
@@ -84,9 +157,9 @@ static int32_t RilAdapterDispatch(
 {
     int32_t ret;
     static pthread_mutex_t dispatchMutex = PTHREAD_MUTEX_INITIALIZER;
-    TELEPHONY_LOGI("RilAdapterDispatch cmd:%{public}d", cmd);
     pthread_mutex_lock(&dispatchMutex);
-    ret = DispatchRequest(SLOTID, cmd, data);
+    TELEPHONY_LOGI("RilAdapterDispatch cmd:%{public}d", cmd);
+    ret = DispatchRequest(HRIL_SIM_SLOT_0, cmd, data);
     pthread_mutex_unlock(&dispatchMutex);
     return ret;
 }
@@ -126,11 +199,7 @@ static int32_t RilAdapterInit(struct HdfDeviceObject *device)
         HdfSBufRecycle(sbuf);
     }
     TELEPHONY_LOGI("sbuf IPC obtain success!");
-    if (!IsLoadedVendorLib()) {
-        LoadVendor();
-    } else {
-        TELEPHONY_LOGI("The vendor library has been loaded!");
-    }
+    LoadVendor();
     return HDF_SUCCESS;
 }
 

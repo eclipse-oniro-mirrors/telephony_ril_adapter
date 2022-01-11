@@ -31,6 +31,16 @@ struct GsmSmsMessageInfo : public HrilBaseParcel {
     void Dump(std::string, int32_t);
 };
 
+struct SendCdmaSmsMessageInfo : public HrilBaseParcel {
+    int32_t serial;
+    std::string smscPdu; /* Short Message Service Center Protocol Data Unit see GSM 03.40 */
+    int32_t state;
+    bool ReadFromParcel(Parcel &parcel);
+    virtual bool Marshalling(Parcel &parcel) const override;
+    std::shared_ptr<SendCdmaSmsMessageInfo> UnMarshalling(Parcel &parcel);
+    void Dump(std::string, int32_t);
+};
+
 struct SmsMessageIOInfo : public HrilBaseParcel {
     int32_t serial;
     std::string smscPdu; /* Short Message Service Center Protocol Data Unit see GSM 03.40 */
@@ -177,6 +187,20 @@ struct CdmaSmsMessageInfo {
     CdmaSmsSubAddress subAddress;
     int32_t size;
     unsigned char bytes[255];
+};
+
+struct CdmaSmsInfo : public HrilBaseParcel {
+    int32_t indicationType;
+    int msgRef; /* TP-Message-Reference for GSM, and BearerData MessageId for CDMA
+                 * from 3GPP2 C.S0015-B, v2.0, 4.5-1 */
+    std::string pdu; /* Protocol Data Unit */
+    int errCode; /* if unknown or not applicable, that is -1
+                  * from 3GPP 27.005, 3.2.5 for GSM/UMTS,
+                  * 3GPP2 N.S0005 (IS-41C) Table 171 for CDMA */
+    bool ReadFromParcel(Parcel &parcel);
+    virtual bool Marshalling(Parcel &parcel) const override;
+    std::shared_ptr<CdmaSmsInfo> UnMarshalling(Parcel &parcel);
+    void Dump(std::string, int32_t);
 };
 } // namespace Telephony
 } // namespace OHOS

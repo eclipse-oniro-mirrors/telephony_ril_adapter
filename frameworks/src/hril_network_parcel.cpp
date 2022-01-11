@@ -61,8 +61,14 @@ bool CsRegStatusInfo::ReadFromParcel(Parcel &parcel)
     if (!ReadBaseInt32(parcel, notifyType)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, regStatus)) {
+    int32_t regStatusValue = 0;
+    if (!ReadBaseInt32(parcel, regStatusValue)) {
         return false;
+    }
+    if ((regStatusValue >= NO_REG_MT_NO_SEARCH) && (regStatusValue <= REG_MT_EMERGENCY)) {
+        regStatus = static_cast<HRilRegStatus>(regStatusValue);
+    } else {
+        regStatus = REG_MT_UNKNOWN;
     }
     if (!ReadBaseInt32(parcel, lacCode)) {
         return false;
@@ -70,9 +76,11 @@ bool CsRegStatusInfo::ReadFromParcel(Parcel &parcel)
     if (!ReadBaseInt32(parcel, cellId)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, radioTechnology)) {
+    int32_t radioTech = 0;
+    if (!ReadBaseInt32(parcel, radioTech)) {
         return false;
     }
+    radioTechnology = static_cast<HRilRadioTech>(radioTech);
     return true;
 }
 
@@ -110,8 +118,14 @@ bool PsRegStatusResultInfo::ReadFromParcel(Parcel &parcel)
     if (!ReadBaseInt32(parcel, notifyType)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, regStatus)) {
+    int32_t regStatusValue = 0;
+    if (!ReadBaseInt32(parcel, regStatusValue)) {
         return false;
+    }
+    if ((regStatusValue >= NO_REG_MT_NO_SEARCH) && (regStatusValue <= REG_MT_EMERGENCY)) {
+        regStatus = static_cast<HRilRegStatus>(regStatusValue);
+    } else {
+        regStatus = REG_MT_UNKNOWN;
     }
     if (!ReadBaseInt32(parcel, lacCode)) {
         return false;
@@ -119,7 +133,18 @@ bool PsRegStatusResultInfo::ReadFromParcel(Parcel &parcel)
     if (!ReadBaseInt32(parcel, cellId)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, radioTechnology)) {
+    int32_t radioTech = 0;
+    if (!ReadBaseInt32(parcel, radioTech)) {
+        return false;
+    }
+    radioTechnology = static_cast<HRilRadioTech>(radioTech);
+    if (!ReadBaseBool(parcel, isNrAvailable)) {
+        return false;
+    }
+    if (!ReadBaseBool(parcel, isEnDcAvailable)) {
+        return false;
+    }
+    if (!ReadBaseBool(parcel, isDcNrRestricted)) {
         return false;
     }
     return true;
@@ -142,12 +167,129 @@ bool PsRegStatusResultInfo::Marshalling(Parcel &parcel) const
     if (!WriteBaseInt32(parcel, radioTechnology)) {
         return false;
     }
+    if (!WriteBaseBool(parcel, isNrAvailable)) {
+        return false;
+    }
+    if (!WriteBaseBool(parcel, isEnDcAvailable)) {
+        return false;
+    }
+    if (!WriteBaseBool(parcel, isDcNrRestricted)) {
+        return false;
+    }
     return true;
 }
 
 std::shared_ptr<PsRegStatusResultInfo> PsRegStatusResultInfo::UnMarshalling(Parcel &parcel)
 {
     std::shared_ptr<PsRegStatusResultInfo> param = std::make_shared<PsRegStatusResultInfo>();
+    if (param == nullptr || !param->ReadFromParcel(parcel)) {
+        param = nullptr;
+    }
+    return param;
+}
+
+bool PhysicalChannelConfig::ReadFromParcel(Parcel &parcel)
+{
+    if (!ReadBaseInt32(parcel, cellConnStatus)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, cellBandwidth)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, ratType)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, freqRange)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, channelNum)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, physicalCellId)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, contextIdNum)) {
+        return false;
+    }
+    contextIds.resize(contextIdNum);
+    for (int32_t i = 0; i < contextIdNum; i++) {
+        if (!ReadBaseInt32(parcel, contextIds[i])) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool PhysicalChannelConfig::Marshalling(Parcel &parcel) const
+{
+    if (!WriteBaseInt32(parcel, cellConnStatus)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, cellBandwidth)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, ratType)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, freqRange)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, channelNum)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, physicalCellId)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, contextIdNum)) {
+        return false;
+    }
+    for (int32_t i = 0; i < contextIdNum; i++) {
+        if (!WriteBaseInt32(parcel, contextIds[i])) {
+            return false;
+        }
+    }
+    return true;
+}
+
+std::shared_ptr<PhysicalChannelConfig> PhysicalChannelConfig::UnMarshalling(Parcel &parcel)
+{
+    std::shared_ptr<PhysicalChannelConfig> param = std::make_shared<PhysicalChannelConfig>();
+    if (param == nullptr || !param->ReadFromParcel(parcel)) {
+        param = nullptr;
+    }
+    return param;
+}
+
+bool ChannelConfigInfoList::ReadFromParcel(Parcel &parcel)
+{
+    if (!ReadBaseInt32(parcel, itemNum)) {
+        return false;
+    }
+    channelConfigInfos.resize(itemNum);
+    for (int32_t i = 0; i < itemNum; i++) {
+        if (!channelConfigInfos[i].ReadFromParcel(parcel)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool ChannelConfigInfoList::Marshalling(Parcel &parcel) const
+{
+    if (!WriteBaseInt32(parcel, itemNum)) {
+        return false;
+    }
+    for (int32_t i = 0; i < itemNum; i++) {
+        if (!channelConfigInfos[i].Marshalling(parcel)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+std::shared_ptr<ChannelConfigInfoList> ChannelConfigInfoList::UnMarshalling(Parcel &parcel)
+{
+    std::shared_ptr<ChannelConfigInfoList> param = std::make_shared<ChannelConfigInfoList>();
     if (param == nullptr || !param->ReadFromParcel(parcel)) {
         param = nullptr;
     }
@@ -371,6 +513,87 @@ bool CurrentCellInfo::ReadRayTypeWcdmaParcel(Parcel &parcel)
     return true;
 }
 
+bool CurrentCellInfo::ReadRayTypeCdmaParcel(Parcel &parcel)
+{
+    if (!ReadBaseInt32(parcel, ServiceCellParas.cdma.systemId)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, ServiceCellParas.cdma.networkId)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, ServiceCellParas.cdma.baseId)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, ServiceCellParas.cdma.zoneId)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, ServiceCellParas.cdma.pilotPn)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, ServiceCellParas.cdma.pilotStrength)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, ServiceCellParas.cdma.channel)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, ServiceCellParas.cdma.longitude)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, ServiceCellParas.cdma.latitude)) {
+        return false;
+    }
+    return true;
+}
+
+bool CurrentCellInfo::ReadRayTypeTdscdmaParcel(Parcel &parcel)
+{
+    if (!ReadBaseInt32(parcel, ServiceCellParas.tdscdma.arfcn)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, ServiceCellParas.tdscdma.syncId)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, ServiceCellParas.tdscdma.sc)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, ServiceCellParas.tdscdma.cellId)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, ServiceCellParas.tdscdma.lac)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, ServiceCellParas.tdscdma.rscp)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, ServiceCellParas.tdscdma.drx)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, ServiceCellParas.tdscdma.rac)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, ServiceCellParas.tdscdma.cpid)) {
+        return false;
+    }
+    return true;
+}
+
+bool CurrentCellInfo::ReadRayTypeNrParcel(Parcel &parcel)
+{
+    if (!ReadBaseInt32(parcel, ServiceCellParas.nr.nrArfcn)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, ServiceCellParas.nr.pci)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, ServiceCellParas.nr.tac)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, ServiceCellParas.nr.nci)) {
+        return false;
+    }
+    return true;
+}
+
 bool CurrentCellInfo::WriteRayTypeGsmParcel(Parcel &parcel) const
 {
     if (!WriteBaseInt32(parcel, ServiceCellParas.gsm.band)) {
@@ -458,6 +681,87 @@ bool CurrentCellInfo::WriteRayTypeWcdmaParcel(Parcel &parcel) const
     return true;
 }
 
+bool CurrentCellInfo::WriteRayTypeCdmaParcel(Parcel &parcel) const
+{
+    if (!WriteBaseInt32(parcel, ServiceCellParas.cdma.systemId)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, ServiceCellParas.cdma.networkId)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, ServiceCellParas.cdma.baseId)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, ServiceCellParas.cdma.zoneId)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, ServiceCellParas.cdma.pilotPn)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, ServiceCellParas.cdma.pilotStrength)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, ServiceCellParas.cdma.channel)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, ServiceCellParas.cdma.longitude)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, ServiceCellParas.cdma.latitude)) {
+        return false;
+    }
+    return true;
+}
+
+bool CurrentCellInfo::WriteRayTypeTdscdmaParcel(Parcel &parcel) const
+{
+    if (!WriteBaseInt32(parcel, ServiceCellParas.tdscdma.arfcn)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, ServiceCellParas.tdscdma.syncId)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, ServiceCellParas.tdscdma.sc)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, ServiceCellParas.tdscdma.cellId)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, ServiceCellParas.tdscdma.lac)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, ServiceCellParas.tdscdma.rscp)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, ServiceCellParas.tdscdma.drx)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, ServiceCellParas.tdscdma.rac)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, ServiceCellParas.tdscdma.cpid)) {
+        return false;
+    }
+    return true;
+}
+
+bool CurrentCellInfo::WriteRayTypeNrParcel(Parcel &parcel) const
+{
+    if (!WriteBaseInt32(parcel, ServiceCellParas.nr.nrArfcn)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, ServiceCellParas.nr.pci)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, ServiceCellParas.nr.tac)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, ServiceCellParas.nr.nci)) {
+        return false;
+    }
+    return true;
+}
+
 bool CurrentCellInfo::ReadFromParcel(Parcel &parcel)
 {
     if (!ReadBaseInt32(parcel, ratType)) {
@@ -479,6 +783,12 @@ bool CurrentCellInfo::ReadFromParcel(Parcel &parcel)
             return ReadRayTypeWcdmaParcel(parcel);
         case NETWORK_TYPE_UNKNOWN:
             return ReadRayTypeWcdmaParcel(parcel);
+        case NETWORK_TYPE_CDMA:
+            return ReadRayTypeCdmaParcel(parcel);
+        case NETWORK_TYPE_TDSCDMA:
+            return ReadRayTypeTdscdmaParcel(parcel);
+        case NETWORK_TYPE_NR:
+            return ReadRayTypeNrParcel(parcel);
         default:
             return false;
     }
@@ -507,6 +817,15 @@ bool CurrentCellInfo::Marshalling(Parcel &parcel) const
             break;
         case NETWORK_TYPE_WCDMA:
             WriteRayTypeWcdmaParcel(parcel);
+            break;
+        case NETWORK_TYPE_CDMA:
+            WriteRayTypeCdmaParcel(parcel);
+            break;
+        case NETWORK_TYPE_TDSCDMA:
+            WriteRayTypeTdscdmaParcel(parcel);
+            break;
+        case NETWORK_TYPE_NR:
+            WriteRayTypeNrParcel(parcel);
             break;
         case NETWORK_TYPE_UNKNOWN:
             WriteRayTypeWcdmaParcel(parcel);
@@ -626,6 +945,87 @@ bool CellNearbyInfo::ReadRayTypeWcdmaListParcel(Parcel &parcel)
     return true;
 }
 
+bool CellNearbyInfo::ReadRayTypeCdmaListParcel(Parcel &parcel)
+{
+    if (!ReadBaseInt32(parcel, ServiceCellParas.cdma.systemId)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, ServiceCellParas.cdma.networkId)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, ServiceCellParas.cdma.baseId)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, ServiceCellParas.cdma.zoneId)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, ServiceCellParas.cdma.pilotPn)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, ServiceCellParas.cdma.pilotStrength)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, ServiceCellParas.cdma.channel)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, ServiceCellParas.cdma.longitude)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, ServiceCellParas.cdma.latitude)) {
+        return false;
+    }
+    return true;
+}
+
+bool CellNearbyInfo::ReadRayTypeTdscdmaListParcel(Parcel &parcel)
+{
+    if (!ReadBaseInt32(parcel, ServiceCellParas.tdscdma.arfcn)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, ServiceCellParas.tdscdma.syncId)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, ServiceCellParas.tdscdma.sc)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, ServiceCellParas.tdscdma.cellId)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, ServiceCellParas.tdscdma.lac)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, ServiceCellParas.tdscdma.rscp)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, ServiceCellParas.tdscdma.drx)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, ServiceCellParas.tdscdma.rac)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, ServiceCellParas.tdscdma.cpid)) {
+        return false;
+    }
+    return true;
+}
+
+bool CellNearbyInfo::ReadRayTypeNrListParcel(Parcel &parcel)
+{
+    if (!ReadBaseInt32(parcel, ServiceCellParas.nr.nrArfcn)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, ServiceCellParas.nr.pci)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, ServiceCellParas.nr.tac)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, ServiceCellParas.nr.nci)) {
+        return false;
+    }
+    return true;
+}
+
 bool CellNearbyInfo::WriteRayTypeGsmListParcel(Parcel &parcel) const
 {
     if (!WriteBaseInt32(parcel, ServiceCellParas.gsm.band)) {
@@ -686,6 +1086,87 @@ bool CellNearbyInfo::WriteRayTypeWcdmaListParcel(Parcel &parcel) const
     return true;
 }
 
+bool CellNearbyInfo::WriteRayTypeCdmaListParcel(Parcel &parcel) const
+{
+    if (!WriteBaseInt32(parcel, ServiceCellParas.cdma.systemId)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, ServiceCellParas.cdma.networkId)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, ServiceCellParas.cdma.baseId)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, ServiceCellParas.cdma.zoneId)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, ServiceCellParas.cdma.pilotPn)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, ServiceCellParas.cdma.pilotStrength)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, ServiceCellParas.cdma.channel)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, ServiceCellParas.cdma.longitude)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, ServiceCellParas.cdma.latitude)) {
+        return false;
+    }
+    return true;
+}
+
+bool CellNearbyInfo::WriteRayTypeTdscdmaListParcel(Parcel &parcel) const
+{
+    if (!WriteBaseInt32(parcel, ServiceCellParas.tdscdma.arfcn)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, ServiceCellParas.tdscdma.syncId)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, ServiceCellParas.tdscdma.sc)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, ServiceCellParas.tdscdma.cellId)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, ServiceCellParas.tdscdma.lac)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, ServiceCellParas.tdscdma.rscp)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, ServiceCellParas.tdscdma.drx)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, ServiceCellParas.tdscdma.rac)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, ServiceCellParas.tdscdma.cpid)) {
+        return false;
+    }
+    return true;
+}
+
+bool CellNearbyInfo::WriteRayTypeNrListParcel(Parcel &parcel) const
+{
+    if (!WriteBaseInt32(parcel, ServiceCellParas.nr.nrArfcn)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, ServiceCellParas.nr.pci)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, ServiceCellParas.nr.tac)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, ServiceCellParas.nr.nci)) {
+        return false;
+    }
+    return true;
+}
+
 bool CellNearbyInfo::ReadFromParcel(Parcel &parcel)
 {
     if (!ReadBaseInt32(parcel, ratType)) {
@@ -698,6 +1179,12 @@ bool CellNearbyInfo::ReadFromParcel(Parcel &parcel)
             return ReadRayTypeLteListParcel(parcel);
         case NETWORK_TYPE_WCDMA:
             return ReadRayTypeWcdmaListParcel(parcel);
+        case NETWORK_TYPE_CDMA:
+            return ReadRayTypeCdmaListParcel(parcel);
+        case NETWORK_TYPE_TDSCDMA:
+            return ReadRayTypeTdscdmaListParcel(parcel);
+        case NETWORK_TYPE_NR:
+            return ReadRayTypeNrListParcel(parcel);
         case NETWORK_TYPE_UNKNOWN:
             return ReadRayTypeGsmListParcel(parcel);
         default:
@@ -721,6 +1208,15 @@ bool CellNearbyInfo::Marshalling(Parcel &parcel) const
             break;
         case NETWORK_TYPE_WCDMA:
             WriteRayTypeWcdmaListParcel(parcel);
+            break;
+        case NETWORK_TYPE_CDMA:
+            WriteRayTypeCdmaListParcel(parcel);
+            break;
+        case NETWORK_TYPE_TDSCDMA:
+            WriteRayTypeTdscdmaListParcel(parcel);
+            break;
+        case NETWORK_TYPE_NR:
+            WriteRayTypeNrListParcel(parcel);
             break;
         case NETWORK_TYPE_UNKNOWN:
             WriteRayTypeGsmListParcel(parcel);
@@ -839,6 +1335,37 @@ bool ImsRegStatusInfo::Marshalling(Parcel &parcel) const
 std::shared_ptr<ImsRegStatusInfo> ImsRegStatusInfo::UnMarshalling(Parcel &parcel)
 {
     std::shared_ptr<ImsRegStatusInfo> param = std::make_shared<ImsRegStatusInfo>();
+    if (param == nullptr || !param->ReadFromParcel(parcel)) {
+        param = nullptr;
+    }
+    return param;
+}
+
+bool RadioCapabilityInfo::ReadFromParcel(Parcel &parcel)
+{
+    if (!ReadBaseInt32(parcel, ratfamily)) {
+        return false;
+    }
+    if (!ReadBaseString(parcel, modemId)) {
+        return false;
+    }
+    return true;
+}
+
+bool RadioCapabilityInfo::Marshalling(Parcel &parcel) const
+{
+    if (!WriteBaseInt32(parcel, ratfamily)) {
+        return false;
+    }
+    if (!WriteBaseString(parcel, modemId)) {
+        return false;
+    }
+    return true;
+}
+
+std::shared_ptr<RadioCapabilityInfo> RadioCapabilityInfo::UnMarshalling(Parcel &parcel)
+{
+    std::shared_ptr<RadioCapabilityInfo> param = std::make_shared<RadioCapabilityInfo>();
     if (param == nullptr || !param->ReadFromParcel(parcel)) {
         param = nullptr;
     }

@@ -10,22 +10,25 @@
 
 RIL Adapter模块主要包括厂商库加载，业务接口实现以及事件调度管理。主要用于屏蔽不同modem厂商硬件差异，为上层提供统一的接口，通过注册HDF服务与上层接口通讯。
 
-**图 1**  RIL Adapter模块架构图<a name="fig1675210296494"></a>  
+**图 1**  RIL Adapter模块架构图<a name="fig1675210296494"></a>
 ![](figures/zh-cn_architecture-of-the-ril-adapter-module.png "RIL-Adapter模块架构图")
 
 ## 目录<a name="section122mcpsimp"></a>
-```
+```sh
 base/telephony/ril_adapter
-├─ hril                            # hril层的各个业务模块接口实现
-├─ hril_hdf                        # HDF服务
-├─ include                         # 头文件存放目录
-├─ interfaces                      # 对应提供上层各业务内部接口
-│  └─ innerkits
-├─ test                            # 单元测试相关代码
-│  ├─ mock
-│  └─ unittest                     # 单元测试代码
-└─ vendor                          # 厂商库代码
-│  └─ include
+├── adapter                             # 厂商库代码
+│   ├── include
+│   └── test                            # 厂商库测试代码
+├── figures                             # readme资源文件
+├── interfaces                          # 对应提供上层各业务内部接口
+│   └── innerkits
+├── services                            # 服务
+│   ├── hril_hdf                        # HDF服务
+│   ├── include                         # hril头文件存放目录
+│   └── src                             # hril层的各个业务模块接口实现
+└── test
+    ├── mock
+    └── unittest                        # 单元测试代码
 ```
 
 ## 约束<a name="section126mcpsimp"></a>
@@ -39,8 +42,9 @@ ril\_adapter不对外暴露接口，可通过核心服务调用。
 
 ## 相关仓<a name="section279mcpsimp"></a>
 
-电话服务子系统
+[电话服务子系统](https://gitee.com/openharmony/docs/blob/master/zh-cn/readme/%E7%94%B5%E8%AF%9D%E6%9C%8D%E5%8A%A1%E5%AD%90%E7%B3%BB%E7%BB%9F.md)
 
-telephony_ril_adapter
+**telephony_ril_adapter**
 
-telephony_core_service
+[telephony_core_service](https://gitee.com/openharmony/telephony_core_service/blob/master/README_zh.md)
+

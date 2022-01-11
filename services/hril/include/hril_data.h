@@ -24,27 +24,37 @@ namespace OHOS {
 namespace Telephony {
 class HRilData : public HRilBase {
 public:
-    HRilData();
+    HRilData(IHRilReporter &hrilReporter);
     virtual ~HRilData();
 
     void DeactivatePdpContext(int32_t slotId, struct HdfSBuf *data);
     void ActivatePdpContext(int32_t slotId, struct HdfSBuf *data);
     void GetPdpContextList(int32_t slotId, struct HdfSBuf *data);
+    void SetInitApnInfo(int32_t slotId, struct HdfSBuf *data);
     int32_t ActivatePdpContextResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
         const void *response, size_t responseLen);
     int32_t DeactivatePdpContextResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
         const void *response, size_t responseLen);
     int32_t GetPdpContextListResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
         const void *response, size_t responseLen);
+    int32_t SetInitApnInfoResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
+        const void *response, size_t responseLen);
     int32_t PdpContextListUpdated(
-        int32_t slotId, int32_t notifyType, HRilErrno e, const void *response, size_t responseLen);
-    void RegisterDataResponseCallback(HdfRemoteService *serviceCallback);
-    void RegisterDataNotifyCallback(HdfRemoteService *serviceCallbackInd);
+        int32_t slotId, int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen);
+    void RegisterDataResponseCallback(const HdfRemoteService *serviceCallback);
+    void RegisterDataNotifyCallback(const HdfRemoteService *serviceCallbackInd);
     void ProcessDataResponse(
         int32_t slotId, int32_t code, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     void ProcessDataRequest(int32_t slotId, int32_t code, struct HdfSBuf *data);
-    void ProcessDataNotify(int32_t slotId, int32_t notifyType, const struct ReportInfo *reportInfo,
+    void ProcessDataNotify(int32_t slotId, const struct ReportInfo *reportInfo,
         const void *response, size_t responseLen);
+    void GetLinkBandwidthInfo(int32_t slotId, struct HdfSBuf *data);
+    int32_t GetLinkBandwidthInfoResponse(int32_t slotId, int32_t requestNum,
+        HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    void SetLinkBandwidthReportingRule(int32_t slotId, struct HdfSBuf *data);
+    int32_t SetLinkBandwidthReportingRuleResponse(int32_t slotId, int32_t requestNum,
+        HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+
     bool IsDataRespOrNotify(uint32_t code);
 
     bool IsDataResponse(uint32_t code);
@@ -57,12 +67,12 @@ private:
     static constexpr uint32_t HRIL_ERROR_UNSPECIFIED_RSN = 0xffff;
     void SwitchHRilDataListToHal(
         const void *response, size_t responseLen, std::vector<SetupDataCallResultInfo> &dcResultList);
-    void SwitchRilDataToHal(HRilDataCallResponse *response, SetupDataCallResultInfo &result);
+    void SwitchRilDataToHal(const HRilDataCallResponse *response, SetupDataCallResultInfo &result);
     static void RilDataCallCharToString(const char *src, std::string dst);
     using RespFunc = int32_t (HRilData::*)(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
         const void *response, size_t responseLen);
     using NotiFunc = int32_t (HRilData::*)(
-        int32_t slotId, int32_t notifyType, HRilErrno e, const void *response, size_t responseLen);
+        int32_t slotId, int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
     using ReqFunc = void (HRilData::*)(int32_t slotId, struct HdfSBuf *data);
     std::map<uint32_t, RespFunc> respMemberFuncMap_;
     std::map<uint32_t, NotiFunc> notiMemberFuncMap_;

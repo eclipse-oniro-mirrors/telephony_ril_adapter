@@ -23,15 +23,15 @@ namespace OHOS {
 namespace Telephony {
 class HRilCall : public HRilBase {
 public:
-    HRilCall();
+    HRilCall(IHRilReporter &hrilReporter);
     virtual ~HRilCall();
 
-    void RegisterCallResponseCallback(HdfRemoteService *serviceCallback);
-    void RegisterCallNotifyCallback(HdfRemoteService *serviceCallbackInd);
+    void RegisterCallResponseCallback(const HdfRemoteService *serviceCallback);
+    void RegisterCallNotifyCallback(const HdfRemoteService *serviceCallbackInd);
     void ProcessCallResponse(
         int32_t slotId, int32_t code, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     void ProcessCallRequest(int32_t slotId, int32_t code, struct HdfSBuf *data);
-    void ProcessCallNotify(int32_t slotId, int32_t notifyType, const struct ReportInfo *reportInfo,
+    void ProcessCallNotify(int32_t slotId, const struct ReportInfo *reportInfo,
         const void *response, size_t responseLen);
 
     bool IsCallRespOrNotify(uint32_t code);
@@ -76,6 +76,12 @@ private:
     void SetCallPreferenceMode(int32_t slotId, struct HdfSBuf *data);
     void GetLteImsSwitchStatus(int32_t slotId, struct HdfSBuf *data);
     void SetLteImsSwitchStatus(int32_t slotId, struct HdfSBuf *data);
+    void SetUssdCusd(int32_t slotId, struct HdfSBuf *data);
+    void GetUssdCusd(int32_t slotId, struct HdfSBuf *data);
+    void SetMute(int32_t slotId, struct HdfSBuf *data);
+    void GetMute(int32_t slotId, struct HdfSBuf *data);
+    void GetEmergencyCallList(int32_t slotId, struct HdfSBuf *data);
+    void GetCallFailReason(int32_t slotId, struct HdfSBuf *data);
 
     int32_t GetCallListResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
         const void *response, size_t responseLen);
@@ -137,23 +143,47 @@ private:
         const void *response, size_t responseLen);
     int32_t SetLteImsSwitchStatusResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
         const void *response, size_t responseLen);
+    int32_t SetUssdCusdResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
+        const void *response, size_t responseLen);
+    int32_t GetUssdCusdResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
+        const void *response, size_t responseLen);
+    int32_t SetMuteResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
+        const void *response, size_t responseLen);
+    int32_t GetMuteResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
+        const void *response, size_t responseLen);
+    int32_t GetEmergencyCallListResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
+        const void *response, size_t responseLen);
+    int32_t GetCallFailReasonResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
+        const void *response, size_t responseLen);
 
     int32_t CallStateUpdated(
-        int32_t slotId, int32_t notifyType, HRilErrno e, const void *response, size_t responseLen);
+        int32_t slotId, int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
     int32_t CallCringNotice(
-        int32_t slotId, int32_t notifyType, HRilErrno e, const void *response, size_t responseLen);
+        int32_t slotId, int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
     int32_t CallWaitingNotice(
-        int32_t slotId, int32_t notifyType, HRilErrno e, const void *response, size_t responseLen);
+        int32_t slotId, int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
     int32_t CallConnectNotice(
-        int32_t slotId, int32_t notifyType, HRilErrno e, const void *response, size_t responseLen);
-    int32_t CallEndNotice(int32_t slotId, int32_t notifyType, HRilErrno e, const void *response, size_t responseLen);
+        int32_t slotId, int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
+    int32_t CallEndNotice(
+        int32_t slotId, int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
     int32_t CallStatusInfoNotice(
-        int32_t slotId, int32_t notifyType, HRilErrno e, const void *response, size_t responseLen);
+        int32_t slotId, int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
     int32_t CallImsServiceStatusNotice(
-        int32_t slotId, int32_t notifyType, HRilErrno e, const void *response, size_t responseLen);
+        int32_t slotId, int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
+    int32_t CallUssdCusdNotice(
+        int32_t slotId, int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
+    int32_t CallRingbackVoiceNotice(
+        int32_t slotId, int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
+    int32_t CallSrvccStatusNotice(
+        int32_t slotId, int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
+    int32_t CallEmergencyNotice(
+        int32_t slotId, int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
+
+    void BuildEmergencyCallList(
+        EmergencyInfoList &list, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
 
     template<typename T>
-    int32_t ResponseMessageParcel(HRilRadioResponseInfo &responseInfo, T &data, int32_t requestNum)
+    int32_t ResponseMessageParcel(const HRilRadioResponseInfo &responseInfo, const T &data, int32_t requestNum)
     {
         struct HdfSBuf *dataSbuf;
         std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
@@ -187,7 +217,7 @@ private:
     using RespFunc = int32_t (HRilCall::*)(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
         const void *response, size_t responseLen);
     using NotiFunc = int32_t (HRilCall::*)(
-        int32_t slotId, int32_t notifyType, HRilErrno e, const void *response, size_t responseLen);
+        int32_t slotId, int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
     using ReqFunc = void (HRilCall::*)(int32_t slotId, struct HdfSBuf *data);
     std::map<uint32_t, RespFunc> respMemberFuncMap_;
     std::map<uint32_t, NotiFunc> notiMemberFuncMap_;

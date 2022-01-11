@@ -14,6 +14,10 @@
  */
 
 #include "at_sim.h"
+#ifdef HMOS_VENDOR_TEST
+#endif
+
+#include "securec.h"
 
 #include "vendor_adapter.h"
 #include "vendor_report.h"
@@ -28,18 +32,18 @@ static int32_t GetSimType(void)
     ret = SendCommandLock("AT^CARDMODE", "^CARDMODE:", 0, &pResponse);
     if (ret != 0 || (pResponse != NULL && !pResponse->success)) {
         TELEPHONY_LOGE("AT^CARDMODE send failed");
-        return HRIL_UNKNOWN;
+        return HRIL_SIM_TYPE_UNKNOWN;
     }
     if (pResponse->head) {
         pLine = pResponse->head->data;
     }
     ret = SkipATPrefix(&pLine);
     if (ret < 0) {
-        return HRIL_UNKNOWN;
+        return HRIL_SIM_TYPE_UNKNOWN;
     }
     ret = NextInt(&pLine, &simType);
     if (ret < 0) {
-        return HRIL_UNKNOWN;
+        return HRIL_SIM_TYPE_UNKNOWN;
     }
     FreeResponseInfo(pResponse);
     return simType;
@@ -49,7 +53,6 @@ static int32_t GetSimState(char *pLine, char *pResult, ResponseInfo *pResponse)
 {
     int32_t status = HRIL_SIM_NOT_INSERTED;
     int32_t ret;
-
     ret = SkipATPrefix(&pLine);
     if (ret != 0) {
         return HRIL_SIM_NOT_READY;
@@ -76,8 +79,7 @@ static int32_t GetSimState(char *pLine, char *pResult, ResponseInfo *pResponse)
 
 static int32_t ParseSimResponseResult(char *pLine, HRilSimIOResponse *pSimResponse)
 {
-    int32_t err;
-    err = SkipATPrefix(&pLine);
+    int32_t err = SkipATPrefix(&pLine);
     if (err != 0) {
         return err;
     }
@@ -89,6 +91,7 @@ static int32_t ParseSimResponseResult(char *pLine, HRilSimIOResponse *pSimRespon
     if (err != 0) {
         return err;
     }
+
     if ((pLine != NULL && *pLine != '\0')) {
         err = NextStr(&pLine, &pSimResponse->response);
         if (err != 0) {
@@ -133,14 +136,36 @@ static int32_t ParseSimPinInputTimesResult(char *pLine, HRilPinInputTimes *pinIn
     return 0;
 }
 
+static int32_t ParseUnlockSimLockResult(char *pLine, HRilLockStatus *lockStatus)
+{
+    int32_t err = HRIL_ERR_GENERIC_FAILURE;
+    if (lockStatus == NULL) {
+        TELEPHONY_LOGE("lockStatus is null!!!");
+        return err;
+    }
+    err = SkipATPrefix(&pLine);
+    if (err != 0) {
+        return err;
+    }
+    err = NextInt(&pLine, &lockStatus->result);
+    err = NextInt(&pLine, &lockStatus->remain);
+    TELEPHONY_LOGI("ParseUnlockSimLockResult, lockStatus->result: %{public}d", lockStatus->result);
+    TELEPHONY_LOGI("ParseUnlockSimLockResult, lockStatus->remain: %{public}d", lockStatus->remain);
+    if (err != 0) {
+        return err;
+    }
+    return 0;
+}
+
 void ReqGetSimStatus(const ReqDataInfo *requestInfo)
 {
-    int32_t ret;
-    ResponseInfo *pResponse = NULL;
     char *pLine = NULL;
     char *pResult = NULL;
+    int32_t ret;
+    ResponseInfo *pResponse = NULL;
     struct ReportInfo reportInfo = {0};
     HRilCardState cardState = {0};
+
     HRilRadioState radioState = GetRadioState();
     if (radioState == HRIL_RADIO_POWER_STATE_UNAVAILABLE || radioState == HRIL_RADIO_POWER_STATE_OFF) {
         cardState.simState = HRIL_SIM_NOT_READY;
@@ -159,10 +184,10 @@ void ReqGetSimStatus(const ReqDataInfo *requestInfo)
         if (ret == HRIL_ERR_NO_SIMCARD_INSERTED) {
             cardState.simState = HRIL_SIM_NOT_INSERTED;
             reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
-            OnSimReport(HRIL_SIM_SLOT_1, reportInfo, (const uint8_t *)&cardState, sizeof(cardState));
+            OnSimReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&cardState, sizeof(cardState));
         } else {
             reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
-            OnSimReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+            OnSimReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
         }
         FreeResponseInfo(pResponse);
         return;
@@ -172,51 +197,74 @@ void ReqGetSimStatus(const ReqDataInfo *requestInfo)
     }
     cardState.simState = GetSimState(pLine, pResult, pResponse);
     reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
-    OnSimReport(HRIL_SIM_SLOT_1, reportInfo, (const uint8_t *)&cardState, sizeof(cardState));
+    OnSimReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&cardState, sizeof(cardState));
     FreeResponseInfo(pResponse);
+}
+
+static int32_t ReqGetSimIOFDNWrite(HRilSimIO *pSim, ResponseInfo **ppResponse, size_t dataLen)
+{
+    char cmd[MAX_CMD_LENGTH] = {0};
+    int32_t tmp = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CLCK=\"%s\",%d,\"%s\"", "FD", 1, pSim->pin2);
+    if (tmp < 0) {
+        TELEPHONY_LOGE("GenerateCommand failed");
+        return VENDOR_FAIL;
+    }
+    int32_t ret = SendCommandLock(cmd, "+CLCK", 0, ppResponse);
+    if (ret != 0 || (ppResponse != NULL && !(*ppResponse)->success)) {
+        TELEPHONY_LOGE("AT+CLCK failed");
+        return HRIL_ERR_CMD_SEND_FAILURE;
+    }
+    tmp = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CRSM=%d,%d,%d,%d,%d,\"%s\",\"%s\"", pSim->command, pSim->fileid,
+        pSim->p1, pSim->p2, pSim->p3, ((pSim->data == NULL) ? "" : (pSim->data)), pSim->pathid);
+    if (tmp < 0) {
+        TELEPHONY_LOGE("GenerateCommand failed");
+        return VENDOR_FAIL;
+    }
+    ret = SendCommandLock(cmd, "+CRSM", 0, ppResponse);
+    if (ret != 0 || (ppResponse != NULL && !(*ppResponse)->success)) {
+        return HRIL_ERR_CMD_SEND_FAILURE;
+    }
+    tmp = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CLCK=\"%s\",%d,\"%s\"", "FD", 0, pSim->pin2);
+    if (tmp < 0) {
+        return VENDOR_FAIL;
+    }
+    ret = SendCommandLock(cmd, "+CLCK", 0, ppResponse);
+    if (ret != 0 || !(*ppResponse)->success) {
+        TELEPHONY_LOGE("AT+CLCK failed");
+        return HRIL_ERR_CMD_SEND_FAILURE;
+    }
+    return HRIL_ERR_SUCCESS;
 }
 
 static int32_t ReqGetSimIOFDN(HRilSimIO *pSim, ResponseInfo **ppResponse, size_t dataLen)
 {
-    char cmdCheck[MAX_CMD_LENGTH] = {0};
-    char cmdActive[MAX_CMD_LENGTH] = {0};
-    char cmdClose[MAX_CMD_LENGTH] = {0};
-
-    int32_t result = GenerateCommand(cmdCheck, MAX_CMD_LENGTH, "AT+CLCK=\"%s\",%d,\"%s\"", "FD", 1, pSim->pin2);
-    if (result <= 0) {
-        TELEPHONY_LOGE("GenerateCommand is failed");
-    }
-    int32_t ret = SendCommandLock(cmdCheck, "+CLCK", 0, ppResponse);
+    const char* queryCmd = "AT+CLCK=\"FD\",2";
+    int32_t ret = SendCommandLock(queryCmd, "+CLCK", 0, ppResponse);
     if (ret != 0 || (ppResponse != NULL && !(*ppResponse)->success)) {
         TELEPHONY_LOGE("AT+CLCK failed");
+        return HRIL_ERR_CMD_SEND_FAILURE;
+    }
+    char *pLine = (*ppResponse)->last == NULL ? (*ppResponse)->result : (*ppResponse)->last->data;
+    SkipATPrefix(&pLine);
+    int32_t clckRes = VENDOR_FAIL;
+    NextInt(&pLine, &clckRes);
+    if (clckRes != 1) {
+        TELEPHONY_LOGE("FDN has not return 1,then can not write fdn");
         return VENDOR_FAIL;
     }
-
-    result = GenerateCommand(cmdActive, MAX_CMD_LENGTH, "AT+CRSM=%d,%d,%d,%d,%d,\"%s\",\"%s\"", pSim->command,
-        pSim->fileid, pSim->p1, pSim->p2, pSim->p3, ((pSim->data == NULL) ? "" : (pSim->data)),
-        (pSim->pathid == NULL) ? "" : (pSim->pathid));
-    if (result <= 0) {
-        TELEPHONY_LOGE("GenerateCommand is failed");
+    int32_t writeRet = ReqGetSimIOFDNWrite(pSim, ppResponse, dataLen);
+    char cmd[MAX_CMD_LENGTH] = {0};
+    int32_t tmp = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CLCK=\"%s\",%d,\"%s\"", "FD", 1, pSim->pin2);
+    if (tmp < 0) {
+        TELEPHONY_LOGE("GenerateCommand failed");
         return VENDOR_FAIL;
     }
-    ret = SendCommandLock(cmdActive, "+CRSM", 0, ppResponse);
-    if (ret != 0 || (ppResponse != NULL && !(*ppResponse)->success)) {
-        TELEPHONY_LOGE("send failed ");
-        return VENDOR_FAIL;
-    }
-
-    result = GenerateCommand(cmdClose, MAX_CMD_LENGTH, "AT+CLCK=\"%s\",%d,\"%s\"", "FD", 0, pSim->pin2);
-    if (result <= 0) {
-        TELEPHONY_LOGE("GenerateCommand is failed");
-        return VENDOR_FAIL;
-    }
-    ret = SendCommandLock(cmdClose, "+CLCK", 0, ppResponse);
+    ret = SendCommandLock(cmd, "+CLCK", 0, ppResponse);
     if (ret != 0 || (ppResponse != NULL && !(*ppResponse)->success)) {
         TELEPHONY_LOGE("AT+CLCK failed");
-        return VENDOR_FAIL;
+        return HRIL_ERR_CMD_SEND_FAILURE;
     }
-    TELEPHONY_LOGE("HRIL_ERR_SUCCESS return");
-    return (int32_t)HRIL_ERR_SUCCESS;
+    return writeRet;
 }
 
 static void HandlerSimIOResult(ResponseInfo *pResponse, HRilSimIOResponse *simResponse,
@@ -240,11 +288,10 @@ static void HandlerSimIOResult(ResponseInfo *pResponse, HRilSimIOResponse *simRe
     reportInfo = CreateReportInfo(requestInfo, *ret, HRIL_RESPONSE, 0);
     if (simResponse == NULL) {
         TELEPHONY_LOGE("simResponse is NULL");
-        OnSimReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+        OnSimReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
     } else {
-        OnSimReport(HRIL_SIM_SLOT_1, reportInfo, (const uint8_t *)simResponse, sizeof(HRilSimIOResponse));
+        OnSimReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)simResponse, sizeof(HRilSimIOResponse));
     }
-
     FreeResponseInfo(pResponse);
 }
 
@@ -253,12 +300,17 @@ void ReqGetSimIO(const ReqDataInfo *requestInfo, const HRilSimIO *data, size_t d
     char *pLine = NULL;
     int32_t ret;
     const int32_t FILEID = 0x6F3B;
-    HRilSimIO *pSim = (HRilSimIO *)data;
-    HRilSimIOResponse simResponse = {0};
     ResponseInfo *pResponse = NULL;
     struct ReportInfo reportInfo = {};
-
-    if (pSim->pin2 != NULL && pSim->fileid == FILEID) {
+    HRilSimIOResponse simResponse = {0};
+    HRilSimIO *pSim = (HRilSimIO *)data;
+    if (pSim == NULL) {
+        reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_RESPONSE, HRIL_RESPONSE, 0);
+        OnSimReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+        FreeResponseInfo(pResponse);
+        return;
+    }
+    if (pSim->pin2 != NULL && strcmp(pSim->pin2, "") != 0 && pSim->fileid == FILEID) {
         ret = ReqGetSimIOFDN(pSim, &pResponse, dataLen);
         TELEPHONY_LOGE("ReqGetSimIOFDN call over");
         if (ret != HRIL_ERR_SUCCESS || !pResponse->success) {
@@ -279,7 +331,7 @@ void ReqGetSimIO(const ReqDataInfo *requestInfo, const HRilSimIO *data, size_t d
     }
     ret = SendCommandLock(cmd, "+CRSM", 0, &pResponse);
     if (ret != HRIL_ERR_SUCCESS || (pResponse != NULL && !pResponse->success)) {
-        TELEPHONY_LOGE("send failed  dataLen:%{public}zu, ret:%{public}d", dataLen, ret);
+        TELEPHONY_LOGE("send failed  dataLen:%{public}zu", dataLen);
         HandlerSimIOResult(pResponse, NULL, requestInfo, pLine, &ret);
         return;
     }
@@ -292,7 +344,7 @@ void ReqGetSimIO(const ReqDataInfo *requestInfo, const HRilSimIO *data, size_t d
         return;
     }
     reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
-    OnSimReport(HRIL_SIM_SLOT_1, reportInfo, (const uint8_t *)&simResponse, sizeof(HRilSimIOResponse));
+    OnSimReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&simResponse, sizeof(simResponse));
     FreeResponseInfo(pResponse);
 }
 
@@ -311,17 +363,18 @@ static void HandlerSimImsiResult(
         *ret = HRIL_ERR_GENERIC_FAILURE;
     }
     reportInfo = CreateReportInfo(requestInfo, *ret, HRIL_RESPONSE, 0);
-    OnSimReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+    OnSimReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
 }
 
 void ReqGetSimImsi(const ReqDataInfo *requestInfo)
 {
-    ResponseInfo *pResponse = NULL;
-    int32_t ret;
     char *pLine = NULL;
-    struct ReportInfo reportInfo = {0};
     char *result = NULL;
+    int32_t ret;
+    ResponseInfo *pResponse = NULL;
+    struct ReportInfo reportInfo = {0};
+
     ret = SendCommandLock("AT+CIMI", NULL, 0, &pResponse);
     if (ret != 0 || (pResponse != NULL && !pResponse->success)) {
         TELEPHONY_LOGE("AT+CIMI send failed");
@@ -335,7 +388,7 @@ void ReqGetSimImsi(const ReqDataInfo *requestInfo)
         return;
     }
     reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
-    OnSimReport(HRIL_SIM_SLOT_1, reportInfo, (const uint8_t *)result, 0);
+    OnSimReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)result, 0);
     FreeResponseInfo(pResponse);
 }
 
@@ -354,21 +407,27 @@ static void HandlerSimLockStatusResult(
         *ret = HRIL_ERR_GENERIC_FAILURE;
     }
     reportInfo = CreateReportInfo(requestInfo, *ret, HRIL_RESPONSE, 0);
-    OnSimReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+    OnSimReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
 }
 
 void ReqGetSimLockStatus(const ReqDataInfo *requestInfo, const HRilSimClock *data, size_t dataLen)
 {
-    ResponseInfo *pResponse = NULL;
     char cmd[MAX_CMD_LENGTH] = {0};
     int32_t ret;
     char *pLine = NULL;
     int32_t status = 0;
     HRilSimClock *pSimClck = NULL;
+    ResponseInfo *pResponse = NULL;
     struct ReportInfo reportInfo = {0};
 
     pSimClck = (HRilSimClock *)data;
+    if (pSimClck == NULL) {
+        reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_RESPONSE, HRIL_RESPONSE, 0);
+        OnSimReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+        FreeResponseInfo(pResponse);
+        return;
+    }
     int32_t result = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CLCK=\"%s\",%d", pSimClck->fac, pSimClck->mode);
     if (result <= 0) {
         TELEPHONY_LOGE("GenerateCommand is failed");
@@ -394,22 +453,28 @@ void ReqGetSimLockStatus(const ReqDataInfo *requestInfo, const HRilSimClock *dat
         return;
     }
     reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
-    OnSimReport(HRIL_SIM_SLOT_1, reportInfo, (const uint8_t *)&status, sizeof(int32_t));
+    OnSimReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&status, sizeof(int32_t));
     FreeResponseInfo(pResponse);
 }
 
 void ReqSetSimLock(const ReqDataInfo *requestInfo, const HRilSimClock *data, size_t dataLen)
 {
-    ResponseInfo *pResponse = NULL;
     char cmd[MAX_CMD_LENGTH] = {0};
     char *pLine = NULL;
     int32_t ret;
     HRilSimClock *pSimClck = NULL;
+    ResponseInfo *pResponse = NULL;
     struct ReportInfo reportInfo = {0};
 
     pSimClck = (HRilSimClock *)data;
-    int32_t result = GenerateCommand(
-        cmd, MAX_CMD_LENGTH, "AT+CLCK=\"%s\",%d,\"%s\"", pSimClck->fac, pSimClck->mode, pSimClck->passwd);
+    if (pSimClck == NULL) {
+        reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_RESPONSE, HRIL_RESPONSE, 0);
+        OnSimReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+        FreeResponseInfo(pResponse);
+        return;
+    }
+    int32_t result = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CLCK=\"%s\",%d,\"%s\"", pSimClck->fac, pSimClck->mode,
+        pSimClck->passwd);
     if (result <= 0) {
         TELEPHONY_LOGE("GenerateCommand is failed");
     }
@@ -424,25 +489,31 @@ void ReqSetSimLock(const ReqDataInfo *requestInfo, const HRilSimClock *data, siz
             ret = HRIL_ERR_GENERIC_FAILURE;
         }
         reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
-        OnSimReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+        OnSimReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
         FreeResponseInfo(pResponse);
         return;
     }
     reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
-    OnSimReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+    OnSimReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
 }
 
 void ReqChangeSimPassword(const ReqDataInfo *requestInfo, const HRilSimPassword *data, size_t dataLen)
 {
-    ResponseInfo *pResponse = NULL;
     char cmd[MAX_CMD_LENGTH] = {0};
     char *pLine = NULL;
     HRilSimPassword *pSimPassword = NULL;
     int32_t ret;
+    ResponseInfo *pResponse = NULL;
     struct ReportInfo reportInfo = {0};
 
     pSimPassword = (HRilSimPassword *)data;
+    if (pSimPassword == NULL) {
+        reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_RESPONSE, HRIL_RESPONSE, 0);
+        OnSimReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+        FreeResponseInfo(pResponse);
+        return;
+    }
     int32_t result = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CPWD=\"%s\",\"%s\",\"%s\"", pSimPassword->fac,
         pSimPassword->oldPassword, pSimPassword->newPassword);
     if (result <= 0) {
@@ -459,23 +530,23 @@ void ReqChangeSimPassword(const ReqDataInfo *requestInfo, const HRilSimPassword 
             ret = HRIL_ERR_GENERIC_FAILURE;
         }
         reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
-        OnSimReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+        OnSimReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
         FreeResponseInfo(pResponse);
         return;
     }
-
     reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
-    OnSimReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+    OnSimReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
 }
 
 void ReqUnlockPin(const ReqDataInfo *requestInfo, const char *pin)
 {
-    ResponseInfo *pResponse = NULL;
     char cmd[MAX_CMD_LENGTH] = {0};
-    int32_t ret;
     char *pLine = NULL;
+    int32_t ret;
+    ResponseInfo *pResponse = NULL;
     struct ReportInfo reportInfo = {0};
+
     int32_t result = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CPIN=\"%s\"", pin);
     if (result <= 0) {
         TELEPHONY_LOGE("GenerateCommand is failed");
@@ -491,23 +562,23 @@ void ReqUnlockPin(const ReqDataInfo *requestInfo, const char *pin)
             ret = HRIL_ERR_GENERIC_FAILURE;
         }
         reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
-        OnSimReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+        OnSimReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
         FreeResponseInfo(pResponse);
         return;
     }
-
     reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
-    OnSimReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+    OnSimReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
 }
 
 void ReqUnlockPuk(const ReqDataInfo *requestInfo, const char *puk, const char *pin)
 {
-    ResponseInfo *pResponse = NULL;
     char cmd[MAX_CMD_LENGTH] = {0};
     char *pLine = NULL;
     int32_t ret;
+    ResponseInfo *pResponse = NULL;
     struct ReportInfo reportInfo = {0};
+
     int32_t result = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CPIN=\"%s\",\"%s\"", puk, pin);
     if (result <= 0) {
         TELEPHONY_LOGE("GenerateCommand is failed");
@@ -523,19 +594,19 @@ void ReqUnlockPuk(const ReqDataInfo *requestInfo, const char *puk, const char *p
             ret = HRIL_ERR_GENERIC_FAILURE;
         }
         reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
-        OnSimReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+        OnSimReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
         FreeResponseInfo(pResponse);
         return;
     }
     reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
-    OnSimReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+    OnSimReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
 }
 
 void ReqGetSimPinInputTimes(const ReqDataInfo *requestInfo)
 {
-    int32_t ret;
     char *pLine = NULL;
+    int32_t ret;
     HRilPinInputTimes pinInputTimes = {0};
     ResponseInfo *pResponse = NULL;
     struct ReportInfo reportInfo = {0};
@@ -551,7 +622,7 @@ void ReqGetSimPinInputTimes(const ReqDataInfo *requestInfo)
             ret = HRIL_ERR_GENERIC_FAILURE;
         }
         reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
-        OnSimReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+        OnSimReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
         FreeResponseInfo(pResponse);
         return;
     }
@@ -568,21 +639,21 @@ void ReqGetSimPinInputTimes(const ReqDataInfo *requestInfo)
             ret = HRIL_ERR_GENERIC_FAILURE;
         }
         reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
-        OnSimReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+        OnSimReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
         FreeResponseInfo(pResponse);
         return;
     }
     reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
-    OnSimReport(HRIL_SIM_SLOT_1, reportInfo, (const uint8_t *)&pinInputTimes, sizeof(pinInputTimes));
+    OnSimReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&pinInputTimes, sizeof(pinInputTimes));
     FreeResponseInfo(pResponse);
 }
 
 void ReqUnlockPin2(const ReqDataInfo *requestInfo, const char *pin2)
 {
-    ResponseInfo *pResponse = NULL;
     char cmd[MAX_CMD_LENGTH] = {0};
-    int32_t ret;
     char *pLine = NULL;
+    int32_t ret;
+    ResponseInfo *pResponse = NULL;
     struct ReportInfo reportInfo = {0};
 
     int32_t result = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT^CPIN2=\"%s\"", pin2);
@@ -600,21 +671,21 @@ void ReqUnlockPin2(const ReqDataInfo *requestInfo, const char *pin2)
             ret = HRIL_ERR_GENERIC_FAILURE;
         }
         reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
-        OnSimReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+        OnSimReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
         FreeResponseInfo(pResponse);
         return;
     }
     reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
-    OnSimReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+    OnSimReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
 }
 
 void ReqUnlockPuk2(const ReqDataInfo *requestInfo, const char *puk2, const char *pin2)
 {
-    ResponseInfo *pResponse = NULL;
     char cmd[MAX_CMD_LENGTH] = {0};
     char *pLine = NULL;
     int32_t ret;
+    ResponseInfo *pResponse = NULL;
     struct ReportInfo reportInfo = {0};
 
     int32_t result = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT^CPIN2=\"%s\",\"%s\"", puk2, pin2);
@@ -632,22 +703,23 @@ void ReqUnlockPuk2(const ReqDataInfo *requestInfo, const char *puk2, const char 
             ret = HRIL_ERR_GENERIC_FAILURE;
         }
         reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
-        OnSimReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+        OnSimReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
         FreeResponseInfo(pResponse);
         return;
     }
     reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
-    OnSimReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+    OnSimReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
 }
 
 void ReqGetSimPin2InputTimes(const ReqDataInfo *requestInfo)
 {
-    int32_t ret;
     char *pLine = NULL;
+    int32_t ret;
     HRilPinInputTimes pin2InputTimes = {0};
     ResponseInfo *pResponse = NULL;
     struct ReportInfo reportInfo = {0};
+
     ret = SendCommandLock("AT^CPIN2?", "^CPIN2", 0, &pResponse);
     if (ret != 0 || (pResponse != NULL && !pResponse->success)) {
         TELEPHONY_LOGE("AT^CPIN2? send failed");
@@ -665,12 +737,12 @@ void ReqGetSimPin2InputTimes(const ReqDataInfo *requestInfo)
             ret = HRIL_ERR_GENERIC_FAILURE;
         }
         reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
-        OnSimReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+        OnSimReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
         FreeResponseInfo(pResponse);
         return;
     }
     reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
-    OnSimReport(HRIL_SIM_SLOT_1, reportInfo, (const uint8_t *)&pin2InputTimes, 0);
+    OnSimReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&pin2InputTimes, 0);
     FreeResponseInfo(pResponse);
 }
 
@@ -697,11 +769,338 @@ void ReqSetActiveSim(const ReqDataInfo *requestInfo, int32_t index, int32_t enab
             ret = HRIL_ERR_GENERIC_FAILURE;
         }
         reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
-        OnSimReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+        OnSimReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
         FreeResponseInfo(pResponse);
         return;
     }
     reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
-    OnSimReport(HRIL_SIM_SLOT_1, reportInfo, NULL, 0);
+    OnSimReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+    FreeResponseInfo(pResponse);
+}
+
+void ReqSendTerminalResponseCmd(const ReqDataInfo *requestInfo, const char *strCmd)
+{
+    char cmd[MAX_CMD_LENGTH] = {0};
+    char *pLine = NULL;
+    int32_t ret;
+    ResponseInfo *pResponse = NULL;
+    struct ReportInfo reportInfo = {0};
+
+    int32_t result = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+SPUSATTERMINAL=\"%s\"", strCmd);
+    if (result < 0) {
+        TELEPHONY_LOGE("GenerateCommand failed, err = %{public}d\n", result);
+    }
+    ret = SendCommandLock(cmd, "+SPUSATTERMINAL", 0, &pResponse);
+    if (ret != 0 || (pResponse != NULL && !pResponse->success)) {
+        TELEPHONY_LOGE("AT+SPUSATTERMINAL send failed");
+        if (pResponse && pResponse->result) {
+            pLine = pResponse->result;
+            SkipATPrefix(&pLine);
+            NextInt(&pLine, &ret);
+        } else {
+            ret = HRIL_ERR_GENERIC_FAILURE;
+        }
+        reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
+        OnSimReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+        FreeResponseInfo(pResponse);
+        return;
+    }
+    reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
+    OnSimReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+    FreeResponseInfo(pResponse);
+}
+
+void ReqSendEnvelopeCmd(const ReqDataInfo *requestInfo, const char *strCmd)
+{
+    char cmd[MAX_CMD_LENGTH] = {0};
+    char *pLine = NULL;
+    int32_t ret;
+    ResponseInfo *pResponse = NULL;
+    struct ReportInfo reportInfo = {0};
+
+    int32_t result = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+SPUSATENVECMD=\"%s\"", strCmd);
+    if (result < 0) {
+        TELEPHONY_LOGE("GenerateCommand failed, err = %{public}d\n", result);
+    }
+    ret = SendCommandLock(cmd, "+SPUSATENVECMD", 0, &pResponse);
+    if (ret != 0 || (pResponse != NULL && !pResponse->success)) {
+        TELEPHONY_LOGE("AT+SPUSATENVECMD send failed");
+        if (pResponse && pResponse->result) {
+            pLine = pResponse->result;
+            SkipATPrefix(&pLine);
+            NextInt(&pLine, &ret);
+        } else {
+            ret = HRIL_ERR_GENERIC_FAILURE;
+        }
+        reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
+        OnSimReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+        FreeResponseInfo(pResponse);
+        return;
+    }
+    reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
+    OnSimReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+    FreeResponseInfo(pResponse);
+}
+
+void ReqStkControllerIsReady(const ReqDataInfo *requestInfo)
+{
+    char *pLine = NULL;
+    int32_t ret;
+    ResponseInfo *pResponse = NULL;
+    struct ReportInfo reportInfo = {0};
+
+    ret = SendCommandLock("AT+SPUSATPROFILE?", "+SPUSATPROFILE", 0, &pResponse);
+    if (ret != 0 || (pResponse != NULL && !pResponse->success)) {
+        TELEPHONY_LOGE("AT+SPUSATPROFILE send failed");
+        if (pResponse && pResponse->result) {
+            pLine = pResponse->result;
+            SkipATPrefix(&pLine);
+            NextInt(&pLine, &ret);
+        } else {
+            ret = HRIL_ERR_GENERIC_FAILURE;
+        }
+        reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
+        OnSimReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+        FreeResponseInfo(pResponse);
+        return;
+    }
+    reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
+    OnSimReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+    FreeResponseInfo(pResponse);
+}
+
+void ReqStkCmdCallSetup(const ReqDataInfo *requestInfo, int flagAccept)
+{
+    char cmd[MAX_CMD_LENGTH] = {0};
+    char *pLine = NULL;
+    int32_t ret;
+    ResponseInfo *pResponse = NULL;
+    struct ReportInfo reportInfo = {0};
+
+    int32_t result = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+SPUSATCALLSETUP= %d", flagAccept);
+    if (result <= 0) {
+        TELEPHONY_LOGE("GenerateCommand is failed");
+    }
+
+    ret = SendCommandLock(cmd, "+SPUSATCALLSETUP", 0, &pResponse);
+    if (ret != 0 || (pResponse != NULL && !pResponse->success)) {
+        TELEPHONY_LOGE("AT+SPUSATCALLSETUP send failed");
+        if (pResponse && pResponse->result) {
+            pLine = pResponse->result;
+            SkipATPrefix(&pLine);
+            NextInt(&pLine, &ret);
+        } else {
+            ret = HRIL_ERR_GENERIC_FAILURE;
+        }
+        reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
+        OnSimReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+        FreeResponseInfo(pResponse);
+        return;
+    }
+    reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
+    OnSimReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+    FreeResponseInfo(pResponse);
+}
+
+void ReqSetRadioProtocol(const ReqDataInfo *requestInfo, const HRilSimProtocolRequest *data, size_t dataLen)
+{
+    ResponseInfo *pResponse = NULL;
+    struct ReportInfo reportInfo = {};
+    HRilSimProtocolResponse simResponse = {0};
+    HRilSimProtocolRequest *pSim = (HRilSimProtocolRequest *)data;
+    if (pSim == NULL || dataLen == 0) {
+        reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_RESPONSE, HRIL_RESPONSE, 0);
+        OnSimReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+        FreeResponseInfo(pResponse);
+        return;
+    }
+    if (simResponse.phase == 0) {
+        simResponse.phase = pSim->phase;
+        simResponse.result = 0;
+        simResponse.slotId = pSim->slotId;
+    } else {
+        simResponse.phase = pSim->phase;
+        simResponse.result = 1;
+        simResponse.slotId = pSim->slotId;
+    }
+    int32_t ret = SendCommandLock("AT+SPTESTMODE", "+SPTESTMODE", 0, &pResponse);
+    if (ret != 0 || (pResponse != NULL && !pResponse->success)) {
+        TELEPHONY_LOGE("AT+SPTESTMODE send failed");
+        if (pResponse && pResponse->result) {
+            ret = HRIL_ERR_SUCCESS;
+        } else {
+            ret = HRIL_ERR_GENERIC_FAILURE;
+        }
+        reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
+        OnSimReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+        FreeResponseInfo(pResponse);
+        return;
+    }
+    reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
+    OnSimReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&simResponse, sizeof(simResponse));
+    FreeResponseInfo(pResponse);
+}
+
+void ReqOpenLogicalSimIO(const ReqDataInfo *requestInfo, const char *appID, int32_t p2)
+{
+    char cmd[MAX_CMD_LENGTH] = {0};
+    char *pLine = NULL;
+    int32_t ret;
+    ResponseInfo *pResponse = NULL;
+    struct ReportInfo reportInfo = {0};
+
+    int32_t result = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+SPCCHO=\"%s\",%d", appID, p2);
+    if (result <= 0) {
+        TELEPHONY_LOGE("GenerateCommand is failed");
+    }
+    ret = SendCommandLock(cmd, "+SPCCHO", 0, &pResponse);
+    if (ret != 0 || (pResponse != NULL && !pResponse->success)) {
+        TELEPHONY_LOGE("AT+SPCCHO send failed");
+        if (pResponse && pResponse->result) {
+            pLine = pResponse->result;
+            SkipATPrefix(&pLine);
+            NextInt(&pLine, &ret);
+        } else {
+            ret = HRIL_ERR_GENERIC_FAILURE;
+        }
+        reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
+        OnSimReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+        FreeResponseInfo(pResponse);
+        return;
+    }
+    reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
+    OnSimReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+    FreeResponseInfo(pResponse);
+}
+
+void ReqCloseLogicalSimIO(const ReqDataInfo *requestInfo, int chanID)
+{
+    char cmd[MAX_CMD_LENGTH] = {0};
+    char *pLine = NULL;
+    int32_t ret;
+    ResponseInfo *pResponse = NULL;
+    struct ReportInfo reportInfo = {0};
+
+    int32_t result = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CCHC=%d", chanID);
+    if (result <= 0) {
+        TELEPHONY_LOGE("GenerateCommand is failed");
+    }
+    ret = SendCommandLock(cmd, "+CCHC", 0, &pResponse);
+    if (ret != 0 || (pResponse != NULL && !pResponse->success)) {
+        TELEPHONY_LOGE("AT+CCHC send failed");
+        if (pResponse && pResponse->result) {
+            pLine = pResponse->result;
+            SkipATPrefix(&pLine);
+            NextInt(&pLine, &ret);
+        } else {
+            ret = HRIL_ERR_GENERIC_FAILURE;
+        }
+        reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
+        OnSimReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+        FreeResponseInfo(pResponse);
+        return;
+    }
+    reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
+    OnSimReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+    FreeResponseInfo(pResponse);
+}
+
+void ReqTransmitApduSimIO(const ReqDataInfo *requestInfo, HRilApduSimIO *data, size_t dataLen)
+{
+    char cmd[MAX_CMD_LENGTH] = {0};
+    char *pLine = NULL;
+    int32_t ret;
+    ResponseInfo *pResponse = NULL;
+    struct ReportInfo reportInfo = {0};
+    HRilSimIOResponse apduSimResponse = {0};
+    HRilApduSimIO *pApduSimIO = (HRilApduSimIO *)data;
+
+    if (pApduSimIO == NULL) {
+        reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_RESPONSE, HRIL_RESPONSE, 0);
+        OnSimReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+        FreeResponseInfo(pResponse);
+        return;
+    }
+
+    int32_t result = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CGLA=%d,%d,%d,%d,%d,%d,\"%s\"", pApduSimIO->chanId,
+        pApduSimIO->type, pApduSimIO->instruction, pApduSimIO->p1, pApduSimIO->p2, pApduSimIO->p3, pApduSimIO->data);
+    if (result <= 0) {
+        TELEPHONY_LOGE("GenerateCommand is failed");
+    }
+    ret = SendCommandLock(cmd, "+CGLA", 0, &pResponse);
+    if (ret != 0 || (pResponse != NULL && !pResponse->success)) {
+        TELEPHONY_LOGE("AT+CGLA send failed  dataLen:%{public}zu", dataLen);
+        if (pResponse && pResponse->result) {
+            pLine = pResponse->result;
+            SkipATPrefix(&pLine);
+            NextInt(&pLine, &ret);
+        } else {
+            ret = HRIL_ERR_GENERIC_FAILURE;
+        }
+        reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
+        OnSimReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+        FreeResponseInfo(pResponse);
+        return;
+    }
+    if (pResponse->head) {
+        pLine = pResponse->head->data;
+    }
+    ret = ParseSimResponseResult(pLine, &apduSimResponse);
+    if (ret != HRIL_ERR_SUCCESS) {
+        HandlerSimIOResult(pResponse, NULL, requestInfo, pLine, &ret);
+        return;
+    }
+    reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
+    OnSimReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&apduSimResponse, sizeof(HRilSimIOResponse));
+    FreeResponseInfo(pResponse);
+}
+
+void ReqUnlockSimLock(const ReqDataInfo *requestInfo, int32_t lockType, const char *password)
+{
+    char cmd[MAX_CMD_LENGTH] = {0};
+    char *pLine = NULL;
+    int32_t ret;
+    ResponseInfo *pResponse = NULL;
+    struct ReportInfo reportInfo = {0};
+
+    int32_t result = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT^UNLOCKSIMLOCK=\"%d\",%s", lockType, password);
+    if (result <= 0) {
+        TELEPHONY_LOGE("GenerateCommand is failed");
+    }
+    ret = SendCommandLock(cmd, "^UNLOCKSIMLOCK", 0, &pResponse);
+    if (ret != 0 || (pResponse != NULL && !pResponse->success)) {
+        TELEPHONY_LOGE("AT^UNLOCKSIMLOCK send failed");
+        if (pResponse && pResponse->result) {
+            pLine = pResponse->result;
+            SkipATPrefix(&pLine);
+            NextInt(&pLine, &ret);
+        } else {
+            ret = HRIL_ERR_GENERIC_FAILURE;
+        }
+        reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
+        OnSimReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+        FreeResponseInfo(pResponse);
+        return;
+    }
+    if (pResponse && pResponse->head) {
+        pLine = pResponse->head->data;
+    }
+    HRilLockStatus lockStatus = {0};
+    ret = ParseUnlockSimLockResult(pLine, &lockStatus);
+    if (ret != 0) {
+        if (pResponse && pResponse->result) {
+            pLine = pResponse->result;
+            SkipATPrefix(&pLine);
+            NextInt(&pLine, &ret);
+        } else {
+            ret = HRIL_ERR_GENERIC_FAILURE;
+        }
+        reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
+        OnSimReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+        FreeResponseInfo(pResponse);
+        return;
+    }
+    reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
+    OnSimReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&lockStatus, sizeof(HRilLockStatus));
     FreeResponseInfo(pResponse);
 }

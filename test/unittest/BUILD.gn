@@ -25,7 +25,7 @@ ohos_executable("ril_adapter_test") {
     "ril_unit_test.cpp",
   ]
   include_dirs = [
-    "$RIL_ADAPTER/ril_adapter/include",
+    "$RIL_ADAPTER/ril_adapter/services/hril/include",
     "$RIL_ADAPTER/ril_adapter/test/unittest/include",
     "//drivers/adapter/uhdf2/include/hdi",
     "$RIL_ADAPTER/ril_adapter/interfaces/innerkits/include",
@@ -37,7 +37,7 @@ ohos_executable("ril_adapter_test") {
     "LOG_DOMAIN = 0xD002B01",
   ]
   deps = [
-    "$RIL_ADAPTER/ril_adapter/interfaces/innerkits:hril_innerkits",
+    "$RIL_ADAPTER/ril_adapter/frameworks:hril_innerkits",
     "$RIL_ADAPTER/ril_adapter/services/hril:hril",
     "$RIL_ADAPTER/ril_adapter/services/hril_hdf:hril_hdf",
     "$RIL_ADAPTER/ril_adapter/services/vendor:ril_vendor",

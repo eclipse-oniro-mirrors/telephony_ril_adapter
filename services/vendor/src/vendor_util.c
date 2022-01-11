@@ -20,12 +20,12 @@
 #define NS_PER_S 1000000000
 #define COUNT 1000
 
-const int G_RESP_ERRORS = 6;
+const int G_RESP_ERRORS = 7;
 const int G_RESP_SUCCESS = 2;
 const int G_RESP_SMS_NOTIFY = 3;
-
+const int G_CHAR_TO_INT = 10;
 static const char *g_respErrors[G_RESP_ERRORS] = {
-    "ERROR", "NO ANSWER", "+CME ERROR:", "NO CARRIER", "NO DIALTONE", "+CMS ERROR:"};
+    "ERROR", "NO ANSWER", "+CME ERROR:", "NO CARRIER", "NO DIALTONE", "+CMS ERROR:", "COMMAND NOT SUPPORT"};
 
 static const char *g_respSuccess[G_RESP_SUCCESS] = {"OK", "CONNECT"};
 
@@ -159,6 +159,53 @@ int NextInt(char **s, int *out)
     }
     ret = strsep(s, ",");
     while (*s != NULL && **s == ',') {
+        (*s)++;
+    }
+    *out = (int)strtol(ret, &end, HRIL_DEC);
+    if (ret == end) {
+        TELEPHONY_LOGE("strtol is fail, err:%{public}d, ret:%{public}s", *out, ret);
+        return -1;
+    }
+    return 0;
+}
+
+int NextIntNotSkipNextComma(char **s, int *out)
+{
+    char *ret = NULL;
+    char *end = NULL;
+    if (*s == NULL) {
+        TELEPHONY_LOGE("str parameter is null.");
+        return -1;
+    }
+    SkipSpace(s);
+    if (*s == NULL) {
+        TELEPHONY_LOGE("str parameter is null, after skip space.");
+        return -1;
+    }
+    ret = strsep(s, ",");
+    *out = (int)strtol(ret, &end, HRIL_DEC);
+    if (ret == end) {
+        TELEPHONY_LOGE("strtol is fail, err:%{public}d, ret:%{public}s", *out, ret);
+        return -1;
+    }
+    return 0;
+}
+
+int NextIntByRightBracket(char **s, int *out)
+{
+    char *ret = NULL;
+    char *end = NULL;
+    if (*s == NULL) {
+        TELEPHONY_LOGE("str parameter is null.");
+        return -1;
+    }
+    SkipSpace(s);
+    if (*s == NULL) {
+        TELEPHONY_LOGE("str parameter is null, after skip space.");
+        return -1;
+    }
+    ret = strsep(s, ")");
+    while (*s != NULL && **s == ')') {
         (*s)++;
     }
     *out = (int)strtol(ret, &end, HRIL_DEC);
@@ -343,7 +390,55 @@ ModemReportErrorInfo GetReportErrorInfo(const ResponseInfo *response)
 ModemReportErrorInfo InitModemReportErrorInfo(void)
 {
     ModemReportErrorInfo errInfo;
+
     errInfo.errorNo = HRIL_ERR_SUCCESS;
     errInfo.errType = HRIL_REPORT_ERR_TYPE_NONE;
     return errInfo;
+}
+
+int ConvertCharToInt(const char *s)
+{
+    char *str = (char *)s;
+    int ret = 0;
+    char firstChar = *str;
+    if ((firstChar == '+') || (firstChar == '-')) {
+        ++str;
+    }
+    while (*str == '0') {
+        ++str;
+    }
+    while (*str) {
+        char tmp = *str;
+        if ((*str < '0') || (*str > '9')) {
+            return ret;
+        } else {
+            int val = (int)(tmp - '0');
+            ret = (ret * G_CHAR_TO_INT) + val;
+        }
+        str++;
+    }
+    if (firstChar == '-') {
+        ret = -ret;
+    }
+    return ret;
+}
+
+int FindCommaCharNum(const char *srcStr)
+{
+    char *str = (char *)srcStr;
+    if (str == NULL) {
+        TELEPHONY_LOGE("srcStr parameter is null.");
+        return -1;
+    }
+    if (*str == '\0') {
+        return -1;
+    }
+    int charNum = 0;
+    while (*str != '\0') {
+        if (*str == ',') {
+            charNum++;
+        }
+        str++;
+    }
+    return charNum;
 }

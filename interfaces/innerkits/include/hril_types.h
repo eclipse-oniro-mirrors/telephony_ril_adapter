@@ -23,6 +23,7 @@
 namespace OHOS {
 namespace Telephony {
 enum class HRilErrType {
+    HRIL_ERR_NULL_POINT = -1,
     NONE = 0,
     HRIL_ERR_GENERIC_FAILURE,
     HRIL_ERR_INVALID_PARAMETER,
@@ -30,6 +31,19 @@ enum class HRilErrType {
     HRIL_ERR_CMD_SEND_FAILURE,
     HRIL_ERR_CMD_NO_CARRIER,
     HRIL_ERR_INVALID_RESPONSE,
+    HRIL_ERR_REPEAT_STATUS,
+    HRIL_ERR_NETWORK_SEARCHING,
+    HRIL_ERR_NETWORK_SEARCHING_INTERRUPTED,
+    HRIL_ERR_MODEM_DEVICE_CLOSE,
+
+    // network error
+    HRIL_ERR_NO_SIMCARD_INSERTED = 10,
+    HRIL_ERR_NEED_PIN_CODE = 11,
+    HRIL_ERR_NEED_PUK_CODE = 12,
+    HRIL_ERR_NETWORK_SEARCH_TIMEOUT = 13,
+    HRIL_ERR_INVALID_MODEM_PARAMETER = 50,
+
+    HRIL_ERR_HDF_IPC_FAILURE = 65535,
 };
 
 enum class HRilNotiType { HRIL_NOTIFICATION, HRIL_NO_DEFINE };
@@ -88,12 +102,24 @@ struct LteRssi {
                    * value range 0~251, 255 not known or not detectable */
 };
 
+struct TdScdmaRssi {
+    uint32_t rscp;
+};
+
+struct NrRssi {
+    uint32_t rsrp;
+    uint32_t rsrq;
+    uint32_t sinr;
+};
+
 struct Rssi {
     int32_t slotId;
     GsmRssi gw;
     CdmaRssi cdma;
     WCdmaRssi wcdma;
     LteRssi lte;
+    TdScdmaRssi tdScdma;
+    NrRssi nr;
 };
 
 /* from 3GPP TS 27.007 V4.3.0 (2001-12) */
@@ -101,12 +127,6 @@ struct GetCallWaitingInfo {
     uint32_t status; /* 0	not active
                       * 1	active */
     uint32_t typeClass; /* <classx> default, SLM790 is 255 */
-};
-
-// phone type
-enum HRilPhoneNetType {
-    PHONE_NET_TYPE_GSM = 1, // gsm
-    PHONE_NET_TYPE_CDMA = 2, // cdma
 };
 
 struct HRilRadioResponseInfo {
@@ -133,14 +153,7 @@ enum HRilOperatorInfoResult {
     HRIL_SHORT_NAME,
     HRIL_LONE_NAME,
 };
-namespace {
-enum HRilNetWorkStatus {
-    UNKNOWN,
-    AVAILABLE,
-    CURRENT,
-    FORBIDDEN,
-};
-}
+
 enum HRilCircuitModeRegState {
     HRIL_STAT_NO_REG_MT_NO_SEARCHING_OP = 0, /* not registered, MT is not searching an operator */
     HRIL_STAT_REGISTERED_HOME_NETWORK = 1, /* registered, home network */
@@ -165,6 +178,15 @@ enum HRiRadioTechnology {
     HRIL_RADIO_HSUPA = 5,
     HRIL_RADIO_HSDPA_HSUPA = 6,
     HRIL_RADIO_EUTRAN = 7,
+    HRIL_RADIO_CDMA = 8,
+    HRIL_RADIO_CDMA_IS95A = 9,
+    HRIL_RADIO_CDMA_IS95B = 10,
+    HRIL_RADIO_CDMA_EVDO_0 = 11,
+    HRIL_RADIO_CDMA_EVDO_A = 12,
+    HRIL_RADIO_CDMA_EVDO_B = 13,
+    HRIL_RADIO_CDMA_EHRPD = 14,
+    HRIL_RADIO_TDSCDMA = 15,
+    HRIL_RADIO_HSPAP = 16
 };
 
 /* from 3GPP TS 27.007 V17.1.0 9.2.2.1.1 */

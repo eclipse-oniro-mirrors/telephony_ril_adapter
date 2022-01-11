@@ -43,15 +43,27 @@ struct SetupDataCallResultInfo : public HrilBaseParcel {
                           * When +CGPIAF is supported, its settings can influence the format of this parameter
                           * returned with the execute form of +CGCONTRDP */
     std::string dns; /* If the MT indicates more than two IP addresses of P-CSCF servers
-                      * or more than two IP addresses of DNS servers,
-                      * multiple lines of information per <cid> will be returned.
-                      * If the MT has dual stack capabilities,
-                      * First one line with the IPv4 parameters followed by one line with the IPv6 parameters. */
+                      * string type; shows the IP address of the secondary DNS server.When +CGPIAF is supported, its
+                      * settings can influence the format of this parameter returned with the execute form of
+                      * +CGCONTRDP. */
+    std::string dnsSec; /* from 3GPP TS 27.007 10.1.23 V4.3.0 (2001-12)
+                         * string type; shows the IP address of the secondary DNS server.When +CGPIAF is supported,
+                         * its settings can influence the format of this parameter returned with the execute form of
+                         * +CGCONTRDP. */
     std::string gateway; /* network gateway address */
-    std::string pcscfa; /* The P-CSCF(Proxy Call State Control Function) addresses,Empty if not IMS client. */
     int32_t maxTransferUnit; /* Maximum Transfer Unit. The range of permitted values (minimum value = 1
                   * or if the initial PDP context is supported minimum value = 0)
                   * is returned by the test form of the command. */
+    std::string pCscfPrimAddr; /* from 3GPP TS 27.007 10.1.23 V4.3.0 (2001-12)
+                                * string type; shows the IP address of the primary P-CSCF server.When +CGPIAF is
+                                * supported, its settings can influence the format of this parameter returned with
+                                * the execute form of +CGCONTRDP. */
+    std::string pCscfSecAddr; /* from 3GPP TS 27.007 10.1.23 V4.3.0 (2001-12)
+                               * string type; shows the IP address of the secondary P-CSCF server. When +CGPIAF is
+                               * supported, its settings can influence the format of this parameter returned with the
+                               * execute form of +CGCONTRDP. */
+    int32_t pduSessionId; /* from 3GPP TS 27.007 10.1.23 V4.3.0 (2001-12)
+                           * integer type; identifies the PDU session, see 3GPP TS 24.501 [161]. */
     bool ReadFromParcel(Parcel &parcel);
     virtual bool Marshalling(Parcel &parcel) const override;
     std::shared_ptr<SetupDataCallResultInfo> UnMarshalling(Parcel &parcel);
@@ -110,6 +122,65 @@ struct DataCallInfo : public HrilBaseParcel {
     bool ReadFromParcel(Parcel &parcel);
     virtual bool Marshalling(Parcel &parcel) const override;
     std::shared_ptr<DataCallInfo> UnMarshalling(Parcel &parcel);
+    void Dump(std::string, int32_t);
+};
+
+struct DataLinkBandwidthInfo : public HrilBaseParcel {
+    int32_t serial;
+    int32_t cid; /* from 3GPP TS 27.007 10.1.50 V4.3.0 (2021-10)
+                  * integer type; specifies a particular QoS flow definition, Traffic Flows
+                  * definition and a PDP Context definition (see the +CGDCONT and +CGDSCONT commands). */
+    int32_t qi; /* from 3GPP TS 27.007 10.1.50 V4.3.0 (2021-10)
+                 * 0 5QI is selected by network
+                 * [1 - 4]	value range for guaranteed bit rate QoS flows
+                 * 65, 66, 67 values for guaranteed bit rate QoS flows
+                 * [71 - 76] value range for guaranteed bit rate QoS flows
+                 * [5 - 9] value range for non-guaranteed bit rate QoS flows
+                 * 69, 70, 79, 80 values for non-guaranteed bit rate QoS flows
+                 * [82 - 85] value range for delay critical guaranteed bit rate QoS flows
+                 * [128 - 254] value range for Operator-specific 5QIs */
+    int32_t dlGfbr; /* from 3GPP TS 27.007 10.1.50 V4.3.0 (2021-10)
+                     * integer type; indicates DL GFBR in case of GBR 5QI. The value is in kbit/s. This parameter is
+                     * omitted for a non-GBR 5QI (see 3GPP TS 24.501 [161]) */
+    int32_t ulGfbr; /* from 3GPP TS 27.007 10.1.50 V4.3.0 (2021-10)
+                     * integer type; indicates UL GFBR in case of GBR 5QI. The value is in kbit/s. This parameter is
+                     * omitted for a non-GBR 5QI (see 3GPP TS 24.501 [161]). */
+    int32_t dlMfbr; /* from 3GPP TS 27.007 10.1.50 V4.3.0 (2021-10)
+                     * integer type; indicates DL MFBR in case of GBR 5QI. The value is in kbit/s. This parameter is
+                     * omitted for a non-GBR 5QI (see 3GPP TS 24.501 [161]). */
+    int32_t ulMfbr; /* from 3GPP TS 27.007 10.1.50 V4.3.0 (2021-10)
+                     * integer type; indicates UL MFBR in case of GBR 5QI. The value is in kbit/s. This parameter is
+                     * omitted for a non-GBR 5QI (see 3GPP TS 24.501 [161]). */
+    int32_t ulSambr; /* from 3GPP TS 27.007 10.1.50 V4.3.0 (2021-10)
+                      * integer type; indicates the UL session AMBR(see 3GPP TS 24.501 [161]).
+                      * The value is in kbit /s. */
+    int32_t dlSambr; /* from 3GPP TS 27.007 10.1.50 V4.3.0 (2021-10)
+                      * integer type; indicates the DL session AMBR(see 3GPP TS 24.501 [161]).
+                      * The value is in kbit/ s. */
+    int32_t averagingWindow; /* from 3GPP TS 27.007 10.1.50 V4.3.0 (2021-10)
+                              * integer type; indicates the averaging window(see 3GPP TS 24.501 [161]) .The value is
+                              * in milliseconds. */
+
+    bool ReadFromParcel(Parcel &parcel);
+    virtual bool Marshalling(Parcel &parcel) const override;
+    std::shared_ptr<DataLinkBandwidthInfo> UnMarshalling(Parcel &parcel);
+    void Dump(std::string, int32_t);
+};
+
+struct DataLinkBandwidthReportingRule : public HrilBaseParcel {
+    int32_t serial;
+    int32_t rat;
+    int32_t delayMs;
+    int32_t delayUplinkKbps;
+    int32_t delayDownlinkKbps;
+    int32_t maximumUplinkKbpsSize;
+    int32_t maximumDownlinkKbpsSize;
+    std::vector<int32_t> maximumUplinkKbps;
+    std::vector<int32_t> maximumDownlinkKbps;
+
+    bool ReadFromParcel(Parcel &parcel);
+    virtual bool Marshalling(Parcel &parcel) const override;
+    std::shared_ptr<DataLinkBandwidthReportingRule> UnMarshalling(Parcel &parcel);
     void Dump(std::string, int32_t);
 };
 } // namespace Telephony

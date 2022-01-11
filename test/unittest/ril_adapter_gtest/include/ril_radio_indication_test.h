@@ -33,7 +33,7 @@ public:
 
 private:
     void RadioStateUpdated(MessageParcel &data);
-    void CallStateUpdated(MessageParcel &data);
+    void CallStateChgInd(MessageParcel &data);
     void NetworkStateNotify(MessageParcel &data);
     void NewSmsNotify(MessageParcel &data);
     void NewCdmaSmsNotify(MessageParcel &data);

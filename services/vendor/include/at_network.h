@@ -16,9 +16,10 @@
 #ifndef OHOS_AT_NETWORK_H
 #define OHOS_AT_NETWORK_H
 
-#include "hril.h"
+#include "hril_vendor_network_defs.h"
 
 #define MAX_REG_INFO_ITEM 5
+#define MAX_5GREG_INFO_ITEM 7
 #define MAX_IMS_REG_INFO_ITEM 2
 #define MAX_IMS_INFO_ITEM 3
 #define DEFAULT_ADD_NUM 8
@@ -32,10 +33,6 @@
 #define LTE_WCDMA_GSM_TYPE "030201"
 #define WCDMA_GSM_TYPE "0201"
 #define LTE_WCDMA_TYPE "0302"
-#define NO_REG_MT_NO_SEARCH 0
-#define NO_REG_MT_SEARCHING 2
-#define REG_MT_REJECTED 3
-#define REG_MT_UNKNOWN 4
 
 void ReqGetImsRegStatus(const ReqDataInfo *requestInfo);
 void ReqGetSignalStrength(const ReqDataInfo *requestInfo);
@@ -44,21 +41,26 @@ void ReqGetPsRegStatus(const ReqDataInfo *requestInfo);
 void ReqGetOperatorInfo(const ReqDataInfo *requestInfo);
 void ReqGetCellInfoList(const ReqDataInfo *requestInfo);
 void ReqGetCurrentCellInfo(const ReqDataInfo *requestInfo);
-void ReqGetImei(const ReqDataInfo *requestInfo);
 void ReqSetPsAttachStatus(const ReqDataInfo *requestInfo, const int32_t *data);
 void ReqGetPsAttachStatus(const ReqDataInfo *requestInfo);
 void ReqGetNetworkSearchInformation(const ReqDataInfo *requestInfo);
 void ReqGetNetworkSelectionMode(const ReqDataInfo *requestInfo);
 void ReqSetNetworkSelectionMode(const ReqDataInfo *requestInfo, const HRilSetNetworkModeInfo *data);
+void ReqGetRadioCapability(const ReqDataInfo *requestInfo);
+void ReqSetRadioCapability(const ReqDataInfo *requestInfo, const HRilRadioCapability *data);
 void ReqSetPreferredNetwork(const ReqDataInfo *requestInfo, const int32_t *data);
 void ReqGetPreferredNetwork(const ReqDataInfo *requestInfo);
-int ProcessRegStatus(const char *s, const HRilRegStatusInfo *hrilRegStateInfo);
-int ProcessImsRegStatus(const char *s, const HRilImsRegStatusInfo *imsRegStatusInfo, int expectInfoNum);
-int ProcessParamSignalStrength(const char *result, HRilRssi *hrilRssi);
-int ProcessParamSignalStrengthNotify(const char *result, HRilRssi *hrilRssi);
-int ProcessOperListToUse(const char *list);
+void ReqGetPhysicalChannelConfig(const ReqDataInfo *requestInfo);
+void ReqSetLocateUpdates(const ReqDataInfo *requestInfo, HRilRegNotifyMode mode);
+void ProcessPhyChnlCfgNotify(struct ReportInfo reportInfo, char *srcstr);
+int32_t ProcessRegStatus(const char *s, const HRilRegStatusInfo *hrilRegStateInfo);
+int32_t ProcessImsRegStatus(const char *s, const HRilImsRegStatusInfo *imsRegStatusInfo, int expectInfoNum);
+int32_t ProcessParamSignalStrength(const char *result, HRilRssi *hrilRssi);
+int32_t ProcessParamSignalStrengthNotify(const char *result, HRilRssi *hrilRssi);
+int32_t ProcessOperListToUse(const char *list);
 void PerformTimeOut(int sigFlag);
-int ParseOperListInfo(const char *lineInfo, int count, AvailableOperInfo *pOperInfo, AvailableOperInfo **ppOperInfo);
+int32_t ParseOperListInfo(
+    const char *lineInfo, int count, AvailableOperInfo *pOperInfo, AvailableOperInfo **ppOperInfo);
 void NotifyNetWorkTime(void);
 void GetNetworkSearchInformationPause(void);
 #endif

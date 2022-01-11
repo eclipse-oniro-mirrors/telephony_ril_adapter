@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "channel.h"
+#include "vendor_channel.h"
 
 #include "vendor_util.h"
 
@@ -81,7 +81,6 @@ const char *ReadResponse(int atFd)
     endEol = ProcessLastResponse(&processed);
     while (endEol == NULL) {
         if (MAX_RESPONSE_LEN == (processed - g_buffer)) {
-            TELEPHONY_LOGI("Input line exceeded buffer\n");
             ClearCurBuffer(&processed);
         }
         do {

@@ -69,6 +69,9 @@ private:
     void SendSmsAckTest(const AppExecFwk::InnerEvent::Pointer &result);
     void ActivatePdpContextTest(const AppExecFwk::InnerEvent::Pointer &result);
     void DeactivatePdpContextTest(const AppExecFwk::InnerEvent::Pointer &result);
+    void SetUssdCusdTest(const AppExecFwk::InnerEvent::Pointer &result);
+    void GetUssdCusdTest(const AppExecFwk::InnerEvent::Pointer &result);
+    void GetLinkBandwidthInfoTest(const AppExecFwk::InnerEvent::Pointer &result);
 
 private:
     std::unique_ptr<RilManagerTest> mRilManager_;

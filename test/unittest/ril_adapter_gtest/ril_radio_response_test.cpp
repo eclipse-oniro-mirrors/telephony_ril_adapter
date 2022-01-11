@@ -15,8 +15,9 @@
 
 #include "ril_radio_response_test.h"
 
-#include "hril_request.h"
 #include "telephony_log_wrapper.h"
+
+#include "hril_request.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -499,6 +500,17 @@ void RilRadioResponseTest::OnRequestGetUssdCusdTest(MessageParcel &data)
     const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
     if (spBuffer == nullptr) {
         TELEPHONY_LOGE("ERROR : OnRequestGetUssdCusdTest --> data.ReadBuffer(readSpSize) failed !!!");
+        return;
+    }
+}
+
+void RilRadioResponseTest::OnRequestGetLinkBandwidthInfoTest(MessageParcel &data)
+{
+    TELEPHONY_LOGI("RilRadioResponseTest::OnRequestGetLinkBandwidthInfoTest --> ");
+    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
+    const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("ERROR : OnRequestGetLinkBandwidthInfoTest --> data.ReadBuffer(readSpSize) failed !!!");
         return;
     }
 }

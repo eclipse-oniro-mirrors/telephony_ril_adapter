@@ -17,11 +17,11 @@
 #define OHOS_AT_SMS_H
 
 #include "at_support.h"
-#include "hril.h"
+#include "hril_vendor_sms_defs.h"
 
 void ReqSendGsmSms(const ReqDataInfo *requestInfo, const char *const *data, size_t dataLen);
 void ReqSendSmsAck(const ReqDataInfo *requestInfo, const int32_t *data, size_t dataLen);
-void ReqSendCdmaSms(const ReqDataInfo *requestInfo, const HRilCdmaSmsMessageInfo *data, size_t dataLen);
+void ReqSendCdmaSms(const ReqDataInfo *requestInfo, const char *data, size_t dataLen);
 void ReqSendCdmaSmsAck(const ReqDataInfo *requestInfo, const char *data, size_t dataLen);
 void ReqWriteSimMessage(const ReqDataInfo *requestInfo, const HRilSmsWriteSms *data, size_t dataLen);
 void ReqDelSimMessage(const ReqDataInfo *requestInfo, const int32_t *data, size_t dataLen);
@@ -31,5 +31,8 @@ void ReqSetCBConfig(const ReqDataInfo *requestInfo, const HRilCBConfigInfo *data
 void ReqGetCBConfig(const ReqDataInfo *requestInfo);
 void ReqGetCdmaCBConfig(const ReqDataInfo *requestInfo);
 void ReqSetCdmaCBConfig(const ReqDataInfo *requestInfo, const HRilCdmaCBConfigInfo *data, size_t dataLen);
+void ReqAddCdmaSimMessage(const ReqDataInfo *requestInfo, const HRilSmsWriteSms *data, size_t dataLen);
+void ReqDelCdmaSimMessage(const ReqDataInfo *requestInfo, const int32_t *data, size_t dataLen);
+void ReqUpdateCdmaSimMessage(const ReqDataInfo *requestInfo, const HRilSmsWriteSms *data, size_t dataLen);
 int32_t ProcessCellBroadcast(char *pBuff, HRilCBConfigReportInfo *response);
 #endif // OHOS_AT_SMS_H
