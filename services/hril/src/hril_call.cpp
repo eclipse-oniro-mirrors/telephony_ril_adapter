@@ -108,7 +108,7 @@ void HRilCall::AddCallNotificationToMap()
     notiMemberFuncMap_[HNOTI_CALL_END_REPORT] = &HRilCall::CallEndNotice;
     notiMemberFuncMap_[HNOTI_CALL_STATUS_INFO_REPORT] = &HRilCall::CallStatusInfoNotice;
     notiMemberFuncMap_[HNOTI_CALL_IMS_SERVICE_STATUS_REPORT] = &HRilCall::CallImsServiceStatusNotice;
-    notiMemberFuncMap_[HNOTI_CALL_USSD_CUSD_REPORT] = &HRilCall::CallUssdCusdNotice;
+    notiMemberFuncMap_[HNOTI_CALL_USSD_REPORT] = &HRilCall::CallUssdCusdNotice;
     notiMemberFuncMap_[HNOTI_CALL_SRVCC_STATUS_REPORT] = &HRilCall::CallSrvccStatusNotice;
     notiMemberFuncMap_[HNOTI_CALL_RINGBACK_VOICE_REPORT] = &HRilCall::CallRingbackVoiceNotice;
     notiMemberFuncMap_[HNOTI_CALL_EMERGENCY_NUMBER_REPORT] = &HRilCall::CallEmergencyNotice;
@@ -146,10 +146,10 @@ void HRilCall::AddCallResponseToMap()
     respMemberFuncMap_[HREQ_CALL_SET_CALL_PREFERENCE] = &HRilCall::SetCallPreferenceModeResponse;
     respMemberFuncMap_[HREQ_CALL_GET_LTEIMSSWITCH_STATUS] = &HRilCall::GetLteImsSwitchStatusResponse;
     respMemberFuncMap_[HREQ_CALL_SET_LTEIMSSWITCH_STATUS] = &HRilCall::SetLteImsSwitchStatusResponse;
-    respMemberFuncMap_[HREQ_CALL_SET_USSD_CUSD] = &HRilCall::SetUssdCusdResponse;
-    respMemberFuncMap_[HREQ_CALL_GET_USSD_CUSD] = &HRilCall::GetUssdCusdResponse;
-    respMemberFuncMap_[HREQ_CALL_SET_CMUT] = &HRilCall::SetMuteResponse;
-    respMemberFuncMap_[HREQ_CALL_GET_CMUT] = &HRilCall::GetMuteResponse;
+    respMemberFuncMap_[HREQ_CALL_SET_USSD] = &HRilCall::SetUssdCusdResponse;
+    respMemberFuncMap_[HREQ_CALL_GET_USSD] = &HRilCall::GetUssdCusdResponse;
+    respMemberFuncMap_[HREQ_CALL_SET_MUTE] = &HRilCall::SetMuteResponse;
+    respMemberFuncMap_[HREQ_CALL_GET_MUTE] = &HRilCall::GetMuteResponse;
     respMemberFuncMap_[HREQ_CALL_GET_EMERGENCY_LIST] = &HRilCall::GetEmergencyCallListResponse;
     respMemberFuncMap_[HREQ_CALL_GET_FAIL_REASON] = &HRilCall::GetCallFailReasonResponse;
 }
@@ -186,10 +186,10 @@ void HRilCall::AddCallRequestToMap()
     reqMemberFuncMap_[HREQ_CALL_SET_CALL_PREFERENCE] = &HRilCall::SetCallPreferenceMode;
     reqMemberFuncMap_[HREQ_CALL_GET_LTEIMSSWITCH_STATUS] = &HRilCall::GetLteImsSwitchStatus;
     reqMemberFuncMap_[HREQ_CALL_SET_LTEIMSSWITCH_STATUS] = &HRilCall::SetLteImsSwitchStatus;
-    reqMemberFuncMap_[HREQ_CALL_SET_USSD_CUSD] = &HRilCall::SetUssdCusd;
-    reqMemberFuncMap_[HREQ_CALL_GET_USSD_CUSD] = &HRilCall::GetUssdCusd;
-    reqMemberFuncMap_[HREQ_CALL_SET_CMUT] = &HRilCall::SetMute;
-    reqMemberFuncMap_[HREQ_CALL_GET_CMUT] = &HRilCall::GetMute;
+    reqMemberFuncMap_[HREQ_CALL_SET_USSD] = &HRilCall::SetUssdCusd;
+    reqMemberFuncMap_[HREQ_CALL_GET_USSD] = &HRilCall::GetUssdCusd;
+    reqMemberFuncMap_[HREQ_CALL_SET_MUTE] = &HRilCall::SetMute;
+    reqMemberFuncMap_[HREQ_CALL_GET_MUTE] = &HRilCall::GetMute;
     reqMemberFuncMap_[HREQ_CALL_GET_EMERGENCY_LIST] = &HRilCall::GetEmergencyCallList;
     reqMemberFuncMap_[HREQ_CALL_GET_FAIL_REASON] = &HRilCall::GetCallFailReason;
 }
@@ -1252,7 +1252,7 @@ void HRilCall::SetUssdCusd(int32_t slotId, struct HdfSBuf *data)
         TELEPHONY_LOGE("miss str parameter");
         return;
     }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_CALL_SET_USSD_CUSD);
+    ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_CALL_SET_USSD);
     if (requestInfo == nullptr) {
         TELEPHONY_LOGE("RilAdapter failed to do Create HRilRequest!");
         return;
@@ -1271,7 +1271,7 @@ void HRilCall::GetUssdCusd(int32_t slotId, struct HdfSBuf *data)
         TELEPHONY_LOGE("miss serial parameter");
         return;
     }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_CALL_GET_USSD_CUSD);
+    ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_CALL_GET_USSD);
     if (requestInfo == nullptr) {
         TELEPHONY_LOGE("RilAdapter failed to do Create HRilRequest!");
         return;
@@ -1296,7 +1296,7 @@ void HRilCall::GetMute(int32_t slotId, struct HdfSBuf *data)
         TELEPHONY_LOGE("miss serial parameter");
         return;
     }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_CALL_GET_CMUT);
+    ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_CALL_GET_MUTE);
     if (requestInfo == nullptr) {
         TELEPHONY_LOGE("RilAdapter failed to do Create HRilRequest!");
         return;
@@ -1330,7 +1330,7 @@ void HRilCall::SetMute(int32_t slotId, struct HdfSBuf *data)
         TELEPHONY_LOGE("miss mute parameter");
         return;
     }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_CALL_SET_CMUT);
+    ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_CALL_SET_MUTE);
     if (requestInfo == nullptr) {
         TELEPHONY_LOGE("RilAdapter failed to do Create HRilRequest!");
         return;
@@ -1557,7 +1557,7 @@ int32_t HRilCall::CallUssdCusdNotice(
     ussdCusdNoticeInfo.m = hUssdCusdNoticeInfo->m;
     ussdCusdNoticeInfo.str = hUssdCusdNoticeInfo->str == nullptr ? "" : hUssdCusdNoticeInfo->str;
     ussdCusdNoticeInfo.dcs = hUssdCusdNoticeInfo->dcs;
-    return NotifyMessageParcel(ussdCusdNoticeInfo, HNOTI_CALL_USSD_CUSD_REPORT);
+    return NotifyMessageParcel(ussdCusdNoticeInfo, HNOTI_CALL_USSD_REPORT);
 }
 
 int32_t HRilCall::CallSrvccStatusNotice(

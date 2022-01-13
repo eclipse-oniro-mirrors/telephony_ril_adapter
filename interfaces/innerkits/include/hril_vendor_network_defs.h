@@ -22,6 +22,10 @@
 
 #include "hril_public_struct.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* From 3GPP TS 27.007 8.5 */
 typedef struct {
     int rxlev; /* integer type, received signal strength level (see 3GPP TS 45.008 [20] sub-clause 8.1.4) value 0~99 */
@@ -296,4 +300,9 @@ typedef struct {
     void (*GetPhysicalChannelConfig)(const ReqDataInfo *requestInfo);
     void (*SetLocateUpdates)(const ReqDataInfo *requestInfo, HRilRegNotifyMode mode);
 } HRilNetworkReq;
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif // OHOS_RIL_VENDOR_NETWORK_DEFS_H

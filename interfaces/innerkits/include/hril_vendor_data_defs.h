@@ -18,6 +18,10 @@
 
 #include "hril_public_struct.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct {
     int reason; /* Data call fail reason. succes is 0 */
     int retryTime; /* if errorCode != 0, suggested retry time */
@@ -136,4 +140,9 @@ typedef struct {
     void (*GetLinkBandwidthInfo)(const ReqDataInfo *requestInfo, int cid);
     void (*SetLinkBandwidthReportingRule)(const ReqDataInfo *requestInfo, const HRilLinkBandwidthReportingRule *data);
 } HRilDataReq;
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif // OHOS_RIL_VENDOR_DATA_DEFS_H

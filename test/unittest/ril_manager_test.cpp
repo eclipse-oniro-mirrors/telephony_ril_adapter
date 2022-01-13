@@ -93,14 +93,15 @@ void RilManagerTest::SetCellularRadioIndication()
 {
     TELEPHONY_LOGI("RilManagerTest SetCellularRadioIndication start!");
     if (cellularRadio_ != nullptr) {
-        std::shared_ptr<OHOS::IPCObjectStub> callback = std::make_shared<RilRadioIndicationTest>(this);
+        std::unique_ptr<IPCObjectStub> callback = std::make_unique<RilRadioResponseTest>(this);
         if (callback == nullptr) {
             return;
         }
-        OHOS::MessageParcel data;
-        OHOS::MessageParcel reply;
-        data.WriteRemoteObject(callback.get());
-        OHOS::MessageOption option;
+        MessageParcel data;
+        MessageParcel reply;
+        sptr<IPCObjectStub> object = callback.release();
+        data.WriteRemoteObject(object);
+        MessageOption option;
         cellularRadio_->SendRequest(RilManagerTest::HRIL_ADAPTER_RADIO_INDICATION, data, reply, option);
     }
 }
@@ -109,14 +110,15 @@ void RilManagerTest::SetCellularRadioResponse()
 {
     TELEPHONY_LOGI("RilManagerTest SetCellularRadioResponse start!");
     if (cellularRadio_ != nullptr) {
-        std::unique_ptr<OHOS::IPCObjectStub> callback = std::make_unique<RilRadioResponseTest>(this);
+        std::unique_ptr<IPCObjectStub> callback = std::make_unique<RilRadioResponseTest>(this);
         if (callback == nullptr) {
             return;
         }
-        OHOS::MessageParcel data;
-        OHOS::MessageParcel reply;
-        data.WriteRemoteObject(callback.release());
-        OHOS::MessageOption option;
+        MessageParcel data;
+        MessageParcel reply;
+        sptr<IPCObjectStub> object = callback.release();
+        data.WriteRemoteObject(object);
+        MessageOption option;
         cellularRadio_->SendRequest(RilManagerTest::HRIL_ADAPTER_RADIO_RESPONSE, data, reply, option);
     }
 }
@@ -562,13 +564,13 @@ void RilManagerTest::RilProcessResponseDone(
 void RilManagerTest::SetUssdCusd(std::string str, const AppExecFwk::InnerEvent::Pointer &result)
 {
     if (cellularRadio_ != nullptr) {
-        std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_CALL_SET_USSD_CUSD, result);
+        std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_CALL_SET_USSD, result);
         OHOS::MessageParcel data;
         OHOS::MessageParcel reply;
         data.WriteInt32(request->serialId_);
         data.WriteCString(str.c_str());
         OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
-        cellularRadio_->SendRequest(HREQ_CALL_SET_USSD_CUSD, data, reply, option);
+        cellularRadio_->SendRequest(HREQ_CALL_SET_USSD, data, reply, option);
     } else {
         TELEPHONY_LOGE("SetUssdCusd  cellularRadio_ == nullptr");
     }
@@ -578,8 +580,8 @@ void RilManagerTest::GetUssdCusd(const AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("RilManagerTest::GetUssdCusd -->");
     if (cellularRadio_ != nullptr) {
-        std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_CALL_GET_USSD_CUSD, result);
-        SendInt32Event(HREQ_CALL_GET_USSD_CUSD, request->serialId_);
+        std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_CALL_GET_USSD, result);
+        SendInt32Event(HREQ_CALL_GET_USSD, request->serialId_);
     } else {
         TELEPHONY_LOGE("ERROR : GetUssdCusd --> cellularRadio_ == nullptr !!!");
     }
