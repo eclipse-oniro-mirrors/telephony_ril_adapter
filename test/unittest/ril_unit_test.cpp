@@ -371,8 +371,8 @@ void RilUnitTest::OnInitInterface()
     memberFuncMap_[HREQ_DATA_DEACTIVATE_PDP_CONTEXT] = &RilUnitTest::DeactivateRilCmDataCallTest;
     memberFuncMap_[HREQ_NETWORK_GET_NEIGHBORING_CELLINFO_LIST] = &RilUnitTest::GetRilCmCellInfoListTest;
     memberFuncMap_[HREQ_NETWORK_GET_CURRENT_CELL_INFO] = &RilUnitTest::GetRilCurrentCellInfoTest;
-    memberFuncMap_[HREQ_CALL_SET_USSD_CUSD] = &RilUnitTest::SetUssdCusdTest;
-    memberFuncMap_[HREQ_CALL_GET_USSD_CUSD] = &RilUnitTest::GetUssdCusdTest;
+    memberFuncMap_[HREQ_CALL_SET_USSD] = &RilUnitTest::SetUssdCusdTest;
+    memberFuncMap_[HREQ_CALL_GET_USSD] = &RilUnitTest::GetUssdCusdTest;
     memberFuncMap_[HREQ_SIM_OPEN_LOGICAL_SIM_IO] = &RilUnitTest::OpenLogicalSimIO;
     memberFuncMap_[HREQ_SIM_CLOSE_LOGICAL_SIM_IO] = &RilUnitTest::CloseLogicalSimIO;
     memberFuncMap_[HREQ_SIM_TRANSMIT_APDU_SIM_IO] = &RilUnitTest::TransmitApduSimIO;
@@ -398,8 +398,8 @@ static void PrintMenu()
     cout << HREQ_CALL_SWITCH_CALL << "---->RilUnitTest::RilCmSwapCallTest " << endl;
     cout << HREQ_CALL_COMBINE_CONFERENCE << "---->RilUnitTest::RilCmJoinCallTest " << endl;
     cout << HREQ_CALL_SEPARATE_CONFERENCE << "---->RilUnitTest::RilCmSplitCallTest " << endl;
-    cout << HREQ_CALL_SET_USSD_CUSD << "---->RilUnitTest::SetUssdCusdTest " << endl;
-    cout << HREQ_CALL_GET_USSD_CUSD << "---->RilUnitTest::GetUssdCusdTest " << endl;
+    cout << HREQ_CALL_SET_USSD << "---->RilUnitTest::SetUssdCusdTest " << endl;
+    cout << HREQ_CALL_GET_USSD << "---->RilUnitTest::GetUssdCusdTest " << endl;
     cout << "---->NETWORK----------------------------------------------------------" << endl;
     cout << HREQ_NETWORK_GET_SIGNAL_STRENGTH << "---->RilUnitTest::GetRilCmSignalIntensityTest " << endl;
     cout << HREQ_NETWORK_GET_OPERATOR_INFO << "---->RilUnitTest::GetRilCmOperatorTest " << endl;

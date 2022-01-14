@@ -460,7 +460,7 @@ void ReportCallUssdCusdNotice(const char *str)
     if (NextInt(&pStr, &ussdCusdNoticeInfo.dcs) < 0) {
         err = HRIL_ERR_INVALID_MODEM_PARAMETER;
     }
-    reportInfo = CreateReportInfo(&requestInfo, err, HRIL_NOTIFICATION, HNOTI_CALL_USSD_CUSD_REPORT);
+    reportInfo = CreateReportInfo(&requestInfo, err, HRIL_NOTIFICATION, HNOTI_CALL_USSD_REPORT);
     reportInfo.modemErrInfo = errInfo;
     OnCallReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&ussdCusdNoticeInfo, sizeof(HRilUssdCusdNoticeInfo));
 }

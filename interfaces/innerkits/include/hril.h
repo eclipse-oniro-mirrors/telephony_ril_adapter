@@ -25,6 +25,10 @@
 
 #define MAX_CMD_LENGTH 500
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct {
     HRilLastCallErrorCode errorCode; /* Execution command causes the TA to return one or more lines of information
                                       * text <report>, determined by the ME manufacturer, which should offer
@@ -58,4 +62,9 @@ typedef struct {
     const HRilNetworkReq *networkOps;
     const HRilModemReq *modemOps;
 } HRilOps;
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif // OHOS_HRIL_H

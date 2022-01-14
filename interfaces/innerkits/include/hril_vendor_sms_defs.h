@@ -21,6 +21,10 @@
 #include "hril_enum.h"
 #include "hril_public_struct.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct {
     int msgRef; /* TP-Message-Reference for GSM, and BearerData MessageId for CDMA
                  * from 3GPP2 C.S0015-B, v2.0, 4.5-1 */
@@ -117,4 +121,9 @@ typedef struct {
     void (*DelCdmaSimMessage)(const ReqDataInfo *requestInfo, const int *data, size_t dataLen);
     void (*UpdateCdmaSimMessage)(const ReqDataInfo *requestInfo, const HRilSmsWriteSms *data, size_t dataLen);
 } HRilSmsReq;
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif // OHOS_RIL_VENDOR_SMS_DEFS_H

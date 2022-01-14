@@ -100,8 +100,8 @@ void RilUnitTest::AddRequestToMap()
     memberFuncMap_[HREQ_SMS_SEND_SMS_ACK] = &RilUnitTest::SendSmsAckTest;
     memberFuncMap_[HREQ_DATA_ACTIVATE_PDP_CONTEXT] = &RilUnitTest::ActivatePdpContextTest;
     memberFuncMap_[HREQ_DATA_DEACTIVATE_PDP_CONTEXT] = &RilUnitTest::DeactivatePdpContextTest;
-    memberFuncMap_[HREQ_CALL_SET_USSD_CUSD] = &RilUnitTest::SetUssdCusdTest;
-    memberFuncMap_[HREQ_CALL_GET_USSD_CUSD] = &RilUnitTest::GetUssdCusdTest;
+    memberFuncMap_[HREQ_CALL_SET_USSD] = &RilUnitTest::SetUssdCusdTest;
+    memberFuncMap_[HREQ_CALL_GET_USSD] = &RilUnitTest::GetUssdCusdTest;
     memberFuncMap_[HREQ_DATA_GET_LINK_BANDWIDTH_INFO] = &RilUnitTest::GetLinkBandwidthInfoTest;
 }
 
@@ -535,17 +535,17 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetRilCmRadioPowerTest_0100, Function
 HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetUssdCusdTest_0100, Function | MediumTest | Level3)
 {
     OnInit();
-    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_SET_USSD_CUSD);
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_SET_USSD);
     event->SetOwner(GetHandler());
-    OnProcessTest(HREQ_CALL_SET_USSD_CUSD, event);
+    OnProcessTest(HREQ_CALL_SET_USSD, event);
 }
 
 HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetUssdCusdTest_0100, Function | MediumTest | Level3)
 {
     OnInit();
-    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_GET_USSD_CUSD);
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_GET_USSD);
     event->SetOwner(GetHandler());
-    OnProcessTest(HREQ_CALL_GET_USSD_CUSD, event);
+    OnProcessTest(HREQ_CALL_GET_USSD, event);
 }
 
 HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetLinkBandwidthInfoTest_0100, Function | MediumTest | Level3)

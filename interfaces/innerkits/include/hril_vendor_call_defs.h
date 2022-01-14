@@ -22,6 +22,10 @@
 #include "hril_enum.h"
 #include "hril_public_struct.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* From 3GPP TS 27.007 V4.3.0 (2001-12)  AT+CGDCONT */
 typedef struct {
     int index; /* Call identification number as described in 3GPP TS 22.030 [19] sub-clause 6.5.5.1.
@@ -360,4 +364,9 @@ typedef struct {
     void (*GetEmergencyCallList)(const ReqDataInfo *requestInfo);
     void (*GetCallFailReason)(const ReqDataInfo *requestInfo);
 } HRilCallReq;
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif // OHOS_RIL_VENDOR_CALL_DEFS_H

@@ -18,6 +18,10 @@
 
 #include "hril_public_struct.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct {
     HRilSrvStatus srvStatus;
     HRilSrvDomain srvDomain;
@@ -37,4 +41,9 @@ typedef struct {
     void (*GetMeid)(const ReqDataInfo *requestInfo);
     void (*GetVoiceRadioTechnology)(const ReqDataInfo *requestInfo);
 } HRilModemReq;
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif // OHOS_RIL_VENDOR_MODEM_DEFS_H

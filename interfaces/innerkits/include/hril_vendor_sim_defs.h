@@ -21,6 +21,10 @@
 #include "hril_enum.h"
 #include "hril_public_struct.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Form 3GPP TS 27.007 V4.3.0 (2001-12) 8.18, + CRSM */
 typedef struct {
     int command; /* command passed on by the MT to the SIM; refer 3GPP TS 51.011 [28]
@@ -165,4 +169,9 @@ typedef struct {
     void (*TransmitApduSimIO)(const ReqDataInfo *requestInfo, HRilApduSimIO *data, size_t dataLen);
     void (*UnlockSimLock)(const ReqDataInfo *requestInfo, int32_t lockType, const char *passward);
 } HRilSimReq;
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif // OHOS_RIL_VENDOR_SIM_DEFS_H
