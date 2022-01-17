@@ -1,0 +1,89 @@
+{
+    "name": "@ohos/ril_adapter",
+    "version": "3.1.0",
+    "description": "telephony ril adapter service",
+    "publishAs": "code-segment",
+    "homePage": "https://gitee.com/openharmony",
+    "repository": "https://gitee.com/openharmony/telephony_ril_adapter",
+    "license": "Apache License 2.0",
+    "language": "",
+    "private": false,
+    "scripts": {},
+    "envs": [],
+    "dirs": [],
+    "author": {},
+    "contributors": [],
+    "segment": {
+        "destPath": "//base/telephony/ril_adapter"
+    },
+    "component": {
+        "name": "ril_adapter",
+        "subsystem": "telephony",
+        "syscap": [
+            "SystemCapability.Telephony.DCall"
+        ],
+        "features": [],
+        "adapted_system_type": [
+            "standard"
+        ],
+        "rom": "",
+        "ram": "",
+        "deps": {
+            "components": [
+                "aafwk_standard",
+                "ans_standard",
+                "core_service",
+                "device_driver_framework",
+                "dmsfwk_standard",
+                "faultloggerd",
+                "hiviewdfx_hilog_native",
+                "ipc",
+                "safwk",
+                "samgr_standard",
+                "startup_l2",
+                "utils_base"
+            ],
+            "third_party": [
+                "eudev",
+                "json"
+            ]
+        },
+        "build": {
+            "sub_component": [
+                "//base/telephony/ril_adapter/services/hril:hril",
+                "//base/telephony/ril_adapter/services/hril_hdf:hril_hdf",
+                "//base/telephony/ril_adapter/services/vendor:ril_vendor"
+            ],
+            "inner_kits": [
+                {
+                    "type": "so",
+                    "name": "//base/telephony/ril_adapter/frameworks:hril_innerkits",
+                    "header": {
+                        "header_files": [
+                            "hril_types.h",
+                            "hril_sms_parcel.h",
+                            "hril_sim_parcel.h",
+                            "hril_request.h",
+                            "hril_notification.h",
+                            "hril_network_parcel.h",
+                            "hril_modem_parcel.h",
+                            "hril_data_parcel.h",
+                            "hril_call_parcel.h",
+                            "hril.h",
+                            "hril_vendor_call_defs.h",
+                            "hril_vendor_data_defs.h",
+                            "hril_vendor_modem_defs.h",
+                            "hril_vendor_network_defs.h",
+                            "hril_vendor_sim_defs.h",
+                            "hril_vendor_sms_defs.h"
+                        ],
+                        "header_base": "//base/telephony/ril_adapter/interfaces/innerkits/include"
+                    }
+                }
+            ],
+            "test": [
+                "//base/telephony/ril_adapter/test:unittest"
+            ]
+        }
+    }
+}
