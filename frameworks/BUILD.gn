@@ -18,19 +18,7 @@ import("//drivers/adapter/uhdf2/uhdf.gni")
 RIL_ADAPTER = "//base/telephony"
 RIL_FRAMEWORKS = "//base/telephony/ril_adapter/frameworks/src"
 
-config("telephony_sim_config") {
-  if (defined(sim_slot_num)) {
-    defines = [ "SIM_SLOT_NUM = $sim_slot_num" ]
-    if (sim_slot_num > 1) {
-      defines += [ "MULTI_SIM_SLOT_SUPPORT" ]
-    }
-  } else {
-    defines = [ "SIM_SLOT_NUM = 1" ]
-  }
-}
-
 config("hril_config") {
-  # header file path
   include_dirs = [ "$RIL_ADAPTER/ril_adapter/interfaces/innerkits/include" ]
 
   cflags = []
@@ -49,7 +37,6 @@ config("hril_config") {
 }
 
 ohos_shared_library("hril_innerkits") {
-  configs = [ ":telephony_sim_config" ]
   sources = [
     "$RIL_FRAMEWORKS/hril_base_parcel.cpp",
     "$RIL_FRAMEWORKS/hril_call_parcel.cpp",
@@ -67,17 +54,22 @@ ohos_shared_library("hril_innerkits") {
     "include",
   ]
   public_configs = [ ":hril_config" ]
-  defines = [
+  defines += [
     "TELEPHONY_LOG_TAG = \"Hril\"",
     "LOG_DOMAIN = 0xD002B01",
   ]
   deps = [
-    "//base/telephony/core_service/utils:libtelephony_common",
+    "//base/telephony/core_service/utils:libtel_common",
     "//drivers/adapter/uhdf2/host:libhdf_host",
     "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
     "//drivers/adapter/uhdf2/utils:libhdf_utils",
+    "//foundation/distributedschedule/dmsfwk/services/dtbschedmgr:distributedschedsvr",
   ]
-  external_deps = [ "ipc:ipc_core" ]
+  external_deps = [
+    "ipc:ipc_core",
+    "safwk:system_ability_fwk",
+    "samgr_standard:samgr_proxy",
+  ]
 
   public_deps = [ "//utils/native/base:utils" ]
 

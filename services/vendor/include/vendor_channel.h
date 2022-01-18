@@ -16,8 +16,10 @@
 #ifndef OHOS_VENDOR_CHANNEL_H
 #define OHOS_VENDOR_CHANNEL_H
 
+#include <stdint.h>
+
 // readLine from modem device
-const char *ReadResponse(int atFd);
+const char *ReadResponse(int32_t atFd);
 // writeLine to modem device
-int WriteATCommand(const char *s, int isPdu, int atFd);
+int32_t WriteATCommand(const char *s, int32_t isPdu, int32_t atFd);
 #endif // OHOS_CHANNEL_H

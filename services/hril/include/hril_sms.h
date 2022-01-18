@@ -23,97 +23,79 @@ namespace OHOS {
 namespace Telephony {
 class HRilSms : public HRilBase {
 public:
-    HRilSms(IHRilReporter &hrilReporter);
+    HRilSms(int32_t slotId, IHRilReporter &hrilReporter);
     virtual ~HRilSms() = default;
 
-    void ProcessSmsRequest(int32_t slotId, int32_t code, struct HdfSBuf *data);
-    void ProcessSmsResponse(
-        int32_t slotId, int32_t code, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
-    void ProcessSmsNotify(int32_t slotId, const struct ReportInfo *reportInfo,
-        const void *response, size_t responseLen);
     bool IsSmsRespOrNotify(uint32_t code);
     void RegisterSmsFuncs(const HRilSmsReq *smsFuncs);
 
 private:
     void AddHandlerToMap();
-    void SendGsmSms(int32_t slotId, struct HdfSBuf *data);
-    void SendCdmaSms(int32_t slotId, struct HdfSBuf *data);
-    void AddSimMessage(int32_t slotId, struct HdfSBuf *data);
-    void DelSimMessage(int32_t slotId, struct HdfSBuf *data);
-    void UpdateSimMessage(int32_t slotId, struct HdfSBuf *data);
-    void SetSmscAddr(int32_t slotId, struct HdfSBuf *data);
-    void GetSmscAddr(int32_t slotId, struct HdfSBuf *data);
-    void SetCBConfig(int32_t slotId, struct HdfSBuf *data);
-    void GetCBConfig(int32_t slotId, struct HdfSBuf *data);
-    void SetCdmaCBConfig(int32_t slotId, struct HdfSBuf *data);
-    void GetCdmaCBConfig(int32_t slotId, struct HdfSBuf *data);
-    void SendSmsMoreMode(int32_t slotId, struct HdfSBuf *data);
-    void SendSmsAck(int32_t slotId, struct HdfSBuf *data);
-    void AddCdmaSimMessage(int32_t slotId, struct HdfSBuf *data);
-    void DelCdmaSimMessage(int32_t slotId, struct HdfSBuf *data);
-    void UpdateCdmaSimMessage(int32_t slotId, struct HdfSBuf *data);
+    int32_t SendGsmSms(struct HdfSBuf *data);
+    int32_t SendCdmaSms(struct HdfSBuf *data);
+    int32_t AddSimMessage(struct HdfSBuf *data);
+    int32_t DelSimMessage(struct HdfSBuf *data);
+    int32_t UpdateSimMessage(struct HdfSBuf *data);
+    int32_t SetSmscAddr(struct HdfSBuf *data);
+    int32_t GetSmscAddr(struct HdfSBuf *data);
+    int32_t SetCBConfig(struct HdfSBuf *data);
+    int32_t GetCBConfig(struct HdfSBuf *data);
+    int32_t SetCdmaCBConfig(struct HdfSBuf *data);
+    int32_t GetCdmaCBConfig(struct HdfSBuf *data);
+    int32_t SendSmsMoreMode(struct HdfSBuf *data);
+    int32_t SendSmsAck(struct HdfSBuf *data);
+    int32_t AddCdmaSimMessage(struct HdfSBuf *data);
+    int32_t DelCdmaSimMessage(struct HdfSBuf *data);
+    int32_t UpdateCdmaSimMessage(struct HdfSBuf *data);
 
-    int32_t SendGsmSmsResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
-        const void *response, size_t responseLen);
-    int32_t SendCdmaSmsResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
-        const void *response, size_t responseLen);
-    int32_t AddSimMessageResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
-        const void *response, size_t responseLen);
-    int32_t DelSimMessageResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
-        const void *response, size_t responseLen);
-    int32_t UpdateSimMessageResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
-        const void *response, size_t responseLen);
-    int32_t SetSmscAddrResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
-        const void *response, size_t responseLen);
-    int32_t GetSmscAddrResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
-        const void *response, size_t responseLen);
-    int32_t SetCBConfigResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
-        const void *response, size_t responseLen);
-    int32_t GetCBConfigResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
-        const void *response, size_t responseLen);
-    int32_t SetCdmaCBConfigResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
-        const void *response, size_t responseLen);
-    int32_t GetCdmaCBConfigResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
-        const void *response, size_t responseLen);
-    int32_t SendSmsMoreModeResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
-        const void *response, size_t responseLen);
-    int32_t SendSmsAckResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
-        const void *response, size_t responseLen);
-    int32_t AddCdmaSimMessageResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
-        const void *response, size_t responseLen);
-    int32_t DelCdmaSimMessageResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
-        const void *response, size_t responseLen);
-    int32_t UpdateCdmaSimMessageResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
-        const void *response, size_t responseLen);
+    int32_t SendGsmSmsResponse(
+        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t SendCdmaSmsResponse(
+        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t AddSimMessageResponse(
+        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t DelSimMessageResponse(
+        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t UpdateSimMessageResponse(
+        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t SetSmscAddrResponse(
+        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t GetSmscAddrResponse(
+        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t SetCBConfigResponse(
+        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t GetCBConfigResponse(
+        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t SetCdmaCBConfigResponse(
+        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t GetCdmaCBConfigResponse(
+        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t SendSmsMoreModeResponse(
+        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t SendSmsAckResponse(
+        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t AddCdmaSimMessageResponse(
+        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t DelCdmaSimMessageResponse(
+        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t UpdateCdmaSimMessageResponse(
+        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
 
-    int32_t SmsStatusReportNotify(
-        int32_t slotId, int32_t indType, HRilErrNumber e, const void *response, size_t responseLen);
-    int32_t NewSmsStoredOnSimNotify(
-        int32_t slotId, int32_t indType, HRilErrNumber e, const void *response, size_t responseLen);
-    int32_t NewSmsNotify(int32_t slotId, int32_t indType, HRilErrNumber e, const void *response, size_t responseLen);
-    int32_t NewCdmaSmsNotify(
-        int32_t slotId, int32_t indType, HRilErrNumber e, const void *response, size_t responseLen);
-    int32_t CBConfigNotify(int32_t slotId, int32_t indType, HRilErrNumber e, const void *response, size_t responseLen);
+    int32_t SmsStatusReportNotify(int32_t indType, HRilErrNumber e, const void *response, size_t responseLen);
+    int32_t NewSmsStoredOnSimNotify(int32_t indType, HRilErrNumber e, const void *response, size_t responseLen);
+    int32_t NewSmsNotify(int32_t indType, HRilErrNumber e, const void *response, size_t responseLen);
+    int32_t NewCdmaSmsNotify(int32_t indType, HRilErrNumber e, const void *response, size_t responseLen);
+    int32_t CBConfigNotify(int32_t indType, HRilErrNumber e, const void *response, size_t responseLen);
 
     bool IsSmsResponse(uint32_t code);
     bool IsSmsNotification(uint32_t code);
     int32_t DataSbuf(HdfSBuf *dataSbuf, int32_t indType);
-    bool RequestWithInts(int **p, ReqDataInfo *requestInfo, int32_t argCount, ...);
-    bool RequestWithStrings(int32_t serial, int32_t slotId, int32_t request, int32_t count, ...);
+    int32_t RequestWithInts(int **p, ReqDataInfo *requestInfo, int32_t argCount, ...);
+    int32_t RequestWithStrings(int32_t serial, int32_t request, int32_t count, ...);
     CBConfigReportInfo MakeCBConfigResult(const void *response, const size_t responseLen);
     SendSmsResultInfo MakeSendSmsResult(
         HRilRadioResponseInfo &responseInfo, int32_t serial, const void *response, const size_t responseLen);
-    void MakeCdmaSmsInfo(HRilCdmaSmsMessageInfo &msg, const CdmaSmsMessageInfo &message);
-    void MakeCdmaSmsInfo(CdmaSmsMessageInfo &msg, const HRilCdmaSmsMessageInfo &message);
 
-    using RespFunc = int32_t (HRilSms::*)(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
-        const void *response, size_t responseLen);
-    using NotiFunc = int32_t (HRilSms::*)(
-        int32_t slotId, int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
-    using ReqFunc = void (HRilSms::*)(int32_t slotId, struct HdfSBuf *data);
-    std::map<uint32_t, ReqFunc> reqMemberFuncMap_;
-    std::map<uint32_t, NotiFunc> notiMemberFuncMap_;
-    std::map<uint32_t, RespFunc> respMemberFuncMap_;
     const HRilSmsReq *smsFuncs_ = nullptr;
 };
 } // namespace Telephony

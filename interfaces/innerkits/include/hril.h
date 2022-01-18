@@ -41,8 +41,6 @@ typedef struct {
     char *vendorError; /* Error codes of vendor. */
 } HRilLastCallErrorCodeInfo;
 
-typedef void (*HRilCallbackFun) (const uint8_t *args);
-
 struct HRilReport {
     void (*OnCallReport)(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *data, size_t dataLen);
     void (*OnDataReport)(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *data, size_t dataLen);
@@ -50,7 +48,6 @@ struct HRilReport {
     void (*OnNetworkReport)(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *data, size_t dataLen);
     void (*OnSimReport)(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *data, size_t dataLen);
     void (*OnSmsReport)(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *data, size_t dataLen);
-    void (*OnTimerCallbackHandler)(HRilCallbackFun callback, const uint8_t *args, uint64_t triggerTime);
 };
 
 typedef struct {
@@ -63,8 +60,8 @@ typedef struct {
     const HRilModemReq *modemOps;
 } HRilOps;
 
+const HRilOps *RilInitOps(const struct HRilReport *reportOps);
 #ifdef __cplusplus
 }
 #endif
-
 #endif // OHOS_HRIL_H

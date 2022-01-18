@@ -18,17 +18,6 @@ import("//drivers/adapter/uhdf2/uhdf.gni")
 RIL_ADAPTER = "//base/telephony"
 RIL_HRIL = "//base/telephony/ril_adapter/services/hril/src"
 
-config("telephony_sim_config") {
-  if (defined(sim_slot_num)) {
-    defines = [ "SIM_SLOT_NUM = $sim_slot_num" ]
-    if (sim_slot_num > 1) {
-      defines += [ "MULTI_SIM_SLOT_SUPPORT" ]
-    }
-  } else {
-    defines = [ "SIM_SLOT_NUM = 1" ]
-  }
-}
-
 config("hril_config") {
   # header file path
   include_dirs = [ "$RIL_ADAPTER/ril_adapter/interfaces/innerkits/include" ]
@@ -49,7 +38,6 @@ config("hril_config") {
 }
 
 ohos_shared_library("hril") {
-  configs = [ ":telephony_sim_config" ]
   sources = [
     "$RIL_HRIL/hril_base.cpp",
     "$RIL_HRIL/hril_call.cpp",
@@ -68,14 +56,14 @@ ohos_shared_library("hril") {
     "include",
   ]
   public_configs = [ ":hril_config" ]
-  defines = [
+  defines += [
     "TELEPHONY_LOG_TAG = \"Hril\"",
     "LOG_DOMAIN = 0xD002B01",
   ]
   deps = [
     "//base/miscservices/time/services:time_service",
     "//base/notification/ans_standard/frameworks/wantagent:wantagent_innerkits",
-    "//base/telephony/core_service/utils:libtelephony_common",
+    "//base/telephony/core_service/utils:libtel_common",
     "//base/telephony/ril_adapter/frameworks:hril_innerkits",
     "//drivers/adapter/uhdf2/host:libhdf_host",
     "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",

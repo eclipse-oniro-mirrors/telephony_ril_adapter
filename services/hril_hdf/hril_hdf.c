@@ -22,11 +22,10 @@
 #include "dfx_signal_handler.h"
 #include "parameter.h"
 
-#include "modem_config.h"
+#include "modem_adapter.h"
 #include "telephony_log_c.h"
 
 #define RIL_VENDOR_LIB_PATH "persist.sys.radio.vendorlib.path"
-#define PARAMETER_SIZE 256
 #define BASE_HEX 16
 
 static struct HRilReport g_reportOps = {
@@ -159,7 +158,7 @@ static int32_t RilAdapterDispatch(
     static pthread_mutex_t dispatchMutex = PTHREAD_MUTEX_INITIALIZER;
     pthread_mutex_lock(&dispatchMutex);
     TELEPHONY_LOGI("RilAdapterDispatch cmd:%{public}d", cmd);
-    ret = DispatchRequest(HRIL_SIM_SLOT_0, cmd, data);
+    ret = DispatchRequest(cmd, data);
     pthread_mutex_unlock(&dispatchMutex);
     return ret;
 }
@@ -213,7 +212,7 @@ static void RilAdapterRelease(struct HdfDeviceObject *device)
 
 struct HdfDriverEntry g_rilAdapterDevEntry = {
     .moduleVersion = 1,
-    .moduleName = MODULE_NAME,
+    .moduleName = "hril_hdf",
     .Bind = RilAdapterBind,
     .Init = RilAdapterInit,
     .Release = RilAdapterRelease,

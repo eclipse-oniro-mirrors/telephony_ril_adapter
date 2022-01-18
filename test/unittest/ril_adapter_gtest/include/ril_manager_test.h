@@ -61,43 +61,43 @@ public:
     int32_t SendStringEvent(int32_t dispatchId, const char *value);
     int32_t SendBufferEvent(int32_t dispatchId, OHOS::MessageParcel &eventData);
     int32_t SendCommonBufferEvent(int32_t dispatchId, const void *eventData, size_t dataLength);
-    void SetCellularRadioIndication();
-    void SetCellularRadioResponse();
+    int32_t SetCellularRadioIndication();
+    int32_t SetCellularRadioResponse();
 
-    void RilSendAck();
+    int32_t RilSendAck();
     void RilProcessResponseDone(std::shared_ptr<HRilRequestTest> request, HRilRadioResponseInfo &responseInfo);
     DataProfileDataInfo ConvertToHalDataProfile(RilDataProfileTest dp);
     GsmSmsMessageInfo ConstructGsmSendSmsRilRequest(std::string smscPdu, std::string pdu);
-    void GetCallList(const AppExecFwk::InnerEvent::Pointer &result);
-    void RilCmDial(std::string address, int clirMode, const AppExecFwk::InnerEvent::Pointer &result);
-    void Reject(const AppExecFwk::InnerEvent::Pointer &result);
-    void HoldCall(const AppExecFwk::InnerEvent::Pointer &result);
-    void UnHoldCall(const AppExecFwk::InnerEvent::Pointer &result);
-    void SwitchCall(const AppExecFwk::InnerEvent::Pointer &result);
-    void GetImsi(std::string aid, const AppExecFwk::InnerEvent::Pointer &result);
-    void Hangup(int32_t gsmIndex, const AppExecFwk::InnerEvent::Pointer &result);
-    void RilCmJoin(int32_t callType, const AppExecFwk::InnerEvent::Pointer &result);
-    void RilCmSplit(int32_t callIndex, int32_t callType, const AppExecFwk::InnerEvent::Pointer &result);
-    void Answer(const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t GetCallList(const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t RilCmDial(std::string address, int clirMode, const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t Reject(const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t HoldCall(const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t UnHoldCall(const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t SwitchCall(const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t GetImsi(std::string aid, const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t Hangup(int32_t gsmIndex, const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t RilCmJoin(int32_t callType, const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t RilCmSplit(int32_t callIndex, int32_t callType, const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t Answer(const AppExecFwk::InnerEvent::Pointer &result);
     void RejectRilCmCall(const AppExecFwk::InnerEvent::Pointer &result);
-    void GetRilCmSignalStrength(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
-    void GetCsRegStatus(const AppExecFwk::InnerEvent::Pointer &response);
-    void GetPsRegStatus(const AppExecFwk::InnerEvent::Pointer &response);
-    void GetOperatorInfo(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
-    void SendSms(std::string smscPdu, std::string pdu, const std::shared_ptr<AppExecFwk::EventHandler> &handler,
+    int32_t GetRilCmSignalStrength(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
+    int32_t GetCsRegStatus(const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t GetPsRegStatus(const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t GetOperatorInfo(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
+    int32_t SendSms(std::string smscPdu, std::string pdu, const std::shared_ptr<AppExecFwk::EventHandler> &handler,
         const AppExecFwk::InnerEvent::Pointer &response);
-    void SendSmsMoreMode(std::string smscPdu, std::string pdu,
+    int32_t SendSmsMoreMode(std::string smscPdu, std::string pdu,
         const std::shared_ptr<AppExecFwk::EventHandler> &handler, const AppExecFwk::InnerEvent::Pointer &response);
-    void SetRadioState(int fan, int rst, const AppExecFwk::InnerEvent::Pointer &response);
-    void SendSmsAck(bool success, int32_t cause, const AppExecFwk::InnerEvent::Pointer &response);
-    void GetSimIO(SimIoRequestInfo data, const AppExecFwk::InnerEvent::Pointer &response);
-    void ActivatePdpContext(int32_t radioTechnology, RilDataProfileTest dataProfile, bool isRoaming,
+    int32_t SetRadioState(int fan, int rst, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t SendSmsAck(bool success, int32_t cause, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t GetSimIO(SimIoRequestInfo data, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t ActivatePdpContext(int32_t radioTechnology, RilDataProfileTest dataProfile, bool isRoaming,
         bool allowRoaming, const AppExecFwk::InnerEvent::Pointer &response);
-    void DeactivatePdpContext(int32_t ci, int32_t reason, const AppExecFwk::InnerEvent::Pointer &response);
-    void GetSimStatus(const AppExecFwk::InnerEvent::Pointer &result);
-    void SetUssdCusd(std::string str, const AppExecFwk::InnerEvent::Pointer &result);
-    void GetUssdCusd(const AppExecFwk::InnerEvent::Pointer &result);
-    void GetLinkBandwidthInfo(const int32_t cid, const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t DeactivatePdpContext(int32_t ci, int32_t reason, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t GetSimStatus(const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t SetUssdCusd(std::string str, const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t GetUssdCusd(const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t GetLinkBandwidthInfo(const int32_t cid, const AppExecFwk::InnerEvent::Pointer &result);
 
     static const int INVALID_WAKELOCK = -1;
     static const int FOR_WAKELOCK = 0;

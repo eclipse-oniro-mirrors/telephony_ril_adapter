@@ -89,38 +89,44 @@ int32_t RilManagerTest::SendCommonBufferEvent(int32_t dispatchId, const void *ev
     return status;
 }
 
-void RilManagerTest::SetCellularRadioIndication()
+int32_t RilManagerTest::SetCellularRadioIndication()
 {
     TELEPHONY_LOGI("RilManagerTest SetCellularRadioIndication start!");
     if (cellularRadio_ != nullptr) {
-        std::unique_ptr<IPCObjectStub> callback = std::make_unique<RilRadioResponseTest>(this);
+        std::unique_ptr<IPCObjectStub> callback = std::make_unique<RilRadioIndicationTest>(this);
         if (callback == nullptr) {
-            return;
+            return HRIL_ERR_NULL_POINT;
         }
         MessageParcel data;
         MessageParcel reply;
         sptr<IPCObjectStub> object = callback.release();
         data.WriteRemoteObject(object);
         MessageOption option;
-        cellularRadio_->SendRequest(RilManagerTest::HRIL_ADAPTER_RADIO_INDICATION, data, reply, option);
+        int32_t ret = cellularRadio_->SendRequest(RilManagerTest::HRIL_ADAPTER_RADIO_INDICATION, data, reply, option);
+        TELEPHONY_LOGI("SendRequest(ID:%{public}d) return: %{public}d", HRIL_ADAPTER_RADIO_INDICATION, ret);
+        return ret;
     }
+    return HRIL_ERR_NULL_POINT;
 }
 
-void RilManagerTest::SetCellularRadioResponse()
+int32_t RilManagerTest::SetCellularRadioResponse()
 {
     TELEPHONY_LOGI("RilManagerTest SetCellularRadioResponse start!");
     if (cellularRadio_ != nullptr) {
         std::unique_ptr<IPCObjectStub> callback = std::make_unique<RilRadioResponseTest>(this);
         if (callback == nullptr) {
-            return;
+            return HRIL_ERR_NULL_POINT;
         }
         MessageParcel data;
         MessageParcel reply;
         sptr<IPCObjectStub> object = callback.release();
         data.WriteRemoteObject(object);
         MessageOption option;
-        cellularRadio_->SendRequest(RilManagerTest::HRIL_ADAPTER_RADIO_RESPONSE, data, reply, option);
+        int32_t ret = cellularRadio_->SendRequest(RilManagerTest::HRIL_ADAPTER_RADIO_RESPONSE, data, reply, option);
+        TELEPHONY_LOGI("SendRequest(ID:%{public}d) return: %{public}d", HRIL_ADAPTER_RADIO_RESPONSE, ret);
+        return ret;
     }
+    return HRIL_ERR_NULL_POINT;
 }
 
 RilManagerTest::RilManagerTest(int32_t preferredNetworkType, int32_t cdmaSubscription)
@@ -179,23 +185,26 @@ static std::string ConvertNullToEmptyString(std::string str)
     return (!str.empty()) ? (str) : ("");
 }
 
-void RilManagerTest::GetCallList(const AppExecFwk::InnerEvent::Pointer &result)
+int32_t RilManagerTest::GetCallList(const AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("RilManagerTest GetCallList");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_CALL_GET_CALL_LIST, result);
-        SendInt32Event(HREQ_CALL_GET_CALL_LIST, request->serialId_);
+        int32_t ret = SendInt32Event(HREQ_CALL_GET_CALL_LIST, request->serialId_);
+        TELEPHONY_LOGI("SendInt32Event(ID:%{public}d) return: %{public}d", HREQ_CALL_GET_CALL_LIST, ret);
+        return ret;
     }
+    return HRIL_ERR_NULL_POINT;
 }
 
-void RilManagerTest::GetSimIO(SimIoRequestInfo data, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t RilManagerTest::GetSimIO(SimIoRequestInfo data, const AppExecFwk::InnerEvent::Pointer &response)
 {
     TELEPHONY_LOGI("RilManagerTest::GetSimIO --> ");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_SIM_GET_SIM_IO, response);
         if (request == nullptr) {
             TELEPHONY_LOGE("RilManagerTest::CreateRequest is null ");
-            return;
+            return HRIL_ERR_NULL_POINT;
         }
         MessageParcel wData;
         SimIoRequestInfo iccIoRequestInfo;
@@ -209,16 +218,19 @@ void RilManagerTest::GetSimIO(SimIoRequestInfo data, const AppExecFwk::InnerEven
         iccIoRequestInfo.data = ConvertNullToEmptyString(data.data);
         if (!iccIoRequestInfo.Marshalling(wData)) {
             TELEPHONY_LOGE("ERROR : GetSimIO --> iccIo.Marshalling (wData) failed !!!");
-            return;
+            return HRIL_ERR_NULL_POINT;
         }
         TELEPHONY_LOGI("GetSimIO --> GetSimIO.Marshalling (wData) success");
-        SendBufferEvent(HREQ_SIM_GET_SIM_IO, wData);
+        int32_t ret = SendBufferEvent(HREQ_SIM_GET_SIM_IO, wData);
+        TELEPHONY_LOGI("SendBufferEvent(ID:%{public}d) return: %{public}d", HREQ_SIM_GET_SIM_IO, ret);
+        return ret;
     } else {
         TELEPHONY_LOGE("ERROR : GetSimIO --> cellularRadio_ == nullptr !!!");
+        return HRIL_ERR_NULL_POINT;
     }
 }
 
-void RilManagerTest::GetImsi(std::string aid, const AppExecFwk::InnerEvent::Pointer &result)
+int32_t RilManagerTest::GetImsi(std::string aid, const AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("RilManagerTest::GetImsi -->");
     if (cellularRadio_ != nullptr) {
@@ -229,38 +241,47 @@ void RilManagerTest::GetImsi(std::string aid, const AppExecFwk::InnerEvent::Poin
         MessageParcel wData;
         if (!imsi.Marshalling(wData)) {
             TELEPHONY_LOGE("ERROR : GetImsi --> imsi.Marshalling(wData) failed !!!");
-            return;
+            return HRIL_ERR_NULL_POINT;
         }
         TELEPHONY_LOGI("GetImsi --> imsi.Marshalling(wData) success.");
         TELEPHONY_LOGI("GetImsi --> imsi.serial = %{public}d", imsi.serial);
-        SendBufferEvent(HREQ_SIM_GET_IMSI, wData);
+        int32_t ret = SendBufferEvent(HREQ_SIM_GET_IMSI, wData);
+        TELEPHONY_LOGI("SendBufferEvent(ID:%{public}d) return: %{public}d", HREQ_SIM_GET_IMSI, ret);
+        return ret;
     } else {
         TELEPHONY_LOGE("ERROR : GetImsi --> cellularRadio_ == nullptr !!!");
+        return HRIL_ERR_NULL_POINT;
     }
 }
 
-void RilManagerTest::GetRilCmSignalStrength(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int32_t what)
+int32_t RilManagerTest::GetRilCmSignalStrength(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int32_t what)
 {
     TELEPHONY_LOGI("RilManagerTest::GetRilCmSignalStrength");
     if (cellularRadio_ != nullptr) {
         auto event = AppExecFwk::InnerEvent::Get(what);
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_NETWORK_GET_SIGNAL_STRENGTH, event);
-        SendInt32Event(HREQ_NETWORK_GET_SIGNAL_STRENGTH, request->serialId_);
+        int32_t ret = SendInt32Event(HREQ_NETWORK_GET_SIGNAL_STRENGTH, request->serialId_);
+        TELEPHONY_LOGI("SendInt32Event(ID:%{public}d) return: %{public}d", HREQ_NETWORK_GET_SIGNAL_STRENGTH, ret);
+        return ret;
     }
+    return HRIL_ERR_NULL_POINT;
 }
 
-void RilManagerTest::GetSimStatus(const AppExecFwk::InnerEvent::Pointer &result)
+int32_t RilManagerTest::GetSimStatus(const AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("RilManagerTest::GetSimStatus -->");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_SIM_GET_SIM_STATUS, result);
-        SendInt32Event(HREQ_SIM_GET_SIM_STATUS, request->serialId_);
+        int32_t ret = SendInt32Event(HREQ_SIM_GET_SIM_STATUS, request->serialId_);
+        TELEPHONY_LOGI("SendInt32Event(ID:%{public}d) return: %{public}d", HREQ_SIM_GET_SIM_STATUS, ret);
+        return ret;
     } else {
         TELEPHONY_LOGE("ERROR : GetSimStatus --> cellularRadio_ == nullptr !!!");
+        return HRIL_ERR_NULL_POINT;
     }
 }
 
-void RilManagerTest::RilCmDial(std::string address, int32_t clirMode, const AppExecFwk::InnerEvent::Pointer &result)
+int32_t RilManagerTest::RilCmDial(std::string address, int32_t clirMode, const AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("RilCmDial ");
     if (cellularRadio_ != nullptr) {
@@ -273,22 +294,28 @@ void RilManagerTest::RilCmDial(std::string address, int32_t clirMode, const AppE
 
         if (!dialInfo.Marshalling(wData)) {
             TELEPHONY_LOGE("RilCmDial -> RilManagerTest Marshalling");
-            return;
+            return HRIL_ERR_NULL_POINT;
         }
-        SendBufferEvent(HREQ_CALL_DIAL, wData);
+        int32_t ret = SendBufferEvent(HREQ_CALL_DIAL, wData);
+        TELEPHONY_LOGI("SendBufferEvent(ID:%{public}d) return: %{public}d", HREQ_CALL_DIAL, ret);
+        return ret;
     }
+    return HRIL_ERR_NULL_POINT;
 }
 
-void RilManagerTest::Reject(const AppExecFwk::InnerEvent::Pointer &result)
+int32_t RilManagerTest::Reject(const AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("Reject  Request ");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_CALL_REJECT, result);
-        SendInt32Event(HREQ_CALL_REJECT, request->serialId_);
+        int32_t ret = SendInt32Event(HREQ_CALL_REJECT, request->serialId_);
+        TELEPHONY_LOGI("SendInt32Event(ID:%{public}d) return: %{public}d", HREQ_CALL_REJECT, ret);
+        return ret;
     }
+    return HRIL_ERR_NULL_POINT;
 }
 
-void RilManagerTest::Hangup(int32_t gsmIndex, const AppExecFwk::InnerEvent::Pointer &result)
+int32_t RilManagerTest::Hangup(int32_t gsmIndex, const AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("Hangup  Request ");
     if (cellularRadio_ != nullptr) {
@@ -298,49 +325,64 @@ void RilManagerTest::Hangup(int32_t gsmIndex, const AppExecFwk::InnerEvent::Poin
         data.WriteInt32(request->serialId_);
         data.WriteInt32(gsmIndex);
         MessageOption option;
-        cellularRadio_->SendRequest(HREQ_CALL_HANGUP, data, reply, option);
+        int32_t ret = cellularRadio_->SendRequest(HREQ_CALL_HANGUP, data, reply, option);
+        TELEPHONY_LOGI("SendRequest(ID:%{public}d) return: %{public}d", HREQ_CALL_HANGUP, ret);
+        return ret;
     } else {
         TELEPHONY_LOGE("Hangup  cellularRadio_ == nullptr");
+        return HRIL_ERR_NULL_POINT;
     }
 }
 
-void RilManagerTest::HoldCall(const AppExecFwk::InnerEvent::Pointer &result)
+int32_t RilManagerTest::HoldCall(const AppExecFwk::InnerEvent::Pointer &result)
 {
-    TELEPHONY_LOGI("Hold  Request ");
+    TELEPHONY_LOGI("HoldCall  Request ");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_CALL_HOLD_CALL, result);
-        SendInt32Event(HREQ_CALL_HOLD_CALL, request->serialId_);
+        int32_t ret = SendInt32Event(HREQ_CALL_HOLD_CALL, request->serialId_);
+        TELEPHONY_LOGI("SendInt32Event(ID:%{public}d) return: %{public}d", HREQ_CALL_HOLD_CALL, ret);
+        return ret;
     }
+    return HRIL_ERR_NULL_POINT;
 }
 
-void RilManagerTest::UnHoldCall(const AppExecFwk::InnerEvent::Pointer &result)
+int32_t RilManagerTest::UnHoldCall(const AppExecFwk::InnerEvent::Pointer &result)
 {
-    TELEPHONY_LOGI("Active  Request ");
+    TELEPHONY_LOGI("UnHoldCall  Request ");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_CALL_UNHOLD_CALL, result);
-        SendInt32Event(HREQ_CALL_UNHOLD_CALL, request->serialId_);
+        int32_t ret = SendInt32Event(HREQ_CALL_UNHOLD_CALL, request->serialId_);
+        TELEPHONY_LOGI("SendInt32Event(ID:%{public}d) return: %{public}d", HREQ_CALL_UNHOLD_CALL, ret);
+        return ret;
     }
+    return HRIL_ERR_NULL_POINT;
 }
 
-void RilManagerTest::SwitchCall(const AppExecFwk::InnerEvent::Pointer &result)
+int32_t RilManagerTest::SwitchCall(const AppExecFwk::InnerEvent::Pointer &result)
 {
-    TELEPHONY_LOGI("Swap  Request ");
+    TELEPHONY_LOGI("SwitchCall  Request ");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_CALL_SWITCH_CALL, result);
-        SendInt32Event(HREQ_CALL_SWITCH_CALL, request->serialId_);
+        int32_t ret = SendInt32Event(HREQ_CALL_SWITCH_CALL, request->serialId_);
+        TELEPHONY_LOGI("SendInt32Event(ID:%{public}d) return: %{public}d", HREQ_CALL_SWITCH_CALL, ret);
+        return ret;
     }
+    return HRIL_ERR_NULL_POINT;
 }
 
-void RilManagerTest::Answer(const AppExecFwk::InnerEvent::Pointer &result)
+int32_t RilManagerTest::Answer(const AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("Answer  Request ");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_CALL_ANSWER, result);
-        SendInt32Event(HREQ_CALL_ANSWER, request->serialId_);
+        int32_t ret = SendInt32Event(HREQ_CALL_ANSWER, request->serialId_);
+        TELEPHONY_LOGI("SendInt32Event(ID:%{public}d) return: %{public}d", HREQ_CALL_ANSWER, ret);
+        return ret;
     }
+    return HRIL_ERR_NULL_POINT;
 }
 
-void RilManagerTest::RilCmJoin(int32_t callType, const AppExecFwk::InnerEvent::Pointer &result)
+int32_t RilManagerTest::RilCmJoin(int32_t callType, const AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("RilCmJoin  Request ");
     if (cellularRadio_ != nullptr) {
@@ -350,13 +392,16 @@ void RilManagerTest::RilCmJoin(int32_t callType, const AppExecFwk::InnerEvent::P
         data.WriteInt32(request->serialId_);
         data.WriteInt32(callType);
         MessageOption option;
-        cellularRadio_->SendRequest(HREQ_CALL_COMBINE_CONFERENCE, data, reply, option);
+        int32_t ret = cellularRadio_->SendRequest(HREQ_CALL_COMBINE_CONFERENCE, data, reply, option);
+        TELEPHONY_LOGI("SendRequest(ID:%{public}d) return: %{public}d", HREQ_CALL_COMBINE_CONFERENCE, ret);
+        return ret;
     } else {
         TELEPHONY_LOGE("RilCmJoin  cellularRadio_ == nullptr");
+        return HRIL_ERR_NULL_POINT;
     }
 }
 
-void RilManagerTest::RilCmSplit(int32_t callIndex, int32_t callType, const AppExecFwk::InnerEvent::Pointer &result)
+int32_t RilManagerTest::RilCmSplit(int32_t callIndex, int32_t callType, const AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("RilCmSplit  Request ");
     if (cellularRadio_ != nullptr) {
@@ -367,9 +412,12 @@ void RilManagerTest::RilCmSplit(int32_t callIndex, int32_t callType, const AppEx
         data.WriteInt32(callIndex);
         data.WriteInt32(callType);
         MessageOption option;
-        cellularRadio_->SendRequest(HREQ_CALL_SEPARATE_CONFERENCE, data, reply, option);
+        int32_t ret = cellularRadio_->SendRequest(HREQ_CALL_SEPARATE_CONFERENCE, data, reply, option);
+        TELEPHONY_LOGI("SendRequest(ID:%{public}d) return: %{public}d", HREQ_CALL_SEPARATE_CONFERENCE, ret);
+        return ret;
     } else {
         TELEPHONY_LOGE("RilCmSplit  cellularRadio_ == nullptr");
+        return HRIL_ERR_NULL_POINT;
     }
 }
 
@@ -378,34 +426,43 @@ void RilManagerTest::RejectRilCmCall(const AppExecFwk::InnerEvent::Pointer &resp
     TELEPHONY_LOGI("RejectRilCmCall");
 }
 
-void RilManagerTest::GetCsRegStatus(const AppExecFwk::InnerEvent::Pointer &response)
+int32_t RilManagerTest::GetCsRegStatus(const AppExecFwk::InnerEvent::Pointer &response)
 {
     TELEPHONY_LOGI("RilManagerTest GetCsRegStatus");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_NETWORK_GET_CS_REG_STATUS, response);
-        SendInt32Event(HREQ_NETWORK_GET_CS_REG_STATUS, request->serialId_);
+        int32_t ret = SendInt32Event(HREQ_NETWORK_GET_CS_REG_STATUS, request->serialId_);
+        TELEPHONY_LOGI("SendInt32Event(ID:%{public}d) return: %{public}d", HREQ_NETWORK_GET_CS_REG_STATUS, ret);
+        return ret;
     }
+    return HRIL_ERR_NULL_POINT;
 }
 
-void RilManagerTest::GetPsRegStatus(const AppExecFwk::InnerEvent::Pointer &response)
+int32_t RilManagerTest::GetPsRegStatus(const AppExecFwk::InnerEvent::Pointer &response)
 {
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_NETWORK_GET_PS_REG_STATUS, response);
-        SendInt32Event(HREQ_NETWORK_GET_PS_REG_STATUS, request->serialId_);
+        int32_t ret = SendInt32Event(HREQ_NETWORK_GET_PS_REG_STATUS, request->serialId_);
+        TELEPHONY_LOGI("SendInt32Event(ID:%{public}d) return: %{public}d", HREQ_NETWORK_GET_PS_REG_STATUS, ret);
+        return ret;
     }
+    return HRIL_ERR_NULL_POINT;
 }
 
-void RilManagerTest::GetOperatorInfo(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int32_t what)
+int32_t RilManagerTest::GetOperatorInfo(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int32_t what)
 {
     TELEPHONY_LOGI("RilManagerTest GetOperatorInfo");
     if (cellularRadio_ != nullptr) {
         auto event = AppExecFwk::InnerEvent::Get(what);
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_NETWORK_GET_OPERATOR_INFO, event);
-        SendInt32Event(HREQ_NETWORK_GET_OPERATOR_INFO, request->serialId_);
+        int32_t ret = SendInt32Event(HREQ_NETWORK_GET_OPERATOR_INFO, request->serialId_);
+        TELEPHONY_LOGI("SendInt32Event(ID:%{public}d) return: %{public}d", HREQ_NETWORK_GET_OPERATOR_INFO, ret);
+        return ret;
     }
+    return HRIL_ERR_NULL_POINT;
 }
 
-void RilManagerTest::SendSms(std::string smscPdu, std::string pdu,
+int32_t RilManagerTest::SendSms(std::string smscPdu, std::string pdu,
     const std::shared_ptr<AppExecFwk::EventHandler> &handler, const AppExecFwk::InnerEvent::Pointer &response)
 {
     if (cellularRadio_ != nullptr) {
@@ -415,13 +472,16 @@ void RilManagerTest::SendSms(std::string smscPdu, std::string pdu,
         mGsmSmsMessageInfo.serial = request->serialId_;
         if (!mGsmSmsMessageInfo.Marshalling(data)) {
             TELEPHONY_LOGE("RilCmSendSMS Marshalling failed!!!");
-            return;
+            return HRIL_ERR_NULL_POINT;
         }
-        SendBufferEvent(HREQ_SMS_SEND_GSM_SMS, data);
+        int32_t ret = SendBufferEvent(HREQ_SMS_SEND_GSM_SMS, data);
+        TELEPHONY_LOGI("SendBufferEvent(ID:%{public}d) return: %{public}d", HREQ_SMS_SEND_GSM_SMS, ret);
+        return ret;
     }
+    return HRIL_ERR_NULL_POINT;
 }
 
-void RilManagerTest::SendSmsMoreMode(std::string smscPdu, std::string pdu,
+int32_t RilManagerTest::SendSmsMoreMode(std::string smscPdu, std::string pdu,
     const std::shared_ptr<AppExecFwk::EventHandler> &handler, const AppExecFwk::InnerEvent::Pointer &response)
 {
     if (cellularRadio_ != nullptr) {
@@ -432,10 +492,13 @@ void RilManagerTest::SendSmsMoreMode(std::string smscPdu, std::string pdu,
         mGsmSmsMessageInfo.serial = request->serialId_;
         if (!mGsmSmsMessageInfo.Marshalling(data)) {
             TELEPHONY_LOGE("RilCmSendSMS Marshalling failed!!!");
-            return;
+            return HRIL_ERR_NULL_POINT;
         }
-        SendBufferEvent(HREQ_SMS_SEND_SMS_MORE_MODE, data);
+        int32_t ret = SendBufferEvent(HREQ_SMS_SEND_SMS_MORE_MODE, data);
+        TELEPHONY_LOGI("SendBufferEvent(ID:%{public}d) return: %{public}d", HREQ_SMS_SEND_SMS_MORE_MODE, ret);
+        return ret;
     }
+    return HRIL_ERR_NULL_POINT;
 }
 
 GsmSmsMessageInfo RilManagerTest::ConstructGsmSendSmsRilRequest(string smscPdu, string pdu)
@@ -446,7 +509,7 @@ GsmSmsMessageInfo RilManagerTest::ConstructGsmSendSmsRilRequest(string smscPdu, 
     return msg;
 }
 
-void RilManagerTest::SetRadioState(int fan, int rst, const AppExecFwk::InnerEvent::Pointer &result)
+int32_t RilManagerTest::SetRadioState(int fan, int rst, const AppExecFwk::InnerEvent::Pointer &result)
 {
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_MODEM_SET_RADIO_STATUS, result);
@@ -456,13 +519,16 @@ void RilManagerTest::SetRadioState(int fan, int rst, const AppExecFwk::InnerEven
         data.WriteInt32(fan);
         data.WriteInt32(rst);
         MessageOption option;
-        cellularRadio_->SendRequest(HREQ_MODEM_SET_RADIO_STATUS, data, reply, option);
+        int32_t ret = cellularRadio_->SendRequest(HREQ_MODEM_SET_RADIO_STATUS, data, reply, option);
+        TELEPHONY_LOGI("SendRequest(ID:%{public}d) return: %{public}d", HREQ_MODEM_SET_RADIO_STATUS, ret);
+        return ret;
     } else {
         TELEPHONY_LOGE("SetRadioState  cellularRadio_ == nullptr");
+        return HRIL_ERR_NULL_POINT;
     }
 }
 
-void RilManagerTest::SendSmsAck(bool success, int32_t cause, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t RilManagerTest::SendSmsAck(bool success, int32_t cause, const AppExecFwk::InnerEvent::Pointer &response)
 {
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_SMS_SEND_SMS_ACK, response);
@@ -473,13 +539,16 @@ void RilManagerTest::SendSmsAck(bool success, int32_t cause, const AppExecFwk::I
         mUniversalInfo.gsmIndex = cause;
         if (!mUniversalInfo.Marshalling(wData)) {
             TELEPHONY_LOGE("RilManagerTest UniversalInfo Marshalling failed!!!");
-            return;
+            return HRIL_ERR_NULL_POINT;
         }
-        SendBufferEvent(HREQ_SMS_SEND_SMS_ACK, wData);
+        int32_t ret = SendBufferEvent(HREQ_SMS_SEND_SMS_ACK, wData);
+        TELEPHONY_LOGI("SendBufferEvent(ID:%{public}d) return: %{public}d", HREQ_SMS_SEND_SMS_ACK, ret);
+        return ret;
     }
+    return HRIL_ERR_NULL_POINT;
 }
 
-void RilManagerTest::ActivatePdpContext(int32_t radioTechnology, RilDataProfileTest dataProfile, bool isRoaming,
+int32_t RilManagerTest::ActivatePdpContext(int32_t radioTechnology, RilDataProfileTest dataProfile, bool isRoaming,
     bool allowRoaming, const AppExecFwk::InnerEvent::Pointer &response)
 {
     TELEPHONY_LOGI("RilManagerTest::ActivatePdpContext -->");
@@ -494,15 +563,19 @@ void RilManagerTest::ActivatePdpContext(int32_t radioTechnology, RilDataProfileT
         MessageParcel wData;
         if (!dataCallInfo.Marshalling(wData)) {
             TELEPHONY_LOGE("ERROR : ActivatePdpContext --> dataCallInfo.Marshalling(wData) failed !!!");
-            return;
+            return HRIL_ERR_NULL_POINT;
         }
-        SendBufferEvent(HREQ_DATA_ACTIVATE_PDP_CONTEXT, wData);
+        int32_t ret = SendBufferEvent(HREQ_DATA_ACTIVATE_PDP_CONTEXT, wData);
+        TELEPHONY_LOGI("SendBufferEvent(ID:%{public}d) return: %{public}d", HREQ_DATA_ACTIVATE_PDP_CONTEXT, ret);
+        return ret;
     } else {
         TELEPHONY_LOGE("ERROR : ActivatePdpContext --> cellularRadio_ == nullptr");
+        return HRIL_ERR_NULL_POINT;
     }
 }
 
-void RilManagerTest::DeactivatePdpContext(int32_t ci, int32_t reason, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t RilManagerTest::DeactivatePdpContext(
+    int32_t ci, int32_t reason, const AppExecFwk::InnerEvent::Pointer &response)
 {
     TELEPHONY_LOGI("RilBaseCommands::DeactivatePdpContext -->");
     if (cellularRadio_ != nullptr) {
@@ -514,21 +587,27 @@ void RilManagerTest::DeactivatePdpContext(int32_t ci, int32_t reason, const AppE
         MessageParcel wData;
         if (!uniInfo.Marshalling(wData)) {
             TELEPHONY_LOGE("ERROR : DeactivatePdpContext --> uniInfo.Marshalling(wData) failed !!!");
-            return;
+            return HRIL_ERR_NULL_POINT;
         }
-        SendBufferEvent(HREQ_DATA_DEACTIVATE_PDP_CONTEXT, wData);
+        int32_t ret = SendBufferEvent(HREQ_DATA_DEACTIVATE_PDP_CONTEXT, wData);
+        TELEPHONY_LOGI("SendBufferEvent(ID:%{public}d) return: %{public}d", HREQ_DATA_DEACTIVATE_PDP_CONTEXT, ret);
+        return ret;
     } else {
         TELEPHONY_LOGE("ERROR : DeactivatePdpContext --> cellularRadio_ == nullptr");
+        return HRIL_ERR_NULL_POINT;
     }
 }
 
-void RilManagerTest::RilSendAck()
+int32_t RilManagerTest::RilSendAck()
 {
     TELEPHONY_LOGI("RilManagerTest RilSendAck");
     if (cellularRadio_ != nullptr) {
-        SendInt32Event(HRIL_RESPONSE_ACKNOWLEDGEMENT, 0);
+        int32_t ret = SendInt32Event(HRIL_RESPONSE_ACKNOWLEDGEMENT, 0);
+        TELEPHONY_LOGI("SendInt32Event(ID:%{public}d) return: %{public}d", HRIL_RESPONSE_ACKNOWLEDGEMENT, ret);
+        return ret;
     } else {
         TELEPHONY_LOGE("RilSendAck Error trying to send ack, radioProxyCellularRadio_y = null");
+        return HRIL_ERR_NULL_POINT;
     }
 }
 
@@ -543,7 +622,7 @@ void RilManagerTest::RilProcessResponseDone(
     }
 }
 
-void RilManagerTest::SetUssdCusd(std::string str, const AppExecFwk::InnerEvent::Pointer &result)
+int32_t RilManagerTest::SetUssdCusd(std::string str, const AppExecFwk::InnerEvent::Pointer &result)
 {
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_CALL_SET_USSD, result);
@@ -552,24 +631,30 @@ void RilManagerTest::SetUssdCusd(std::string str, const AppExecFwk::InnerEvent::
         data.WriteInt32(request->serialId_);
         data.WriteCString(str.c_str());
         MessageOption option = {MessageOption::TF_ASYNC};
-        cellularRadio_->SendRequest(HREQ_CALL_SET_USSD, data, reply, option);
+        int32_t ret = cellularRadio_->SendRequest(HREQ_CALL_SET_USSD, data, reply, option);
+        TELEPHONY_LOGI("SendRequest(ID:%{public}d) return: %{public}d", HREQ_CALL_SET_USSD, ret);
+        return ret;
     } else {
         TELEPHONY_LOGE("SetUssdCusd  cellularRadio_ == nullptr");
+        return HRIL_ERR_NULL_POINT;
     }
 }
 
-void RilManagerTest::GetUssdCusd(const AppExecFwk::InnerEvent::Pointer &result)
+int32_t RilManagerTest::GetUssdCusd(const AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("RilManagerTest::GetUssdCusd -->");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_CALL_GET_USSD, result);
-        SendInt32Event(HREQ_CALL_GET_USSD, request->serialId_);
+        int32_t ret = SendInt32Event(HREQ_CALL_GET_USSD, request->serialId_);
+        TELEPHONY_LOGI("SendInt32Event(ID:%{public}d) return: %{public}d", HREQ_CALL_GET_USSD, ret);
+        return ret;
     } else {
         TELEPHONY_LOGE("ERROR : GetUssdCusd --> cellularRadio_ == nullptr !!!");
+        return HRIL_ERR_NULL_POINT;
     }
 }
 
-void RilManagerTest::GetLinkBandwidthInfo(const int32_t cid, const AppExecFwk::InnerEvent::Pointer &result)
+int32_t RilManagerTest::GetLinkBandwidthInfo(const int32_t cid, const AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("RilManagerTest::GetLinkBandwidthInfo -->");
     if (cellularRadio_ != nullptr) {
@@ -579,9 +664,12 @@ void RilManagerTest::GetLinkBandwidthInfo(const int32_t cid, const AppExecFwk::I
         data.WriteInt32(request->serialId_);
         data.WriteInt32(cid);
         MessageOption option = {MessageOption::TF_ASYNC};
-        cellularRadio_->SendRequest(HREQ_DATA_GET_LINK_BANDWIDTH_INFO, data, reply, option);
+        int32_t ret = cellularRadio_->SendRequest(HREQ_DATA_GET_LINK_BANDWIDTH_INFO, data, reply, option);
+        TELEPHONY_LOGI("SendRequest(ID:%{public}d) return: %{public}d", HREQ_DATA_GET_LINK_BANDWIDTH_INFO, ret);
+        return ret;
     } else {
         TELEPHONY_LOGE("ERROR : GetLinkBandwidthInfo --> cellularRadio_ == nullptr !!!");
+        return HRIL_ERR_NULL_POINT;
     }
 }
 } // namespace Telephony

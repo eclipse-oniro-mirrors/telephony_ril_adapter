@@ -43,23 +43,20 @@ CallNotify g_callNotifyTab[] = {
     {"^XLEMA:", ReportEmergencyNumberList},
 };
 
-static int32_t  lastCcCause = HRIL_ERR_CALL_CAUSE;
+static int32_t lastCcCause = HRIL_ERR_CALL_CAUSE;
 
 static void OnCallReportErrorMessages(const ReqDataInfo *requestInfo, uint32_t err, ResponseInfo *pResponse)
 {
     uint32_t errorNo = HRIL_ERR_SUCCESS;
     struct ReportInfo reportInfo;
-    ModemReportErrorInfo errInfo = {
-        .errorNo = HRIL_ERR_SUCCESS,
-        .errType = HRIL_REPORT_ERR_TYPE_NONE
-    };
+    ModemReportErrorInfo errInfo = {.errorNo = HRIL_ERR_SUCCESS, .errType = HRIL_REPORT_ERR_TYPE_NONE};
     errInfo = GetReportErrorInfo(pResponse);
     errorNo = (err != HRIL_ERR_SUCCESS) ? err : errInfo.errorNo;
     TELEPHONY_LOGW("Report error! ret:%{public}d", errorNo);
     FreeResponseInfo(pResponse);
     reportInfo = CreateReportInfo(requestInfo, errorNo, HRIL_RESPONSE, 0);
     reportInfo.modemErrInfo = errInfo;
-    OnCallReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+    OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
 }
 
 static int32_t ParseDiffPart(int32_t isAllInfo, char **pLine, HRilCallInfo *outCall)
@@ -168,7 +165,7 @@ void ReportImsServiceStatusInfo(const char *str)
 
     reportInfo = CreateReportInfo(&requestInfo, err, HRIL_NOTIFICATION, HNOTI_CALL_IMS_SERVICE_STATUS_REPORT);
     reportInfo.modemErrInfo = errInfo;
-    OnCallReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&imsSrvStatus, sizeof(HRilImsServiceStatus));
+    OnCallReport(GetSlotId(NULL), reportInfo, (const uint8_t *)&imsSrvStatus, sizeof(HRilImsServiceStatus));
 }
 
 void ReportCallStatusInfo(const char *str)
@@ -195,7 +192,7 @@ void ReportCallStatusInfo(const char *str)
 
     reportInfo = CreateReportInfo(&requestInfo, err, HRIL_NOTIFICATION, HNOTI_CALL_STATUS_INFO_REPORT);
     reportInfo.modemErrInfo = errInfo;
-    OnCallReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&callStatus, sizeof(HRilCallStatusInfo));
+    OnCallReport(GetSlotId(NULL), reportInfo, (const uint8_t *)&callStatus, sizeof(HRilCallStatusInfo));
 }
 
 void ReportCallEndInfo(const char *str)
@@ -228,7 +225,7 @@ void ReportCallEndInfo(const char *str)
 
     reportInfo = CreateReportInfo(&requestInfo, err, HRIL_NOTIFICATION, HNOTI_CALL_END_REPORT);
     reportInfo.modemErrInfo = errInfo;
-    OnCallReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&endInfo, sizeof(HRilCallEndInfo));
+    OnCallReport(GetSlotId(NULL), reportInfo, (const uint8_t *)&endInfo, sizeof(HRilCallEndInfo));
 }
 
 void ReportCallConnectInfo(const char *str)
@@ -252,7 +249,7 @@ void ReportCallConnectInfo(const char *str)
 
     reportInfo = CreateReportInfo(&requestInfo, err, HRIL_NOTIFICATION, HNOTI_CALL_CONNECT_REPORT);
     reportInfo.modemErrInfo = errInfo;
-    OnCallReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&connectInfo, sizeof(HRilCallConnectInfo));
+    OnCallReport(GetSlotId(NULL), reportInfo, (const uint8_t *)&connectInfo, sizeof(HRilCallConnectInfo));
 }
 
 void ReportCallCringInfo(const char *str)
@@ -284,7 +281,7 @@ void ReportCallCringInfo(const char *str)
     }
     reportInfo = CreateReportInfo(&requestInfo, err, HRIL_NOTIFICATION, HNOTI_CALL_CRING_REPORT);
     reportInfo.modemErrInfo = errInfo;
-    OnCallReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&ringInfo, sizeof(HRilCallCringInfo));
+    OnCallReport(GetSlotId(NULL), reportInfo, (const uint8_t *)&ringInfo, sizeof(HRilCallCringInfo));
 }
 
 void ReportCallWaitingInfo(const char *str)
@@ -311,7 +308,7 @@ void ReportCallWaitingInfo(const char *str)
 
     reportInfo = CreateReportInfo(&requestInfo, err, HRIL_NOTIFICATION, HNOTI_CALL_WAITING_REPORT);
     reportInfo.modemErrInfo = errInfo;
-    OnCallReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&waitInfo, sizeof(HRilCallWaitInfo));
+    OnCallReport(GetSlotId(NULL), reportInfo, (const uint8_t *)&waitInfo, sizeof(HRilCallWaitInfo));
 }
 
 void ReportCallStatusUpdate(const char *str)
@@ -327,7 +324,7 @@ void ReportCallStatusUpdate(const char *str)
     }
     reportInfo = CreateReportInfo(&requestInfo, err, HRIL_NOTIFICATION, HNOTI_CALL_STATE_UPDATED);
     reportInfo.modemErrInfo = errInfo;
-    OnCallReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+    OnCallReport(GetSlotId(NULL), reportInfo, NULL, 0);
 }
 
 void ReportSrvccStatusUpdate(const char *str)
@@ -348,7 +345,7 @@ void ReportSrvccStatusUpdate(const char *str)
 
     reportInfo = CreateReportInfo(&requestInfo, err, HRIL_NOTIFICATION, HNOTI_CALL_SRVCC_STATUS_REPORT);
     reportInfo.modemErrInfo = errInfo;
-    OnCallReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t*)&srvccStatus, sizeof(HRilCallSrvccStatus));
+    OnCallReport(GetSlotId(NULL), reportInfo, (const uint8_t *)&srvccStatus, sizeof(HRilCallSrvccStatus));
 }
 
 void ReportCsChannelInfo(const char *str)
@@ -375,7 +372,7 @@ void ReportCsChannelInfo(const char *str)
     ringbackVoiceFlag = !csChannelInfo.status;
     reportInfo = CreateReportInfo(&requestInfo, err, HRIL_NOTIFICATION, HNOTI_CALL_RINGBACK_VOICE_REPORT);
     reportInfo.modemErrInfo = errInfo;
-    OnCallReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t*)&ringbackVoiceFlag, sizeof(int32_t));
+    OnCallReport(GetSlotId(NULL), reportInfo, (const uint8_t *)&ringbackVoiceFlag, sizeof(int32_t));
 }
 
 int32_t IsCallNoticeCmd(const char *str)
@@ -400,11 +397,11 @@ void CallReportInfoProcess(const char *str)
     }
 }
 
-void ReportEmergencyNumberList(const char* str)
+void ReportEmergencyNumberList(const char *str)
 {
     int32_t err = HRIL_ERR_SUCCESS;
     char *pStr = (char *)str;
-    HRilEmergencyinfo pEmergencyinfo = {0};
+    HRilEmergencyInfo pEmergencyInfo = {0};
     struct ReportInfo reportInfo = {0};
     ReqDataInfo requestInfo = {0};
     ModemReportErrorInfo errInfo = InitModemReportErrorInfo();
@@ -412,31 +409,31 @@ void ReportEmergencyNumberList(const char* str)
     if (SkipATPrefix(&pStr) < 0) {
         err = HRIL_ERR_INVALID_MODEM_PARAMETER;
     }
-    if (NextInt(&pStr, &pEmergencyinfo.index) < 0) {
+    if (NextInt(&pStr, &pEmergencyInfo.index) < 0) {
         err = HRIL_ERR_INVALID_MODEM_PARAMETER;
     }
-    if (NextInt(&pStr, &pEmergencyinfo.total) < 0) {
+    if (NextInt(&pStr, &pEmergencyInfo.total) < 0) {
         err = HRIL_ERR_INVALID_MODEM_PARAMETER;
     }
-    if (NextStr(&pStr, &pEmergencyinfo.eccNum) < 0) {
+    if (NextStr(&pStr, &pEmergencyInfo.eccNum) < 0) {
         err = HRIL_ERR_INVALID_MODEM_PARAMETER;
     }
-    if (NextInt(&pStr, &pEmergencyinfo.category) < 0) {
+    if (NextInt(&pStr, &pEmergencyInfo.category) < 0) {
         err = HRIL_ERR_INVALID_MODEM_PARAMETER;
     }
-    if (NextInt(&pStr, &pEmergencyinfo.simpresent) < 0) {
+    if (NextInt(&pStr, &pEmergencyInfo.simpresent) < 0) {
         err = HRIL_ERR_INVALID_MODEM_PARAMETER;
     }
-    if (NextStr(&pStr, &pEmergencyinfo.mcc) < 0) {
+    if (NextStr(&pStr, &pEmergencyInfo.mcc) < 0) {
         err = HRIL_ERR_INVALID_MODEM_PARAMETER;
     }
-    if (NextInt(&pStr, &pEmergencyinfo.abnormalService) < 0) {
+    if (NextInt(&pStr, &pEmergencyInfo.abnormalService) < 0) {
         err = HRIL_ERR_INVALID_MODEM_PARAMETER;
     }
 
     reportInfo = CreateReportInfo(&requestInfo, err, HRIL_NOTIFICATION, HNOTI_CALL_EMERGENCY_NUMBER_REPORT);
     reportInfo.modemErrInfo = errInfo;
-    OnCallReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&pEmergencyinfo, sizeof(pEmergencyinfo));
+    OnCallReport(GetSlotId(NULL), reportInfo, (const uint8_t *)&pEmergencyInfo, sizeof(pEmergencyInfo));
 }
 
 void ReportCallUssdCusdNotice(const char *str)
@@ -462,7 +459,7 @@ void ReportCallUssdCusdNotice(const char *str)
     }
     reportInfo = CreateReportInfo(&requestInfo, err, HRIL_NOTIFICATION, HNOTI_CALL_USSD_REPORT);
     reportInfo.modemErrInfo = errInfo;
-    OnCallReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&ussdCusdNoticeInfo, sizeof(HRilUssdCusdNoticeInfo));
+    OnCallReport(GetSlotId(NULL), reportInfo, (const uint8_t *)&ussdCusdNoticeInfo, sizeof(HRilUssdCusdNoticeInfo));
 }
 
 static int32_t InitCallListCmdBuffer(
@@ -554,7 +551,7 @@ int32_t BuildCallInfoList(const ReqDataInfo *requestInfo, ResponseInfo *response
 
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
 
-    OnCallReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)ppCalls, sizeof(HRilCallInfo) * validCallNum);
+    OnCallReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)ppCalls, sizeof(HRilCallInfo) * validCallNum);
     FreeResponseInfo(pResponse);
     free(ppCalls);
     free(pCalls);
@@ -631,7 +628,7 @@ void ReqDial(const ReqDataInfo *requestInfo, const HRilDial *data, size_t dataLe
     }
 
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-    OnCallReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+    OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
 }
 
@@ -662,7 +659,7 @@ void ReqHangup(const ReqDataInfo *requestInfo, const uint32_t *data, size_t data
     }
 
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-    OnCallReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+    OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
 }
 
@@ -680,7 +677,7 @@ void ReqReject(const ReqDataInfo *requestInfo)
     }
 
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-    OnCallReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+    OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
 }
 
@@ -697,7 +694,7 @@ void ReqAnswer(const ReqDataInfo *requestInfo)
     }
 
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-    OnCallReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+    OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
 }
 
@@ -726,12 +723,12 @@ void ReqGetClip(const ReqDataInfo *requestInfo)
             }
         }
         reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-        OnCallReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&result, sizeof(result));
+        OnCallReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&result, sizeof(result));
         FreeResponseInfo(pResponse);
     } else {
         TELEPHONY_LOGE("ReqGetClip send failed");
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_CMD_SEND_FAILURE, HRIL_RESPONSE, 0);
-        OnCallReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&result, 0);
+        OnCallReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&result, 0);
     }
 }
 
@@ -761,7 +758,7 @@ void ReqSetClip(const ReqDataInfo *requestInfo, int32_t action)
         err = HRIL_ERR_GENERIC_FAILURE;
     }
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-    OnCallReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+    OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
 }
 
 void ReqGetClir(const ReqDataInfo *requestInfo)
@@ -788,7 +785,7 @@ void ReqGetClir(const ReqDataInfo *requestInfo)
             }
         }
         reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-        OnCallReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&result, sizeof(result));
+        OnCallReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&result, sizeof(result));
         FreeResponseInfo(pResponse);
     } else {
         TELEPHONY_LOGE("ReqGetClir send failed");
@@ -816,7 +813,7 @@ void ReqSetClir(const ReqDataInfo *requestInfo, int32_t action)
         err = HRIL_ERR_GENERIC_FAILURE;
     }
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-    OnCallReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+    OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
 }
 
@@ -839,7 +836,7 @@ void ReqStartDtmf(const ReqDataInfo *requestInfo, CallDtmfInfo info)
         err = HRIL_ERR_GENERIC_FAILURE;
     }
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-    OnCallReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+    OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
 }
 
@@ -873,7 +870,7 @@ void ReqSendDtmf(const ReqDataInfo *requestInfo, CallDtmfInfo info)
         }
     }
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-    OnCallReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+    OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
 }
 
@@ -896,7 +893,7 @@ void ReqStopDtmf(const ReqDataInfo *requestInfo, CallDtmfInfo info)
         err = HRIL_ERR_GENERIC_FAILURE;
     }
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-    OnCallReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+    OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
 }
 
@@ -914,7 +911,7 @@ static void HoldCallAndUnHoldCallAtSend(const ReqDataInfo *requestInfo)
     }
 
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-    OnCallReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+    OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
 }
 
@@ -966,7 +963,7 @@ void ReqCombineConference(const ReqDataInfo *requestInfo, int32_t callType)
         err = HRIL_ERR_INVALID_PARAMETER;
     }
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-    OnCallReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+    OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
 }
 
 void ReqSeparateConference(const ReqDataInfo *requestInfo, int32_t callIndex, int32_t callType)
@@ -1003,7 +1000,7 @@ void ReqSeparateConference(const ReqDataInfo *requestInfo, int32_t callIndex, in
         err = HRIL_ERR_INVALID_PARAMETER;
     }
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-    OnCallReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+    OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
 }
 
@@ -1037,7 +1034,7 @@ void ReqCallSupplement(const ReqDataInfo *requestInfo, int32_t type)
         default: {
             TELEPHONY_LOGW("ReqCallSupplement warring, type is invalid");
             reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_PARAMETER, HRIL_RESPONSE, 0);
-            OnCallReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+            OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
             FreeResponseInfo(pResponse);
             return;
         }
@@ -1056,7 +1053,7 @@ void ReqCallSupplement(const ReqDataInfo *requestInfo, int32_t type)
     }
 
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-    OnCallReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+    OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
 }
 
@@ -1073,7 +1070,8 @@ void ReqGetCallWaiting(const ReqDataInfo *requestInfo)
         TELEPHONY_LOGE("ReqGetCallWaiting return, CCWA send failed");
         err = HRIL_ERR_CMD_SEND_FAILURE;
         reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-        OnCallReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&hrilCallWaitResult, sizeof(HRilCallWaitResult));
+        OnCallReport(
+            GetSlotId(requestInfo), reportInfo, (const uint8_t *)&hrilCallWaitResult, sizeof(HRilCallWaitResult));
         return;
     }
     if (!pResponse->success) {
@@ -1091,7 +1089,7 @@ void ReqGetCallWaiting(const ReqDataInfo *requestInfo)
         }
     }
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-    OnCallReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&hrilCallWaitResult, sizeof(HRilCallWaitResult));
+    OnCallReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&hrilCallWaitResult, sizeof(HRilCallWaitResult));
     FreeResponseInfo(pResponse);
 }
 
@@ -1119,7 +1117,7 @@ void ReqSetCallWaiting(const ReqDataInfo *requestInfo, int32_t active)
         }
     }
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-    OnCallReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+    OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
 }
 
@@ -1133,10 +1131,10 @@ void ReqSetCallTransferInfo(const ReqDataInfo *requestInfo, HRilCFInfo info)
     struct ReportInfo reportInfo = {0};
     char cmd[MAX_CMD_LENGTH] = {0};
 
-    if (info.reason > CALL_FORWARD_REASON_ALL_CCF && info.mode > CALL_FORWARD_MODE_ERASURE) {
+    if (info.reason > CALL_FORWARD_REASON_ALL_CCF || info.mode > CALL_FORWARD_MODE_ERASURE) {
         TELEPHONY_LOGE("ReqSetCallTransferInfo call forwarding parameter err!!");
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_PARAMETER, HRIL_RESPONSE, 0);
-        OnCallReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+        OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
         return;
     }
 
@@ -1163,7 +1161,7 @@ void ReqSetCallTransferInfo(const ReqDataInfo *requestInfo, HRilCFInfo info)
         }
     }
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-    OnCallReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+    OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
 }
 
@@ -1179,7 +1177,7 @@ void ReqGetCallTransferInfo(const ReqDataInfo *requestInfo, int32_t reason)
     if (reason > CALL_FORWARD_REASON_ALL_CCF) {
         TELEPHONY_LOGE("ReqGetCallTransferInfo call forwarding parameter err!!");
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_PARAMETER, HRIL_RESPONSE, 0);
-        OnCallReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+        OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
         return;
     }
     int32_t ret = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CCFC=%d,2", reason);
@@ -1214,7 +1212,7 @@ void ReqGetCallTransferInfo(const ReqDataInfo *requestInfo, int32_t reason)
         err = HRIL_ERR_GENERIC_FAILURE;
     }
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-    OnCallReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&queryInfo, sizeof(queryInfo));
+    OnCallReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&queryInfo, sizeof(queryInfo));
     FreeResponseInfo(pResponse);
 }
 
@@ -1258,7 +1256,7 @@ void ReqGetCallRestriction(const ReqDataInfo *requestInfo, const char *fac)
         err = HRIL_ERR_GENERIC_FAILURE;
     }
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-    OnCallReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&result, sizeof(HRilCallRestrictionResult));
+    OnCallReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&result, sizeof(HRilCallRestrictionResult));
     FreeResponseInfo(pResponse);
 }
 
@@ -1286,7 +1284,7 @@ void ReqSetCallRestriction(const ReqDataInfo *requestInfo, CallRestrictionInfo i
         }
     }
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-    OnCallReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+    OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
 }
 
@@ -1295,7 +1293,7 @@ void ReqGetImsCallList(const ReqDataInfo *requestInfo)
     int32_t ret;
     ResponseInfo *pResponse = NULL;
     int32_t err = HRIL_ERR_SUCCESS;
-    ModemReportErrorInfo errInfo;
+    ModemReportErrorInfo errInfo = {};
     long timeOut = DEFAULT_TIMEOUT;
 
     errInfo = InitModemReportErrorInfo();
@@ -1321,7 +1319,7 @@ void ReqGetCallPreferenceMode(const ReqDataInfo *requestInfo)
     int32_t err = HRIL_ERR_SUCCESS;
     struct ReportInfo reportInfo = {0};
     ResponseInfo *pResponse = NULL;
-    ModemReportErrorInfo errInfo;
+    ModemReportErrorInfo errInfo = {};
 
     errInfo = InitModemReportErrorInfo();
     ret = SendCommandLock("AT+CEVDP?", "+CEVDP:", 0, &pResponse);
@@ -1342,7 +1340,7 @@ void ReqGetCallPreferenceMode(const ReqDataInfo *requestInfo)
     }
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
     reportInfo.modemErrInfo = errInfo;
-    OnCallReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&mode, sizeof(mode));
+    OnCallReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&mode, sizeof(mode));
     FreeResponseInfo(pResponse);
 }
 
@@ -1354,7 +1352,7 @@ void ReqSetCallPreferenceMode(const ReqDataInfo *requestInfo, int32_t mode)
     char cmd[MAX_CMD_LENGTH] = {0};
     struct ReportInfo reportInfo;
     ResponseInfo *pResponse = NULL;
-    ModemReportErrorInfo errInfo;
+    ModemReportErrorInfo errInfo = {};
 
     errInfo = InitModemReportErrorInfo();
     value = mode;
@@ -1372,7 +1370,7 @@ void ReqSetCallPreferenceMode(const ReqDataInfo *requestInfo, int32_t mode)
     }
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
     reportInfo.modemErrInfo = errInfo;
-    OnCallReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+    OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
 }
 
@@ -1384,7 +1382,7 @@ void ReqGetLteImsSwitchStatus(const ReqDataInfo *requestInfo)
     int32_t err = HRIL_ERR_SUCCESS;
     struct ReportInfo reportInfo = {0};
     ResponseInfo *pResponse = NULL;
-    ModemReportErrorInfo errInfo;
+    ModemReportErrorInfo errInfo = {};
 
     errInfo = InitModemReportErrorInfo();
     ret = SendCommandLock("AT^LTEIMSSWITCH?", "^LTEIMSSWITCH:", 0, &pResponse);
@@ -1405,7 +1403,7 @@ void ReqGetLteImsSwitchStatus(const ReqDataInfo *requestInfo)
     }
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
     reportInfo.modemErrInfo = errInfo;
-    OnCallReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&value, sizeof(value));
+    OnCallReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&value, sizeof(value));
     FreeResponseInfo(pResponse);
 }
 
@@ -1435,21 +1433,18 @@ void ReqSetLteImsSwitchStatus(const ReqDataInfo *requestInfo, int32_t active)
     }
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
     reportInfo.modemErrInfo = errInfo;
-    OnCallReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+    OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
 }
 
 void ReqSetUssdCusd(const ReqDataInfo *requestInfo, const char *str)
 {
-    int ret;
-    int err = HRIL_ERR_SUCCESS;
+    int32_t ret;
+    int32_t err = HRIL_ERR_SUCCESS;
     char cmd[MAX_CMD_LENGTH] = {0};
     struct ReportInfo reportInfo;
     ResponseInfo *pResponse = NULL;
-    ModemReportErrorInfo errInfo = {
-        .errorNo = HRIL_ERR_SUCCESS,
-        .errType = HRIL_REPORT_ERR_TYPE_NONE
-    };
+    ModemReportErrorInfo errInfo = {};
 
     ret = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CUSD=1, \"% s\" , 15", str);
     if (ret < 0) {
@@ -1465,22 +1460,19 @@ void ReqSetUssdCusd(const ReqDataInfo *requestInfo, const char *str)
     }
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
     reportInfo.modemErrInfo = errInfo;
-    OnCallReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+    OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
 }
 
 void ReqGetUssdCusd(const ReqDataInfo *requestInfo)
 {
-    int ret;
+    int32_t ret;
     char *line = NULL;
     int32_t cusd = 0;
-    int err = HRIL_ERR_SUCCESS;
+    int32_t err = HRIL_ERR_SUCCESS;
     struct ReportInfo reportInfo;
     ResponseInfo *pResponse = NULL;
-    ModemReportErrorInfo errInfo = {
-        .errorNo = HRIL_ERR_SUCCESS,
-        .errType = HRIL_REPORT_ERR_TYPE_NONE
-    };
+    ModemReportErrorInfo errInfo = {};
 
     ret = SendCommandLock("AT+CUSD?", "+CUSD:", 0, &pResponse);
     if (ret || (pResponse != NULL && !pResponse->success)) {
@@ -1500,21 +1492,18 @@ void ReqGetUssdCusd(const ReqDataInfo *requestInfo)
     }
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
     reportInfo.modemErrInfo = errInfo;
-    OnCallReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&cusd, sizeof(cusd));
+    OnCallReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&cusd, sizeof(cusd));
     FreeResponseInfo(pResponse);
 }
 
-void ReqSetMute(const ReqDataInfo *requestInfo, int mute)
+void ReqSetMute(const ReqDataInfo *requestInfo, int32_t mute)
 {
-    int ret;
-    int err = HRIL_ERR_SUCCESS;
+    int32_t ret;
+    int32_t err = HRIL_ERR_SUCCESS;
     char cmd[MAX_CMD_LENGTH] = {0};
     struct ReportInfo reportInfo;
     ResponseInfo *pResponse = NULL;
-    ModemReportErrorInfo errInfo = {
-        .errorNo = HRIL_ERR_SUCCESS,
-        .errType = HRIL_REPORT_ERR_TYPE_NONE
-    };
+    ModemReportErrorInfo errInfo = {};
 
     ret = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CMUT=%d ", mute);
     if (ret < 0) {
@@ -1530,22 +1519,19 @@ void ReqSetMute(const ReqDataInfo *requestInfo, int mute)
     }
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
     reportInfo.modemErrInfo = errInfo;
-    OnCallReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+    OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
 }
 
 void ReqGetMute(const ReqDataInfo *requestInfo)
 {
-    int ret;
+    int32_t ret;
     char *line = NULL;
     int32_t mute = 0;
-    int err = HRIL_ERR_SUCCESS;
+    int32_t err = HRIL_ERR_SUCCESS;
     struct ReportInfo reportInfo;
     ResponseInfo *pResponse = NULL;
-    ModemReportErrorInfo errInfo = {
-        .errorNo = HRIL_ERR_SUCCESS,
-        .errType = HRIL_REPORT_ERR_TYPE_NONE
-    };
+    ModemReportErrorInfo errInfo = {};
 
     ret = SendCommandLock("AT+CMUT?", "+CMUT:", 0, &pResponse);
     if (ret || (pResponse != NULL && !pResponse->success)) {
@@ -1565,11 +1551,11 @@ void ReqGetMute(const ReqDataInfo *requestInfo)
     }
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
     reportInfo.modemErrInfo = errInfo;
-    OnCallReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&mute, sizeof(mute));
+    OnCallReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&mute, sizeof(mute));
     FreeResponseInfo(pResponse);
 }
 
-static int32_t CallCmdXLEMA(const char *lineCmd, HRilEmergencyinfo *outCall)
+static int32_t CallCmdXLEMA(const char *lineCmd, HRilEmergencyInfo *outCall)
 {
     char *pLine = (char *)lineCmd;
 
@@ -1605,20 +1591,19 @@ static int32_t CallCmdXLEMA(const char *lineCmd, HRilEmergencyinfo *outCall)
     return HRIL_ERR_SUCCESS;
 }
 
-static int32_t InitGetEmergencyCallList(
-    const ResponseInfo *pResponse, int32_t *callNum, HRilEmergencyinfo ***ppEmergencyCalls,
-    HRilEmergencyinfo **pEmergencyCalls)
+static int32_t InitGetEmergencyCallList(const ResponseInfo *pResponse, int32_t *callNum,
+    HRilEmergencyInfo ***ppEmergencyCalls, HRilEmergencyInfo **pEmergencyCalls)
 {
     int32_t i;
     int32_t ret;
     int32_t callNumTmp = 0;
     Line *pLine = NULL;
-    HRilEmergencyinfo *pEmergencyCallsTmp = NULL;
-    HRilEmergencyinfo **ppEmergencyCallsTmp = NULL;
+    HRilEmergencyInfo *pEmergencyCallsTmp = NULL;
+    HRilEmergencyInfo **ppEmergencyCallsTmp = NULL;
 
     if (pResponse == NULL || ppEmergencyCalls == NULL || pEmergencyCalls == NULL || callNum == NULL) {
-        TELEPHONY_LOGE("params: %{public}p,%{public}p,%{public}p,%{public}p",
-            pResponse, callNum, ppEmergencyCalls, pEmergencyCalls);
+        TELEPHONY_LOGE("params: %{public}p,%{public}p,%{public}p,%{public}p", pResponse, callNum, ppEmergencyCalls,
+            pEmergencyCalls);
         return HRIL_ERR_NULL_POINT;
     }
 
@@ -1632,19 +1617,19 @@ static int32_t InitGetEmergencyCallList(
     if (!callNumTmp) {
         callNumTmp++; // Malloc size cannot be 0.
     }
-    ppEmergencyCallsTmp = (HRilEmergencyinfo **)malloc(callNumTmp * sizeof(int64_t));
+    ppEmergencyCallsTmp = (HRilEmergencyInfo **)malloc(callNumTmp * sizeof(int64_t));
     if (ppEmergencyCallsTmp == NULL) {
         TELEPHONY_LOGE("ReqGetCallList malloc ppCalls failure");
         return HRIL_ERR_MEMORY_FULL;
     }
-    pEmergencyCallsTmp = (HRilEmergencyinfo *)malloc(callNumTmp * sizeof(HRilEmergencyinfo));
+    pEmergencyCallsTmp = (HRilEmergencyInfo *)malloc(callNumTmp * sizeof(HRilEmergencyInfo));
     if (pEmergencyCallsTmp == NULL) {
         TELEPHONY_LOGE("ReqGetCallList malloc pCalls failure");
         free(ppEmergencyCallsTmp);
         return HRIL_ERR_MEMORY_FULL;
     }
-    ret = memset_s(pEmergencyCallsTmp, callNumTmp * sizeof(HRilEmergencyinfo), 0,
-        callNumTmp * sizeof(HRilEmergencyinfo));
+    ret = memset_s(
+        pEmergencyCallsTmp, callNumTmp * sizeof(HRilEmergencyInfo), 0, callNumTmp * sizeof(HRilEmergencyInfo));
     if (ret != EOK) {
         TELEPHONY_LOGE("memset_s is failed!");
     }
@@ -1668,8 +1653,8 @@ int32_t BuildGetEmergencyCallList(const ReqDataInfo *requestInfo, ResponseInfo *
     struct ReportInfo reportInfo = {0};
     Line *pLine = NULL;
     ResponseInfo *pResponse = response;
-    HRilEmergencyinfo *pEmergencyCalls = NULL;
-    HRilEmergencyinfo **ppEmergencyCalls = NULL;
+    HRilEmergencyInfo *pEmergencyCalls = NULL;
+    HRilEmergencyInfo **ppEmergencyCalls = NULL;
 
     if (pResponse == NULL || requestInfo == NULL) {
         TELEPHONY_LOGE("response or requestInfo is null.");
@@ -1696,8 +1681,8 @@ int32_t BuildGetEmergencyCallList(const ReqDataInfo *requestInfo, ResponseInfo *
     }
 
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-    OnCallReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)ppEmergencyCalls,
-        sizeof(HRilEmergencyinfo) * validCallNum);
+    OnCallReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)ppEmergencyCalls,
+        sizeof(HRilEmergencyInfo) * validCallNum);
     FreeResponseInfo(pResponse);
     free(ppEmergencyCalls);
     free(pEmergencyCalls);
@@ -1729,13 +1714,10 @@ void ReqGetEmergencyCallList(const ReqDataInfo *requestInfo)
 
 void ReqGetCallFailReason(const ReqDataInfo *requestInfo)
 {
-    int err = HRIL_ERR_SUCCESS;
+    int32_t err = HRIL_ERR_SUCCESS;
     struct ReportInfo reportInfo;
     ResponseInfo *pResponse = NULL;
-    ModemReportErrorInfo errInfo = {
-        .errorNo = HRIL_ERR_SUCCESS,
-        .errType = HRIL_REPORT_ERR_TYPE_NONE
-    };
+    ModemReportErrorInfo errInfo = {};
 
     if (lastCcCause == HRIL_ERR_CALL_CAUSE) {
         TELEPHONY_LOGE("lastCcCause is none!");
@@ -1745,6 +1727,6 @@ void ReqGetCallFailReason(const ReqDataInfo *requestInfo)
 
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
     reportInfo.modemErrInfo = errInfo;
-    OnCallReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&lastCcCause, sizeof(lastCcCause));
+    OnCallReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&lastCcCause, sizeof(lastCcCause));
     FreeResponseInfo(pResponse);
 }

@@ -32,8 +32,7 @@ public:
     RilRadioResponseTest(RilManagerTest *mRilManager);
     ~RilRadioResponseTest();
 
-    int OnRemoteRequest(
-        uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
+    int OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
     void OnResponseGetSimState(MessageParcel &data);
     void OnResponseGetCurrentCalls(MessageParcel &data);
     void OnResponseGetRilCurrentCellInfo(MessageParcel &data);
@@ -68,8 +67,8 @@ public:
     void OnRequestGetNetworkSelectionModeTest(MessageParcel &data);
     void OnRequestGetNetworkSearchInformationTest(MessageParcel &data);
     void OnRequestSetNetworkSelectionModeTest(MessageParcel &data);
-    void OnRequestSetUssdCusdTest(MessageParcel &data);
-    void OnRequestGetUssdCusdTest(MessageParcel &data);
+    void OnRequestSetUssdTest(MessageParcel &data);
+    void OnRequestGetUssdTest(MessageParcel &data);
     void OnRequestGetLinkBandwidthInfoTest(MessageParcel &data);
 
 private:

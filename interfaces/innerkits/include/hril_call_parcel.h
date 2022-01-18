@@ -108,7 +108,7 @@ struct CallInfoList : public HrilBaseParcel {
     void Dump(std::string, int32_t);
 };
 
-struct Emergencyinfo : public HrilBaseParcel {
+struct EmergencyInfo : public HrilBaseParcel {
     int32_t index;
     int32_t total;
     std::string eccNum;
@@ -119,14 +119,14 @@ struct Emergencyinfo : public HrilBaseParcel {
 
     bool ReadFromParcel(Parcel &parcel);
     virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<Emergencyinfo> UnMarshalling(Parcel &parcel);
+    std::shared_ptr<EmergencyInfo> UnMarshalling(Parcel &parcel);
     void Dump(std::string, int32_t);
 };
 
 struct EmergencyInfoList : public HrilBaseParcel {
     int32_t callSize;
     int32_t flag;
-    std::vector<Emergencyinfo> calls;
+    std::vector<EmergencyInfo> calls;
 
     bool ReadFromParcel(Parcel &parcel);
     virtual bool Marshalling(Parcel &parcel) const override;
@@ -284,7 +284,7 @@ struct SrvccStatus : public HrilBaseParcel {
      *   2: SRVCC is successful;
      *   3: SRVCC is cancelled;
      *   4: SRVCC failed.
-    */
+     */
     int32_t status;
 
     bool ReadFromParcel(Parcel &parcel);

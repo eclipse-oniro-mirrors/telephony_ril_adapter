@@ -23,15 +23,15 @@ extern "C" {
 #endif
 
 typedef struct {
-    int reason; /* Data call fail reason. succes is 0 */
-    int retryTime; /* if errorCode != 0, suggested retry time */
-    int cid; /* from 3GPP TS 27.007 V17.3.0 (2021-09)
-              * specifies a particular PDP context definition. The parameter is local to the TE-MT interface and
-              * is used in other PDP context-related commands. */
-    int active; /* from 3GPP TS 27.007 V17.3.0 (2021-09)
-                 * indicates the state of PDP context activation
-                 * 0 - deactivated
-                 * 1 - activated */
+    int32_t reason; /* Data call fail reason. success is 0 */
+    int32_t retryTime; /* if errorCode != 0, suggested retry time */
+    int32_t cid; /* from 3GPP TS 27.007 V17.3.0 (2021-09)
+                  * specifies a particular PDP context definition. The parameter is local to the TE-MT interface and
+                  * is used in other PDP context-related commands. */
+    int32_t active; /* from 3GPP TS 27.007 V17.3.0 (2021-09)
+                     * indicates the state of PDP context activation
+                     * 0 - deactivated
+                     * 1 - activated */
     char *type; /* PDP_type values from 3GPP TS 27.007 V17.3.0 (2021-09)
                  * specifies the type of packet data protocol. The default value is manufacturer specific. */
     char *netPortName; /* Network interface name */
@@ -50,7 +50,7 @@ typedef struct {
                    * +CGCONTRDP. */
     char *gateway; /* shows the Gateway Address of the MT.
                     * The string is given as dot-separated numeric (0- 255) parameters. */
-    int maxTransferUnit; /* Maximum Transfer Unit. shows the IPv4 MTU size in octets. */
+    int32_t maxTransferUnit; /* Maximum Transfer Unit. shows the IPv4 MTU size in octets. */
     char *pCscfPrimAddr; /* from 3GPP TS 27.007 V17.3.0 (2021-09)
                           * string type; shows the IP address of the primary P-CSCF server.When +CGPIAF is
                           * supported, its settings can 	 influence the format of this parameter returned with
@@ -59,20 +59,20 @@ typedef struct {
                          * string type; shows the IP address of the secondary P-CSCF server. When +CGPIAF is
                          * supported, its settings can influence the format of this parameter returned with the
                          * execute form of +CGCONTRDP. */
-    int pduSessionId; /* from 3GPP TS 27.007 V17.3.0 (2021-09)
-                       * integer type; identifies the PDU session, see 3GPP TS 24.501 [161]. */
+    int32_t pduSessionId; /* from 3GPP TS 27.007 V17.3.0 (2021-09)
+                           * integer type; identifies the PDU session, see 3GPP TS 24.501 [161]. */
 } HRilDataCallResponse;
 
 typedef struct { /* from 3GPP TS 27.007 V17.3.0 (2021-09) */
-    int cid; /* specifies a particular PDP context definition. The parameter is local to the TE-MT interface and
-              * is used in other PDP context-related commands. */
-    int reason; /* Reason for the data request. */
-    int rat; /* Radio Access Technology */
-    int verType; /* Authentication protocol used for this PDP context.
-                   * 0 None. Used to indicate that no authentication protocol is used for this PDP context.
-                   *    Username and password are removed if previously specified.
-                   * 1 PAP
-                   * 2 CHAP */
+    int32_t cid; /* specifies a particular PDP context definition. The parameter is local to the TE-MT interface and
+                  * is used in other PDP context-related commands. */
+    int32_t reason; /* Reason for the data request. */
+    int32_t rat; /* Radio Access Technology */
+    int32_t verType; /* Authentication protocol used for this PDP context.
+                      * 0 None. Used to indicate that no authentication protocol is used for this PDP context.
+                      *    Username and password are removed if previously specified.
+                      * 1 PAP
+                      * 2 CHAP */
     char *userName; /* User name for access to the IP network. */
     char *password; /* Password for access to the IP network. */
     char *apn; /* (Access Point Name) a string parameter
@@ -80,7 +80,7 @@ typedef struct { /* from 3GPP TS 27.007 V17.3.0 (2021-09) */
     char *type; /* PDP_type values from 3GPP TS 27.007 section 10.1.1.
                  * specifies the type of packet data protocol. The default value is manufacturer specific. */
     char *roamingType; /* PDP_type values from 3GPP TS 27.007 section 10.1.1.
-                 * specifies the type of packet data protocol. The default value is manufacturer specific. */
+                        * specifies the type of packet data protocol. The default value is manufacturer specific. */
 } HRilDataInfo;
 
 typedef struct {
@@ -137,12 +137,10 @@ typedef struct {
     void (*ActivatePdpContext)(const ReqDataInfo *requestInfo, const HRilDataInfo *data);
     void (*DeactivatePdpContext)(const ReqDataInfo *requestInfo, const HRilDataInfo *data);
     void (*GetPdpContextList)(const ReqDataInfo *requestInfo);
-    void (*GetLinkBandwidthInfo)(const ReqDataInfo *requestInfo, int cid);
+    void (*GetLinkBandwidthInfo)(const ReqDataInfo *requestInfo, int32_t cid);
     void (*SetLinkBandwidthReportingRule)(const ReqDataInfo *requestInfo, const HRilLinkBandwidthReportingRule *data);
 } HRilDataReq;
-
 #ifdef __cplusplus
 }
 #endif
-
 #endif // OHOS_RIL_VENDOR_DATA_DEFS_H
