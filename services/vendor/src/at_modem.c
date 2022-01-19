@@ -21,10 +21,11 @@
 struct ResponseAck {
     ResponseInfo *responseInfo;
     uint8_t *respDataPointer;
-    int respDataLen;
+    int32_t respDataLen;
 };
 
-static int ResponseModemReport(int slotId, const ReqDataInfo *requestInfo, int err, struct ResponseAck *respDataAck)
+static int32_t ResponseModemReport(
+    int32_t slotId, const ReqDataInfo *requestInfo, int32_t err, struct ResponseAck *respDataAck)
 {
     if (requestInfo == NULL) {
         TELEPHONY_LOGE("requestInfo is nullptr!");
@@ -35,7 +36,7 @@ static int ResponseModemReport(int slotId, const ReqDataInfo *requestInfo, int e
         return HRIL_ERR_GENERIC_FAILURE;
     }
     struct ReportInfo reportInfo;
-    reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 1);
+    reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
     OnModemReport(slotId, reportInfo, (const uint8_t *)(respDataAck->respDataPointer), respDataAck->respDataLen);
     if (respDataAck->responseInfo != NULL) {
         FreeResponseInfo(respDataAck->responseInfo);
@@ -43,10 +44,10 @@ static int ResponseModemReport(int slotId, const ReqDataInfo *requestInfo, int e
     return err;
 }
 
-static int GetResponseErrorCode(ResponseInfo *pResponseInfo)
+static int32_t GetResponseErrorCode(ResponseInfo *pResponseInfo)
 {
     char *pLine = NULL;
-    int ret = HRIL_ERR_GENERIC_FAILURE;
+    int32_t ret = HRIL_ERR_GENERIC_FAILURE;
     if (pResponseInfo && pResponseInfo->result) {
         pLine = pResponseInfo->result;
         SkipATPrefix(&pLine);
@@ -60,10 +61,10 @@ static int GetResponseErrorCode(ResponseInfo *pResponseInfo)
     return ret;
 }
 
-void ReqSetRadioState(const ReqDataInfo *requestInfo, int function, int reset)
+void ReqSetRadioState(const ReqDataInfo *requestInfo, int32_t function, int32_t reset)
 {
     struct ReportInfo reportInfo;
-    int ret = SetRadioState(function, reset);
+    int32_t ret = SetRadioState(function, reset);
     if (ret == HRIL_ERR_SUCCESS) {
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
     } else {
@@ -74,14 +75,14 @@ void ReqSetRadioState(const ReqDataInfo *requestInfo, int function, int reset)
             reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
         }
     }
-    OnModemReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+    OnModemReport(requestInfo->slotId, reportInfo, NULL, 0);
 }
 
 static void ErrorHandler(const ReqDataInfo *requestInfo, ResponseInfo *pResponse)
 {
     struct ReportInfo reportInfo;
     reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
-    OnModemReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+    OnModemReport(requestInfo->slotId, reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
 }
 
@@ -89,11 +90,11 @@ void ReqGetRadioState(const ReqDataInfo *requestInfo)
 {
     const long long timeOut = DEFAULT_TIMEOUT;
     char *pLine = NULL;
-    int radioState = -1;
+    int32_t radioState = -1;
     ResponseInfo *pResponse = NULL;
     struct ReportInfo reportInfo;
 
-    int ret = SendCommandLock("AT+CFUN?", "+CFUN", timeOut, &pResponse);
+    int32_t ret = SendCommandLock("AT+CFUN?", "+CFUN", timeOut, &pResponse);
     if (ret != 0 || !pResponse->success) {
         TELEPHONY_LOGE("AT+CFUN send failed");
         return ErrorHandler(requestInfo, pResponse);
@@ -112,7 +113,7 @@ void ReqGetRadioState(const ReqDataInfo *requestInfo)
     }
 
     reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
-    OnModemReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&radioState, sizeof(int));
+    OnModemReport(requestInfo->slotId, reportInfo, (const uint8_t *)&radioState, sizeof(int32_t));
     FreeResponseInfo(pResponse);
     return;
 }
@@ -120,74 +121,74 @@ void ReqGetRadioState(const ReqDataInfo *requestInfo)
 void ReqGetImei(const ReqDataInfo *requestInfo)
 {
     const long TIME_OUT = DEFAULT_TIMEOUT;
-    int err = HRIL_ERR_SUCCESS;
+    int32_t err = HRIL_ERR_SUCCESS;
     ResponseInfo *responseInfo = NULL;
     TELEPHONY_LOGI("enter to [%{public}s]:%{public}d", __func__, __LINE__);
-    int ret = SendCommandLock("AT+CGSN", NULL, TIME_OUT, &responseInfo);
+    int32_t ret = SendCommandLock("AT+CGSN", NULL, TIME_OUT, &responseInfo);
     struct ResponseAck respDataAck = {responseInfo, NULL, 0};
     if (responseInfo == NULL) {
         TELEPHONY_LOGE("responseInfo is null");
-        ResponseModemReport(HRIL_SIM_SLOT_0, requestInfo, HRIL_ERR_NULL_POINT, &respDataAck);
+        ResponseModemReport(requestInfo->slotId, requestInfo, HRIL_ERR_NULL_POINT, &respDataAck);
         return;
     }
     respDataAck.responseInfo = responseInfo;
     if (ret != 0 || !responseInfo->success) {
         err = GetResponseErrorCode(responseInfo);
         TELEPHONY_LOGE("send AT CMD failed!");
-        ResponseModemReport(HRIL_SIM_SLOT_0, requestInfo, err, &respDataAck);
+        ResponseModemReport(requestInfo->slotId, requestInfo, err, &respDataAck);
         return;
     }
     if (responseInfo->head == NULL) {
         TELEPHONY_LOGE("no data!");
-        ResponseModemReport(HRIL_SIM_SLOT_0, requestInfo, HRIL_ERR_INVALID_RESPONSE, &respDataAck);
+        ResponseModemReport(requestInfo->slotId, requestInfo, HRIL_ERR_INVALID_RESPONSE, &respDataAck);
         return;
     }
     char *imeiSn = responseInfo->head->data;
     if ((imeiSn == NULL) || (strlen(imeiSn) == 0)) {
         TELEPHONY_LOGE("ReqGetImei: ResponseInfo is Invalid!");
-        ResponseModemReport(HRIL_SIM_SLOT_0, requestInfo, HRIL_ERR_INVALID_RESPONSE, &respDataAck);
+        ResponseModemReport(requestInfo->slotId, requestInfo, HRIL_ERR_INVALID_RESPONSE, &respDataAck);
         return;
     }
     respDataAck.respDataPointer = (uint8_t *)imeiSn;
     respDataAck.respDataLen = strlen(imeiSn);
-    ResponseModemReport(HRIL_SIM_SLOT_0, requestInfo, HRIL_ERR_SUCCESS, &respDataAck);
+    ResponseModemReport(requestInfo->slotId, requestInfo, HRIL_ERR_SUCCESS, &respDataAck);
 }
 
 void ReqGetMeid(const ReqDataInfo *requestInfo)
 {
     const long TIME_OUT = DEFAULT_TIMEOUT;
-    int err = HRIL_ERR_SUCCESS;
+    int32_t err = HRIL_ERR_SUCCESS;
     ResponseInfo *responseInfo = NULL;
     TELEPHONY_LOGI("enter to [%{public}s]:%{public}d", __func__, __LINE__);
-    int ret = SendCommandLock("AT+MEID", NULL, TIME_OUT, &responseInfo);
+    int32_t ret = SendCommandLock("AT+MEID", NULL, TIME_OUT, &responseInfo);
     struct ResponseAck respDataAck = {responseInfo, NULL, 0};
     if (responseInfo == NULL) {
-        ResponseModemReport(HRIL_SIM_SLOT_0, requestInfo, HRIL_ERR_NULL_POINT, &respDataAck);
+        ResponseModemReport(requestInfo->slotId, requestInfo, HRIL_ERR_NULL_POINT, &respDataAck);
         return;
     }
     respDataAck.responseInfo = responseInfo;
     if (ret != 0 || !responseInfo->success) {
         err = GetResponseErrorCode(responseInfo);
         TELEPHONY_LOGE("send AT CMD failed!");
-        ResponseModemReport(HRIL_SIM_SLOT_0, requestInfo, err, &respDataAck);
+        ResponseModemReport(requestInfo->slotId, requestInfo, err, &respDataAck);
         return;
     }
     if (responseInfo->head == NULL) {
         TELEPHONY_LOGE("no data!");
-        ResponseModemReport(HRIL_SIM_SLOT_0, requestInfo, HRIL_ERR_INVALID_RESPONSE, &respDataAck);
+        ResponseModemReport(requestInfo->slotId, requestInfo, HRIL_ERR_INVALID_RESPONSE, &respDataAck);
         return;
     }
     char *meidSn = responseInfo->head->data;
     if ((meidSn == NULL) || (strlen(meidSn) == 0)) {
-        ResponseModemReport(HRIL_SIM_SLOT_0, requestInfo, HRIL_ERR_INVALID_RESPONSE, &respDataAck);
+        ResponseModemReport(requestInfo->slotId, requestInfo, HRIL_ERR_INVALID_RESPONSE, &respDataAck);
         return;
     }
     respDataAck.respDataPointer = (uint8_t *)meidSn;
     respDataAck.respDataLen = strlen(meidSn);
-    ResponseModemReport(HRIL_SIM_SLOT_0, requestInfo, HRIL_ERR_SUCCESS, &respDataAck);
+    ResponseModemReport(requestInfo->slotId, requestInfo, HRIL_ERR_SUCCESS, &respDataAck);
 }
 
-static HRilRadioTech ConvertVoiceTechToRadioTech(HRilVoiceSubmode subMode)
+static HRilRadioTech ConvertVoiceTechToRadioTech(HRilVoiceSubMode subMode)
 {
     switch (subMode) {
         case HRIL_ACT_GSM:
@@ -230,15 +231,15 @@ static HRilRadioTech ConvertVoiceTechToRadioTech(HRilVoiceSubmode subMode)
     }
 }
 
-int ProcessVoiceRadioInfo(const char *s, const HRilVoiceRadioInfo *hrilVoiceRadioInfo)
+int32_t ProcessVoiceRadioInfo(const char *s, const HRilVoiceRadioInfo *hrilVoiceRadioInfo)
 {
-    int srvStatus = 0;
-    int srvDomain = 0;
-    int roamStatus = 0;
-    int simStatus = 0;
-    int lockStatus = 0;
-    int sysMode = 0;
-    int actType = 0;
+    int32_t srvStatus = 0;
+    int32_t srvDomain = 0;
+    int32_t roamStatus = 0;
+    int32_t simStatus = 0;
+    int32_t lockStatus = 0;
+    int32_t sysMode = 0;
+    int32_t actType = 0;
     char *str = (char *)s;
     HRilVoiceRadioInfo *voiceRadioInfo = (HRilVoiceRadioInfo *)hrilVoiceRadioInfo;
     if ((str == NULL) || (voiceRadioInfo == NULL)) {
@@ -247,13 +248,13 @@ int ProcessVoiceRadioInfo(const char *s, const HRilVoiceRadioInfo *hrilVoiceRadi
     } else {
         memset_s(voiceRadioInfo, sizeof(HRilVoiceRadioInfo), 0, sizeof(HRilVoiceRadioInfo));
         TELEPHONY_LOGI("result: %{public}s", str);
-        int err = SkipATPrefix(&str);
+        int32_t err = SkipATPrefix(&str);
         if (err < 0) {
             TELEPHONY_LOGE("skip failed: [%{public}s]", str);
             return HRIL_ERR_INVALID_RESPONSE;
         }
-        int commaNum = FindCommaCharNum(str);
-        const int VOICE_COMMA_NUM = 8;
+        int32_t commaNum = FindCommaCharNum(str);
+        const int32_t VOICE_COMMA_NUM = 8;
         if (commaNum != VOICE_COMMA_NUM) {
             TELEPHONY_LOGE("ProcessVoiceRadioInfo failed commaNum: [%{public}d]", commaNum);
             return HRIL_ERR_INVALID_RESPONSE;
@@ -275,7 +276,7 @@ int ProcessVoiceRadioInfo(const char *s, const HRilVoiceRadioInfo *hrilVoiceRadi
         voiceRadioInfo->sysMode = sysMode;
         NextStr(&str, &(voiceRadioInfo->sysModeName));
         NextIntNotSkipNextComma(&str, &actType);
-        voiceRadioInfo->actType = ConvertVoiceTechToRadioTech((HRilVoiceSubmode)actType);
+        voiceRadioInfo->actType = ConvertVoiceTechToRadioTech((HRilVoiceSubMode)actType);
         NextStr(&str, &(voiceRadioInfo->actName));
         return HRIL_ERR_SUCCESS;
     }
@@ -283,16 +284,16 @@ int ProcessVoiceRadioInfo(const char *s, const HRilVoiceRadioInfo *hrilVoiceRadi
 
 void ReqGetVoiceRadioTechnology(const ReqDataInfo *requestInfo)
 {
-    int err = HRIL_ERR_SUCCESS;
+    int32_t err = HRIL_ERR_SUCCESS;
     struct ReportInfo reportInfo;
     ResponseInfo *responseInfo = NULL;
     char *result = NULL;
     const long TIME_OUT = DEFAULT_TIMEOUT;
-    int ret = SendCommandLock("AT^SYSINFOEX", "^SYSINFOEX:", TIME_OUT, &responseInfo);
+    int32_t ret = SendCommandLock("AT^SYSINFOEX", "^SYSINFOEX:", TIME_OUT, &responseInfo);
     if (responseInfo == NULL) {
         TELEPHONY_LOGE("responseInfo is nullptr!");
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_NULL_POINT, HRIL_RESPONSE, 0);
-        OnModemReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+        OnModemReport(requestInfo->slotId, reportInfo, NULL, 0);
         return;
     }
     if (ret != 0 || !responseInfo->success) {
@@ -307,11 +308,11 @@ void ReqGetVoiceRadioTechnology(const ReqDataInfo *requestInfo)
     if (ret != 0) {
         TELEPHONY_LOGE("ProcessVoiceRadioInfo format  unexpected: %{public}s", result);
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_RESPONSE, HRIL_RESPONSE, 0);
-        OnModemReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+        OnModemReport(requestInfo->slotId, reportInfo, NULL, 0);
         FreeResponseInfo(responseInfo);
         return;
     }
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-    OnModemReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&voiceRadioInfo, sizeof(HRilVoiceRadioInfo));
+    OnModemReport(requestInfo->slotId, reportInfo, (const uint8_t *)&voiceRadioInfo, sizeof(HRilVoiceRadioInfo));
     FreeResponseInfo(responseInfo);
 }

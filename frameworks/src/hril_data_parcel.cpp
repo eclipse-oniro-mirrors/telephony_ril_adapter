@@ -21,49 +21,49 @@ namespace OHOS {
 namespace Telephony {
 bool SetupDataCallResultInfo::ReadFromParcel(Parcel &parcel)
 {
-    if (!ReadBaseInt32(parcel, flag)) {
+    if (!Read(parcel, flag)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, reason)) {
+    if (!Read(parcel, reason)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, retryTime)) {
+    if (!Read(parcel, retryTime)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, cid)) {
+    if (!Read(parcel, cid)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, active)) {
+    if (!Read(parcel, active)) {
         return false;
     }
-    if (!ReadBaseString(parcel, type)) {
+    if (!Read(parcel, type)) {
         return false;
     }
-    if (!ReadBaseString(parcel, netPortName)) {
+    if (!Read(parcel, netPortName)) {
         return false;
     }
-    if (!ReadBaseString(parcel, address)) {
+    if (!Read(parcel, address)) {
         return false;
     }
-    if (!ReadBaseString(parcel, dns)) {
+    if (!Read(parcel, dns)) {
         return false;
     }
-    if (!ReadBaseString(parcel, dnsSec)) {
+    if (!Read(parcel, dnsSec)) {
         return false;
     }
-    if (!ReadBaseString(parcel, gateway)) {
+    if (!Read(parcel, gateway)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, maxTransferUnit)) {
+    if (!Read(parcel, maxTransferUnit)) {
         return false;
     }
-    if (!ReadBaseString(parcel, pCscfPrimAddr)) {
+    if (!Read(parcel, pCscfPrimAddr)) {
         return false;
     }
-    if (!ReadBaseString(parcel, pCscfSecAddr)) {
+    if (!Read(parcel, pCscfSecAddr)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, pduSessionId)) {
+    if (!Read(parcel, pduSessionId)) {
         return false;
     }
     return true;
@@ -71,49 +71,49 @@ bool SetupDataCallResultInfo::ReadFromParcel(Parcel &parcel)
 
 bool SetupDataCallResultInfo::Marshalling(Parcel &parcel) const
 {
-    if (!WriteBaseInt32(parcel, flag)) {
+    if (!Write(parcel, flag)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, reason)) {
+    if (!Write(parcel, reason)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, retryTime)) {
+    if (!Write(parcel, retryTime)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, cid)) {
+    if (!Write(parcel, cid)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, active)) {
+    if (!Write(parcel, active)) {
         return false;
     }
-    if (!WriteBaseString(parcel, type)) {
+    if (!Write(parcel, type)) {
         return false;
     }
-    if (!WriteBaseString(parcel, netPortName)) {
+    if (!Write(parcel, netPortName)) {
         return false;
     }
-    if (!WriteBaseString(parcel, address)) {
+    if (!Write(parcel, address)) {
         return false;
     }
-    if (!WriteBaseString(parcel, dns)) {
+    if (!Write(parcel, dns)) {
         return false;
     }
-    if (!WriteBaseString(parcel, dnsSec)) {
+    if (!Write(parcel, dnsSec)) {
         return false;
     }
-    if (!WriteBaseString(parcel, gateway)) {
+    if (!Write(parcel, gateway)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, maxTransferUnit)) {
+    if (!Write(parcel, maxTransferUnit)) {
         return false;
     }
-    if (!WriteBaseString(parcel, pCscfPrimAddr)) {
+    if (!Write(parcel, pCscfPrimAddr)) {
         return false;
     }
-    if (!WriteBaseString(parcel, pCscfSecAddr)) {
+    if (!Write(parcel, pCscfSecAddr)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, pduSessionId)) {
+    if (!Write(parcel, pduSessionId)) {
         return false;
     }
     return true;
@@ -130,7 +130,7 @@ std::shared_ptr<SetupDataCallResultInfo> SetupDataCallResultInfo::UnMarshalling(
 
 bool DataCallResultList::ReadFromParcel(Parcel &parcel)
 {
-    if (!ReadBaseInt32(parcel, size)) {
+    if (!Read(parcel, size)) {
         return false;
     }
     dcList.resize(size);
@@ -142,7 +142,7 @@ bool DataCallResultList::ReadFromParcel(Parcel &parcel)
 
 bool DataCallResultList::Marshalling(Parcel &parcel) const
 {
-    if (!WriteBaseInt32(parcel, size)) {
+    if (!Write(parcel, size)) {
         return false;
     }
     for (int32_t i = 0; i < size; i++) {
@@ -162,28 +162,28 @@ std::shared_ptr<DataCallResultList> DataCallResultList::UnMarshalling(Parcel &pa
 
 bool DataProfileDataInfo::ReadFromParcel(Parcel &parcel)
 {
-    if (!ReadBaseInt32(parcel, serial)) {
+    if (!Read(parcel, serial)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, profileId)) {
+    if (!Read(parcel, profileId)) {
         return false;
     }
-    if (!ReadBaseString(parcel, apn)) {
+    if (!Read(parcel, apn)) {
         return false;
     }
-    if (!ReadBaseString(parcel, protocol)) {
+    if (!Read(parcel, protocol)) {
         return false;
     }
-    if (!ReadBaseString(parcel, roamingProtocol)) {
+    if (!Read(parcel, roamingProtocol)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, verType)) {
+    if (!Read(parcel, verType)) {
         return false;
     }
-    if (!ReadBaseString(parcel, userName)) {
+    if (!Read(parcel, userName)) {
         return false;
     }
-    if (!ReadBaseString(parcel, password)) {
+    if (!Read(parcel, password)) {
         return false;
     }
     return true;
@@ -191,28 +191,28 @@ bool DataProfileDataInfo::ReadFromParcel(Parcel &parcel)
 
 bool DataProfileDataInfo::Marshalling(Parcel &parcel) const
 {
-    if (!WriteBaseInt32(parcel, serial)) {
+    if (!Write(parcel, serial)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, profileId)) {
+    if (!Write(parcel, profileId)) {
         return false;
     }
-    if (!WriteBaseString(parcel, apn)) {
+    if (!Write(parcel, apn)) {
         return false;
     }
-    if (!WriteBaseString(parcel, protocol)) {
+    if (!Write(parcel, protocol)) {
         return false;
     }
-    if (!WriteBaseString(parcel, roamingProtocol)) {
+    if (!Write(parcel, roamingProtocol)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, verType)) {
+    if (!Write(parcel, verType)) {
         return false;
     }
-    if (!WriteBaseString(parcel, userName)) {
+    if (!Write(parcel, userName)) {
         return false;
     }
-    if (!WriteBaseString(parcel, password)) {
+    if (!Write(parcel, password)) {
         return false;
     }
     return true;
@@ -229,17 +229,17 @@ std::shared_ptr<DataProfileDataInfo> DataProfileDataInfo::UnMarshalling(Parcel &
 
 bool DataProfilesInfo::ReadFromParcel(Parcel &parcel)
 {
-    if (!ReadBaseInt32(parcel, serial)) {
+    if (!Read(parcel, serial)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, profilesSize)) {
+    if (!Read(parcel, profilesSize)) {
         return false;
     }
     profiles.resize(profilesSize);
     for (int32_t i = 0; i < profilesSize; i++) {
         profiles[i].ReadFromParcel(parcel);
     }
-    if (!ReadBaseBool(parcel, isRoaming)) {
+    if (!Read(parcel, isRoaming)) {
         return false;
     }
     return true;
@@ -247,16 +247,16 @@ bool DataProfilesInfo::ReadFromParcel(Parcel &parcel)
 
 bool DataProfilesInfo::Marshalling(Parcel &parcel) const
 {
-    if (!WriteBaseInt32(parcel, serial)) {
+    if (!Write(parcel, serial)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, profilesSize)) {
+    if (!Write(parcel, profilesSize)) {
         return false;
     }
     for (int32_t i = 0; i < profilesSize; i++) {
         profiles[i].Marshalling(parcel);
     }
-    if (!WriteBaseBool(parcel, isRoaming)) {
+    if (!Write(parcel, isRoaming)) {
         return false;
     }
     return true;
@@ -273,20 +273,20 @@ std::shared_ptr<DataProfilesInfo> DataProfilesInfo::UnMarshalling(Parcel &parcel
 
 bool DataCallInfo::ReadFromParcel(Parcel &parcel)
 {
-    if (!ReadBaseInt32(parcel, serial)) {
+    if (!Read(parcel, serial)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, radioTechnology)) {
+    if (!Read(parcel, radioTechnology)) {
         return false;
     }
     dataProfileInfo.ReadFromParcel(parcel);
-    if (!ReadBaseBool(parcel, modemCognitive)) {
+    if (!Read(parcel, modemCognitive)) {
         return false;
     }
-    if (!ReadBaseBool(parcel, roamingAllowed)) {
+    if (!Read(parcel, roamingAllowed)) {
         return false;
     }
-    if (!ReadBaseBool(parcel, isRoaming)) {
+    if (!Read(parcel, isRoaming)) {
         return false;
     }
     return true;
@@ -294,20 +294,20 @@ bool DataCallInfo::ReadFromParcel(Parcel &parcel)
 
 bool DataCallInfo::Marshalling(Parcel &parcel) const
 {
-    if (!WriteBaseInt32(parcel, serial)) {
+    if (!Write(parcel, serial)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, radioTechnology)) {
+    if (!Write(parcel, radioTechnology)) {
         return false;
     }
     dataProfileInfo.Marshalling(parcel);
-    if (!WriteBaseBool(parcel, modemCognitive)) {
+    if (!Write(parcel, modemCognitive)) {
         return false;
     }
-    if (!WriteBaseBool(parcel, roamingAllowed)) {
+    if (!Write(parcel, roamingAllowed)) {
         return false;
     }
-    if (!WriteBaseBool(parcel, isRoaming)) {
+    if (!Write(parcel, isRoaming)) {
         return false;
     }
     return true;
@@ -324,34 +324,34 @@ std::shared_ptr<DataCallInfo> DataCallInfo::UnMarshalling(Parcel &parcel)
 
 bool DataLinkBandwidthInfo::ReadFromParcel(Parcel &parcel)
 {
-    if (!ReadBaseInt32(parcel, serial)) {
+    if (!Read(parcel, serial)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, cid)) {
+    if (!Read(parcel, cid)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, qi)) {
+    if (!Read(parcel, qi)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, dlGfbr)) {
+    if (!Read(parcel, dlGfbr)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, ulGfbr)) {
+    if (!Read(parcel, ulGfbr)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, dlMfbr)) {
+    if (!Read(parcel, dlMfbr)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, ulMfbr)) {
+    if (!Read(parcel, ulMfbr)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, ulSambr)) {
+    if (!Read(parcel, ulSambr)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, dlSambr)) {
+    if (!Read(parcel, dlSambr)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, averagingWindow)) {
+    if (!Read(parcel, averagingWindow)) {
         return false;
     }
     return true;
@@ -359,34 +359,34 @@ bool DataLinkBandwidthInfo::ReadFromParcel(Parcel &parcel)
 
 bool DataLinkBandwidthInfo::Marshalling(Parcel &parcel) const
 {
-    if (!WriteBaseInt32(parcel, serial)) {
+    if (!Write(parcel, serial)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, cid)) {
+    if (!Write(parcel, cid)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, qi)) {
+    if (!Write(parcel, qi)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, dlGfbr)) {
+    if (!Write(parcel, dlGfbr)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, ulGfbr)) {
+    if (!Write(parcel, ulGfbr)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, dlMfbr)) {
+    if (!Write(parcel, dlMfbr)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, ulMfbr)) {
+    if (!Write(parcel, ulMfbr)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, ulSambr)) {
+    if (!Write(parcel, ulSambr)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, dlSambr)) {
+    if (!Write(parcel, dlSambr)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, averagingWindow)) {
+    if (!Write(parcel, averagingWindow)) {
         return false;
     }
     return true;
@@ -394,8 +394,7 @@ bool DataLinkBandwidthInfo::Marshalling(Parcel &parcel) const
 
 std::shared_ptr<DataLinkBandwidthInfo> DataLinkBandwidthInfo::UnMarshalling(Parcel &parcel)
 {
-    std::shared_ptr<DataLinkBandwidthInfo> param =
-        std::make_shared<DataLinkBandwidthInfo>();
+    std::shared_ptr<DataLinkBandwidthInfo> param = std::make_shared<DataLinkBandwidthInfo>();
     if (param == nullptr || !param->ReadFromParcel(parcel)) {
         param = nullptr;
     }
@@ -405,36 +404,36 @@ std::shared_ptr<DataLinkBandwidthInfo> DataLinkBandwidthInfo::UnMarshalling(Parc
 bool DataLinkBandwidthReportingRule::ReadFromParcel(Parcel &parcel)
 {
     int i;
-    if (!ReadBaseInt32(parcel, serial)) {
+    if (!Read(parcel, serial)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, rat)) {
+    if (!Read(parcel, rat)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, delayMs)) {
+    if (!Read(parcel, delayMs)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, delayUplinkKbps)) {
+    if (!Read(parcel, delayUplinkKbps)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, delayDownlinkKbps)) {
+    if (!Read(parcel, delayDownlinkKbps)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, maximumUplinkKbpsSize)) {
+    if (!Read(parcel, maximumUplinkKbpsSize)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, maximumDownlinkKbpsSize)) {
+    if (!Read(parcel, maximumDownlinkKbpsSize)) {
         return false;
     }
     maximumUplinkKbps.resize(maximumUplinkKbpsSize);
     for (i = 0; i < maximumUplinkKbpsSize; i++) {
-        if (!ReadBaseInt32(parcel, maximumUplinkKbps[i])) {
+        if (!Read(parcel, maximumUplinkKbps[i])) {
             return false;
         }
     }
     maximumDownlinkKbps.resize(maximumDownlinkKbpsSize);
     for (i = 0; i < maximumDownlinkKbpsSize; i++) {
-        if (!ReadBaseInt32(parcel, maximumDownlinkKbps[i])) {
+        if (!Read(parcel, maximumDownlinkKbps[i])) {
             return false;
         }
     }
@@ -444,34 +443,34 @@ bool DataLinkBandwidthReportingRule::ReadFromParcel(Parcel &parcel)
 bool DataLinkBandwidthReportingRule::Marshalling(Parcel &parcel) const
 {
     int i;
-    if (!WriteBaseInt32(parcel, serial)) {
+    if (!Write(parcel, serial)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, rat)) {
+    if (!Write(parcel, rat)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, delayMs)) {
+    if (!Write(parcel, delayMs)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, delayUplinkKbps)) {
+    if (!Write(parcel, delayUplinkKbps)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, delayDownlinkKbps)) {
+    if (!Write(parcel, delayDownlinkKbps)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, maximumUplinkKbpsSize)) {
+    if (!Write(parcel, maximumUplinkKbpsSize)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, maximumDownlinkKbpsSize)) {
+    if (!Write(parcel, maximumDownlinkKbpsSize)) {
         return false;
     }
     for (i = 0; i < maximumUplinkKbpsSize; i++) {
-        if (!WriteBaseInt32(parcel, maximumUplinkKbps[i])) {
+        if (!Write(parcel, maximumUplinkKbps[i])) {
             return false;
         }
     }
     for (i = 0; i < maximumDownlinkKbpsSize; i++) {
-        if (!WriteBaseInt32(parcel, maximumDownlinkKbps[i])) {
+        if (!Write(parcel, maximumDownlinkKbps[i])) {
             return false;
         }
     }
@@ -480,8 +479,7 @@ bool DataLinkBandwidthReportingRule::Marshalling(Parcel &parcel) const
 
 std::shared_ptr<DataLinkBandwidthReportingRule> DataLinkBandwidthReportingRule::UnMarshalling(Parcel &parcel)
 {
-    std::shared_ptr<DataLinkBandwidthReportingRule> param =
-        std::make_shared<DataLinkBandwidthReportingRule>();
+    std::shared_ptr<DataLinkBandwidthReportingRule> param = std::make_shared<DataLinkBandwidthReportingRule>();
     if (param == nullptr || !param->ReadFromParcel(parcel)) {
         param = nullptr;
     }

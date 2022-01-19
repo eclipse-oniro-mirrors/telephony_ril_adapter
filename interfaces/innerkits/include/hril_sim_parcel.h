@@ -161,7 +161,7 @@ struct SimProtocolResponse : public HrilBaseParcel {
 
 struct ApduSimIORequestInfo : public HrilBaseParcel {
     int32_t serial;
-    int32_t chanId;
+    int32_t channelId;
     int32_t type;
     int32_t instruction;
     int32_t p1;

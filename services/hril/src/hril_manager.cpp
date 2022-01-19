@@ -20,110 +20,77 @@
 
 namespace OHOS {
 namespace Telephony {
-using namespace std;
-
-std::map<int, std::unique_ptr<HRilManager>> g_manager;
-pthread_rwlock_t *GetRadioServiceLock()
-{
-    return &g_radioServiceRwLock;
-}
+static std::unique_ptr<HRilManager> g_manager = std::make_unique<HRilManager>();
 
 // Distribute the request event to a specific card slot processing flow
-static void DispatchModule(int32_t slotId, int32_t cmd, struct HdfSBuf *data)
+static int32_t DispatchModule(int32_t slotId, int32_t cmd, struct HdfSBuf *data)
 {
-    auto itFunc = g_manager.find(slotId);
-    if (itFunc != g_manager.end()) {
-        auto &manager = itFunc->second;
-        if (manager != nullptr) {
-            int32_t ret = manager->Dispatch(slotId, cmd, data);
-            if (ret != HRIL_ERR_SUCCESS) {
-                TELEPHONY_LOGE("HRilManager::Dispatch is failed!");
-            }
-        } else {
-            TELEPHONY_LOGE("Manager is nullptr, id:%{public}d, addr:%{public}p!", slotId, &manager);
-        }
-    } else {
-        TELEPHONY_LOGE("Can not find slotId in g_manager: %{public}d!", slotId);
+    if (g_manager == nullptr) {
+        TELEPHONY_LOGE("Manager is nullptr, id:%{public}d!", slotId);
+        return HDF_FAILURE;
     }
+    int32_t ret = g_manager->Dispatch(slotId, cmd, data);
+    if (ret != HRIL_ERR_SUCCESS) {
+        TELEPHONY_LOGE("HRilManager::Dispatch is failed!");
+        return ret;
+    }
+    return ret;
 }
 
-static void RegisterManagerNotifyCallback(int32_t slotId, const HdfRemoteService *serviceCallbackInd)
+static int32_t RegisterManagerNotifyCallback(const HdfRemoteService *serviceCallbackInd)
 {
-    auto itFunc = g_manager.find(slotId);
-    if (itFunc != g_manager.end()) {
-        auto &manager = itFunc->second;
-        if (manager != nullptr) {
-            manager->RegisterModulesNotifyCallback(serviceCallbackInd);
-        } else {
-            TELEPHONY_LOGE("Manager is nullptr, id:%{public}d, addr:%{public}p!", slotId, &manager);
-        }
-    } else {
-        TELEPHONY_LOGE("Can not find slotId in g_manager: %{public}d!", slotId);
+    if (g_manager == nullptr) {
+        TELEPHONY_LOGE("HRilManager is nullptr!");
+        return HDF_FAILURE;
     }
+    g_manager->RegisterModulesNotifyCallback(serviceCallbackInd);
+    return HRIL_ERR_SUCCESS;
 }
 
-static void RegisterManagerResponseCallback(int32_t slotId, const HdfRemoteService *serviceCallbackInd)
+static int32_t RegisterManagerResponseCallback(const HdfRemoteService *serviceCallbackResp)
 {
-    auto itFunc = g_manager.find(slotId);
-    if (itFunc != g_manager.end()) {
-        auto &manager = itFunc->second;
-        if (manager != nullptr) {
-            manager->RegisterModulesResponseCallback(serviceCallbackInd);
-        } else {
-            TELEPHONY_LOGE("Manager is nullptr, id:%{public}d, addr:%{public}p!", slotId, &manager);
-        }
-    } else {
-        TELEPHONY_LOGE("Can not find slotId in g_manager: %{public}d!", slotId);
+    if (g_manager == nullptr) {
+        TELEPHONY_LOGE("HRilManager is nullptr!");
+        return HDF_FAILURE;
     }
+    g_manager->RegisterModulesResponseCallback(serviceCallbackResp);
+    return HRIL_ERR_SUCCESS;
 }
 
 int32_t HRilManager::Dispatch(int32_t slotId, int32_t code, struct HdfSBuf *data)
 {
-    if (hrilCall_ != nullptr && hrilCall_->IsCallRespOrNotify(code)) {
-        hrilCall_->ProcessCallRequest(slotId, code, data);
+    if (hrilCall_[slotId] != nullptr && hrilCall_[slotId]->IsCallRespOrNotify(code)) {
+        hrilCall_[slotId]->ProcessRequest<HRilCall>(code, data);
         return HRIL_ERR_SUCCESS;
     }
-    if (hrilSms_ != nullptr && hrilSms_->IsSmsRespOrNotify(code)) {
-        hrilSms_->ProcessSmsRequest(slotId, code, data);
+    if (hrilSms_[slotId] != nullptr && hrilSms_[slotId]->IsSmsRespOrNotify(code)) {
+        hrilSms_[slotId]->ProcessRequest<HRilSms>(code, data);
         return HRIL_ERR_SUCCESS;
     }
-    if (hrilSim_ != nullptr && hrilSim_->IsSimRespOrNotify(code)) {
-        hrilSim_->ProcessSimRequest(slotId, code, data);
+    if (hrilSim_[slotId] != nullptr && hrilSim_[slotId]->IsSimRespOrNotify(code)) {
+        hrilSim_[slotId]->ProcessRequest<HRilSim>(code, data);
         return HRIL_ERR_SUCCESS;
     }
-    if (hrilNetwork_ != nullptr && hrilNetwork_->IsNetworkRespOrNotify(code)) {
-        hrilNetwork_->ProcessNetworkRequest(slotId, code, data);
+    if (hrilNetwork_[slotId] != nullptr && hrilNetwork_[slotId]->IsNetworkRespOrNotify(code)) {
+        hrilNetwork_[slotId]->ProcessRequest<HRilNetwork>(code, data);
         return HRIL_ERR_SUCCESS;
     }
-    if (hrilModem_ != nullptr && hrilModem_->IsModemRespOrNotify(code)) {
-        hrilModem_->ProcessCommonRequest(slotId, code, data);
+    if (hrilModem_[slotId] != nullptr && hrilModem_[slotId]->IsModemRespOrNotify(code)) {
+        hrilModem_[slotId]->ProcessRequest<HRilModem>(code, data);
         return HRIL_ERR_SUCCESS;
     }
-    if (hrilData_ != nullptr && hrilData_->IsDataRespOrNotify(code)) {
-        hrilData_->ProcessDataRequest(slotId, code, data);
+    if (hrilData_[slotId] != nullptr && hrilData_[slotId]->IsDataRespOrNotify(code)) {
+        hrilData_[slotId]->ProcessRequest<HRilData>(code, data);
         return HRIL_ERR_SUCCESS;
     }
     return HDF_FAILURE;
-}
-
-int32_t HRilManager::ReportToParent(int32_t requestNum, const HdfSBuf *dataSbuf)
-{
-    int32_t ret;
-    if (serviceCallback_ != nullptr && serviceCallback_->dispatcher != nullptr) {
-        ret = serviceCallback_->dispatcher->Dispatch(
-            const_cast<HdfRemoteService *>(serviceCallback_), requestNum, const_cast<HdfSBuf *>(dataSbuf), nullptr);
-    } else {
-        TELEPHONY_LOGE("it is null, serviceCallback_=%{public}p", serviceCallback_);
-        ret = HDF_FAILURE;
-    }
-    return ret;
 }
 
 ReqDataInfo *HRilManager::CreateHRilRequest(int32_t serial, int32_t slotId, int32_t request)
 {
     ReqDataInfo *requestInfo = nullptr;
     HRilSimSlotId simSlotId = (HRilSimSlotId)slotId;
-    requestInfo = (ReqDataInfo *)calloc(1, sizeof(ReqDataInfo));
+    requestInfo = (ReqDataInfo *)malloc(sizeof(ReqDataInfo));
     if (requestInfo == nullptr) {
         return nullptr;
     }
@@ -135,9 +102,9 @@ ReqDataInfo *HRilManager::CreateHRilRequest(int32_t serial, int32_t slotId, int3
     if (iter != requestList_.end()) {
         std::list<ReqDataInfo *> &reqDataSet = iter->second;
         reqDataSet.push_back(requestInfo);
-        TELEPHONY_LOGI("CreateHRilRequest requestid=%{public}d, list size: %{public}zu", request, reqDataSet.size());
+        TELEPHONY_LOGI("CreateHRilRequest requestId=%{public}d, list size: %{public}zu", request, reqDataSet.size());
     } else {
-        TELEPHONY_LOGI("CreateHRilRequest  create requestlist, requestid=%{public}d", request);
+        TELEPHONY_LOGI("CreateHRilRequest  create requestList, requestId=%{public}d", request);
         std::list<ReqDataInfo *> reqDataSet;
         reqDataSet.push_back(requestInfo);
         requestList_.emplace(request, reqDataSet);
@@ -159,6 +126,19 @@ void HRilManager::ReleaseHRilRequest(int32_t request, ReqDataInfo *requestInfo)
             reqDataSet.erase(it);
         }
     }
+}
+
+int32_t HRilManager::ReportToParent(int32_t requestNum, const HdfSBuf *dataSbuf)
+{
+    int32_t ret;
+    if (serviceCallback_ != nullptr && serviceCallback_->dispatcher != nullptr) {
+        ret = serviceCallback_->dispatcher->Dispatch(
+            const_cast<HdfRemoteService *>(serviceCallback_), requestNum, const_cast<HdfSBuf *>(dataSbuf), nullptr);
+    } else {
+        TELEPHONY_LOGE("it is null, serviceCallback_=%{public}p", serviceCallback_);
+        ret = HDF_FAILURE;
+    }
+    return ret;
 }
 
 int32_t HRilManager::NotifyToParent(int32_t requestNum, const HdfSBuf *dataSbuf)
@@ -184,218 +164,122 @@ void HRilManager::RegisterModulesResponseCallback(const HdfRemoteService *servic
     serviceCallback_ = serviceCallback;
 }
 
-void HRilManager::RegisterCallFuncs(const HRilCallReq *callFuncs)
+void HRilManager::RegisterCallFuncs(int32_t slotId, const HRilCallReq *callFuncs)
 {
-    if (hrilCall_ != nullptr) {
-        hrilCall_->RegisterCallFuncs(callFuncs);
+    if (hrilCall_[slotId] != nullptr) {
+        hrilCall_[slotId]->RegisterCallFuncs(callFuncs);
     }
 }
 
-void HRilManager::RegisterDataFuncs(const HRilDataReq *dataFuncs)
+void HRilManager::RegisterDataFuncs(int32_t slotId, const HRilDataReq *dataFuncs)
 {
-    if (hrilData_ != nullptr) {
-        hrilData_->RegisterDataFuncs(dataFuncs);
+    if (hrilData_[slotId] != nullptr) {
+        hrilData_[slotId]->RegisterDataFuncs(dataFuncs);
     }
 }
 
-void HRilManager::RegisterModemFuncs(const HRilModemReq *modemFuncs)
+void HRilManager::RegisterModemFuncs(int32_t slotId, const HRilModemReq *modemFuncs)
 {
-    if (hrilModem_ != nullptr) {
-        hrilModem_->RegisterModemFuncs(modemFuncs);
+    if (hrilModem_[slotId] != nullptr) {
+        hrilModem_[slotId]->RegisterModemFuncs(modemFuncs);
     }
 }
 
-void HRilManager::RegisterNetworkFuncs(const HRilNetworkReq *networkFuncs)
+void HRilManager::RegisterNetworkFuncs(int32_t slotId, const HRilNetworkReq *networkFuncs)
 {
-    if (hrilNetwork_ != nullptr) {
-        hrilNetwork_->RegisterNetworkFuncs(networkFuncs);
+    if (hrilNetwork_[slotId] != nullptr) {
+        hrilNetwork_[slotId]->RegisterNetworkFuncs(networkFuncs);
     }
 }
 
-void HRilManager::RegisterSimFuncs(const HRilSimReq *simFuncs)
+void HRilManager::RegisterSimFuncs(int32_t slotId, const HRilSimReq *simFuncs)
 {
-    if (hrilSim_ != nullptr) {
-        hrilSim_->RegisterSimFuncs(simFuncs);
+    if (hrilSim_[slotId] != nullptr) {
+        hrilSim_[slotId]->RegisterSimFuncs(simFuncs);
     }
 }
 
-void HRilManager::RegisterSmsFuncs(const HRilSmsReq *smsFuncs)
+void HRilManager::RegisterSmsFuncs(int32_t slotId, const HRilSmsReq *smsFuncs)
 {
-    if (hrilSms_ != nullptr) {
-        hrilSms_->RegisterSmsFuncs(smsFuncs);
+    if (hrilSms_[slotId] != nullptr) {
+        hrilSms_[slotId]->RegisterSmsFuncs(smsFuncs);
+    }
+}
+
+template<typename T>
+void HRilManager::OnReport(std::vector<std::unique_ptr<T>> &subModules, int32_t slotId, const ReportInfo *reportInfo,
+    const uint8_t *response, size_t responseLen)
+{
+    if (reportInfo == nullptr) {
+        TELEPHONY_LOGE("OnReport reportInfo is null!!!");
+        return;
+    }
+    switch (reportInfo->type) {
+        case (int32_t)ReportType::HRIL_RESPONSE: {
+            ReqDataInfo *reqInfo = (ReqDataInfo *)reportInfo->requestInfo;
+            HRilRadioResponseInfo responseInfo = {};
+            responseInfo.serial = reqInfo->serial;
+            responseInfo.error = (HRilErrType)reportInfo->error;
+            int requestId = reqInfo->request;
+            ReleaseHRilRequest(requestId, reqInfo);
+            subModules[slotId]->template ProcessResponse<T>(requestId, responseInfo, response, responseLen);
+            break;
+        }
+        case (int32_t)ReportType::HRIL_NOTIFICATION: {
+            subModules[slotId]->template ProcessNotify<T>(reportInfo, response, responseLen);
+            break;
+        }
+        default:
+            break;
     }
 }
 
 void HRilManager::OnCallReport(
     int32_t slotId, const ReportInfo *reportInfo, const uint8_t *response, size_t responseLen)
 {
-    if (reportInfo == nullptr) {
-        TELEPHONY_LOGE("OnCallReport reportInfo is null!!!");
-        return;
-    }
-    switch (reportInfo->type) {
-        case (int32_t)ReportType::HRIL_RESPONSE: {
-            ReqDataInfo *reqInfo = (ReqDataInfo *)reportInfo->requestInfo;
-            HRilRadioResponseInfo responseInfo = {};
-            responseInfo.serial = reqInfo->serial;
-            responseInfo.error = (HRilErrType)reportInfo->error;
-            int requestId = reqInfo->request;
-            ReleaseHRilRequest(requestId, reqInfo);
-            hrilCall_->ProcessCallResponse(slotId, requestId, responseInfo, response, responseLen);
-            break;
-        }
-        case (int32_t)ReportType::HRIL_NOTIFICATION: {
-            hrilCall_->ProcessCallNotify(slotId, reportInfo, response, responseLen);
-            break;
-        }
-        default:
-            break;
-    }
+    OnReport(hrilCall_, slotId, reportInfo, response, responseLen);
 }
 
 void HRilManager::OnDataReport(
     int32_t slotId, const ReportInfo *reportInfo, const uint8_t *response, size_t responseLen)
 {
-    if (reportInfo == nullptr) {
-        TELEPHONY_LOGE("OnDataReport reportInfo is null!!!");
-        return;
-    }
-    switch (reportInfo->type) {
-        case (int32_t)ReportType::HRIL_RESPONSE: {
-            ReqDataInfo *reqInfo = (ReqDataInfo *)reportInfo->requestInfo;
-            HRilRadioResponseInfo responseInfo = {};
-            responseInfo.serial = reqInfo->serial;
-            responseInfo.error = (HRilErrType)reportInfo->error;
-            int requestId = reqInfo->request;
-            ReleaseHRilRequest(requestId, reqInfo);
-            hrilData_->ProcessDataResponse(slotId, requestId, responseInfo, response, responseLen);
-            break;
-        }
-        case (int32_t)ReportType::HRIL_NOTIFICATION: {
-            hrilData_->ProcessDataNotify(slotId, reportInfo, response, responseLen);
-            break;
-        }
-        default:
-            break;
-    }
+    OnReport(hrilData_, slotId, reportInfo, response, responseLen);
 }
 
 void HRilManager::OnModemReport(
     int32_t slotId, const ReportInfo *reportInfo, const uint8_t *response, size_t responseLen)
 {
-    if (reportInfo == nullptr) {
-        TELEPHONY_LOGE("OnModemReport reportInfo is null!!!");
-        return;
-    }
-    switch (reportInfo->type) {
-        case (int32_t)ReportType::HRIL_RESPONSE: {
-            ReqDataInfo *reqInfo = (ReqDataInfo *)reportInfo->requestInfo;
-            HRilRadioResponseInfo responseInfo = {};
-            responseInfo.serial = reqInfo->serial;
-            responseInfo.error = (HRilErrType)reportInfo->error;
-            int requestId = reqInfo->request;
-            ReleaseHRilRequest(requestId, reqInfo);
-            hrilModem_->ProcessModemResponse(slotId, requestId, responseInfo, response, responseLen);
-            break;
-        }
-        case (int32_t)ReportType::HRIL_NOTIFICATION: {
-            hrilModem_->ProcessModemNotify(slotId, reportInfo, response, responseLen);
-            break;
-        }
-        default:
-            break;
-    }
+    OnReport(hrilModem_, slotId, reportInfo, response, responseLen);
 }
 
 void HRilManager::OnNetworkReport(
     int32_t slotId, const ReportInfo *reportInfo, const uint8_t *response, size_t responseLen)
 {
-    if (reportInfo == nullptr) {
-        TELEPHONY_LOGE("OnNetworkReport reportInfo is null!!!");
-        return;
-    }
-    switch (reportInfo->type) {
-        case (int32_t)ReportType::HRIL_RESPONSE: {
-            ReqDataInfo *reqInfo = (ReqDataInfo *)reportInfo->requestInfo;
-            HRilRadioResponseInfo responseInfo = {};
-            responseInfo.serial = reqInfo->serial;
-            responseInfo.error = (HRilErrType)reportInfo->error;
-            int requestId = reqInfo->request;
-            ReleaseHRilRequest(requestId, reqInfo);
-            hrilNetwork_->ProcessNetworkResponse(slotId, requestId, responseInfo, response, responseLen);
-            break;
-        }
-        case (int32_t)ReportType::HRIL_NOTIFICATION: {
-            hrilNetwork_->ProcessNetworkNotify(slotId, reportInfo, response, responseLen);
-            break;
-        }
-        default:
-            break;
-    }
+    OnReport(hrilNetwork_, slotId, reportInfo, response, responseLen);
 }
 
 void HRilManager::OnSimReport(
     int32_t slotId, const ReportInfo *reportInfo, const uint8_t *response, size_t responseLen)
 {
-    if (reportInfo == nullptr) {
-        TELEPHONY_LOGE("OnSimReport reportInfo is null!!!");
-        return;
-    }
-    switch (reportInfo->type) {
-        case (int32_t)ReportType::HRIL_RESPONSE: {
-            ReqDataInfo *reqInfo = (ReqDataInfo *)reportInfo->requestInfo;
-            HRilRadioResponseInfo responseInfo = {};
-            responseInfo.serial = reqInfo->serial;
-            responseInfo.error = (HRilErrType)reportInfo->error;
-            int requestId = reqInfo->request;
-            ReleaseHRilRequest(requestId, reqInfo);
-            hrilSim_->ProcessSimResponse(slotId, requestId, responseInfo, response, responseLen);
-            break;
-        }
-        case (int32_t)ReportType::HRIL_NOTIFICATION: {
-            hrilSim_->ProcessSimNotify(slotId, reportInfo, response, responseLen);
-            break;
-        }
-        default:
-            break;
-    }
+    OnReport(hrilSim_, slotId, reportInfo, response, responseLen);
 }
 
 void HRilManager::OnSmsReport(
     int32_t slotId, const ReportInfo *reportInfo, const uint8_t *response, size_t responseLen)
 {
-    if (reportInfo == nullptr) {
-        TELEPHONY_LOGE("OnSmsReport reportInfo is null!!!");
-        return;
-    }
-    switch (reportInfo->type) {
-        case (int32_t)ReportType::HRIL_RESPONSE: {
-            ReqDataInfo *reqInfo = (ReqDataInfo *)reportInfo->requestInfo;
-            HRilRadioResponseInfo responseInfo = {};
-            responseInfo.serial = reqInfo->serial;
-            responseInfo.error = (HRilErrType)reportInfo->error;
-            int requestId = reqInfo->request;
-            ReleaseHRilRequest(requestId, reqInfo);
-            hrilSms_->ProcessSmsResponse(slotId, requestId, responseInfo, response, responseLen);
-            break;
-        }
-        case (int32_t)ReportType::HRIL_NOTIFICATION: {
-            hrilSms_->ProcessSmsNotify(slotId, reportInfo, response, responseLen);
-            break;
-        }
-        default:
-            break;
-    }
+    OnReport(hrilSms_, slotId, reportInfo, response, responseLen);
 }
 
 HRilManager::HRilManager()
 {
-    hrilCall_ = std::make_unique<HRilCall>(*this);
-    hrilModem_ = std::make_unique<HRilModem>(*this);
-    hrilNetwork_ = std::make_unique<HRilNetwork>(*this);
-    hrilSim_ = std::make_unique<HRilSim>(*this);
-    hrilSms_ = std::make_unique<HRilSms>(*this);
-    hrilData_ = std::make_unique<HRilData>(*this);
+    for (int32_t slotId = HRIL_SIM_SLOT_0; slotId < HRIL_SIM_SLOT_NUM; slotId++) {
+        hrilCall_.push_back(std::make_unique<HRilCall>(slotId, *this));
+        hrilModem_.push_back(std::make_unique<HRilModem>(slotId, *this));
+        hrilNetwork_.push_back(std::make_unique<HRilNetwork>(slotId, *this));
+        hrilSim_.push_back(std::make_unique<HRilSim>(slotId, *this));
+        hrilSms_.push_back(std::make_unique<HRilSms>(slotId, *this));
+        hrilData_.push_back(std::make_unique<HRilData>(slotId, *this));
+    }
 }
 
 HRilManager::~HRilManager() {}
@@ -404,7 +288,7 @@ HRilManager::~HRilManager() {}
 extern "C" {
 #endif
 
-int32_t DispatchRequest(int32_t slotId, int32_t cmd, struct HdfSBuf *data)
+int32_t DispatchRequest(int32_t cmd, struct HdfSBuf *data)
 {
     if (data == nullptr) {
         TELEPHONY_LOGE("miss callback parameter");
@@ -417,7 +301,7 @@ int32_t DispatchRequest(int32_t slotId, int32_t cmd, struct HdfSBuf *data)
                 TELEPHONY_LOGE("miss callback parameter");
                 return HDF_ERR_INVALID_PARAM;
             }
-            RegisterManagerNotifyCallback(slotId, serviceCallbackInd);
+            RegisterManagerNotifyCallback(serviceCallbackInd);
             break;
         }
         case HRIL_ADAPTER_RADIO_RESPONSE: {
@@ -426,18 +310,24 @@ int32_t DispatchRequest(int32_t slotId, int32_t cmd, struct HdfSBuf *data)
                 TELEPHONY_LOGE("miss callback parameter");
                 return HDF_ERR_INVALID_PARAM;
             }
-            RegisterManagerResponseCallback(slotId, serviceCallback);
+            RegisterManagerResponseCallback(serviceCallback);
             break;
         }
         default:
-            DispatchModule(slotId, cmd, data);
+            int32_t slotId = 0;
+            if (!HdfSbufReadInt32(data, &slotId)) {
+                TELEPHONY_LOGE("Hdf sbuf read slotId is failed!");
+            }
+            return DispatchModule(slotId, cmd, data);
     }
     return HRIL_ERR_SUCCESS;
 }
 
 void HRilRegOps(const HRilOps *hrilOps)
 {
-    int i;
+    static HRilOps callBacks = {0};
+    static RegisterState rilRegisterStatus = RIL_REGISTER_IS_NONE;
+
     if (hrilOps == nullptr) {
         TELEPHONY_LOGE("HRilRegOps: HRilRegOps * nullptr");
         return;
@@ -447,119 +337,82 @@ void HRilRegOps(const HRilOps *hrilOps)
         return;
     }
     rilRegisterStatus = RIL_REGISTER_IS_RUNNING;
-    (void)memcpy_s(&g_callBacks, sizeof(HRilOps), hrilOps, sizeof(HRilOps));
 
-    for (i = HRIL_SIM_SLOT_0; i < HRIL_SIM_SLOT_NUM; i++) {
-        g_manager[i] = std::make_unique<HRilManager>();
-        if (g_callBacks.smsOps != nullptr) {
-            g_manager[i]->RegisterSmsFuncs(g_callBacks.smsOps);
+    (void)memcpy_s(&callBacks, sizeof(HRilOps), hrilOps, sizeof(HRilOps));
+    for (int32_t slotId = HRIL_SIM_SLOT_0; slotId < HRIL_SIM_SLOT_NUM; slotId++) {
+        if (callBacks.smsOps != nullptr) {
+            g_manager->RegisterSmsFuncs(slotId, callBacks.smsOps);
         }
-        if (g_callBacks.callOps != nullptr) {
-            g_manager[i]->RegisterCallFuncs(g_callBacks.callOps);
+        if (callBacks.callOps != nullptr) {
+            g_manager->RegisterCallFuncs(slotId, callBacks.callOps);
         }
-        if (g_callBacks.dataOps != nullptr) {
-            g_manager[i]->RegisterDataFuncs(g_callBacks.dataOps);
+        if (callBacks.dataOps != nullptr) {
+            g_manager->RegisterDataFuncs(slotId, callBacks.dataOps);
         }
-        if (g_callBacks.modemOps != nullptr) {
-            g_manager[i]->RegisterModemFuncs(g_callBacks.modemOps);
+        if (callBacks.modemOps != nullptr) {
+            g_manager->RegisterModemFuncs(slotId, callBacks.modemOps);
         }
-        if (g_callBacks.networkOps != nullptr) {
-            g_manager[i]->RegisterNetworkFuncs(g_callBacks.networkOps);
+        if (callBacks.networkOps != nullptr) {
+            g_manager->RegisterNetworkFuncs(slotId, callBacks.networkOps);
         }
-        if (g_callBacks.simOps != nullptr) {
-            g_manager[i]->RegisterSimFuncs(g_callBacks.simOps);
+        if (callBacks.simOps != nullptr) {
+            g_manager->RegisterSimFuncs(slotId, callBacks.simOps);
         }
     }
 }
 
 void OnCallReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen)
 {
-    auto itFunc = g_manager.find(slotId);
-    if (itFunc != g_manager.end()) {
-        auto &manager = itFunc->second;
-        if (manager != nullptr) {
-            manager->OnCallReport(slotId, &reportInfo, response, responseLen);
-        } else {
-            TELEPHONY_LOGE("Manager is nullptr, id:%{public}d, addr:%{public}p!", slotId, &manager);
-        }
-    } else {
-        TELEPHONY_LOGE("Can not find slotId in g_manager: %{public}d!", slotId);
+    if (g_manager == nullptr) {
+        TELEPHONY_LOGE("HrilManager is nullptr, id:%{public}d, addr:%{public}p!", slotId, &g_manager);
+        return;
     }
+    g_manager->OnCallReport(slotId, &reportInfo, response, responseLen);
 }
 
 void OnDataReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen)
 {
-    auto itFunc = g_manager.find(slotId);
-    if (itFunc != g_manager.end()) {
-        auto &manager = itFunc->second;
-        if (manager != nullptr) {
-            manager->OnDataReport(slotId, &reportInfo, response, responseLen);
-        } else {
-            TELEPHONY_LOGE("Manager is nullptr, id:%{public}d, addr:%{public}p!", slotId, &manager);
-        }
-    } else {
-        TELEPHONY_LOGE("Can not find slotId in g_manager: %{public}d!", slotId);
+    if (g_manager == nullptr) {
+        TELEPHONY_LOGE("HrilManager is nullptr, id:%{public}d, addr:%{public}p!", slotId, &g_manager);
+        return;
     }
+    g_manager->OnDataReport(slotId, &reportInfo, response, responseLen);
 }
 
 void OnModemReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen)
 {
-    auto itFunc = g_manager.find(slotId);
-    if (itFunc != g_manager.end()) {
-        auto &manager = itFunc->second;
-        if (manager != nullptr) {
-            manager->OnModemReport(slotId, &reportInfo, response, responseLen);
-        } else {
-            TELEPHONY_LOGE("Manager is nullptr, id:%{public}d, addr:%{public}p!", slotId, &manager);
-        }
-    } else {
-        TELEPHONY_LOGE("Can not find slotId in g_manager: %{public}d!", slotId);
+    if (g_manager == nullptr) {
+        TELEPHONY_LOGE("HrilManager is nullptr, id:%{public}d, addr:%{public}p!", slotId, &g_manager);
+        return;
     }
+    g_manager->OnModemReport(slotId, &reportInfo, response, responseLen);
 }
 
 void OnNetworkReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen)
 {
-    auto itFunc = g_manager.find(slotId);
-    if (itFunc != g_manager.end()) {
-        auto &manager = itFunc->second;
-        if (manager != nullptr) {
-            manager->OnNetworkReport(slotId, &reportInfo, response, responseLen);
-        } else {
-            TELEPHONY_LOGE("Manager is nullptr, id:%{public}d, addr:%{public}p!", slotId, &manager);
-        }
-    } else {
-        TELEPHONY_LOGE("Can not find slotId in g_manager: %{public}d!", slotId);
+    if (g_manager == nullptr) {
+        TELEPHONY_LOGE("HrilManager is nullptr, id:%{public}d, addr:%{public}p!", slotId, &g_manager);
+        return;
     }
+    g_manager->OnNetworkReport(slotId, &reportInfo, response, responseLen);
 }
 
 void OnSimReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen)
 {
-    auto itFunc = g_manager.find(slotId);
-    if (itFunc != g_manager.end()) {
-        auto &manager = itFunc->second;
-        if (manager != nullptr) {
-            manager->OnSimReport(slotId, &reportInfo, response, responseLen);
-        } else {
-            TELEPHONY_LOGE("Manager is nullptr, id:%{public}d, addr:%{public}p!", slotId, &manager);
-        }
-    } else {
-        TELEPHONY_LOGE("Can not find slotId in g_manager: %{public}d!", slotId);
+    if (g_manager == nullptr) {
+        TELEPHONY_LOGE("HrilManager is nullptr, id:%{public}d, addr:%{public}p!", slotId, &g_manager);
+        return;
     }
+    g_manager->OnSimReport(slotId, &reportInfo, response, responseLen);
 }
 
 void OnSmsReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen)
 {
-    auto itFunc = g_manager.find(slotId);
-    if (itFunc != g_manager.end()) {
-        auto &manager = itFunc->second;
-        if (manager != nullptr) {
-            manager->OnSmsReport(slotId, &reportInfo, response, responseLen);
-        } else {
-            TELEPHONY_LOGE("Manager is nullptr, id:%{public}d, addr:%{public}p!", slotId, &manager);
-        }
-    } else {
-        TELEPHONY_LOGE("Can not find slotId in g_manager: %{public}d!", slotId);
+    if (g_manager == nullptr) {
+        TELEPHONY_LOGE("HrilManager is nullptr, id:%{public}d, addr:%{public}p!", slotId, &g_manager);
+        return;
     }
+    g_manager->OnSmsReport(slotId, &reportInfo, response, responseLen);
 }
 #ifdef __cplusplus
 }

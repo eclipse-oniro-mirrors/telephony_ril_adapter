@@ -79,7 +79,7 @@ void OnSimReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *re
     }
 }
 
-struct ReportInfo CreateReportInfo(const ReqDataInfo *requestInfo, unsigned int err, unsigned int type, int notifyId)
+struct ReportInfo CreateReportInfo(const ReqDataInfo *requestInfo, uint32_t err, uint32_t type, int32_t notifyId)
 {
     struct ReportInfo reportInfo = {(ReqDataInfo *)requestInfo, notifyId, type, err, {0, 0}};
     return reportInfo;
@@ -115,13 +115,13 @@ static void ReportCBMOrCSCB(struct ReportInfo *reportInfo)
     }
     HRilCBConfigReportInfo response = {0};
     reportInfo->notifyId = HNOTI_CB_CONFIG_REPORT;
-    int ret = ProcessCellBroadcast("+CBM:100", &response);
+    int32_t ret = ProcessCellBroadcast("+CBM:100", &response);
     if (ret > 1) {
         response.data = (char *)tempData;
     } else {
         response.pdu = (char *)tempData;
     }
-    OnSmsReport(HRIL_SIM_SLOT_0, *reportInfo, (const uint8_t *)&response, sizeof(HRilCBConfigReportInfo));
+    OnSmsReport(GetSlotId(NULL), *reportInfo, (const uint8_t *)&response, sizeof(HRilCBConfigReportInfo));
 }
 
 static void SmsStatus(const char *smsPdu, struct ReportInfo *reportInfo)
@@ -130,11 +130,9 @@ static void SmsStatus(const char *smsPdu, struct ReportInfo *reportInfo)
         TELEPHONY_LOGE("reportInfo is NULL");
         return;
     }
-    HRilSmsResponse smsResponse = {};
-    smsResponse.pdu = (char *)smsPdu;
-    int size = (smsPdu != NULL) ? strlen(smsPdu) : 0;
+    int32_t size = (smsPdu != NULL) ? strlen(smsPdu) : 0;
     reportInfo->notifyId = HNOTI_SMS_STATUS_REPORT;
-    OnSmsReport(HRIL_SIM_SLOT_0, *reportInfo, (const uint8_t *)&smsResponse, size);
+    OnSmsReport(GetSlotId(NULL), *reportInfo, (const uint8_t *)smsPdu, size);
 }
 
 static void ReportInfoInit(struct ReportInfo *reportInfo)
@@ -147,7 +145,7 @@ static void ReportInfoInit(struct ReportInfo *reportInfo)
     reportInfo->type = HRIL_NOTIFICATION;
 }
 
-static int CdmaSmsNotifyMock(const char *s, HRilSmsResponse *smsResponse)
+static int32_t CdmaSmsNotifyMock(const char *s, HRilSmsResponse *smsResponse)
 {
     char *testDataStr = ("0101020004081300031008d00106102c2870e1420801c00c01c0");
     char *testDataTmp =
@@ -162,7 +160,7 @@ static int CdmaSmsNotifyMock(const char *s, HRilSmsResponse *smsResponse)
     return HNOTI_SMS_NEW_CDMA_SMS;
 }
 
-static int WapPushNotifyMock(const char *s, HRilSmsResponse *smsResponse)
+static int32_t WapPushNotifyMock(const char *s, HRilSmsResponse *smsResponse)
 {
     char *testDataStr =
         ("0891683108200105f04408a0015608860104216092902512236e0605040b8423f0120601ae020"
@@ -197,42 +195,44 @@ void OnNotifyOps(const char *s, const char *smsPdu)
         HRilSmsResponse smsResponse = {};
         smsResponse.pdu = (char *)smsPdu;
         reportInfo.notifyId = HNOTI_SMS_NEW_SMS;
-        OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&smsResponse, sizeof(HRilSmsResponse));
+        OnSmsReport(GetSlotId(NULL), reportInfo, (const uint8_t *)&smsResponse, strlen(smsResponse.pdu));
     } else if (ReportStrWith(s, "+CDS:")) {
         SmsStatus(smsPdu, &reportInfo);
     } else if (ReportStrWith(s, "+CBM:") || ReportStrWith(s, "+CSCB:")) {
         ReportCBMOrCSCB(&reportInfo);
-        ReportCBMOrCSCB(&reportInfo); // The test requires sending two
+        ReportCBMOrCSCB(&reportInfo); // The test requires send twice
     } else if (ReportStrWith(s, "+COPS: (")) {
         char *copsStr = strdup(s);
         ProcessOperListToUse(copsStr);
         free(copsStr);
     } else if (ReportStrWith(s, "^SIMST:")) {
         reportInfo.notifyId = HNOTI_SIM_STATUS_CHANGED;
-        OnSimReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+        OnSimReport(GetSlotId(NULL), reportInfo, NULL, 0);
+    } else if (ReportStrWith(s, "^MONSC:")) {
+        ProcessCurrentCellList(reportInfo, str);
     } else if (OnNotifyStkOps(s, str)) {
         TELEPHONY_LOGI("STK notify completed.");
     } else {
         HRilSmsResponse response = {0};
         if ((reportInfo.notifyId = CdmaSmsNotifyMock(s, &response)) > 0) {
-            OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&response, sizeof(HRilSmsResponse));
+            OnSmsReport(GetSlotId(NULL), reportInfo, (const uint8_t *)&response, sizeof(HRilSmsResponse));
         }
         if ((reportInfo.notifyId = WapPushNotifyMock(s, &response)) > 0) {
-            OnSmsReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&response, sizeof(HRilSmsResponse));
+            OnSmsReport(GetSlotId(NULL), reportInfo, (const uint8_t *)&response, strlen(response.pdu));
         }
         OnNotifyNetWorksOps(s, str);
     }
     free(str);
 }
 
-static int ParseStkResponseStr(const char *s, char **cmdResponseInfo)
+static int32_t ParseStkResponseStr(const char *s, char **cmdResponseInfo)
 {
     char *str = (char *)s;
     if (str == NULL) {
         TELEPHONY_LOGE("ProcessStkNotify, s or cmdResponse param is null");
         return HRIL_ERR_NULL_POINT;
     }
-    int err = SkipATPrefix(&str);
+    int32_t err = SkipATPrefix(&str);
     if (err != VENDOR_SUCCESS) {
         TELEPHONY_LOGE("ProcessStkNotify, invalid response");
         return HRIL_ERR_INVALID_RESPONSE;
@@ -253,37 +253,37 @@ bool OnNotifyStkOps(const char *s, const char *strInfo)
     reportInfo.type = HRIL_NOTIFICATION;
     if (ReportStrWith(s, "SoftwareVersion:")) {
         reportInfo.notifyId = HNOTI_SIM_STK_SESSION_END_NOTIFY;
-        OnSimReport(HRIL_SIM_SLOT_0, reportInfo, NULL, ZERO_RESPONSE_LEN);
+        OnSimReport(GetSlotId(NULL), reportInfo, NULL, ZERO_RESPONSE_LEN);
     } else if (ReportStrWith(s, "HardwareVersion:")) {
-        reportInfo.notifyId = HNOTI_SIM_STK_PROACTIVE_CMD_NOTIFY;
+        reportInfo.notifyId = HNOTI_SIM_STK_PROACTIVE_NOTIFY;
         char *cmdResponse = (char *)strInfo;
-        int ret = ParseStkResponseStr(s, &cmdResponse);
+        int32_t ret = ParseStkResponseStr(s, &cmdResponse);
         if (ret != VENDOR_SUCCESS) {
             reportInfo.error = ret;
         }
         if (cmdResponse == NULL) {
             TELEPHONY_LOGE("cmdResponse is NULL");
-            OnSimReport(HRIL_SIM_SLOT_0, reportInfo, NULL, ZERO_RESPONSE_LEN);
+            OnSimReport(GetSlotId(NULL), reportInfo, NULL, ZERO_RESPONSE_LEN);
         } else {
             TELEPHONY_LOGI("OnNotifyStkOps, cmdResponse: %{public}s", cmdResponse);
-            OnSimReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)cmdResponse, sizeof(char));
+            OnSimReport(GetSlotId(NULL), reportInfo, (const uint8_t *)cmdResponse, sizeof(char));
         }
     } else if (ReportStrWith(s, "+CGMM:")) {
         reportInfo.notifyId = HNOTI_SIM_STK_ALPHA_NOTIFY;
-        OnSimReport(HRIL_SIM_SLOT_0, reportInfo, NULL, ZERO_RESPONSE_LEN);
+        OnSimReport(GetSlotId(NULL), reportInfo, NULL, ZERO_RESPONSE_LEN);
     } else {
         isStkNotify = false;
     }
     return isStkNotify;
 }
 
-static void OnCsRegStatusNotify(struct ReportInfo reportInfo, int ret, char *str, const char *s)
+static void OnCsRegStatusNotify(struct ReportInfo reportInfo, int32_t ret, char *str, const char *s)
 {
     reportInfo.notifyId = HNOTI_NETWORK_CS_REG_STATUS_UPDATED;
     HRilRegStatusInfo regStatusInfo;
     ret = ProcessRegStatus(str, &regStatusInfo);
     if (ret == 0) {
-        OnNetworkReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)(&regStatusInfo), sizeof(HRilRegStatusInfo));
+        OnNetworkReport(GetSlotId(NULL), reportInfo, (const uint8_t *)(&regStatusInfo), sizeof(HRilRegStatusInfo));
     } else {
         TELEPHONY_LOGW("CREG notify str format  unexpected: %{public}s", s);
     }
@@ -303,17 +303,17 @@ static void RadioTurnNotify(struct ReportInfo reportInfo, char *str)
         reportInfo.error = HRIL_ERR_SUCCESS;
         reportInfo.type = HRIL_NOTIFICATION;
         reportInfo.notifyId = HNOTI_MODEM_RADIO_STATE_UPDATED;
-        OnModemReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&radioState, sizeof(HRilRadioState));
+        OnModemReport(GetSlotId(NULL), reportInfo, (const uint8_t *)&radioState, sizeof(HRilRadioState));
     }
 }
 
-static void OnPsRegStatusNotify(struct ReportInfo reportInfo, int ret, char *str, const char *s)
+static void OnPsRegStatusNotify(struct ReportInfo reportInfo, int32_t ret, char *str, const char *s)
 {
     reportInfo.notifyId = HNOTI_NETWORK_PS_REG_STATUS_UPDATED;
     HRilRegStatusInfo regStatusInfo;
     ret = ProcessRegStatus(str, &regStatusInfo);
     if (ret == 0) {
-        OnNetworkReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)(&regStatusInfo), sizeof(HRilRegStatusInfo));
+        OnNetworkReport(GetSlotId(NULL), reportInfo, (const uint8_t *)(&regStatusInfo), sizeof(HRilRegStatusInfo));
     } else {
         TELEPHONY_LOGW("CGREG notify str format  unexpected: %{public}s", s);
     }
@@ -326,27 +326,27 @@ static void OnNotifyNetWorksOpsJudgeTwo(
     char *time[DEFAULT_INDEX] = {""};
     if (GenerateCommand((char *)time, DEFAULT_INDEX, "^TIME:\"20%s", infoStr + DEFAULT_ADD_NUM) < 0) {
         TELEPHONY_LOGE("GenerateCommand is failed!");
-        OnNetworkReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)responseData, MAX_REG_INFO_ITEM * sizeof(char));
+        OnNetworkReport(GetSlotId(NULL), reportInfo, (const uint8_t *)responseData, MAX_REG_INFO_ITEM * sizeof(char));
         return;
     }
     TELEPHONY_LOGW("Report TIME: %{public}s", (char *)time);
-    OnNetworkReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)time, MAX_REG_INFO_ITEM * sizeof(char));
+    OnNetworkReport(GetSlotId(NULL), reportInfo, (const uint8_t *)time, MAX_REG_INFO_ITEM * sizeof(char));
 }
 
-static void SignalStrengthNotify(struct ReportInfo reportInfo, int ret, char *str, const char *s)
+static void SignalStrengthNotify(struct ReportInfo reportInfo, int32_t ret, char *str, const char *s)
 {
     HRilRssi response = {0};
     reportInfo.notifyId = HNOTI_NETWORK_SIGNAL_STRENGTH_UPDATED;
     TELEPHONY_LOGI("start report SignalStrengthNotify ");
     ret = ProcessParamSignalStrengthNotify(str, &response);
     if (ret == 0) {
-        OnNetworkReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)(&response), sizeof(HRilRssi));
+        OnNetworkReport(GetSlotId(NULL), reportInfo, (const uint8_t *)(&response), sizeof(HRilRssi));
     } else {
         TELEPHONY_LOGW("HCSQ notify str format  unexpected: %{public}s", s);
     }
 }
 
-static void VoiceRadioInfoNotify(struct ReportInfo reportInfo, int ret, char *str, const char *s)
+static void VoiceRadioInfoNotify(struct ReportInfo reportInfo, int32_t ret, char *str, const char *s)
 {
     HRilVoiceRadioInfo voiceRadioInfo = {0};
     ret = ProcessVoiceRadioInfo(str, &voiceRadioInfo);
@@ -355,12 +355,12 @@ static void VoiceRadioInfoNotify(struct ReportInfo reportInfo, int ret, char *st
         return;
     }
     reportInfo.notifyId = HNOTI_MODEM_VOICE_TECH_UPDATED;
-    OnModemReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)(&voiceRadioInfo), sizeof(HRilVoiceRadioInfo));
+    OnModemReport(GetSlotId(NULL), reportInfo, (const uint8_t *)(&voiceRadioInfo), sizeof(HRilVoiceRadioInfo));
 }
 
 void OnNotifyNetWorksOps(const char *s, const char *infoStr)
 {
-    int ret = 0;
+    int32_t ret = 0;
     char *str = (char *)infoStr;
     char *responseData[MAX_REG_INFO_ITEM] = {""};
     struct ReportInfo reportInfo = {0};
@@ -374,7 +374,7 @@ void OnNotifyNetWorksOps(const char *s, const char *infoStr)
         OnNotifyNetWorksOpsJudgeTwo(reportInfo, infoStr, responseData);
     } else if (ReportStrWith(s, "+CTZV:")) {
         reportInfo.notifyId = HNOTI_NETWORK_TIME_ZONE_UPDATED;
-        OnNetworkReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)responseData, MAX_REG_INFO_ITEM * sizeof(char));
+        OnNetworkReport(GetSlotId(NULL), reportInfo, (const uint8_t *)responseData, MAX_REG_INFO_ITEM * sizeof(char));
     } else if (ReportStrWith(s, "^HCSQ:")) {
         SignalStrengthNotify(reportInfo, ret, str, s);
     } else if (ReportStrWith(s, "^RADIO:")) {
@@ -389,7 +389,7 @@ void OnNotifyNetWorksOps(const char *s, const char *infoStr)
         ret = ProcessImsRegStatus(str, &imsRegStatusInfo, MAX_IMS_REG_INFO_ITEM);
         if (ret == 0) {
             OnNetworkReport(
-                HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)(&imsRegStatusInfo), sizeof(HRilImsRegStatusInfo));
+                GetSlotId(NULL), reportInfo, (const uint8_t *)(&imsRegStatusInfo), sizeof(HRilImsRegStatusInfo));
         } else {
             TELEPHONY_LOGW("CIREGU notify str format  unexpected: %{public}s", s);
         }

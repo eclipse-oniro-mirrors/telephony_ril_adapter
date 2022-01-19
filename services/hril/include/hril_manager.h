@@ -29,39 +29,12 @@
 
 namespace OHOS {
 namespace Telephony {
-static void *g_lastNITZTimeData = nullptr;
-static size_t g_lastNITZTimeDataSize;
-
-typedef enum WakeMonitorType { DONT_WAKE, WAKE } WakeMonitorType;
-typedef struct {
-    int32_t request;
-    int32_t (*respFunc)(
-        int32_t slotId, int32_t responseType, HRilErrNumber e, const uint8_t *response, size_t responseLen);
-    WakeMonitorType wakeType;
-} UnsolResponseInfo;
-
 typedef enum : int32_t {
     RIL_REGISTER_IS_NONE = 0,
     RIL_REGISTER_IS_RUNNING,
 } RegisterState;
 
-static int32_t rilRegisterStatus = 0;
-
-static HRilOps g_callBacks = {
-    0,
-    nullptr,
-    nullptr,
-    nullptr,
-    nullptr,
-    nullptr,
-    nullptr,
-};
-
-static pthread_rwlock_t g_radioServiceRwLock = PTHREAD_RWLOCK_INITIALIZER;
-
-pthread_rwlock_t *GetRadioServiceLock();
-
-class HRilManager : public IHRilReporter, public std::enable_shared_from_this<HRilManager> {
+class HRilManager : public IHRilReporter {
 public:
     HRilManager();
     virtual ~HRilManager();
@@ -71,12 +44,12 @@ public:
     virtual ReqDataInfo *CreateHRilRequest(int32_t serial, int32_t slotId, int32_t request) override;
     virtual void ReleaseHRilRequest(int32_t request, ReqDataInfo *requestInfo) override;
 
-    void RegisterCallFuncs(const HRilCallReq *callFuncs);
-    void RegisterDataFuncs(const HRilDataReq *dataFuncs);
-    void RegisterModemFuncs(const HRilModemReq *modemFuncs);
-    void RegisterNetworkFuncs(const HRilNetworkReq *networkFuncs);
-    void RegisterSimFuncs(const HRilSimReq *simFuncs);
-    void RegisterSmsFuncs(const HRilSmsReq *smsFuncs);
+    void RegisterCallFuncs(int32_t slotId, const HRilCallReq *callFuncs);
+    void RegisterDataFuncs(int32_t slotId, const HRilDataReq *dataFuncs);
+    void RegisterModemFuncs(int32_t slotId, const HRilModemReq *modemFuncs);
+    void RegisterNetworkFuncs(int32_t slotId, const HRilNetworkReq *networkFuncs);
+    void RegisterSimFuncs(int32_t slotId, const HRilSimReq *simFuncs);
+    void RegisterSmsFuncs(int32_t slotId, const HRilSmsReq *smsFuncs);
 
     int32_t Dispatch(int32_t slotId, int32_t cmd, struct HdfSBuf *data);
 
@@ -92,12 +65,17 @@ public:
     void OnSmsReport(int32_t slotId, const ReportInfo *reportInfo, const uint8_t *response, size_t responseLen);
 
 private:
-    std::unique_ptr<HRilCall> hrilCall_;
-    std::unique_ptr<HRilModem> hrilModem_;
-    std::unique_ptr<HRilNetwork> hrilNetwork_;
-    std::unique_ptr<HRilSim> hrilSim_;
-    std::unique_ptr<HRilSms> hrilSms_;
-    std::unique_ptr<HRilData> hrilData_;
+    template<typename T>
+    void OnReport(std::vector<std::unique_ptr<T>> &subModules, int32_t slotId, const ReportInfo *reportInfo,
+        const uint8_t *response, size_t responseLen);
+
+private:
+    std::vector<std::unique_ptr<HRilCall>> hrilCall_;
+    std::vector<std::unique_ptr<HRilModem>> hrilModem_;
+    std::vector<std::unique_ptr<HRilNetwork>> hrilNetwork_;
+    std::vector<std::unique_ptr<HRilSim>> hrilSim_;
+    std::vector<std::unique_ptr<HRilSms>> hrilSms_;
+    std::vector<std::unique_ptr<HRilData>> hrilData_;
 
     const struct HdfRemoteService *serviceCallback_ = nullptr;
     const struct HdfRemoteService *serviceCallbackNotify_ = nullptr;
@@ -109,7 +87,7 @@ private:
 extern "C" {
 #endif
 
-int32_t DispatchRequest(int32_t slotId, int32_t cmd, struct HdfSBuf *data);
+int32_t DispatchRequest(int32_t cmd, struct HdfSBuf *data);
 void HRilRegOps(const HRilOps *hrilOps);
 void OnCallReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen);
 void OnDataReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen);
@@ -117,7 +95,6 @@ void OnModemReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *
 void OnNetworkReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen);
 void OnSimReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen);
 void OnSmsReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen);
-int32_t IsLoadedVendorLib(void);
 
 #ifdef __cplusplus
 }

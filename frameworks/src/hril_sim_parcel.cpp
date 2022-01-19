@@ -420,7 +420,7 @@ bool ApduSimIORequestInfo::ReadFromParcel(Parcel &parcel)
     if (!ReadBaseInt32(parcel, serial)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, chanId)) {
+    if (!ReadBaseInt32(parcel, channelId)) {
         return false;
     }
     if (!ReadBaseInt32(parcel, type)) {
@@ -449,7 +449,7 @@ bool ApduSimIORequestInfo::Marshalling(Parcel &parcel) const
     if (!WriteBaseInt32(parcel, serial)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, chanId)) {
+    if (!WriteBaseInt32(parcel, channelId)) {
         return false;
     }
     if (!WriteBaseInt32(parcel, type)) {

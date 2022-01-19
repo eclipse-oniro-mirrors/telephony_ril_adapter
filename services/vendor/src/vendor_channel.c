@@ -23,7 +23,7 @@ static char *g_bufferCur = g_buffer;
 static char *FindEndOfLine(char *cur)
 {
     char *endLine = cur;
-    int count = 2;
+    int32_t count = 2;
     if (endLine == NULL) {
         return NULL;
     }
@@ -71,7 +71,7 @@ static char *ProcessLastResponse(char **processed)
     return endLine;
 }
 
-const char *ReadResponse(int atFd)
+const char *ReadResponse(int32_t atFd)
 {
     ssize_t size;
     char *processed = NULL;
@@ -106,7 +106,7 @@ const char *ReadResponse(int atFd)
     return ret;
 }
 
-int WriteATCommand(const char *s, int isPdu, int atFd)
+int32_t WriteATCommand(const char *s, int32_t isPdu, int32_t atFd)
 {
     TELEPHONY_LOGI("cmd:%{public}s", s);
     ssize_t ret;

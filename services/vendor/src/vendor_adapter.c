@@ -35,14 +35,13 @@
 #define DEVICE_PATH_DEFAULT "/dev/ttyUSB"
 
 #define AT_TTY_PATH "persist.sys.radio.attty.path"
-#define PARAMETER_SIZE 128
 
 static HRilRadioState g_radioState = HRIL_RADIO_POWER_STATE_UNAVAILABLE;
 static pthread_mutex_t g_statusMutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t g_statusCond = PTHREAD_COND_INITIALIZER;
 static pthread_t g_eventListeners;
-static int g_fd = -1;
-static int g_atStatus = 0;
+static int32_t g_fd = -1;
+static int32_t g_atStatus = 0;
 
 static const HRilCallReq g_callReqOps = {
     .GetCallList = ReqGetCallList,
@@ -96,14 +95,13 @@ static const HRilSimReq g_simReqOps = {
     .UnlockPuk2 = ReqUnlockPuk2,
     .GetSimPin2InputTimes = ReqGetSimPin2InputTimes,
     .SetActiveSim = ReqSetActiveSim,
-    .SendTerminalResponseCmd = ReqSendTerminalResponseCmd,
-    .SendEnvelopeCmd = ReqSendEnvelopeCmd,
-    .StkControllerIsReady = ReqStkControllerIsReady,
-    .StkCmdCallSetup = ReqStkCmdCallSetup,
+    .SimStkSendTerminalResponse = ReqSimStkSendTerminalResponse,
+    .SimStkSendEnvelope = ReqSimStkSendEnvelope,
+    .SimStkIsReady = ReqSimStkIsReady,
     .SetRadioProtocol = ReqSetRadioProtocol,
-    .OpenLogicalSimIO = ReqOpenLogicalSimIO,
-    .CloseLogicalSimIO = ReqCloseLogicalSimIO,
-    .TransmitApduSimIO = ReqTransmitApduSimIO,
+    .SimOpenLogicalChannel = ReqSimOpenLogicalChannel,
+    .SimCloseLogicalChannel = ReqSimCloseLogicalChannel,
+    .SimTransmitApduLogicalChannel = ReqSimTransmitApduLogicalChannel,
     .UnlockSimLock = ReqUnlockSimLock,
 };
 
@@ -139,7 +137,7 @@ static const HRilNetworkReq g_networkReqOps = {
     .SetNetworkSelectionMode = ReqSetNetworkSelectionMode,
     .SetPreferredNetwork = ReqSetPreferredNetwork,
     .GetPreferredNetwork = ReqGetPreferredNetwork,
-    .GetCellInfoList = ReqGetCellInfoList,
+    .GetNeighboringCellInfoList = ReqGetNeighboringCellInfoList,
     .GetCurrentCellInfo = ReqGetCurrentCellInfo,
     .GetRadioCapability = ReqGetRadioCapability,
     .SetRadioCapability = ReqSetRadioCapability,
@@ -178,12 +176,12 @@ HRilRadioState GetRadioState(void)
     return g_radioState;
 }
 
-int SetRadioState(HRilRadioState newState, int rst)
+int32_t SetRadioState(HRilRadioState newState, int32_t rst)
 {
     char cmd[MAX_CMD_LENGTH] = {0};
     ResponseInfo *pResponse = NULL;
     HRilRadioState oldState;
-    const int timeOut = 10000;
+    const int32_t timeOut = 10000;
     (void)memset_s(&oldState, sizeof(HRilRadioState), 0, sizeof(HRilRadioState));
     struct ReportInfo reportInfo;
     (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
@@ -202,7 +200,7 @@ int SetRadioState(HRilRadioState newState, int rst)
 
     if (oldState != g_radioState) {
         (void)sprintf_s(cmd, MAX_CMD_LENGTH, "AT+CFUN=%u,%d", newState, rst);
-        int err = SendCommandLock(cmd, NULL, timeOut, &pResponse);
+        int32_t err = SendCommandLock(cmd, NULL, timeOut, &pResponse);
         if (err != 0 || !pResponse->success) {
             TELEPHONY_LOGE("AT+CFUN send failed");
             FreeResponseInfo(pResponse);
@@ -217,7 +215,7 @@ int SetRadioState(HRilRadioState newState, int rst)
     reportInfo.notifyId = HNOTI_MODEM_RADIO_STATE_UPDATED;
     reportInfo.type = HRIL_NOTIFICATION;
     reportInfo.error = HRIL_ERR_SUCCESS;
-    OnModemReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&g_radioState, sizeof(HRilRadioState));
+    OnModemReport(GetSlotId(NULL), reportInfo, (const uint8_t *)&g_radioState, sizeof(HRilRadioState));
     return 0;
 }
 
@@ -226,7 +224,7 @@ static void AtOnUnusual(void)
     ATCloseReadLoop();
     g_atStatus = 1;
     g_fd = -1;
-    int err = SetRadioState(HRIL_RADIO_POWER_STATE_OFF, 0);
+    int32_t err = SetRadioState(HRIL_RADIO_POWER_STATE_OFF, 0);
     if (err == -1) {
         TELEPHONY_LOGE("RadioState set failed");
     }
@@ -243,10 +241,10 @@ static void WaitAtClose(void)
     pthread_mutex_unlock(&g_statusMutex);
 }
 
-static int ModemInit(void)
+static int32_t ModemInit(void)
 {
     ResponseInfo *pResponse = NULL;
-    int err = SetRadioState(HRIL_RADIO_POWER_STATE_ON, 0);
+    int32_t err = SetRadioState(HRIL_RADIO_POWER_STATE_ON, 0);
     if (err == -1) {
         TELEPHONY_LOGE("RadioState set failed");
     }
@@ -311,13 +309,13 @@ static int ModemInit(void)
     reportInfo.notifyId = HNOTI_MODEM_RADIO_STATE_UPDATED;
     reportInfo.type = HRIL_NOTIFICATION;
     reportInfo.error = HRIL_ERR_SUCCESS;
-    OnModemReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&g_radioState, sizeof(HRilRadioState));
+    OnModemReport(GetSlotId(NULL), reportInfo, (const uint8_t *)&g_radioState, sizeof(HRilRadioState));
     return err;
 }
 
 static void EventListeners(void)
 {
-    int waitNextTryTime = SLEEP_TIME;
+    int32_t waitNextTryTime = SLEEP_TIME;
     const char *devicePath = DEVICE_PATH;
     char atTtyPath[PARAMETER_SIZE] = {0};
 
@@ -345,7 +343,7 @@ static void EventListeners(void)
             }
         }
         g_atStatus = 0;
-        int ret = ATStartReadLoop(g_fd, OnNotifyOps);
+        int32_t ret = ATStartReadLoop(g_fd, OnNotifyOps);
         if (ret < 0) {
             TELEPHONY_LOGE("AtRead error %d\n", ret);
             return;
@@ -362,7 +360,7 @@ const HRilOps *RilInitOps(const struct HRilReport *reportOps)
     SetReportOps(reportOps);
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-    int ret = pthread_create(&g_eventListeners, &attr, (void *(*)(void *))EventListeners, NULL);
+    int32_t ret = pthread_create(&g_eventListeners, &attr, (void *(*)(void *))EventListeners, NULL);
     if (ret < 0) {
         TELEPHONY_LOGE("EventListeners create failed %d \n", ret);
     }

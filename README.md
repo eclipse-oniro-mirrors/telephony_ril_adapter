@@ -17,17 +17,18 @@ The RIL Adapter module provides functions such as vendor library loading, servic
 
 ```shell
 base/telephony/ril_adapter
-├── adapter                             # Vendor lib code
-│   ├── include
-│   └── test                            # Test code of vendor lib
 ├── figures                             # Resource file of readme
+├── frameworks
+│   ├── BUILD.gn
+│   └── src                             # Serialized file
 ├── interfaces                          # Provide internal interfaces for each business
 │   └── innerkits
 ├── services                            # Service
+│   ├── hril                            # Implementation of each business module interface of the hri layer
 │   ├── hril_hdf                        # HDF service
-│   ├── include                         # Header files
-│   └── src                             # Implementation of each business module interface of the hri layer
+│   └── vendor                          # vendor file
 └── test                                # Test code
+    ├── BUILD.gn
     ├── mock
     └── unittest                        # Unit test code
 ```

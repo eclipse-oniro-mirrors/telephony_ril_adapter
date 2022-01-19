@@ -29,11 +29,11 @@ typedef struct ModemReportErrorInfo {
     ReportErrorType errType;
 } ModemReportErrorInfo;
 
-struct ReportInfo {
+typedef struct ReportInfo {
     ReqDataInfo *requestInfo;
     int notifyId;
     ReportType type;
     HRilErrNumber error;
     ModemReportErrorInfo modemErrInfo;
-};
+} ReportInfo;
 #endif // OHOS_RIL_PUBLIC_STRUCT_H

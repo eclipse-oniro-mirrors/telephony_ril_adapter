@@ -17,13 +17,17 @@
 
 #include <stdlib.h>
 
+#include "parameter.h"
+
 #define NS_PER_S 1000000000
 #define COUNT 1000
 
-const int G_RESP_ERRORS = 7;
-const int G_RESP_SUCCESS = 2;
-const int G_RESP_SMS_NOTIFY = 3;
-const int G_CHAR_TO_INT = 10;
+#define SUPPORT_SLOT_ID "persist.sys.support.slotid"
+
+const int32_t G_RESP_ERRORS = 7;
+const int32_t G_RESP_SUCCESS = 2;
+const int32_t G_RESP_SMS_NOTIFY = 3;
+const int32_t G_CHAR_TO_INT = 10;
 static const char *g_respErrors[G_RESP_ERRORS] = {
     "ERROR", "NO ANSWER", "+CME ERROR:", "NO CARRIER", "NO DIALTONE", "+CMS ERROR:", "COMMAND NOT SUPPORT"};
 
@@ -48,7 +52,7 @@ int32_t GenerateCommand(char *buffer, size_t bufferLen, const char *fmt, ...)
     return ret;
 }
 
-int ReportStrWith(const char *s, const char *prefix)
+int32_t ReportStrWith(const char *s, const char *prefix)
 {
     const char *source = s;
     const char *dest = prefix;
@@ -64,7 +68,7 @@ int ReportStrWith(const char *s, const char *prefix)
     return *dest == '\0';
 }
 
-int IsResponseSuccess(const char *s)
+int32_t IsResponseSuccess(const char *s)
 {
     size_t i;
     for (i = 0; i < G_RESP_SUCCESS; i++) {
@@ -75,7 +79,7 @@ int IsResponseSuccess(const char *s)
     return 0;
 }
 
-int IsResponseError(const char *s)
+int32_t IsResponseError(const char *s)
 {
     size_t i;
     for (i = 0; i < G_RESP_ERRORS; i++) {
@@ -86,7 +90,7 @@ int IsResponseError(const char *s)
     return 0;
 }
 
-int IsSms(const char *s)
+int32_t IsSms(const char *s)
 {
     if (s[0] == '>') {
         return 1;
@@ -94,7 +98,7 @@ int IsSms(const char *s)
     return 0;
 }
 
-int IsSmsNotify(const char *s)
+int32_t IsSmsNotify(const char *s)
 {
     size_t i;
     for (i = 0; i < G_RESP_SMS_NOTIFY; i++) {
@@ -118,7 +122,7 @@ void SetWaitTimeout(struct timespec *time, long long msec)
     }
 }
 
-int SkipATPrefix(char **s)
+int32_t SkipATPrefix(char **s)
 {
     if (*s == NULL) {
         TELEPHONY_LOGE("str parameter is null.");
@@ -144,7 +148,7 @@ void SkipSpace(char **s)
     }
 }
 
-int NextInt(char **s, int *out)
+int32_t NextInt(char **s, int32_t *out)
 {
     char *ret = NULL;
     char *end = NULL;
@@ -161,7 +165,7 @@ int NextInt(char **s, int *out)
     while (*s != NULL && **s == ',') {
         (*s)++;
     }
-    *out = (int)strtol(ret, &end, HRIL_DEC);
+    *out = (int32_t)strtol(ret, &end, HRIL_DEC);
     if (ret == end) {
         TELEPHONY_LOGE("strtol is fail, err:%{public}d, ret:%{public}s", *out, ret);
         return -1;
@@ -169,7 +173,7 @@ int NextInt(char **s, int *out)
     return 0;
 }
 
-int NextIntNotSkipNextComma(char **s, int *out)
+int64_t NextInt64(char **s, int64_t *out)
 {
     char *ret = NULL;
     char *end = NULL;
@@ -183,7 +187,31 @@ int NextIntNotSkipNextComma(char **s, int *out)
         return -1;
     }
     ret = strsep(s, ",");
-    *out = (int)strtol(ret, &end, HRIL_DEC);
+    while (*s != NULL && **s == ',') {
+        (*s)++;
+    }
+    *out = (int64_t)strtol(ret, &end, HRIL_DEC);
+    if (ret == end) {
+        return -1;
+    }
+    return 0;
+}
+
+int32_t NextIntNotSkipNextComma(char **s, int32_t *out)
+{
+    char *ret = NULL;
+    char *end = NULL;
+    if (*s == NULL) {
+        TELEPHONY_LOGE("str parameter is null.");
+        return -1;
+    }
+    SkipSpace(s);
+    if (*s == NULL) {
+        TELEPHONY_LOGE("str parameter is null, after skip space.");
+        return -1;
+    }
+    ret = strsep(s, ",");
+    *out = (int32_t)strtol(ret, &end, HRIL_DEC);
     if (ret == end) {
         TELEPHONY_LOGE("strtol is fail, err:%{public}d, ret:%{public}s", *out, ret);
         return -1;
@@ -191,7 +219,7 @@ int NextIntNotSkipNextComma(char **s, int *out)
     return 0;
 }
 
-int NextIntByRightBracket(char **s, int *out)
+int32_t NextIntByRightBracket(char **s, int32_t *out)
 {
     char *ret = NULL;
     char *end = NULL;
@@ -208,7 +236,7 @@ int NextIntByRightBracket(char **s, int *out)
     while (*s != NULL && **s == ')') {
         (*s)++;
     }
-    *out = (int)strtol(ret, &end, HRIL_DEC);
+    *out = (int32_t)strtol(ret, &end, HRIL_DEC);
     if (ret == end) {
         TELEPHONY_LOGE("strtol is fail, err:%{public}d, ret:%{public}s", *out, ret);
         return -1;
@@ -230,7 +258,7 @@ void SkipNextComma(char **s)
     }
 }
 
-int NextIntFromHex(char **s, int *out)
+int32_t NextIntFromHex(char **s, int32_t *out)
 {
     char *ret = NULL;
     char *end = NULL;
@@ -249,7 +277,7 @@ int NextIntFromHex(char **s, int *out)
     } else {
         ret = strsep(s, ",");
     }
-    *out = (int)strtol(ret, &end, HRIL_HEX);
+    *out = (int32_t)strtol(ret, &end, HRIL_HEX);
     if (ret == end) {
         TELEPHONY_LOGE("strtol is fail, err:%{public}d, ret:%{public}s", *out, ret);
         return -1;
@@ -284,7 +312,7 @@ uint64_t NextULongFromHex(char **s, uint64_t *out)
     return 0;
 }
 
-int NextStr(char **s, char **out)
+int32_t NextStr(char **s, char **out)
 {
     if (*s == NULL) {
         TELEPHONY_LOGE("str parameter is null.");
@@ -307,7 +335,7 @@ int NextStr(char **s, char **out)
 /* +CRING: GPRS "IP","00.00.00.00",,"abc.com"
  * get GPRS
  */
-int NextTxtStr(char **s, char **out)
+int32_t NextTxtStr(char **s, char **out)
 {
     if (*s == NULL) {
         TELEPHONY_LOGE("str parameter is null.");
@@ -323,10 +351,10 @@ int NextTxtStr(char **s, char **out)
     return 0;
 }
 
-int NextBool(char **s, char *out)
+int32_t NextBool(char **s, char *out)
 {
-    int ret;
-    int result;
+    int32_t ret;
+    int32_t result;
 
     if (*s == NULL) {
         TELEPHONY_LOGE("str parameter is null.");
@@ -348,9 +376,9 @@ int NextBool(char **s, char *out)
     return ret;
 }
 
-int ParseReportError(char *str)
+int32_t ParseReportError(char *str)
 {
-    int ret = VENDOR_FAIL;
+    int32_t ret = VENDOR_FAIL;
     char *pStr = str;
 
     if (pStr == NULL) {
@@ -365,7 +393,7 @@ int ParseReportError(char *str)
 
 ModemReportErrorInfo GetReportErrorInfo(const ResponseInfo *response)
 {
-    int ret = VENDOR_FAIL;
+    int32_t ret = VENDOR_FAIL;
     ModemReportErrorInfo errInfo;
 
     errInfo.errType = HRIL_REPORT_ERR_TYPE_GENERIC;
@@ -380,7 +408,7 @@ ModemReportErrorInfo GetReportErrorInfo(const ResponseInfo *response)
             return errInfo;
         }
         ret = ParseReportError(pStr);
-        if (ret >= 0) {
+        if (ret > 0) {
             errInfo.errorNo = ret;
         }
     }
@@ -396,10 +424,10 @@ ModemReportErrorInfo InitModemReportErrorInfo(void)
     return errInfo;
 }
 
-int ConvertCharToInt(const char *s)
+int32_t ConvertCharToInt32(const char *s)
 {
     char *str = (char *)s;
-    int ret = 0;
+    int32_t ret = 0;
     char firstChar = *str;
     if ((firstChar == '+') || (firstChar == '-')) {
         ++str;
@@ -412,7 +440,7 @@ int ConvertCharToInt(const char *s)
         if ((*str < '0') || (*str > '9')) {
             return ret;
         } else {
-            int val = (int)(tmp - '0');
+            int32_t val = (int32_t)(tmp - '0');
             ret = (ret * G_CHAR_TO_INT) + val;
         }
         str++;
@@ -423,7 +451,7 @@ int ConvertCharToInt(const char *s)
     return ret;
 }
 
-int FindCommaCharNum(const char *srcStr)
+int32_t FindCommaCharNum(const char *srcStr)
 {
     char *str = (char *)srcStr;
     if (str == NULL) {
@@ -433,7 +461,7 @@ int FindCommaCharNum(const char *srcStr)
     if (*str == '\0') {
         return -1;
     }
-    int charNum = 0;
+    int32_t charNum = 0;
     while (*str != '\0') {
         if (*str == ',') {
             charNum++;
@@ -441,4 +469,23 @@ int FindCommaCharNum(const char *srcStr)
         str++;
     }
     return charNum;
+}
+
+int32_t GetSlotId(const ReqDataInfo *requestInfo)
+{
+    int32_t slotId = HRIL_SIM_SLOT_0;
+    char strSlotId[PARAMETER_SIZE] = {0};
+
+    if (requestInfo != NULL) {
+        slotId = requestInfo->slotId;
+    } else { // proactive notification
+        if (GetParameter(SUPPORT_SLOT_ID, "", strSlotId, PARAMETER_SIZE) > 0) {
+            slotId = atoi(strSlotId);
+        }
+    }
+    if (slotId >= HRIL_SIM_SLOT_NUM) {
+        slotId = HRIL_SIM_SLOT_0;
+        TELEPHONY_LOGE("slotId is invalid, slotId0 will be used. slotId:%{public}d", slotId);
+    }
+    return slotId;
 }

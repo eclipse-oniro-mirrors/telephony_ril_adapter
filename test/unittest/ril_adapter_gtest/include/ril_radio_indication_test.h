@@ -28,8 +28,7 @@ public:
     RilRadioIndicationTest(RilManagerTest *mRilManager);
     ~RilRadioIndicationTest();
 
-    int OnRemoteRequest(
-        uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
+    int OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
 private:
     void RadioStateUpdated(MessageParcel &data);

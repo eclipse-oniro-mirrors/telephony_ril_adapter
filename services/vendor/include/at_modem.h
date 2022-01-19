@@ -18,10 +18,10 @@
 
 #include "vendor_adapter.h"
 
-void ReqSetRadioState(const ReqDataInfo *requestInfo, int function, int reset);
+void ReqSetRadioState(const ReqDataInfo *requestInfo, int32_t function, int32_t reset);
 void ReqGetRadioState(const ReqDataInfo *requestInfo);
 void ReqGetImei(const ReqDataInfo *requestInfo);
 void ReqGetMeid(const ReqDataInfo *requestInfo);
 void ReqGetVoiceRadioTechnology(const ReqDataInfo *requestInfo);
-int ProcessVoiceRadioInfo(const char *s, const HRilVoiceRadioInfo *hrilVoiceRadioInfo);
+int32_t ProcessVoiceRadioInfo(const char *s, const HRilVoiceRadioInfo *hrilVoiceRadioInfo);
 #endif // OHOS_AT_MODEM_H
