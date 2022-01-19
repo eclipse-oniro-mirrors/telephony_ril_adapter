@@ -37,7 +37,7 @@ typedef enum {
 } VendorType; // Radio Access Technology
 
 typedef struct {
-    int success;
+    int32_t success;
     char *result;
     Line *head;
     Line *last;
@@ -45,7 +45,7 @@ typedef struct {
 
 typedef void (*OnNotify)(const char *s, const char *s1); // onNotify
 
-int ATStartReadLoop(int fd, OnNotify func); // at_open
+int32_t ATStartReadLoop(int32_t fd, OnNotify func); // at_open
 
 void ATCloseReadLoop(void); // at_close
 
@@ -53,14 +53,15 @@ void AtSetOnUnusual(void (*OnAtUnusual)(void));
 
 void FreeResponseInfo(ResponseInfo *resp); // free ResponseResult
 
-int SendCommandLock(const char *command, const char *prefix, long long timeout, ResponseInfo **outResponse);
+int32_t SendCommandLock(const char *command, const char *prefix, long long timeout, ResponseInfo **outResponse);
 
-int SendCommandNetWorksLock(const char *command, const char *prefix, long long timeout, ResponseInfo **outResponse);
+int32_t SendCommandNetWorksLock(
+    const char *command, const char *prefix, long long timeout, ResponseInfo **outResponse);
 
-int SendCommandSmsLock(
+int32_t SendCommandSmsLock(
     const char *command, const char *smsPdu, const char *prefix, long long timeout, ResponseInfo **outResponse);
 
-int SendCommandNoLock(const char *command, long long timeout, ResponseInfo **outResponse);
+int32_t SendCommandNoLock(const char *command, long long timeout, ResponseInfo **outResponse);
 
 void SetWatchFunction(void (*WatchFun)(void));
 

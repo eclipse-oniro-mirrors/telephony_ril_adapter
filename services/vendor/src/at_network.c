@@ -28,13 +28,43 @@ static pthread_mutex_t g_networkSearchInformationMutex = PTHREAD_MUTEX_INITIALIZ
 struct ResponseAck {
     ResponseInfo *responseInfo;
     uint8_t *respDataPointer;
-    int respDataLen;
+    int32_t respDataLen;
 };
 
-static int GetResponseErrorCode(ResponseInfo *pResponseInfo)
+// RadioAccessFamily defines
+const int32_t RAF_UNKNOWN = 1 << RADIO_TECHNOLOGY_UNKNOWN;
+const int32_t RAF_GSM = 1 << RADIO_TECHNOLOGY_GSM;
+const int32_t RAF_1XRTT = 1 << RADIO_TECHNOLOGY_1XRTT;
+const int32_t RAF_WCDMA = 1 << RADIO_TECHNOLOGY_WCDMA;
+const int32_t RAF_HSPA = 1 << RADIO_TECHNOLOGY_HSPA;
+const int32_t RAF_HSPAP = 1 << RADIO_TECHNOLOGY_HSPAP;
+const int32_t RAF_TD_SCDMA = 1 << RADIO_TECHNOLOGY_TD_SCDMA;
+const int32_t RAF_EVDO = 1 << RADIO_TECHNOLOGY_EVDO;
+const int32_t RAF_EHRPD = 1 << RADIO_TECHNOLOGY_EHRPD;
+const int32_t RAF_LTE = 1 << RADIO_TECHNOLOGY_LTE;
+const int32_t RAF_LTE_CA = 1 << RADIO_TECHNOLOGY_LTE_CA;
+const int32_t RAF_NR = 1 << RADIO_TECHNOLOGY_NR;
+
+// Group
+const int32_t GSM = RAF_GSM;
+const int32_t CDMA = RAF_1XRTT;
+const int32_t EVDO = RAF_EVDO | RAF_EHRPD;
+const int32_t HS = RAF_WCDMA | RAF_HSPA | RAF_HSPAP;
+const int32_t WCDMA = HS;
+const int32_t LTE = RAF_LTE | RAF_LTE_CA;
+const int32_t NR = RAF_NR;
+
+// NG
+const int32_t RAF_2G = GSM | CDMA;
+const int32_t RAF_3G = WCDMA | EVDO | RAF_TD_SCDMA;
+const int32_t RAF_4G = LTE;
+const int32_t RAF_5G = NR;
+const int32_t RAF_AUTO = RAF_2G | RAF_3G | RAF_4G | RAF_5G;
+
+static int32_t GetResponseErrorCode(ResponseInfo *pResponseInfo)
 {
     char *pLine = NULL;
-    int ret = HRIL_ERR_GENERIC_FAILURE;
+    int32_t ret = HRIL_ERR_GENERIC_FAILURE;
     if (pResponseInfo && pResponseInfo->result) {
         pLine = pResponseInfo->result;
         SkipATPrefix(&pLine);
@@ -48,7 +78,8 @@ static int GetResponseErrorCode(ResponseInfo *pResponseInfo)
     return ret;
 }
 
-static int ResponseNetworkReport(int slotId, const ReqDataInfo *requestInfo, int err, struct ResponseAck *respDataAck)
+static int32_t ResponseNetworkReport(
+    int32_t slotId, const ReqDataInfo *requestInfo, int32_t err, struct ResponseAck *respDataAck)
 {
     if (requestInfo == NULL) {
         TELEPHONY_LOGE("requestInfo is nullptr!");
@@ -59,7 +90,7 @@ static int ResponseNetworkReport(int slotId, const ReqDataInfo *requestInfo, int
         return HRIL_ERR_GENERIC_FAILURE;
     }
     struct ReportInfo reportInfo;
-    reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 1);
+    reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
     OnNetworkReport(slotId, reportInfo, (const uint8_t *)(respDataAck->respDataPointer), respDataAck->respDataLen);
     if (respDataAck->responseInfo != NULL) {
         FreeResponseInfo(respDataAck->responseInfo);
@@ -105,7 +136,7 @@ static HRilRadioTech ConvertActToRadioTech(HRilActTech actType)
     }
 }
 
-static int FindSemicolonCharNum(const char *srcStr)
+static int32_t FindSemicolonCharNum(const char *srcStr)
 {
     char *str = (char *)srcStr;
     if (str == NULL) {
@@ -115,7 +146,7 @@ static int FindSemicolonCharNum(const char *srcStr)
     if (*str == '\0') {
         return -1;
     }
-    int charNum = 0;
+    int32_t charNum = 0;
     while (*str != '\0') {
         if (*str == ';') {
             charNum++;
@@ -125,7 +156,7 @@ static int FindSemicolonCharNum(const char *srcStr)
     return charNum;
 }
 
-static HRilRegStatus ConvertIntToHRilRegStatus(int reg)
+static HRilRegStatus ConvertIntToHRilRegStatus(int32_t reg)
 {
     if ((reg >= NO_REG_MT_NO_SEARCH) && (reg <= REG_MT_EMERGENCY)) {
         return (HRilRegStatus)reg;
@@ -138,11 +169,11 @@ static int32_t ExtractRegStatus(const char *s, const HRilRegStatusInfo *hrilRegI
 {
     char *str = (char *)s;
     HRilRegStatusInfo *regStateInfo = (HRilRegStatusInfo *)hrilRegInfo;
-    int info[MAX_5GREG_INFO_ITEM] = {0, 0, 0, 0, 0, 0, 0};
-    const int FORMAT_ONE_COMMA_NUM = 0;
-    const int FORMAT_TWO_COMMA_NUM = 3;
-    const int FORMAT_TWO_5G_COMMA_NUM = 6;
-    int commaNum = FindCommaCharNum(str);
+    int32_t info[MAX_5GREG_INFO_ITEM] = {0, 0, 0, 0, 0, 0, 0};
+    const int32_t FORMAT_ONE_COMMA_NUM = 0;
+    const int32_t FORMAT_TWO_COMMA_NUM = 3;
+    const int32_t FORMAT_TWO_5G_COMMA_NUM = 6;
+    int32_t commaNum = FindCommaCharNum(str);
     if (NextInt(&str, &(info[REG_STAT_POS])) != 0) {
         return HRIL_ERR_INVALID_RESPONSE;
     }
@@ -198,14 +229,14 @@ static int32_t ParseRegStatusStr(const char *srcStr, HRilRegStatusInfo *hrilRegI
         TELEPHONY_LOGE("skip failed: [%{public}s]", str);
         return HRIL_ERR_INVALID_RESPONSE;
     }
-    const int NUM_ONE = 1;
-    const int NUM_THREE = 3;
-    const int NUM_FOUR = 4;
-    const int NUM_SIX = 6;
-    const int NUM_SEVEN = 7;
+    const int32_t NUM_ONE = 1;
+    const int32_t NUM_THREE = 3;
+    const int32_t NUM_FOUR = 4;
+    const int32_t NUM_SIX = 6;
+    const int32_t NUM_SEVEN = 7;
     hrilRegInfo->notifyMode = REG_NOTIFY_STAT_LAC_CELLID;
     hrilRegInfo->regMsgType = REG_RESPONSE_TYPE;
-    int commaNum = FindCommaCharNum(str);
+    int32_t commaNum = FindCommaCharNum(str);
     if (commaNum == 0) {
         hrilRegInfo->regMsgType = REG_NOTIFY_TYPE;
         hrilRegInfo->notifyMode = REG_NOTIFY_STAT_ONLY;
@@ -218,14 +249,14 @@ static int32_t ParseRegStatusStr(const char *srcStr, HRilRegStatusInfo *hrilRegI
         hrilRegInfo->regMsgType = REG_NOTIFY_TYPE;
         return HRIL_ERR_INVALID_RESPONSE;
     }
-    int skip = 0;
+    int32_t skip = 0;
     if (hrilRegInfo->regMsgType == REG_RESPONSE_TYPE) {
         if ((NextInt(&str, &skip)) != 0) {
             TELEPHONY_LOGE("skip failed: [%{public}s]", str);
             return HRIL_ERR_INVALID_RESPONSE;
         }
-        if ((skip != (int)REG_NOTIFY_STAT_LAC_CELLID) && (skip != (int)REG_NOTIFY_STAT_ONLY)) {
-            TELEPHONY_LOGE("notifytype check failed: [%{public}d]", skip);
+        if ((skip != (int32_t)REG_NOTIFY_STAT_LAC_CELLID) && (skip != (int32_t)REG_NOTIFY_STAT_ONLY)) {
+            TELEPHONY_LOGE("notifyType check failed: [%{public}d]", skip);
             return HRIL_ERR_INVALID_RESPONSE;
         }
     }
@@ -319,8 +350,8 @@ int32_t ProcessParamSignalStrength(const char *result, HRilRssi *hrilRssi)
 {
     char *resultStr = (char *)result;
     char *c = NULL;
-    int tmp = 0;
-    int err = SkipATPrefix(&resultStr);
+    int32_t tmp = 0;
+    int32_t err = SkipATPrefix(&resultStr);
     if (err < 0) {
         TELEPHONY_LOGE("skip failed: [%{public}s]", resultStr);
         return err;
@@ -362,14 +393,14 @@ int32_t ProcessParamSignalStrength(const char *result, HRilRssi *hrilRssi)
         TELEPHONY_LOGI("ProcessParamSignalStrength  enter NR-->, result %{public}s", resultStr);
         ParseGetNrSignalStrength(resultStr, hrilRssi);
     }
-    return 0;
+    return HRIL_ERR_SUCCESS;
 }
 
 int32_t ProcessParamSignalStrengthNotify(const char *result, HRilRssi *hrilRssi)
 {
     char *resultStr = (char *)result;
     char *c = NULL;
-    int err = SkipATPrefix(&resultStr);
+    int32_t err = SkipATPrefix(&resultStr);
     TELEPHONY_LOGI("ProcessParamSignalStrengthNotify  enter -->, resultStr %{public}s", resultStr);
     if (err < 0) {
         TELEPHONY_LOGE("skip failed: %{public}s", resultStr);
@@ -395,20 +426,20 @@ int32_t ProcessParamSignalStrengthNotify(const char *result, HRilRssi *hrilRssi)
     } else if (!strcmp(c, "NR")) {
         ParseGetNrSignalStrength(resultStr, hrilRssi);
     }
-    return 0;
+    return HRIL_ERR_SUCCESS;
 }
 
-static int CheckImsStatusValid(
-    const int *imsStatusArray, HRilImsRegStatusInfo *imsRegStatusInfo, int realInfoNum, int expectInfoNum)
+static int32_t CheckImsStatusValid(
+    const int32_t *imsStatusArray, HRilImsRegStatusInfo *imsRegStatusInfo, int32_t realInfoNum, int32_t expectInfoNum)
 {
     if ((imsStatusArray == NULL) || (imsRegStatusInfo == NULL)) {
         TELEPHONY_LOGE("imsStatusArray or imsRegStatusInfo is invalid");
         return HRIL_ERR_INVALID_RESPONSE;
     }
-    const int IMS_NOTIFY_NUM = 2;
-    const int IMS_EXT_INFO_NOTIFY_TYPE = 2;
-    const int REG_INFO_MAX_VALUE = 1;
-    const int IMS_STATUS_INDEX = 2;
+    const int32_t IMS_NOTIFY_NUM = 2;
+    const int32_t IMS_EXT_INFO_NOTIFY_TYPE = 2;
+    const int32_t REG_INFO_MAX_VALUE = 1;
+    const int32_t IMS_STATUS_INDEX = 2;
     if (expectInfoNum == IMS_NOTIFY_NUM) {
         if ((realInfoNum == IMS_NOTIFY_NUM) && (imsStatusArray[0] <= REG_INFO_MAX_VALUE)) {
             imsRegStatusInfo->notifyType = IMS_EXT_INFO_NOTIFY_TYPE;
@@ -449,7 +480,7 @@ static int CheckImsStatusValid(
     return HRIL_ERR_SUCCESS;
 }
 
-int32_t ProcessImsRegStatus(const char *s, const HRilImsRegStatusInfo *imsRegStatusInfo, int expectInfoNum)
+int32_t ProcessImsRegStatus(const char *s, const HRilImsRegStatusInfo *imsRegStatusInfo, int32_t expectInfoNum)
 {
     char *str = (char *)s;
     if ((str == NULL) || (imsRegStatusInfo == NULL)) {
@@ -457,18 +488,18 @@ int32_t ProcessImsRegStatus(const char *s, const HRilImsRegStatusInfo *imsRegSta
         return HRIL_ERR_NULL_POINT;
     } else {
         TELEPHONY_LOGI("result: %{public}s", str);
-        int err = SkipATPrefix(&str);
+        int32_t err = SkipATPrefix(&str);
         if (err < 0) {
             TELEPHONY_LOGE("skip failed: [%{public}s]", str);
             return HRIL_ERR_INVALID_RESPONSE;
         }
-        int commaNum = FindCommaCharNum(str);
+        int32_t commaNum = FindCommaCharNum(str);
         if ((commaNum < 0) || (commaNum >= MAX_IMS_INFO_ITEM)) {
             TELEPHONY_LOGE("check failed commaNum: [%{public}d]", commaNum);
             return HRIL_ERR_INVALID_RESPONSE;
         }
-        int info[MAX_IMS_INFO_ITEM] = {0, 0, 0};
-        for (int i = 0; i <= commaNum; i++) {
+        int32_t info[MAX_IMS_INFO_ITEM] = {0, 0, 0};
+        for (int32_t i = 0; i <= commaNum; i++) {
             err = NextInt(&str, &(info[i]));
             if (err == -1) {
                 info[i] = -1;
@@ -486,17 +517,17 @@ int32_t ProcessImsRegStatus(const char *s, const HRilImsRegStatusInfo *imsRegSta
 
 void ReqGetImsRegStatus(const ReqDataInfo *requestInfo)
 {
-    int err = HRIL_ERR_SUCCESS;
+    int32_t err = HRIL_ERR_SUCCESS;
     char *result = NULL;
     struct ReportInfo reportInfo;
     const long TIME_OUT = DEFAULT_TIMEOUT;
     ResponseInfo *responseInfo = NULL;
 
     TELEPHONY_LOGI("enter to [%{public}s]:%{public}d", __func__, __LINE__);
-    int ret = SendCommandLock("AT+CIREG?", "+CIREG:", TIME_OUT, &responseInfo);
+    int32_t ret = SendCommandLock("AT+CIREG?", "+CIREG:", TIME_OUT, &responseInfo);
     if (responseInfo == NULL) {
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_NULL_POINT, HRIL_RESPONSE, 0);
-        OnNetworkReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+        OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 0);
         return;
     }
 
@@ -510,34 +541,35 @@ void ReqGetImsRegStatus(const ReqDataInfo *requestInfo)
     HRilImsRegStatusInfo imsRegStatusInfo;
     ret = ProcessImsRegStatus(result, &imsRegStatusInfo, MAX_IMS_INFO_ITEM);
     if (ret != 0) {
-        TELEPHONY_LOGE("GetImsRegStatusRespone CIREGU format  unexpected: %{public}s", result);
+        TELEPHONY_LOGE("GetImsRegStatusResponse CIREGU format  unexpected: %{public}s", result);
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_RESPONSE, HRIL_RESPONSE, 0);
-        OnNetworkReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+        OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 0);
         FreeResponseInfo(responseInfo);
         return;
     }
 
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-    OnNetworkReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&imsRegStatusInfo, sizeof(HRilImsRegStatusInfo));
+    OnNetworkReport(requestInfo->slotId, reportInfo, (const uint8_t *)&imsRegStatusInfo, sizeof(HRilImsRegStatusInfo));
     FreeResponseInfo(responseInfo);
 }
 
 void ReqGetSignalStrength(const ReqDataInfo *requestInfo)
 {
-    int err = HRIL_ERR_SUCCESS;
+    int32_t err = HRIL_ERR_SUCCESS;
     struct ReportInfo reportInfo;
     const long TIME_OUT = DEFAULT_TIMEOUT;
-    const int REPORT_SIZE = 20;
+    const int32_t REPORT_SIZE = 20;
     ResponseInfo *responseInfo = NULL;
     char *result = NULL;
     TELEPHONY_LOGI("enter to [%{public}s]:%{public}d", __func__, __LINE__);
-    int ret = SendCommandLock("AT^HCSQ?", "^HCSQ:", TIME_OUT, &responseInfo);
+    int32_t ret = SendCommandLock("AT^HCSQ?", "^HCSQ:", TIME_OUT, &responseInfo);
     if (responseInfo == NULL) {
         TELEPHONY_LOGE("responseInfo is nullptr!");
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_NULL_POINT, HRIL_RESPONSE, 0);
-        OnNetworkReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+        OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 0);
         return;
     }
+
     if (ret != 0 || !responseInfo->success) {
         err = GetResponseErrorCode(responseInfo);
         TELEPHONY_LOGE("AT^HCSQ send failed");
@@ -547,7 +579,7 @@ void ReqGetSignalStrength(const ReqDataInfo *requestInfo)
     }
     if (result == NULL) {
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_RESPONSE, HRIL_RESPONSE, 0);
-        OnNetworkReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+        OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 0);
         FreeResponseInfo(responseInfo);
         return;
     }
@@ -563,23 +595,23 @@ void ReqGetSignalStrength(const ReqDataInfo *requestInfo)
     }
 
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-    OnNetworkReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&hrilRssi, sizeof(HRilRssi));
+    OnNetworkReport(requestInfo->slotId, reportInfo, (const uint8_t *)&hrilRssi, sizeof(HRilRssi));
     FreeResponseInfo(responseInfo);
 }
 
 void ReqGetCsRegStatus(const ReqDataInfo *requestInfo)
 {
-    int err = HRIL_ERR_SUCCESS;
+    int32_t err = HRIL_ERR_SUCCESS;
     struct ReportInfo reportInfo;
     ResponseInfo *responseInfo = NULL;
     char *result = NULL;
     const long TIME_OUT = DEFAULT_TIMEOUT;
 
-    int ret = SendCommandLock("AT+CREG?", "+CREG:", TIME_OUT, &responseInfo);
+    int32_t ret = SendCommandLock("AT+CREG?", "+CREG:", TIME_OUT, &responseInfo);
     if (responseInfo == NULL) {
         TELEPHONY_LOGE("responseInfo is nullptr!");
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_NULL_POINT, HRIL_RESPONSE, 0);
-        OnNetworkReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+        OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 0);
         return;
     }
     if (ret != 0 || !responseInfo->success) {
@@ -594,28 +626,28 @@ void ReqGetCsRegStatus(const ReqDataInfo *requestInfo)
     if (ret != 0) {
         TELEPHONY_LOGE("ReqGetCsRegStatus CREG format  unexpected: %{public}s", result);
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_RESPONSE, HRIL_RESPONSE, 0);
-        OnNetworkReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+        OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 0);
         FreeResponseInfo(responseInfo);
         return;
     }
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-    OnNetworkReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&regStatusInfo, sizeof(HRilRegStatusInfo));
+    OnNetworkReport(requestInfo->slotId, reportInfo, (const uint8_t *)&regStatusInfo, sizeof(HRilRegStatusInfo));
     FreeResponseInfo(responseInfo);
 }
 
 void ReqGetPsRegStatus(const ReqDataInfo *requestInfo)
 {
-    int err = HRIL_ERR_SUCCESS;
+    int32_t err = HRIL_ERR_SUCCESS;
     struct ReportInfo reportInfo;
     ResponseInfo *responseInfo = NULL;
     char *result = NULL;
     const long TIME_OUT = DEFAULT_TIMEOUT;
 
-    int ret = SendCommandLock("AT+CGREG?", "+CGREG:", TIME_OUT, &responseInfo);
+    int32_t ret = SendCommandLock("AT+CGREG?", "+CGREG:", TIME_OUT, &responseInfo);
     if (responseInfo == NULL) {
         TELEPHONY_LOGE("responseInfo is nullptr!");
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_NULL_POINT, HRIL_RESPONSE, 0);
-        OnNetworkReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+        OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 0);
         return;
     }
     if (ret != 0 || responseInfo->success == 0) {
@@ -630,31 +662,31 @@ void ReqGetPsRegStatus(const ReqDataInfo *requestInfo)
     if (ret != 0) {
         TELEPHONY_LOGE("ReqGetPsRegStatus CGREG format  unexpected: %{public}s", result);
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_RESPONSE, HRIL_RESPONSE, 0);
-        OnNetworkReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+        OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 0);
         FreeResponseInfo(responseInfo);
         return;
     }
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-    OnNetworkReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&regStatusInfo, sizeof(HRilRegStatusInfo));
+    OnNetworkReport(requestInfo->slotId, reportInfo, (const uint8_t *)&regStatusInfo, sizeof(HRilRegStatusInfo));
     FreeResponseInfo(responseInfo);
 }
 
 void ReqGetOperatorInfo(const ReqDataInfo *requestInfo)
 {
-    int err = HRIL_ERR_SUCCESS;
+    int32_t err = HRIL_ERR_SUCCESS;
     struct ReportInfo reportInfo;
     ResponseInfo *responseInfo = NULL;
     char *result = NULL;
-    const int numCount = 3;
+    const int32_t numCount = 3;
     char *response[numCount] = {"", "", ""};
     const long TIME_OUT = DEFAULT_TIMEOUT;
 
-    int ret =
-        SendCommandLock("AT+COPS=3,2;+COPS?;+COPS=3,1;+COPS?;+COPS=3,0;+COPS?", "+COPS:", TIME_OUT, &responseInfo);
+    int32_t ret =
+        SendCommandLock("AT+COPS=3,0;+COPS?;+COPS=3,1;+COPS?;+COPS=3,2;+COPS?", "+COPS:", TIME_OUT, &responseInfo);
     if (responseInfo == NULL) {
         TELEPHONY_LOGE("responseInfo is nullptr!");
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_NULL_POINT, HRIL_RESPONSE, 0);
-        OnNetworkReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+        OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 0);
         return;
     }
     if (ret != 0 || !responseInfo->success) {
@@ -662,8 +694,8 @@ void ReqGetOperatorInfo(const ReqDataInfo *requestInfo)
         TELEPHONY_LOGE("send AT CMD failed!");
     }
     Line *pLine = responseInfo->head;
-    for (int i = 0; pLine != NULL; i++, pLine = pLine->next) {
-        int skip = 0;
+    for (int32_t i = 0; pLine != NULL; i++, pLine = pLine->next) {
+        int32_t skip = 0;
         result = pLine->data;
         SkipATPrefix(&result);
         ret = NextInt(&result, &skip);
@@ -685,11 +717,11 @@ void ReqGetOperatorInfo(const ReqDataInfo *requestInfo)
         }
     }
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-    OnNetworkReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)response, numCount);
+    OnNetworkReport(requestInfo->slotId, reportInfo, (const uint8_t *)response, numCount);
     FreeResponseInfo(responseInfo);
 }
 
-static int MoveLeftBracket(char **pStr)
+static int32_t MoveLeftBracket(char **pStr)
 {
     if (*pStr == NULL) {
         TELEPHONY_LOGE("pStr is nullptr");
@@ -709,7 +741,7 @@ void GetNetworkSearchInformationPause(void)
     TELEPHONY_LOGI("enter to [%{public}s]:%{public}d", __func__, __LINE__);
     pthread_mutex_lock(&g_networkSearchInformationMutex);
     g_reportInfoForOperListToUse.error = HRIL_ERR_NETWORK_SEARCHING_INTERRUPTED;
-    OnNetworkReport(HRIL_SIM_SLOT_0, g_reportInfoForOperListToUse, NULL, 0);
+    OnNetworkReport(g_reportInfoForOperListToUse.requestInfo->slotId, g_reportInfoForOperListToUse, NULL, 0);
     SetAtPauseFlag(false);
     if (g_reportInfoForOperListToUse.requestInfo != NULL) {
         g_reportInfoForOperListToUse.requestInfo = NULL;
@@ -717,7 +749,7 @@ void GetNetworkSearchInformationPause(void)
     pthread_mutex_unlock(&g_networkSearchInformationMutex);
 }
 
-void PerformTimeOut(int sigFlag)
+void PerformTimeOut(int32_t sigFlag)
 {
     if (SIGALRM == sigFlag) {
         pthread_mutex_lock(&g_networkSearchInformationMutex);
@@ -725,12 +757,12 @@ void PerformTimeOut(int sigFlag)
         TELEPHONY_LOGI("enter to [%{public}s]:%{public}d", __func__, __LINE__);
         if (sendFlag) {
             g_reportInfoForOperListToUse.error = HRIL_ERR_NETWORK_SEARCH_TIMEOUT;
-            OnNetworkReport(HRIL_SIM_SLOT_0, g_reportInfoForOperListToUse, NULL, 0);
+            OnNetworkReport(g_reportInfoForOperListToUse.requestInfo->slotId, g_reportInfoForOperListToUse, NULL, 0);
             SetAtPauseFlag(false);
             if (g_reportInfoForOperListToUse.requestInfo != NULL) {
                 g_reportInfoForOperListToUse.requestInfo = NULL;
             }
-            TELEPHONY_LOGI("ReqGetNetworkSearchInformation responese timeout!");
+            TELEPHONY_LOGI("ReqGetNetworkSearchInformation response timeout!");
         }
         pthread_mutex_unlock(&g_networkSearchInformationMutex);
     }
@@ -741,13 +773,13 @@ void ReqGetNetworkSearchInformation(const ReqDataInfo *requestInfo)
 {
     const long TIME_OUT = 1000;
     ResponseInfo *responseInfo = NULL;
-    const int SECOND = 120;
+    const int32_t SECOND = 120;
     TELEPHONY_LOGI("enter to [%{public}s]:%{public}d", __func__, __LINE__);
     pthread_mutex_lock(&g_networkSearchInformationMutex);
     alarm(0);
     if (g_reportInfoForOperListToUse.requestInfo != NULL) {
         struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_NETWORK_SEARCHING, HRIL_RESPONSE, 0);
-        OnNetworkReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+        OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 0);
         pthread_mutex_unlock(&g_networkSearchInformationMutex);
         TELEPHONY_LOGE("ReqGetNetworkSearchInformation repeat Send!");
         return;
@@ -757,14 +789,14 @@ void ReqGetNetworkSearchInformation(const ReqDataInfo *requestInfo)
         pthread_mutex_unlock(&g_networkSearchInformationMutex);
         return;
     }
-    int ret = SendCommandNetWorksLock("AT+COPS=?", "+COPS:", TIME_OUT, &responseInfo);
+    int32_t ret = SendCommandNetWorksLock("AT+COPS=?", "+COPS:", TIME_OUT, &responseInfo);
 
     g_reportInfoForOperListToUse = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
     if ((ret != 0 && ret != AT_ERR_WAITING) || (responseInfo != NULL && !responseInfo->success)) {
         TELEPHONY_LOGE("send AT CMD failed!");
         SetAtPauseFlag(false);
         g_reportInfoForOperListToUse.error = GetResponseErrorCode(responseInfo);
-        OnNetworkReport(HRIL_SIM_SLOT_0, g_reportInfoForOperListToUse, NULL, 1);
+        OnNetworkReport(requestInfo->slotId, g_reportInfoForOperListToUse, NULL, 1);
         if (responseInfo != NULL) {
             FreeResponseInfo(responseInfo);
         }
@@ -782,14 +814,14 @@ void ReqGetNetworkSearchInformation(const ReqDataInfo *requestInfo)
     SetWatchFunction(GetNetworkSearchInformationPause);
 }
 
-static int ParseOperInfoItem(
+static int32_t ParseOperInfoItem(
     char **lineInfo, char **const longNameInfo, char **const shortNameInfo, char **const numericInfo)
 {
     char *data = *lineInfo;
     char **longNameInfoStr = (char **)longNameInfo;
     char **shortNameInfoStr = (char **)shortNameInfo;
     char **numericInfoStr = (char **)numericInfo;
-    int ret = NextStr(&data, longNameInfoStr);
+    int32_t ret = NextStr(&data, longNameInfoStr);
     if (ret < 0) {
         return -1;
     }
@@ -810,15 +842,16 @@ static int ParseOperInfoItem(
     return 0;
 }
 
-int32_t ParseOperListInfo(const char *lineInfo, int count, AvailableOperInfo *pOperInfo, AvailableOperInfo **ppOperInfo)
+int32_t ParseOperListInfo(
+    const char *lineInfo, int32_t count, AvailableOperInfo *pOperInfo, AvailableOperInfo **ppOperInfo)
 {
-    int state = 0;
-    int rat = 0;
+    int32_t state = 0;
+    int32_t rat = 0;
     int32_t operCount = 0;
     char *line = (char *)lineInfo;
-    int item = count;
-    for (int i = 0; i < item && operCount < item; i++) {
-        int ret = MoveLeftBracket(&line);
+    int32_t item = count;
+    for (int32_t i = 0; i < item && operCount < item; i++) {
+        int32_t ret = MoveLeftBracket(&line);
         if (ret < 0) {
             break;
         }
@@ -854,9 +887,9 @@ int32_t ParseOperListInfo(const char *lineInfo, int count, AvailableOperInfo *pO
     return operCount;
 }
 
-int ParseListItemNum(const char *list)
+int32_t ParseListItemNum(const char *list)
 {
-    int item = 0;
+    int32_t item = 0;
     if (list == NULL) {
         TELEPHONY_LOGI("ProcessOperListToUse result is null");
     } else {
@@ -871,7 +904,8 @@ int ParseListItemNum(const char *list)
     return item;
 }
 
-static void DealNetworkSearchInformation(int operCount, AvailableOperInfo **ppOperInfo, AvailableOperInfo *pOperInfo)
+static void DealNetworkSearchInformation(
+    int32_t operCount, AvailableOperInfo **ppOperInfo, AvailableOperInfo *pOperInfo)
 {
     if (operCount == 0) {
         pthread_mutex_lock(&g_networkSearchInformationMutex);
@@ -879,7 +913,7 @@ static void DealNetworkSearchInformation(int operCount, AvailableOperInfo **ppOp
         alarm(0);
         if (g_reportInfoForOperListToUse.requestInfo != NULL) {
             g_reportInfoForOperListToUse.error = HRIL_ERR_INVALID_RESPONSE;
-            OnNetworkReport(HRIL_SIM_SLOT_0, g_reportInfoForOperListToUse, NULL, 0);
+            OnNetworkReport(g_reportInfoForOperListToUse.requestInfo->slotId, g_reportInfoForOperListToUse, NULL, 0);
             g_reportInfoForOperListToUse.requestInfo = NULL;
         }
         pthread_mutex_unlock(&g_networkSearchInformationMutex);
@@ -888,7 +922,8 @@ static void DealNetworkSearchInformation(int operCount, AvailableOperInfo **ppOp
         SetAtPauseFlag(false);
         alarm(0);
         if (g_reportInfoForOperListToUse.requestInfo != NULL) {
-            OnNetworkReport(HRIL_SIM_SLOT_0, g_reportInfoForOperListToUse, (const uint8_t *)ppOperInfo, operCount);
+            OnNetworkReport(g_reportInfoForOperListToUse.requestInfo->slotId, g_reportInfoForOperListToUse,
+                (const uint8_t *)ppOperInfo, operCount);
             g_reportInfoForOperListToUse.requestInfo = NULL;
         }
         pthread_mutex_unlock(&g_networkSearchInformationMutex);
@@ -901,13 +936,13 @@ static void DealNetworkSearchInformation(int operCount, AvailableOperInfo **ppOp
     }
 }
 
-static int ErrorHandling(void)
+static int32_t ErrorHandling(void)
 {
     TELEPHONY_LOGE("This command resolution is not supported.");
     return HRIL_ERR_GENERIC_FAILURE;
 }
 
-static int ParseCellInfoGsm(const char *str, CellInfo *ci)
+static int32_t ParseCellInfoGsm(const char *str, CellInfo *ci)
 {
     char *pStr = (char *)str;
     char *pat = NULL;
@@ -941,7 +976,7 @@ static int ParseCellInfoGsm(const char *str, CellInfo *ci)
     return HRIL_ERR_SUCCESS;
 }
 
-static int ParseCellInfoLte(const char *str, CellInfo *ci)
+static int32_t ParseCellInfoLte(const char *str, CellInfo *ci)
 {
     char *pStr = (char *)str;
     char *pat = NULL;
@@ -972,7 +1007,7 @@ static int ParseCellInfoLte(const char *str, CellInfo *ci)
     return HRIL_ERR_SUCCESS;
 }
 
-static int ParseCellInfoWcdma(const char *str, CellInfo *ci)
+static int32_t ParseCellInfoWcdma(const char *str, CellInfo *ci)
 {
     char *pStr = (char *)str;
     char *pat = NULL;
@@ -1000,7 +1035,7 @@ static int ParseCellInfoWcdma(const char *str, CellInfo *ci)
     return HRIL_ERR_SUCCESS;
 }
 
-static int ParseCellInfoCdma(const char *str, CellInfo *ci)
+static int32_t ParseCellInfoCdma(const char *str, CellInfo *ci)
 {
     char *pStr = (char *)str;
     char *pat = NULL;
@@ -1043,7 +1078,7 @@ static int ParseCellInfoCdma(const char *str, CellInfo *ci)
     return HRIL_ERR_SUCCESS;
 }
 
-static int ParseCellInfoTdscdma(const char *str, CellInfo *ci)
+static int32_t ParseCellInfoTdscdma(const char *str, CellInfo *ci)
 {
     char *pStr = (char *)str;
     char *pat = NULL;
@@ -1086,7 +1121,7 @@ static int ParseCellInfoTdscdma(const char *str, CellInfo *ci)
     return HRIL_ERR_SUCCESS;
 }
 
-static int ParseCellInfoNr(const char *str, CellInfo *ci)
+static int32_t ParseCellInfoNr(const char *str, CellInfo *ci)
 {
     char *pStr = (char *)str;
     char *pat = NULL;
@@ -1107,14 +1142,14 @@ static int ParseCellInfoNr(const char *str, CellInfo *ci)
     if (NextInt(&pStr, &ci->ServiceCellParas.nr.tac) < 0) {
         return ErrorHandling();
     }
-    if (NextInt(&pStr, &ci->ServiceCellParas.nr.nci) < 0) {
+    if (NextInt64(&pStr, &ci->ServiceCellParas.nr.nci) < 0) {
         return ErrorHandling();
     }
     ci->ratType = NETWORK_TYPE_NR;
     return HRIL_ERR_SUCCESS;
 }
 
-static int ParseCellInfos(const char *str, const CellInfo *cellInfo)
+static int32_t ParseCellInfos(const char *str, const CellInfo *cellInfo)
 {
     CellInfo *ci = (CellInfo *)cellInfo;
     char *pStr = (char *)str;
@@ -1163,17 +1198,17 @@ static int ParseCellInfos(const char *str, const CellInfo *cellInfo)
     return HRIL_ERR_SUCCESS;
 }
 
-void ReqGetCellInfoList(const ReqDataInfo *requestInfo)
+void ReqGetNeighboringCellInfoList(const ReqDataInfo *requestInfo)
 {
     const long TIME_OUT = DEFAULT_TIMEOUT;
-    int err = HRIL_ERR_SUCCESS;
-    int countCellInfo = 0;
-    int index = 0;
+    int32_t err = HRIL_ERR_SUCCESS;
+    int32_t countCellInfo = 0;
+    int32_t index = 0;
     ResponseInfo *responseInfo = NULL;
     Line *pLine = NULL;
     CellInfo *cellInfo = NULL;
-    CellInfoList cellInfoList;
-    int ret = SendCommandLock("AT^MONNC", "^MONNC:", TIME_OUT, &responseInfo);
+    CellInfoList cellInfoList = {0, NULL};
+    int32_t ret = SendCommandLock("AT^MONNC", "^MONNC:", TIME_OUT, &responseInfo);
     struct ResponseAck respDataAck = {responseInfo, NULL, 0};
     respDataAck.respDataPointer = (uint8_t *)&cellInfoList;
     respDataAck.respDataLen = sizeof(CellInfoList);
@@ -1186,21 +1221,21 @@ void ReqGetCellInfoList(const ReqDataInfo *requestInfo)
     if (ret != 0 || responseInfo->success == 0) {
         TELEPHONY_LOGE("send AT CMD failed!");
         err = (ret != 0) ? HRIL_ERR_GENERIC_FAILURE : HRIL_ERR_CMD_SEND_FAILURE;
-        ResponseNetworkReport(HRIL_SIM_SLOT_0, requestInfo, err, &respDataAck);
+        ResponseNetworkReport(requestInfo->slotId, requestInfo, err, &respDataAck);
         return;
     }
     for (countCellInfo = 0, pLine = responseInfo->head; pLine != NULL; pLine = pLine->next) {
         countCellInfo++;
     }
     if (countCellInfo == 0) {
-        ResponseNetworkReport(HRIL_SIM_SLOT_0, requestInfo, HRIL_ERR_INVALID_RESPONSE, &respDataAck);
+        ResponseNetworkReport(requestInfo->slotId, requestInfo, HRIL_ERR_INVALID_RESPONSE, &respDataAck);
         return;
     }
     TELEPHONY_LOGI("countCellInfo:%{public}d", countCellInfo);
     cellInfo = (CellInfo *)calloc(countCellInfo, sizeof(CellInfo));
     if (cellInfo == NULL) {
         TELEPHONY_LOGE("cellInfoList alloc failed!");
-        ResponseNetworkReport(HRIL_SIM_SLOT_0, requestInfo, HRIL_ERR_MEMORY_FULL, &respDataAck);
+        ResponseNetworkReport(requestInfo->slotId, requestInfo, HRIL_ERR_MEMORY_FULL, &respDataAck);
         return;
     }
     for (pLine = responseInfo->head; pLine != NULL; pLine = pLine->next) {
@@ -1213,7 +1248,7 @@ void ReqGetCellInfoList(const ReqDataInfo *requestInfo)
 
     cellInfoList.itemNum = index;
     cellInfoList.cellNearbyInfo = cellInfo;
-    ResponseNetworkReport(HRIL_SIM_SLOT_0, requestInfo, err, &respDataAck);
+    ResponseNetworkReport(requestInfo->slotId, requestInfo, err, &respDataAck);
     free(cellInfo);
     return;
 }
@@ -1322,15 +1357,12 @@ static void ParseGetNrCellInfoLine(char *line, CurrentCellInfoVendor *response)
     NextInt(&line, &response->ServiceCellParas.nr.nrArfcn);
     NextInt(&line, &response->ServiceCellParas.nr.pci);
     NextInt(&line, &response->ServiceCellParas.nr.tac);
-    NextInt(&line, &response->ServiceCellParas.nr.nci);
-    TELEPHONY_LOGI("ParseGetNrCellInfoLine nrArfcn:%{public}d,pci:%{public}d,tac:%{public}d,nci:%{public}d,",
-        response->ServiceCellParas.nr.nrArfcn, response->ServiceCellParas.nr.pci, response->ServiceCellParas.nr.tac,
-        response->ServiceCellParas.nr.nci);
+    NextInt64(&line, &response->ServiceCellParas.nr.nci);   
 }
 
-static int ParseGetCurrentCellInfoResponseLineSwitch(const char *lineStr, const CurrentCellInfoVendor *hrilResponse)
+static int32_t ParseGetCurrentCellInfoResponseLineSwitch(const char *str, const CurrentCellInfoVendor *hrilResponse)
 {
-    char *line = (char *)lineStr;
+    char *line = (char *)str;
     CurrentCellInfoVendor *response = (CurrentCellInfoVendor *)hrilResponse;
     if ((line == NULL) || (response == NULL)) {
         TELEPHONY_LOGE("ParseGetCurrentCellInfoResponseLineSwitch line or response param is null");
@@ -1362,11 +1394,11 @@ static int ParseGetCurrentCellInfoResponseLineSwitch(const char *lineStr, const 
     return HRIL_ERR_SUCCESS;
 }
 
-static int ParseGetCurrentCellInfoResponseLine(char *line, CurrentCellInfoVendor *response)
+static int32_t ParseGetCurrentCellInfoResponseLine(char *line, CurrentCellInfoVendor *response)
 {
     char *c = NULL;
     TELEPHONY_LOGI("ParseGetCurrentCellInfoResponseLine  line %{public}s", line);
-    int err = SkipATPrefix(&line);
+    int32_t err = SkipATPrefix(&line);
     if (err < 0) {
         return err;
     }
@@ -1389,9 +1421,9 @@ static int ParseGetCurrentCellInfoResponseLine(char *line, CurrentCellInfoVendor
     } else if (!strcmp(c, "NONE")) {
         memset_s(response, sizeof(CurrentCellInfoVendor), 0, sizeof(CurrentCellInfoVendor));
         response->ratType = NETWORK_TYPE_UNKNOWN;
-        return 0;
+        return HRIL_ERR_SUCCESS;
     } else {
-        TELEPHONY_LOGI("ParseCurrentCellInfo unsupport rattype line %{public}s", line);
+        TELEPHONY_LOGI("ParseCurrentCellInfo unSupport ratType line %{public}s", line);
         return -1;
     }
     err = NextInt(&line, &response->mcc);
@@ -1403,59 +1435,104 @@ static int ParseGetCurrentCellInfoResponseLine(char *line, CurrentCellInfoVendor
         return err;
     }
     ParseGetCurrentCellInfoResponseLineSwitch(line, response);
-    return 0;
+    return HRIL_ERR_SUCCESS;
+}
+
+int32_t ProcessCurrentCellList(struct ReportInfo reportInfo, const char *s)
+{
+    char *str = (char *)s;
+    if (str == NULL) {
+        TELEPHONY_LOGE("ProcessCurrentCellList Str  is null.");
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
+    int32_t err = SkipATPrefix(&str);
+    if (err < 0) {
+        TELEPHONY_LOGE("ProcessCurrentCellList skip failed: [%{public}s]", str);
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
+    int32_t semicolonNum = FindSemicolonCharNum(str);
+    if (semicolonNum > 0) {
+        CurrentCellInfoVendor *cciv = NULL;
+        CurrentCellInfoList cellList = {0, NULL};
+        cciv = (CurrentCellInfoVendor *)calloc(semicolonNum, sizeof(CurrentCellInfoVendor));
+        if (cciv == NULL) {
+            TELEPHONY_LOGE("^MONSC: notify CurrentCellInfoVendor alloc failed!");
+            return HRIL_ERR_MEMORY_FULL;
+        }
+        for (int32_t i = 0; i < semicolonNum; i++) {
+            char *pStr = strsep(&str, ";");
+            if (ParseGetCurrentCellInfoResponseLine(pStr, &cciv[cellList.itemNum]) != 0) {
+                continue;
+            }
+            cellList.itemNum++;
+        }
+        cellList.currentCellInfo = cciv;
+        reportInfo.error = HRIL_ERR_SUCCESS;
+        reportInfo.type = HRIL_NOTIFICATION;
+        reportInfo.notifyId = HNOTI_NETWORK_CURRENT_CELL_UPDATED;
+        OnNetworkReport(GetSlotId(NULL), reportInfo, (const uint8_t *)&cellList, sizeof(CurrentCellInfoList));
+        if (cellList.currentCellInfo != NULL) {
+            free(cellList.currentCellInfo);
+        }
+        return HRIL_ERR_SUCCESS;
+    } else {
+        TELEPHONY_LOGW("^MONSC: notify str format  unexpected: %{public}s", str);
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
 }
 
 void ReqGetCurrentCellInfo(const ReqDataInfo *requestInfo)
 {
     const long TIME_OUT = DEFAULT_TIMEOUT;
-    int err = HRIL_ERR_SUCCESS;
-    CurrentCellInfoVendor cciv;
+    int32_t err = HRIL_ERR_SUCCESS;
+    int32_t countCellInfo = 0;
+    int32_t index = 0;
     ResponseInfo *responseInfo = NULL;
-    int ret = SendCommandLock("AT^MONSC", "^MONSC:", TIME_OUT, &responseInfo);
+    Line *pLine = NULL;
+    CurrentCellInfoVendor *currCellInfo = NULL;
+    CurrentCellInfoList currCellInfoList = {0, NULL};
+    int32_t ret = SendCommandLock("AT^MONSC", "^MONSC:", TIME_OUT, &responseInfo);
     struct ResponseAck respDataAck = {responseInfo, NULL, 0};
-    respDataAck.respDataPointer = (uint8_t *)&cciv;
-    respDataAck.respDataLen = sizeof(CurrentCellInfoVendor);
+    respDataAck.respDataPointer = (uint8_t *)&currCellInfoList;
+    respDataAck.respDataLen = sizeof(CurrentCellInfoList);
     if (responseInfo == NULL) {
-        TELEPHONY_LOGE("responseInfo is nullptr");
-        err = HRIL_ERR_INVALID_RESPONSE;
-        ResponseNetworkReport(HRIL_SIM_SLOT_0, requestInfo, err, &respDataAck);
+        TELEPHONY_LOGE("AT^MONSC responseInfo is nullptr");
+        ResponseNetworkReport(requestInfo->slotId, requestInfo, HRIL_ERR_INVALID_RESPONSE, &respDataAck);
         return;
     }
     if (ret != 0 || responseInfo->success == 0) {
-        TELEPHONY_LOGE("send AT CMD failed!");
+        TELEPHONY_LOGE("AT^MONSC send AT CMD failed!");
         err = (ret != 0) ? HRIL_ERR_GENERIC_FAILURE : HRIL_ERR_CMD_SEND_FAILURE;
-        memset_s(&cciv, sizeof(CurrentCellInfoVendor), 0, sizeof(CurrentCellInfoVendor));
-        ResponseNetworkReport(HRIL_SIM_SLOT_0, requestInfo, err, &respDataAck);
+        ResponseNetworkReport(requestInfo->slotId, requestInfo, err, &respDataAck);
         return;
     }
-
-    if (responseInfo->head == NULL) {
-        TELEPHONY_LOGE("responseInfo->head is nullptr");
-        err = HRIL_ERR_INVALID_RESPONSE;
-        ResponseNetworkReport(HRIL_SIM_SLOT_0, requestInfo, err, &respDataAck);
+    for (countCellInfo = 0, pLine = responseInfo->head; pLine != NULL; pLine = pLine->next) {
+        countCellInfo++;
+    }
+    if (countCellInfo == 0) {
+        ResponseNetworkReport(requestInfo->slotId, requestInfo, HRIL_ERR_INVALID_RESPONSE, &respDataAck);
         return;
     }
-    char *line = responseInfo->head->data;
-    if (line == NULL) {
-        TELEPHONY_LOGE("requestGetCurrentCellInfo, line = %{public}s", line);
-        err = HRIL_ERR_INVALID_RESPONSE;
-        memset_s(&cciv, sizeof(CurrentCellInfoVendor), 0, sizeof(CurrentCellInfoVendor));
-        ResponseNetworkReport(HRIL_SIM_SLOT_0, requestInfo, err, &respDataAck);
+    currCellInfo = (CurrentCellInfoVendor *)calloc(countCellInfo, sizeof(CurrentCellInfoVendor));
+    if (currCellInfo == NULL) {
+        TELEPHONY_LOGE("currentCellList  countCellInfo:%{public}d,currCellInfo alloc failed!", countCellInfo);
+        ResponseNetworkReport(requestInfo->slotId, requestInfo, HRIL_ERR_MEMORY_FULL, &respDataAck);
         return;
     }
-    if (ParseGetCurrentCellInfoResponseLine(line, &cciv) != 0) {
-        TELEPHONY_LOGE("requestGetCurrentCellInfo, line = %{public}s", line);
-        err = HRIL_ERR_INVALID_RESPONSE;
-        memset_s(&cciv, sizeof(CurrentCellInfoVendor), 0, sizeof(CurrentCellInfoVendor));
-        ResponseNetworkReport(HRIL_SIM_SLOT_0, requestInfo, err, &respDataAck);
-        return;
+    for (pLine = responseInfo->head; pLine != NULL; pLine = pLine->next) {
+        if (ParseGetCurrentCellInfoResponseLine(pLine->data, &currCellInfo[index]) != 0) {
+            continue;
+        }
+        index++;
     }
-    ResponseNetworkReport(HRIL_SIM_SLOT_0, requestInfo, err, &respDataAck);
+    currCellInfoList.itemNum = index;
+    currCellInfoList.currentCellInfo = currCellInfo;
+    ResponseNetworkReport(requestInfo->slotId, requestInfo, err, &respDataAck);
+    free(currCellInfo);
     return;
 }
 
-static int OperListErrorHandler(AvailableOperInfo **ppOperInfo, AvailableOperInfo *pOperInfo)
+static int32_t OperListErrorHandler(AvailableOperInfo **ppOperInfo, AvailableOperInfo *pOperInfo)
 {
     TELEPHONY_LOGE("ReqGetNetworkSearchInformation Failed");
     DealNetworkSearchInformation(0, ppOperInfo, pOperInfo);
@@ -1464,17 +1541,17 @@ static int OperListErrorHandler(AvailableOperInfo **ppOperInfo, AvailableOperInf
 
 int32_t ProcessOperListToUse(const char *list)
 {
-    const int UNUSED_ITEM_COUNT = 2;
+    const int32_t UNUSED_ITEM_COUNT = 2;
     AvailableOperInfo **ppOperInfo = NULL;
     AvailableOperInfo *pOperInfo = NULL;
     SetAtPauseFlag(false);
     alarm(0);
-    int item = ParseListItemNum(list);
+    int32_t item = ParseListItemNum(list);
     if (item <= UNUSED_ITEM_COUNT) {
         return OperListErrorHandler(ppOperInfo, pOperInfo);
     }
     char *line = (char *)list;
-    int ret = SkipATPrefix(&line);
+    int32_t ret = SkipATPrefix(&line);
     if (ret < 0) {
         return OperListErrorHandler(ppOperInfo, pOperInfo);
     }
@@ -1492,11 +1569,11 @@ int32_t ProcessOperListToUse(const char *list)
         return OperListErrorHandler(ppOperInfo, pOperInfo);
     }
     (void)memset_s(pOperInfo, item * sizeof(AvailableOperInfo), 0, item * sizeof(AvailableOperInfo));
-    for (int j = 0; j < item; j++) {
+    for (int32_t j = 0; j < item; j++) {
         ppOperInfo[j] = &(pOperInfo[j]);
     }
 
-    int operCount = ParseOperListInfo(line, item, pOperInfo, ppOperInfo);
+    int32_t operCount = ParseOperListInfo(line, item, pOperInfo, ppOperInfo);
     if (operCount != 0) {
         DealNetworkSearchInformation(operCount, ppOperInfo, pOperInfo);
     } else {
@@ -1533,22 +1610,22 @@ void ReqSetNetworkSelectionMode(const ReqDataInfo *requestInfo, const HRilSetNet
     HRilSetNetworkModeInfo *setModeInfo = (HRilSetNetworkModeInfo *)data;
     if (setModeInfo == NULL) {
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_NULL_POINT, HRIL_RESPONSE, 0);
-        OnNetworkReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 1);
+        OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 1);
         TELEPHONY_LOGE("SetAutomaticMode HRIL_ERR_NULL_POINT");
         return;
     }
     if (!PrepareSetNetworkSelectionMode(cmdBuff, setModeInfo)) {
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_PARAMETER, HRIL_RESPONSE, 0);
-        OnNetworkReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 1);
+        OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 1);
         TELEPHONY_LOGE("SetAutomaticMode HRIL_ERR_INVALID_PARAMETER");
         return;
     }
     TELEPHONY_LOGI("requestSetAutomaticModeForNetworks, cmd = %{public}s", cmd);
-    int err = SendCommandLock(cmd, NULL, 0, &responseInfo);
+    int32_t err = SendCommandLock(cmd, NULL, 0, &responseInfo);
 
     if (responseInfo == NULL) {
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_NULL_POINT, HRIL_RESPONSE, 0);
-        OnNetworkReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 1);
+        OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 1);
         TELEPHONY_LOGE("SetAutomaticMode responseInfo == NULL");
         return;
     }
@@ -1557,79 +1634,78 @@ void ReqSetNetworkSelectionMode(const ReqDataInfo *requestInfo, const HRilSetNet
         TELEPHONY_LOGE("ret is not equal to HDF_SUCCESS!");
         err = GetResponseErrorCode(responseInfo);
         reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-        OnNetworkReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 1);
+        OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 0);
         TELEPHONY_LOGE("SetAutomaticMode HRIL_ERR_GENERIC_FAILURE");
         FreeResponseInfo(responseInfo);
         return;
     }
-    reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 1);
-    OnNetworkReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+    reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
+    OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 0);
     FreeResponseInfo(responseInfo);
 }
 
 void ReqGetNetworkSelectionMode(const ReqDataInfo *requestInfo)
 {
     const long TIME_OUT = DEFAULT_TIMEOUT;
-    int err = HRIL_ERR_SUCCESS;
+    int32_t err = HRIL_ERR_SUCCESS;
     ResponseInfo *responseInfo = NULL;
-    int state = 0;
+    int32_t state = 0;
     struct ReportInfo reportInfo;
-    int ret = SendCommandLock("AT+COPS?", "+COPS:", TIME_OUT, &responseInfo);
+    int32_t ret = SendCommandLock("AT+COPS?", "+COPS:", TIME_OUT, &responseInfo);
     struct ResponseAck respDataAck = {responseInfo, NULL, 0};
     if (responseInfo == NULL) {
         TELEPHONY_LOGE("responseInfo is nullptr");
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_NULL_POINT, HRIL_RESPONSE, 0);
-        OnNetworkReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+        OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 0);
         return;
     }
     if (ret != 0 || responseInfo->success == 0) {
         err = GetResponseErrorCode(responseInfo);
         TELEPHONY_LOGE("send AT CMD failed!");
-        ResponseNetworkReport(HRIL_SIM_SLOT_0, requestInfo, err, &respDataAck);
+        ResponseNetworkReport(requestInfo->slotId, requestInfo, err, &respDataAck);
         return;
     }
     if (responseInfo->head == NULL) {
         TELEPHONY_LOGE("no data!");
         err = HRIL_ERR_NULL_POINT;
-        ResponseNetworkReport(HRIL_SIM_SLOT_0, requestInfo, err, &respDataAck);
+        ResponseNetworkReport(requestInfo->slotId, requestInfo, err, &respDataAck);
         return;
     }
-    Line *pLine = responseInfo->head;
-    char *line = pLine->data;
+    char *line = responseInfo->head->data;
     ret = SkipATPrefix(&line);
     if (ret < 0) {
         err = HRIL_ERR_INVALID_RESPONSE;
         TELEPHONY_LOGE("Response is Invalid!");
-        ResponseNetworkReport(HRIL_SIM_SLOT_0, requestInfo, err, &respDataAck);
+        ResponseNetworkReport(requestInfo->slotId, requestInfo, err, &respDataAck);
         return;
     }
     ret = NextInt(&line, &state);
     if (ret < 0) {
         err = HRIL_ERR_INVALID_RESPONSE;
         TELEPHONY_LOGE("Response is Invalid!");
-        ResponseNetworkReport(HRIL_SIM_SLOT_0, requestInfo, err, &respDataAck);
+        ResponseNetworkReport(requestInfo->slotId, requestInfo, err, &respDataAck);
         return;
     }
-
-    respDataAck.respDataPointer = (uint8_t *)&state;
-    respDataAck.respDataLen = sizeof(int);
-    ResponseNetworkReport(HRIL_SIM_SLOT_0, requestInfo, HRIL_ERR_SUCCESS, &respDataAck);
-    NotifyNetWorkTime();
+    int32_t mode = (int32_t)state;
+    respDataAck.respDataPointer = (uint8_t *)&mode;
+    respDataAck.respDataLen = sizeof(int32_t);
+    ResponseNetworkReport(requestInfo->slotId, requestInfo, HRIL_ERR_SUCCESS, &respDataAck);
+    NotifyNetWorkTime(requestInfo->slotId);
     return;
 }
 
-static int IntToNetTypeCmd(int value, char *dst, int dstMaxSize)
+static int32_t IntToNetTypeCmd(int32_t value, char *dst, int32_t dstMaxSize)
 {
-    int len = MAX_CMD_LENGTH - 1;
+    int32_t len = MAX_CMD_LENGTH - 1;
     (void)strcat_s(dst, len, "AT^SYSCFGEX=\"");
-    const int MAX_PREFERRED_NET_ENUM = 99;
-    const int MIN_CHAR_ARRAY_SIZE = 50;
-    const int CONVERT_FAIL = -1;
-    const int DECIMAL = 10;
+    const int32_t MAX_PREFERRED_NET_ENUM = 99;
+    const int32_t MIN_CHAR_ARRAY_SIZE = 50;
+    const int32_t CONVERT_FAIL = -1;
+    const int32_t DECIMAL = 10;
     if ((value > MAX_PREFERRED_NET_ENUM) || (value < 0) || (dstMaxSize < MIN_CHAR_ARRAY_SIZE)) {
         return CONVERT_FAIL;
     }
-    int pos = strlen(dst);
+    int32_t pos = strlen(dst);
     if (value < DECIMAL) {
         dst[pos++] = '0';
         dst[pos++] = (value % DECIMAL) + '0';
@@ -1682,16 +1758,16 @@ void ReqSetPreferredNetwork(const ReqDataInfo *requestInfo, const int32_t *data)
     struct ReportInfo reportInfo;
     if (data == NULL) {
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_PARAMETER, HRIL_RESPONSE, 0);
-        OnNetworkReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 1);
+        OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 0);
         return;
     }
-    int net = *(int *)data;
-    int err = HRIL_ERR_INVALID_PARAMETER;
+    int32_t net = *(int32_t *)data;
+    int32_t err = HRIL_ERR_INVALID_PARAMETER;
     char *cmd = PrepareCommandByNetworkType(net);
     if (cmd == NULL) {
         TELEPHONY_LOGE("RequestReqSetPreferredNetwork  HRIL_ERR_INVALID_PARAMETER cmd NULL");
         reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-        OnNetworkReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+        OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 0);
         return;
     }
     err = SendCommandLock(cmd, NULL, 0, &responseInfo);
@@ -1701,18 +1777,18 @@ void ReqSetPreferredNetwork(const ReqDataInfo *requestInfo, const int32_t *data)
     }
     if (responseInfo == NULL) {
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
-        OnNetworkReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 1);
+        OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 0);
         return;
     }
     if (err != 0 || responseInfo->success == 0) {
         err = GetResponseErrorCode(responseInfo);
     }
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-    OnNetworkReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+    OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 0);
     FreeResponseInfo(responseInfo);
 }
 
-static int ParseNetTypeStr(const char *netType)
+static int32_t ParseNetTypeStr(const char *netType)
 {
     TELEPHONY_LOGI("enter to [%{public}s]:%{public}d", __func__, __LINE__);
     if (netType == NULL) {
@@ -1735,7 +1811,7 @@ static int ParseNetTypeStr(const char *netType)
     } else if (strcmp(netType, WCDMA_GSM_TYPE) == 0) {
         return HRIL_NETWORK_WCDMA_GSM;
     } else {
-        int net = ConvertCharToInt(netType);
+        int32_t net = ConvertCharToInt32(netType);
         if (((net > HRIL_NETWORK_WCDMA_GSM) && (net <= HRIL_NETWORK_LTE_TDSCDMA_WCDMA_GSM_EVDO_CDMA)) ||
             ((net >= HRIL_NETWORK_NR_ONLY) && (net <= HRIL_NETWORK_NR_LTE_TDSCDMA_CDMA_EVDO_GSM_WCDMA))) {
             return net;
@@ -1748,40 +1824,41 @@ static int ParseNetTypeStr(const char *netType)
 void ReqGetPreferredNetwork(const ReqDataInfo *requestInfo)
 {
     const long TIME_OUT = DEFAULT_TIMEOUT;
-    int err = HRIL_ERR_SUCCESS;
+    int32_t err = HRIL_ERR_SUCCESS;
     ResponseInfo *responseInfo = NULL;
     char *netTypeStr = "";
-    int ret = SendCommandLock("AT^SYSCFGEX?", "^SYSCFGEX:", TIME_OUT, &responseInfo);
-    struct ResponseAck respDataAck = {responseInfo, NULL, sizeof(int)};
+    int32_t ret = SendCommandLock("AT^SYSCFGEX?", "^SYSCFGEX:", TIME_OUT, &responseInfo);
+    struct ResponseAck respDataAck = {responseInfo, NULL, 0};
     if (responseInfo == NULL) {
         TELEPHONY_LOGE("responseInfo is null");
-        ResponseNetworkReport(HRIL_SIM_SLOT_0, requestInfo, HRIL_ERR_NULL_POINT, &respDataAck);
+        ResponseNetworkReport(requestInfo->slotId, requestInfo, HRIL_ERR_NULL_POINT, &respDataAck);
         return;
     }
     respDataAck.responseInfo = responseInfo;
     if (ret != 0 || !responseInfo->success) {
         err = GetResponseErrorCode(responseInfo);
         TELEPHONY_LOGE("send AT CMD failed!");
-        ResponseNetworkReport(HRIL_SIM_SLOT_0, requestInfo, err, &respDataAck);
+        ResponseNetworkReport(requestInfo->slotId, requestInfo, err, &respDataAck);
         return;
     }
     if (responseInfo->head == NULL) {
-        ResponseNetworkReport(HRIL_SIM_SLOT_0, requestInfo, HRIL_ERR_INVALID_RESPONSE, &respDataAck);
+        ResponseNetworkReport(requestInfo->slotId, requestInfo, HRIL_ERR_INVALID_RESPONSE, &respDataAck);
         return;
     }
     Line *pLine = responseInfo->head;
     char *line = pLine->data;
     if (SkipATPrefix(&line) < 0) {
-        ResponseNetworkReport(HRIL_SIM_SLOT_0, requestInfo, HRIL_ERR_INVALID_RESPONSE, &respDataAck);
+        ResponseNetworkReport(requestInfo->slotId, requestInfo, HRIL_ERR_INVALID_RESPONSE, &respDataAck);
         return;
     }
     if (NextStr(&line, &netTypeStr) < 0) {
-        ResponseNetworkReport(HRIL_SIM_SLOT_0, requestInfo, HRIL_ERR_INVALID_RESPONSE, &respDataAck);
+        ResponseNetworkReport(requestInfo->slotId, requestInfo, HRIL_ERR_INVALID_RESPONSE, &respDataAck);
         return;
     }
-    int netType = ParseNetTypeStr(netTypeStr);
+    int32_t netType = ParseNetTypeStr(netTypeStr);
     respDataAck.respDataPointer = (uint8_t *)&netType;
-    ResponseNetworkReport(HRIL_SIM_SLOT_0, requestInfo, HRIL_ERR_SUCCESS, &respDataAck);
+    respDataAck.respDataLen = sizeof(int32_t);
+    ResponseNetworkReport(requestInfo->slotId, requestInfo, HRIL_ERR_SUCCESS, &respDataAck);
 }
 
 static HRilRadioCapability *GetRadioCapability(void)
@@ -1792,31 +1869,33 @@ static HRilRadioCapability *GetRadioCapability(void)
 
 void ReqGetRadioCapability(const ReqDataInfo *requestInfo)
 {
-    int err = HRIL_ERR_SUCCESS;
+    int32_t err = HRIL_ERR_SUCCESS;
     struct ReportInfo reportInfo;
-    TELEPHONY_LOGE("ReqGetRadioCapability before ratfamily:%{public}d", GetRadioCapability()->ratfamily);
-    GetRadioCapability()->ratfamily = 0xffff;
+    TELEPHONY_LOGE("ReqGetRadioCapability before ratFamily:%{public}d", GetRadioCapability()->ratFamily);
+    GetRadioCapability()->ratFamily = RAF_AUTO;
     TELEPHONY_LOGE("ReqGetRadioCapability OnNetworkReport ");
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-    OnNetworkReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)GetRadioCapability(), sizeof(HRilRadioCapability));
+    OnNetworkReport(
+        requestInfo->slotId, reportInfo, (const uint8_t *)GetRadioCapability(), sizeof(HRilRadioCapability));
 }
 
 void ReqSetRadioCapability(const ReqDataInfo *requestInfo, const HRilRadioCapability *data)
 {
-    int err = HRIL_ERR_SUCCESS;
+    int32_t err = HRIL_ERR_SUCCESS;
     struct ReportInfo reportInfo;
     HRilRadioCapability *hRilRadioCapability = (HRilRadioCapability *)data;
     if (hRilRadioCapability == NULL) {
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_NULL_POINT, HRIL_RESPONSE, 0);
-        OnNetworkReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 1);
+        OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 0);
         TELEPHONY_LOGE("ReqSetRadioCapability HRIL_ERR_NULL_POINT");
         return;
     }
-    GetRadioCapability()->ratfamily = hRilRadioCapability->ratfamily;
+    GetRadioCapability()->ratFamily = hRilRadioCapability->ratFamily;
     strcpy_s(GetRadioCapability()->modemId, strlen(hRilRadioCapability->modemId) + 1, hRilRadioCapability->modemId);
-    TELEPHONY_LOGE("ReqSetRadioCapability OnNetworkReport ");
+    TELEPHONY_LOGI("ReqSetRadioCapability OnNetworkReport ");
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-    OnNetworkReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)GetRadioCapability(), sizeof(HRilRadioCapability));
+    OnNetworkReport(
+        requestInfo->slotId, reportInfo, (const uint8_t *)GetRadioCapability(), sizeof(HRilRadioCapability));
 }
 
 void ReqSetPsAttachStatus(const ReqDataInfo *requestInfo, const int32_t *data)
@@ -1826,11 +1905,11 @@ void ReqSetPsAttachStatus(const ReqDataInfo *requestInfo, const int32_t *data)
     struct ReportInfo reportInfo;
     if (data == NULL) {
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_PARAMETER, HRIL_RESPONSE, 0);
-        OnNetworkReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 1);
+        OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 0);
         TELEPHONY_LOGE("ReqSetPsAttachStatus  HRIL_ERR_INVALID_PARAMETER data NULL");
         return;
     }
-    int setPsAttachStatus = *(int *)data;
+    int32_t setPsAttachStatus = *(int32_t *)data;
     char *cmd = NULL;
     if (setPsAttachStatus == 1) {
         cmd = "AT+CGATT=1";
@@ -1838,15 +1917,15 @@ void ReqSetPsAttachStatus(const ReqDataInfo *requestInfo, const int32_t *data)
         cmd = "AT+CGATT=0";
     } else {
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_PARAMETER, HRIL_RESPONSE, 0);
-        OnNetworkReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 1);
+        OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 0);
         TELEPHONY_LOGE("ReqSetPsAttachStatus:  setPsAttachStatus > 1");
         return;
     }
     TELEPHONY_LOGI("ReqSetPsAttachStatus, cmd = %{public}s", cmd);
-    int err = SendCommandLock(cmd, NULL, TIME_OUT, &responseInfo);
+    int32_t err = SendCommandLock(cmd, NULL, TIME_OUT, &responseInfo);
     if (responseInfo == NULL) {
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
-        OnNetworkReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 1);
+        OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 0);
         TELEPHONY_LOGE("ReqSetPsAttachStatus responseInfo == NULL");
         return;
     }
@@ -1856,11 +1935,11 @@ void ReqSetPsAttachStatus(const ReqDataInfo *requestInfo, const int32_t *data)
         TELEPHONY_LOGE("ReqSetPsAttachStatus errcode = %{public}d", err);
     }
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-    OnNetworkReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+    OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 0);
     FreeResponseInfo(responseInfo);
 }
 
-static int ParsePsAttachStatusStr(const Line *pLine)
+static int32_t ParsePsAttachStatusStr(const Line *pLine)
 {
     const char *psAttachedStr = "1";
     const char *psDetachedStr = "0";
@@ -1869,7 +1948,7 @@ static int ParsePsAttachStatusStr(const Line *pLine)
         return -1;
     }
     char *line = pLine->data;
-    int ret = SkipATPrefix(&line);
+    int32_t ret = SkipATPrefix(&line);
     if (ret < 0) {
         return -1;
     }
@@ -1882,7 +1961,7 @@ static int ParsePsAttachStatusStr(const Line *pLine)
         return -1;
     }
     TELEPHONY_LOGI("psAttachStatusStr： [%{public}s]", psAttachStatusStr);
-    int psAttachStatus = -1;
+    int32_t psAttachStatus = -1;
     if (strcmp(psAttachStatusStr, psAttachedStr) == 0) {
         psAttachStatus = 1;
     } else if (strcmp(psAttachStatusStr, psDetachedStr) == 0) {
@@ -1895,34 +1974,34 @@ static int ParsePsAttachStatusStr(const Line *pLine)
 void ReqGetPsAttachStatus(const ReqDataInfo *requestInfo)
 {
     const long TIME_OUT = DEFAULT_TIMEOUT;
-    int err = HRIL_ERR_SUCCESS;
+    int32_t err = HRIL_ERR_SUCCESS;
     ResponseInfo *responseInfo = NULL;
-    int ret = SendCommandLock("AT+CGATT?", "+CGATT:", TIME_OUT, &responseInfo);
+    int32_t ret = SendCommandLock("AT+CGATT?", "+CGATT:", TIME_OUT, &responseInfo);
     struct ResponseAck respDataAck = {responseInfo, NULL, 0};
     if (responseInfo == NULL) {
         TELEPHONY_LOGE("responseInfo is null");
-        ResponseNetworkReport(HRIL_SIM_SLOT_0, requestInfo, HRIL_ERR_NULL_POINT, &respDataAck);
+        ResponseNetworkReport(requestInfo->slotId, requestInfo, HRIL_ERR_NULL_POINT, &respDataAck);
         return;
     }
     respDataAck.responseInfo = responseInfo;
     if (ret != 0 || !responseInfo->success) {
         err = GetResponseErrorCode(responseInfo);
         TELEPHONY_LOGE("send AT CMD failed!");
-        ResponseNetworkReport(HRIL_SIM_SLOT_0, requestInfo, err, &respDataAck);
+        ResponseNetworkReport(requestInfo->slotId, requestInfo, err, &respDataAck);
         return;
     }
-    int psAttachStatus = ParsePsAttachStatusStr(responseInfo->head);
+    int32_t psAttachStatus = ParsePsAttachStatusStr(responseInfo->head);
     if (psAttachStatus < 0) {
         TELEPHONY_LOGE("ReqGetPsAttachStatus: psAttachStatus < 0");
-        ResponseNetworkReport(HRIL_SIM_SLOT_0, requestInfo, HRIL_ERR_INVALID_RESPONSE, &respDataAck);
+        ResponseNetworkReport(requestInfo->slotId, requestInfo, HRIL_ERR_INVALID_RESPONSE, &respDataAck);
         return;
     }
     respDataAck.respDataPointer = (uint8_t *)&psAttachStatus;
-    respDataAck.respDataLen = sizeof(int);
-    ResponseNetworkReport(HRIL_SIM_SLOT_0, requestInfo, HRIL_ERR_SUCCESS, &respDataAck);
+    respDataAck.respDataLen = sizeof(int32_t);
+    ResponseNetworkReport(requestInfo->slotId, requestInfo, HRIL_ERR_SUCCESS, &respDataAck);
 }
 
-static int ExtractConfigInfo(const char *str, const HRilPhyChannelConfig *config)
+static int32_t ExtractConfigInfo(const char *str, const HRilPhyChannelConfig *config)
 {
     HRilPhyChannelConfig *cfg = (HRilPhyChannelConfig *)config;
     char *pStr = (char *)str;
@@ -1958,7 +2037,7 @@ static int ExtractConfigInfo(const char *str, const HRilPhyChannelConfig *config
             TELEPHONY_LOGE("contextIds alloc failed!");
             return HRIL_ERR_MEMORY_FULL;
         }
-        for (int i = 0; i < cfg->contextIdNum; i++) {
+        for (int32_t i = 0; i < cfg->contextIdNum; i++) {
             if (NextInt(&pStr, &(contextIds[i])) < 0) {
                 return HRIL_ERR_INVALID_RESPONSE;
             }
@@ -1970,19 +2049,19 @@ static int ExtractConfigInfo(const char *str, const HRilPhyChannelConfig *config
     return HRIL_ERR_SUCCESS;
 }
 
-void ProcessPhyChnlCfgNotify(struct ReportInfo reportInfo, char *srcstr)
+void ProcessPhyChnlCfgNotify(struct ReportInfo reportInfo, char *srcStr)
 {
-    char *str = (char *)srcstr;
+    char *str = (char *)srcStr;
     if (str == NULL) {
         TELEPHONY_LOGE("ProcessPhyChnlCfgNotify Str  is null.");
         return;
     }
-    int err = SkipATPrefix(&str);
+    int32_t err = SkipATPrefix(&str);
     if (err < 0) {
         TELEPHONY_LOGE("ProcessPhyChnlCfgNotify skip failed: [%{public}s]", str);
         return;
     }
-    int semicolonNum = FindSemicolonCharNum(str);
+    int32_t semicolonNum = FindSemicolonCharNum(str);
     if (semicolonNum > 0) {
         HRilPhyChannelConfig *configInfo = NULL;
         HRilChannelConfigList configInfoList = {0, NULL};
@@ -1991,9 +2070,9 @@ void ProcessPhyChnlCfgNotify(struct ReportInfo reportInfo, char *srcstr)
             TELEPHONY_LOGE("^PHYCHLCFG: notify configInfo alloc failed!");
             return;
         }
-        for (int i = 0; i < semicolonNum; i++) {
+        for (int32_t i = 0; i < semicolonNum; i++) {
             char *pStr = strsep(&str, ";");
-            int ret = ExtractConfigInfo(pStr, &configInfo[configInfoList.itemNum]);
+            int32_t ret = ExtractConfigInfo(pStr, &configInfo[configInfoList.itemNum]);
             if (ret != 0) {
                 continue;
             }
@@ -2003,8 +2082,8 @@ void ProcessPhyChnlCfgNotify(struct ReportInfo reportInfo, char *srcstr)
         reportInfo.error = HRIL_ERR_SUCCESS;
         reportInfo.type = HRIL_NOTIFICATION;
         reportInfo.notifyId = HNOTI_NETWORK_PHY_CHNL_CFG_UPDATED;
-        OnNetworkReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)&configInfoList, sizeof(HRilChannelConfigList));
-        for (int i = 0; i < configInfoList.itemNum; i++) {
+        OnNetworkReport(GetSlotId(NULL), reportInfo, (const uint8_t *)&configInfoList, sizeof(HRilChannelConfigList));
+        for (int32_t i = 0; i < configInfoList.itemNum; i++) {
             if (configInfoList.channelConfigs[i].contextIds != NULL) {
                 free(configInfoList.channelConfigs[i].contextIds);
             }
@@ -2017,7 +2096,7 @@ void ProcessPhyChnlCfgNotify(struct ReportInfo reportInfo, char *srcstr)
     }
 }
 
-static int ParseConfigInfo(const char *str, const HRilPhyChannelConfig *config)
+static int32_t ParseConfigInfo(const char *str, const HRilPhyChannelConfig *config)
 {
     HRilPhyChannelConfig *cfg = (HRilPhyChannelConfig *)config;
     char *pStr = (char *)str;
@@ -2029,7 +2108,7 @@ static int ParseConfigInfo(const char *str, const HRilPhyChannelConfig *config)
         TELEPHONY_LOGE("skip failed: [%{public}s]", str);
         return HRIL_ERR_INVALID_RESPONSE;
     }
-    int err = SkipATPrefix(&pStr);
+    int32_t err = SkipATPrefix(&pStr);
     if (err < 0) {
         TELEPHONY_LOGE("skip failed: [%{public}s]", str);
         return HRIL_ERR_INVALID_RESPONSE;
@@ -2040,19 +2119,19 @@ static int ParseConfigInfo(const char *str, const HRilPhyChannelConfig *config)
 void ReqGetPhysicalChannelConfig(const ReqDataInfo *requestInfo)
 {
     const long TIME_OUT = DEFAULT_TIMEOUT;
-    int err = HRIL_ERR_SUCCESS;
-    int configCount = 0;
+    int32_t err = HRIL_ERR_SUCCESS;
+    int32_t configCount = 0;
     ResponseInfo *responseInfo = NULL;
     Line *pLine = NULL;
     HRilPhyChannelConfig *configInfo = NULL;
     HRilChannelConfigList configInfoList = {0, NULL};
-    int ret = SendCommandLock("AT^PHYCHLCFG", "^PHYCHLCFG:", TIME_OUT, &responseInfo);
+    int32_t ret = SendCommandLock("AT^PHYCHLCFG", "^PHYCHLCFG:", TIME_OUT, &responseInfo);
     struct ResponseAck respDataAck = {responseInfo, NULL, 0};
     respDataAck.respDataPointer = (uint8_t *)&configInfoList;
     respDataAck.respDataLen = sizeof(HRilChannelConfigList);
     if (ret != 0 || !responseInfo->success) {
         err = (responseInfo->success == 0) ? HRIL_ERR_CMD_SEND_FAILURE : HRIL_ERR_GENERIC_FAILURE;
-        ResponseNetworkReport(HRIL_SIM_SLOT_0, requestInfo, err, &respDataAck);
+        ResponseNetworkReport(requestInfo->slotId, requestInfo, err, &respDataAck);
         TELEPHONY_LOGE("send AT CMD failed!");
     }
     for (configCount = 0, pLine = responseInfo->head; pLine != NULL; pLine = pLine->next) {
@@ -2063,7 +2142,7 @@ void ReqGetPhysicalChannelConfig(const ReqDataInfo *requestInfo)
         configInfo = (HRilPhyChannelConfig *)calloc(configCount, sizeof(HRilPhyChannelConfig));
         if (configInfo == NULL) {
             TELEPHONY_LOGE("configInfo alloc failed!");
-            ResponseNetworkReport(HRIL_SIM_SLOT_0, requestInfo, HRIL_ERR_MEMORY_FULL, &respDataAck);
+            ResponseNetworkReport(requestInfo->slotId, requestInfo, HRIL_ERR_MEMORY_FULL, &respDataAck);
             return;
         }
         for (pLine = responseInfo->head; pLine != NULL; pLine = pLine->next) {
@@ -2075,8 +2154,8 @@ void ReqGetPhysicalChannelConfig(const ReqDataInfo *requestInfo)
         }
         configInfoList.channelConfigs = configInfo;
     }
-    ResponseNetworkReport(HRIL_SIM_SLOT_0, requestInfo, err, &respDataAck);
-    for (int i = 0; i < configInfoList.itemNum; i++) {
+    ResponseNetworkReport(requestInfo->slotId, requestInfo, err, &respDataAck);
+    for (int32_t i = 0; i < configInfoList.itemNum; i++) {
         if (configInfoList.channelConfigs[i].contextIds != NULL) {
             free(configInfoList.channelConfigs[i].contextIds);
         }
@@ -2091,7 +2170,7 @@ void ReqSetLocateUpdates(const ReqDataInfo *requestInfo, HRilRegNotifyMode mode)
 {
     const long TIME_OUT = DEFAULT_TIMEOUT;
     ResponseInfo *responseInfo = NULL;
-    struct ReportInfo reportInfo;
+    struct ReportInfo reportInfo = {};
     char *cmd = NULL;
     if (mode == REG_NOTIFY_STAT_LAC_CELLID) {
         cmd = "AT+CREG=2";
@@ -2099,15 +2178,15 @@ void ReqSetLocateUpdates(const ReqDataInfo *requestInfo, HRilRegNotifyMode mode)
         cmd = "AT+CREG=1";
     } else {
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_PARAMETER, HRIL_RESPONSE, 0);
-        OnNetworkReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 1);
+        OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 0);
         TELEPHONY_LOGE("ReqSetLocateUpdates:  locateUpdateMode > 1");
         return;
     }
     TELEPHONY_LOGI("ReqSetLocateUpdates, cmd = %{public}s", cmd);
-    int err = SendCommandLock(cmd, NULL, TIME_OUT, &responseInfo);
+    int32_t err = SendCommandLock(cmd, NULL, TIME_OUT, &responseInfo);
     if (responseInfo == NULL) {
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
-        OnNetworkReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 1);
+        OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 0);
         TELEPHONY_LOGE("ReqSetLocateUpdates responseInfo == NULL");
         return;
     }
@@ -2117,20 +2196,20 @@ void ReqSetLocateUpdates(const ReqDataInfo *requestInfo, HRilRegNotifyMode mode)
         TELEPHONY_LOGE("ReqSetLocateUpdates errcode = %{public}d", err);
     }
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-    OnNetworkReport(HRIL_SIM_SLOT_0, reportInfo, NULL, 0);
+    OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 0);
     FreeResponseInfo(responseInfo);
 }
 
-void NotifyNetWorkTime(void)
+void NotifyNetWorkTime(int32_t slotId)
 {
     const long TIME_OUT = DEFAULT_TIMEOUT;
     ResponseInfo *responseInfo = NULL;
-    const int TIME_VALUE_LEN = 30;
+    const int32_t TIME_VALUE_LEN = 30;
     const size_t TIME_VALUE_OFFSET = 2;
     char timeStr[TIME_VALUE_LEN] = {0};
     struct ReportInfo reportInfo = {0};
 
-    int ret = SendCommandLock("AT+CCLK?", "+CCLK:", TIME_OUT, &responseInfo);
+    int32_t ret = SendCommandLock("AT+CCLK?", "+CCLK:", TIME_OUT, &responseInfo);
     if (ret != 0 || responseInfo->success == 0) {
         TELEPHONY_LOGE("send AT CMD failed!");
         return;
@@ -2158,10 +2237,10 @@ void NotifyNetWorkTime(void)
     for (size_t i = TIME_VALUE_OFFSET; i < len; i++) {
         timeStr[i - TIME_VALUE_OFFSET] = *(line + i);
     }
-    TELEPHONY_LOGI("netTime：%{public}s", timeStr);
+    TELEPHONY_LOGI("netTime:%{public}s", timeStr);
     reportInfo.notifyId = HNOTI_NETWORK_TIME_UPDATED;
     reportInfo.type = HRIL_NOTIFICATION;
     reportInfo.error = HRIL_ERR_SUCCESS;
-    OnNetworkReport(HRIL_SIM_SLOT_0, reportInfo, (const uint8_t *)timeStr, TIME_VALUE_LEN);
+    OnNetworkReport(GetSlotId(NULL), reportInfo, (const uint8_t *)timeStr, TIME_VALUE_LEN);
     FreeResponseInfo(responseInfo);
 }

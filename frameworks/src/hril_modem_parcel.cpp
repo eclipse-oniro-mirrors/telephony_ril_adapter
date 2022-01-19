@@ -19,22 +19,22 @@ namespace OHOS {
 namespace Telephony {
 bool UniInfo::ReadFromParcel(Parcel &parcel)
 {
-    if (!ReadBaseInt32(parcel, serial)) {
+    if (!Read(parcel, serial)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, gsmIndex)) {
+    if (!Read(parcel, gsmIndex)) {
         return false;
     }
-    if (!ReadBaseBool(parcel, flag)) {
+    if (!Read(parcel, flag)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, arg1)) {
+    if (!Read(parcel, arg1)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, arg2)) {
+    if (!Read(parcel, arg2)) {
         return false;
     }
-    if (!ReadBaseString(parcel, strTmp)) {
+    if (!Read(parcel, strTmp)) {
         return false;
     }
     return true;
@@ -42,22 +42,22 @@ bool UniInfo::ReadFromParcel(Parcel &parcel)
 
 bool UniInfo::Marshalling(Parcel &parcel) const
 {
-    if (!WriteBaseInt32(parcel, serial)) {
+    if (!Write(parcel, serial)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, gsmIndex)) {
+    if (!Write(parcel, gsmIndex)) {
         return false;
     }
-    if (!WriteBaseBool(parcel, flag)) {
+    if (!Write(parcel, flag)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, arg1)) {
+    if (!Write(parcel, arg1)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, arg2)) {
+    if (!Write(parcel, arg2)) {
         return false;
     }
-    if (!WriteBaseString(parcel, strTmp)) {
+    if (!Write(parcel, strTmp)) {
         return false;
     }
     return true;
@@ -72,82 +72,35 @@ std::shared_ptr<UniInfo> UniInfo::UnMarshalling(Parcel &parcel)
     return param;
 }
 
+VoiceRadioTechnology::VoiceRadioTechnology(const HRilVoiceRadioInfo &hrilVoiceRadioInfo)
+{
+    *this = hrilVoiceRadioInfo;
+}
+
+VoiceRadioTechnology &VoiceRadioTechnology::operator=(const HRilVoiceRadioInfo &hrilVoiceRadioInfo)
+{
+    srvStatus = hrilVoiceRadioInfo.srvStatus;
+    srvDomain = hrilVoiceRadioInfo.srvDomain;
+    roamStatus = hrilVoiceRadioInfo.roamStatus;
+    simStatus = hrilVoiceRadioInfo.simStatus;
+    lockStatus = hrilVoiceRadioInfo.lockStatus;
+    sysMode = hrilVoiceRadioInfo.sysMode;
+    sysModeName = hrilVoiceRadioInfo.sysModeName != nullptr ? hrilVoiceRadioInfo.sysModeName : "";
+    actType = hrilVoiceRadioInfo.actType;
+    actName = hrilVoiceRadioInfo.actName != nullptr ? hrilVoiceRadioInfo.actName : "";
+    return *this;
+}
+
 bool VoiceRadioTechnology::ReadFromParcel(Parcel &parcel)
 {
-    int32_t srv = 0;
-    int32_t domain = 0;
-    int32_t roam = 0;
-    int32_t sim = 0;
-    int32_t lock = 0;
-    int32_t sys = 0;
-    int32_t act = 0;
-    if (!ReadBaseInt32(parcel, srv)) {
-        return false;
-    }
-    srvStatus = static_cast<HRilSrvStatus>(srv);
-    if (!ReadBaseInt32(parcel, domain)) {
-        return false;
-    }
-    srvDomain = static_cast<HRilSrvDomain>(domain);
-    if (!ReadBaseInt32(parcel, roam)) {
-        return false;
-    }
-    roam = static_cast<HRilRoamStatus>(roam);
-    if (!ReadBaseInt32(parcel, sim)) {
-        return false;
-    }
-    simStatus = static_cast<HRilSimStatus>(sim);
-    if (!ReadBaseInt32(parcel, lock)) {
-        return false;
-    }
-    lockStatus = static_cast<HRilSimLockStatus>(lock);
-    if (!ReadBaseInt32(parcel, sys)) {
-        return false;
-    }
-    sysMode = static_cast<HRilSysMode>(sys);
-    if (!ReadBaseString(parcel, sysModeName)) {
-        return false;
-    }
-    if (!ReadBaseInt32(parcel, act)) {
-        return false;
-    }
-    actType = static_cast<HRilRadioTech>(act);
-    if (!ReadBaseString(parcel, actName)) {
-        return false;
-    }
-    return true;
+    return Read(parcel, srvStatus, srvDomain, roamStatus, simStatus,
+        lockStatus, sysMode, sysModeName, actType, actName);
 }
 
 bool VoiceRadioTechnology::Marshalling(Parcel &parcel) const
 {
-    if (!WriteBaseInt32(parcel, static_cast<int32_t>(srvStatus))) {
-        return false;
-    }
-    if (!WriteBaseInt32(parcel, static_cast<int32_t>(srvDomain))) {
-        return false;
-    }
-    if (!WriteBaseInt32(parcel, static_cast<int32_t>(roamStatus))) {
-        return false;
-    }
-    if (!WriteBaseInt32(parcel, static_cast<int32_t>(simStatus))) {
-        return false;
-    }
-    if (!WriteBaseInt32(parcel, static_cast<int32_t>(lockStatus))) {
-        return false;
-    }
-    if (!WriteBaseInt32(parcel, static_cast<int32_t>(sysMode))) {
-        return false;
-    }
-    if (!WriteBaseString(parcel, sysModeName)) {
-        return false;
-    }
-    if (!WriteBaseInt32(parcel, static_cast<int32_t>(actType))) {
-        return false;
-    }
-    if (!WriteBaseString(parcel, actName)) {
-        return false;
-    }
-    return true;
+    return Write(parcel, srvStatus, srvDomain, roamStatus, simStatus,
+        lockStatus, sysMode, sysModeName, actType, actName);
 }
 
 std::shared_ptr<VoiceRadioTechnology> VoiceRadioTechnology::UnMarshalling(Parcel &parcel)
@@ -157,6 +110,14 @@ std::shared_ptr<VoiceRadioTechnology> VoiceRadioTechnology::UnMarshalling(Parcel
         param = nullptr;
     }
     return param;
+}
+
+const char *VoiceRadioTechnology::ToString() const
+{
+    DesensitizeStringStream dss(String(), StringStream());
+    dss << srvStatus << srvDomain << roamStatus << simStatus << lockStatus << sysMode << sysModeName << actType
+        << actName;
+    return *dss;
 }
 } // namespace Telephony
 } // namespace OHOS

@@ -17,7 +17,7 @@
 #include "vendor_channel.h"
 #include "vendor_util.h"
 
-static int g_atFd = -1;
+static int32_t g_atFd = -1;
 static OnNotify g_onNotifyFunc = NULL;
 
 static volatile ResponseInfo *g_response = NULL;
@@ -26,7 +26,7 @@ static volatile bool g_isNeedATPause = false;
 static volatile const char *g_prefix = NULL;
 static pthread_mutex_t g_commandmutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t g_commandcond = PTHREAD_COND_INITIALIZER;
-static volatile int g_readerClosed = 0;
+static volatile int32_t g_readerClosed = 0;
 static pthread_t g_reader;
 static void (*g_onTimeout)(void) = NULL;
 static void (*g_atnUnusual)(void) = NULL;
@@ -48,9 +48,9 @@ void AtSetOnUnusual(void (*OnAtUnusual)(void))
     g_atnUnusual = OnAtUnusual;
 }
 
-int ATStartReadLoop(int fd, OnNotify func)
+int32_t ATStartReadLoop(int32_t fd, OnNotify func)
 {
-    int ret = 0;
+    int32_t ret = 0;
     g_atFd = fd;
     g_onNotifyFunc = func;
     pthread_attr_t t;
@@ -157,7 +157,7 @@ void ProcessResponse(const char *responseLine, const char *pdu)
     }
 
     TELEPHONY_LOGI("processLine line = %{public}s", responseLine);
-    int isPrefix = ReportStrWith(responseLine, (const char *)g_prefix);
+    int32_t isPrefix = ReportStrWith(responseLine, (const char *)g_prefix);
     pthread_mutex_lock(&g_commandmutex);
     if (g_response == NULL) {
         if (g_onNotifyFunc != NULL) {
@@ -215,10 +215,10 @@ void AddLinkListNode(const char *responseLine)
     g_response->last = line;
 }
 
-int SendCommandLock(const char *command, const char *prefix, long long timeout, ResponseInfo **outResponse)
+int32_t SendCommandLock(const char *command, const char *prefix, long long timeout, ResponseInfo **outResponse)
 {
     const char *atCmd = "AT";
-    int err;
+    int32_t err;
     if (pthread_equal(g_reader, pthread_self()) != 0) {
         TELEPHONY_LOGE("The read thread prohibits sending commands.");
         return AT_ERR_INVALID_THREAD;
@@ -252,9 +252,9 @@ int SendCommandLock(const char *command, const char *prefix, long long timeout, 
     return err;
 }
 
-int SendCommandNetWorksLock(const char *command, const char *prefix, long long timeout, ResponseInfo **outResponse)
+int32_t SendCommandNetWorksLock(const char *command, const char *prefix, long long timeout, ResponseInfo **outResponse)
 {
-    int err;
+    int32_t err;
     if (pthread_equal(g_reader, pthread_self()) != 0) {
         TELEPHONY_LOGE("The read thread prohibits sending commands.");
         return AT_ERR_INVALID_THREAD;
@@ -272,10 +272,10 @@ int SendCommandNetWorksLock(const char *command, const char *prefix, long long t
     return err;
 }
 
-int SendCommandSmsLock(
+int32_t SendCommandSmsLock(
     const char *command, const char *smsPdu, const char *prefix, long long timeout, ResponseInfo **outResponse)
 {
-    int err;
+    int32_t err;
     if (pthread_equal(g_reader, pthread_self()) != 0) {
         TELEPHONY_LOGE("The read thread prohibits sending commands.");
         return AT_ERR_INVALID_THREAD;
@@ -293,8 +293,9 @@ int SendCommandSmsLock(
     return err;
 }
 
-static int GresponseJudgeWhetherIsempty(int err)
+static int32_t NewResponseInfo(void)
 {
+    int32_t err = VENDOR_SUCCESS;
     if (g_response != NULL) {
         err = AT_ERR_COMMAND_PENDING;
         TELEPHONY_LOGE("g_response is not null, so the command cannot be sent.");
@@ -308,17 +309,20 @@ static int GresponseJudgeWhetherIsempty(int err)
         ClearCurCommand();
         return err;
     }
-    err = VENDOR_SUCCESS;
     return err;
 }
 
-int SendCommandNoLock(const char *command, long long timeout, ResponseInfo **outResponse)
+int32_t SendCommandNoLock(const char *command, long long timeout, ResponseInfo **outResponse)
 {
     long long defaultTimeOut = DEFAULT_LONG_TIMEOUT;
-    int err = 0;
+    int32_t err = 0;
     struct timespec time;
 
-    GresponseJudgeWhetherIsempty(err);
+    err = NewResponseInfo();
+    if (err != VENDOR_SUCCESS) {
+        TELEPHONY_LOGE("New responseInfo is fail, err:%{public}d.", err);
+        return err;
+    }
     err = WriteATCommand(command, 0, g_atFd);
     if (err != VENDOR_SUCCESS) {
         TELEPHONY_LOGE("send AT cmd is fail, err:%{public}d.", err);

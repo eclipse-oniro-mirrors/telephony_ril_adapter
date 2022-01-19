@@ -44,37 +44,39 @@ typedef enum {
 
 int32_t GenerateCommand(char *buffer, size_t bufferLen, const char *fmt, ...);
 
-int ReportStrWith(const char *line, const char *prefix);
+int32_t ReportStrWith(const char *line, const char *prefix);
 
-int IsResponseSuccess(const char *line);
+int32_t IsResponseSuccess(const char *line);
 
-int IsResponseError(const char *line);
+int32_t IsResponseError(const char *line);
 
-int IsSms(const char *line);
+int32_t IsSms(const char *line);
 
-int IsSmsNotify(const char *line);
+int32_t IsSmsNotify(const char *line);
 
 void SetWaitTimeout(struct timespec *time, long long msec);
 
-int SkipATPrefix(char **s);
+int32_t SkipATPrefix(char **s);
 
 void SkipSpace(char **s);
 
-int NextInt(char **s, int *out);
+int32_t NextInt(char **s, int32_t *out);
 
-int NextIntNotSkipNextComma(char **s, int *out);
+int64_t NextInt64(char **s, int64_t *out);
 
-int NextIntByRightBracket(char **s, int *out);
+int32_t NextIntNotSkipNextComma(char **s, int32_t *out);
 
-int NextIntFromHex(char **s, int *out);
+int32_t NextIntByRightBracket(char **s, int32_t *out);
 
-int NextStr(char **s, char **out);
+int32_t NextIntFromHex(char **s, int32_t *out);
 
-int NextTxtStr(char **s, char **out);
+int32_t NextStr(char **s, char **out);
 
-int NextBool(char **s, char *out);
+int32_t NextTxtStr(char **s, char **out);
 
-int ParseReportError(char *str);
+int32_t NextBool(char **s, char *out);
+
+int32_t ParseReportError(char *str);
 
 uint64_t NextULongFromHex(char **s, uint64_t *out);
 
@@ -82,7 +84,9 @@ ModemReportErrorInfo GetReportErrorInfo(const ResponseInfo *response);
 
 ModemReportErrorInfo InitModemReportErrorInfo(void);
 
-int ConvertCharToInt(const char *s);
+int32_t ConvertCharToInt32(const char *s);
 
-int FindCommaCharNum(const char *srcStr);
+int32_t FindCommaCharNum(const char *srcStr);
+
+int32_t GetSlotId(const ReqDataInfo *requestInfo);
 #endif // OHOS_VENDOR_UTIL_H

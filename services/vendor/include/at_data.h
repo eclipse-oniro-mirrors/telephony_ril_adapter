@@ -30,29 +30,27 @@
 #define MIN_CID 1 // GU is 1~16 (currently only 11 is supported, and it can be expanded to 16 in the future).
 #define MAX_PDP_NUM 11
 
-
 #define ACTIVATE 1
 #define DEACTIVATE 0
 
 #define ADDR_MASK 0xFF
-#define ADDR_OFFSET_0BIT    0
-#define ADDR_OFFSET_8BIT    8
-#define ADDR_OFFSET_16BIT   16
-#define ADDR_OFFSET_24BIT   24
-#define ADDR_OFFSET_32BIT   32
-#define IVP4_INDEX_MAX      4
+#define ADDR_OFFSET_0BIT 0
+#define ADDR_OFFSET_8BIT 8
+#define ADDR_OFFSET_16BIT 16
+#define ADDR_OFFSET_24BIT 24
+#define ADDR_OFFSET_32BIT 32
+#define IVP4_INDEX_MAX 4
 
-#define DELAY_WAIT_MS    (1000 * 1000)
+#define DELAY_WAIT_MS (1000 * 1000)
 
 #define DEFAULT_CID (-1)
 
-#define QUERY_MAX_COUNT     6
-#define QUERY_DELAY_MS      500
-#define DELAY_US_OFFSET     1000
+#define QUERY_MAX_COUNT 6
+#define QUERY_DELAY_MS 500
+#define DELAY_US_OFFSET 1000
 
-#define VERIFY_TYPE_MIN     0
-#define VERIFY_TYPE_MAX     2
-
+#define VERIFY_TYPE_MIN 0
+#define VERIFY_TYPE_MAX 2
 
 /* 3GPP TS 27.007 V17.3.0 (2021-09)
  * Mobile termination error result code +CME ERROR */
@@ -73,7 +71,7 @@ typedef enum {
     PDP_CME_ERR_SERVICE_OPTION_TEMPORARILY_OUT_OF_ORDER = 134, /* Service option temporarily out of order */
     PDP_CME_ERR_NSAPI_ALREADY_USED = 135, /* NSAPI already used */
     PDP_CME_ERR_REGULAR_DEACTIVATION = 136, /* Regular deactivation */
-    PDP_CME_ERR_UNKNOWN_PDP_CONTEXT = 143, /* Unknown PDP contex */
+    PDP_CME_ERR_UNKNOWN_PDP_CONTEXT = 143, /* Unknown PDP context */
     PDP_CME_ERR_PROTOCOL_ERRORS = 176, /* Protocol error, unspecified */
     PDP_CME_ERR_OPERATOR_DETERMINED_BARRING = 177, /* Operator Determined Barring */
     PDP_CME_ERR_NO_PDP_CONTEXT_ACTIVATED = 185, /* No PDP context activated */
@@ -85,7 +83,7 @@ typedef enum {
 } ModemErrorCode;
 
 typedef struct {
-    int cid;
+    int32_t cid;
     char *ipType;
     char *apn;
 } PDNInfo;
@@ -94,6 +92,6 @@ void ReqSetInitApnInfo(const ReqDataInfo *requestInfo, const HRilDataInfo *data)
 void ReqActivatePdpContext(const ReqDataInfo *requestInfo, const HRilDataInfo *data);
 void ReqDeactivatePdpContext(const ReqDataInfo *requestInfo, const HRilDataInfo *data);
 void ReqGetPdpContextList(const ReqDataInfo *requestInfo);
-void ReqGetLinkBandwidthInfo(const ReqDataInfo *requestInfo, const int cid);
+void ReqGetLinkBandwidthInfo(const ReqDataInfo *requestInfo, const int32_t cid);
 void ReqSetLinkBandwidthReportingRule(const ReqDataInfo *requestInfo, const HRilLinkBandwidthReportingRule *data);
 #endif // OHOS_AT_DATA_H

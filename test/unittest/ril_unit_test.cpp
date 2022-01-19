@@ -18,6 +18,7 @@
 #include <iostream>
 
 #include "telephony_log_wrapper.h"
+
 #include "hril_request.h"
 
 using namespace std;
@@ -35,8 +36,8 @@ const int32_t FILEID = 2;
 const int32_t P1 = 4;
 const int32_t P2 = 5;
 const int32_t P3 = 6;
-const int32_t REQINFO_P2 = 2;
-const int32_t REQINFO_P3 = 3;
+const int32_t REQ_INFO_P2 = 2;
+const int32_t REQ_INFO_P3 = 3;
 
 void RilUnitTest::OnInit()
 {
@@ -163,7 +164,7 @@ void RilUnitTest::RilCmSplitCallTest(const OHOS::AppExecFwk::InnerEvent::Pointer
                        * 3: Video call: two-way video, two-way voice
                        */
 
-    TELEPHONY_LOGI("RilUnitTest::RilCmJoinCallTest -->");
+    TELEPHONY_LOGI("RilUnitTest::RilCmSplitCallTest -->");
 
     std::cout << "please enter the call split number:";
     std::cin >> callIndex;
@@ -300,41 +301,41 @@ void RilUnitTest::GetUssdCusdTest(const OHOS::AppExecFwk::InnerEvent::Pointer &r
     TELEPHONY_LOGI("RilUnitTest::GetUssdCusdTest --> GetUssdCusdTest finished");
 }
 
-void RilUnitTest::OpenLogicalSimIO(const AppExecFwk::InnerEvent::Pointer &result)
+void RilUnitTest::SimOpenLogicalChannel(const AppExecFwk::InnerEvent::Pointer &result)
 {
-    TELEPHONY_LOGI("RilUnitTest::OpenLogicalSimIOResponse -->");
-    mRilManager_->OpenLogicalSimIO("appID", 0, result);
-    TELEPHONY_LOGI("RilUnitTest::OpenLogicalSimIOResponse --> OpenLogicalSimIOResponse finished");
+    TELEPHONY_LOGI("RilUnitTest::SimOpenLogicalChannel -->");
+    mRilManager_->SimOpenLogicalChannel("appID", 0, result);
+    TELEPHONY_LOGI("RilUnitTest::SimOpenLogicalChannel --> SimOpenLogicalChannel finished");
 }
 
-void RilUnitTest::CloseLogicalSimIO(const AppExecFwk::InnerEvent::Pointer &result)
+void RilUnitTest::SimCloseLogicalChannel(const AppExecFwk::InnerEvent::Pointer &result)
 {
-    TELEPHONY_LOGI("RilUnitTest::CloseLogicalSimIOResponse -->");
-    mRilManager_->CloseLogicalSimIO(0, result);
-    TELEPHONY_LOGI("RilUnitTest::CloseLogicalSimIOResponse --> CloseLogicalSimIOResponse finished");
+    TELEPHONY_LOGI("RilUnitTest::SimCloseLogicalChannel -->");
+    mRilManager_->SimCloseLogicalChannel(0, result);
+    TELEPHONY_LOGI("RilUnitTest::SimCloseLogicalChannel --> SimCloseLogicalChannel finished");
 }
 
-void RilUnitTest::TransmitApduSimIO(const AppExecFwk::InnerEvent::Pointer &result)
+void RilUnitTest::SimTransmitApduLogicalChannel(const AppExecFwk::InnerEvent::Pointer &result)
 {
-    TELEPHONY_LOGI("RilUnitTest::TransmitApduSimIOResponse -->");
+    TELEPHONY_LOGI("RilUnitTest::SimTransmitApduLogicalChannel -->");
     ApduSimIORequestInfo reqInfo = ApduSimIORequestInfo();
     reqInfo.serial = 0;
-    reqInfo.chanId = 1;
+    reqInfo.channelId = 1;
     reqInfo.type = 0;
     reqInfo.instruction = 1;
     reqInfo.p1 = 1;
-    reqInfo.p2 = REQINFO_P2;
-    reqInfo.p3 = REQINFO_P3;
+    reqInfo.p2 = REQ_INFO_P2;
+    reqInfo.p3 = REQ_INFO_P3;
     reqInfo.data = "apdu";
-    mRilManager_->TransmitApduSimIO(reqInfo, result);
-    TELEPHONY_LOGI("RilUnitTest::TransmitApduSimIOResponse --> TransmitApduSimIOResponse finished");
+    mRilManager_->SimTransmitApduLogicalChannel(reqInfo, result);
+    TELEPHONY_LOGI("RilUnitTest::SimTransmitApduLogicalChannel --> SimTransmitApduLogicalChannel finished");
 }
 
 void RilUnitTest::UnlockSimLock(const AppExecFwk::InnerEvent::Pointer &result)
 {
-    TELEPHONY_LOGI("RilUnitTest::UnlocksimLockResponse -->");
+    TELEPHONY_LOGI("RilUnitTest::UnlockSimLock -->");
     mRilManager_->UnlockSimLock(0, "1234", result);
-    TELEPHONY_LOGI("RilUnitTest::UnlocksimLockResponse --> UnlocksimLockResponse finished");
+    TELEPHONY_LOGI("RilUnitTest::UnlockSimLock --> UnlockSimLock finished");
 }
 
 void RilUnitTest::GetLinkBandwidthInfoTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
@@ -373,9 +374,9 @@ void RilUnitTest::OnInitInterface()
     memberFuncMap_[HREQ_NETWORK_GET_CURRENT_CELL_INFO] = &RilUnitTest::GetRilCurrentCellInfoTest;
     memberFuncMap_[HREQ_CALL_SET_USSD] = &RilUnitTest::SetUssdCusdTest;
     memberFuncMap_[HREQ_CALL_GET_USSD] = &RilUnitTest::GetUssdCusdTest;
-    memberFuncMap_[HREQ_SIM_OPEN_LOGICAL_SIM_IO] = &RilUnitTest::OpenLogicalSimIO;
-    memberFuncMap_[HREQ_SIM_CLOSE_LOGICAL_SIM_IO] = &RilUnitTest::CloseLogicalSimIO;
-    memberFuncMap_[HREQ_SIM_TRANSMIT_APDU_SIM_IO] = &RilUnitTest::TransmitApduSimIO;
+    memberFuncMap_[HREQ_SIM_OPEN_LOGICAL_CHANNEL] = &RilUnitTest::SimOpenLogicalChannel;
+    memberFuncMap_[HREQ_SIM_CLOSE_LOGICAL_CHANNEL] = &RilUnitTest::SimCloseLogicalChannel;
+    memberFuncMap_[HREQ_SIM_TRANSMIT_APDU_LOGICAL_CHANNEL] = &RilUnitTest::SimTransmitApduLogicalChannel;
     memberFuncMap_[HREQ_SIM_UNLOCK_SIM_LOCK] = &RilUnitTest::UnlockSimLock;
     memberFuncMap_[HREQ_DATA_GET_LINK_BANDWIDTH_INFO] = &RilUnitTest::GetLinkBandwidthInfoTest;
 }
@@ -410,15 +411,15 @@ static void PrintMenu()
     cout << HREQ_SIM_GET_SIM_IO << "---->RilUnitTest::IccRilCmIoForAppTest " << endl;
     cout << HREQ_SIM_GET_IMSI << "---->RilUnitTest::GetRilCmImsiForAppTest " << endl;
     cout << HREQ_SIM_GET_SIM_STATUS << "---->RilUnitTest::GetRilCmIccCardStatusTest " << endl;
-    cout << HREQ_SIM_OPEN_LOGICAL_SIM_IO << "---->RilUnitTest::OpenLogicalSimIOResponse " << endl;
-    cout << HREQ_SIM_CLOSE_LOGICAL_SIM_IO << "---->RilUnitTest::CloseLogicalSimIOResponse " << endl;
-    cout << HREQ_SIM_TRANSMIT_APDU_SIM_IO << "---->RilUnitTest::TransmitApduSimIOResponse " << endl;
+    cout << HREQ_SIM_OPEN_LOGICAL_CHANNEL << "---->RilUnitTest::SimOpenLogicalChannelResponse " << endl;
+    cout << HREQ_SIM_CLOSE_LOGICAL_CHANNEL << "---->RilUnitTest::SimCloseLogicalChannelResponse " << endl;
+    cout << HREQ_SIM_TRANSMIT_APDU_LOGICAL_CHANNEL << "---->RilUnitTest::SimTransmitApduLogicalChannelResponse "
+         << endl;
     cout << HREQ_SIM_UNLOCK_SIM_LOCK << "---->RilUnitTest::UnlockSimLockResponse " << endl;
     cout << "---->DATA----------------------------------------------------------" << endl;
     cout << HREQ_DATA_ACTIVATE_PDP_CONTEXT << "---->RilUnitTest::SetupRilCmDataCallTest " << endl;
     cout << HREQ_DATA_DEACTIVATE_PDP_CONTEXT << "---->RilUnitTest::DeactivateRilCmDataCallTest " << endl;
-    cout << HREQ_DATA_GET_LINK_BANDWIDTH_INFO << "---->RilUnitTest::GetLinkBandwidthInfoTest "
-         << endl;
+    cout << HREQ_DATA_GET_LINK_BANDWIDTH_INFO << "---->RilUnitTest::GetLinkBandwidthInfoTest " << endl;
     cout << "---->SMS----------------------------------------------------------" << endl;
     cout << HREQ_SMS_SEND_GSM_SMS << "---->RilUnitTest::SendRilCmSmsTest " << endl;
     cout << HREQ_SMS_SEND_SMS_MORE_MODE << "---->RilUnitTest::SendRilCmSmsMoreModeTest " << endl;

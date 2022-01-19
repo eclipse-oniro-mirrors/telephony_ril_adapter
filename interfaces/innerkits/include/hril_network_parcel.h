@@ -68,7 +68,7 @@ struct SetNetworkModeInfo : public HrilBaseParcel {
 struct CsRegStatusInfo : public HrilBaseParcel {
     int32_t notifyType; /* The notifyType,Indicate the content of the notification */
     HRilRegStatus regStatus; /* The corresponding valid registration states are NOT_REG_MT_NOT_SEARCHING_OP,
-                        * "REG_MT_HOME, NOT_REG_MT_SEARCHING_OP, REG_DENIED,  UNKNOWN, REG_ROAMING". */
+                              * "REG_MT_HOME, NOT_REG_MT_SEARCHING_OP, REG_DENIED,  UNKNOWN, REG_ROAMING". */
     int32_t lacCode;
     int32_t cellId;
     HRilRadioTech radioTechnology; /* Available voice radio technology, RMS defined by radio technology */
@@ -161,8 +161,8 @@ typedef struct {
     int32_t pilotPn; /* integer type and range is 0-65535 */
     int32_t pilotStrength; /* integer type and range is 0-65535 */
     int32_t channel; /* integer type and range is 0-65535 */
-    int32_t longitude; /* integer typeand range is -648000 -- 648000, unit: second */
-    int32_t latitude; /* integer typeand range is -648000 -- 648000, unit: second */
+    int32_t longitude; /* integer type and range is -648000 -- 648000, unit: second */
+    int32_t latitude; /* integer type and range is -648000 -- 648000, unit: second */
 } CellRatCdma;
 
 typedef struct {
@@ -181,8 +181,8 @@ typedef struct {
     int32_t nrArfcn;
     int32_t pci;
     int32_t tac;
-    int32_t nci;
-}CellRatNr;
+    int64_t nci;
+} CellRatNr;
 
 struct CurrentCellInfo : public HrilBaseParcel {
     int32_t ratType;
@@ -214,6 +214,16 @@ struct CurrentCellInfo : public HrilBaseParcel {
     bool ReadFromParcel(Parcel &parcel);
     virtual bool Marshalling(Parcel &parcel) const override;
     std::shared_ptr<CurrentCellInfo> UnMarshalling(Parcel &parcel);
+    void Dump(std::string, int32_t);
+};
+
+struct CellListCurrentInfo : public HrilBaseParcel {
+    int32_t itemNum;
+    std::vector<CurrentCellInfo> cellCurrentInfo;
+
+    bool ReadFromParcel(Parcel &parcel);
+    virtual bool Marshalling(Parcel &parcel) const override;
+    std::shared_ptr<CellListCurrentInfo> UnMarshalling(Parcel &parcel);
     void Dump(std::string, int32_t);
 };
 
@@ -249,8 +259,8 @@ typedef struct {
     int32_t pilotPn; /* integer type and range is 0-65535 */
     int32_t pilotStrength; /* integer type and range is 0-65535 */
     int32_t channel; /* integer type and range is 0-65535 */
-    int32_t longitude; /* integer typeand range is -648000 -- 648000, unit: second */
-    int32_t latitude; /* integer typeand range is -648000 -- 648000, unit: second */
+    int32_t longitude; /* integer type and range is -648000 -- 648000, unit: second */
+    int32_t latitude; /* integer type and range is -648000 -- 648000, unit: second */
 } CellListRatCdma;
 
 typedef struct {
@@ -262,15 +272,15 @@ typedef struct {
     int32_t rscp;
     int32_t drx;
     int32_t rac;
-    int32_t cpid;    /* 8-bit Cell Parameters ID described in TS 25.331, 0..127, INT_MAX if unknown */
+    int32_t cpid; /* 8-bit Cell Parameters ID described in TS 25.331, 0..127, INT_MAX if unknown */
 } CellListRatTdscdma;
 
 typedef struct {
     int32_t nrArfcn;
     int32_t pci;
     int32_t tac;
-    int32_t nci;
-}CellListRatNr;
+    int64_t nci;
+} CellListRatNr;
 
 struct CellNearbyInfo : public HrilBaseParcel {
     int ratType;
@@ -323,7 +333,7 @@ struct PreferredNetworkTypeInfo : public HrilBaseParcel {
 };
 
 struct RadioCapabilityInfo : public HrilBaseParcel {
-    int32_t ratfamily;
+    int32_t ratFamily;
     std::string modemId;
     bool ReadFromParcel(Parcel &parcel);
     virtual bool Marshalling(Parcel &parcel) const override;

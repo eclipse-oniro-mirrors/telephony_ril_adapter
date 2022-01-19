@@ -29,13 +29,13 @@ std::shared_ptr<DialInfo> DialInfo::UnMarshalling(Parcel &parcel)
 
 bool DialInfo::ReadFromParcel(Parcel &parcel)
 {
-    if (!ReadBaseInt32(parcel, serial)) {
+    if (!Read(parcel, serial)) {
         return false;
     }
-    if (!ReadBaseString(parcel, address)) {
+    if (!Read(parcel, address)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, clir)) {
+    if (!Read(parcel, clir)) {
         return false;
     }
     return true;
@@ -43,13 +43,13 @@ bool DialInfo::ReadFromParcel(Parcel &parcel)
 
 bool DialInfo::Marshalling(Parcel &parcel) const
 {
-    if (!WriteBaseInt32(parcel, serial)) {
+    if (!Write(parcel, serial)) {
         return false;
     }
-    if (!WriteBaseString(parcel, address)) {
+    if (!Write(parcel, address)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, clir)) {
+    if (!Write(parcel, clir)) {
         return false;
     }
     return true;
@@ -57,34 +57,34 @@ bool DialInfo::Marshalling(Parcel &parcel) const
 
 bool CallInfo::ReadFromParcel(Parcel &parcel)
 {
-    if (!ReadBaseInt32(parcel, index)) {
+    if (!Read(parcel, index)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, dir)) {
+    if (!Read(parcel, dir)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, state)) {
+    if (!Read(parcel, state)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, mode)) {
+    if (!Read(parcel, mode)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, mpty)) {
+    if (!Read(parcel, mpty)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, voiceDomain)) {
+    if (!Read(parcel, voiceDomain)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, callType)) {
+    if (!Read(parcel, callType)) {
         return false;
     }
-    if (!ReadBaseString(parcel, number)) {
+    if (!Read(parcel, number)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, type)) {
+    if (!Read(parcel, type)) {
         return false;
     }
-    if (!ReadBaseString(parcel, alpha)) {
+    if (!Read(parcel, alpha)) {
         return false;
     }
     return true;
@@ -92,34 +92,34 @@ bool CallInfo::ReadFromParcel(Parcel &parcel)
 
 bool CallInfo::Marshalling(Parcel &parcel) const
 {
-    if (!WriteBaseInt32(parcel, index)) {
+    if (!Write(parcel, index)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, dir)) {
+    if (!Write(parcel, dir)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, state)) {
+    if (!Write(parcel, state)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, mode)) {
+    if (!Write(parcel, mode)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, mpty)) {
+    if (!Write(parcel, mpty)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, voiceDomain)) {
+    if (!Write(parcel, voiceDomain)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, callType)) {
+    if (!Write(parcel, callType)) {
         return false;
     }
-    if (!WriteBaseString(parcel, number)) {
+    if (!Write(parcel, number)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, type)) {
+    if (!Write(parcel, type)) {
         return false;
     }
-    if (!WriteBaseString(parcel, alpha)) {
+    if (!Write(parcel, alpha)) {
         return false;
     }
     return true;
@@ -138,10 +138,10 @@ void CallInfo::Dump(std::string, int32_t) {}
 
 bool CallInfoList::ReadFromParcel(Parcel &parcel)
 {
-    if (!ReadBaseInt32(parcel, callSize)) {
+    if (!Read(parcel, callSize)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, flag)) {
+    if (!Read(parcel, flag)) {
         return false;
     }
     calls.resize(callSize);
@@ -153,10 +153,10 @@ bool CallInfoList::ReadFromParcel(Parcel &parcel)
 
 bool CallInfoList::Marshalling(Parcel &parcel) const
 {
-    if (!WriteBaseInt32(parcel, callSize)) {
+    if (!Write(parcel, callSize)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, flag)) {
+    if (!Write(parcel, flag)) {
         return false;
     }
     for (int32_t i = 0; i < callSize; i++) {
@@ -176,75 +176,75 @@ std::shared_ptr<CallInfoList> CallInfoList::UnMarshalling(Parcel &parcel)
 
 void CallInfoList::Dump(std::string, int32_t) {}
 
-bool Emergencyinfo::ReadFromParcel(Parcel &parcel)
+bool EmergencyInfo::ReadFromParcel(Parcel &parcel)
 {
-    if (!ReadBaseInt32(parcel, index)) {
+    if (!Read(parcel, index)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, total)) {
+    if (!Read(parcel, total)) {
         return false;
     }
-    if (!ReadBaseString(parcel, eccNum)) {
+    if (!Read(parcel, eccNum)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, category)) {
+    if (!Read(parcel, category)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, simpresent)) {
+    if (!Read(parcel, simpresent)) {
         return false;
     }
-    if (!ReadBaseString(parcel, mcc)) {
+    if (!Read(parcel, mcc)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, abnormalService)) {
+    if (!Read(parcel, abnormalService)) {
         return false;
     }
     return true;
 }
 
-bool Emergencyinfo::Marshalling(Parcel &parcel) const
+bool EmergencyInfo::Marshalling(Parcel &parcel) const
 {
-    if (!WriteBaseInt32(parcel, index)) {
+    if (!Write(parcel, index)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, total)) {
+    if (!Write(parcel, total)) {
         return false;
     }
-    if (!WriteBaseString(parcel, eccNum)) {
+    if (!Write(parcel, eccNum)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, category)) {
+    if (!Write(parcel, category)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, simpresent)) {
+    if (!Write(parcel, simpresent)) {
         return false;
     }
-    if (!WriteBaseString(parcel, mcc)) {
+    if (!Write(parcel, mcc)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, abnormalService)) {
+    if (!Write(parcel, abnormalService)) {
         return false;
     }
     return true;
 }
 
-std::shared_ptr<Emergencyinfo> Emergencyinfo::UnMarshalling(Parcel &parcel)
+std::shared_ptr<EmergencyInfo> EmergencyInfo::UnMarshalling(Parcel &parcel)
 {
-    std::shared_ptr<Emergencyinfo> param = std::make_shared<Emergencyinfo>();
+    std::shared_ptr<EmergencyInfo> param = std::make_shared<EmergencyInfo>();
     if (param == nullptr || !param->ReadFromParcel(parcel)) {
         param = nullptr;
     }
     return param;
 }
 
-void Emergencyinfo::Dump(std::string, int32_t) {}
+void EmergencyInfo::Dump(std::string, int32_t) {}
 
 bool EmergencyInfoList::ReadFromParcel(Parcel &parcel)
 {
-    if (!ReadBaseInt32(parcel, callSize)) {
+    if (!Read(parcel, callSize)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, flag)) {
+    if (!Read(parcel, flag)) {
         return false;
     }
     calls.resize(callSize);
@@ -256,10 +256,10 @@ bool EmergencyInfoList::ReadFromParcel(Parcel &parcel)
 
 bool EmergencyInfoList::Marshalling(Parcel &parcel) const
 {
-    if (!WriteBaseInt32(parcel, callSize)) {
+    if (!Write(parcel, callSize)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, flag)) {
+    if (!Write(parcel, flag)) {
         return false;
     }
     for (int32_t i = 0; i < callSize; i++) {
@@ -281,7 +281,7 @@ void EmergencyInfoList::Dump(std::string, int32_t) {}
 
 bool UusData::ReadFromParcel(Parcel &parcel)
 {
-    if (!ReadBaseInt32(parcel, uusDcs)) {
+    if (!Read(parcel, uusDcs)) {
         return false;
     }
     return true;
@@ -289,7 +289,7 @@ bool UusData::ReadFromParcel(Parcel &parcel)
 
 bool UusData::Marshalling(Parcel &parcel) const
 {
-    if (!WriteBaseInt32(parcel, uusDcs)) {
+    if (!Write(parcel, uusDcs)) {
         return false;
     }
     return true;
@@ -308,19 +308,19 @@ void UusData::Dump(std::string, int32_t) {}
 
 bool CallForwardSetInfo::ReadFromParcel(Parcel &parcel)
 {
-    if (!ReadBaseInt32(parcel, serial)) {
+    if (!Read(parcel, serial)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, reason)) {
+    if (!Read(parcel, reason)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, mode)) {
+    if (!Read(parcel, mode)) {
         return false;
     }
-    if (!ReadBaseString(parcel, number)) {
+    if (!Read(parcel, number)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, classx)) {
+    if (!Read(parcel, classx)) {
         return false;
     }
     return true;
@@ -328,19 +328,19 @@ bool CallForwardSetInfo::ReadFromParcel(Parcel &parcel)
 
 bool CallForwardSetInfo::Marshalling(Parcel &parcel) const
 {
-    if (!WriteBaseInt32(parcel, serial)) {
+    if (!Write(parcel, serial)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, reason)) {
+    if (!Write(parcel, reason)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, mode)) {
+    if (!Write(parcel, mode)) {
         return false;
     }
-    if (!WriteBaseString(parcel, number)) {
+    if (!Write(parcel, number)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, classx)) {
+    if (!Write(parcel, classx)) {
         return false;
     }
     return true;
@@ -359,22 +359,22 @@ void CallForwardSetInfo::Dump(std::string, int32_t) {}
 
 bool CallForwardQueryResult::ReadFromParcel(Parcel &parcel)
 {
-    if (!ReadBaseInt32(parcel, serial)) {
+    if (!Read(parcel, serial)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, result)) {
+    if (!Read(parcel, result)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, status)) {
+    if (!Read(parcel, status)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, classx)) {
+    if (!Read(parcel, classx)) {
         return false;
     }
-    if (!ReadBaseString(parcel, number)) {
+    if (!Read(parcel, number)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, type)) {
+    if (!Read(parcel, type)) {
         return false;
     }
     return true;
@@ -382,22 +382,22 @@ bool CallForwardQueryResult::ReadFromParcel(Parcel &parcel)
 
 bool CallForwardQueryResult::Marshalling(Parcel &parcel) const
 {
-    if (!WriteBaseInt32(parcel, serial)) {
+    if (!Write(parcel, serial)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, result)) {
+    if (!Write(parcel, result)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, status)) {
+    if (!Write(parcel, status)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, classx)) {
+    if (!Write(parcel, classx)) {
         return false;
     }
-    if (!WriteBaseString(parcel, number)) {
+    if (!Write(parcel, number)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, type)) {
+    if (!Write(parcel, type)) {
         return false;
     }
     return true;
@@ -416,13 +416,13 @@ void CallForwardQueryResult::Dump(std::string, int32_t) {}
 
 bool GetClipResult::ReadFromParcel(Parcel &parcel)
 {
-    if (!ReadBaseInt32(parcel, result)) {
+    if (!Read(parcel, result)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, action)) {
+    if (!Read(parcel, action)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, clipStat)) {
+    if (!Read(parcel, clipStat)) {
         return false;
     }
     return true;
@@ -430,13 +430,13 @@ bool GetClipResult::ReadFromParcel(Parcel &parcel)
 
 bool GetClipResult::Marshalling(Parcel &parcel) const
 {
-    if (!WriteBaseInt32(parcel, result)) {
+    if (!Write(parcel, result)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, action)) {
+    if (!Write(parcel, action)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, clipStat)) {
+    if (!Write(parcel, clipStat)) {
         return false;
     }
     return true;
@@ -455,13 +455,13 @@ void GetClipResult::Dump(std::string, int32_t) {}
 
 bool GetClirResult::ReadFromParcel(Parcel &parcel)
 {
-    if (!ReadBaseInt32(parcel, result)) {
+    if (!Read(parcel, result)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, action)) {
+    if (!Read(parcel, action)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, clirStat)) {
+    if (!Read(parcel, clirStat)) {
         return false;
     }
     return true;
@@ -469,13 +469,13 @@ bool GetClirResult::ReadFromParcel(Parcel &parcel)
 
 bool GetClirResult::Marshalling(Parcel &parcel) const
 {
-    if (!WriteBaseInt32(parcel, result)) {
+    if (!Write(parcel, result)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, action)) {
+    if (!Write(parcel, action)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, clirStat)) {
+    if (!Write(parcel, clirStat)) {
         return false;
     }
     return true;
@@ -494,13 +494,13 @@ void GetClirResult::Dump(std::string, int32_t) {}
 
 bool CallWaitResult::ReadFromParcel(Parcel &parcel)
 {
-    if (!ReadBaseInt32(parcel, result)) {
+    if (!Read(parcel, result)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, status)) {
+    if (!Read(parcel, status)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, classCw)) {
+    if (!Read(parcel, classCw)) {
         return false;
     }
     return true;
@@ -508,13 +508,13 @@ bool CallWaitResult::ReadFromParcel(Parcel &parcel)
 
 bool CallWaitResult::Marshalling(Parcel &parcel) const
 {
-    if (!WriteBaseInt32(parcel, result)) {
+    if (!Write(parcel, result)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, status)) {
+    if (!Write(parcel, status)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, classCw)) {
+    if (!Write(parcel, classCw)) {
         return false;
     }
     return true;
@@ -533,13 +533,13 @@ void CallWaitResult::Dump(std::string, int32_t) {}
 
 bool CallRestrictionResult::ReadFromParcel(Parcel &parcel)
 {
-    if (!ReadBaseInt32(parcel, result)) {
+    if (!Read(parcel, result)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, status)) {
+    if (!Read(parcel, status)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, classCw)) {
+    if (!Read(parcel, classCw)) {
         return false;
     }
     return true;
@@ -547,13 +547,13 @@ bool CallRestrictionResult::ReadFromParcel(Parcel &parcel)
 
 bool CallRestrictionResult::Marshalling(Parcel &parcel) const
 {
-    if (!WriteBaseInt32(parcel, result)) {
+    if (!Write(parcel, result)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, status)) {
+    if (!Write(parcel, status)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, classCw)) {
+    if (!Write(parcel, classCw)) {
         return false;
     }
     return true;
@@ -572,19 +572,19 @@ void CallRestrictionResult::Dump(std::string, int32_t) {}
 
 bool CallCringInfo::ReadFromParcel(Parcel &parcel)
 {
-    if (!ReadBaseString(parcel, type)) {
+    if (!Read(parcel, type)) {
         return false;
     }
-    if (!ReadBaseString(parcel, pdpType)) {
+    if (!Read(parcel, pdpType)) {
         return false;
     }
-    if (!ReadBaseString(parcel, pdpAddress)) {
+    if (!Read(parcel, pdpAddress)) {
         return false;
     }
-    if (!ReadBaseString(parcel, l2p)) {
+    if (!Read(parcel, l2p)) {
         return false;
     }
-    if (!ReadBaseString(parcel, apn)) {
+    if (!Read(parcel, apn)) {
         return false;
     }
     return true;
@@ -592,19 +592,19 @@ bool CallCringInfo::ReadFromParcel(Parcel &parcel)
 
 bool CallCringInfo::Marshalling(Parcel &parcel) const
 {
-    if (!WriteBaseString(parcel, type)) {
+    if (!Write(parcel, type)) {
         return false;
     }
-    if (!WriteBaseString(parcel, pdpType)) {
+    if (!Write(parcel, pdpType)) {
         return false;
     }
-    if (!WriteBaseString(parcel, pdpAddress)) {
+    if (!Write(parcel, pdpAddress)) {
         return false;
     }
-    if (!WriteBaseString(parcel, l2p)) {
+    if (!Write(parcel, l2p)) {
         return false;
     }
-    if (!WriteBaseString(parcel, apn)) {
+    if (!Write(parcel, apn)) {
         return false;
     }
     return true;
@@ -623,13 +623,13 @@ void CallCringInfo::Dump(std::string, int32_t) {}
 
 bool CallWaitInfo::ReadFromParcel(Parcel &parcel)
 {
-    if (!ReadBaseString(parcel, number)) {
+    if (!Read(parcel, number)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, type)) {
+    if (!Read(parcel, type)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, businessClass)) {
+    if (!Read(parcel, businessClass)) {
         return false;
     }
     return true;
@@ -637,13 +637,13 @@ bool CallWaitInfo::ReadFromParcel(Parcel &parcel)
 
 bool CallWaitInfo::Marshalling(Parcel &parcel) const
 {
-    if (!WriteBaseString(parcel, number)) {
+    if (!Write(parcel, number)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, type)) {
+    if (!Write(parcel, type)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, businessClass)) {
+    if (!Write(parcel, businessClass)) {
         return false;
     }
     return true;
@@ -662,10 +662,10 @@ void CallWaitInfo::Dump(std::string, int32_t) {}
 
 bool CallConnectInfo::ReadFromParcel(Parcel &parcel)
 {
-    if (!ReadBaseInt32(parcel, callId)) {
+    if (!Read(parcel, callId)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, type)) {
+    if (!Read(parcel, type)) {
         return false;
     }
     return true;
@@ -673,10 +673,10 @@ bool CallConnectInfo::ReadFromParcel(Parcel &parcel)
 
 bool CallConnectInfo::Marshalling(Parcel &parcel) const
 {
-    if (!WriteBaseInt32(parcel, callId)) {
+    if (!Write(parcel, callId)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, type)) {
+    if (!Write(parcel, type)) {
         return false;
     }
     return true;
@@ -695,16 +695,16 @@ void CallConnectInfo::Dump(std::string, int32_t) {}
 
 bool CallEndInfo::ReadFromParcel(Parcel &parcel)
 {
-    if (!ReadBaseInt32(parcel, callId)) {
+    if (!Read(parcel, callId)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, duration)) {
+    if (!Read(parcel, duration)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, noCliCause)) {
+    if (!Read(parcel, noCliCause)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, ccCause)) {
+    if (!Read(parcel, ccCause)) {
         return false;
     }
     return true;
@@ -712,16 +712,16 @@ bool CallEndInfo::ReadFromParcel(Parcel &parcel)
 
 bool CallEndInfo::Marshalling(Parcel &parcel) const
 {
-    if (!WriteBaseInt32(parcel, callId)) {
+    if (!Write(parcel, callId)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, duration)) {
+    if (!Write(parcel, duration)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, noCliCause)) {
+    if (!Write(parcel, noCliCause)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, ccCause)) {
+    if (!Write(parcel, ccCause)) {
         return false;
     }
     return true;
@@ -740,13 +740,13 @@ void CallEndInfo::Dump(std::string, int32_t) {}
 
 bool CallStatusInfo::ReadFromParcel(Parcel &parcel)
 {
-    if (!ReadBaseInt32(parcel, callId)) {
+    if (!Read(parcel, callId)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, status)) {
+    if (!Read(parcel, status)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, voiceDomain)) {
+    if (!Read(parcel, voiceDomain)) {
         return false;
     }
     return true;
@@ -754,13 +754,13 @@ bool CallStatusInfo::ReadFromParcel(Parcel &parcel)
 
 bool CallStatusInfo::Marshalling(Parcel &parcel) const
 {
-    if (!WriteBaseInt32(parcel, callId)) {
+    if (!Write(parcel, callId)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, status)) {
+    if (!Write(parcel, status)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, voiceDomain)) {
+    if (!Write(parcel, voiceDomain)) {
         return false;
     }
     return true;
@@ -779,28 +779,28 @@ void CallStatusInfo::Dump(std::string, int32_t) {}
 
 bool CallImsServiceStatus::ReadFromParcel(Parcel &parcel)
 {
-    if (!ReadBaseInt32(parcel, smsSrvStatus)) {
+    if (!Read(parcel, smsSrvStatus)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, smsSrvRat)) {
+    if (!Read(parcel, smsSrvRat)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, voipSrvStatus)) {
+    if (!Read(parcel, voipSrvStatus)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, voipSrvRat)) {
+    if (!Read(parcel, voipSrvRat)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, vtSrvStatus)) {
+    if (!Read(parcel, vtSrvStatus)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, vtSrvRat)) {
+    if (!Read(parcel, vtSrvRat)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, vsSrvStatus)) {
+    if (!Read(parcel, vsSrvStatus)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, vsSrvRat)) {
+    if (!Read(parcel, vsSrvRat)) {
         return false;
     }
     return true;
@@ -808,28 +808,28 @@ bool CallImsServiceStatus::ReadFromParcel(Parcel &parcel)
 
 bool CallImsServiceStatus::Marshalling(Parcel &parcel) const
 {
-    if (!WriteBaseInt32(parcel, smsSrvStatus)) {
+    if (!Write(parcel, smsSrvStatus)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, smsSrvRat)) {
+    if (!Write(parcel, smsSrvRat)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, voipSrvStatus)) {
+    if (!Write(parcel, voipSrvStatus)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, voipSrvRat)) {
+    if (!Write(parcel, voipSrvRat)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, vtSrvStatus)) {
+    if (!Write(parcel, vtSrvStatus)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, vtSrvRat)) {
+    if (!Write(parcel, vtSrvRat)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, vsSrvStatus)) {
+    if (!Write(parcel, vsSrvStatus)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, vsSrvRat)) {
+    if (!Write(parcel, vsSrvRat)) {
         return false;
     }
     return true;
@@ -848,13 +848,13 @@ void CallImsServiceStatus::Dump(std::string, int32_t) {}
 
 bool UssdCusdInfo::ReadFromParcel(Parcel &parcel)
 {
-    if (!ReadBaseInt32(parcel, n)) {
+    if (!Read(parcel, n)) {
         return false;
     }
-    if (!ReadBaseString(parcel, str)) {
+    if (!Read(parcel, str)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, dcs)) {
+    if (!Read(parcel, dcs)) {
         return false;
     }
     return true;
@@ -862,13 +862,13 @@ bool UssdCusdInfo::ReadFromParcel(Parcel &parcel)
 
 bool UssdCusdInfo::Marshalling(Parcel &parcel) const
 {
-    if (!WriteBaseInt32(parcel, n)) {
+    if (!Write(parcel, n)) {
         return false;
     }
-    if (!WriteBaseString(parcel, str)) {
+    if (!Write(parcel, str)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, dcs)) {
+    if (!Write(parcel, dcs)) {
         return false;
     }
     return true;
@@ -887,13 +887,13 @@ void UssdCusdInfo::Dump(std::string, int32_t) {}
 
 bool UssdCusdNoticeInfo::ReadFromParcel(Parcel &parcel)
 {
-    if (!ReadBaseInt32(parcel, m)) {
+    if (!Read(parcel, m)) {
         return false;
     }
-    if (!ReadBaseString(parcel, str)) {
+    if (!Read(parcel, str)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, dcs)) {
+    if (!Read(parcel, dcs)) {
         return false;
     }
     return true;
@@ -901,13 +901,13 @@ bool UssdCusdNoticeInfo::ReadFromParcel(Parcel &parcel)
 
 bool UssdCusdNoticeInfo::Marshalling(Parcel &parcel) const
 {
-    if (!WriteBaseInt32(parcel, m)) {
+    if (!Write(parcel, m)) {
         return false;
     }
-    if (!WriteBaseString(parcel, str)) {
+    if (!Write(parcel, str)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, dcs)) {
+    if (!Write(parcel, dcs)) {
         return false;
     }
     return true;
@@ -926,7 +926,7 @@ void UssdCusdNoticeInfo::Dump(std::string, int32_t) {}
 
 bool SrvccStatus::ReadFromParcel(Parcel &parcel)
 {
-    if (!ReadBaseInt32(parcel, status)) {
+    if (!Read(parcel, status)) {
         return false;
     }
     return true;
@@ -934,7 +934,7 @@ bool SrvccStatus::ReadFromParcel(Parcel &parcel)
 
 bool SrvccStatus::Marshalling(Parcel &parcel) const
 {
-    if (!WriteBaseInt32(parcel, status)) {
+    if (!Write(parcel, status)) {
         return false;
     }
     return true;
@@ -953,7 +953,7 @@ void SrvccStatus::Dump(std::string, int32_t) {}
 
 bool RingbackVoice::ReadFromParcel(Parcel &parcel)
 {
-    if (!ReadBaseInt32(parcel, status)) {
+    if (!Read(parcel, status)) {
         return false;
     }
     return true;
@@ -961,7 +961,7 @@ bool RingbackVoice::ReadFromParcel(Parcel &parcel)
 
 bool RingbackVoice::Marshalling(Parcel &parcel) const
 {
-    if (!WriteBaseInt32(parcel, status)) {
+    if (!Write(parcel, status)) {
         return false;
     }
     return true;

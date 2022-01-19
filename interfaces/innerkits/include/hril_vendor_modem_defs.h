@@ -35,15 +35,13 @@ typedef struct {
 } HRilVoiceRadioInfo;
 
 typedef struct {
-    void (*SetRadioState)(const ReqDataInfo *requestInfo, int fun, int rst);
+    void (*SetRadioState)(const ReqDataInfo *requestInfo, int32_t fun, int32_t rst);
     void (*GetRadioState)(const ReqDataInfo *requestInfo);
     void (*GetImei)(const ReqDataInfo *requestInfo);
     void (*GetMeid)(const ReqDataInfo *requestInfo);
     void (*GetVoiceRadioTechnology)(const ReqDataInfo *requestInfo);
 } HRilModemReq;
-
 #ifdef __cplusplus
 }
 #endif
-
 #endif // OHOS_RIL_VENDOR_MODEM_DEFS_H

@@ -24,10 +24,18 @@
 #define TRUE 1
 #define FALSE 0
 
+#define PARAMETER_SIZE 128
+
 typedef enum {
     HRIL_SIM_SLOT_0,
-#if (SIM_SLOT_NUM >= 2) /* SIM_SLOT_NUM is defined in Makefile. */
+#if (SIM_SLOT_COUNT >= 2) /* SIM_SLOT_COUNT is defined in Build.gn. */
     HRIL_SIM_SLOT_1,
+#endif
+#if (SIM_SLOT_COUNT >= 3) /* SIM_SLOT_COUNT is defined in Build.gn. */
+    HRIL_SIM_SLOT_2,
+#endif
+#if (SIM_SLOT_COUNT >= 4) /* SIM_SLOT_COUNT is defined in Build.gn. */
+    HRIL_SIM_SLOT_3,
 #endif
     HRIL_SIM_SLOT_NUM
 } HRilSimSlotId;
@@ -52,6 +60,7 @@ typedef enum {
     HRIL_ERR_NEED_PUK_CODE,
     HRIL_ERR_NETWORK_SEARCH_TIMEOUT,
     HRIL_ERR_INVALID_MODEM_PARAMETER = 50,
+    HRIL_ERR_HDF_IPC_FAILURE = 65535,
 } HRilErrNumber;
 
 /* From 3GPP TS 27.007 V4.3.0 (2001-12) ATD%s%s */
@@ -67,7 +76,7 @@ typedef enum {
 typedef enum {
     HRIL_CALL_FAIL_NO_VALID_NUMBER = 1,
     HRIL_CALL_FAIL_NO_LINE_TO_TARGET_ADDRESS = 3,
-    HRIL_ERR_CALL_CAUSE  = 5
+    HRIL_ERR_CALL_CAUSE = 5
 } HRilLastCallErrorCode;
 
 typedef enum {
@@ -99,7 +108,6 @@ typedef enum {
     REG_NOT_NOTIFY = 0, /* AT command: +CREG,+CGREG,+CEREG,+C5GREG,n=0,Turn off notify function */
     REG_NOTIFY_STAT_ONLY, /* AT command: +CREG,+CGREG,+CEREG,+C5GREG,n=1,notify data format type 1 */
     REG_NOTIFY_STAT_LAC_CELLID, /* AT command: +CREG,+CGREG,+CEREG,+C5GREG,n=2,notify data format type 2 */
-    REG_NOTIFY_WITH_5G, /* AT command: +C5GREG,n=3,notify data format type 3 */
 } HRilRegNotifyMode;
 
 // 3GPP TS 27.007 V3.9.0 (2001-06) 7.11	Call forwarding number and conditions +CCFC
@@ -242,7 +250,7 @@ typedef enum {
 typedef enum {
     HRIL_NO_ROAM = 0,
     HRIL_ROAMING = 1,
-    HRIL_ROAM_UNKOWN = 2,
+    HRIL_ROAM_UNKNOWN = 2,
 } HRilRoamStatus;
 
 typedef enum {
@@ -300,7 +308,7 @@ typedef enum {
     HRIL_ACT_LTE = 101,
     HRIL_ACT_LTE_CA,
     HRIL_ACT_NR,
-} HRilVoiceSubmode;
+} HRilVoiceSubMode;
 
 typedef enum {
     HRIL_RADIO_GSM = 0,
@@ -372,5 +380,13 @@ typedef enum {
     HRIL_PDP_ERR_MULT_ACCESSES_PDN_NOT_ALLOWED = 113, /* Multiple accesses to a PDN connection not allowed */
 } HRilPdpErrorReason;
 
-typedef enum { HRIL_SIM_TYPE_UNKNOWN = 0, HRIL_SIM_TYPE_SIM = 1, HRIL_SIM_TYPE_USIM = 2 } HRilSimType;
+typedef enum {
+    HRIL_EVENT_COUNT_0 = 0,
+    HRIL_EVENT_COUNT_1,
+    HRIL_EVENT_COUNT_2,
+    HRIL_EVENT_COUNT_3,
+    HRIL_EVENT_COUNT_4
+} HRilSendEventCount;
+
+typedef enum { HRIL_SIM_TYPE_UNKNOWN = 0, HRIL_SIM_TYPE_SIM, HRIL_SIM_TYPE_USIM } HRilSimType;
 #endif // OHOS_HRIL_ENUM_H

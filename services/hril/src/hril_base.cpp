@@ -17,12 +17,60 @@
 
 namespace OHOS {
 namespace Telephony {
+bool HRilBase::ReadFromHdfBuf(struct HdfSBuf *data, int32_t &val)
+{
+    return HdfSbufReadInt32(data, &val);
+}
+
+bool HRilBase::ReadFromHdfBuf(struct HdfSBuf *data, const char *&val)
+{
+    val = HdfSbufReadString(data);
+    if (val == nullptr) {
+        TELEPHONY_LOGE("read failed from hdf buf!!!");
+        return false;
+    }
+    return true;
+}
+
+int HRilBase::ResponseHeader(
+    const HRilRadioResponseInfo &responseInfo, std::shared_ptr<struct HdfSBuf> &dataSbuf, MessageParcel &parcel)
+{
+    int32_t ret = ReportHeader(dataSbuf, parcel);
+    if (ret != HRIL_ERR_SUCCESS) {
+        TELEPHONY_LOGE("write fail for report header!!!");
+        return ret;
+    }
+    if (!HdfSbufWriteUnpadBuffer(dataSbuf.get(), (const uint8_t *)&responseInfo, sizeof(responseInfo))) {
+        TELEPHONY_LOGE("write failed for buffer");
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
+    return HRIL_ERR_SUCCESS;
+}
+
+int HRilBase::ReportHeader(std::shared_ptr<struct HdfSBuf> &dataSbuf, MessageParcel &parcel)
+{
+    dataSbuf.reset(ParcelToSbuf(&parcel), [](struct HdfSBuf *d) { HdfSBufRecycle(d); });
+    if (dataSbuf == nullptr) {
+        TELEPHONY_LOGE("dataSbuf is null!!!");
+        return HRIL_ERR_NULL_POINT;
+    }
+    if (!HdfSbufWriteInt32(dataSbuf.get(), GetSlotId())) {
+        TELEPHONY_LOGE("write failed for slot id");
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
+    return HRIL_ERR_SUCCESS;
+}
+
 int32_t HRilBase::ResponseBuffer(
     int32_t requestNum, const void *responseInfo, uint32_t reqLen, const void *event, uint32_t eventLen)
 {
     struct HdfSBuf *dataSbuf = HdfSBufTypedObtain(SBUF_IPC);
     if (dataSbuf == nullptr) {
         return HRIL_ERR_NULL_POINT;
+    }
+    if (!HdfSbufWriteInt32(dataSbuf, slotId_)) {
+        HdfSBufRecycle(dataSbuf);
+        return HRIL_ERR_GENERIC_FAILURE;
     }
     if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)responseInfo, reqLen)) {
         HdfSBufRecycle(dataSbuf);
@@ -47,8 +95,11 @@ int32_t HRilBase::ResponseInt32(int32_t requestNum, const void *responseInfo, ui
 {
     struct HdfSBuf *dataSbuf = HdfSBufTypedObtain(SBUF_IPC);
     if (dataSbuf == nullptr) {
-        TELEPHONY_LOGE("Get dataSbuf is nullptr.");
         return HRIL_ERR_NULL_POINT;
+    }
+    if (!HdfSbufWriteInt32(dataSbuf, slotId_)) {
+        HdfSBufRecycle(dataSbuf);
+        return HRIL_ERR_GENERIC_FAILURE;
     }
     if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)responseInfo, reqLen)) {
         HdfSBufRecycle(dataSbuf);
@@ -56,11 +107,9 @@ int32_t HRilBase::ResponseInt32(int32_t requestNum, const void *responseInfo, ui
     }
     if (!HdfSbufWriteInt32(dataSbuf, value)) {
         HdfSBufRecycle(dataSbuf);
-        TELEPHONY_LOGE("HdfSbufWriteInt32 is fail.");
         return HRIL_ERR_GENERIC_FAILURE;
     }
     int32_t ret = ServiceDispatcher(requestNum, dataSbuf);
-    TELEPHONY_LOGI("ret:%{public}d value:%{public}d ", ret, value);
     if (ret != HRIL_ERR_SUCCESS) {
         HdfSBufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
@@ -76,6 +125,10 @@ int32_t HRilBase::ResponseRequestInfo(int32_t requestNum, const void *responseIn
     struct HdfSBuf *dataSbuf = HdfSBufTypedObtain(SBUF_IPC);
     if (dataSbuf == nullptr) {
         return HRIL_ERR_NULL_POINT;
+    }
+    if (!HdfSbufWriteInt32(dataSbuf, slotId_)) {
+        HdfSBufRecycle(dataSbuf);
+        return HRIL_ERR_GENERIC_FAILURE;
     }
     if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)responseInfo, reqLen)) {
         HdfSBufRecycle(dataSbuf);
@@ -103,8 +156,8 @@ int32_t HRilBase::ConvertHexStringToInt(char **response, int32_t index, int32_t 
 
 HRilNotiType HRilBase::ConvertIntToRadioNoticeType(int32_t indicationType)
 {
-    return (indicationType == (int32_t)ReportType::HRIL_NOTIFICATION)
-        ? (HRilNotiType::HRIL_NOTIFICATION) : (HRilNotiType::HRIL_NO_DEFINE);
+    return (indicationType == (int32_t)ReportType::HRIL_NOTIFICATION) ? (HRilNotiType::HRIL_NOTIFICATION) :
+                                                                        (HRilNotiType::HRIL_NO_DEFINE);
 }
 
 uint8_t HRilBase::ConvertHexCharToInt(uint8_t ch)
@@ -175,21 +228,6 @@ bool HRilBase::ConvertToString(char **dest, const std::string &srcStr)
     return true;
 }
 
-void HRilBase::FreeStrings(int32_t argCounts, ...)
-{
-    va_list list;
-    va_start(list, argCounts);
-    int32_t i = 0;
-    while (i < argCounts) {
-        char *ch = va_arg(list, char *);
-        if (ch) {
-            free(ch);
-        }
-        i++;
-    }
-    va_end(list);
-}
-
 int32_t HRilBase::ServiceDispatcher(int32_t requestNum, const HdfSBuf *dataSbuf)
 {
     return hrilReporter_.ReportToParent(requestNum, dataSbuf);
@@ -200,9 +238,9 @@ int32_t HRilBase::ServiceNotifyDispatcher(int32_t requestNum, const HdfSBuf *dat
     return hrilReporter_.NotifyToParent(requestNum, dataSbuf);
 }
 
-ReqDataInfo *HRilBase::CreateHRilRequest(int32_t serial, int32_t slotId, int32_t request)
+ReqDataInfo *HRilBase::CreateHRilRequest(int32_t serial, int32_t request)
 {
-    return hrilReporter_.CreateHRilRequest(serial, slotId, request);
+    return hrilReporter_.CreateHRilRequest(serial, slotId_, request);
 }
 } // namespace Telephony
 } // namespace OHOS

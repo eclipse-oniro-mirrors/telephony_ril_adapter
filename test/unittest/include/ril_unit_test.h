@@ -60,9 +60,9 @@ public:
     void OnProcessInput(int32_t what, const OHOS::AppExecFwk::InnerEvent::Pointer &event);
     void SetUssdCusdTest(const AppExecFwk::InnerEvent::Pointer &result);
     void GetUssdCusdTest(const AppExecFwk::InnerEvent::Pointer &result);
-    void OpenLogicalSimIO(const AppExecFwk::InnerEvent::Pointer &result);
-    void CloseLogicalSimIO(const AppExecFwk::InnerEvent::Pointer &result);
-    void TransmitApduSimIO(const AppExecFwk::InnerEvent::Pointer &result);
+    void SimOpenLogicalChannel(const AppExecFwk::InnerEvent::Pointer &result);
+    void SimCloseLogicalChannel(const AppExecFwk::InnerEvent::Pointer &result);
+    void SimTransmitApduLogicalChannel(const AppExecFwk::InnerEvent::Pointer &result);
     void UnlockSimLock(const AppExecFwk::InnerEvent::Pointer &result);
     void GetLinkBandwidthInfoTest(const AppExecFwk::InnerEvent::Pointer &result);
     void OnInitInterface();

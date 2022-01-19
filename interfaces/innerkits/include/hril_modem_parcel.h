@@ -45,10 +45,15 @@ struct VoiceRadioTechnology : public HrilBaseParcel {
     HRilRadioTech actType;
     std::string actName;
     int64_t flag;
+
+    VoiceRadioTechnology() = default;
+    VoiceRadioTechnology(const HRilVoiceRadioInfo &hrilVoiceRadioInfo);
+    VoiceRadioTechnology &operator=(const HRilVoiceRadioInfo &hrilVoiceRadioInfo);
     bool ReadFromParcel(Parcel &parcel);
     virtual bool Marshalling(Parcel &parcel) const override;
     std::shared_ptr<VoiceRadioTechnology> UnMarshalling(Parcel &parcel);
     void Dump(std::string, int32_t);
+    virtual const char *ToString() const override;
 };
 } // namespace Telephony
 } // namespace OHOS
