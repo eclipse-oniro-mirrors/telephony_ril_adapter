@@ -71,7 +71,7 @@ ohos_shared_library("hril") {
     "//foundation/distributedschedule/dmsfwk/services/dtbschedmgr:distributedschedsvr",
   ]
   external_deps = [
-    "aafwk_standard:want",
+    "ability_runtime:want",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
