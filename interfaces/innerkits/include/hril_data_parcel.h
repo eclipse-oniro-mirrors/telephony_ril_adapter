@@ -22,7 +22,7 @@ namespace OHOS {
 namespace Telephony {
 struct SetupDataCallResultInfo : public HrilBaseParcel {
     int32_t flag;
-    int32_t reason; /* Data call fail reason. succes is 0 */
+    int32_t reason; /* Data call fail reason. success is 0 */
     int32_t retryTime; /* if errorCode != 0, suggested retry time */
     int32_t cid; /* from 3GPP TS 27.007 V17.3.0 (2021-09)
                   * specifies a particular PDP context definition. The parameter is local to the TE-MT interface
@@ -52,8 +52,8 @@ struct SetupDataCallResultInfo : public HrilBaseParcel {
                          * +CGCONTRDP. */
     std::string gateway; /* network gateway address */
     int32_t maxTransferUnit; /* Maximum Transfer Unit. The range of permitted values (minimum value = 1
-                  * or if the initial PDP context is supported minimum value = 0)
-                  * is returned by the test form of the command. */
+                              * or if the initial PDP context is supported minimum value = 0)
+                              * is returned by the test form of the command. */
     std::string pCscfPrimAddr; /* from 3GPP TS 27.007 10.1.23 V4.3.0 (2001-12)
                                 * string type; shows the IP address of the primary P-CSCF server.When +CGPIAF is
                                 * supported, its settings can influence the format of this parameter returned with

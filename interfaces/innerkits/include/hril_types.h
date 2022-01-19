@@ -22,7 +22,7 @@
 
 namespace OHOS {
 namespace Telephony {
-enum class HRilErrType {
+enum class HRilErrType : int32_t {
     HRIL_ERR_NULL_POINT = -1,
     NONE = 0,
     HRIL_ERR_GENERIC_FAILURE,
@@ -130,9 +130,14 @@ struct GetCallWaitingInfo {
 };
 
 struct HRilRadioResponseInfo {
-    int32_t flag;
-    int32_t serial;
+    int32_t flag = -1;
+    int32_t serial = -1;
     HRilErrType error;
+
+    bool IsInvalid(void) const
+    {
+        return flag == -1 && serial == -1;
+    }
 };
 
 struct HRilRadioStateInfo {
@@ -149,9 +154,9 @@ enum HRilCommonNumber {
 };
 
 enum HRilOperatorInfoResult {
-    HRIL_NUMERIC = 0,
+    HRIL_LONE_NAME = 0,
     HRIL_SHORT_NAME,
-    HRIL_LONE_NAME,
+    HRIL_NUMERIC,
 };
 
 enum HRilCircuitModeRegState {

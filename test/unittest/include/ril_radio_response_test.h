@@ -66,8 +66,8 @@ public:
     void OnRequestGetNetworkSelectionModeTest(OHOS::MessageParcel &data);
     void OnRequestGetNetworkSearchInformationTest(OHOS::MessageParcel &data);
     void OnRequestSetNetworkSelectionModeTest(OHOS::MessageParcel &data);
-    void OnRequestSetUssdCusdTest(OHOS::MessageParcel &data);
-    void OnRequestGetUssdCusdTest(OHOS::MessageParcel &data);
+    void OnRequestSetUssdTest(OHOS::MessageParcel &data);
+    void OnRequestGetUssdTest(OHOS::MessageParcel &data);
     void OnRequestGetLinkBandwidthInfoTest(OHOS::MessageParcel &data);
 
 private:

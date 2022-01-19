@@ -21,11 +21,11 @@
 namespace OHOS {
 namespace Telephony {
 enum class NetworkParameter : int32_t {
-    ERR_INVALID_RESPONSE_VALUE = 3,
+    RESPONSE_VALUE = 3,
     INVALID_RESPONSE_VALUE = 11,
 };
 
-HRilNetwork::HRilNetwork(IHRilReporter &hrilReporter) : HRilBase(hrilReporter)
+HRilNetwork::HRilNetwork(int32_t slotId, IHRilReporter &hrilReporter) : HRilBase(slotId, hrilReporter)
 {
     AddHandlerToMap();
 }
@@ -40,6 +40,7 @@ void HRilNetwork::AddHandlerToMap()
     notiMemberFuncMap_[HNOTI_NETWORK_IMS_REG_STATUS_UPDATED] = &HRilNetwork::NetworkImsRegStatusUpdated;
     notiMemberFuncMap_[HNOTI_NETWORK_PS_REG_STATUS_UPDATED] = &HRilNetwork::NetworkPsRegStatusUpdated;
     notiMemberFuncMap_[HNOTI_NETWORK_PHY_CHNL_CFG_UPDATED] = &HRilNetwork::NetworkPhyChnlCfgUpdated;
+    notiMemberFuncMap_[HNOTI_NETWORK_CURRENT_CELL_UPDATED] = &HRilNetwork::NetworkCurrentCellUpdated;
 
     // request
     reqMemberFuncMap_[HREQ_NETWORK_GET_IMS_REG_STATUS] = &HRilNetwork::GetImsRegStatus;
@@ -54,7 +55,7 @@ void HRilNetwork::AddHandlerToMap()
     reqMemberFuncMap_[HREQ_NETWORK_GET_PREFERRED_NETWORK] = &HRilNetwork::GetPreferredNetwork;
     reqMemberFuncMap_[HREQ_NETWORK_SET_PS_ATTACH_STATUS] = &HRilNetwork::SetPsAttachStatus;
     reqMemberFuncMap_[HREQ_NETWORK_GET_PS_ATTACH_STATUS] = &HRilNetwork::GetPsAttachStatus;
-    reqMemberFuncMap_[HREQ_NETWORK_GET_NEIGHBORING_CELLINFO_LIST] = &HRilNetwork::GetCellInfoList;
+    reqMemberFuncMap_[HREQ_NETWORK_GET_NEIGHBORING_CELLINFO_LIST] = &HRilNetwork::GetNeighboringCellInfoList;
     reqMemberFuncMap_[HREQ_NETWORK_GET_CURRENT_CELL_INFO] = &HRilNetwork::GetCurrentCellInfo;
     reqMemberFuncMap_[HREQ_NETWORK_GET_RADIO_CAPABILITY] = &HRilNetwork::GetRadioCapability;
     reqMemberFuncMap_[HREQ_NETWORK_SET_RADIO_CAPABILITY] = &HRilNetwork::SetRadioCapability;
@@ -83,141 +84,96 @@ void HRilNetwork::AddHandlerToMap()
     respMemberFuncMap_[HREQ_NETWORK_SET_LOCATE_UPDATES] = &HRilNetwork::SetLocateUpdatesResponse;
 }
 
-void HRilNetwork::ProcessNetworkResponse(
-    int32_t slotId, int32_t code, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
-{
-    TELEPHONY_LOGI("HRilNetwork ProcessNetworkResponse code:%{public}d", code);
-    TELEPHONY_LOGI("HRilNetwork ProcessNetworkResponse responseLen:%{public}zu", responseLen);
-    auto itFunc = respMemberFuncMap_.find(code);
-    if (itFunc != respMemberFuncMap_.end()) {
-        auto memberFunc = itFunc->second;
-        if (memberFunc != nullptr) {
-            (this->*memberFunc)(slotId, code, responseInfo, response, responseLen);
-        }
-    }
-}
-
-void HRilNetwork::ProcessNetworkRequest(int32_t slotId, int32_t code, struct HdfSBuf *data)
-{
-    auto itFunc = reqMemberFuncMap_.find(code);
-    if (itFunc != reqMemberFuncMap_.end()) {
-        auto memberFunc = itFunc->second;
-        if (memberFunc != nullptr) {
-            (this->*memberFunc)(slotId, data);
-        }
-    }
-}
-
-void HRilNetwork::ProcessNetworkNotify(int32_t slotId, const struct ReportInfo *reportInfo,
-    const void *response, size_t responseLen)
-{
-    int code;
-    HRilErrNumber e;
-    if (reportInfo == nullptr) {
-        TELEPHONY_LOGE("reportInfo is nullptr");
-        return;
-    }
-    code = reportInfo->notifyId;
-    e = (HRilErrNumber)reportInfo->error;
-    TELEPHONY_LOGI("HRilNetwork ProcessCallNotify code:%{public}d", code);
-    auto itFunc = notiMemberFuncMap_.find(code);
-    if (itFunc != notiMemberFuncMap_.end()) {
-        auto memberFunc = itFunc->second;
-        if (memberFunc != nullptr) {
-            (this->*memberFunc)(slotId, (int32_t)reportInfo->type, e, response, responseLen);
-        }
-    }
-}
-
-void HRilNetwork::GetImsRegStatus(int32_t slotId, struct HdfSBuf *data)
+int32_t HRilNetwork::GetImsRegStatus(struct HdfSBuf *data)
 {
     if (networkFuncs_ == nullptr) {
         TELEPHONY_LOGE("GetImsRegStatus::networkFuncs_ is nullptr");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
     int32_t serial = 0;
     if (!HdfSbufReadInt32(data, &serial)) {
         TELEPHONY_LOGE("miss serial parameter");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_NETWORK_GET_IMS_REG_STATUS);
+    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_NETWORK_GET_IMS_REG_STATUS);
     if (requestInfo == nullptr) {
         TELEPHONY_LOGE("Create Request is fail");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
     networkFuncs_->GetImsRegStatus(requestInfo);
+    return HRIL_ERR_SUCCESS;
 }
 
-void HRilNetwork::GetSignalStrength(int32_t slotId, struct HdfSBuf *data)
+int32_t HRilNetwork::GetSignalStrength(struct HdfSBuf *data)
 {
     if (networkFuncs_ == nullptr) {
         TELEPHONY_LOGE("GetSignalStrength::networkFuncs_ is nullptr");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
     int32_t serial = 0;
     if (!HdfSbufReadInt32(data, &serial)) {
         TELEPHONY_LOGE("miss serial parameter");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_NETWORK_GET_SIGNAL_STRENGTH);
+    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_NETWORK_GET_SIGNAL_STRENGTH);
     if (requestInfo == nullptr) {
         TELEPHONY_LOGE("Create Request is fail");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
     networkFuncs_->GetSignalStrength(requestInfo);
+    return HRIL_ERR_SUCCESS;
 }
 
-void HRilNetwork::GetRadioCapability(int32_t slotId, struct HdfSBuf *data)
+int32_t HRilNetwork::GetRadioCapability(struct HdfSBuf *data)
 {
     if (networkFuncs_ == nullptr) {
         TELEPHONY_LOGE("GetRadioCapability::networkFuncs_ is nullptr");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
     int32_t serial = 0;
     if (!HdfSbufReadInt32(data, &serial)) {
         TELEPHONY_LOGE("miss serial parameter");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_NETWORK_GET_RADIO_CAPABILITY);
+    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_NETWORK_GET_RADIO_CAPABILITY);
     if (requestInfo == nullptr) {
         TELEPHONY_LOGE("Create Request is fail");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
     networkFuncs_->GetRadioCapability(requestInfo);
+    return HRIL_ERR_SUCCESS;
 }
 
-void HRilNetwork::SetRadioCapability(int32_t slotId, struct HdfSBuf *data)
+int32_t HRilNetwork::SetRadioCapability(struct HdfSBuf *data)
 {
     if (networkFuncs_ == nullptr) {
         TELEPHONY_LOGE("SetRadioCapability::networkFuncs_ is nullptr");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
-    const int32_t POINTER_NUM = 1;
     struct RadioCapabilityInfo setRadioCapabilityInfo = {};
     MessageParcel *parcel = nullptr;
     if (SbufToParcel(data, &parcel)) {
         TELEPHONY_LOGE("RilAdapter failed to do SbufToParcel");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
     int32_t serial = 0;
     if (!HdfSbufReadInt32(data, &serial)) {
         TELEPHONY_LOGE("miss serial parameter");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
     HRilRadioCapability setRadioInfo = {};
-    setRadioInfo.ratfamily = setRadioCapabilityInfo.ratfamily;
+    setRadioInfo.ratFamily = setRadioCapabilityInfo.ratFamily;
     strcpy_s(setRadioInfo.modemId, strlen(setRadioCapabilityInfo.modemId.c_str()) + 1,
         setRadioCapabilityInfo.modemId.c_str());
-    TELEPHONY_LOGI("setRadioInfo = %{public}d", setRadioInfo.ratfamily);
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_NETWORK_SET_RADIO_CAPABILITY);
+    TELEPHONY_LOGI("setRadioInfo = %{public}d", setRadioInfo.ratFamily);
+    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_NETWORK_SET_RADIO_CAPABILITY);
     if (requestInfo == nullptr) {
         TELEPHONY_LOGE("SetRadioCapability::Create Request is fail");
-        FreeStrings(POINTER_NUM, setRadioInfo.modemId);
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
     TELEPHONY_LOGI("SetRadioCapability selectMode:%{public}s", setRadioInfo.modemId);
     networkFuncs_->SetRadioCapability(requestInfo, &setRadioInfo);
-    FreeStrings(POINTER_NUM, setRadioInfo.modemId);
+    return HRIL_ERR_SUCCESS;
 }
 
 void HRilNetwork::ExchangeRilRssiToHdf(const void *response, size_t responseLen, Rssi &rssi)
@@ -252,16 +208,20 @@ void HRilNetwork::ExchangeRilRssiToHdf(const void *response, size_t responseLen,
     TELEPHONY_LOGI("rxlev:%{public}d, rsrp:%{public}d", rssi.lte.rxlev, rssi.lte.rsrp);
 }
 
-int32_t HRilNetwork::GetImsRegStatusResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
-    const void *response, size_t responseLen)
+int32_t HRilNetwork::GetImsRegStatusResponse(
+    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    const int IMS_EXT_INFO_NOTIFY_TYPE = 2;
-    ImsRegStatusInfo imsRegResponse;
+    const int32_t IMS_EXT_INFO_NOTIFY_TYPE = 2;
+    ImsRegStatusInfo imsRegResponse = {};
     imsRegResponse.notifyType = IMS_EXT_INFO_NOTIFY_TYPE;
     imsRegResponse.regInfo = 0;
     imsRegResponse.extInfo = 0;
     TELEPHONY_LOGI("GetImsRegStatusResponse ---> response %{public}p", response);
-    if (response == nullptr) {
+    if (((response == nullptr) && (responseLen != 0)) ||
+        ((response != nullptr) && (responseLen != sizeof(HRilImsRegStatusInfo)))) {
+        TELEPHONY_LOGE("GetImsRegStatusResponse check data: error");
+        return HRIL_ERR_GENERIC_FAILURE;
+    } else if ((response == nullptr) && (responseLen == 0)) {
         TELEPHONY_LOGE("response is nullptr");
         if (responseInfo.error == HRilErrType::NONE) {
             responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
@@ -275,12 +235,16 @@ int32_t HRilNetwork::GetImsRegStatusResponse(int32_t slotId, int32_t requestNum,
     return ResponseMessageParcel(responseInfo, imsRegResponse, requestNum);
 }
 
-int32_t HRilNetwork::GetSignalStrengthResponse(int32_t slotId, int32_t requestNum,
-    HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+int32_t HRilNetwork::GetSignalStrengthResponse(
+    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     Rssi event = {};
-    event.slotId = slotId;
-    if (response == nullptr || responseLen != sizeof(HRilRssi)) {
+    event.slotId = GetSlotId();
+    if (((response == nullptr) && (responseLen != 0)) ||
+        ((response != nullptr) && (responseLen != sizeof(HRilRssi)))) {
+        TELEPHONY_LOGE("GetSignalStrengthResponse check data: error");
+        return HRIL_ERR_GENERIC_FAILURE;
+    } else if (response == nullptr || responseLen != sizeof(HRilRssi)) {
         TELEPHONY_LOGE("GetSignalStrengthResponse: Invalid response");
         if (responseInfo.error == HRilErrType::NONE) {
             responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
@@ -291,35 +255,40 @@ int32_t HRilNetwork::GetSignalStrengthResponse(int32_t slotId, int32_t requestNu
     return ResponseBuffer(requestNum, &responseInfo, sizeof(responseInfo), &event, sizeof(event));
 }
 
-void HRilNetwork::GetCsRegStatus(int32_t slotId, struct HdfSBuf *data)
+int32_t HRilNetwork::GetCsRegStatus(struct HdfSBuf *data)
 {
     if (networkFuncs_ == nullptr) {
         TELEPHONY_LOGE("GetCsRegStatus::networkFuncs_ is nullptr");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
     int32_t serial = 0;
     if (!HdfSbufReadInt32(data, &serial)) {
         TELEPHONY_LOGE("miss serial parameter");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_NETWORK_GET_CS_REG_STATUS);
+    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_NETWORK_GET_CS_REG_STATUS);
     if (requestInfo == nullptr) {
         TELEPHONY_LOGE("Create Request is fail");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
     networkFuncs_->GetCsRegStatus(requestInfo);
+    return HRIL_ERR_SUCCESS;
 }
 
-int32_t HRilNetwork::GetCsRegStatusResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
-    const void *response, size_t responseLen)
+int32_t HRilNetwork::GetCsRegStatusResponse(
+    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    CsRegStatusInfo csRegResponse;
+    CsRegStatusInfo csRegResponse = {};
     csRegResponse.notifyType = REG_NOTIFY_STAT_LAC_CELLID;
     csRegResponse.regStatus = NO_REG_MT_NO_SEARCH;
     csRegResponse.lacCode = 0;
     csRegResponse.cellId = 0;
     csRegResponse.radioTechnology = RADIO_TECHNOLOGY_UNKNOWN;
-    if (response == nullptr) {
+    if (((response == nullptr) && (responseLen != 0)) ||
+        ((response != nullptr) && (responseLen != sizeof(HRilRegStatusInfo)))) {
+        TELEPHONY_LOGE("GetCsRegStatusResponse check data: error");
+        return HRIL_ERR_GENERIC_FAILURE;
+    } else if ((response == nullptr) && (responseLen == 0)) {
         TELEPHONY_LOGE("GetCsRegStatusResponse Invalid response: nullptr");
         if (responseInfo.error == HRilErrType::NONE) {
             responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
@@ -340,246 +309,257 @@ int32_t HRilNetwork::GetCsRegStatusResponse(int32_t slotId, int32_t requestNum, 
     return ResponseMessageParcel(responseInfo, csRegResponse, requestNum);
 }
 
-void HRilNetwork::GetOperatorInfo(int32_t slotId, struct HdfSBuf *data)
+int32_t HRilNetwork::GetOperatorInfo(struct HdfSBuf *data)
 {
     if (networkFuncs_ == nullptr) {
         TELEPHONY_LOGE("GetOperatorInfo::networkFuncs_ is nullptr");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
     int32_t serial = 0;
     if (!HdfSbufReadInt32(data, &serial)) {
         TELEPHONY_LOGE("miss serial parameter");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_NETWORK_GET_OPERATOR_INFO);
+    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_NETWORK_GET_OPERATOR_INFO);
     if (requestInfo == nullptr) {
         TELEPHONY_LOGE("Create Request is fail");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
     networkFuncs_->GetOperatorInfo(requestInfo);
+    return HRIL_ERR_SUCCESS;
 }
 
-void HRilNetwork::GetNetworkSearchInformation(int32_t slotId, struct HdfSBuf *data)
+int32_t HRilNetwork::GetNetworkSearchInformation(struct HdfSBuf *data)
 {
     if (networkFuncs_ == nullptr) {
         TELEPHONY_LOGE("GetNetworkSearchInformation::networkFuncs_ is nullptr");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
     int32_t serial = 0;
     if (!HdfSbufReadInt32(data, &serial)) {
         TELEPHONY_LOGE("GetNetworkSearchInformation::miss serial parameter");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_NETWORK_GET_NETWORK_SEARCH_INFORMATION);
+    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_NETWORK_GET_NETWORK_SEARCH_INFORMATION);
     if (requestInfo == nullptr) {
         TELEPHONY_LOGE("GetNetworkSearchInformation::Create Request is fail");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
     networkFuncs_->GetNetworkSearchInformation(requestInfo);
+    return HRIL_ERR_SUCCESS;
 }
 
-void HRilNetwork::GetNetworkSelectionMode(int32_t slotId, struct HdfSBuf *data)
+int32_t HRilNetwork::GetNetworkSelectionMode(struct HdfSBuf *data)
 {
     if (networkFuncs_ == nullptr) {
         TELEPHONY_LOGE("GetNetworkSelectionMode::networkFuncs_ is nullptr");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
     int32_t serial = 0;
     if (!HdfSbufReadInt32(data, &serial)) {
         TELEPHONY_LOGE("GetNetworkSelectionMode::miss serial parameter");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_NETWORK_GET_NETWORK_SELECTION_MODE);
+    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_NETWORK_GET_NETWORK_SELECTION_MODE);
     if (requestInfo == nullptr) {
         TELEPHONY_LOGE("GetNetworkSelectionMode::Create Request is fail");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
     networkFuncs_->GetNetworkSelectionMode(requestInfo);
+    return HRIL_ERR_SUCCESS;
 }
 
-void HRilNetwork::SetNetworkSelectionMode(int32_t slotId, struct HdfSBuf *data)
+int32_t HRilNetwork::SetNetworkSelectionMode(struct HdfSBuf *data)
 {
     if (networkFuncs_ == nullptr) {
         TELEPHONY_LOGE("SetNetworkSelectionMode::networkFuncs_ is nullptr");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
-    const int32_t POINTER_NUM = 1;
     struct SetNetworkModeInfo setNetworkModeInfo = {};
     MessageParcel *parcel = nullptr;
     if (SbufToParcel(data, &parcel)) {
         TELEPHONY_LOGE("RilAdapter failed to do SbufToParcel");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
     if (!setNetworkModeInfo.ReadFromParcel(*parcel)) {
         TELEPHONY_LOGE("RilAdapter failed to do ReadFromParcel!");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
     HRilSetNetworkModeInfo setModeInfo = {};
     setModeInfo.selectMode = setNetworkModeInfo.selectMode;
     TELEPHONY_LOGI("setModeInfo = %{public}d", setModeInfo.selectMode);
     if (!ConvertToString(&setModeInfo.oper, setNetworkModeInfo.oper)) {
         TELEPHONY_LOGE("SetNetworkSelectionMode::ConvertToString failed");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
-    ReqDataInfo *requestInfo =
-        CreateHRilRequest(setNetworkModeInfo.serial, slotId, HREQ_NETWORK_SET_NETWORK_SELECTION_MODE);
+    ReqDataInfo *requestInfo = CreateHRilRequest(setNetworkModeInfo.serial, HREQ_NETWORK_SET_NETWORK_SELECTION_MODE);
     if (requestInfo == nullptr) {
         TELEPHONY_LOGE("SetNetworkSelectionMode::Create Request is fail");
-        FreeStrings(POINTER_NUM, setModeInfo.oper);
-        return;
+        SafeFrees(setModeInfo.oper);
+        return HRIL_ERR_INVALID_PARAMETER;
     }
     TELEPHONY_LOGI("SetNetworkSelectionMode selectMode:%{public}s", setModeInfo.oper);
     networkFuncs_->SetNetworkSelectionMode(requestInfo, &setModeInfo);
-    FreeStrings(POINTER_NUM, setModeInfo.oper);
+    SafeFrees(setModeInfo.oper);
+    return HRIL_ERR_SUCCESS;
 }
 
-void HRilNetwork::GetPreferredNetwork(int32_t slotId, struct HdfSBuf *data)
+int32_t HRilNetwork::GetPreferredNetwork(struct HdfSBuf *data)
 {
     if (networkFuncs_ == nullptr) {
         TELEPHONY_LOGE("GetPreferredNetwork::networkFuncs_ is nullptr");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
     int32_t serial = 0;
     if (!HdfSbufReadInt32(data, &serial)) {
         TELEPHONY_LOGE("miss serial parameter");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
     TELEPHONY_LOGI("serial = %{public}d", serial);
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_NETWORK_GET_PREFERRED_NETWORK);
+    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_NETWORK_GET_PREFERRED_NETWORK);
     if (requestInfo == nullptr) {
         TELEPHONY_LOGE("GetPreferredNetwork::Create Request is fail");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
     networkFuncs_->GetPreferredNetwork(requestInfo);
+    return HRIL_ERR_SUCCESS;
 }
 
-void HRilNetwork::SetPreferredNetwork(int32_t slotId, struct HdfSBuf *data)
+int32_t HRilNetwork::SetPreferredNetwork(struct HdfSBuf *data)
 {
     if (networkFuncs_ == nullptr) {
         TELEPHONY_LOGE("SetPreferredNetwork::networkFuncs_ is nullptr");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
     int32_t netType = 0;
     int32_t serial = 0;
     if (!HdfSbufReadInt32(data, &serial)) {
         TELEPHONY_LOGE("miss serial parameter");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
     if (!HdfSbufReadInt32(data, &netType)) {
         TELEPHONY_LOGE("miss netType parameter");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_NETWORK_SET_PREFERRED_NETWORK);
+    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_NETWORK_SET_PREFERRED_NETWORK);
     if (requestInfo == nullptr) {
         TELEPHONY_LOGE("SetPreferredNetwork::Create Request is fail");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
     TELEPHONY_LOGI("SetPreferredNetwork netType:%{public}d", netType);
     networkFuncs_->SetPreferredNetwork(requestInfo, &netType);
+    return HRIL_ERR_SUCCESS;
 }
 
-void HRilNetwork::SetPsAttachStatus(int32_t slotId, struct HdfSBuf *data)
+int32_t HRilNetwork::SetPsAttachStatus(struct HdfSBuf *data)
 {
     if (networkFuncs_ == nullptr) {
         TELEPHONY_LOGE("SetPsAttachStatus::networkFuncs_ is nullptr");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
     int32_t psAttachStatus = 0;
     int32_t serial = 0;
 
     if (!HdfSbufReadInt32(data, &serial)) {
         TELEPHONY_LOGE("miss serial parameter");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
 
     if (!HdfSbufReadInt32(data, &psAttachStatus)) {
         TELEPHONY_LOGE("miss psAttachStatus parameter");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_NETWORK_SET_PS_ATTACH_STATUS);
+    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_NETWORK_SET_PS_ATTACH_STATUS);
     if (requestInfo == nullptr) {
         TELEPHONY_LOGE("SetPsAttachStatus::Create Request is fail");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
     TELEPHONY_LOGI("SetPsAttachStatus psAttachStatus:%{public}d", psAttachStatus);
     networkFuncs_->SetPsAttachStatus(requestInfo, &psAttachStatus);
+    return HRIL_ERR_SUCCESS;
 }
 
-void HRilNetwork::GetPsAttachStatus(int32_t slotId, struct HdfSBuf *data)
+int32_t HRilNetwork::GetPsAttachStatus(struct HdfSBuf *data)
 {
     if (networkFuncs_ == nullptr) {
         TELEPHONY_LOGE("GetPsAttachStatus::networkFuncs_ is nullptr");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
     int32_t serial = 0;
     if (!HdfSbufReadInt32(data, &serial)) {
         TELEPHONY_LOGE("GetPsAttachStatus::miss serial parameter");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_NETWORK_GET_PS_ATTACH_STATUS);
+    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_NETWORK_GET_PS_ATTACH_STATUS);
     if (requestInfo == nullptr) {
         TELEPHONY_LOGE("GetPsAttachStatus::Create Request is fail");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
     networkFuncs_->GetPsAttachStatus(requestInfo);
+    return HRIL_ERR_SUCCESS;
 }
 
-void HRilNetwork::GetPhysicalChannelConfig(int32_t slotId, struct HdfSBuf *data)
+int32_t HRilNetwork::GetPhysicalChannelConfig(struct HdfSBuf *data)
 {
     if (networkFuncs_ == nullptr) {
         TELEPHONY_LOGE("GetPhysicalChannelConfig::networkFuncs_ is nullptr");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
     int32_t serial = 0;
     if (!HdfSbufReadInt32(data, &serial)) {
         TELEPHONY_LOGE("GetPhysicalChannelConfig::miss serial parameter");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_NETWORK_GET_PHYSICAL_CHANNEL_CONFIG);
+    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_NETWORK_GET_PHYSICAL_CHANNEL_CONFIG);
     if (requestInfo == nullptr) {
         TELEPHONY_LOGE("GetPhysicalChannelConfig::Create Request is fail");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
     networkFuncs_->GetPhysicalChannelConfig(requestInfo);
+    return HRIL_ERR_SUCCESS;
 }
 
-void HRilNetwork::SetLocateUpdates(int32_t slotId, struct HdfSBuf *data)
+int32_t HRilNetwork::SetLocateUpdates(struct HdfSBuf *data)
 {
     if (networkFuncs_ == nullptr) {
         TELEPHONY_LOGE("SetLocateUpdates::networkFuncs_ is nullptr");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
     int32_t serial = 0;
     if (!HdfSbufReadInt32(data, &serial)) {
         TELEPHONY_LOGE("SetLocateUpdates::miss serial parameter");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
     int32_t regNotifyMode = 0;
     if (!HdfSbufReadInt32(data, &regNotifyMode)) {
         TELEPHONY_LOGE("miss regNotifyMode parameter");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
     HRilRegNotifyMode mode = REG_NOTIFY_STAT_LAC_CELLID;
-    if ((regNotifyMode >= REG_NOT_NOTIFY) && (regNotifyMode <= REG_NOTIFY_WITH_5G)) {
+    if ((regNotifyMode >= REG_NOT_NOTIFY) && (regNotifyMode <= REG_NOTIFY_STAT_LAC_CELLID)) {
         mode = static_cast<HRilRegNotifyMode>(regNotifyMode);
     } else {
         TELEPHONY_LOGE("Invalid regNotifyMode parameter");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_NETWORK_SET_LOCATE_UPDATES);
+    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_NETWORK_SET_LOCATE_UPDATES);
     if (requestInfo == nullptr) {
         TELEPHONY_LOGE("SetLocateUpdates::Create Request is fail");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
     networkFuncs_->SetLocateUpdates(requestInfo, mode);
+    return HRIL_ERR_SUCCESS;
 }
 
-int32_t HRilNetwork::GetOperatorInfoResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
-    const void *response, size_t responseLen)
+int32_t HRilNetwork::GetOperatorInfoResponse(
+    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     struct OperatorInfoResult operatorInfoResult = {};
-    int32_t numStrings = responseLen;
-    if (response == nullptr || numStrings != static_cast<int32_t>(NetworkParameter::ERR_INVALID_RESPONSE_VALUE)) {
+    if (((response == nullptr) && (responseLen != 0)) ||
+        ((response != nullptr) && (responseLen == 0))) {
+        TELEPHONY_LOGE("GetOperatorInfoResponse check data: error");
+        return HRIL_ERR_GENERIC_FAILURE;
+    } else if ((response == nullptr) && (responseLen == 0)) {
         TELEPHONY_LOGE("Create Request is fail");
         if (responseInfo.error == HRilErrType::NONE) {
             responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
@@ -597,14 +577,14 @@ int32_t HRilNetwork::GetOperatorInfoResponse(int32_t slotId, int32_t requestNum,
 }
 
 int32_t HRilNetwork::NetworkCsRegStatusUpdated(
-    int32_t slotId, int32_t indType, const HRilErrNumber e, const void *response, size_t responseLen)
+    int32_t indType, const HRilErrNumber e, const void *response, size_t responseLen)
 {
     const HRilRegStatusInfo *hrilRegStatusInfo = static_cast<const HRilRegStatusInfo *>(response);
     if (hrilRegStatusInfo == nullptr) {
         TELEPHONY_LOGE("hrilRegStatusInfo is nullptr");
         return HRIL_ERR_NULL_POINT;
     }
-    CsRegStatusInfo regStatusInfoNotify;
+    CsRegStatusInfo regStatusInfoNotify = {};
     regStatusInfoNotify.notifyType = hrilRegStatusInfo->notifyMode;
     regStatusInfoNotify.regStatus = hrilRegStatusInfo->regStatus;
     regStatusInfoNotify.lacCode = hrilRegStatusInfo->lacCode;
@@ -615,14 +595,19 @@ int32_t HRilNetwork::NetworkCsRegStatusUpdated(
         TELEPHONY_LOGE("parcel is nullptr");
         return HRIL_ERR_NULL_POINT;
     }
-    if (!regStatusInfoNotify.Marshalling(*parcel.get())) {
-        TELEPHONY_LOGE("Marshalling is fail");
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
     struct HdfSBuf *dataSbuf = ParcelToSbuf(parcel.get());
     if (dataSbuf == nullptr) {
         TELEPHONY_LOGE("dataSbuf is nullptr");
         return HRIL_ERR_NULL_POINT;
+    }
+    if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
+        HdfSBufRecycle(dataSbuf);
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
+    if (!regStatusInfoNotify.Marshalling(*parcel.get())) {
+        TELEPHONY_LOGE("Marshalling is fail");
+        HdfSBufRecycle(dataSbuf);
+        return HRIL_ERR_GENERIC_FAILURE;
     }
     indType = static_cast<int32_t>(ConvertIntToRadioNoticeType(indType));
     if (!HdfSbufWriteInt32(dataSbuf, indType)) {
@@ -643,15 +628,15 @@ int32_t HRilNetwork::NetworkCsRegStatusUpdated(
 }
 
 int32_t HRilNetwork::NetworkPhyChnlCfgUpdated(
-    int32_t slotId, int32_t indType, const HRilErrNumber e, const void *response, size_t responseLen)
+    int32_t indType, const HRilErrNumber e, const void *response, size_t responseLen)
 {
     const HRilChannelConfigList *hrilChannelConfigList = static_cast<const HRilChannelConfigList *>(response);
     if (hrilChannelConfigList == nullptr) {
         return HRIL_ERR_NULL_POINT;
     }
-    ChannelConfigInfoList phyChnlCfgList;
+    ChannelConfigInfoList phyChnlCfgList = {};
     phyChnlCfgList.itemNum = hrilChannelConfigList->itemNum;
-    for (int i = 0; i < phyChnlCfgList.itemNum; i++) {
+    for (int32_t i = 0; i < phyChnlCfgList.itemNum; i++) {
         PhysicalChannelConfig cfg;
         cfg.cellConnStatus = hrilChannelConfigList->channelConfigs[i].cellConnStatus;
         cfg.cellBandwidth = hrilChannelConfigList->channelConfigs[i].cellBandwidth;
@@ -660,12 +645,7 @@ int32_t HRilNetwork::NetworkPhyChnlCfgUpdated(
         cfg.channelNum = hrilChannelConfigList->channelConfigs[i].channelNum;
         cfg.physicalCellId = hrilChannelConfigList->channelConfigs[i].physicalCellId;
         cfg.contextIdNum = hrilChannelConfigList->channelConfigs[i].contextIdNum;
-        TELEPHONY_LOGI(
-            "cellConn:%{public}d,cellBandwidth:%{public}d,phyCellId:%{public}d,ratType:%{public}d,"
-            "freqRange:%{public}d,channelNum:%{public}d,contextIdNum:%{public}d",
-            cfg.cellConnStatus, cfg.cellBandwidth, cfg.ratType, cfg.freqRange, cfg.channelNum, cfg.physicalCellId,
-            cfg.contextIdNum);
-        for (int j = 0; j < cfg.contextIdNum; j++) {
+        for (int32_t j = 0; j < cfg.contextIdNum; j++) {
             cfg.contextIds.push_back(hrilChannelConfigList->channelConfigs[i].contextIds[j]);
         }
         phyChnlCfgList.channelConfigInfos.push_back(cfg);
@@ -674,12 +654,17 @@ int32_t HRilNetwork::NetworkPhyChnlCfgUpdated(
     if (parcel == nullptr) {
         return HRIL_ERR_NULL_POINT;
     }
-    if (!phyChnlCfgList.Marshalling(*parcel.get())) {
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
     struct HdfSBuf *dataSbuf = ParcelToSbuf(parcel.get());
     if (dataSbuf == nullptr) {
         return HRIL_ERR_NULL_POINT;
+    }
+    if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
+        HdfSBufRecycle(dataSbuf);
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
+    if (!phyChnlCfgList.Marshalling(*parcel.get())) {
+        HdfSBufRecycle(dataSbuf);
+        return HRIL_ERR_GENERIC_FAILURE;
     }
     indType = static_cast<int32_t>(ConvertIntToRadioNoticeType(indType));
     if (!HdfSbufWriteInt32(dataSbuf, indType)) {
@@ -693,15 +678,74 @@ int32_t HRilNetwork::NetworkPhyChnlCfgUpdated(
     return HRIL_ERR_SUCCESS;
 }
 
+int32_t HRilNetwork::FixCurrentCellList(
+    CellListCurrentInfo &cellInfoList, const CurrentCellInfoList *hrilCurrentCellList)
+{
+    if (hrilCurrentCellList == nullptr) {
+        TELEPHONY_LOGE("BuildCurrentCellList: hrilCurrentCellList nullptr!");
+        return HRIL_ERR_GENERIC_FAILURE;
+    } else {
+        cellInfoList.itemNum = hrilCurrentCellList->itemNum;
+        TELEPHONY_LOGI("BuildCurrentCellList:  cellInfoList.itemNum = %{public}d", cellInfoList.itemNum);
+        for (int32_t i = 0; i < cellInfoList.itemNum; i++) {
+            CurrentCellInfo cellInfo;
+            CurrentCellInfoVendor *cellPtr = hrilCurrentCellList->currentCellInfo + i;
+            if (cellPtr == nullptr) {
+                TELEPHONY_LOGE("BuildNeighboringCellList: response item error!");
+                return HRIL_ERR_GENERIC_FAILURE;
+            }
+            FillCurrentCellInfo(cellInfo, cellPtr);
+            cellInfoList.cellCurrentInfo.push_back(cellInfo);
+        }
+        return HRIL_ERR_SUCCESS;
+    }
+}
+
+int32_t HRilNetwork::NetworkCurrentCellUpdated(
+    int32_t indType, const HRilErrNumber e, const void *response, size_t responseLen)
+{
+    const CurrentCellInfoList *hrilCurrentCellList = static_cast<const CurrentCellInfoList *>(response);
+    if (hrilCurrentCellList == nullptr) {
+        return HRIL_ERR_NULL_POINT;
+    }
+    CellListCurrentInfo cellListCurrentInfo;
+    cellListCurrentInfo.itemNum = 0;
+    cellListCurrentInfo.cellCurrentInfo.clear();
+    if (FixCurrentCellList(cellListCurrentInfo, hrilCurrentCellList) != 0) {
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
+    std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
+    if (parcel == nullptr) {
+        return HRIL_ERR_NULL_POINT;
+    }
+    if (!cellListCurrentInfo.Marshalling(*parcel.get())) {
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
+    struct HdfSBuf *dataSbuf = ParcelToSbuf(parcel.get());
+    if (dataSbuf == nullptr) {
+        return HRIL_ERR_NULL_POINT;
+    }
+    indType = static_cast<int32_t>(ConvertIntToRadioNoticeType(indType));
+    if (!HdfSbufWriteInt32(dataSbuf, indType)) {
+        HdfSBufRecycle(dataSbuf);
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
+    ServiceNotifyDispatcher(HNOTI_NETWORK_CURRENT_CELL_UPDATED, dataSbuf);
+    if (dataSbuf != nullptr) {
+        HdfSBufRecycle(dataSbuf);
+    }
+    return HRIL_ERR_SUCCESS;
+}
+
 int32_t HRilNetwork::NetworkPsRegStatusUpdated(
-    int32_t slotId, int32_t indType, const HRilErrNumber e, const void *response, size_t responseLen)
+    int32_t indType, const HRilErrNumber e, const void *response, size_t responseLen)
 {
     const HRilRegStatusInfo *hrilRegStatusInfo = static_cast<const HRilRegStatusInfo *>(response);
     if (hrilRegStatusInfo == nullptr) {
         TELEPHONY_LOGE("hrilRegStatusInfo is nullptr");
         return HRIL_ERR_GENERIC_FAILURE;
     }
-    CsRegStatusInfo regStatusInfoNotify;
+    CsRegStatusInfo regStatusInfoNotify = {};
     regStatusInfoNotify.notifyType = hrilRegStatusInfo->notifyMode;
     regStatusInfoNotify.regStatus = hrilRegStatusInfo->regStatus;
     regStatusInfoNotify.lacCode = hrilRegStatusInfo->lacCode;
@@ -712,14 +756,19 @@ int32_t HRilNetwork::NetworkPsRegStatusUpdated(
         TELEPHONY_LOGE("parcel is nullptr");
         return HRIL_ERR_NULL_POINT;
     }
-    if (!regStatusInfoNotify.Marshalling(*parcel.get())) {
-        TELEPHONY_LOGE("Marshalling is fail");
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
     struct HdfSBuf *dataSbuf = ParcelToSbuf(parcel.get());
     if (dataSbuf == nullptr) {
         TELEPHONY_LOGE("dataSbuf is nullptr");
         return HRIL_ERR_NULL_POINT;
+    }
+    if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
+        HdfSBufRecycle(dataSbuf);
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
+    if (!regStatusInfoNotify.Marshalling(*parcel.get())) {
+        HdfSBufRecycle(dataSbuf);
+        TELEPHONY_LOGE("Marshalling is fail");
+        return HRIL_ERR_GENERIC_FAILURE;
     }
     indType = static_cast<int32_t>(ConvertIntToRadioNoticeType(indType));
     if (!HdfSbufWriteInt32(dataSbuf, indType)) {
@@ -740,14 +789,14 @@ int32_t HRilNetwork::NetworkPsRegStatusUpdated(
 }
 
 int32_t HRilNetwork::NetworkImsRegStatusUpdated(
-    int32_t slotId, int32_t indType, const HRilErrNumber e, const void *response, size_t responseLen)
+    int32_t indType, const HRilErrNumber e, const void *response, size_t responseLen)
 {
     const HRilImsRegStatusInfo *hrilImsRegStatusInfo = static_cast<const HRilImsRegStatusInfo *>(response);
     if (hrilImsRegStatusInfo == nullptr) {
         TELEPHONY_LOGE("hrilRegStatusInfo is nullptr");
         return HRIL_ERR_GENERIC_FAILURE;
     }
-    ImsRegStatusInfo imsRegStatusInfoNotify;
+    ImsRegStatusInfo imsRegStatusInfoNotify = {};
     imsRegStatusInfoNotify.notifyType = hrilImsRegStatusInfo->notifyType;
     imsRegStatusInfoNotify.regInfo = hrilImsRegStatusInfo->regInfo;
     imsRegStatusInfoNotify.extInfo = hrilImsRegStatusInfo->extInfo;
@@ -756,13 +805,18 @@ int32_t HRilNetwork::NetworkImsRegStatusUpdated(
         TELEPHONY_LOGE("parcel is nullptr");
         return HRIL_ERR_NULL_POINT;
     }
-    if (!imsRegStatusInfoNotify.Marshalling(*parcel.get())) {
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
     struct HdfSBuf *dataSbuf = ParcelToSbuf(parcel.get());
     if (dataSbuf == nullptr) {
         TELEPHONY_LOGE("dataSbuf is nullptr");
         return HRIL_ERR_NULL_POINT;
+    }
+    if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
+        HdfSBufRecycle(dataSbuf);
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
+    if (!imsRegStatusInfoNotify.Marshalling(*parcel.get())) {
+        HdfSBufRecycle(dataSbuf);
+        return HRIL_ERR_GENERIC_FAILURE;
     }
     indType = static_cast<int32_t>(ConvertIntToRadioNoticeType(indType));
     if (!HdfSbufWriteInt32(dataSbuf, indType)) {
@@ -783,7 +837,7 @@ int32_t HRilNetwork::NetworkImsRegStatusUpdated(
 }
 
 int32_t HRilNetwork::SignalStrengthUpdated(
-    int32_t slotId, int32_t indType, const HRilErrNumber e, const void *response, size_t responseLen)
+    int32_t indType, const HRilErrNumber e, const void *response, size_t responseLen)
 {
     indType = static_cast<int32_t>(ConvertIntToRadioNoticeType(indType));
     Rssi rssi = {0};
@@ -797,6 +851,10 @@ int32_t HRilNetwork::SignalStrengthUpdated(
     if (dataSbuf == nullptr) {
         TELEPHONY_LOGE("dataSbuf is nullptr");
         return HRIL_ERR_NULL_POINT;
+    }
+    if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
+        HdfSBufRecycle(dataSbuf);
+        return HRIL_ERR_GENERIC_FAILURE;
     }
     if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&rssi, sizeof(rssi))) {
         TELEPHONY_LOGE("HdfSbufWriteUnpadBuffer in SignalStrengthUpdated is failed!");
@@ -820,14 +878,18 @@ int32_t HRilNetwork::SignalStrengthUpdated(
 }
 
 int32_t HRilNetwork::NetworkTimeUpdated(
-    int32_t slotId, int32_t indType, const HRilErrNumber e, const void *response, size_t responseLen)
+    int32_t indType, const HRilErrNumber e, const void *response, size_t responseLen)
 {
     indType = static_cast<int32_t>(ConvertIntToRadioNoticeType(indType));
 
     struct HdfSBuf *dataSbuf = HdfSBufTypedObtain(SBUF_IPC);
     if (dataSbuf == nullptr) {
-        TELEPHONY_LOGE("dataSubf is nullptr");
+        TELEPHONY_LOGE("dataSbuf is nullptr");
         return HRIL_ERR_NULL_POINT;
+    }
+    if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
+        HdfSBufRecycle(dataSbuf);
+        return HRIL_ERR_GENERIC_FAILURE;
     }
     if (!HdfSbufWriteString(dataSbuf, (const char *)response)) {
         TELEPHONY_LOGE("HdfSbufWriteString in NetworkTimeUpdated is failed!");
@@ -852,16 +914,19 @@ int32_t HRilNetwork::NetworkTimeUpdated(
 }
 
 int32_t HRilNetwork::NetworkTimeZoneUpdated(
-    int32_t slotId, int32_t indType, const HRilErrNumber e, const void *response, size_t responseLen)
+    int32_t indType, const HRilErrNumber e, const void *response, size_t responseLen)
 {
     indType = static_cast<int32_t>(ConvertIntToRadioNoticeType(indType));
 
     struct HdfSBuf *dataSbuf = HdfSBufTypedObtain(SBUF_IPC);
     if (dataSbuf == nullptr) {
-        TELEPHONY_LOGE("dataSubf is nullptr");
+        TELEPHONY_LOGE("dataSbuf is nullptr");
         return HRIL_ERR_NULL_POINT;
     }
-
+    if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
+        HdfSBufRecycle(dataSbuf);
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
     if (!HdfSbufWriteString(dataSbuf, (const char *)response)) {
         TELEPHONY_LOGE("HdfSbufWriteString in NetworkTimeZoneUpdated is failed!");
         HdfSBufRecycle(dataSbuf);
@@ -886,68 +951,71 @@ int32_t HRilNetwork::NetworkTimeZoneUpdated(
     return HRIL_ERR_SUCCESS;
 }
 
-void HRilNetwork::GetPsRegStatus(int32_t slotId, struct HdfSBuf *data)
+int32_t HRilNetwork::GetPsRegStatus(struct HdfSBuf *data)
 {
     if (networkFuncs_ == nullptr) {
         TELEPHONY_LOGE("GetPsRegStatus::networkFuncs_ is nullptr");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
     int32_t serial = 0;
     if (!HdfSbufReadInt32(data, &serial)) {
         TELEPHONY_LOGE("miss serial parameter");
         HdfSBufRecycle(data);
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_NETWORK_GET_PS_REG_STATUS);
+    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_NETWORK_GET_PS_REG_STATUS);
     if (requestInfo == nullptr) {
         TELEPHONY_LOGE("Create Request is fail");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
     networkFuncs_->GetPsRegStatus(requestInfo);
+    return HRIL_ERR_SUCCESS;
 }
 
-void HRilNetwork::GetCellInfoList(int32_t slotId, struct HdfSBuf *data)
+int32_t HRilNetwork::GetNeighboringCellInfoList(struct HdfSBuf *data)
 {
     if (networkFuncs_ == nullptr) {
-        TELEPHONY_LOGE("GetCellInfoList::networkFuncs_ is nullptr");
-        return;
+        TELEPHONY_LOGE("GetNeighboringCellInfoList::networkFuncs_ is nullptr");
+        return HRIL_ERR_INVALID_PARAMETER;
     }
     int32_t serial = 0;
     if (!HdfSbufReadInt32(data, &serial)) {
-        TELEPHONY_LOGE("GetCellInfoList miss serial parameter");
-        return;
+        TELEPHONY_LOGE("GetNeighboringCellInfoList miss serial parameter");
+        return HRIL_ERR_INVALID_PARAMETER;
     }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_NETWORK_GET_NEIGHBORING_CELLINFO_LIST);
+    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_NETWORK_GET_NEIGHBORING_CELLINFO_LIST);
     if (requestInfo == nullptr) {
-        TELEPHONY_LOGE("GetCellInfoList::Create Request is fail");
-        return;
+        TELEPHONY_LOGE("GetNeighboringCellInfoList::Create Request is fail");
+        return HRIL_ERR_INVALID_PARAMETER;
     }
-    networkFuncs_->GetCellInfoList(requestInfo);
+    networkFuncs_->GetNeighboringCellInfoList(requestInfo);
+    return HRIL_ERR_SUCCESS;
 }
 
-void HRilNetwork::GetCurrentCellInfo(int32_t slotId, struct HdfSBuf *data)
+int32_t HRilNetwork::GetCurrentCellInfo(struct HdfSBuf *data)
 {
     if (networkFuncs_ == nullptr) {
         TELEPHONY_LOGE("GetCurrentCellInfo::networkFuncs_ is nullptr");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
     int32_t serial = 0;
     if (!HdfSbufReadInt32(data, &serial)) {
         TELEPHONY_LOGE("GetCurrentCellInfo miss serial parameter");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, slotId, HREQ_NETWORK_GET_CURRENT_CELL_INFO);
+    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_NETWORK_GET_CURRENT_CELL_INFO);
     if (requestInfo == nullptr) {
         TELEPHONY_LOGE("GetCurrentCellInfo::Create Request is fail");
-        return;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
     networkFuncs_->GetCurrentCellInfo(requestInfo);
+    return HRIL_ERR_SUCCESS;
 }
 
-int32_t HRilNetwork::GetPsRegStatusResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
-    const void *response, size_t responseLen)
+int32_t HRilNetwork::GetPsRegStatusResponse(
+    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    PsRegStatusResultInfo psRegResponse;
+    PsRegStatusResultInfo psRegResponse = {};
     psRegResponse.notifyType = REG_NOTIFY_STAT_LAC_CELLID;
     psRegResponse.regStatus = REG_MT_UNKNOWN;
     psRegResponse.lacCode = 0;
@@ -956,7 +1024,11 @@ int32_t HRilNetwork::GetPsRegStatusResponse(int32_t slotId, int32_t requestNum, 
     psRegResponse.isDcNrRestricted = false;
     psRegResponse.isNrAvailable = false;
     psRegResponse.isEnDcAvailable = false;
-    if (response == nullptr) {
+    if (((response == nullptr) && (responseLen != 0)) ||
+        ((response != nullptr) && (responseLen != sizeof(HRilRegStatusInfo)))) {
+        TELEPHONY_LOGE("GetPsRegStatusResponse check data: error");
+        return HRIL_ERR_GENERIC_FAILURE;
+    } else if ((response == nullptr) && (responseLen == 0)) {
         TELEPHONY_LOGE("GetPsRegStatusResponse Invalid response: nullptr");
         if (responseInfo.error == HRilErrType::NONE) {
             responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
@@ -978,29 +1050,6 @@ int32_t HRilNetwork::GetPsRegStatusResponse(int32_t slotId, int32_t requestNum, 
             psRegResponse.radioTechnology);
     }
     return ResponseMessageParcel(responseInfo, psRegResponse, requestNum);
-}
-
-int32_t HRilNetwork::GetNeighboringCellInfoListResponse(int32_t slotId, int32_t requestNum,
-    HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
-{
-    CellListNearbyInfo cellList;
-    cellList.itemNum = 0;
-    cellList.cellNearbyInfo.clear();
-    if (response == nullptr) {
-        TELEPHONY_LOGE("GetNeighboringCellInfoListResponse Invalid response: nullptr");
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
-        }
-    } else {
-        BuildCellList(cellList, responseInfo, response, responseLen);
-    }
-
-    std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
-    if (parcel == nullptr) {
-        TELEPHONY_LOGE("parcel is nullptr!");
-        return HRIL_ERR_NULL_POINT;
-    }
-    return ResponseMessageParcel(responseInfo, cellList, requestNum);
 }
 
 void HRilNetwork::FillCellNearbyInfoTdscdma(CellNearbyInfo &cellInfo, const CellInfo *hrilCellPtr)
@@ -1087,25 +1136,54 @@ void HRilNetwork::FillCellNearbyInfo(CellNearbyInfo &cellInfo, const CellInfo *c
     }
 }
 
-void HRilNetwork::BuildCellList(
+int32_t HRilNetwork::BuildNeighboringCellList(
     CellListNearbyInfo &cellInfoList, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    if ((response == nullptr) || ((responseLen % sizeof(CellInfoList)) != 0)) {
+    if (response == nullptr) {
         TELEPHONY_LOGE("BuildCellList: Invalid response");
         if (responseInfo.error == HRilErrType::NONE) {
             responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
         }
+        return HRIL_ERR_NULL_POINT;
     } else {
         const CellInfoList *temp = reinterpret_cast<const CellInfoList *>(response);
         cellInfoList.itemNum = temp->itemNum;
-        TELEPHONY_LOGI("BuildCellList:  cellInfoList.itemNum = %{public}d", cellInfoList.itemNum);
+        TELEPHONY_LOGI("BuildNeighboringCellList:  cellInfoList.itemNum = %{public}d", cellInfoList.itemNum);
         for (int32_t i = 0; i < temp->itemNum; i++) {
             CellNearbyInfo cellInfo;
             CellInfo *cellPtr = temp->cellNearbyInfo + i;
+            if (cellPtr == nullptr) {
+                TELEPHONY_LOGE("BuildNeighboringCellList: response item error!");
+                return HRIL_ERR_GENERIC_FAILURE;
+            }
             FillCellNearbyInfo(cellInfo, cellPtr);
             cellInfoList.cellNearbyInfo.push_back(cellInfo);
         }
+        return HRIL_ERR_SUCCESS;
     }
+}
+
+int32_t HRilNetwork::GetNeighboringCellInfoListResponse(
+    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+{
+    CellListNearbyInfo cellList;
+    cellList.itemNum = 0;
+    cellList.cellNearbyInfo.clear();
+    if (((response == nullptr) && (responseLen != 0)) ||
+        ((response != nullptr) && (responseLen != sizeof(CellInfoList)))) {
+        TELEPHONY_LOGE("GetNeighboringCellInfoListResponse  check data: error");
+        return HRIL_ERR_GENERIC_FAILURE;
+    } else if ((response == nullptr) && (responseLen == 0)) {
+        TELEPHONY_LOGI("GetNeighboringCellInfoListResponse Invalid response: nullptr");
+        if (responseInfo.error == HRilErrType::NONE) {
+            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
+        }
+    } else {
+        if (BuildNeighboringCellList(cellList, responseInfo, response, responseLen) != 0) {
+            return HRIL_ERR_GENERIC_FAILURE;
+        }
+    }
+    return ResponseMessageParcel(responseInfo, cellList, requestNum);
 }
 
 void HRilNetwork::FillCellInfoType(CurrentCellInfo &cellInfo, const CurrentCellInfoVendor *hrilCellInfoVendor)
@@ -1148,7 +1226,7 @@ void HRilNetwork::FillCellInfoType(CurrentCellInfo &cellInfo, const CurrentCellI
     }
 }
 
-void HRilNetwork::FillCellInfo(CurrentCellInfo &cellInfo, const CurrentCellInfoVendor *cellInfoVendor)
+void HRilNetwork::FillCurrentCellInfo(CurrentCellInfo &cellInfo, const CurrentCellInfoVendor *cellInfoVendor)
 {
     cellInfo.ratType = cellInfoVendor->ratType;
     cellInfo.mcc = cellInfoVendor->mcc;
@@ -1198,44 +1276,62 @@ void HRilNetwork::FillCellInfo(CurrentCellInfo &cellInfo, const CurrentCellInfoV
     }
 }
 
-void HRilNetwork::BuildCellInfo(
-    CurrentCellInfo &cellInfo, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+int32_t HRilNetwork::BuildCurrentCellList(
+    CellListCurrentInfo &cellInfoList, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     if (response == nullptr) {
-        TELEPHONY_LOGE("BuildCallList: Invalid response");
+        TELEPHONY_LOGE("BuildCurrentCellList: Invalid response");
+        return HRIL_ERR_NULL_POINT;
+    } else {
+        const CurrentCellInfoList *temp = reinterpret_cast<const CurrentCellInfoList *>(response);
+        cellInfoList.itemNum = temp->itemNum;
+        TELEPHONY_LOGI("BuildCurrentCellList:  cellInfoList.itemNum = %{public}d", cellInfoList.itemNum);
+        for (int32_t i = 0; i < temp->itemNum; i++) {
+            CurrentCellInfo cellInfo;
+            CurrentCellInfoVendor *cellPtr = temp->currentCellInfo + i;
+            if (cellPtr == nullptr) {
+                TELEPHONY_LOGE("BuildCurrentCellList: response item error!");
+                return HRIL_ERR_GENERIC_FAILURE;
+            }
+            FillCurrentCellInfo(cellInfo, cellPtr);
+            cellInfoList.cellCurrentInfo.push_back(cellInfo);
+        }
+        return HRIL_ERR_SUCCESS;
+    }
+}
+
+int32_t HRilNetwork::GetCurrentCellInfoResponse(
+    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+{
+    CellListCurrentInfo cellList;
+    cellList.itemNum = 0;
+    cellList.cellCurrentInfo.clear();
+    if (((response == nullptr) && (responseLen != 0)) ||
+        ((response != nullptr) && (responseLen != sizeof(CurrentCellInfoList)))) {
+        TELEPHONY_LOGE("GetCurrentCellInfoResponse check data: error");
+        return HRIL_ERR_GENERIC_FAILURE;
+    } else if ((response == nullptr) && (responseLen == 0)) {
+        TELEPHONY_LOGI("GetCurrentCellInfoResponse Invalid response: nullptr");
         if (responseInfo.error == HRilErrType::NONE) {
             responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
         }
     } else {
-        const CurrentCellInfoVendor *temp = reinterpret_cast<const CurrentCellInfoVendor *>(response);
-        FillCellInfo(cellInfo, temp);
-    }
-}
-
-int32_t HRilNetwork::GetCurrentCellInfoResponse(int32_t slotId, int32_t requestNum,
-    HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
-{
-    CurrentCellInfo cellInfo;
-    if (response == nullptr) {
-        TELEPHONY_LOGE("GetCurrentCellInfoResponse Invalid response: nullptr");
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
+        if (BuildCurrentCellList(cellList, responseInfo, response, responseLen) != 0) {
+            return HRIL_ERR_GENERIC_FAILURE;
         }
     }
-    BuildCellInfo(cellInfo, responseInfo, response, responseLen);
-    std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
-    if (parcel == nullptr) {
-        TELEPHONY_LOGE("parcel is nullptr");
-        return HRIL_ERR_NULL_POINT;
-    }
-    return ResponseMessageParcel(responseInfo, cellInfo, requestNum);
+    return ResponseMessageParcel(responseInfo, cellList, requestNum);
 }
 
-int32_t HRilNetwork::GetNetworkSelectionModeResponse(int32_t slotId, int32_t requestNum,
-    HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+int32_t HRilNetwork::GetNetworkSelectionModeResponse(
+    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     struct SetNetworkModeInfo selectModeResultInfo = {};
-    if (response == nullptr) {
+    if (((response == nullptr) && (responseLen != 0)) ||
+        ((response != nullptr) && (responseLen != sizeof(int32_t)))) {
+        TELEPHONY_LOGE("GetNetworkSelectionModeResponse check data: error");
+        return HRIL_ERR_GENERIC_FAILURE;
+    } else if ((response == nullptr) && (responseLen == 0)) {
         TELEPHONY_LOGE("response is nullptr");
         if (responseInfo.error == HRilErrType::NONE) {
             responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
@@ -1258,7 +1354,7 @@ void HRilNetwork::BuildOperatorList(AvailableNetworkList &availableNetworkList, 
             responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
         }
     } else {
-        AvailableNetworkInfo operInfo;
+        AvailableNetworkInfo operInfo = {};
         availableNetworkList.itemNum = numStrings;
         TELEPHONY_LOGI("availableNetworkList.itemNum: %{public}d", numStrings);
         for (int32_t i = 0; i < numStrings; i++) {
@@ -1280,24 +1376,28 @@ void HRilNetwork::BuildOperatorList(AvailableNetworkList &availableNetworkList, 
     }
 }
 
-int32_t HRilNetwork::GetNetworkSearchInformationResponse(int32_t slotId, int32_t requestNum,
-    HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+int32_t HRilNetwork::GetNetworkSearchInformationResponse(
+    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     TELEPHONY_LOGI("GetNetworkSearchInformationResponse ---> response %{public}p", response);
-    AvailableNetworkList availableNetworkList;
+    AvailableNetworkList availableNetworkList = {};
     availableNetworkList.itemNum = 0;
     BuildOperatorList(availableNetworkList, responseInfo, response, responseLen);
 
     return ResponseMessageParcel(responseInfo, availableNetworkList, requestNum);
 }
 
-int32_t HRilNetwork::GetPreferredNetworkResponse(int32_t slotId, int32_t requestNum,
-    HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+int32_t HRilNetwork::GetPreferredNetworkResponse(
+    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    PreferredNetworkTypeInfo preferredNetworkTypeInfo;
+    PreferredNetworkTypeInfo preferredNetworkTypeInfo = {};
 
     TELEPHONY_LOGI("GetPreferredNetworkResponse ---> response %{public}p", response);
-    if (response == nullptr) {
+    if (((response == nullptr) && (responseLen != 0)) ||
+        ((response != nullptr) && (responseLen != sizeof(int32_t)))) {
+        TELEPHONY_LOGE("GetPreferredNetworkResponse check data: error");
+        return HRIL_ERR_GENERIC_FAILURE;
+    } else if ((response == nullptr) && (responseLen == 0)) {
         TELEPHONY_LOGE("response is nullptr");
         if (responseInfo.error == HRilErrType::NONE) {
             responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
@@ -1310,37 +1410,41 @@ int32_t HRilNetwork::GetPreferredNetworkResponse(int32_t slotId, int32_t request
     return ResponseMessageParcel(responseInfo, preferredNetworkTypeInfo, requestNum);
 }
 
-int32_t HRilNetwork::SetPreferredNetworkResponse(int32_t slotId, int32_t requestNum,
-    HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+int32_t HRilNetwork::SetPreferredNetworkResponse(
+    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));
 }
 
-int32_t HRilNetwork::SetNetworkSelectionModeResponse(int32_t slotId, int32_t requestNum,
-    HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+int32_t HRilNetwork::SetNetworkSelectionModeResponse(
+    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));
 }
 
-int32_t HRilNetwork::SetRadioCapabilityResponse(int32_t slotId, int32_t requestNum,
-    HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+int32_t HRilNetwork::SetRadioCapabilityResponse(
+    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));
 }
 
-int32_t HRilNetwork::SetPsAttachStatusResponse(int32_t slotId, int32_t requestNum,
-    HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+int32_t HRilNetwork::SetPsAttachStatusResponse(
+    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));
 }
 
-int32_t HRilNetwork::GetPsAttachStatusResponse(int32_t slotId, int32_t requestNum,
-    HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+int32_t HRilNetwork::GetPsAttachStatusResponse(
+    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    PsAttachStatusInfo psAttachStatusInfo;
+    PsAttachStatusInfo psAttachStatusInfo = {};
 
     TELEPHONY_LOGI("GetPsAttachStatusResponse ---> response %{public}p", response);
-    if (response == nullptr) {
+    if (((response == nullptr) && (responseLen != 0)) ||
+        ((response != nullptr) && (responseLen != sizeof(int32_t)))) {
+        TELEPHONY_LOGE("GetPsAttachStatusResponse check data: error");
+        return HRIL_ERR_GENERIC_FAILURE;
+    } else if ((response == nullptr) && (responseLen == 0)) {
         TELEPHONY_LOGE("response is nullptr");
         if (responseInfo.error == HRilErrType::NONE) {
             responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
@@ -1353,11 +1457,15 @@ int32_t HRilNetwork::GetPsAttachStatusResponse(int32_t slotId, int32_t requestNu
     return ResponseMessageParcel(responseInfo, psAttachStatusInfo, requestNum);
 }
 
-int32_t HRilNetwork::GetRadioCapabilityResponse(int32_t slotId, int32_t requestNum,
-    HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+int32_t HRilNetwork::GetRadioCapabilityResponse(
+    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    RadioCapabilityInfo radioCapabilityInfo;
-    if (response == nullptr) {
+    RadioCapabilityInfo radioCapabilityInfo = {};
+    if (((response == nullptr) && (responseLen != 0)) ||
+        ((response != nullptr) && (responseLen != sizeof(HRilRadioCapability)))) {
+        TELEPHONY_LOGE("GetRadioCapabilityResponse check data: error");
+        return HRIL_ERR_GENERIC_FAILURE;
+    } else if ((response == nullptr) && (responseLen == 0)) {
         TELEPHONY_LOGE("response is nullptr");
         if (responseInfo.error == HRilErrType::NONE) {
             responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
@@ -1365,19 +1473,23 @@ int32_t HRilNetwork::GetRadioCapabilityResponse(int32_t slotId, int32_t requestN
     } else {
         TELEPHONY_LOGE("GetRadioCapabilityResponse is success");
         const HRilRadioCapability *hRilRadioCapability = static_cast<const HRilRadioCapability *>(response);
-        radioCapabilityInfo.ratfamily = hRilRadioCapability->ratfamily;
+        radioCapabilityInfo.ratFamily = hRilRadioCapability->ratFamily;
         radioCapabilityInfo.modemId = hRilRadioCapability->modemId;
     }
     return ResponseMessageParcel(responseInfo, radioCapabilityInfo, requestNum);
 }
 
-int32_t HRilNetwork::GetPhysicalChannelConfigResponse(int32_t slotId, int32_t requestNum,
-    HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+int32_t HRilNetwork::GetPhysicalChannelConfigResponse(
+    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    ChannelConfigInfoList phyChnlCfgList;
+    ChannelConfigInfoList phyChnlCfgList = {};
     phyChnlCfgList.itemNum = 0;
     phyChnlCfgList.channelConfigInfos.clear();
-    if (response == nullptr) {
+    if (((response == nullptr) && (responseLen != 0)) ||
+        ((response != nullptr) && (responseLen != sizeof(HRilChannelConfigList)))) {
+        TELEPHONY_LOGE("GetPhysicalChannelConfigResponse check data: error");
+        return HRIL_ERR_GENERIC_FAILURE;
+    } else if ((response == nullptr) && (responseLen == 0)) {
         TELEPHONY_LOGE("GetPhysicalChannelConfigResponse Invalid response: nullptr");
         if (responseInfo.error == HRilErrType::NONE) {
             responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
@@ -1385,7 +1497,7 @@ int32_t HRilNetwork::GetPhysicalChannelConfigResponse(int32_t slotId, int32_t re
     } else {
         const HRilChannelConfigList *hrilChannelConfigList = static_cast<const HRilChannelConfigList *>(response);
         phyChnlCfgList.itemNum = hrilChannelConfigList->itemNum;
-        for (int i = 0; i < phyChnlCfgList.itemNum; i++) {
+        for (int32_t i = 0; i < phyChnlCfgList.itemNum; i++) {
             PhysicalChannelConfig phyChnlCfg;
             phyChnlCfg.cellConnStatus = hrilChannelConfigList->channelConfigs[i].cellConnStatus;
             phyChnlCfg.cellBandwidth = hrilChannelConfigList->channelConfigs[i].cellBandwidth;
@@ -1399,7 +1511,7 @@ int32_t HRilNetwork::GetPhysicalChannelConfigResponse(int32_t slotId, int32_t re
                 "ratType:%{public}d,freqRange:%{public}d,channelNum:%{public}d,contextIdNum:%{public}d",
                 phyChnlCfg.cellConnStatus, phyChnlCfg.cellBandwidth, phyChnlCfg.ratType, phyChnlCfg.freqRange,
                 phyChnlCfg.channelNum, phyChnlCfg.physicalCellId, phyChnlCfg.contextIdNum);
-            for (int j = 0; j < phyChnlCfg.contextIdNum; j++) {
+            for (int32_t j = 0; j < phyChnlCfg.contextIdNum; j++) {
                 phyChnlCfg.contextIds.push_back(hrilChannelConfigList->channelConfigs[i].contextIds[j]);
                 TELEPHONY_LOGI("contextIds:%{public}d---contextId:%{public}d", j, phyChnlCfg.contextIds[j]);
             }
@@ -1410,8 +1522,8 @@ int32_t HRilNetwork::GetPhysicalChannelConfigResponse(int32_t slotId, int32_t re
     return ResponseMessageParcel(responseInfo, phyChnlCfgList, requestNum);
 }
 
-int32_t HRilNetwork::SetLocateUpdatesResponse(int32_t slotId, int32_t requestNum,
-    HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+int32_t HRilNetwork::SetLocateUpdatesResponse(
+    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));
 }

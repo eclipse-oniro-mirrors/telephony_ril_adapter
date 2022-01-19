@@ -16,17 +16,18 @@ RIL Adapter模块主要包括厂商库加载，业务接口实现以及事件调
 ## 目录<a name="section122mcpsimp"></a>
 ```sh
 base/telephony/ril_adapter
-├── adapter                             # 厂商库代码
-│   ├── include
-│   └── test                            # 厂商库测试代码
 ├── figures                             # readme资源文件
+├── frameworks
+│   ├── BUILD.gn
+│   └── src                             # 序列化文件
 ├── interfaces                          # 对应提供上层各业务内部接口
 │   └── innerkits
 ├── services                            # 服务
+│   ├── hril                            # hril层的各个业务模块接口实现
 │   ├── hril_hdf                        # HDF服务
-│   ├── include                         # hril头文件存放目录
-│   └── src                             # hril层的各个业务模块接口实现
-└── test
+│   └── vendor                          # 厂商库文件
+└── test                                # 测试代码
+    ├── BUILD.gn
     ├── mock
     └── unittest                        # 单元测试代码
 ```

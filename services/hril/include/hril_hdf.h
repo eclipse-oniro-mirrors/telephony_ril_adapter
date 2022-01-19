@@ -30,7 +30,7 @@
 
 static void *g_dlHandle = NULL;
 
-extern int32_t DispatchRequest(int32_t slotId, int32_t cmd, struct HdfSBuf *data);
+extern int32_t DispatchRequest(int32_t cmd, struct HdfSBuf *data);
 extern void HRilRegOps(const HRilOps *g_hrilOps);
 
 extern void OnCallReport(

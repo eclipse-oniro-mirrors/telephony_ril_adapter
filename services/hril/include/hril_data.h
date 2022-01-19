@@ -24,36 +24,32 @@ namespace OHOS {
 namespace Telephony {
 class HRilData : public HRilBase {
 public:
-    HRilData(IHRilReporter &hrilReporter);
+    HRilData(int32_t slotId, IHRilReporter &hrilReporter);
     virtual ~HRilData();
 
-    void DeactivatePdpContext(int32_t slotId, struct HdfSBuf *data);
-    void ActivatePdpContext(int32_t slotId, struct HdfSBuf *data);
-    void GetPdpContextList(int32_t slotId, struct HdfSBuf *data);
-    void SetInitApnInfo(int32_t slotId, struct HdfSBuf *data);
-    int32_t ActivatePdpContextResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
-        const void *response, size_t responseLen);
-    int32_t DeactivatePdpContextResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
-        const void *response, size_t responseLen);
-    int32_t GetPdpContextListResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
-        const void *response, size_t responseLen);
-    int32_t SetInitApnInfoResponse(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
-        const void *response, size_t responseLen);
-    int32_t PdpContextListUpdated(
-        int32_t slotId, int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen);
-    void RegisterDataResponseCallback(const HdfRemoteService *serviceCallback);
-    void RegisterDataNotifyCallback(const HdfRemoteService *serviceCallbackInd);
-    void ProcessDataResponse(
-        int32_t slotId, int32_t code, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
-    void ProcessDataRequest(int32_t slotId, int32_t code, struct HdfSBuf *data);
-    void ProcessDataNotify(int32_t slotId, const struct ReportInfo *reportInfo,
-        const void *response, size_t responseLen);
-    void GetLinkBandwidthInfo(int32_t slotId, struct HdfSBuf *data);
-    int32_t GetLinkBandwidthInfoResponse(int32_t slotId, int32_t requestNum,
-        HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
-    void SetLinkBandwidthReportingRule(int32_t slotId, struct HdfSBuf *data);
-    int32_t SetLinkBandwidthReportingRuleResponse(int32_t slotId, int32_t requestNum,
-        HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t DeactivatePdpContext(struct HdfSBuf *data);
+    int32_t ActivatePdpContext(struct HdfSBuf *data);
+    int32_t GetPdpContextList(struct HdfSBuf *data);
+    int32_t SetInitApnInfo(struct HdfSBuf *data);
+    int32_t ActivatePdpContextResponse(
+        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t DeactivatePdpContextResponse(
+        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t GetPdpContextListResponse(
+        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t SetInitApnInfoResponse(
+        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t PdpContextListUpdated(int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen);
+    int32_t ProcessDataResponse(
+        int32_t code, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t ProcessDataRequest(int32_t code, struct HdfSBuf *data);
+    int32_t ProcessDataNotify(const struct ReportInfo *reportInfo, const void *response, size_t responseLen);
+    int32_t GetLinkBandwidthInfo(struct HdfSBuf *data);
+    int32_t GetLinkBandwidthInfoResponse(
+        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t SetLinkBandwidthReportingRule(struct HdfSBuf *data);
+    int32_t SetLinkBandwidthReportingRuleResponse(
+        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
 
     bool IsDataRespOrNotify(uint32_t code);
 
@@ -69,14 +65,7 @@ private:
         const void *response, size_t responseLen, std::vector<SetupDataCallResultInfo> &dcResultList);
     void SwitchRilDataToHal(const HRilDataCallResponse *response, SetupDataCallResultInfo &result);
     static void RilDataCallCharToString(const char *src, std::string dst);
-    using RespFunc = int32_t (HRilData::*)(int32_t slotId, int32_t requestNum, HRilRadioResponseInfo &responseInfo,
-        const void *response, size_t responseLen);
-    using NotiFunc = int32_t (HRilData::*)(
-        int32_t slotId, int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
-    using ReqFunc = void (HRilData::*)(int32_t slotId, struct HdfSBuf *data);
-    std::map<uint32_t, RespFunc> respMemberFuncMap_;
-    std::map<uint32_t, NotiFunc> notiMemberFuncMap_;
-    std::map<uint32_t, ReqFunc> reqMemberFuncMap_;
+
     const HRilDataReq *dataFuncs_ = nullptr;
 };
 } // namespace Telephony

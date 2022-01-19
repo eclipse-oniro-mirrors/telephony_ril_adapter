@@ -588,7 +588,7 @@ bool CurrentCellInfo::ReadRayTypeNrParcel(Parcel &parcel)
     if (!ReadBaseInt32(parcel, ServiceCellParas.nr.tac)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, ServiceCellParas.nr.nci)) {
+    if (!ReadBaseInt64(parcel, ServiceCellParas.nr.nci)) {
         return false;
     }
     return true;
@@ -756,7 +756,7 @@ bool CurrentCellInfo::WriteRayTypeNrParcel(Parcel &parcel) const
     if (!WriteBaseInt32(parcel, ServiceCellParas.nr.tac)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, ServiceCellParas.nr.nci)) {
+    if (!WriteBaseInt64(parcel, ServiceCellParas.nr.nci)) {
         return false;
     }
     return true;
@@ -839,6 +839,46 @@ bool CurrentCellInfo::Marshalling(Parcel &parcel) const
 std::shared_ptr<CurrentCellInfo> CurrentCellInfo::UnMarshalling(Parcel &parcel)
 {
     std::shared_ptr<CurrentCellInfo> param = std::make_shared<CurrentCellInfo>();
+    if (param == nullptr || !param->ReadFromParcel(parcel)) {
+        param = nullptr;
+    }
+    return param;
+}
+
+bool CellListCurrentInfo::ReadFromParcel(Parcel &parcel)
+{
+    if (!ReadBaseInt32(parcel, itemNum)) {
+        return false;
+    }
+    if (itemNum <= 0) {
+        cellCurrentInfo.clear();
+    } else {
+        cellCurrentInfo.resize(itemNum);
+        for (int32_t i = 0; i < itemNum; i++) {
+            if (!cellCurrentInfo[i].ReadFromParcel(parcel)) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+bool CellListCurrentInfo::Marshalling(Parcel &parcel) const
+{
+    if (!WriteBaseInt32(parcel, itemNum)) {
+        return false;
+    }
+    for (int32_t i = 0; i < itemNum; i++) {
+        if (!cellCurrentInfo[i].Marshalling(parcel)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+std::shared_ptr<CellListCurrentInfo> CellListCurrentInfo::UnMarshalling(Parcel &parcel)
+{
+    std::shared_ptr<CellListCurrentInfo> param = std::make_shared<CellListCurrentInfo>();
     if (param == nullptr || !param->ReadFromParcel(parcel)) {
         param = nullptr;
     }
@@ -1020,7 +1060,7 @@ bool CellNearbyInfo::ReadRayTypeNrListParcel(Parcel &parcel)
     if (!ReadBaseInt32(parcel, ServiceCellParas.nr.tac)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, ServiceCellParas.nr.nci)) {
+    if (!ReadBaseInt64(parcel, ServiceCellParas.nr.nci)) {
         return false;
     }
     return true;
@@ -1161,7 +1201,7 @@ bool CellNearbyInfo::WriteRayTypeNrListParcel(Parcel &parcel) const
     if (!WriteBaseInt32(parcel, ServiceCellParas.nr.tac)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, ServiceCellParas.nr.nci)) {
+    if (!WriteBaseInt64(parcel, ServiceCellParas.nr.nci)) {
         return false;
     }
     return true;
@@ -1343,7 +1383,7 @@ std::shared_ptr<ImsRegStatusInfo> ImsRegStatusInfo::UnMarshalling(Parcel &parcel
 
 bool RadioCapabilityInfo::ReadFromParcel(Parcel &parcel)
 {
-    if (!ReadBaseInt32(parcel, ratfamily)) {
+    if (!ReadBaseInt32(parcel, ratFamily)) {
         return false;
     }
     if (!ReadBaseString(parcel, modemId)) {
@@ -1354,7 +1394,7 @@ bool RadioCapabilityInfo::ReadFromParcel(Parcel &parcel)
 
 bool RadioCapabilityInfo::Marshalling(Parcel &parcel) const
 {
-    if (!WriteBaseInt32(parcel, ratfamily)) {
+    if (!WriteBaseInt32(parcel, ratFamily)) {
         return false;
     }
     if (!WriteBaseString(parcel, modemId)) {

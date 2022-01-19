@@ -26,29 +26,29 @@ extern "C" {
 #endif
 
 typedef struct {
-    int msgRef; /* TP-Message-Reference for GSM, and BearerData MessageId for CDMA
-                 * from 3GPP2 C.S0015-B, v2.0, 4.5-1 */
+    int32_t msgRef; /* TP-Message-Reference for GSM, and BearerData MessageId for CDMA
+                     * from 3GPP2 C.S0015-B, v2.0, 4.5-1 */
     char *pdu; /* Protocol Data Unit */
-    int errCode; /* if unknown or not applicable, that is -1
-                  * from 3GPP 27.005, 3.2.5 for GSM/UMTS,
-                  * 3GPP2 N.S0005 (IS-41C) Table 171 for CDMA */
+    int32_t errCode; /* if unknown or not applicable, that is -1
+                      * from 3GPP 27.005, 3.2.5 for GSM/UMTS,
+                      * 3GPP2 N.S0005 (IS-41C) Table 171 for CDMA */
 } HRilSmsResponse;
 
 typedef struct {
-    int index;
-    int state;
+    int32_t index;
+    int32_t state;
     char *smsc;
     char *pdu; /* Protocol Data Unit */
 } HRilSmsWriteSms;
 
 typedef struct {
-    int tosca;
+    int32_t tosca;
     char *address;
 } HRilServiceCenterAddress;
 
 /* From 3GPP TS 27.005  AT+CSCB=[<mode>[,<mids>[,<dcss>]]] */
 typedef struct {
-    int mode;
+    int32_t mode;
     char *mids;
     char *dcss;
 } HRilCBConfigInfo;
@@ -67,13 +67,13 @@ typedef struct {
     <CR><LF>+CBM: <length><CR><LF><pdu><CR><LF>
 */
 typedef struct {
-    int sn;
-    int mid;
-    int page;
-    int pages;
+    int32_t sn;
+    int32_t mid;
+    int32_t page;
+    int32_t pages;
     char *dcs;
     char *data;
-    int length;
+    int32_t length;
     char *pdu;
 } HRilCBConfigReportInfo;
 
@@ -109,7 +109,7 @@ typedef struct {
     void (*SendCdmaSms)(const ReqDataInfo *requestInfo, const char *data, size_t dataLen);
     void (*SendCdmaAck)(const ReqDataInfo *requestInfo, const char *data, size_t dataLen);
     void (*AddSimMessage)(const ReqDataInfo *requestInfo, const HRilSmsWriteSms *data, size_t dataLen);
-    void (*DelSimMessage)(const ReqDataInfo *requestInfo, const int *data, size_t dataLen);
+    void (*DelSimMessage)(const ReqDataInfo *requestInfo, const int32_t *data, size_t dataLen);
     void (*UpdateSimMessage)(const ReqDataInfo *requestInfo, const HRilSmsWriteSms *data, size_t dataLen);
     void (*SetSmscAddr)(const ReqDataInfo *requestInfo, const HRilServiceCenterAddress *data, size_t dataLen);
     void (*GetSmscAddr)(const ReqDataInfo *requestInfo);
@@ -118,12 +118,10 @@ typedef struct {
     void (*GetCdmaCBConfig)(const ReqDataInfo *requestInfo);
     void (*SetCdmaCBConfig)(const ReqDataInfo *requestInfo, const HRilCdmaCBConfigInfo *data, size_t dataLen);
     void (*AddCdmaSimMessage)(const ReqDataInfo *requestInfo, const HRilSmsWriteSms *data, size_t dataLen);
-    void (*DelCdmaSimMessage)(const ReqDataInfo *requestInfo, const int *data, size_t dataLen);
+    void (*DelCdmaSimMessage)(const ReqDataInfo *requestInfo, const int32_t *data, size_t dataLen);
     void (*UpdateCdmaSimMessage)(const ReqDataInfo *requestInfo, const HRilSmsWriteSms *data, size_t dataLen);
 } HRilSmsReq;
-
 #ifdef __cplusplus
 }
 #endif
-
 #endif // OHOS_RIL_VENDOR_SMS_DEFS_H

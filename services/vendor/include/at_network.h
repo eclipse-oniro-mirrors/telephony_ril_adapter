@@ -39,7 +39,7 @@ void ReqGetSignalStrength(const ReqDataInfo *requestInfo);
 void ReqGetCsRegStatus(const ReqDataInfo *requestInfo);
 void ReqGetPsRegStatus(const ReqDataInfo *requestInfo);
 void ReqGetOperatorInfo(const ReqDataInfo *requestInfo);
-void ReqGetCellInfoList(const ReqDataInfo *requestInfo);
+void ReqGetNeighboringCellInfoList(const ReqDataInfo *requestInfo);
 void ReqGetCurrentCellInfo(const ReqDataInfo *requestInfo);
 void ReqSetPsAttachStatus(const ReqDataInfo *requestInfo, const int32_t *data);
 void ReqGetPsAttachStatus(const ReqDataInfo *requestInfo);
@@ -52,15 +52,16 @@ void ReqSetPreferredNetwork(const ReqDataInfo *requestInfo, const int32_t *data)
 void ReqGetPreferredNetwork(const ReqDataInfo *requestInfo);
 void ReqGetPhysicalChannelConfig(const ReqDataInfo *requestInfo);
 void ReqSetLocateUpdates(const ReqDataInfo *requestInfo, HRilRegNotifyMode mode);
-void ProcessPhyChnlCfgNotify(struct ReportInfo reportInfo, char *srcstr);
+void ProcessPhyChnlCfgNotify(struct ReportInfo reportInfo, char *srcStr);
+int32_t ProcessCurrentCellList(struct ReportInfo reportInfo, const char *s);
 int32_t ProcessRegStatus(const char *s, const HRilRegStatusInfo *hrilRegStateInfo);
-int32_t ProcessImsRegStatus(const char *s, const HRilImsRegStatusInfo *imsRegStatusInfo, int expectInfoNum);
+int32_t ProcessImsRegStatus(const char *s, const HRilImsRegStatusInfo *imsRegStatusInfo, int32_t expectInfoNum);
 int32_t ProcessParamSignalStrength(const char *result, HRilRssi *hrilRssi);
 int32_t ProcessParamSignalStrengthNotify(const char *result, HRilRssi *hrilRssi);
 int32_t ProcessOperListToUse(const char *list);
-void PerformTimeOut(int sigFlag);
+void PerformTimeOut(int32_t sigFlag);
 int32_t ParseOperListInfo(
-    const char *lineInfo, int count, AvailableOperInfo *pOperInfo, AvailableOperInfo **ppOperInfo);
-void NotifyNetWorkTime(void);
+    const char *lineInfo, int32_t count, AvailableOperInfo *pOperInfo, AvailableOperInfo **ppOperInfo);
+void NotifyNetWorkTime(int32_t slotId);
 void GetNetworkSearchInformationPause(void);
 #endif

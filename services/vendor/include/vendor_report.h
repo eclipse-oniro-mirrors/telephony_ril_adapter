@@ -24,7 +24,7 @@
 #include "at_network.h"
 #include "vendor_util.h"
 
-struct ReportInfo CreateReportInfo(const ReqDataInfo *requestInfo, unsigned int err, unsigned int type, int notifyId);
+struct ReportInfo CreateReportInfo(const ReqDataInfo *requestInfo, uint32_t err, uint32_t type, int32_t notifyId);
 void SetReportOps(const struct HRilReport *reportOps);
 void OnModemReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen);
 void OnCallReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen);
@@ -32,7 +32,6 @@ void OnDataReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *r
 void OnSimReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen);
 void OnSmsReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen);
 void OnNetworkReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen);
-void OnTimerCallbackHandler(HRilCallbackFun callback, const uint8_t *args, uint64_t triggerTime);
 void OnNotifyOps(const char *s, const char *smsPdu);
 void OnNotifyNetWorksOps(const char *s, const char *infoStr);
 bool OnNotifyStkOps(const char *s, const char *infoStr);

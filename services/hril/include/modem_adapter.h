@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_MODE_CONFIG_H
-#define OHOS_MODE_CONFIG_H
+#ifndef OHOS_MODE_ADAPTER_H
+#define OHOS_MODE_ADAPTER_H
 
 typedef struct {
     int32_t idVendor;
@@ -37,4 +37,4 @@ UsbDeviceInfo g_usbModemVendorInfo[] = {
     {.idVendor = FIBOCOM_VENDOR_ID, .idProduct = FIBOCOM_PRODUCT_ID_NL668, .libPath = "libfibocom_ril.z.so"},
 };
 
-#endif // OHOS_MODE_CONFIG_H
+#endif // OHOS_MODE_ADAPTER_H

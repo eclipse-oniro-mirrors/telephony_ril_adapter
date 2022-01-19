@@ -11,6 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//base/telephony/core_service/telephony.gni")
 import("//build/ohos.gni")
 RIL_ADAPTER = "//base/telephony"
 RIL_VENDOR = "//base/telephony/ril_adapter/services/vendor/src"
@@ -34,13 +35,13 @@ ohos_shared_library("ril_vendor") {
     "$RIL_ADAPTER/ril_adapter/interfaces/innerkits/include",
     "include",
   ]
-  defines = [
+  defines += [
     "LOG_TAG = \"Rilvendor\"",
     "LOG_DOMAIN = 0xD002B01",
   ]
   deps = [
     "//base/startup/syspara_lite/interfaces/innerkits/native/syspara:syspara",
-    "//base/telephony/core_service/utils:libtelephony_common",
+    "//base/telephony/core_service/utils:libtel_common",
     "//drivers/adapter/uhdf2/utils:libhdf_utils",
   ]
 
