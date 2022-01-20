@@ -46,32 +46,26 @@ ohos_shared_library("hril_innerkits") {
     "$RIL_FRAMEWORKS/hril_sim_parcel.cpp",
     "$RIL_FRAMEWORKS/hril_sms_parcel.cpp",
   ]
-  include_dirs = [
-    "$RIL_ADAPTER/ril_adapter/services/hril/include",
-    "//drivers/adapter/uhdf2/include/hdi",
-    "$RIL_ADAPTER/ril_adapter/interfaces/innerkits/include",
-    "//third_party/json/include",
-    "include",
-  ]
+
   public_configs = [ ":hril_config" ]
   defines += [
     "TELEPHONY_LOG_TAG = \"Hril\"",
     "LOG_DOMAIN = 0xD002B01",
   ]
-  deps = [
-    "//base/telephony/core_service/utils:libtel_common",
-    "//drivers/adapter/uhdf2/host:libhdf_host",
-    "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
-    "//drivers/adapter/uhdf2/utils:libhdf_utils",
-    "//foundation/distributedschedule/dmsfwk/services/dtbschedmgr:distributedschedsvr",
-  ]
+
+  deps = [ "//foundation/distributedschedule/dmsfwk/services/dtbschedmgr:distributedschedsvr" ]
+
   external_deps = [
+    "core_service:libtel_common",
+    "device_driver_framework:libhdf_host",
+    "device_driver_framework:libhdf_ipc_adapter",
+    "device_driver_framework:libhdf_utils",
+    "device_driver_framework:libhdi",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
+    "utils_base:utils",
   ]
-
-  public_deps = [ "//utils/native/base:utils" ]
 
   if (is_standard_system) {
     external_deps += [ "hiviewdfx_hilog_native:libhilog" ]

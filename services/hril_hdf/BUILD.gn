@@ -14,36 +14,40 @@
 import("//build/ohos.gni")
 import("//drivers/adapter/uhdf2/uhdf.gni")
 
-RIL_ADAPTER = "//base/telephony"
-
 ohos_shared_library("hril_hdf") {
   defines = [
     "LOG_TAG = \"RilAdapterInit\"",
     "LOG_DOMAIN = 0xD002B01",
   ]
+
   sources = [ "hril_hdf.c" ]
+
   include_dirs = [
-    "$RIL_ADAPTER/ril_adapter/services/hril/include",
-    "//drivers/adapter/uhdf2/include/hdi",
-    "$RIL_ADAPTER/include",
-    "$RIL_ADAPTER/ril_adapter/interfaces/innerkits/include",
+    "//base/telephony/ril_adapter/services/hril/include",
     "include",
   ]
-  public_deps = [ "//third_party/eudev:libudev" ]
+
   deps = [
-    "$RIL_ADAPTER/ril_adapter/services/hril:hril",
     "//base/hiviewdfx/faultloggerd/interfaces/innerkits/signal_handler:dfx_signalhandler",
-    "//base/startup/syspara_lite/interfaces/innerkits/native/syspara:syspara",
-    "//base/telephony/core_service/utils:libtel_common",
-    "//drivers/adapter/uhdf2/host:libhdf_host",
-    "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
-    "//drivers/adapter/uhdf2/utils:libhdf_utils",
-    "//utils/native/base:utils",
+    "//base/telephony/ril_adapter/frameworks:hril_innerkits",
+    "//base/telephony/ril_adapter/services/hril:hril",
+    "//third_party/eudev:libudev",
   ]
+
+  external_deps = [
+    "core_service:libtel_common",
+    "device_driver_framework:libhdf_host",
+    "device_driver_framework:libhdf_ipc_adapter",
+    "device_driver_framework:libhdf_utils",
+    "device_driver_framework:libhdi",
+    "startup_l2:syspara",
+    "utils_base:utils",
+  ]
+
   if (is_standard_system) {
-    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
   } else {
-    external_deps = [ "hilog:libhilog" ]
+    external_deps += [ "hilog:libhilog" ]
   }
 
   part_name = "ril_adapter"
