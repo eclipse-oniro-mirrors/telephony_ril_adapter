@@ -28,21 +28,19 @@ ohos_executable("ril_adapter_test") {
     "$RIL_ADAPTER/ril_adapter/services/hril/include",
     "$RIL_ADAPTER/ril_adapter/test/unittest/include",
     "//drivers/adapter/uhdf2/include/hdi",
-    "$RIL_ADAPTER/ril_adapter/interfaces/innerkits/include",
     "//third_party/json/include",
     "//base/telephony/ril_adapter/include",
   ]
+  configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
   defines = [
     "TELEPHONY_LOG_TAG = \"HrilTest\"",
     "LOG_DOMAIN = 0xD002B01",
   ]
   deps = [
-    "$RIL_ADAPTER/ril_adapter/frameworks:hril_innerkits",
+    "$RIL_ADAPTER/ril_adapter/interfaces/innerkits:hril_innerkits",
     "$RIL_ADAPTER/ril_adapter/services/hril:hril",
-    "$RIL_ADAPTER/ril_adapter/services/hril_hdf:hril_hdf",
     "$RIL_ADAPTER/ril_adapter/services/vendor:ril_vendor",
     "$hdf_uhdf_path/hdi:libhdi",
-    "//base/telephony/core_service/utils:libtel_common",
     "//drivers/adapter/uhdf2/host:libhdf_host",
     "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
     "//drivers/adapter/uhdf2/utils:libhdf_utils",
@@ -50,6 +48,7 @@ ohos_executable("ril_adapter_test") {
   external_deps = [
     "appexecfwk_standard:libeventhandler",
     "ipc:ipc_core",
+    "ril_adapter:hril_innerkits",
   ]
 
   public_deps = [ "//utils/native/base:utils" ]

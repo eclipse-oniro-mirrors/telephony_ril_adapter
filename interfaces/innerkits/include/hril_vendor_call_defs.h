@@ -269,7 +269,7 @@ typedef struct {
                                 15: Not specified (default 7bit encoding);
                                 68: 8bit encoding (not supported temporarily);
                                 72: UCS2 encoding (not supported temporarily). */
-} HRilUssdCusdNoticeInfo;
+} HRilUssdNoticeInfo;
 
 typedef struct {
     int32_t index; /* Number index */
@@ -357,8 +357,8 @@ typedef struct {
     void (*SetCallPreferenceMode)(const ReqDataInfo *requestInfo, int32_t mode);
     void (*GetLteImsSwitchStatus)(const ReqDataInfo *requestInfo);
     void (*SetLteImsSwitchStatus)(const ReqDataInfo *requestInfo, int32_t active);
-    void (*SetUssdCusd)(const ReqDataInfo *requestInfo, const char *str);
-    void (*GetUssdCusd)(const ReqDataInfo *requestInfo);
+    void (*SetUssd)(const ReqDataInfo *requestInfo, const char *str);
+    void (*GetUssd)(const ReqDataInfo *requestInfo);
     void (*SetMute)(const ReqDataInfo *requestInfo, int32_t mute);
     void (*GetMute)(const ReqDataInfo *requestInfo);
     void (*GetEmergencyCallList)(const ReqDataInfo *requestInfo);

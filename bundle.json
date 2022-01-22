@@ -57,7 +57,7 @@
             "inner_kits": [
                 {
                     "type": "so",
-                    "name": "//base/telephony/ril_adapter/frameworks:hril_innerkits",
+                    "name": "//base/telephony/ril_adapter/interfaces/innerkits:hril_innerkits",
                     "header": {
                         "header_files": [
                             "hril_types.h",

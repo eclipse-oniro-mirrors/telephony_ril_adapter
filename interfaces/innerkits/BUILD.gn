@@ -11,9 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//base/telephony/core_service/telephony.gni")
 import("//build/ohos.gni")
-import("//drivers/adapter/uhdf2/uhdf.gni")
 
 RIL_ADAPTER = "//base/telephony"
 RIL_FRAMEWORKS = "//base/telephony/ril_adapter/frameworks/src"
@@ -47,31 +45,19 @@ ohos_shared_library("hril_innerkits") {
     "$RIL_FRAMEWORKS/hril_sms_parcel.cpp",
   ]
 
-  public_configs = [ ":hril_config" ]
-  defines += [
+  configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
+
+  public_configs = [
+    ":hril_config",
+    "$RIL_ADAPTER/ril_adapter/utils:utils_config",
+  ]
+
+  defines = [
     "TELEPHONY_LOG_TAG = \"Hril\"",
     "LOG_DOMAIN = 0xD002B01",
   ]
 
-  deps = [ "//foundation/distributedschedule/dmsfwk/services/dtbschedmgr:distributedschedsvr" ]
-
-  external_deps = [
-    "core_service:libtel_common",
-    "device_driver_framework:libhdf_host",
-    "device_driver_framework:libhdf_ipc_adapter",
-    "device_driver_framework:libhdf_utils",
-    "device_driver_framework:libhdi",
-    "ipc:ipc_core",
-    "safwk:system_ability_fwk",
-    "samgr_standard:samgr_proxy",
-    "utils_base:utils",
-  ]
-
-  if (is_standard_system) {
-    external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
-  } else {
-    external_deps += [ "hilog:libhilog" ]
-  }
+  external_deps = [ "utils_base:utils" ]
 
   part_name = "ril_adapter"
   subsystem_name = "telephony"

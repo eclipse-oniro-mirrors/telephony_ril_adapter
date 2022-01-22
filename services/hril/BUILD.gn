@@ -15,6 +15,7 @@ import("//base/telephony/core_service/telephony.gni")
 import("//build/ohos.gni")
 import("//drivers/adapter/uhdf2/uhdf.gni")
 
+RIL_ADAPTER = "//base/telephony"
 RIL_HRIL = "//base/telephony/ril_adapter/services/hril/src"
 
 ohos_shared_library("hril") {
@@ -28,32 +29,38 @@ ohos_shared_library("hril") {
     "$RIL_HRIL/hril_sim.cpp",
     "$RIL_HRIL/hril_sms.cpp",
   ]
+
   include_dirs = [
-    "include",
+    "$RIL_ADAPTER/ril_adapter/services/hril/include",
+    "//drivers/adapter/uhdf2/include/hdi",
     "//third_party/json/include",
   ]
+
+  configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
+
   defines += [
     "TELEPHONY_LOG_TAG = \"Hril\"",
     "LOG_DOMAIN = 0xD002B01",
   ]
+
   deps = [
     "//base/miscservices/time/services:time_service",
     "//base/notification/ans_standard/frameworks/wantagent:wantagent_innerkits",
-    "//base/telephony/ril_adapter/frameworks:hril_innerkits",
+    "//base/telephony/ril_adapter/interfaces/innerkits:hril_innerkits",
+    "//drivers/adapter/uhdf2/host:libhdf_host",
+    "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
+    "//drivers/adapter/uhdf2/utils:libhdf_utils",
+    "//foundation/distributedschedule/dmsfwk/services/dtbschedmgr:distributedschedsvr",
   ]
+
   external_deps = [
     "ability_runtime:want",
-    "core_service:libtel_common",
-    "device_driver_framework:libhdf_host",
-    "device_driver_framework:libhdf_ipc_adapter",
-    "device_driver_framework:libhdf_utils",
-    "device_driver_framework:libhdi",
-    "dmsfwk_standard:zuri",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
-    "utils_base:utils",
   ]
+
+  public_deps = [ "//utils/native/base:utils" ]
 
   if (is_standard_system) {
     external_deps += [ "hiviewdfx_hilog_native:libhilog" ]

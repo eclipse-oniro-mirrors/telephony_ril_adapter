@@ -52,11 +52,11 @@ struct HRilRequestTest {
 
 class RilManagerTest {
     typedef struct UusInfo {
-        int uusDcs; /* 3GPP TS 23.038 [25] Cell Broadcast Data Coding Scheme(default 0) */
+        int32_t uusDcs; /* 3GPP TS 23.038 [25] Cell Broadcast Data Coding Scheme(default 0) */
     } UusInfo;
 
 public:
-    RilManagerTest(int preferredNetworkType, int cdmaSubscription);
+    RilManagerTest(int32_t preferredNetworkType, int32_t cdmaSubscription);
     ~RilManagerTest();
 
     void OnInit();
@@ -72,7 +72,7 @@ public:
     DataProfileDataInfo ConvertToHalDataProfile(RilDataProfileTest dp);
     GsmSmsMessageInfo ConstructGsmSendSmsRilRequest(std::string smscPdu, std::string pdu);
     void GetCallList(const AppExecFwk::InnerEvent::Pointer &result);
-    void RilCmDial(std::string address, int clirMode, const AppExecFwk::InnerEvent::Pointer &result);
+    void RilCmDial(std::string address, int32_t clirMode, const AppExecFwk::InnerEvent::Pointer &result);
 
     void Reject(const AppExecFwk::InnerEvent::Pointer &result);
 
@@ -89,18 +89,18 @@ public:
 
     void Answer(const AppExecFwk::InnerEvent::Pointer &result);
     void RejectRilCmCall(const AppExecFwk::InnerEvent::Pointer &result);
-    void GetRilCmSignalStrength(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
+    void GetRilCmSignalStrength(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int32_t what);
 
     void GetCsRegStatus(const AppExecFwk::InnerEvent::Pointer &response);
     void GetPsRegStatus(const AppExecFwk::InnerEvent::Pointer &response);
     void GetCellInfoList(const AppExecFwk::InnerEvent::Pointer &response);
     void GetCurrentCellInfo(const AppExecFwk::InnerEvent::Pointer &response);
-    void GetOperatorInfo(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
+    void GetOperatorInfo(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int32_t what);
     void SendSms(std::string smscPdu, std::string pdu, const std::shared_ptr<AppExecFwk::EventHandler> &handler,
         const AppExecFwk::InnerEvent::Pointer &response);
     void SendSmsMoreMode(std::string smscPdu, std::string pdu,
         const std::shared_ptr<AppExecFwk::EventHandler> &handler, const AppExecFwk::InnerEvent::Pointer &response);
-    void SetRadioState(int fan, int rst, const AppExecFwk::InnerEvent::Pointer &response);
+    void SetRadioState(int32_t fan, int32_t rst, const AppExecFwk::InnerEvent::Pointer &response);
     void SendSmsAck(bool success, int32_t cause, const AppExecFwk::InnerEvent::Pointer &response);
     void GetSimIO(int32_t command, int32_t fileId, int32_t p1, int32_t p2, int32_t p3, std::string data,
         std::string path, const AppExecFwk::InnerEvent::Pointer &response);
@@ -108,21 +108,21 @@ public:
         bool allowRoaming, const AppExecFwk::InnerEvent::Pointer &response);
     void DeactivatePdpContext(int32_t ci, int32_t reason, const AppExecFwk::InnerEvent::Pointer &response);
     void GetSimStatus(const AppExecFwk::InnerEvent::Pointer &result);
-    void SetUssdCusd(std::string str, const AppExecFwk::InnerEvent::Pointer &result);
-    void GetUssdCusd(const AppExecFwk::InnerEvent::Pointer &result);
+    void SetUssd(std::string str, const AppExecFwk::InnerEvent::Pointer &result);
+    void GetUssd(const AppExecFwk::InnerEvent::Pointer &result);
     void SimOpenLogicalChannel(std::string appID, int32_t p2, const AppExecFwk::InnerEvent::Pointer &response);
-    void SimCloseLogicalChannel(int channelId, const AppExecFwk::InnerEvent::Pointer &response);
+    void SimCloseLogicalChannel(int32_t channelId, const AppExecFwk::InnerEvent::Pointer &response);
     void SimTransmitApduLogicalChannel(ApduSimIORequestInfo reqInfo, const AppExecFwk::InnerEvent::Pointer &response);
     void UnlockSimLock(int32_t lockType, std::string password, const AppExecFwk::InnerEvent::Pointer &response);
     void GetLinkBandwidthInfo(const int32_t cid, const AppExecFwk::InnerEvent::Pointer &result);
 
-    static const int INVALID_WAKELOCK = -1;
-    static const int FOR_WAKELOCK = 0;
-    static const int FOR_ACK_WAKELOCK = 1;
-    const int HRIL_ADAPTER_RADIO_INDICATION = 2001;
-    const int HRIL_ADAPTER_RADIO_RESPONSE = 2002;
-    const int RIL_ADAPTER_OEM_INDICATION = 2003;
-    const int RIL_ADAPTER_OEM_RESPONSE = 2004;
+    static const int32_t INVALID_WAKELOCK = -1;
+    static const int32_t FOR_WAKELOCK = 0;
+    static const int32_t FOR_ACK_WAKELOCK = 1;
+    const int32_t HRIL_ADAPTER_RADIO_INDICATION = 2001;
+    const int32_t HRIL_ADAPTER_RADIO_RESPONSE = 2002;
+    const int32_t RIL_ADAPTER_OEM_INDICATION = 2003;
+    const int32_t RIL_ADAPTER_OEM_RESPONSE = 2004;
     sptr<IRemoteObject> cellularRadio_;
     int32_t cdmaSubscription_ = 0;
 
@@ -135,10 +135,10 @@ public:
     static std::unordered_map<int32_t, std::shared_ptr<HRilRequestTest>> requestMap_;
 
 private:
-    std::shared_ptr<HRilRequestTest> CreateRequest(int request, const AppExecFwk::InnerEvent::Pointer &result);
+    std::shared_ptr<HRilRequestTest> CreateRequest(int32_t request, const AppExecFwk::InnerEvent::Pointer &result);
 
     static constexpr const char *RIL_ADAPTER_SERVICE_NAME = "cellular_radio1";
-    static constexpr int PAYLOAD_NUM = 1234;
+    static constexpr int32_t PAYLOAD_NUM = 1234;
 };
 } // namespace Telephony
 } // namespace OHOS

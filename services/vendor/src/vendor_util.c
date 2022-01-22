@@ -190,8 +190,9 @@ int64_t NextInt64(char **s, int64_t *out)
     while (*s != NULL && **s == ',') {
         (*s)++;
     }
-    *out = (int64_t)strtol(ret, &end, HRIL_DEC);
+    *out = (int64_t)strtoll(ret, &end, HRIL_DEC);
     if (ret == end) {
+        TELEPHONY_LOGE("NextInt64 strtoll is fail, ret:%{public}s", ret);
         return -1;
     }
     return 0;

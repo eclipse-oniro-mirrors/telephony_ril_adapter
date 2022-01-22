@@ -100,8 +100,8 @@ void RilUnitTest::AddRequestToMap()
     memberFuncMap_[HREQ_SMS_SEND_SMS_ACK] = &RilUnitTest::SendSmsAckTest;
     memberFuncMap_[HREQ_DATA_ACTIVATE_PDP_CONTEXT] = &RilUnitTest::ActivatePdpContextTest;
     memberFuncMap_[HREQ_DATA_DEACTIVATE_PDP_CONTEXT] = &RilUnitTest::DeactivatePdpContextTest;
-    memberFuncMap_[HREQ_CALL_SET_USSD] = &RilUnitTest::SetUssdCusdTest;
-    memberFuncMap_[HREQ_CALL_GET_USSD] = &RilUnitTest::GetUssdCusdTest;
+    memberFuncMap_[HREQ_CALL_SET_USSD] = &RilUnitTest::SetUssdTest;
+    memberFuncMap_[HREQ_CALL_GET_USSD] = &RilUnitTest::GetUssdTest;
     memberFuncMap_[HREQ_DATA_GET_LINK_BANDWIDTH_INFO] = &RilUnitTest::GetLinkBandwidthInfoTest;
 }
 
@@ -145,7 +145,7 @@ void RilUnitTest::GetRilCmSignalStrengthTest(const OHOS::AppExecFwk::InnerEvent:
 {
     TELEPHONY_LOGI("RilUnitTest::GetRilCmSignalStrengthTest -->");
     int32_t ret =
-        mRilManager_->GetRilCmSignalStrength(result->GetOwner(), static_cast<int>(result->GetInnerEventId()));
+        mRilManager_->GetRilCmSignalStrength(result->GetOwner(), static_cast<int32_t>(result->GetInnerEventId()));
     TELEPHONY_LOGI("RilUnitTest::GetRilCmSignalStrengthTest --> GetRilCmSignalStrengthTest finished");
     TELEPHONY_LOGI("RilUnitTest::GetRilCmSignalStrengthTest return: %{public}d", ret);
     ASSERT_EQ(0, ret);
@@ -268,7 +268,7 @@ void RilUnitTest::RilCmSplitCallTest(const OHOS::AppExecFwk::InnerEvent::Pointer
 void RilUnitTest::HangupRilCmConnectionTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("RilUnitTest::HangupRilCmConnectionTest -->");
-    int32_t ret = mRilManager_->Hangup(static_cast<int>(result->GetInnerEventId()), result);
+    int32_t ret = mRilManager_->Hangup(static_cast<int32_t>(result->GetInnerEventId()), result);
     TELEPHONY_LOGI("RilUnitTest::HangupRilCmConnectionTest --> HangupRilCmConnectionTest finished");
     TELEPHONY_LOGI("RilUnitTest::HangupRilCmConnectionTest return: %{public}d", ret);
     ASSERT_EQ(0, ret);
@@ -304,7 +304,7 @@ void RilUnitTest::GetRilCmPsRegStatusTest(const OHOS::AppExecFwk::InnerEvent::Po
 void RilUnitTest::GetRilCmOperatorTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("RilUnitTest::GetRilCmOperatorTest -->");
-    int32_t ret = mRilManager_->GetOperatorInfo(result->GetOwner(), static_cast<int>(result->GetInnerEventId()));
+    int32_t ret = mRilManager_->GetOperatorInfo(result->GetOwner(), static_cast<int32_t>(result->GetInnerEventId()));
     TELEPHONY_LOGI("RilUnitTest::GetRilCmOperatorTest --> GetRilCmOperatorTest finished");
     TELEPHONY_LOGI("RilUnitTest::GetRilCmOperatorTest return: %{public}d", ret);
     ASSERT_EQ(0, ret);
@@ -373,21 +373,21 @@ void RilUnitTest::DemoHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointe
     event->GetInnerEventId();
 }
 
-void RilUnitTest::SetUssdCusdTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+void RilUnitTest::SetUssdTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
 {
-    TELEPHONY_LOGI("RilUnitTest::SetUssdCusdTest -->");
-    int32_t ret = mRilManager_->SetUssdCusd("12345678", result);
-    TELEPHONY_LOGI("RilUnitTest::SetUssdCusdTest --> SetUssdCusdTest finished");
-    TELEPHONY_LOGI("RilUnitTest::SetUssdCusdTest return: %{public}d", ret);
+    TELEPHONY_LOGI("RilUnitTest::SetUssdTest -->");
+    int32_t ret = mRilManager_->SetUssd("12345678", result);
+    TELEPHONY_LOGI("RilUnitTest::SetUssdTest --> SetUssdTest finished");
+    TELEPHONY_LOGI("RilUnitTest::SetUssdTest return: %{public}d", ret);
     ASSERT_EQ(0, ret);
 }
 
-void RilUnitTest::GetUssdCusdTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+void RilUnitTest::GetUssdTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
 {
-    TELEPHONY_LOGI("RilUnitTest::GetUssdCusdTest -->");
-    int32_t ret = mRilManager_->GetUssdCusd(result);
-    TELEPHONY_LOGI("RilUnitTest::GetUssdCusdTest --> GetUssdCusdTest finished");
-    TELEPHONY_LOGI("RilUnitTest::GetUssdCusdTest return: %{public}d", ret);
+    TELEPHONY_LOGI("RilUnitTest::GetUssdTest -->");
+    int32_t ret = mRilManager_->GetUssd(result);
+    TELEPHONY_LOGI("RilUnitTest::GetUssdTest --> GetUssdTest finished");
+    TELEPHONY_LOGI("RilUnitTest::GetUssdTest return: %{public}d", ret);
     ASSERT_EQ(0, ret);
 }
 
@@ -585,7 +585,7 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetRilCmRadioPowerTest_0100, Function
     OnProcessTest(HREQ_MODEM_SET_RADIO_STATUS, event);
 }
 
-HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetUssdCusdTest_0100, Function | MediumTest | Level3)
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetUssdTest_0100, Function | MediumTest | Level3)
 {
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_SET_USSD);
@@ -593,7 +593,7 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetUssdCusdTest_0100, Function | Medi
     OnProcessTest(HREQ_CALL_SET_USSD, event);
 }
 
-HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetUssdCusdTest_0100, Function | MediumTest | Level3)
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetUssdTest_0100, Function | MediumTest | Level3)
 {
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_GET_USSD);

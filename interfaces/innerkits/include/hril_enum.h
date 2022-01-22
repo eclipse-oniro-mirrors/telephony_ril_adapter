@@ -334,6 +334,7 @@ typedef enum {
 } HRilActTech;
 
 typedef enum {
+    RADIO_TECHNOLOGY_INVALID = -1,
     RADIO_TECHNOLOGY_UNKNOWN = 0,
     RADIO_TECHNOLOGY_GSM = 1,
     RADIO_TECHNOLOGY_1XRTT = 2,

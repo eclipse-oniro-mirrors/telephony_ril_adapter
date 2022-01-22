@@ -51,7 +51,7 @@ struct HRilReport {
 };
 
 typedef struct {
-    int version;
+    int32_t version;
     const HRilCallReq *callOps;
     const HRilSimReq *simOps;
     const HRilSmsReq *smsOps;

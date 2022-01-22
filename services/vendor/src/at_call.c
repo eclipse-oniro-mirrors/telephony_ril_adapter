@@ -37,7 +37,7 @@ CallNotify g_callNotifyTab[] = {
     {"RING", ReportCallStatusUpdate},
     {"IRING", ReportCallStatusUpdate},
     {"NO CARRIER", ReportCallStatusUpdate},
-    {"+CUSD:", ReportCallUssdCusdNotice},
+    {"+CUSD:", ReportCallUssdNotice},
     {"+CIREPH:", ReportSrvccStatusUpdate},
     {"^CSCHANNELINFO:", ReportCsChannelInfo},
     {"^XLEMA:", ReportEmergencyNumberList},
@@ -436,11 +436,11 @@ void ReportEmergencyNumberList(const char *str)
     OnCallReport(GetSlotId(NULL), reportInfo, (const uint8_t *)&pEmergencyInfo, sizeof(pEmergencyInfo));
 }
 
-void ReportCallUssdCusdNotice(const char *str)
+void ReportCallUssdNotice(const char *str)
 {
     int32_t err = HRIL_ERR_SUCCESS;
     char *pStr = (char *)str;
-    HRilUssdCusdNoticeInfo ussdCusdNoticeInfo = {0};
+    HRilUssdNoticeInfo ussdNoticeInfo = {0};
     struct ReportInfo reportInfo = {0};
     ReqDataInfo requestInfo = {0};
     ModemReportErrorInfo errInfo = InitModemReportErrorInfo();
@@ -448,37 +448,33 @@ void ReportCallUssdCusdNotice(const char *str)
     if (SkipATPrefix(&pStr) < 0) {
         err = HRIL_ERR_INVALID_MODEM_PARAMETER;
     }
-    if (NextInt(&pStr, &ussdCusdNoticeInfo.m) < 0) {
+    if (NextInt(&pStr, &ussdNoticeInfo.m) < 0) {
         err = HRIL_ERR_INVALID_MODEM_PARAMETER;
     }
-    if (NextStr(&pStr, &ussdCusdNoticeInfo.str) < 0) {
+    if (NextStr(&pStr, &ussdNoticeInfo.str) < 0) {
         err = HRIL_ERR_INVALID_MODEM_PARAMETER;
     }
-    if (NextInt(&pStr, &ussdCusdNoticeInfo.dcs) < 0) {
+    if (NextInt(&pStr, &ussdNoticeInfo.dcs) < 0) {
         err = HRIL_ERR_INVALID_MODEM_PARAMETER;
     }
     reportInfo = CreateReportInfo(&requestInfo, err, HRIL_NOTIFICATION, HNOTI_CALL_USSD_REPORT);
     reportInfo.modemErrInfo = errInfo;
-    OnCallReport(GetSlotId(NULL), reportInfo, (const uint8_t *)&ussdCusdNoticeInfo, sizeof(HRilUssdCusdNoticeInfo));
+    OnCallReport(GetSlotId(NULL), reportInfo, (const uint8_t *)&ussdNoticeInfo, sizeof(HRilUssdNoticeInfo));
 }
 
-static int32_t InitCallListCmdBuffer(
-    const ResponseInfo *pResponse, int32_t *callNum, HRilCallInfo ***ppCalls, HRilCallInfo **pCalls)
+static int32_t InitCallListCmdBuffer(const ResponseInfo *pResponse, int32_t *callNum, HRilCallInfo **pCalls)
 {
-    int32_t i;
     int32_t ret;
     int32_t callNumTmp = 0;
     Line *pLine = NULL;
     HRilCallInfo *pCallsTmp = NULL;
-    HRilCallInfo **ppCallsTmp = NULL;
 
-    if (pResponse == NULL || ppCalls == NULL || pCalls == NULL || callNum == NULL) {
-        TELEPHONY_LOGE("params: %{public}p,%{public}p,%{public}p,%{public}p", pResponse, callNum, ppCalls, pCalls);
+    if (pResponse == NULL || pCalls == NULL || callNum == NULL) {
+        TELEPHONY_LOGE("params: %{public}p,%{public}p,%{public}p", pResponse, callNum, pCalls);
         return HRIL_ERR_NULL_POINT;
     }
 
     *callNum = 0;
-    *ppCalls = NULL;
     *pCalls = NULL;
 
     for (pLine = pResponse->head; pLine != NULL; pLine = pLine->next) {
@@ -487,26 +483,16 @@ static int32_t InitCallListCmdBuffer(
     if (!callNumTmp) {
         callNumTmp++; // Malloc size cannot be 0.
     }
-    ppCallsTmp = (HRilCallInfo **)malloc(callNumTmp * sizeof(int64_t));
-    if (ppCallsTmp == NULL) {
-        TELEPHONY_LOGE("ReqGetCallList malloc ppCalls failure");
-        return HRIL_ERR_MEMORY_FULL;
-    }
     pCallsTmp = (HRilCallInfo *)malloc(callNumTmp * sizeof(HRilCallInfo));
     if (pCallsTmp == NULL) {
         TELEPHONY_LOGE("ReqGetCallList malloc pCalls failure");
-        free(ppCallsTmp);
         return HRIL_ERR_MEMORY_FULL;
     }
     ret = memset_s(pCallsTmp, callNumTmp * sizeof(HRilCallInfo), 0, callNumTmp * sizeof(HRilCallInfo));
     if (ret != EOK) {
         TELEPHONY_LOGE("memset_s is failed!");
     }
-    for (i = 0; i < callNumTmp; i++) {
-        ppCallsTmp[i] = &(pCallsTmp[i]);
-    }
 
-    *ppCalls = ppCallsTmp;
     *pCalls = pCallsTmp;
     *callNum = callNumTmp;
 
@@ -523,7 +509,6 @@ int32_t BuildCallInfoList(const ReqDataInfo *requestInfo, ResponseInfo *response
     Line *pLine = NULL;
     ResponseInfo *pResponse = response;
     HRilCallInfo *pCalls = NULL;
-    HRilCallInfo **ppCalls = NULL;
 
     if (pResponse == NULL || requestInfo == NULL) {
         TELEPHONY_LOGE("response or requestInfo is null.");
@@ -534,7 +519,7 @@ int32_t BuildCallInfoList(const ReqDataInfo *requestInfo, ResponseInfo *response
         err = HRIL_ERR_GENERIC_FAILURE;
     }
 
-    ret = InitCallListCmdBuffer(pResponse, &callNum, &ppCalls, &pCalls);
+    ret = InitCallListCmdBuffer(pResponse, &callNum, &pCalls);
     if (ret != HRIL_ERR_SUCCESS) {
         TELEPHONY_LOGE("init command failed: %{public}d", ret);
         return ret;
@@ -550,10 +535,8 @@ int32_t BuildCallInfoList(const ReqDataInfo *requestInfo, ResponseInfo *response
     }
 
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-
-    OnCallReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)ppCalls, sizeof(HRilCallInfo) * validCallNum);
+    OnCallReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)pCalls, sizeof(HRilCallInfo) * validCallNum);
     FreeResponseInfo(pResponse);
-    free(ppCalls);
     free(pCalls);
     return HRIL_ERR_SUCCESS;
 }
@@ -1437,7 +1420,7 @@ void ReqSetLteImsSwitchStatus(const ReqDataInfo *requestInfo, int32_t active)
     FreeResponseInfo(pResponse);
 }
 
-void ReqSetUssdCusd(const ReqDataInfo *requestInfo, const char *str)
+void ReqSetUssd(const ReqDataInfo *requestInfo, const char *str)
 {
     int32_t ret;
     int32_t err = HRIL_ERR_SUCCESS;
@@ -1464,7 +1447,7 @@ void ReqSetUssdCusd(const ReqDataInfo *requestInfo, const char *str)
     FreeResponseInfo(pResponse);
 }
 
-void ReqGetUssdCusd(const ReqDataInfo *requestInfo)
+void ReqGetUssd(const ReqDataInfo *requestInfo)
 {
     int32_t ret;
     char *line = NULL;
@@ -1592,23 +1575,19 @@ static int32_t CallCmdXLEMA(const char *lineCmd, HRilEmergencyInfo *outCall)
 }
 
 static int32_t InitGetEmergencyCallList(const ResponseInfo *pResponse, int32_t *callNum,
-    HRilEmergencyInfo ***ppEmergencyCalls, HRilEmergencyInfo **pEmergencyCalls)
+    HRilEmergencyInfo **pEmergencyCalls)
 {
-    int32_t i;
     int32_t ret;
     int32_t callNumTmp = 0;
     Line *pLine = NULL;
     HRilEmergencyInfo *pEmergencyCallsTmp = NULL;
-    HRilEmergencyInfo **ppEmergencyCallsTmp = NULL;
 
-    if (pResponse == NULL || ppEmergencyCalls == NULL || pEmergencyCalls == NULL || callNum == NULL) {
-        TELEPHONY_LOGE("params: %{public}p,%{public}p,%{public}p,%{public}p", pResponse, callNum, ppEmergencyCalls,
-            pEmergencyCalls);
+    if (pResponse == NULL || pEmergencyCalls == NULL || callNum == NULL) {
+        TELEPHONY_LOGE("params: %{public}p,%{public}p,%{public}p", pResponse, callNum, pEmergencyCalls);
         return HRIL_ERR_NULL_POINT;
     }
 
     *callNum = 0;
-    *ppEmergencyCalls = NULL;
     *pEmergencyCalls = NULL;
 
     for (pLine = pResponse->head; pLine != NULL; pLine = pLine->next) {
@@ -1617,15 +1596,9 @@ static int32_t InitGetEmergencyCallList(const ResponseInfo *pResponse, int32_t *
     if (!callNumTmp) {
         callNumTmp++; // Malloc size cannot be 0.
     }
-    ppEmergencyCallsTmp = (HRilEmergencyInfo **)malloc(callNumTmp * sizeof(int64_t));
-    if (ppEmergencyCallsTmp == NULL) {
-        TELEPHONY_LOGE("ReqGetCallList malloc ppCalls failure");
-        return HRIL_ERR_MEMORY_FULL;
-    }
     pEmergencyCallsTmp = (HRilEmergencyInfo *)malloc(callNumTmp * sizeof(HRilEmergencyInfo));
     if (pEmergencyCallsTmp == NULL) {
         TELEPHONY_LOGE("ReqGetCallList malloc pCalls failure");
-        free(ppEmergencyCallsTmp);
         return HRIL_ERR_MEMORY_FULL;
     }
     ret = memset_s(
@@ -1633,11 +1606,7 @@ static int32_t InitGetEmergencyCallList(const ResponseInfo *pResponse, int32_t *
     if (ret != EOK) {
         TELEPHONY_LOGE("memset_s is failed!");
     }
-    for (i = 0; i < callNumTmp; i++) {
-        ppEmergencyCallsTmp[i] = &(pEmergencyCallsTmp[i]);
-    }
 
-    *ppEmergencyCalls = ppEmergencyCallsTmp;
     *pEmergencyCalls = pEmergencyCallsTmp;
     *callNum = callNumTmp;
 
@@ -1654,7 +1623,6 @@ int32_t BuildGetEmergencyCallList(const ReqDataInfo *requestInfo, ResponseInfo *
     Line *pLine = NULL;
     ResponseInfo *pResponse = response;
     HRilEmergencyInfo *pEmergencyCalls = NULL;
-    HRilEmergencyInfo **ppEmergencyCalls = NULL;
 
     if (pResponse == NULL || requestInfo == NULL) {
         TELEPHONY_LOGE("response or requestInfo is null.");
@@ -1665,7 +1633,7 @@ int32_t BuildGetEmergencyCallList(const ReqDataInfo *requestInfo, ResponseInfo *
         err = HRIL_ERR_GENERIC_FAILURE;
     }
 
-    ret = InitGetEmergencyCallList(pResponse, &callNum, &ppEmergencyCalls, &pEmergencyCalls);
+    ret = InitGetEmergencyCallList(pResponse, &callNum, &pEmergencyCalls);
     if (ret != HRIL_ERR_SUCCESS) {
         TELEPHONY_LOGE("init command failed: %{public}d", ret);
         return ret;
@@ -1681,10 +1649,9 @@ int32_t BuildGetEmergencyCallList(const ReqDataInfo *requestInfo, ResponseInfo *
     }
 
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-    OnCallReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)ppEmergencyCalls,
+    OnCallReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)pEmergencyCalls,
         sizeof(HRilEmergencyInfo) * validCallNum);
     FreeResponseInfo(pResponse);
-    free(ppEmergencyCalls);
     free(pEmergencyCalls);
     return HRIL_ERR_SUCCESS;
 }

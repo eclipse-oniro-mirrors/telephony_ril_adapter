@@ -67,8 +67,8 @@ void ReqGetCallPreferenceMode(const ReqDataInfo *requestInfo);
 void ReqSetCallPreferenceMode(const ReqDataInfo *requestInfo, int32_t mode);
 void ReqGetLteImsSwitchStatus(const ReqDataInfo *requestInfo);
 void ReqSetLteImsSwitchStatus(const ReqDataInfo *requestInfo, int32_t active);
-void ReqSetUssdCusd(const ReqDataInfo *requestInfo, const char *str);
-void ReqGetUssdCusd(const ReqDataInfo *requestInfo);
+void ReqSetUssd(const ReqDataInfo *requestInfo, const char *str);
+void ReqGetUssd(const ReqDataInfo *requestInfo);
 void ReqGetMute(const ReqDataInfo *requestInfo);
 void ReqSetMute(const ReqDataInfo *requestInfo, int32_t mute);
 void ReqGetEmergencyCallList(const ReqDataInfo *requestInfo);
@@ -85,6 +85,6 @@ void ReportSrvccStatusUpdate(const char *str);
 void ReportCsChannelInfo(const char *str);
 void CallReportInfoProcess(const char *str);
 int32_t IsCallNoticeCmd(const char *str);
-void ReportCallUssdCusdNotice(const char *str);
+void ReportCallUssdNotice(const char *str);
 void ReportEmergencyNumberList(const char *str);
 #endif // OHOS_AT_CALL_H

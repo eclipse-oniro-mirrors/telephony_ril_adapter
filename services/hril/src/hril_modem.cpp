@@ -55,7 +55,7 @@ int32_t HRilModem::GetVoiceRadioTechnology(struct HdfSBuf *data)
 int32_t HRilModem::RadioStateUpdated(
     const int32_t indType, const HRilErrNumber e, const void *response, size_t responselen)
 {
-    return Notify<int32_t, HrilInt32Parcel>((const int32_t *)response, responselen, HNOTI_MODEM_RADIO_STATE_UPDATED);
+    return Notify<int32_t, HRilInt32Parcel>((const int32_t *)response, responselen, HNOTI_MODEM_RADIO_STATE_UPDATED);
 }
 
 int32_t HRilModem::VoiceRadioTechUpdated(
@@ -74,19 +74,19 @@ int32_t HRilModem::SetRadioStateResponse(
 int32_t HRilModem::GetRadioStateResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    return Response(responseInfo, HrilInt32Parcel((const uint8_t *)response, responseLen), requestNum);
+    return Response(responseInfo, HRilInt32Parcel((const uint8_t *)response, responseLen), requestNum);
 }
 
 int32_t HRilModem::GetImeiResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    return Response(responseInfo, HrilStringParcel((const char *)response), requestNum);
+    return Response(responseInfo, HRilStringParcel((const char *)response), requestNum);
 }
 
 int32_t HRilModem::GetMeidResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    return Response(responseInfo, HrilStringParcel((const char *)response), requestNum);
+    return Response(responseInfo, HRilStringParcel((const char *)response), requestNum);
 }
 
 int32_t HRilModem::GetVoiceRadioTechnologyResponse(

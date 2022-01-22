@@ -23,7 +23,7 @@
 namespace OHOS {
 namespace Telephony {
 struct Tmp1 {
-    int serial;
+    int32_t serial;
     int32_t status;
 };
 
@@ -32,7 +32,7 @@ public:
     RilRadioResponseTest(RilManagerTest *mRilManager);
     ~RilRadioResponseTest();
 
-    int OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
+    int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
     void OnResponseGetSimState(MessageParcel &data);
     void OnResponseGetCurrentCalls(MessageParcel &data);
     void OnResponseGetRilCurrentCellInfo(MessageParcel &data);

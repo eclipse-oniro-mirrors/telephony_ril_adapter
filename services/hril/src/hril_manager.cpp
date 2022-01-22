@@ -220,7 +220,7 @@ void HRilManager::OnReport(std::vector<std::unique_ptr<T>> &subModules, int32_t 
             HRilRadioResponseInfo responseInfo = {};
             responseInfo.serial = reqInfo->serial;
             responseInfo.error = (HRilErrType)reportInfo->error;
-            int requestId = reqInfo->request;
+            int32_t requestId = reqInfo->request;
             ReleaseHRilRequest(requestId, reqInfo);
             subModules[slotId]->template ProcessResponse<T>(requestId, responseInfo, response, responseLen);
             break;

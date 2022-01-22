@@ -91,6 +91,10 @@ void HRilSim::AddHandlerToMap()
 
 int32_t HRilSim::GetSimIO(struct HdfSBuf *data)
 {
+    if ((simFuncs_ == nullptr) || (simFuncs_->GetSimIO == nullptr)) {
+        TELEPHONY_LOGE("GetSimIO::simFuncs_:%{public}p", simFuncs_);
+        return HRIL_ERR_NULL_POINT;
+    }
     SimIoRequestInfo SimIO = SimIoRequestInfo();
     MessageParcel *parcel = nullptr;
     if (SbufToParcel(data, &parcel)) {
@@ -126,6 +130,10 @@ int32_t HRilSim::GetSimIO(struct HdfSBuf *data)
 
 int32_t HRilSim::GetSimStatus(struct HdfSBuf *data)
 {
+    if ((simFuncs_ == nullptr) || (simFuncs_->GetSimStatus == nullptr)) {
+        TELEPHONY_LOGE("GetSimStatus::simFuncs_:%{public}p", simFuncs_);
+        return HRIL_ERR_NULL_POINT;
+    }
     int32_t serial = 0;
     if (!HdfSbufReadInt32(data, &serial)) {
         TELEPHONY_LOGE("miss serial parameter");
@@ -142,7 +150,11 @@ int32_t HRilSim::GetSimStatus(struct HdfSBuf *data)
 
 int32_t HRilSim::GetImsi(struct HdfSBuf *data)
 {
-    int serial = 0;
+    if ((simFuncs_ == nullptr) || (simFuncs_->GetSimImsi == nullptr)) {
+        TELEPHONY_LOGE("GetSimImsi::simFuncs_:%{public}p", simFuncs_);
+        return HRIL_ERR_NULL_POINT;
+    }
+    int32_t serial = 0;
     if (!HdfSbufReadInt32(data, &serial)) {
         TELEPHONY_LOGE("miss serial parameter");
         return HRIL_ERR_INVALID_PARAMETER;
@@ -159,6 +171,10 @@ int32_t HRilSim::GetImsi(struct HdfSBuf *data)
 
 int32_t HRilSim::GetSimLockStatus(struct HdfSBuf *data)
 {
+    if ((simFuncs_ == nullptr) || (simFuncs_->GetSimLockStatus == nullptr)) {
+        TELEPHONY_LOGE("GetSimLockStatus::simFuncs_:%{public}p", simFuncs_);
+        return HRIL_ERR_NULL_POINT;
+    }
     SimLockInfo simClock = SimLockInfo();
     MessageParcel *parcel = nullptr;
     if (SbufToParcel(data, &parcel)) {
@@ -191,6 +207,10 @@ int32_t HRilSim::GetSimLockStatus(struct HdfSBuf *data)
 
 int32_t HRilSim::SetSimLock(struct HdfSBuf *data)
 {
+    if ((simFuncs_ == nullptr) || (simFuncs_->SetSimLock == nullptr)) {
+        TELEPHONY_LOGE("SetSimLock::simFuncs_:%{public}p", simFuncs_);
+        return HRIL_ERR_NULL_POINT;
+    }
     SimLockInfo simClock = SimLockInfo();
     MessageParcel *parcel = nullptr;
     if (SbufToParcel(data, &parcel)) {
@@ -223,6 +243,10 @@ int32_t HRilSim::SetSimLock(struct HdfSBuf *data)
 
 int32_t HRilSim::ChangeSimPassword(struct HdfSBuf *data)
 {
+    if ((simFuncs_ == nullptr) || (simFuncs_->ChangeSimPassword == nullptr)) {
+        TELEPHONY_LOGE("ChangeSimPassword::simFuncs_:%{public}p", simFuncs_);
+        return HRIL_ERR_NULL_POINT;
+    }
     SimPasswordInfo simPassword = SimPasswordInfo();
     MessageParcel *parcel = nullptr;
     if (SbufToParcel(data, &parcel)) {
@@ -254,6 +278,10 @@ int32_t HRilSim::ChangeSimPassword(struct HdfSBuf *data)
 
 int32_t HRilSim::UnlockPin(struct HdfSBuf *data)
 {
+    if ((simFuncs_ == nullptr) || (simFuncs_->UnlockPin == nullptr)) {
+        TELEPHONY_LOGE("UnlockPin::simFuncs_:%{public}p", simFuncs_);
+        return HRIL_ERR_NULL_POINT;
+    }
     int32_t serial = 0;
     const char *pin = nullptr;
     if (!HdfSbufReadInt32(data, &serial)) {
@@ -285,6 +313,10 @@ int32_t HRilSim::UnlockPin(struct HdfSBuf *data)
 
 int32_t HRilSim::UnlockPuk(struct HdfSBuf *data)
 {
+    if ((simFuncs_ == nullptr) || (simFuncs_->UnlockPuk == nullptr)) {
+        TELEPHONY_LOGE("UnlockPuk::simFuncs_:%{public}p", simFuncs_);
+        return HRIL_ERR_NULL_POINT;
+    }
     int32_t serial = 0;
     const char *puk = nullptr;
     const char *pin = nullptr;
@@ -313,7 +345,11 @@ int32_t HRilSim::UnlockPuk(struct HdfSBuf *data)
 
 int32_t HRilSim::GetSimPinInputTimes(struct HdfSBuf *data)
 {
-    int serial = 0;
+    if ((simFuncs_ == nullptr) || (simFuncs_->GetSimPinInputTimes == nullptr)) {
+        TELEPHONY_LOGE("GetSimPinInputTimes::simFuncs_:%{public}p", simFuncs_);
+        return HRIL_ERR_NULL_POINT;
+    }
+    int32_t serial = 0;
     if (!HdfSbufReadInt32(data, &serial)) {
         TELEPHONY_LOGE("miss serial parameter");
         return HRIL_ERR_INVALID_PARAMETER;
@@ -329,6 +365,10 @@ int32_t HRilSim::GetSimPinInputTimes(struct HdfSBuf *data)
 
 int32_t HRilSim::UnlockPin2(struct HdfSBuf *data)
 {
+    if ((simFuncs_ == nullptr) || (simFuncs_->UnlockPin2 == nullptr)) {
+        TELEPHONY_LOGE("UnlockPin2::simFuncs_:%{public}p", simFuncs_);
+        return HRIL_ERR_NULL_POINT;
+    }
     int32_t serial = 0;
     const char *pin2 = nullptr;
     if (!HdfSbufReadInt32(data, &serial)) {
@@ -356,6 +396,10 @@ int32_t HRilSim::UnlockPin2(struct HdfSBuf *data)
 
 int32_t HRilSim::UnlockPuk2(struct HdfSBuf *data)
 {
+    if ((simFuncs_ == nullptr) || (simFuncs_->UnlockPuk2 == nullptr)) {
+        TELEPHONY_LOGE("UnlockPuk2::simFuncs_:%{public}p", simFuncs_);
+        return HRIL_ERR_NULL_POINT;
+    }
     int32_t serial = 0;
     const char *puk2 = nullptr;
     const char *pin2 = nullptr;
@@ -384,7 +428,11 @@ int32_t HRilSim::UnlockPuk2(struct HdfSBuf *data)
 
 int32_t HRilSim::GetSimPin2InputTimes(struct HdfSBuf *data)
 {
-    int serial = 0;
+    if ((simFuncs_ == nullptr) || (simFuncs_->GetSimPin2InputTimes == nullptr)) {
+        TELEPHONY_LOGE("GetSimPin2InputTimes::simFuncs_:%{public}p", simFuncs_);
+        return HRIL_ERR_NULL_POINT;
+    }
+    int32_t serial = 0;
     if (!HdfSbufReadInt32(data, &serial)) {
         TELEPHONY_LOGE("miss serial parameter");
         return HRIL_ERR_INVALID_PARAMETER;
@@ -400,9 +448,13 @@ int32_t HRilSim::GetSimPin2InputTimes(struct HdfSBuf *data)
 
 int32_t HRilSim::SetActiveSim(struct HdfSBuf *data)
 {
+    if ((simFuncs_ == nullptr) || (simFuncs_->SetActiveSim == nullptr)) {
+        TELEPHONY_LOGE("SetActiveSim::simFuncs_:%{public}p", simFuncs_);
+        return HRIL_ERR_NULL_POINT;
+    }
     int32_t serial = 0;
-    int index = 0;
-    int enable = 0;
+    int32_t index = 0;
+    int32_t enable = 0;
     if (!HdfSbufReadInt32(data, &serial)) {
         TELEPHONY_LOGE("miss serial parameter");
         return HRIL_ERR_INVALID_PARAMETER;
@@ -426,6 +478,10 @@ int32_t HRilSim::SetActiveSim(struct HdfSBuf *data)
 
 int32_t HRilSim::SimStkSendTerminalResponse(struct HdfSBuf *data)
 {
+    if ((simFuncs_ == nullptr) || (simFuncs_->SimStkSendTerminalResponse == nullptr)) {
+        TELEPHONY_LOGE("SimStkSendTerminalResponse::simFuncs_:%{public}p", simFuncs_);
+        return HRIL_ERR_NULL_POINT;
+    }
     int32_t serial = 0;
     const char *strCmd = nullptr;
     if (!HdfSbufReadInt32(data, &serial)) {
@@ -453,6 +509,10 @@ int32_t HRilSim::SimStkSendTerminalResponse(struct HdfSBuf *data)
 
 int32_t HRilSim::SimStkSendEnvelope(struct HdfSBuf *data)
 {
+    if ((simFuncs_ == nullptr) || (simFuncs_->SimStkSendEnvelope == nullptr)) {
+        TELEPHONY_LOGE("SimStkSendEnvelope::simFuncs_:%{public}p", simFuncs_);
+        return HRIL_ERR_NULL_POINT;
+    }
     int32_t serial = 0;
     const char *strCmd = nullptr;
     if (!HdfSbufReadInt32(data, &serial)) {
@@ -480,7 +540,11 @@ int32_t HRilSim::SimStkSendEnvelope(struct HdfSBuf *data)
 
 int32_t HRilSim::SimStkIsReady(struct HdfSBuf *data)
 {
-    int serial = 0;
+    if ((simFuncs_ == nullptr) || (simFuncs_->SimStkIsReady == nullptr)) {
+        TELEPHONY_LOGE("SimStkIsReady::simFuncs_:%{public}p", simFuncs_);
+        return HRIL_ERR_NULL_POINT;
+    }
+    int32_t serial = 0;
     if (!HdfSbufReadInt32(data, &serial)) {
         TELEPHONY_LOGE("miss serial parameter");
         return HRIL_ERR_INVALID_PARAMETER;
@@ -497,6 +561,10 @@ int32_t HRilSim::SimStkIsReady(struct HdfSBuf *data)
 
 int32_t HRilSim::SetRadioProtocol(struct HdfSBuf *data)
 {
+    if ((simFuncs_ == nullptr) || (simFuncs_->SetRadioProtocol == nullptr)) {
+        TELEPHONY_LOGE("SetRadioProtocol::simFuncs_:%{public}p", simFuncs_);
+        return HRIL_ERR_NULL_POINT;
+    }
     SimProtocolRequest protocol = SimProtocolRequest();
     MessageParcel *parcel = nullptr;
     if (SbufToParcel(data, &parcel)) {
@@ -527,6 +595,10 @@ int32_t HRilSim::SetRadioProtocol(struct HdfSBuf *data)
 
 int32_t HRilSim::SimOpenLogicalChannel(struct HdfSBuf *data)
 {
+    if ((simFuncs_ == nullptr) || (simFuncs_->SimOpenLogicalChannel == nullptr)) {
+        TELEPHONY_LOGE("SimOpenLogicalChannel::simFuncs_:%{public}p", simFuncs_);
+        return HRIL_ERR_NULL_POINT;
+    }
     int32_t serial = 0;
     const char *appID = nullptr;
     int32_t p2 = 0;
@@ -556,6 +628,10 @@ int32_t HRilSim::SimOpenLogicalChannel(struct HdfSBuf *data)
 
 int32_t HRilSim::SimCloseLogicalChannel(struct HdfSBuf *data)
 {
+    if ((simFuncs_ == nullptr) || (simFuncs_->SimCloseLogicalChannel == nullptr)) {
+        TELEPHONY_LOGE("SimCloseLogicalChannel::simFuncs_:%{public}p", simFuncs_);
+        return HRIL_ERR_NULL_POINT;
+    }
     int32_t serial = 0;
     int32_t channelId = 0;
     if (!HdfSbufReadInt32(data, &serial)) {
@@ -579,6 +655,10 @@ int32_t HRilSim::SimCloseLogicalChannel(struct HdfSBuf *data)
 
 int32_t HRilSim::SimTransmitApduLogicalChannel(struct HdfSBuf *data)
 {
+    if ((simFuncs_ == nullptr) || (simFuncs_->SimTransmitApduLogicalChannel == nullptr)) {
+        TELEPHONY_LOGE("SimTransmitApduLogicalChannel::simFuncs_:%{public}p", simFuncs_);
+        return HRIL_ERR_NULL_POINT;
+    }
     ApduSimIORequestInfo apduSimIO = ApduSimIORequestInfo();
     MessageParcel *parcel = nullptr;
     if (SbufToParcel(data, &parcel)) {
@@ -614,6 +694,10 @@ int32_t HRilSim::SimTransmitApduLogicalChannel(struct HdfSBuf *data)
 
 int32_t HRilSim::UnlockSimLock(struct HdfSBuf *data)
 {
+    if ((simFuncs_ == nullptr) || (simFuncs_->UnlockSimLock == nullptr)) {
+        TELEPHONY_LOGE("UnlockSimLock::simFuncs_:%{public}p", simFuncs_);
+        return HRIL_ERR_NULL_POINT;
+    }
     int32_t serial = 0;
     int32_t lockType = 0;
     const char *key = nullptr;

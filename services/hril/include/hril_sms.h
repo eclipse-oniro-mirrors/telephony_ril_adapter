@@ -90,7 +90,7 @@ private:
     bool IsSmsResponse(uint32_t code);
     bool IsSmsNotification(uint32_t code);
     int32_t DataSbuf(HdfSBuf *dataSbuf, int32_t indType);
-    int32_t RequestWithInts(int **p, ReqDataInfo *requestInfo, int32_t argCount, ...);
+    int32_t RequestWithInts(int32_t **p, ReqDataInfo *requestInfo, int32_t argCount, ...);
     int32_t RequestWithStrings(int32_t serial, int32_t request, int32_t count, ...);
     CBConfigReportInfo MakeCBConfigResult(const void *response, const size_t responseLen);
     SendSmsResultInfo MakeSendSmsResult(

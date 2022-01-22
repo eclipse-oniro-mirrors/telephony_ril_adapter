@@ -191,10 +191,10 @@ struct CdmaSmsMessageInfo {
 
 struct CdmaSmsInfo : public HrilBaseParcel {
     int32_t indicationType;
-    int msgRef; /* TP-Message-Reference for GSM, and BearerData MessageId for CDMA
+    int32_t msgRef; /* TP-Message-Reference for GSM, and BearerData MessageId for CDMA
                  * from 3GPP2 C.S0015-B, v2.0, 4.5-1 */
     std::string pdu; /* Protocol Data Unit */
-    int errCode; /* if unknown or not applicable, that is -1
+    int32_t errCode; /* if unknown or not applicable, that is -1
                   * from 3GPP 27.005, 3.2.5 for GSM/UMTS,
                   * 3GPP2 N.S0005 (IS-41C) Table 171 for CDMA */
     bool ReadFromParcel(Parcel &parcel);

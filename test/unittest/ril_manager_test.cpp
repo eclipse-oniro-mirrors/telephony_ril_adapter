@@ -463,7 +463,7 @@ GsmSmsMessageInfo RilManagerTest::ConstructGsmSendSmsRilRequest(string smscPdu, 
     return msg;
 }
 
-void RilManagerTest::SetRadioState(int fan, int rst, const AppExecFwk::InnerEvent::Pointer &result)
+void RilManagerTest::SetRadioState(int32_t fan, int32_t rst, const AppExecFwk::InnerEvent::Pointer &result)
 {
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_MODEM_SET_RADIO_STATUS, result);
@@ -560,7 +560,7 @@ void RilManagerTest::RilProcessResponseDone(
     }
 }
 
-void RilManagerTest::SetUssdCusd(std::string str, const AppExecFwk::InnerEvent::Pointer &result)
+void RilManagerTest::SetUssd(std::string str, const AppExecFwk::InnerEvent::Pointer &result)
 {
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_CALL_SET_USSD, result);
@@ -571,18 +571,18 @@ void RilManagerTest::SetUssdCusd(std::string str, const AppExecFwk::InnerEvent::
         OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
         cellularRadio_->SendRequest(HREQ_CALL_SET_USSD, data, reply, option);
     } else {
-        TELEPHONY_LOGE("SetUssdCusd  cellularRadio_ == nullptr");
+        TELEPHONY_LOGE("SetUssd  cellularRadio_ == nullptr");
     }
 }
 
-void RilManagerTest::GetUssdCusd(const AppExecFwk::InnerEvent::Pointer &result)
+void RilManagerTest::GetUssd(const AppExecFwk::InnerEvent::Pointer &result)
 {
-    TELEPHONY_LOGI("RilManagerTest::GetUssdCusd -->");
+    TELEPHONY_LOGI("RilManagerTest::GetUssd -->");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_CALL_GET_USSD, result);
         SendInt32Event(HREQ_CALL_GET_USSD, request->serialId_);
     } else {
-        TELEPHONY_LOGE("ERROR : GetUssdCusd --> cellularRadio_ == nullptr !!!");
+        TELEPHONY_LOGE("ERROR : GetUssd --> cellularRadio_ == nullptr !!!");
     }
 }
 
@@ -608,7 +608,7 @@ void RilManagerTest::SimOpenLogicalChannel(
     }
 }
 
-void RilManagerTest::SimCloseLogicalChannel(int channelId, const AppExecFwk::InnerEvent::Pointer &response)
+void RilManagerTest::SimCloseLogicalChannel(int32_t channelId, const AppExecFwk::InnerEvent::Pointer &response)
 {
     TELEPHONY_LOGI("RilManagerTest::SimCloseLogicalChannel -->");
     if (cellularRadio_ != nullptr) {

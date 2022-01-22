@@ -25,7 +25,9 @@
 
 namespace OHOS {
 namespace Telephony {
+// Serialize the underlying set of handler functions.
 namespace BaseParcel {
+// Read specific data from the parcel object.
 bool Read(Parcel &parcel, int8_t &value);
 bool Read(Parcel &parcel, uint8_t &value);
 bool Read(Parcel &parcel, int32_t &value);
@@ -34,6 +36,7 @@ bool Read(Parcel &parcel, int64_t &value);
 bool Read(Parcel &parcel, uint64_t &value);
 bool Read(Parcel &parcel, bool &value);
 bool Read(Parcel &parcel, std::string &value);
+// Reads only 32 bits of data. Such as: enum.
 template<typename E>
 bool Read(Parcel &parcel, E &e)
 {
@@ -42,6 +45,7 @@ bool Read(Parcel &parcel, E &e)
         " please use the enumeration type(type size == sizeof(int32_t)).");
     return Read(parcel, *((int32_t *)&e));
 }
+// Write the data to the parcel object.
 bool Write(Parcel &parcel, const int8_t &value);
 bool Write(Parcel &parcel, const uint8_t &value);
 bool Write(Parcel &parcel, const int32_t &value);
@@ -50,6 +54,7 @@ bool Write(Parcel &parcel, const int64_t &value);
 bool Write(Parcel &parcel, const uint64_t &value);
 bool Write(Parcel &parcel, const bool &value);
 bool Write(Parcel &parcel, const std::string &value);
+// Writes only 32 bits of data. Such as: enum.
 template<typename E>
 bool Write(Parcel &parcel, E &&e)
 {
@@ -72,6 +77,7 @@ bool Write(Parcel &parcel, E &&e)
 template<typename... ValueTypes>
 bool WriteVals(Parcel &parcel, ValueTypes &&...__vals)
 {
+    // Write data with the return value "and".
     return (Write(parcel, std::forward<ValueTypes>(__vals)) && ...);
 }
 
@@ -86,12 +92,14 @@ bool WriteVals(Parcel &parcel, ValueTypes &&...__vals)
 template<typename... ValueTypes>
 bool ReadVals(Parcel &parcel, ValueTypes &&...__vals)
 {
+    // Read data with the return value "and".
     return (Read(parcel, std::forward<ValueTypes>(__vals)) && ...);
 }
 } // namespace BaseParcel
 
 class HrilBaseParcel : public virtual Parcelable {
 public:
+    // Formatted output for serialized structures.
     virtual const char *ToString() const;
 
 protected:
@@ -118,10 +126,13 @@ protected:
         return BaseParcel::WriteVals(parcel, std::forward<ValueTypes>(__vals)...);
     }
 
+    // String streams: thread variables. Used to optimize execution efficiency.
     std::stringstream &StringStream(void) const;
+    // String: Thread variable. Used to optimize execution efficiency.
     std::string &String(void) const;
 };
 
+// Empty serialization class.
 struct HrilEmptyParcel : public HrilBaseParcel {
     bool ReadFromParcel(Parcel &parcel)
     {
@@ -138,24 +149,28 @@ struct HrilEmptyParcel : public HrilBaseParcel {
     void Dump(std::string, int32_t) {}
 };
 
+// Primitive type serialization class.
 template<typename T>
-struct HrilCommonParcel : public HrilBaseParcel {
+struct HRilCommonParcel : public HrilBaseParcel {
     T data;
 
-    HrilCommonParcel() {}
-    HrilCommonParcel(const T &d) : data(d) {}
-    HrilCommonParcel(const T &&d) : data(d) {}
-    HrilCommonParcel(const char *s)
+    HRilCommonParcel() {}
+    // copy constructor
+    HRilCommonParcel(const T &d) : data(d) {}
+    HRilCommonParcel(const T &&d) : data(d) {}
+    // Only the std::string template type is supported.
+    HRilCommonParcel(const char *s)
     {
         if (s != nullptr) {
             data = s;
         }
     }
-    HrilCommonParcel(const uint8_t *buf, size_t bufLen)
+    // The std::string template type is not supported.
+    HRilCommonParcel(const uint8_t *buf, size_t bufLen)
     {
         static_assert(std::is_class<T>::value == 0,
             "This constructor does not support the std::string type,"
-            " please use the HrilStringParcel(const std::string &) constructor.");
+            " please use the HRilStringParcel(const std::string &) constructor.");
         assert((bufLen % sizeof(T)) == 0);
 
         if (buf != nullptr) {
@@ -164,7 +179,7 @@ struct HrilCommonParcel : public HrilBaseParcel {
             data = 0;
         }
     }
-    HrilCommonParcel &operator=(const T &t)
+    HRilCommonParcel &operator=(const T &t)
     {
         data = t;
         return *this;
@@ -177,9 +192,9 @@ struct HrilCommonParcel : public HrilBaseParcel {
     {
         return Write(parcel, data);
     }
-    std::shared_ptr<HrilCommonParcel<T>> UnMarshalling(Parcel &parcel)
+    std::shared_ptr<HRilCommonParcel<T>> UnMarshalling(Parcel &parcel)
     {
-        return std::make_shared<HrilCommonParcel<T>>();
+        return std::make_shared<HRilCommonParcel<T>>();
     }
     void Dump(std::string, int32_t) {}
     virtual const char *ToString() const override
@@ -190,11 +205,12 @@ struct HrilCommonParcel : public HrilBaseParcel {
     }
 };
 
-using HrilUint8Parcel = struct HrilCommonParcel<uint8_t>;
-using HrilInt32Parcel = struct HrilCommonParcel<int32_t>;
-using HrilInt64Parcel = struct HrilCommonParcel<int64_t>;
-using HrilBoolParcel = struct HrilCommonParcel<bool>;
-using HrilStringParcel = struct HrilCommonParcel<std::string>;
+// Basic type serialization type extension.
+using HRilUint8Parcel = struct HRilCommonParcel<uint8_t>;
+using HRilInt32Parcel = struct HRilCommonParcel<int32_t>;
+using HRilInt64Parcel = struct HRilCommonParcel<int64_t>;
+using HRilBoolParcel = struct HRilCommonParcel<bool>;
+using HRilStringParcel = struct HRilCommonParcel<std::string>;
 } // namespace Telephony
 } // namespace OHOS
 #endif // OHOS_RIL_BASE_PARCEL_H
