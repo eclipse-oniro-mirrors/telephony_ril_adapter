@@ -58,7 +58,7 @@ void HRilCall::AddCallNotificationToMap()
     notiMemberFuncMap_[HNOTI_CALL_END_REPORT] = &HRilCall::CallEndNotice;
     notiMemberFuncMap_[HNOTI_CALL_STATUS_INFO_REPORT] = &HRilCall::CallStatusInfoNotice;
     notiMemberFuncMap_[HNOTI_CALL_IMS_SERVICE_STATUS_REPORT] = &HRilCall::CallImsServiceStatusNotice;
-    notiMemberFuncMap_[HNOTI_CALL_USSD_REPORT] = &HRilCall::CallUssdCusdNotice;
+    notiMemberFuncMap_[HNOTI_CALL_USSD_REPORT] = &HRilCall::CallUssdNotice;
     notiMemberFuncMap_[HNOTI_CALL_SRVCC_STATUS_REPORT] = &HRilCall::CallSrvccStatusNotice;
     notiMemberFuncMap_[HNOTI_CALL_RINGBACK_VOICE_REPORT] = &HRilCall::CallRingbackVoiceNotice;
     notiMemberFuncMap_[HNOTI_CALL_EMERGENCY_NUMBER_REPORT] = &HRilCall::CallEmergencyNotice;
@@ -96,8 +96,8 @@ void HRilCall::AddCallResponseToMap()
     respMemberFuncMap_[HREQ_CALL_SET_CALL_PREFERENCE] = &HRilCall::SetCallPreferenceModeResponse;
     respMemberFuncMap_[HREQ_CALL_GET_LTEIMSSWITCH_STATUS] = &HRilCall::GetLteImsSwitchStatusResponse;
     respMemberFuncMap_[HREQ_CALL_SET_LTEIMSSWITCH_STATUS] = &HRilCall::SetLteImsSwitchStatusResponse;
-    respMemberFuncMap_[HREQ_CALL_SET_USSD] = &HRilCall::SetUssdCusdResponse;
-    respMemberFuncMap_[HREQ_CALL_GET_USSD] = &HRilCall::GetUssdCusdResponse;
+    respMemberFuncMap_[HREQ_CALL_SET_USSD] = &HRilCall::SetUssdResponse;
+    respMemberFuncMap_[HREQ_CALL_GET_USSD] = &HRilCall::GetUssdResponse;
     respMemberFuncMap_[HREQ_CALL_SET_MUTE] = &HRilCall::SetMuteResponse;
     respMemberFuncMap_[HREQ_CALL_GET_MUTE] = &HRilCall::GetMuteResponse;
     respMemberFuncMap_[HREQ_CALL_GET_EMERGENCY_LIST] = &HRilCall::GetEmergencyCallListResponse;
@@ -136,8 +136,8 @@ void HRilCall::AddCallRequestToMap()
     reqMemberFuncMap_[HREQ_CALL_SET_CALL_PREFERENCE] = &HRilCall::SetCallPreferenceMode;
     reqMemberFuncMap_[HREQ_CALL_GET_LTEIMSSWITCH_STATUS] = &HRilCall::GetLteImsSwitchStatus;
     reqMemberFuncMap_[HREQ_CALL_SET_LTEIMSSWITCH_STATUS] = &HRilCall::SetLteImsSwitchStatus;
-    reqMemberFuncMap_[HREQ_CALL_SET_USSD] = &HRilCall::SetUssdCusd;
-    reqMemberFuncMap_[HREQ_CALL_GET_USSD] = &HRilCall::GetUssdCusd;
+    reqMemberFuncMap_[HREQ_CALL_SET_USSD] = &HRilCall::SetUssd;
+    reqMemberFuncMap_[HREQ_CALL_GET_USSD] = &HRilCall::GetUssd;
     reqMemberFuncMap_[HREQ_CALL_SET_MUTE] = &HRilCall::SetMute;
     reqMemberFuncMap_[HREQ_CALL_GET_MUTE] = &HRilCall::GetMute;
     reqMemberFuncMap_[HREQ_CALL_GET_EMERGENCY_LIST] = &HRilCall::GetEmergencyCallList;
@@ -146,12 +146,8 @@ void HRilCall::AddCallRequestToMap()
 
 int32_t HRilCall::Dial(struct HdfSBuf *data)
 {
-    if (callFuncs_ == nullptr) {
-        TELEPHONY_LOGE("RilAdapter HRilCall::Dial  callFuncs_ is nullptr!");
-        return HRIL_ERR_NULL_POINT;
-    }
-    if (data == nullptr) {
-        TELEPHONY_LOGE("RilAdapter Dial data is null!");
+    if (callFuncs_ == nullptr || callFuncs_->Dial == nullptr || data == nullptr) {
+        TELEPHONY_LOGE("callFuncs_:%{public}p or callFuncs_->Dial or data:%{public}p is nullptr!", callFuncs_, data);
         return HRIL_ERR_NULL_POINT;
     }
     DialInfo dialInfo = DialInfo();
@@ -178,8 +174,9 @@ int32_t HRilCall::Dial(struct HdfSBuf *data)
 
 int32_t HRilCall::GetCallList(struct HdfSBuf *data)
 {
-    if (callFuncs_ == nullptr) {
-        TELEPHONY_LOGE("RilAdapter HRilCall::GetCallList  callFuncs_ is nullptr!");
+    if (callFuncs_ == nullptr || callFuncs_->GetCallList == nullptr || data == nullptr) {
+        TELEPHONY_LOGE(
+            "callFuncs_:%{public}p or callFuncs_->GetCallList or data:%{public}p is nullptr!", callFuncs_, data);
         return HRIL_ERR_NULL_POINT;
     }
     int32_t serial = 0;
@@ -198,8 +195,8 @@ int32_t HRilCall::GetCallList(struct HdfSBuf *data)
 
 int32_t HRilCall::Hangup(struct HdfSBuf *data)
 {
-    if (callFuncs_ == nullptr) {
-        TELEPHONY_LOGE("RilAdapter HRilCall::Hangup  callFuncs_ is nullptr!");
+    if (callFuncs_ == nullptr || callFuncs_->Hangup == nullptr || data == nullptr) {
+        TELEPHONY_LOGE("callFuncs_:%{public}p or callFuncs_->Hangup or data:%{public}p is nullptr!", callFuncs_, data);
         return HRIL_ERR_NULL_POINT;
     }
     uint32_t serial = 0;
@@ -223,8 +220,8 @@ int32_t HRilCall::Hangup(struct HdfSBuf *data)
 
 int32_t HRilCall::Reject(struct HdfSBuf *data)
 {
-    if (callFuncs_ == nullptr) {
-        TELEPHONY_LOGE("RilAdapter HRilCall::Reject  callFuncs_ is nullptr!");
+    if (callFuncs_ == nullptr || callFuncs_->Reject == nullptr || data == nullptr) {
+        TELEPHONY_LOGE("callFuncs_:%{public}p or callFuncs_->Reject or data:%{public}p is nullptr!", callFuncs_, data);
         return HRIL_ERR_NULL_POINT;
     }
     int32_t serial = 0;
@@ -243,8 +240,9 @@ int32_t HRilCall::Reject(struct HdfSBuf *data)
 
 int32_t HRilCall::GetClip(struct HdfSBuf *data)
 {
-    if (callFuncs_ == nullptr) {
-        TELEPHONY_LOGE("RilAdapter HRilCall::GetClip  callFuncs_ is nullptr!");
+    if (callFuncs_ == nullptr || callFuncs_->GetClip == nullptr || data == nullptr) {
+        TELEPHONY_LOGE(
+            "callFuncs_:%{public}p or callFuncs_->GetClip or data:%{public}p is nullptr!", callFuncs_, data);
         return HRIL_ERR_NULL_POINT;
     }
     int32_t serial = 0;
@@ -263,8 +261,9 @@ int32_t HRilCall::GetClip(struct HdfSBuf *data)
 
 int32_t HRilCall::SetClip(struct HdfSBuf *data)
 {
-    if (callFuncs_ == nullptr) {
-        TELEPHONY_LOGE("RilAdapter HRilCall::SetClip  callFuncs_ is nullptr!");
+    if (callFuncs_ == nullptr || callFuncs_->SetClip == nullptr || data == nullptr) {
+        TELEPHONY_LOGE(
+            "callFuncs_:%{public}p or callFuncs_->SetClip or data:%{public}p is nullptr!", callFuncs_, data);
         return HRIL_ERR_NULL_POINT;
     }
     int32_t action = 0;
@@ -288,8 +287,9 @@ int32_t HRilCall::SetClip(struct HdfSBuf *data)
 
 int32_t HRilCall::GetClir(struct HdfSBuf *data)
 {
-    if (callFuncs_ == nullptr) {
-        TELEPHONY_LOGE("RilAdapter HRilCall::GetClir  callFuncs_ is nullptr!");
+    if (callFuncs_ == nullptr || callFuncs_->GetClir == nullptr || data == nullptr) {
+        TELEPHONY_LOGE(
+            "callFuncs_:%{public}p or callFuncs_->GetClir or data:%{public}p is nullptr!", callFuncs_, data);
         return HRIL_ERR_NULL_POINT;
     }
     int32_t serial = 0;
@@ -308,8 +308,9 @@ int32_t HRilCall::GetClir(struct HdfSBuf *data)
 
 int32_t HRilCall::SetClir(struct HdfSBuf *data)
 {
-    if (callFuncs_ == nullptr) {
-        TELEPHONY_LOGE("RilAdapter HRilCall::SetClir  callFuncs_ is nullptr!");
+    if (callFuncs_ == nullptr || callFuncs_->SetClir == nullptr || data == nullptr) {
+        TELEPHONY_LOGE(
+            "callFuncs_:%{public}p or callFuncs_->SetClir or data:%{public}p is nullptr!", callFuncs_, data);
         return HRIL_ERR_NULL_POINT;
     }
     int32_t action = 0;
@@ -333,8 +334,9 @@ int32_t HRilCall::SetClir(struct HdfSBuf *data)
 
 int32_t HRilCall::GetCallRestriction(struct HdfSBuf *data)
 {
-    if (callFuncs_ == nullptr) {
-        TELEPHONY_LOGE("RilAdapter HRilCall::GetCallRestriction  callFuncs_ is nullptr!");
+    if (callFuncs_ == nullptr || callFuncs_->GetCallRestriction == nullptr || data == nullptr) {
+        TELEPHONY_LOGE("callFuncs_:%{public}p or callFuncs_->GetCallRestriction or data:%{public}p is nullptr!",
+            callFuncs_, data);
         return HRIL_ERR_NULL_POINT;
     }
     int32_t serial = 0;
@@ -344,16 +346,7 @@ int32_t HRilCall::GetCallRestriction(struct HdfSBuf *data)
     }
 
     const char *fac = nullptr;
-    MessageParcel *parcel = nullptr;
-    if (SbufToParcel(data, &parcel)) {
-        TELEPHONY_LOGE("GetCallRestriction failed to do SbufToParcel");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    if (parcel == nullptr) {
-        TELEPHONY_LOGE("HRilCall::GetCallRestriction parcel is nullptr");
-        return HRIL_ERR_NULL_POINT;
-    }
-    fac = parcel->ReadCString();
+    fac = HdfSbufReadString(data);
     ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_CALL_GET_CALL_RESTRICTION);
     if (requestInfo == nullptr) {
         TELEPHONY_LOGE("RilAdapter failed to do Create GetCallRestriction HRilRequest!");
@@ -365,8 +358,9 @@ int32_t HRilCall::GetCallRestriction(struct HdfSBuf *data)
 
 int32_t HRilCall::SetCallRestriction(struct HdfSBuf *data)
 {
-    if (callFuncs_ == nullptr) {
-        TELEPHONY_LOGE("RilAdapter HRilCall::SetCallRestriction  callFuncs_ is nullptr!");
+    if (callFuncs_ == nullptr || callFuncs_->SetCallRestriction == nullptr || data == nullptr) {
+        TELEPHONY_LOGE("callFuncs_:%{public}p or callFuncs_->SetCallRestriction or data:%{public}p is nullptr!",
+            callFuncs_, data);
         return HRIL_ERR_NULL_POINT;
     }
     int32_t serial = 0;
@@ -381,17 +375,8 @@ int32_t HRilCall::SetCallRestriction(struct HdfSBuf *data)
     }
     const char *fac = nullptr;
     const char *code = nullptr;
-    MessageParcel *parcel = nullptr;
-    if (SbufToParcel(data, &parcel)) {
-        TELEPHONY_LOGE("SetCallRestriction failed to do SbufToParcel");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    if (parcel == nullptr) {
-        TELEPHONY_LOGE("HRilCall::SetCallRestriction parcel is null!");
-        return HRIL_ERR_NULL_POINT;
-    }
-    fac = parcel->ReadCString();
-    code = parcel->ReadCString();
+    fac = HdfSbufReadString(data);
+    code = HdfSbufReadString(data);
     CallRestrictionInfo info = {.fac = fac, .mode = mode, .password = code};
     ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_CALL_SET_CALL_RESTRICTION);
     if (requestInfo == nullptr) {
@@ -404,8 +389,9 @@ int32_t HRilCall::SetCallRestriction(struct HdfSBuf *data)
 
 int32_t HRilCall::StartDtmf(struct HdfSBuf *data)
 {
-    if (callFuncs_ == nullptr) {
-        TELEPHONY_LOGE("RilAdapter HRilCall::StartDtmf  callFuncs_ is nullptr!");
+    if (callFuncs_ == nullptr || callFuncs_->StartDtmf == nullptr || data == nullptr) {
+        TELEPHONY_LOGE(
+            "callFuncs_:%{public}p or callFuncs_->StartDtmf or data:%{public}p is nullptr!", callFuncs_, data);
         return HRIL_ERR_NULL_POINT;
     }
     int32_t serial = 0;
@@ -418,18 +404,9 @@ int32_t HRilCall::StartDtmf(struct HdfSBuf *data)
         TELEPHONY_LOGE("StartDtmf miss index parameter");
         return HRIL_ERR_INVALID_PARAMETER;
     }
-    MessageParcel *parcel = nullptr;
-    if (SbufToParcel(data, &parcel)) {
-        TELEPHONY_LOGE("RilAdapter failed to do SbufToParcel");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    if (parcel == nullptr) {
-        TELEPHONY_LOGE("HRilCall::StartDtmf parcel is null!");
-        return HRIL_ERR_NULL_POINT;
-    }
     CallDtmfInfo info = {0};
     info.callId = index;
-    info.dtmfKey = parcel->ReadCString();
+    info.dtmfKey = HdfSbufReadString(data);
     if (info.dtmfKey == nullptr) {
         TELEPHONY_LOGE("StartDtmf miss dtmfKey parameter");
         return HRIL_ERR_NULL_POINT;
@@ -445,6 +422,10 @@ int32_t HRilCall::StartDtmf(struct HdfSBuf *data)
 
 int32_t HRilCall::SendDtmf(struct HdfSBuf *data)
 {
+    if (data == nullptr) {
+        TELEPHONY_LOGE("data is nullptr!");
+        return HRIL_ERR_NULL_POINT;
+    }
     int32_t serial = 0;
     int32_t index = 1;
     int32_t onLength = 1;
@@ -466,15 +447,6 @@ int32_t HRilCall::SendDtmf(struct HdfSBuf *data)
         TELEPHONY_LOGE("SendDtmf miss offLength parameter");
         return HRIL_ERR_INVALID_PARAMETER;
     }
-    MessageParcel *parcel = nullptr;
-    if (SbufToParcel(data, &parcel)) {
-        TELEPHONY_LOGE("HRilCall::SendDtmf  failed to do SbufToParcel");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    if (parcel == nullptr) {
-        TELEPHONY_LOGE("HRilCall::SendDtmf parcel is null!");
-        return HRIL_ERR_NULL_POINT;
-    }
     if (!HdfSbufReadInt32(data, &stringLength)) {
         TELEPHONY_LOGE("SendDtmf miss stringLength parameter");
         return HRIL_ERR_INVALID_PARAMETER;
@@ -484,7 +456,7 @@ int32_t HRilCall::SendDtmf(struct HdfSBuf *data)
     info.onLength = onLength;
     info.offLength = offLength;
     info.stringLength = stringLength;
-    info.dtmfKey = parcel->ReadCString();
+    info.dtmfKey = HdfSbufReadString(data);
     if (info.dtmfKey == nullptr) {
         TELEPHONY_LOGE("SendDtmf miss dtmfKey parameter");
         return HRIL_ERR_NULL_POINT;
@@ -494,8 +466,8 @@ int32_t HRilCall::SendDtmf(struct HdfSBuf *data)
 
 int32_t HRilCall::ProcessSendDtmf(int32_t serial, CallDtmfInfo &info)
 {
-    if (callFuncs_ == nullptr) {
-        TELEPHONY_LOGE("RilAdapter HRilCall::SendDtmf  callFuncs_ is nullptr!");
+    if (callFuncs_ == nullptr || callFuncs_->SendDtmf == nullptr) {
+        TELEPHONY_LOGE("callFuncs_:%{public}p or callFuncs_->SendDtmf is nullptr!", callFuncs_);
         return HRIL_ERR_NULL_POINT;
     }
     ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_CALL_SEND_DTMF);
@@ -509,8 +481,9 @@ int32_t HRilCall::ProcessSendDtmf(int32_t serial, CallDtmfInfo &info)
 
 int32_t HRilCall::StopDtmf(struct HdfSBuf *data)
 {
-    if (callFuncs_ == nullptr) {
-        TELEPHONY_LOGE("RilAdapter HRilCall::StopDtmf  callFuncs_ is nullptr!");
+    if (callFuncs_ == nullptr || callFuncs_->StopDtmf == nullptr || data == nullptr) {
+        TELEPHONY_LOGE(
+            "callFuncs_:%{public}p or callFuncs_->StopDtmf or data:%{public}p is nullptr!", callFuncs_, data);
         return HRIL_ERR_NULL_POINT;
     }
     int32_t serial = 0;
@@ -523,18 +496,9 @@ int32_t HRilCall::StopDtmf(struct HdfSBuf *data)
         TELEPHONY_LOGE("StopDtmf miss index parameter");
         return HRIL_ERR_INVALID_PARAMETER;
     }
-    MessageParcel *parcel = nullptr;
-    if (SbufToParcel(data, &parcel)) {
-        TELEPHONY_LOGE("RilAdapter failed to do SbufToParcel");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    if (parcel == nullptr) {
-        TELEPHONY_LOGE("HRilCall::StopDtmf parcel is null!");
-        return HRIL_ERR_NULL_POINT;
-    }
     CallDtmfInfo info = {0};
     info.callId = index;
-    info.dtmfKey = parcel->ReadCString();
+    info.dtmfKey = HdfSbufReadString(data);
     if (info.dtmfKey == nullptr) {
         TELEPHONY_LOGE("StopDtmf miss dtmfKey parameter");
         return HRIL_ERR_NULL_POINT;
@@ -550,8 +514,8 @@ int32_t HRilCall::StopDtmf(struct HdfSBuf *data)
 
 int32_t HRilCall::Answer(struct HdfSBuf *data)
 {
-    if (callFuncs_ == nullptr) {
-        TELEPHONY_LOGE("RilAdapter HRilCall::Answer  callFuncs_ is nullptr!");
+    if (callFuncs_ == nullptr || callFuncs_->Answer == nullptr || data == nullptr) {
+        TELEPHONY_LOGE("callFuncs_:%{public}p or callFuncs_->Answer or data:%{public}p is nullptr!", callFuncs_, data);
         return HRIL_ERR_NULL_POINT;
     }
     int32_t serial = 0;
@@ -570,8 +534,9 @@ int32_t HRilCall::Answer(struct HdfSBuf *data)
 
 int32_t HRilCall::HoldCall(struct HdfSBuf *data)
 {
-    if (callFuncs_ == nullptr) {
-        TELEPHONY_LOGE("HRilCall::HoldCall callFuncs_ is nullptr!");
+    if (callFuncs_ == nullptr || callFuncs_->HoldCall == nullptr || data == nullptr) {
+        TELEPHONY_LOGE(
+            "callFuncs_:%{public}p or callFuncs_->HoldCall or data:%{public}p is nullptr!", callFuncs_, data);
         return HRIL_ERR_NULL_POINT;
     }
     int32_t serial = 0;
@@ -590,8 +555,9 @@ int32_t HRilCall::HoldCall(struct HdfSBuf *data)
 
 int32_t HRilCall::UnHoldCall(struct HdfSBuf *data)
 {
-    if (callFuncs_ == nullptr) {
-        TELEPHONY_LOGE("HRilCall::UnHoldCall callFuncs_ is nullptr!");
+    if (callFuncs_ == nullptr || callFuncs_->UnHoldCall == nullptr || data == nullptr) {
+        TELEPHONY_LOGE(
+            "callFuncs_:%{public}p or callFuncs_->UnHoldCall or data:%{public}p is nullptr!", callFuncs_, data);
         return HRIL_ERR_NULL_POINT;
     }
     int32_t serial = 0;
@@ -610,8 +576,9 @@ int32_t HRilCall::UnHoldCall(struct HdfSBuf *data)
 
 int32_t HRilCall::SwitchCall(struct HdfSBuf *data)
 {
-    if (callFuncs_ == nullptr) {
-        TELEPHONY_LOGE("RilAdapter HRilCall::SwitchCall  callFuncs_ is nullptr!");
+    if (callFuncs_ == nullptr || callFuncs_->SwitchCall == nullptr || data == nullptr) {
+        TELEPHONY_LOGE(
+            "callFuncs_:%{public}p or callFuncs_->SwitchCall or data:%{public}p is nullptr!", callFuncs_, data);
         return HRIL_ERR_NULL_POINT;
     }
     int32_t serial = 0;
@@ -630,8 +597,9 @@ int32_t HRilCall::SwitchCall(struct HdfSBuf *data)
 
 int32_t HRilCall::CombineConference(struct HdfSBuf *data)
 {
-    if (callFuncs_ == nullptr) {
-        TELEPHONY_LOGE("RilAdapter HRilCall::CombineConference  callFuncs_ is nullptr!");
+    if (callFuncs_ == nullptr || callFuncs_->CombineConference == nullptr || data == nullptr) {
+        TELEPHONY_LOGE("callFuncs_:%{public}p or callFuncs_->CombineConference or data:%{public}p is nullptr!",
+            callFuncs_, data);
         return HRIL_ERR_NULL_POINT;
     }
     uint32_t serial = 0;
@@ -655,8 +623,9 @@ int32_t HRilCall::CombineConference(struct HdfSBuf *data)
 
 int32_t HRilCall::SeparateConference(struct HdfSBuf *data)
 {
-    if (callFuncs_ == nullptr) {
-        TELEPHONY_LOGE("RilAdapter HRilCall::SeparateConference  callFuncs_ is nullptr!");
+    if (callFuncs_ == nullptr || callFuncs_->SeparateConference == nullptr || data == nullptr) {
+        TELEPHONY_LOGE("callFuncs_:%{public}p or callFuncs_->SeparateConference or data:%{public}p is nullptr!",
+            callFuncs_, data);
         return HRIL_ERR_NULL_POINT;
     }
     int32_t serial = 0;
@@ -685,8 +654,9 @@ int32_t HRilCall::SeparateConference(struct HdfSBuf *data)
 
 int32_t HRilCall::CallSupplement(struct HdfSBuf *data)
 {
-    if (callFuncs_ == nullptr) {
-        TELEPHONY_LOGE("RilAdapter HRilCall::CallSupplement  callFuncs_ is nullptr!");
+    if (callFuncs_ == nullptr || callFuncs_->CallSupplement == nullptr || data == nullptr) {
+        TELEPHONY_LOGE(
+            "callFuncs_:%{public}p or callFuncs_->CallSupplement or data:%{public}p is nullptr!", callFuncs_, data);
         return HRIL_ERR_NULL_POINT;
     }
     int32_t serial = 0;
@@ -710,8 +680,9 @@ int32_t HRilCall::CallSupplement(struct HdfSBuf *data)
 
 int32_t HRilCall::GetCallWaiting(struct HdfSBuf *data)
 {
-    if (callFuncs_ == nullptr) {
-        TELEPHONY_LOGE("HRilCall::GetCallWaiting callFuncs_ is nullptr!");
+    if (callFuncs_ == nullptr || callFuncs_->GetCallWaiting == nullptr || data == nullptr) {
+        TELEPHONY_LOGE(
+            "callFuncs_:%{public}p or callFuncs_->GetCallWaiting or data:%{public}p is nullptr!", callFuncs_, data);
         return HRIL_ERR_NULL_POINT;
     }
     int32_t serial = 0;
@@ -730,8 +701,9 @@ int32_t HRilCall::GetCallWaiting(struct HdfSBuf *data)
 
 int32_t HRilCall::SetCallWaiting(struct HdfSBuf *data)
 {
-    if (callFuncs_ == nullptr) {
-        TELEPHONY_LOGE("HRilCall::SetCallWaiting callFuncs_ is nullptr!");
+    if (callFuncs_ == nullptr || callFuncs_->SetCallWaiting == nullptr || data == nullptr) {
+        TELEPHONY_LOGE(
+            "callFuncs_:%{public}p or callFuncs_->SetCallWaiting or data:%{public}p is nullptr!", callFuncs_, data);
         return HRIL_ERR_NULL_POINT;
     }
     int32_t serial = 0;
@@ -755,8 +727,9 @@ int32_t HRilCall::SetCallWaiting(struct HdfSBuf *data)
 
 int32_t HRilCall::GetCallTransferInfo(struct HdfSBuf *data)
 {
-    if (callFuncs_ == nullptr) {
-        TELEPHONY_LOGE("HRilCall::GetCallTransferInfo callFuncs_ is nullptr!");
+    if (callFuncs_ == nullptr || callFuncs_->GetCallTransferInfo == nullptr || data == nullptr) {
+        TELEPHONY_LOGE("callFuncs_:%{public}p or callFuncs_->GetCallTransferInfo or data:%{public}p is nullptr!",
+            callFuncs_, data);
         return HRIL_ERR_NULL_POINT;
     }
     int32_t serial = 0;
@@ -780,8 +753,9 @@ int32_t HRilCall::GetCallTransferInfo(struct HdfSBuf *data)
 
 int32_t HRilCall::SetCallTransferInfo(struct HdfSBuf *data)
 {
-    if (callFuncs_ == nullptr) {
-        TELEPHONY_LOGE("HRilCall::SetCallTransferInfo callFuncs_ is nullptr!");
+    if (callFuncs_ == nullptr || callFuncs_->SetCallTransferInfo == nullptr || data == nullptr) {
+        TELEPHONY_LOGE("callFuncs_:%{public}p or callFuncs_->SetCallTransferInfo or data:%{public}p is nullptr!",
+            callFuncs_, data);
         return HRIL_ERR_NULL_POINT;
     }
     CallForwardSetInfo callForwardSetInfo = CallForwardSetInfo();
@@ -814,8 +788,9 @@ int32_t HRilCall::SetCallTransferInfo(struct HdfSBuf *data)
 
 int32_t HRilCall::GetImsCallList(struct HdfSBuf *data)
 {
-    if (callFuncs_ == nullptr) {
-        TELEPHONY_LOGE("RilAdapter HRilCall::GetImsCallList  callFuncs_ is nullptr!");
+    if (callFuncs_ == nullptr || callFuncs_->GetImsCallList == nullptr || data == nullptr) {
+        TELEPHONY_LOGE(
+            "callFuncs_:%{public}p or callFuncs_->GetImsCallList or data:%{public}p is nullptr!", callFuncs_, data);
         return HRIL_ERR_NULL_POINT;
     }
     int32_t serial = 0;
@@ -834,8 +809,9 @@ int32_t HRilCall::GetImsCallList(struct HdfSBuf *data)
 
 int32_t HRilCall::GetCallPreferenceMode(struct HdfSBuf *data)
 {
-    if (callFuncs_ == nullptr) {
-        TELEPHONY_LOGE("HRilCall::GetCallPreferenceMode  callFuncs_ is nullptr!");
+    if (callFuncs_ == nullptr || callFuncs_->GetCallPreferenceMode == nullptr || data == nullptr) {
+        TELEPHONY_LOGE("callFuncs_:%{public}p or callFuncs_->GetCallPreferenceMode or data:%{public}p is nullptr!",
+            callFuncs_, data);
         return HRIL_ERR_NULL_POINT;
     }
     int32_t serial = 0;
@@ -854,8 +830,9 @@ int32_t HRilCall::GetCallPreferenceMode(struct HdfSBuf *data)
 
 int32_t HRilCall::SetCallPreferenceMode(struct HdfSBuf *data)
 {
-    if (callFuncs_ == nullptr) {
-        TELEPHONY_LOGE("HRilCall::SetCallPreferenceMode  callFuncs_ is nullptr!");
+    if (callFuncs_ == nullptr || callFuncs_->SetCallPreferenceMode == nullptr || data == nullptr) {
+        TELEPHONY_LOGE("callFuncs_:%{public}p or callFuncs_->SetCallPreferenceMode or data:%{public}p is nullptr!",
+            callFuncs_, data);
         return HRIL_ERR_NULL_POINT;
     }
     int32_t mode = HRIL_CALL_MODE_CS_1ST_PS_2ND;
@@ -879,8 +856,9 @@ int32_t HRilCall::SetCallPreferenceMode(struct HdfSBuf *data)
 
 int32_t HRilCall::GetLteImsSwitchStatus(struct HdfSBuf *data)
 {
-    if (callFuncs_ == nullptr) {
-        TELEPHONY_LOGE("HRilCall::GetLteImsSwitchStatus  callFuncs_ is nullptr!");
+    if (callFuncs_ == nullptr || callFuncs_->GetLteImsSwitchStatus == nullptr || data == nullptr) {
+        TELEPHONY_LOGE("callFuncs_:%{public}p or callFuncs_->GetLteImsSwitchStatus or data:%{public}p is nullptr!",
+            callFuncs_, data);
         return HRIL_ERR_NULL_POINT;
     }
     int32_t serial = 0;
@@ -899,8 +877,9 @@ int32_t HRilCall::GetLteImsSwitchStatus(struct HdfSBuf *data)
 
 int32_t HRilCall::SetLteImsSwitchStatus(struct HdfSBuf *data)
 {
-    if (callFuncs_ == nullptr) {
-        TELEPHONY_LOGE("HRilCall::SetLteImsSwitchStatus  callFuncs_ is nullptr!");
+    if (callFuncs_ == nullptr || callFuncs_->SetLteImsSwitchStatus == nullptr || data == nullptr) {
+        TELEPHONY_LOGE("callFuncs_:%{public}p or callFuncs_->SetLteImsSwitchStatus or data:%{public}p is nullptr!",
+            callFuncs_, data);
         return HRIL_ERR_NULL_POINT;
     }
     int32_t active = 0;
@@ -929,7 +908,7 @@ void HRilCall::BuildCallList(
     CallInfo callInfo;
     callInfoList.callSize = num;
     for (int32_t i = 0; i < num; i++) {
-        HRilCallInfo *curPtr = ((HRilCallInfo **)response)[i];
+        HRilCallInfo *curPtr = ((HRilCallInfo *)response + i);
         if (curPtr != nullptr) {
             callInfo.index = curPtr->index;
             callInfo.dir = curPtr->dir;
@@ -1230,10 +1209,11 @@ int32_t HRilCall::CallStateUpdated(int32_t notifyType, const HRilErrNumber e, co
     return HRIL_ERR_SUCCESS;
 }
 
-int32_t HRilCall::SetUssdCusd(struct HdfSBuf *data)
+int32_t HRilCall::SetUssd(struct HdfSBuf *data)
 {
-    if (callFuncs_ == nullptr) {
-        TELEPHONY_LOGE("SetUssdCusd callFuncs_ is nullptr!");
+    if (callFuncs_ == nullptr || callFuncs_->SetUssd == nullptr || data == nullptr) {
+        TELEPHONY_LOGE(
+            "callFuncs_:%{public}p or callFuncs_->SetUssd or data:%{public}p is nullptr!", callFuncs_, data);
         return HRIL_ERR_NULL_POINT;
     }
     const char *str = NULL;
@@ -1252,14 +1232,15 @@ int32_t HRilCall::SetUssdCusd(struct HdfSBuf *data)
         TELEPHONY_LOGE("RilAdapter failed to do Create HRilRequest!");
         return HRIL_ERR_NULL_POINT;
     }
-    callFuncs_->SetUssdCusd(requestInfo, str);
+    callFuncs_->SetUssd(requestInfo, str);
     return HRIL_ERR_SUCCESS;
 }
 
-int32_t HRilCall::GetUssdCusd(struct HdfSBuf *data)
+int32_t HRilCall::GetUssd(struct HdfSBuf *data)
 {
-    if (callFuncs_ == nullptr) {
-        TELEPHONY_LOGE("GetUssdCusd callFuncs_ is nullptr!");
+    if (callFuncs_ == nullptr || callFuncs_->GetUssd == nullptr || data == nullptr) {
+        TELEPHONY_LOGE(
+            "callFuncs_:%{public}p or callFuncs_->GetUssd or data:%{public}p is nullptr!", callFuncs_, data);
         return HRIL_ERR_NULL_POINT;
     }
     int32_t serial = 0;
@@ -1272,11 +1253,11 @@ int32_t HRilCall::GetUssdCusd(struct HdfSBuf *data)
         TELEPHONY_LOGE("RilAdapter failed to do Create HRilRequest!");
         return HRIL_ERR_NULL_POINT;
     }
-    callFuncs_->GetUssdCusd(requestInfo);
+    callFuncs_->GetUssd(requestInfo);
     return HRIL_ERR_SUCCESS;
 }
 
-int32_t HRilCall::SetUssdCusdResponse(
+int32_t HRilCall::SetUssdResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));
@@ -1284,8 +1265,9 @@ int32_t HRilCall::SetUssdCusdResponse(
 
 int32_t HRilCall::GetMute(struct HdfSBuf *data)
 {
-    if (callFuncs_ == nullptr) {
-        TELEPHONY_LOGE("GetMute callFuncs_ is nullptr!");
+    if (callFuncs_ == nullptr || callFuncs_->GetMute == nullptr || data == nullptr) {
+        TELEPHONY_LOGE(
+            "callFuncs_:%{public}p or callFuncs_->GetMute or data:%{public}p is nullptr!", callFuncs_, data);
         return HRIL_ERR_NULL_POINT;
     }
     int32_t serial = 0;
@@ -1318,8 +1300,9 @@ int32_t HRilCall::GetMuteResponse(
 
 int32_t HRilCall::SetMute(struct HdfSBuf *data)
 {
-    if (callFuncs_ == nullptr) {
-        TELEPHONY_LOGE("SetMute callFuncs_ is nullptr!");
+    if (callFuncs_ == nullptr || callFuncs_->SetMute == nullptr || data == nullptr) {
+        TELEPHONY_LOGE(
+            "callFuncs_:%{public}p or callFuncs_->SetMute or data:%{public}p is nullptr!", callFuncs_, data);
         return HRIL_ERR_NULL_POINT;
     }
     int32_t mute = 0;
@@ -1347,7 +1330,7 @@ int32_t HRilCall::SetMuteResponse(
     return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));
 }
 
-int32_t HRilCall::GetUssdCusdResponse(
+int32_t HRilCall::GetUssdResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     if ((response == nullptr && responseLen != 0) || (responseLen % sizeof(int32_t)) != 0) {
@@ -1363,13 +1346,18 @@ int32_t HRilCall::GetUssdCusdResponse(
 
 int32_t HRilCall::GetCallFailReason(struct HdfSBuf *data)
 {
+    if (callFuncs_ == nullptr || callFuncs_->GetCallFailReason == nullptr || data == nullptr) {
+        TELEPHONY_LOGE("callFuncs_:%{public}p or callFuncs_->GetCallFailReason or data:%{public}p is nullptr!",
+            callFuncs_, data);
+        return HRIL_ERR_NULL_POINT;
+    }
     int32_t serial = 0;
     if (!HdfSbufReadInt32(data, &serial)) {
         TELEPHONY_LOGE("miss serial parameter");
         return HRIL_ERR_INVALID_PARAMETER;
     }
     ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_CALL_GET_FAIL_REASON);
-    if (requestInfo == nullptr || callFuncs_ == nullptr) {
+    if (requestInfo == nullptr) {
         TELEPHONY_LOGE("RilAdapter failed to do Create HRilRequest!");
         SafeFrees(requestInfo);
         return HRIL_ERR_NULL_POINT;
@@ -1394,13 +1382,18 @@ int32_t HRilCall::GetCallFailReasonResponse(
 
 int32_t HRilCall::GetEmergencyCallList(struct HdfSBuf *data)
 {
+    if (callFuncs_ == nullptr || callFuncs_->GetEmergencyCallList == nullptr || data == nullptr) {
+        TELEPHONY_LOGE("callFuncs_:%{public}p or callFuncs_->GetEmergencyCallList or data:%{public}p is nullptr!",
+            callFuncs_, data);
+        return HRIL_ERR_NULL_POINT;
+    }
     int32_t serial = 0;
     if (!HdfSbufReadInt32(data, &serial)) {
         TELEPHONY_LOGE("miss serial parameter");
         return HRIL_ERR_INVALID_PARAMETER;
     }
     ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_CALL_GET_EMERGENCY_LIST);
-    if (requestInfo == nullptr || callFuncs_ == nullptr) {
+    if (requestInfo == nullptr) {
         TELEPHONY_LOGE("RilAdapter failed to do Create HRilRequest!");
         SafeFrees(requestInfo);
         return HRIL_ERR_NULL_POINT;
@@ -1409,14 +1402,14 @@ int32_t HRilCall::GetEmergencyCallList(struct HdfSBuf *data)
     return HRIL_ERR_SUCCESS;
 }
 
-void HRilCall::BuildEmergencyCallList(EmergencyInfoList &EmergencyCallInfoList, HRilRadioResponseInfo &responseInfo,
+void HRilCall::BuildEmergencyCallList(EmergencyInfoList &emergencyCallInfoList, HRilRadioResponseInfo &responseInfo,
     const void *response, size_t responseLen)
 {
     int32_t num = responseLen / sizeof(HRilEmergencyInfo);
     EmergencyInfo callInfo;
-    EmergencyCallInfoList.callSize = num;
+    emergencyCallInfoList.callSize = num;
     for (int32_t i = 0; i < num; i++) {
-        HRilEmergencyInfo *curPtr = ((HRilEmergencyInfo **)response)[i];
+        HRilEmergencyInfo *curPtr = ((HRilEmergencyInfo *)response + i);
         if (curPtr != nullptr) {
             callInfo.index = curPtr->index;
             callInfo.total = curPtr->total;
@@ -1425,7 +1418,7 @@ void HRilCall::BuildEmergencyCallList(EmergencyInfoList &EmergencyCallInfoList, 
             callInfo.simpresent = curPtr->simpresent;
             callInfo.mcc = curPtr->mcc;
             callInfo.abnormalService = curPtr->abnormalService;
-            EmergencyCallInfoList.calls.push_back(callInfo);
+            emergencyCallInfoList.calls.push_back(callInfo);
         } else {
             TELEPHONY_LOGE("BuildEmergencyCallList: Invalid curPtr");
             break;
@@ -1436,7 +1429,7 @@ void HRilCall::BuildEmergencyCallList(EmergencyInfoList &EmergencyCallInfoList, 
 int32_t HRilCall::GetEmergencyCallListResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    if ((response == nullptr && responseLen != 0) || (responseLen % sizeof(int32_t)) != 0) {
+    if ((response == nullptr && responseLen != 0) || (responseLen % sizeof(HRilEmergencyInfo)) != 0) {
         TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
         return HRIL_ERR_INVALID_PARAMETER;
     }
@@ -1543,19 +1536,18 @@ int32_t HRilCall::CallImsServiceStatusNotice(
     return NotifyMessageParcel(imsServiceStatusInfo, HNOTI_CALL_IMS_SERVICE_STATUS_REPORT);
 }
 
-int32_t HRilCall::CallUssdCusdNotice(
-    int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen)
+int32_t HRilCall::CallUssdNotice(int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen)
 {
-    if ((response == nullptr) || (responseLen % sizeof(HRilUssdCusdNoticeInfo)) != 0) {
+    if ((response == nullptr) || (responseLen % sizeof(HRilUssdNoticeInfo)) != 0) {
         TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
         return HRIL_ERR_INVALID_PARAMETER;
     }
-    UssdCusdNoticeInfo ussdCusdNoticeInfo = {};
-    const HRilUssdCusdNoticeInfo *hUssdCusdNoticeInfo = reinterpret_cast<const HRilUssdCusdNoticeInfo *>(response);
-    ussdCusdNoticeInfo.m = hUssdCusdNoticeInfo->m;
-    ussdCusdNoticeInfo.str = hUssdCusdNoticeInfo->str == nullptr ? "" : hUssdCusdNoticeInfo->str;
-    ussdCusdNoticeInfo.dcs = hUssdCusdNoticeInfo->dcs;
-    return NotifyMessageParcel(ussdCusdNoticeInfo, HNOTI_CALL_USSD_REPORT);
+    UssdNoticeInfo ussdNoticeInfo = {};
+    const HRilUssdNoticeInfo *hUssdNoticeInfo = reinterpret_cast<const HRilUssdNoticeInfo *>(response);
+    ussdNoticeInfo.m = hUssdNoticeInfo->m;
+    ussdNoticeInfo.str = hUssdNoticeInfo->str == nullptr ? "" : hUssdNoticeInfo->str;
+    ussdNoticeInfo.dcs = hUssdNoticeInfo->dcs;
+    return NotifyMessageParcel(ussdNoticeInfo, HNOTI_CALL_USSD_REPORT);
 }
 
 int32_t HRilCall::CallSrvccStatusNotice(int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen)

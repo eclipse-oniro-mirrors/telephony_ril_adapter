@@ -39,11 +39,14 @@ public:
 
 class HRilBase {
 public:
+    // The "reply" event processing entry.
     template<typename T>
     int32_t ProcessResponse(
         int32_t code, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    // The "Active reporting" event processing entry.
     template<typename T>
     int32_t ProcessNotify(const struct ReportInfo *reportInfo, const void *response, size_t responseLen);
+    // The "request" event processing entry.
     template<typename T>
     int32_t ProcessRequest(int32_t code, struct HdfSBuf *data);
 
@@ -74,8 +77,16 @@ protected:
         SafeFrees(ms...);
     }
 
+    /**
+     * @brief Receive the reply event from vendorlib, encapsulate the C-style data structure into
+     *         a C++-style data structure, and pass the encapsulated data into the HDF service.
+     */
     template<typename T>
     int32_t Response(const HRilRadioResponseInfo &responseInfo, T &&data, int32_t requestNum);
+    /**
+     * @brief Receive active reporting events from vendorlib, encapsulate C-style data structures into
+     *  C++-style data structures, and transfer the encapsulated data into HDF services.
+     */
     template<typename SourceType, typename ToType>
     int32_t Notify(const SourceType *notifyData, size_t notifyDataLen, int32_t notifyId);
     template<typename T>
@@ -116,11 +127,13 @@ private:
     bool ReadFromHdfBuf(struct HdfSBuf *data, const char *&val);
     template<typename... ValueTypes>
     bool ReadFromHdf(struct HdfSBuf *data, ValueTypes &&...vals);
-    // Response
+    // Get the function pointer of the event handler.
     template<typename F>
     F GetFunc(std::map<uint32_t, std::any> &funcs, uint32_t code);
-    int ReportHeader(std::shared_ptr<struct HdfSBuf> &dataSbuf, MessageParcel &parcel);
-    int ResponseHeader(
+    // Write the report message header.
+    int32_t ReportHeader(std::shared_ptr<struct HdfSBuf> &dataSbuf, MessageParcel &parcel);
+    // Write reply message header
+    int32_t ResponseHeader(
         const HRilRadioResponseInfo &responseInfo, std::shared_ptr<struct HdfSBuf> &dataSbuf, MessageParcel &parcel);
 
 private:
@@ -188,7 +201,7 @@ template<typename T>
 int32_t HRilBase::ProcessNotify(const struct ReportInfo *reportInfo, const void *response, size_t responseLen)
 {
     using NotiFunc = int32_t (T::*)(int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
-    int code = reportInfo->notifyId;
+    int32_t code = reportInfo->notifyId;
     HRilErrNumber e = (HRilErrNumber)reportInfo->error;
     auto func = GetFunc<NotiFunc>(notiMemberFuncMap_, code);
     if (func != nullptr) {

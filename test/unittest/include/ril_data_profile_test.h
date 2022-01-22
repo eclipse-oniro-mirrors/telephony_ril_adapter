@@ -20,7 +20,7 @@ namespace OHOS {
 namespace Telephony {
 class RilDataProfileTest {
 public:
-    RilDataProfileTest(int profileId, std::string apn, std::string protocol, int verType, std::string userName,
+    RilDataProfileTest(int32_t profileId, std::string apn, std::string protocol, int32_t verType, std::string userName,
         std::string password, std::string roamingProtocol)
         : profileId(profileId), apn(apn), protocol(protocol), verType(verType), userName(userName),
           password(password), roamingProtocol(roamingProtocol)
@@ -29,10 +29,10 @@ public:
     virtual ~RilDataProfileTest() = default;
 
 public:
-    int profileId;
+    int32_t profileId;
     std::string apn;
     std::string protocol;
-    int verType;
+    int32_t verType;
     std::string userName;
     std::string password;
     std::string roamingProtocol;

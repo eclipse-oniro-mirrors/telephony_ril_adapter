@@ -169,7 +169,7 @@ static int32_t ExtractRegStatus(const char *s, const HRilRegStatusInfo *hrilRegI
 {
     char *str = (char *)s;
     HRilRegStatusInfo *regStateInfo = (HRilRegStatusInfo *)hrilRegInfo;
-    int32_t info[MAX_5GREG_INFO_ITEM] = {0, 0, 0, 0, 0, 0, 0};
+    int32_t info[MAX_5GREG_INFO_ITEM] = {0, 0, 0, RADIO_TECHNOLOGY_INVALID, 0, 0, 0};
     const int32_t FORMAT_ONE_COMMA_NUM = 0;
     const int32_t FORMAT_TWO_COMMA_NUM = 3;
     const int32_t FORMAT_TWO_5G_COMMA_NUM = 6;
@@ -1357,7 +1357,7 @@ static void ParseGetNrCellInfoLine(char *line, CurrentCellInfoVendor *response)
     NextInt(&line, &response->ServiceCellParas.nr.nrArfcn);
     NextInt(&line, &response->ServiceCellParas.nr.pci);
     NextInt(&line, &response->ServiceCellParas.nr.tac);
-    NextInt64(&line, &response->ServiceCellParas.nr.nci);   
+    NextInt64(&line, &response->ServiceCellParas.nr.nci);
 }
 
 static int32_t ParseGetCurrentCellInfoResponseLineSwitch(const char *str, const CurrentCellInfoVendor *hrilResponse)

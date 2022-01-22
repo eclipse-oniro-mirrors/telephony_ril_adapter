@@ -32,7 +32,7 @@ bool HRilBase::ReadFromHdfBuf(struct HdfSBuf *data, const char *&val)
     return true;
 }
 
-int HRilBase::ResponseHeader(
+int32_t HRilBase::ResponseHeader(
     const HRilRadioResponseInfo &responseInfo, std::shared_ptr<struct HdfSBuf> &dataSbuf, MessageParcel &parcel)
 {
     int32_t ret = ReportHeader(dataSbuf, parcel);
@@ -47,7 +47,7 @@ int HRilBase::ResponseHeader(
     return HRIL_ERR_SUCCESS;
 }
 
-int HRilBase::ReportHeader(std::shared_ptr<struct HdfSBuf> &dataSbuf, MessageParcel &parcel)
+int32_t HRilBase::ReportHeader(std::shared_ptr<struct HdfSBuf> &dataSbuf, MessageParcel &parcel)
 {
     dataSbuf.reset(ParcelToSbuf(&parcel), [](struct HdfSBuf *d) { HdfSBufRecycle(d); });
     if (dataSbuf == nullptr) {

@@ -68,6 +68,7 @@ typedef struct { /* from 3GPP TS 27.007 V17.3.0 (2021-09) */
                   * is used in other PDP context-related commands. */
     int32_t reason; /* Reason for the data request. */
     int32_t rat; /* Radio Access Technology */
+    int32_t roamingEnable; /* Roaming Enable. eg: 1--enable, 0--disnable */
     int32_t verType; /* Authentication protocol used for this PDP context.
                       * 0 None. Used to indicate that no authentication protocol is used for this PDP context.
                       *    Username and password are removed if previously specified.

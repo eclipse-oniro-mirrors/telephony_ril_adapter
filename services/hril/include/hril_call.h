@@ -67,8 +67,8 @@ private:
     int32_t SetCallPreferenceMode(struct HdfSBuf *data);
     int32_t GetLteImsSwitchStatus(struct HdfSBuf *data);
     int32_t SetLteImsSwitchStatus(struct HdfSBuf *data);
-    int32_t SetUssdCusd(struct HdfSBuf *data);
-    int32_t GetUssdCusd(struct HdfSBuf *data);
+    int32_t SetUssd(struct HdfSBuf *data);
+    int32_t GetUssd(struct HdfSBuf *data);
     int32_t SetMute(struct HdfSBuf *data);
     int32_t GetMute(struct HdfSBuf *data);
     int32_t GetEmergencyCallList(struct HdfSBuf *data);
@@ -134,9 +134,9 @@ private:
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t SetLteImsSwitchStatusResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
-    int32_t SetUssdCusdResponse(
+    int32_t SetUssdResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
-    int32_t GetUssdCusdResponse(
+    int32_t GetUssdResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t SetMuteResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
@@ -154,7 +154,7 @@ private:
     int32_t CallEndNotice(int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
     int32_t CallStatusInfoNotice(int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
     int32_t CallImsServiceStatusNotice(int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
-    int32_t CallUssdCusdNotice(int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
+    int32_t CallUssdNotice(int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
     int32_t CallRingbackVoiceNotice(int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
     int32_t CallSrvccStatusNotice(int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
     int32_t CallEmergencyNotice(int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);

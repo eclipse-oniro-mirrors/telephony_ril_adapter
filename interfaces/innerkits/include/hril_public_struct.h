@@ -19,19 +19,19 @@
 #include "hril_enum.h"
 
 typedef struct ReqDataInfo {
-    int serial;
-    int request;
+    int32_t serial;
+    int32_t request;
     HRilSimSlotId slotId;
 } ReqDataInfo;
 
 typedef struct ModemReportErrorInfo {
-    int errorNo;
+    int32_t errorNo;
     ReportErrorType errType;
 } ModemReportErrorInfo;
 
 typedef struct ReportInfo {
     ReqDataInfo *requestInfo;
-    int notifyId;
+    int32_t notifyId;
     ReportType type;
     HRilErrNumber error;
     ModemReportErrorInfo modemErrInfo;

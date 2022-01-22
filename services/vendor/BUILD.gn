@@ -30,24 +30,22 @@ ohos_shared_library("ril_vendor") {
     "$RIL_VENDOR/vendor_report.c",
     "$RIL_VENDOR/vendor_util.c",
   ]
-  include_dirs = [
-    "$RIL_ADAPTER/ril_adapter/services/vendor/include",
-    "$RIL_ADAPTER/ril_adapter/interfaces/innerkits/include",
-    "include",
-  ]
+  include_dirs = [ "$RIL_ADAPTER/ril_adapter/services/vendor/include" ]
+  configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
   defines += [
-    "LOG_TAG = \"Rilvendor\"",
+    "LOG_TAG = \"RilVendor\"",
     "LOG_DOMAIN = 0xD002B01",
   ]
-  external_deps = [
-    "core_service:libtel_common",
-    "device_driver_framework:libhdf_utils",
-    "startup_l2:syspara",
+  deps = [
+    "//base/startup/syspara_lite/interfaces/innerkits/native/syspara:syspara",
+    "//base/telephony/ril_adapter/interfaces/innerkits:hril_innerkits",
+    "//utils/native/base:utils",
   ]
+
   if (is_standard_system) {
-    external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
+    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
   } else {
-    external_deps += [ "hilog:libhilog" ]
+    external_deps = [ "hilog:libhilog" ]
   }
 
   part_name = "ril_adapter"

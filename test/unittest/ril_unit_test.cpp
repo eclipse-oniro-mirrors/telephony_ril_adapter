@@ -74,7 +74,7 @@ void RilUnitTest::GetRilCmImsiForAppTest(const OHOS::AppExecFwk::InnerEvent::Poi
 void RilUnitTest::GetRilCmSignalIntensityTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("RilUnitTest::GetRilCmSignalIntensityTest -->");
-    mRilManager_->GetRilCmSignalStrength(result->GetOwner(), static_cast<int>(result->GetInnerEventId()));
+    mRilManager_->GetRilCmSignalStrength(result->GetOwner(), static_cast<int32_t>(result->GetInnerEventId()));
     TELEPHONY_LOGI("RilUnitTest::GetRilCmSignalIntensityTest --> GetRilCmSignalIntensityTest finished");
 }
 
@@ -179,7 +179,7 @@ void RilUnitTest::RilCmSplitCallTest(const OHOS::AppExecFwk::InnerEvent::Pointer
 void RilUnitTest::HangupRilCmConnectionTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("RilUnitTest::HangupRilCmConnectionTest -->");
-    mRilManager_->Hangup(static_cast<int>(result->GetInnerEventId()), result);
+    mRilManager_->Hangup(static_cast<int32_t>(result->GetInnerEventId()), result);
     TELEPHONY_LOGI("RilUnitTest::HangupRilCmConnectionTest --> HangupRilCmConnectionTest finished");
 }
 
@@ -221,7 +221,7 @@ void RilUnitTest::GetRilCurrentCellInfoTest(const OHOS::AppExecFwk::InnerEvent::
 void RilUnitTest::GetRilCmOperatorTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("RilUnitTest::GetRilCmOperatorTest -->");
-    mRilManager_->GetOperatorInfo(result->GetOwner(), static_cast<int>(result->GetInnerEventId()));
+    mRilManager_->GetOperatorInfo(result->GetOwner(), static_cast<int32_t>(result->GetInnerEventId()));
     TELEPHONY_LOGI("RilUnitTest::GetRilCmOperatorTest --> GetRilCmOperatorTest finished");
 }
 
@@ -287,18 +287,18 @@ void RilUnitTest::OnProcessInput(int32_t what, const OHOS::AppExecFwk::InnerEven
     }
 }
 
-void RilUnitTest::SetUssdCusdTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+void RilUnitTest::SetUssdTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
 {
-    TELEPHONY_LOGI("RilUnitTest::SetUssdCusdTest -->");
-    mRilManager_->SetUssdCusd("12345678", result);
-    TELEPHONY_LOGI("RilUnitTest::SetUssdCusdTest --> SetUssdCusdTest finished");
+    TELEPHONY_LOGI("RilUnitTest::SetUssdTest -->");
+    mRilManager_->SetUssd("12345678", result);
+    TELEPHONY_LOGI("RilUnitTest::SetUssdTest --> SetUssdTest finished");
 }
 
-void RilUnitTest::GetUssdCusdTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+void RilUnitTest::GetUssdTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
 {
-    TELEPHONY_LOGI("RilUnitTest::GetUssdCusdTest -->");
-    mRilManager_->GetUssdCusd(result);
-    TELEPHONY_LOGI("RilUnitTest::GetUssdCusdTest --> GetUssdCusdTest finished");
+    TELEPHONY_LOGI("RilUnitTest::GetUssdTest -->");
+    mRilManager_->GetUssd(result);
+    TELEPHONY_LOGI("RilUnitTest::GetUssdTest --> GetUssdTest finished");
 }
 
 void RilUnitTest::SimOpenLogicalChannel(const AppExecFwk::InnerEvent::Pointer &result)
@@ -372,8 +372,8 @@ void RilUnitTest::OnInitInterface()
     memberFuncMap_[HREQ_DATA_DEACTIVATE_PDP_CONTEXT] = &RilUnitTest::DeactivateRilCmDataCallTest;
     memberFuncMap_[HREQ_NETWORK_GET_NEIGHBORING_CELLINFO_LIST] = &RilUnitTest::GetRilCmCellInfoListTest;
     memberFuncMap_[HREQ_NETWORK_GET_CURRENT_CELL_INFO] = &RilUnitTest::GetRilCurrentCellInfoTest;
-    memberFuncMap_[HREQ_CALL_SET_USSD] = &RilUnitTest::SetUssdCusdTest;
-    memberFuncMap_[HREQ_CALL_GET_USSD] = &RilUnitTest::GetUssdCusdTest;
+    memberFuncMap_[HREQ_CALL_SET_USSD] = &RilUnitTest::SetUssdTest;
+    memberFuncMap_[HREQ_CALL_GET_USSD] = &RilUnitTest::GetUssdTest;
     memberFuncMap_[HREQ_SIM_OPEN_LOGICAL_CHANNEL] = &RilUnitTest::SimOpenLogicalChannel;
     memberFuncMap_[HREQ_SIM_CLOSE_LOGICAL_CHANNEL] = &RilUnitTest::SimCloseLogicalChannel;
     memberFuncMap_[HREQ_SIM_TRANSMIT_APDU_LOGICAL_CHANNEL] = &RilUnitTest::SimTransmitApduLogicalChannel;
@@ -399,8 +399,8 @@ static void PrintMenu()
     cout << HREQ_CALL_SWITCH_CALL << "---->RilUnitTest::RilCmSwapCallTest " << endl;
     cout << HREQ_CALL_COMBINE_CONFERENCE << "---->RilUnitTest::RilCmJoinCallTest " << endl;
     cout << HREQ_CALL_SEPARATE_CONFERENCE << "---->RilUnitTest::RilCmSplitCallTest " << endl;
-    cout << HREQ_CALL_SET_USSD << "---->RilUnitTest::SetUssdCusdTest " << endl;
-    cout << HREQ_CALL_GET_USSD << "---->RilUnitTest::GetUssdCusdTest " << endl;
+    cout << HREQ_CALL_SET_USSD << "---->RilUnitTest::SetUssdTest " << endl;
+    cout << HREQ_CALL_GET_USSD << "---->RilUnitTest::GetUssdTest " << endl;
     cout << "---->NETWORK----------------------------------------------------------" << endl;
     cout << HREQ_NETWORK_GET_SIGNAL_STRENGTH << "---->RilUnitTest::GetRilCmSignalIntensityTest " << endl;
     cout << HREQ_NETWORK_GET_OPERATOR_INFO << "---->RilUnitTest::GetRilCmOperatorTest " << endl;
@@ -423,7 +423,6 @@ static void PrintMenu()
     cout << "---->SMS----------------------------------------------------------" << endl;
     cout << HREQ_SMS_SEND_GSM_SMS << "---->RilUnitTest::SendRilCmSmsTest " << endl;
     cout << HREQ_SMS_SEND_SMS_MORE_MODE << "---->RilUnitTest::SendRilCmSmsMoreModeTest " << endl;
-    cout << HREQ_SMS_IMS_SEND_SMS << "---->RilUnitTest::SendRilCmImsGsmSmsTest " << endl;
     cout << HREQ_MODEM_SET_RADIO_STATUS << "---->RilUnitTest::SetRilCmRadioPowerTest " << endl;
     cout << HREQ_MODEM_EXIT << "---->exit " << endl;
 }

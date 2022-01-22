@@ -283,7 +283,7 @@ typedef struct {
 } CellListRatNr;
 
 struct CellNearbyInfo : public HrilBaseParcel {
-    int ratType;
+    int32_t ratType;
 
     union {
         CellListRatGsm gsm;

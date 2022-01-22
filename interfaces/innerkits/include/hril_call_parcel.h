@@ -234,7 +234,7 @@ struct CallImsServiceStatus : public HrilBaseParcel {
     void Dump(std::string, int32_t);
 };
 
-struct UssdCusdInfo : public HrilBaseParcel {
+struct UssdInfo : public HrilBaseParcel {
     int32_t n; /* Integer value, the control result code is reported, the default value is 0.
                             0: Disable the reporting of result codes;
                             1: Enable result code reporting;
@@ -247,11 +247,11 @@ struct UssdCusdInfo : public HrilBaseParcel {
 
     bool ReadFromParcel(Parcel &parcel);
     virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<UssdCusdInfo> UnMarshalling(Parcel &parcel);
+    std::shared_ptr<UssdInfo> UnMarshalling(Parcel &parcel);
     void Dump(std::string, int32_t);
 };
 
-struct UssdCusdNoticeInfo : public HrilBaseParcel {
+struct UssdNoticeInfo : public HrilBaseParcel {
     int32_t m; /* Integer value.
                             0: The network does not require a TE reply (USSD-Notify initiated by the network or TE
                             The network does not need further information after starting operation);
@@ -269,7 +269,7 @@ struct UssdCusdNoticeInfo : public HrilBaseParcel {
 
     bool ReadFromParcel(Parcel &parcel);
     virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<UssdCusdNoticeInfo> UnMarshalling(Parcel &parcel);
+    std::shared_ptr<UssdNoticeInfo> UnMarshalling(Parcel &parcel);
     void Dump(std::string, int32_t);
 };
 

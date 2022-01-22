@@ -86,9 +86,9 @@ void HRilNetwork::AddHandlerToMap()
 
 int32_t HRilNetwork::GetImsRegStatus(struct HdfSBuf *data)
 {
-    if (networkFuncs_ == nullptr) {
-        TELEPHONY_LOGE("GetImsRegStatus::networkFuncs_ is nullptr");
-        return HRIL_ERR_INVALID_PARAMETER;
+    if ((networkFuncs_ == nullptr) || (networkFuncs_->GetImsRegStatus == nullptr)) {
+        TELEPHONY_LOGE("GetImsRegStatus::networkFuncs_:%{public}p", networkFuncs_);
+        return HRIL_ERR_NULL_POINT;
     }
     int32_t serial = 0;
     if (!HdfSbufReadInt32(data, &serial)) {
@@ -106,9 +106,9 @@ int32_t HRilNetwork::GetImsRegStatus(struct HdfSBuf *data)
 
 int32_t HRilNetwork::GetSignalStrength(struct HdfSBuf *data)
 {
-    if (networkFuncs_ == nullptr) {
-        TELEPHONY_LOGE("GetSignalStrength::networkFuncs_ is nullptr");
-        return HRIL_ERR_INVALID_PARAMETER;
+    if ((networkFuncs_ == nullptr) || (networkFuncs_->GetSignalStrength == nullptr)) {
+        TELEPHONY_LOGE("GetSignalStrength::networkFuncs_:%{public}p", networkFuncs_);
+        return HRIL_ERR_NULL_POINT;
     }
     int32_t serial = 0;
     if (!HdfSbufReadInt32(data, &serial)) {
@@ -126,9 +126,9 @@ int32_t HRilNetwork::GetSignalStrength(struct HdfSBuf *data)
 
 int32_t HRilNetwork::GetRadioCapability(struct HdfSBuf *data)
 {
-    if (networkFuncs_ == nullptr) {
-        TELEPHONY_LOGE("GetRadioCapability::networkFuncs_ is nullptr");
-        return HRIL_ERR_INVALID_PARAMETER;
+    if ((networkFuncs_ == nullptr) || (networkFuncs_->GetRadioCapability == nullptr)) {
+        TELEPHONY_LOGE("GetRadioCapability::networkFuncs_:%{public}p", networkFuncs_);
+        return HRIL_ERR_NULL_POINT;
     }
     int32_t serial = 0;
     if (!HdfSbufReadInt32(data, &serial)) {
@@ -146,9 +146,9 @@ int32_t HRilNetwork::GetRadioCapability(struct HdfSBuf *data)
 
 int32_t HRilNetwork::SetRadioCapability(struct HdfSBuf *data)
 {
-    if (networkFuncs_ == nullptr) {
-        TELEPHONY_LOGE("SetRadioCapability::networkFuncs_ is nullptr");
-        return HRIL_ERR_INVALID_PARAMETER;
+    if ((networkFuncs_ == nullptr) || (networkFuncs_->SetRadioCapability == nullptr)) {
+        TELEPHONY_LOGE("SetRadioCapability::networkFuncs_:%{public}p", networkFuncs_);
+        return HRIL_ERR_NULL_POINT;
     }
     struct RadioCapabilityInfo setRadioCapabilityInfo = {};
     MessageParcel *parcel = nullptr;
@@ -257,9 +257,9 @@ int32_t HRilNetwork::GetSignalStrengthResponse(
 
 int32_t HRilNetwork::GetCsRegStatus(struct HdfSBuf *data)
 {
-    if (networkFuncs_ == nullptr) {
-        TELEPHONY_LOGE("GetCsRegStatus::networkFuncs_ is nullptr");
-        return HRIL_ERR_INVALID_PARAMETER;
+    if ((networkFuncs_ == nullptr) || (networkFuncs_->GetCsRegStatus == nullptr)) {
+        TELEPHONY_LOGE("GetCsRegStatus::networkFuncs_:%{public}p", networkFuncs_);
+        return HRIL_ERR_NULL_POINT;
     }
     int32_t serial = 0;
     if (!HdfSbufReadInt32(data, &serial)) {
@@ -311,9 +311,9 @@ int32_t HRilNetwork::GetCsRegStatusResponse(
 
 int32_t HRilNetwork::GetOperatorInfo(struct HdfSBuf *data)
 {
-    if (networkFuncs_ == nullptr) {
-        TELEPHONY_LOGE("GetOperatorInfo::networkFuncs_ is nullptr");
-        return HRIL_ERR_INVALID_PARAMETER;
+    if ((networkFuncs_ == nullptr) || (networkFuncs_->GetOperatorInfo == nullptr)) {
+        TELEPHONY_LOGE("GetOperatorInfo::networkFuncs_:%{public}p", networkFuncs_);
+        return HRIL_ERR_NULL_POINT;
     }
     int32_t serial = 0;
     if (!HdfSbufReadInt32(data, &serial)) {
@@ -331,9 +331,9 @@ int32_t HRilNetwork::GetOperatorInfo(struct HdfSBuf *data)
 
 int32_t HRilNetwork::GetNetworkSearchInformation(struct HdfSBuf *data)
 {
-    if (networkFuncs_ == nullptr) {
-        TELEPHONY_LOGE("GetNetworkSearchInformation::networkFuncs_ is nullptr");
-        return HRIL_ERR_INVALID_PARAMETER;
+    if ((networkFuncs_ == nullptr) || (networkFuncs_->GetNetworkSearchInformation == nullptr)) {
+        TELEPHONY_LOGE("GetNetworkSearchInformation::networkFuncs_:%{public}p", networkFuncs_);
+        return HRIL_ERR_NULL_POINT;
     }
     int32_t serial = 0;
     if (!HdfSbufReadInt32(data, &serial)) {
@@ -351,9 +351,9 @@ int32_t HRilNetwork::GetNetworkSearchInformation(struct HdfSBuf *data)
 
 int32_t HRilNetwork::GetNetworkSelectionMode(struct HdfSBuf *data)
 {
-    if (networkFuncs_ == nullptr) {
-        TELEPHONY_LOGE("GetNetworkSelectionMode::networkFuncs_ is nullptr");
-        return HRIL_ERR_INVALID_PARAMETER;
+    if ((networkFuncs_ == nullptr) || (networkFuncs_->GetNetworkSelectionMode == nullptr)) {
+        TELEPHONY_LOGE("GetNetworkSelectionMode::networkFuncs_:%{public}p", networkFuncs_);
+        return HRIL_ERR_NULL_POINT;
     }
     int32_t serial = 0;
     if (!HdfSbufReadInt32(data, &serial)) {
@@ -371,9 +371,9 @@ int32_t HRilNetwork::GetNetworkSelectionMode(struct HdfSBuf *data)
 
 int32_t HRilNetwork::SetNetworkSelectionMode(struct HdfSBuf *data)
 {
-    if (networkFuncs_ == nullptr) {
-        TELEPHONY_LOGE("SetNetworkSelectionMode::networkFuncs_ is nullptr");
-        return HRIL_ERR_INVALID_PARAMETER;
+    if ((networkFuncs_ == nullptr) || (networkFuncs_->SetNetworkSelectionMode == nullptr)) {
+        TELEPHONY_LOGE("SetNetworkSelectionMode::networkFuncs_:%{public}p", networkFuncs_);
+        return HRIL_ERR_NULL_POINT;
     }
     struct SetNetworkModeInfo setNetworkModeInfo = {};
     MessageParcel *parcel = nullptr;
@@ -406,9 +406,9 @@ int32_t HRilNetwork::SetNetworkSelectionMode(struct HdfSBuf *data)
 
 int32_t HRilNetwork::GetPreferredNetwork(struct HdfSBuf *data)
 {
-    if (networkFuncs_ == nullptr) {
-        TELEPHONY_LOGE("GetPreferredNetwork::networkFuncs_ is nullptr");
-        return HRIL_ERR_INVALID_PARAMETER;
+    if ((networkFuncs_ == nullptr) || (networkFuncs_->GetPreferredNetwork == nullptr)) {
+        TELEPHONY_LOGE("GetPreferredNetwork::networkFuncs_:%{public}p", networkFuncs_);
+        return HRIL_ERR_NULL_POINT;
     }
     int32_t serial = 0;
     if (!HdfSbufReadInt32(data, &serial)) {
@@ -427,9 +427,9 @@ int32_t HRilNetwork::GetPreferredNetwork(struct HdfSBuf *data)
 
 int32_t HRilNetwork::SetPreferredNetwork(struct HdfSBuf *data)
 {
-    if (networkFuncs_ == nullptr) {
-        TELEPHONY_LOGE("SetPreferredNetwork::networkFuncs_ is nullptr");
-        return HRIL_ERR_INVALID_PARAMETER;
+    if ((networkFuncs_ == nullptr) || (networkFuncs_->SetPreferredNetwork == nullptr)) {
+        TELEPHONY_LOGE("SetPreferredNetwork::networkFuncs_:%{public}p", networkFuncs_);
+        return HRIL_ERR_NULL_POINT;
     }
     int32_t netType = 0;
     int32_t serial = 0;
@@ -453,9 +453,9 @@ int32_t HRilNetwork::SetPreferredNetwork(struct HdfSBuf *data)
 
 int32_t HRilNetwork::SetPsAttachStatus(struct HdfSBuf *data)
 {
-    if (networkFuncs_ == nullptr) {
-        TELEPHONY_LOGE("SetPsAttachStatus::networkFuncs_ is nullptr");
-        return HRIL_ERR_INVALID_PARAMETER;
+    if ((networkFuncs_ == nullptr) || (networkFuncs_->SetPsAttachStatus == nullptr)) {
+        TELEPHONY_LOGE("SetPsAttachStatus::networkFuncs_:%{public}p", networkFuncs_);
+        return HRIL_ERR_NULL_POINT;
     }
     int32_t psAttachStatus = 0;
     int32_t serial = 0;
@@ -481,9 +481,9 @@ int32_t HRilNetwork::SetPsAttachStatus(struct HdfSBuf *data)
 
 int32_t HRilNetwork::GetPsAttachStatus(struct HdfSBuf *data)
 {
-    if (networkFuncs_ == nullptr) {
-        TELEPHONY_LOGE("GetPsAttachStatus::networkFuncs_ is nullptr");
-        return HRIL_ERR_INVALID_PARAMETER;
+    if ((networkFuncs_ == nullptr) || (networkFuncs_->GetPsAttachStatus == nullptr)) {
+        TELEPHONY_LOGE("GetPsAttachStatus::networkFuncs_:%{public}p", networkFuncs_);
+        return HRIL_ERR_NULL_POINT;
     }
     int32_t serial = 0;
     if (!HdfSbufReadInt32(data, &serial)) {
@@ -501,9 +501,9 @@ int32_t HRilNetwork::GetPsAttachStatus(struct HdfSBuf *data)
 
 int32_t HRilNetwork::GetPhysicalChannelConfig(struct HdfSBuf *data)
 {
-    if (networkFuncs_ == nullptr) {
-        TELEPHONY_LOGE("GetPhysicalChannelConfig::networkFuncs_ is nullptr");
-        return HRIL_ERR_INVALID_PARAMETER;
+    if ((networkFuncs_ == nullptr) || (networkFuncs_->GetPhysicalChannelConfig == nullptr)) {
+        TELEPHONY_LOGE("GetPhysicalChannelConfig::networkFuncs_:%{public}p", networkFuncs_);
+        return HRIL_ERR_NULL_POINT;
     }
     int32_t serial = 0;
     if (!HdfSbufReadInt32(data, &serial)) {
@@ -521,9 +521,9 @@ int32_t HRilNetwork::GetPhysicalChannelConfig(struct HdfSBuf *data)
 
 int32_t HRilNetwork::SetLocateUpdates(struct HdfSBuf *data)
 {
-    if (networkFuncs_ == nullptr) {
-        TELEPHONY_LOGE("SetLocateUpdates::networkFuncs_ is nullptr");
-        return HRIL_ERR_INVALID_PARAMETER;
+    if ((networkFuncs_ == nullptr) || (networkFuncs_->SetLocateUpdates == nullptr)) {
+        TELEPHONY_LOGE("SetLocateUpdates::networkFuncs_:%{public}p", networkFuncs_);
+        return HRIL_ERR_NULL_POINT;
     }
     int32_t serial = 0;
     if (!HdfSbufReadInt32(data, &serial)) {
@@ -953,9 +953,9 @@ int32_t HRilNetwork::NetworkTimeZoneUpdated(
 
 int32_t HRilNetwork::GetPsRegStatus(struct HdfSBuf *data)
 {
-    if (networkFuncs_ == nullptr) {
-        TELEPHONY_LOGE("GetPsRegStatus::networkFuncs_ is nullptr");
-        return HRIL_ERR_INVALID_PARAMETER;
+    if ((networkFuncs_ == nullptr) || (networkFuncs_->GetPsRegStatus == nullptr)) {
+        TELEPHONY_LOGE("GetPsRegStatus::networkFuncs_:%{public}p", networkFuncs_);
+        return HRIL_ERR_NULL_POINT;
     }
     int32_t serial = 0;
     if (!HdfSbufReadInt32(data, &serial)) {
@@ -974,9 +974,9 @@ int32_t HRilNetwork::GetPsRegStatus(struct HdfSBuf *data)
 
 int32_t HRilNetwork::GetNeighboringCellInfoList(struct HdfSBuf *data)
 {
-    if (networkFuncs_ == nullptr) {
-        TELEPHONY_LOGE("GetNeighboringCellInfoList::networkFuncs_ is nullptr");
-        return HRIL_ERR_INVALID_PARAMETER;
+    if ((networkFuncs_ == nullptr) || (networkFuncs_->GetNeighboringCellInfoList == nullptr)) {
+        TELEPHONY_LOGE("GetNeighboringCellInfoList::networkFuncs_:%{public}p", networkFuncs_);
+        return HRIL_ERR_NULL_POINT;
     }
     int32_t serial = 0;
     if (!HdfSbufReadInt32(data, &serial)) {
@@ -994,9 +994,9 @@ int32_t HRilNetwork::GetNeighboringCellInfoList(struct HdfSBuf *data)
 
 int32_t HRilNetwork::GetCurrentCellInfo(struct HdfSBuf *data)
 {
-    if (networkFuncs_ == nullptr) {
-        TELEPHONY_LOGE("GetCurrentCellInfo::networkFuncs_ is nullptr");
-        return HRIL_ERR_INVALID_PARAMETER;
+    if ((networkFuncs_ == nullptr) || (networkFuncs_->GetCurrentCellInfo == nullptr)) {
+        TELEPHONY_LOGE("GetCurrentCellInfo::networkFuncs_:%{public}p", networkFuncs_);
+        return HRIL_ERR_NULL_POINT;
     }
     int32_t serial = 0;
     if (!HdfSbufReadInt32(data, &serial)) {

@@ -21,11 +21,11 @@
 
 namespace OHOS {
 namespace Telephony {
-const int NUM_CIRCLES = 4;
+const int32_t NUM_CIRCLES = 4;
 namespace {
 class RilUnitTest {
 public:
-    RilUnitTest(int opt);
+    RilUnitTest(int32_t opt);
     ~RilUnitTest();
 
     void OnInit();
@@ -58,8 +58,8 @@ public:
     void GetRilCurrentCellInfoTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void DeactivateRilCmDataCallTest(const AppExecFwk::InnerEvent::Pointer &result);
     void OnProcessInput(int32_t what, const OHOS::AppExecFwk::InnerEvent::Pointer &event);
-    void SetUssdCusdTest(const AppExecFwk::InnerEvent::Pointer &result);
-    void GetUssdCusdTest(const AppExecFwk::InnerEvent::Pointer &result);
+    void SetUssdTest(const AppExecFwk::InnerEvent::Pointer &result);
+    void GetUssdTest(const AppExecFwk::InnerEvent::Pointer &result);
     void SimOpenLogicalChannel(const AppExecFwk::InnerEvent::Pointer &result);
     void SimCloseLogicalChannel(const AppExecFwk::InnerEvent::Pointer &result);
     void SimTransmitApduLogicalChannel(const AppExecFwk::InnerEvent::Pointer &result);
@@ -76,7 +76,7 @@ public:
     };
 
     std::unique_ptr<RilManagerTest> mRilManager_;
-    int slotId_;
+    int32_t slotId_;
     using RilManagerAndResponseTestFun = void (RilUnitTest::*)(const OHOS::AppExecFwk::InnerEvent::Pointer &event);
     std::map<uint32_t, RilManagerAndResponseTestFun> memberFuncMap_;
 };

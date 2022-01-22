@@ -846,7 +846,7 @@ std::shared_ptr<CallImsServiceStatus> CallImsServiceStatus::UnMarshalling(Parcel
 
 void CallImsServiceStatus::Dump(std::string, int32_t) {}
 
-bool UssdCusdInfo::ReadFromParcel(Parcel &parcel)
+bool UssdInfo::ReadFromParcel(Parcel &parcel)
 {
     if (!Read(parcel, n)) {
         return false;
@@ -860,7 +860,7 @@ bool UssdCusdInfo::ReadFromParcel(Parcel &parcel)
     return true;
 }
 
-bool UssdCusdInfo::Marshalling(Parcel &parcel) const
+bool UssdInfo::Marshalling(Parcel &parcel) const
 {
     if (!Write(parcel, n)) {
         return false;
@@ -874,18 +874,18 @@ bool UssdCusdInfo::Marshalling(Parcel &parcel) const
     return true;
 }
 
-std::shared_ptr<UssdCusdInfo> UssdCusdInfo::UnMarshalling(Parcel &parcel)
+std::shared_ptr<UssdInfo> UssdInfo::UnMarshalling(Parcel &parcel)
 {
-    std::shared_ptr<UssdCusdInfo> param = std::make_shared<UssdCusdInfo>();
+    std::shared_ptr<UssdInfo> param = std::make_shared<UssdInfo>();
     if (param == nullptr || !param->ReadFromParcel(parcel)) {
         param = nullptr;
     }
     return param;
 }
 
-void UssdCusdInfo::Dump(std::string, int32_t) {}
+void UssdInfo::Dump(std::string, int32_t) {}
 
-bool UssdCusdNoticeInfo::ReadFromParcel(Parcel &parcel)
+bool UssdNoticeInfo::ReadFromParcel(Parcel &parcel)
 {
     if (!Read(parcel, m)) {
         return false;
@@ -899,7 +899,7 @@ bool UssdCusdNoticeInfo::ReadFromParcel(Parcel &parcel)
     return true;
 }
 
-bool UssdCusdNoticeInfo::Marshalling(Parcel &parcel) const
+bool UssdNoticeInfo::Marshalling(Parcel &parcel) const
 {
     if (!Write(parcel, m)) {
         return false;
@@ -913,16 +913,16 @@ bool UssdCusdNoticeInfo::Marshalling(Parcel &parcel) const
     return true;
 }
 
-std::shared_ptr<UssdCusdNoticeInfo> UssdCusdNoticeInfo::UnMarshalling(Parcel &parcel)
+std::shared_ptr<UssdNoticeInfo> UssdNoticeInfo::UnMarshalling(Parcel &parcel)
 {
-    std::shared_ptr<UssdCusdNoticeInfo> param = std::make_shared<UssdCusdNoticeInfo>();
+    std::shared_ptr<UssdNoticeInfo> param = std::make_shared<UssdNoticeInfo>();
     if (param == nullptr || !param->ReadFromParcel(parcel)) {
         param = nullptr;
     }
     return param;
 }
 
-void UssdCusdNoticeInfo::Dump(std::string, int32_t) {}
+void UssdNoticeInfo::Dump(std::string, int32_t) {}
 
 bool SrvccStatus::ReadFromParcel(Parcel &parcel)
 {

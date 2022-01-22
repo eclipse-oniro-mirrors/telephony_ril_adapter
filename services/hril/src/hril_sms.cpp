@@ -93,7 +93,7 @@ int32_t HRilSms::SendGsmSms(struct HdfSBuf *data)
         return HRIL_ERR_INVALID_PARAMETER;
     }
     if (parcel == nullptr) {
-        TELEPHONY_LOGE("parcel int SendGsmSms is nullptr!");
+        TELEPHONY_LOGE("parcel int32_t SendGsmSms is nullptr!");
         return HRIL_ERR_INVALID_PARAMETER;
     }
     if (!message.ReadFromParcel(*parcel)) {
@@ -106,6 +106,10 @@ int32_t HRilSms::SendGsmSms(struct HdfSBuf *data)
 
 int32_t HRilSms::SendCdmaSms(struct HdfSBuf *data)
 {
+    if ((smsFuncs_ == nullptr) || (smsFuncs_->SendCdmaSms == nullptr)) {
+        TELEPHONY_LOGE("SendCdmaSms::smsFuncs_:%{public}p", smsFuncs_);
+        return HRIL_ERR_NULL_POINT;
+    }
     struct SendCdmaSmsMessageInfo message;
     MessageParcel *parcel = nullptr;
     if (SbufToParcel(data, &parcel)) {
@@ -113,7 +117,7 @@ int32_t HRilSms::SendCdmaSms(struct HdfSBuf *data)
         return HRIL_ERR_INVALID_PARAMETER;
     }
     if (parcel == nullptr) {
-        TELEPHONY_LOGE("parcel int SendCdmaSms is nullptr!");
+        TELEPHONY_LOGE("parcel int32_t SendCdmaSms is nullptr!");
         return HRIL_ERR_INVALID_PARAMETER;
     }
     if (!message.ReadFromParcel(*parcel)) {
@@ -130,11 +134,15 @@ int32_t HRilSms::SendCdmaSms(struct HdfSBuf *data)
 
 int32_t HRilSms::AddSimMessage(struct HdfSBuf *data)
 {
+    if ((smsFuncs_ == nullptr) || (smsFuncs_->AddSimMessage == nullptr)) {
+        TELEPHONY_LOGE("AddSimMessage::smsFuncs_:%{public}p", smsFuncs_);
+        return HRIL_ERR_NULL_POINT;
+    }
     struct GsmSmsMessageInfo message = {};
     HRilSmsWriteSms msg = {};
     int32_t pduLen = 0;
     int32_t smscPduLen = 0;
-    const int MSG_INDEX = -1;
+    const int32_t MSG_INDEX = -1;
     MessageParcel *parcel = nullptr;
     if (SbufToParcel(data, &parcel) || parcel == nullptr) {
         TELEPHONY_LOGE("RilAdapter failed to do SbufToParcel parcel=%{public}p", parcel);
@@ -178,6 +186,10 @@ int32_t HRilSms::AddSimMessage(struct HdfSBuf *data)
 
 int32_t HRilSms::DelSimMessage(struct HdfSBuf *data)
 {
+    if ((smsFuncs_ == nullptr) || (smsFuncs_->DelSimMessage == nullptr)) {
+        TELEPHONY_LOGE("DelSimMessage::smsFuncs_:%{public}p", smsFuncs_);
+        return HRIL_ERR_NULL_POINT;
+    }
     int32_t *pBuff = nullptr;
     int32_t index = 0;
     int32_t serial = 0;
@@ -203,6 +215,10 @@ int32_t HRilSms::DelSimMessage(struct HdfSBuf *data)
 
 int32_t HRilSms::UpdateSimMessage(struct HdfSBuf *data)
 {
+    if ((smsFuncs_ == nullptr) || (smsFuncs_->UpdateSimMessage == nullptr)) {
+        TELEPHONY_LOGE("UpdateSimMessage::smsFuncs_:%{public}p", smsFuncs_);
+        return HRIL_ERR_NULL_POINT;
+    }
     struct SmsMessageIOInfo message = {};
     HRilSmsWriteSms msg = {};
     int32_t len = 0;
@@ -243,6 +259,10 @@ int32_t HRilSms::UpdateSimMessage(struct HdfSBuf *data)
 
 int32_t HRilSms::SetSmscAddr(struct HdfSBuf *data)
 {
+    if ((smsFuncs_ == nullptr) || (smsFuncs_->SetSmscAddr == nullptr)) {
+        TELEPHONY_LOGE("SetSmscAddr::smsFuncs_:%{public}p", smsFuncs_);
+        return HRIL_ERR_NULL_POINT;
+    }
     struct ServiceCenterAddress serCenterAddress;
     HRilServiceCenterAddress address;
     int32_t len = 0;
@@ -286,6 +306,10 @@ int32_t HRilSms::SetSmscAddr(struct HdfSBuf *data)
 
 int32_t HRilSms::GetSmscAddr(struct HdfSBuf *data)
 {
+    if ((smsFuncs_ == nullptr) || (smsFuncs_->GetSmscAddr == nullptr)) {
+        TELEPHONY_LOGE("GetSmscAddr::smsFuncs_:%{public}p", smsFuncs_);
+        return HRIL_ERR_NULL_POINT;
+    }
     int32_t serial = 0;
     if (!HdfSbufReadInt32(data, &serial)) {
         TELEPHONY_LOGE("miss serial parameter");
@@ -301,6 +325,10 @@ int32_t HRilSms::GetSmscAddr(struct HdfSBuf *data)
 
 int32_t HRilSms::SetCBConfig(struct HdfSBuf *data)
 {
+    if ((smsFuncs_ == nullptr) || (smsFuncs_->SetCBConfig == nullptr)) {
+        TELEPHONY_LOGE("SetCBConfig::smsFuncs_:%{public}p", smsFuncs_);
+        return HRIL_ERR_NULL_POINT;
+    }
     struct CBConfigInfo broadcastInfo;
     HRilCBConfigInfo cellBroadcastInfo;
     int32_t midsLen = 0;
@@ -347,6 +375,10 @@ int32_t HRilSms::SetCBConfig(struct HdfSBuf *data)
 
 int32_t HRilSms::GetCBConfig(struct HdfSBuf *data)
 {
+    if ((smsFuncs_ == nullptr) || (smsFuncs_->GetCBConfig == nullptr)) {
+        TELEPHONY_LOGE("GetCBConfig::smsFuncs_:%{public}p", smsFuncs_);
+        return HRIL_ERR_NULL_POINT;
+    }
     int32_t serial = 0;
     if (!HdfSbufReadInt32(data, &serial)) {
         TELEPHONY_LOGE("miss serial parameter");
@@ -362,6 +394,10 @@ int32_t HRilSms::GetCBConfig(struct HdfSBuf *data)
 
 int32_t HRilSms::SetCdmaCBConfig(struct HdfSBuf *data)
 {
+    if ((smsFuncs_ == nullptr) || (smsFuncs_->SetCdmaCBConfig == nullptr)) {
+        TELEPHONY_LOGE("SetCdmaCBConfig::smsFuncs_:%{public}p", smsFuncs_);
+        return HRIL_ERR_NULL_POINT;
+    }
     CdmaCBConfigInfoList cellBroadcastInfoList = {};
     MessageParcel *parcel = nullptr;
     if (SbufToParcel(data, &parcel)) {
@@ -386,14 +422,17 @@ int32_t HRilSms::SetCdmaCBConfig(struct HdfSBuf *data)
     if (requestInfo == nullptr) {
         return HRIL_ERR_INVALID_PARAMETER;
     }
-    if (smsFuncs_->SetCdmaCBConfig != nullptr) {
-        smsFuncs_->SetCdmaCBConfig(requestInfo, list, cellBroadcastInfoList.size * sizeof(HRilCdmaCBConfigInfo));
-    }
+    smsFuncs_->SetCdmaCBConfig(requestInfo, list, cellBroadcastInfoList.size * sizeof(HRilCdmaCBConfigInfo));
+
     return HRIL_ERR_SUCCESS;
 }
 
 int32_t HRilSms::GetCdmaCBConfig(struct HdfSBuf *data)
 {
+    if ((smsFuncs_ == nullptr) || (smsFuncs_->GetCdmaCBConfig == nullptr)) {
+        TELEPHONY_LOGE("GetCdmaCBConfig::smsFuncs_:%{public}p", smsFuncs_);
+        return HRIL_ERR_NULL_POINT;
+    }
     int32_t serial = 0;
     if (!HdfSbufReadInt32(data, &serial)) {
         TELEPHONY_LOGE("miss serial parameter");
@@ -403,9 +442,8 @@ int32_t HRilSms::GetCdmaCBConfig(struct HdfSBuf *data)
     if (requestInfo == nullptr) {
         return HRIL_ERR_INVALID_PARAMETER;
     }
-    if (smsFuncs_->GetCdmaCBConfig != nullptr) {
-        smsFuncs_->GetCdmaCBConfig(requestInfo);
-    }
+    smsFuncs_->GetCdmaCBConfig(requestInfo);
+
     return HRIL_ERR_SUCCESS;
 }
 
@@ -432,6 +470,10 @@ int32_t HRilSms::SendSmsMoreMode(struct HdfSBuf *data)
 
 int32_t HRilSms::SendSmsAck(struct HdfSBuf *data)
 {
+    if ((smsFuncs_ == nullptr) || (smsFuncs_->SendSmsAck == nullptr)) {
+        TELEPHONY_LOGE("SendSmsAck::smsFuncs_:%{public}p", smsFuncs_);
+        return HRIL_ERR_NULL_POINT;
+    }
     int32_t *pBuff = nullptr;
     struct ModeData mode;
     MessageParcel *parcel = nullptr;
@@ -463,10 +505,14 @@ int32_t HRilSms::SendSmsAck(struct HdfSBuf *data)
 
 int32_t HRilSms::AddCdmaSimMessage(struct HdfSBuf *data)
 {
+    if ((smsFuncs_ == nullptr) || (smsFuncs_->AddCdmaSimMessage == nullptr)) {
+        TELEPHONY_LOGE("AddCdmaSimMessage::smsFuncs_:%{public}p", smsFuncs_);
+        return HRIL_ERR_NULL_POINT;
+    }
     struct SmsMessageIOInfo mSmsMessageIOInfo = {};
     HRilSmsWriteSms msg = {};
     int32_t pduLen = 0;
-    const int MSG_INDEX = -1;
+    const int32_t MSG_INDEX = -1;
     MessageParcel *parcel = nullptr;
     if (SbufToParcel(data, &parcel) || parcel == nullptr) {
         TELEPHONY_LOGE("RilAdapter failed to do SbufToParcel parcel=%{public}p", parcel);
@@ -499,6 +545,10 @@ int32_t HRilSms::AddCdmaSimMessage(struct HdfSBuf *data)
 
 int32_t HRilSms::DelCdmaSimMessage(struct HdfSBuf *data)
 {
+    if ((smsFuncs_ == nullptr) || (smsFuncs_->DelCdmaSimMessage == nullptr)) {
+        TELEPHONY_LOGE("DelCdmaSimMessage::smsFuncs_:%{public}p", smsFuncs_);
+        return HRIL_ERR_NULL_POINT;
+    }
     int32_t *pBuff = nullptr;
     int32_t index = 0;
     int32_t serial = 0;
@@ -524,6 +574,10 @@ int32_t HRilSms::DelCdmaSimMessage(struct HdfSBuf *data)
 
 int32_t HRilSms::UpdateCdmaSimMessage(struct HdfSBuf *data)
 {
+    if ((smsFuncs_ == nullptr) || (smsFuncs_->UpdateCdmaSimMessage == nullptr)) {
+        TELEPHONY_LOGE("UpdateCdmaSimMessage::smsFuncs_:%{public}p", smsFuncs_);
+        return HRIL_ERR_NULL_POINT;
+    }
     struct SmsMessageIOInfo mSmsMessageIOInfo = {};
     HRilSmsWriteSms msg = {};
     int32_t len = 0;
@@ -992,7 +1046,7 @@ int32_t HRilSms::DataSbuf(HdfSBuf *dataSbuf, int32_t indType)
     return HRIL_ERR_SUCCESS;
 }
 
-int32_t HRilSms::RequestWithInts(int **p, ReqDataInfo *requestInfo, int32_t argCount, ...)
+int32_t HRilSms::RequestWithInts(int32_t **p, ReqDataInfo *requestInfo, int32_t argCount, ...)
 {
     size_t len = sizeof(int32_t);
     if (len <= 0 || argCount <= 0) {
@@ -1017,7 +1071,8 @@ int32_t HRilSms::RequestWithInts(int **p, ReqDataInfo *requestInfo, int32_t argC
 
 int32_t HRilSms::RequestWithStrings(int32_t serial, int32_t request, int32_t count, ...)
 {
-    if (smsFuncs_ == nullptr) {
+    if ((smsFuncs_ == nullptr) || (smsFuncs_->SendGsmSms == nullptr)) {
+        TELEPHONY_LOGE("SendGsmSms::smsFuncs_:%{public}p", smsFuncs_);
         return HRIL_ERR_NULL_POINT;
     }
     char **pBuff = nullptr;

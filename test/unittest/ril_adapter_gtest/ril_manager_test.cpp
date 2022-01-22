@@ -509,7 +509,7 @@ GsmSmsMessageInfo RilManagerTest::ConstructGsmSendSmsRilRequest(string smscPdu, 
     return msg;
 }
 
-int32_t RilManagerTest::SetRadioState(int fan, int rst, const AppExecFwk::InnerEvent::Pointer &result)
+int32_t RilManagerTest::SetRadioState(int32_t fan, int32_t rst, const AppExecFwk::InnerEvent::Pointer &result)
 {
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_MODEM_SET_RADIO_STATUS, result);
@@ -622,7 +622,7 @@ void RilManagerTest::RilProcessResponseDone(
     }
 }
 
-int32_t RilManagerTest::SetUssdCusd(std::string str, const AppExecFwk::InnerEvent::Pointer &result)
+int32_t RilManagerTest::SetUssd(std::string str, const AppExecFwk::InnerEvent::Pointer &result)
 {
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_CALL_SET_USSD, result);
@@ -635,21 +635,21 @@ int32_t RilManagerTest::SetUssdCusd(std::string str, const AppExecFwk::InnerEven
         TELEPHONY_LOGI("SendRequest(ID:%{public}d) return: %{public}d", HREQ_CALL_SET_USSD, ret);
         return ret;
     } else {
-        TELEPHONY_LOGE("SetUssdCusd  cellularRadio_ == nullptr");
+        TELEPHONY_LOGE("SetUssd  cellularRadio_ == nullptr");
         return HRIL_ERR_NULL_POINT;
     }
 }
 
-int32_t RilManagerTest::GetUssdCusd(const AppExecFwk::InnerEvent::Pointer &result)
+int32_t RilManagerTest::GetUssd(const AppExecFwk::InnerEvent::Pointer &result)
 {
-    TELEPHONY_LOGI("RilManagerTest::GetUssdCusd -->");
+    TELEPHONY_LOGI("RilManagerTest::GetUssd -->");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_CALL_GET_USSD, result);
         int32_t ret = SendInt32Event(HREQ_CALL_GET_USSD, request->serialId_);
         TELEPHONY_LOGI("SendInt32Event(ID:%{public}d) return: %{public}d", HREQ_CALL_GET_USSD, ret);
         return ret;
     } else {
-        TELEPHONY_LOGE("ERROR : GetUssdCusd --> cellularRadio_ == nullptr !!!");
+        TELEPHONY_LOGE("ERROR : GetUssd --> cellularRadio_ == nullptr !!!");
         return HRIL_ERR_NULL_POINT;
     }
 }

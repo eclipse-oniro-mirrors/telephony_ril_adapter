@@ -27,7 +27,7 @@ public:
     RilRadioIndicationTest(RilManagerTest *mRilManager);
     ~RilRadioIndicationTest();
 
-    int OnRemoteRequest(
+    int32_t OnRemoteRequest(
         uint32_t code, OHOS::MessageParcel &data, OHOS::MessageParcel &reply, OHOS::MessageOption &option) override;
     void RadioStateChange(OHOS::MessageParcel &data);
     void CallStateChgInd(OHOS::MessageParcel &data);

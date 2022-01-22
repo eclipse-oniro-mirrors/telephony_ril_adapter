@@ -108,8 +108,9 @@ void HRilData::SwitchHRilDataListToHal(
 
 int32_t HRilData::DeactivatePdpContext(struct HdfSBuf *data)
 {
-    if (dataFuncs_ == nullptr) {
-        TELEPHONY_LOGE("DeactivatePdpContext dataFuncs_ is nullptr!");
+    if (dataFuncs_ == nullptr || dataFuncs_->DeactivatePdpContext == nullptr || data == nullptr) {
+        TELEPHONY_LOGE("dataFuncs_:%{public}p or dataFuncs_->DeactivatePdpContext or data:%{public}p is nullptr!",
+            dataFuncs_, data);
         return HRIL_ERR_NULL_POINT;
     }
     struct UniInfo uInfo;
@@ -140,8 +141,9 @@ int32_t HRilData::DeactivatePdpContext(struct HdfSBuf *data)
 
 int32_t HRilData::ActivatePdpContext(struct HdfSBuf *data)
 {
-    if (dataFuncs_ == nullptr) {
-        TELEPHONY_LOGE("ActivatePdpContext dataFuncs_ is nullptr!");
+    if (dataFuncs_ == nullptr || dataFuncs_->ActivatePdpContext == nullptr || data == nullptr) {
+        TELEPHONY_LOGE("dataFuncs_:%{public}p or dataFuncs_->ActivatePdpContext or data:%{public}p is nullptr!",
+            dataFuncs_, data);
         return HRIL_ERR_NULL_POINT;
     }
     struct DataCallInfo dataCallInfo;
@@ -155,14 +157,14 @@ int32_t HRilData::ActivatePdpContext(struct HdfSBuf *data)
         TELEPHONY_LOGE("RilAdapter failed to do ReadFromParcel!");
         return HRIL_ERR_INVALID_PARAMETER;
     }
-    std::string protocol = (dataCallInfo.isRoaming ? dataCallInfo.dataProfileInfo.roamingProtocol :
-                                                     dataCallInfo.dataProfileInfo.protocol);
     dataInfo.apn = StringToCString(dataCallInfo.dataProfileInfo.apn);
-    dataInfo.type = StringToCString(protocol);
+    dataInfo.type = StringToCString(dataCallInfo.dataProfileInfo.protocol);
+    dataInfo.roamingType = StringToCString(dataCallInfo.dataProfileInfo.roamingProtocol);
     dataInfo.userName = StringToCString(dataCallInfo.dataProfileInfo.userName);
     dataInfo.password = StringToCString(dataCallInfo.dataProfileInfo.password);
     dataInfo.verType = dataCallInfo.dataProfileInfo.verType;
     dataInfo.rat = dataCallInfo.radioTechnology;
+    dataInfo.roamingEnable = dataCallInfo.roamingAllowed ? 1 : 0;
     ReqDataInfo *requestInfo = CreateHRilRequest(dataCallInfo.serial, HREQ_DATA_ACTIVATE_PDP_CONTEXT);
     if (requestInfo == nullptr) {
         return HRIL_ERR_NULL_POINT;
@@ -173,8 +175,9 @@ int32_t HRilData::ActivatePdpContext(struct HdfSBuf *data)
 
 int32_t HRilData::GetPdpContextList(struct HdfSBuf *data)
 {
-    if (dataFuncs_ == nullptr) {
-        TELEPHONY_LOGE("GetPdpContextList dataFuncs_ is nullptr!");
+    if (dataFuncs_ == nullptr || dataFuncs_->GetPdpContextList == nullptr || data == nullptr) {
+        TELEPHONY_LOGE("dataFuncs_:%{public}p or dataFuncs_->GetPdpContextList or data:%{public}p is nullptr!",
+            dataFuncs_, data);
         return HRIL_ERR_NULL_POINT;
     }
     struct UniInfo uInfo;
@@ -204,8 +207,9 @@ int32_t HRilData::GetPdpContextList(struct HdfSBuf *data)
 
 int32_t HRilData::SetInitApnInfo(struct HdfSBuf *data)
 {
-    if (dataFuncs_ == nullptr) {
-        TELEPHONY_LOGE("dataFuncs_ is nullptr!");
+    if (dataFuncs_ == nullptr || dataFuncs_->SetInitApnInfo == nullptr || data == nullptr) {
+        TELEPHONY_LOGE(
+            "dataFuncs_:%{public}p or dataFuncs_->SetInitApnInfo or data:%{public}p is nullptr!", dataFuncs_, data);
         return HRIL_ERR_NULL_POINT;
     }
     DataProfileDataInfo dataProfileInfo;
@@ -235,17 +239,13 @@ int32_t HRilData::SetInitApnInfo(struct HdfSBuf *data)
 
 int32_t HRilData::GetLinkBandwidthInfo(struct HdfSBuf *data)
 {
+    if (dataFuncs_ == nullptr || dataFuncs_->GetLinkBandwidthInfo == nullptr || data == nullptr) {
+        TELEPHONY_LOGE("dataFuncs_:%{public}p or dataFuncs_->GetLinkBandwidthInfo or data:%{public}p is nullptr!",
+            dataFuncs_, data);
+        return HRIL_ERR_NULL_POINT;
+    }
     int32_t serial = 0;
     int32_t cid;
-
-    if (dataFuncs_ == nullptr) {
-        TELEPHONY_LOGE("dataFuncs_ is nullptr!");
-        return HRIL_ERR_NULL_POINT;
-    }
-    if (data == nullptr) {
-        TELEPHONY_LOGE("RilAdapter data is null!");
-        return HRIL_ERR_NULL_POINT;
-    }
     if (!HdfSbufReadInt32(data, &serial)) {
         TELEPHONY_LOGE("miss serial parameter");
         return HRIL_ERR_INVALID_PARAMETER;
@@ -265,8 +265,10 @@ int32_t HRilData::GetLinkBandwidthInfo(struct HdfSBuf *data)
 
 int32_t HRilData::SetLinkBandwidthReportingRule(struct HdfSBuf *data)
 {
-    if (dataFuncs_ == nullptr) {
-        TELEPHONY_LOGE("dataFuncs_ is nullptr!");
+    if (dataFuncs_ == nullptr || dataFuncs_->SetLinkBandwidthReportingRule == nullptr || data == nullptr) {
+        TELEPHONY_LOGE(
+            "dataFuncs_:%{public}p or dataFuncs_->SetLinkBandwidthReportingRule or data:%{public}p is nullptr!",
+            dataFuncs_, data);
         return HRIL_ERR_NULL_POINT;
     }
     DataLinkBandwidthReportingRule linkBandwidthRule;
@@ -291,10 +293,10 @@ int32_t HRilData::SetLinkBandwidthReportingRule(struct HdfSBuf *data)
 
     TELEPHONY_LOGI("maximumUplinkKbpsSize:%{public}d, maximumDownlinkKbpsSize:%{public}d",
         linkBandwidthRule.maximumUplinkKbpsSize, linkBandwidthRule.maximumDownlinkKbpsSize);
-    for (int i = 0; i < hLinkBandwidthRule.maximumUplinkKbpsSize; i++) {
+    for (int32_t i = 0; i < hLinkBandwidthRule.maximumUplinkKbpsSize; i++) {
         hLinkBandwidthRule.maximumUplinkKbps[i] = linkBandwidthRule.maximumUplinkKbps[i];
     }
-    for (int i = 0; i < hLinkBandwidthRule.maximumDownlinkKbpsSize; i++) {
+    for (int32_t i = 0; i < hLinkBandwidthRule.maximumDownlinkKbpsSize; i++) {
         hLinkBandwidthRule.maximumDownlinkKbps[i] = linkBandwidthRule.maximumDownlinkKbps[i];
     }
     ReqDataInfo *requestInfo =

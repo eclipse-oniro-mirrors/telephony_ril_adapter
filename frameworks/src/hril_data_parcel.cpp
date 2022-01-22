@@ -403,7 +403,7 @@ std::shared_ptr<DataLinkBandwidthInfo> DataLinkBandwidthInfo::UnMarshalling(Parc
 
 bool DataLinkBandwidthReportingRule::ReadFromParcel(Parcel &parcel)
 {
-    int i;
+    int32_t i;
     if (!Read(parcel, serial)) {
         return false;
     }
@@ -442,7 +442,7 @@ bool DataLinkBandwidthReportingRule::ReadFromParcel(Parcel &parcel)
 
 bool DataLinkBandwidthReportingRule::Marshalling(Parcel &parcel) const
 {
-    int i;
+    int32_t i;
     if (!Write(parcel, serial)) {
         return false;
     }
