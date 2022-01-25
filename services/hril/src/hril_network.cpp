@@ -1347,7 +1347,7 @@ int32_t HRilNetwork::GetNetworkSelectionModeResponse(
 void HRilNetwork::BuildOperatorList(AvailableNetworkList &availableNetworkList, HRilRadioResponseInfo &responseInfo,
     const void *response, size_t responseLen)
 {
-    int32_t numStrings = responseLen;
+    int32_t numStrings = responseLen / sizeof(AvailableOperInfo *);
     if (response == nullptr) {
         TELEPHONY_LOGE("response is nullptr");
         if (responseInfo.error == HRilErrType::NONE) {
