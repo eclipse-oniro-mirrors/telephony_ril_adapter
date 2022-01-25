@@ -46,7 +46,7 @@ ohos_executable("ril_adapter_test") {
     "//drivers/adapter/uhdf2/utils:libhdf_utils",
   ]
   external_deps = [
-    "appexecfwk_standard:libeventhandler",
+    "eventhandler:libeventhandler",
     "ipc:ipc_core",
     "ril_adapter:hril_innerkits",
   ]
