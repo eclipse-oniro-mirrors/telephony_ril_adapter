@@ -1194,18 +1194,18 @@ int32_t HRilCall::SetLteImsSwitchStatusResponse(
 
 int32_t HRilCall::CallStateUpdated(int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen)
 {
-    struct HdfSBuf *dataSbuf = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *dataSbuf = HdfSbufTypedObtain(SBUF_IPC);
 
     if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     int32_t ret = ServiceNotifyDispatcher(HNOTI_CALL_STATE_UPDATED, dataSbuf);
     if (ret != HRIL_ERR_SUCCESS) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
-    HdfSBufRecycle(dataSbuf);
+    HdfSbufRecycle(dataSbuf);
     return HRIL_ERR_SUCCESS;
 }
 

@@ -379,18 +379,18 @@ int32_t HRilData::PdpContextListUpdated(
         return HRIL_ERR_GENERIC_FAILURE;
     }
     if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     dataCallResultList.size = dataCallResultList.dcList.size();
     dataCallResultList.Marshalling(*parcel.get());
     int32_t ret = ServiceNotifyDispatcher(HNOTI_DATA_PDP_CONTEXT_LIST_UPDATED, dataSbuf);
     if (ret != HRIL_ERR_SUCCESS) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         TELEPHONY_LOGE("Call Dispatch is failed. ret:%{public}d", ret);
         return HRIL_ERR_GENERIC_FAILURE;
     }
-    HdfSBufRecycle(dataSbuf);
+    HdfSbufRecycle(dataSbuf);
     return HRIL_ERR_SUCCESS;
 }
 

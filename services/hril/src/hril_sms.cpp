@@ -756,24 +756,24 @@ int32_t HRilSms::SendSmsMoreModeResponse(
 int32_t HRilSms::SendSmsAckResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    struct HdfSBuf *dataSbuf = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *dataSbuf = HdfSbufTypedObtain(SBUF_IPC);
     if (dataSbuf == nullptr) {
         TELEPHONY_LOGE("dataSbuf in SendSmsAckResponse is nullptr!");
         return HRIL_ERR_NULL_POINT;
     }
     if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&responseInfo, sizeof(HRilRadioResponseInfo))) {
         TELEPHONY_LOGE("HdfSbufWriteUnpadBuffer in SendSmsAckResponse is failed!");
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     int32_t ret = ServiceDispatcher(requestNum, dataSbuf);
     if (ret != HRIL_ERR_SUCCESS) {
         TELEPHONY_LOGE("ret in SendSmsAckResponse is not equal to HRIL_ERR_SUCCESS!");
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     if (dataSbuf != nullptr) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
     }
     return HRIL_ERR_SUCCESS;
 }
@@ -833,16 +833,16 @@ int32_t HRilSms::SmsStatusReportNotify(
     }
     if (!HdfSbufWriteInt32(dataSbuf, indType)) {
         TELEPHONY_LOGE("HdfSbufWriteInt32 in SmsStatusReportNotify is failed!");
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     int32_t ret = ServiceNotifyDispatcher(HNOTI_SMS_STATUS_REPORT, dataSbuf);
     if (ret != HRIL_ERR_SUCCESS) {
         TELEPHONY_LOGE("ret in SmsStatusReportNotify is not equal to HRIL_ERR_SUCCESS!");
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
-    HdfSBufRecycle(dataSbuf);
+    HdfSbufRecycle(dataSbuf);
     return HRIL_ERR_SUCCESS;
 }
 
@@ -855,35 +855,35 @@ int32_t HRilSms::NewSmsStoredOnSimNotify(
     }
     indType = (int32_t)ConvertIntToRadioNoticeType(indType);
     int32_t recordNumber = *(static_cast<const int32_t *>(response));
-    struct HdfSBuf *dataSbuf = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *dataSbuf = HdfSbufTypedObtain(SBUF_IPC);
     if (dataSbuf == nullptr) {
-        TELEPHONY_LOGE("HdfSBufTypedObtain in NewSmsStoredOnSimNotify is failed!");
+        TELEPHONY_LOGE("HdfSbufTypedObtain in NewSmsStoredOnSimNotify is failed!");
         return HRIL_ERR_NULL_POINT;
     }
     if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
         TELEPHONY_LOGE("HdfSbufWriteInt32 in SmsStatusReportNotify is failed!");
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     if (!HdfSbufWriteInt32(dataSbuf, recordNumber)) {
         TELEPHONY_LOGE("HdfSbufWriteInt32 in NewSmsStoredOnSimNotify is failed!");
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     if (!HdfSbufWriteInt32(dataSbuf, indType)) {
         TELEPHONY_LOGE("HdfSbufWriteInt32 in NewSmsStoredOnSimNotify is failed!");
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     int32_t ret = ServiceNotifyDispatcher(HNOTI_SMS_NEW_SMS_STORED_ON_SIM, dataSbuf);
     if (ret != HRIL_ERR_SUCCESS) {
         TELEPHONY_LOGE("ret in NewSmsStoredOnSimNotify is not equal to HRIL_ERR_SUCCESS!");
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     if (dataSbuf != nullptr) {
         TELEPHONY_LOGE("dataSbuf in NewSmsStoredOnSimNotify is nullptr!");
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
     }
     return HRIL_ERR_SUCCESS;
 }
@@ -967,16 +967,16 @@ int32_t HRilSms::NewCdmaSmsNotify(int32_t indType, const HRilErrNumber e, const 
         return HRIL_ERR_NULL_POINT;
     }
     if (!HdfSbufWriteInt32(dataSbuf, indType)) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     int32_t ret = ServiceNotifyDispatcher(HNOTI_SMS_NEW_CDMA_SMS, dataSbuf);
     if (ret != HRIL_ERR_SUCCESS) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     if (dataSbuf != nullptr) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
     }
     return HRIL_ERR_SUCCESS;
 }
@@ -1000,17 +1000,17 @@ int32_t HRilSms::CBConfigNotify(int32_t indType, const HRilErrNumber e, const vo
     }
     if (!HdfSbufWriteInt32(dataSbuf, indType)) {
         TELEPHONY_LOGE("HdfSbufWriteInt32 in CBConfigNotify is failed!");
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     int32_t ret = ServiceNotifyDispatcher(HNOTI_CB_CONFIG_REPORT, dataSbuf);
     if (ret != HRIL_ERR_SUCCESS) {
         TELEPHONY_LOGE("ret in CBConfigNotify is not equal to HRIL_ERR_SUCCESS!");
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     if (dataSbuf != nullptr) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
     }
     return HRIL_ERR_SUCCESS;
 }
@@ -1033,16 +1033,16 @@ int32_t HRilSms::DataSbuf(HdfSBuf *dataSbuf, int32_t indType)
     }
     if (!HdfSbufWriteInt32(dataSbuf, indType)) {
         TELEPHONY_LOGE("HdfSbufWriteInt32 in DataSbuf is failed!");
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     int32_t ret = ServiceNotifyDispatcher(HNOTI_SMS_NEW_SMS, dataSbuf);
     if (ret != HRIL_ERR_SUCCESS) {
         TELEPHONY_LOGE("ret in DataSbuf is not equal to HRIL_ERR_SUCCESS!");
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
-    HdfSBufRecycle(dataSbuf);
+    HdfSbufRecycle(dataSbuf);
     return HRIL_ERR_SUCCESS;
 }
 

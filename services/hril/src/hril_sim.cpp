@@ -769,32 +769,32 @@ int32_t HRilSim::GetImsiResponse(
             responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
         }
     }
-    struct HdfSBuf *dataSbuf = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *dataSbuf = HdfSbufTypedObtain(SBUF_IPC);
     if (dataSbuf == nullptr) {
         TELEPHONY_LOGE("Error : dataSbuf in GetImsiResponse is nullptr!");
         return HRIL_ERR_NULL_POINT;
     }
     if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     if (!HdfSbufWriteString(dataSbuf, (const char *)response)) {
         TELEPHONY_LOGE("HdfSbufWriteString in GetImsiResponse is failed!");
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&responseInfo, sizeof(responseInfo))) {
         TELEPHONY_LOGE("HdfSbufWriteUnpadBuffer in GetImsiResponse is failed!");
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     int32_t ret = ServiceDispatcher(requestNum, dataSbuf);
     if (ret != HRIL_ERR_SUCCESS) {
         TELEPHONY_LOGE("ret in GetImsiResponse is not equal to HRIL_ERR_SUCCESS!");
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
-    HdfSBufRecycle(dataSbuf);
+    HdfSbufRecycle(dataSbuf);
 
     return HRIL_ERR_SUCCESS;
 }
@@ -811,32 +811,32 @@ int32_t HRilSim::GetSimLockStatusResponse(
     } else {
         simLockStatus = *(static_cast<const int32_t *>(response));
     }
-    struct HdfSBuf *dataSbuf = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *dataSbuf = HdfSbufTypedObtain(SBUF_IPC);
     if (dataSbuf == nullptr) {
         TELEPHONY_LOGE("GetSimLockStatusResponse dataSbuf is NULL.");
         return HRIL_ERR_NULL_POINT;
     }
     if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     if (!HdfSbufWriteInt32(dataSbuf, simLockStatus)) {
         TELEPHONY_LOGE("HdfSbufWriteInt32 in GetSimLockStatusResponse is failed!");
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&responseInfo, sizeof(responseInfo))) {
         TELEPHONY_LOGE("HdfSbufWriteUnpadBuffer in GetSimLockStatusResponse is failed!");
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     int32_t ret = ServiceDispatcher(requestNum, dataSbuf);
     if (ret != HRIL_ERR_SUCCESS) {
         TELEPHONY_LOGE("ret in GetSimLockStatusResponse is not equal to HRIL_ERR_SUCCESS!");
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
-    HdfSBufRecycle(dataSbuf);
+    HdfSbufRecycle(dataSbuf);
     return HRIL_ERR_SUCCESS;
 }
 
@@ -1026,19 +1026,19 @@ IccIoResultInfo HRilSim::ProcessIccIoResponse(
 
 int32_t HRilSim::SimStateUpdated(int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen)
 {
-    struct HdfSBuf *dataSbuf = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *dataSbuf = HdfSbufTypedObtain(SBUF_IPC);
     if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     int32_t ret = ServiceNotifyDispatcher(HNOTI_SIM_STATUS_CHANGED, dataSbuf);
     if (ret != HRIL_ERR_SUCCESS) {
         TELEPHONY_LOGE("ret in SimStateUpdated is not equal to HRIL_ERR_SUCCESS!");
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     if (dataSbuf != nullptr) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
     }
 
     return HRIL_ERR_SUCCESS;
@@ -1047,19 +1047,19 @@ int32_t HRilSim::SimStateUpdated(int32_t notifyType, const HRilErrNumber e, cons
 int32_t HRilSim::SimStkSessionEndNotify(
     int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen)
 {
-    struct HdfSBuf *dataSbuf = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *dataSbuf = HdfSbufTypedObtain(SBUF_IPC);
     if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     int32_t ret = ServiceNotifyDispatcher(HNOTI_SIM_STK_SESSION_END_NOTIFY, dataSbuf);
     if (ret != HRIL_ERR_SUCCESS) {
         TELEPHONY_LOGE("ret in SimStkSessionEndNotify is not equal to HRIL_ERR_SUCCESS!");
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     if (dataSbuf != nullptr) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
     }
 
     return HRIL_ERR_SUCCESS;
@@ -1068,46 +1068,46 @@ int32_t HRilSim::SimStkSessionEndNotify(
 int32_t HRilSim::SimStkProactiveNotify(
     int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen)
 {
-    struct HdfSBuf *dataSbuf = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *dataSbuf = HdfSbufTypedObtain(SBUF_IPC);
     if (dataSbuf == nullptr) {
         TELEPHONY_LOGE("Error : dataSbuf in SimStkProactiveNotify is nullptr!");
         return HRIL_ERR_NULL_POINT;
     }
     if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     if (!HdfSbufWriteString(dataSbuf, (const char *)response)) {
         TELEPHONY_LOGE("HdfSbufWriteString in SimStkProactiveNotify is failed!");
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     int32_t ret = ServiceNotifyDispatcher(HNOTI_SIM_STK_PROACTIVE_NOTIFY, dataSbuf);
     if (ret != HRIL_ERR_SUCCESS) {
         TELEPHONY_LOGE("ret in SimStkProactiveNotify is not equal to HRIL_ERR_SUCCESS!");
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
-    HdfSBufRecycle(dataSbuf);
+    HdfSbufRecycle(dataSbuf);
 
     return HRIL_ERR_SUCCESS;
 }
 
 int32_t HRilSim::SimStkAlphaNotify(int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen)
 {
-    struct HdfSBuf *dataSbuf = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *dataSbuf = HdfSbufTypedObtain(SBUF_IPC);
     if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     int32_t ret = ServiceNotifyDispatcher(HNOTI_SIM_STK_ALPHA_NOTIFY, dataSbuf);
     if (ret != HRIL_ERR_SUCCESS) {
         TELEPHONY_LOGE("ret in SimStkAlphaNotify is not equal to HRIL_ERR_SUCCESS!");
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     if (dataSbuf != nullptr) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
     }
 
     return HRIL_ERR_SUCCESS;

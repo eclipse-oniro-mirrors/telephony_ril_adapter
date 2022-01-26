@@ -281,23 +281,23 @@ int32_t HRilBase::ResponseMessageParcel(const HRilRadioResponseInfo &responseInf
     }
     // step2:Write slotId into serialization.
     if (!HdfSbufWriteInt32(dataSbuf, slotId_)) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     // step3:Write data to serialization.
     data.Marshalling(*parcel.get());
     // step4:Write responseInfo into serialization.
     if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&responseInfo, sizeof(responseInfo))) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     // step5:Dispatch to telRil.
     int32_t ret = ServiceDispatcher(requestNum, dataSbuf);
     if (ret != HRIL_ERR_SUCCESS) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
-    HdfSBufRecycle(dataSbuf);
+    HdfSbufRecycle(dataSbuf);
     return HRIL_ERR_SUCCESS;
 }
 
@@ -314,7 +314,7 @@ int32_t HRilBase::NotifyMessageParcel(T &data, int32_t requestNum)
     }
     // step2:Write slotId into serialization.
     if (!HdfSbufWriteInt32(dataSbuf, slotId_)) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     // step3:Write data to serialization.
@@ -322,10 +322,10 @@ int32_t HRilBase::NotifyMessageParcel(T &data, int32_t requestNum)
     // step4:Dispatch to telRil.
     int32_t ret = ServiceNotifyDispatcher(requestNum, dataSbuf);
     if (ret != HRIL_ERR_SUCCESS) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
-    HdfSBufRecycle(dataSbuf);
+    HdfSbufRecycle(dataSbuf);
     return HRIL_ERR_SUCCESS;
 }
 } // namespace Telephony
