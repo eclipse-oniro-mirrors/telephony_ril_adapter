@@ -184,18 +184,18 @@ static int32_t RilAdapterInit(struct HdfDeviceObject *device)
         return HDF_ERR_INVALID_OBJECT;
     }
     DFX_InstallSignalHandler();
-    struct HdfSBuf *sbuf = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *sbuf = HdfSbufTypedObtain(SBUF_IPC);
     if (sbuf == NULL) {
         TELEPHONY_LOGE("HdfSampleDriverBind, failed to obtain ipc sbuf");
         return HDF_ERR_INVALID_OBJECT;
     }
     if (!HdfSbufWriteString(sbuf, "string")) {
         TELEPHONY_LOGE("HdfSampleDriverBind, failed to write string to ipc sbuf");
-        HdfSBufRecycle(sbuf);
+        HdfSbufRecycle(sbuf);
         return HDF_FAILURE;
     }
     if (sbuf != NULL) {
-        HdfSBufRecycle(sbuf);
+        HdfSbufRecycle(sbuf);
     }
     TELEPHONY_LOGI("sbuf IPC obtain success!");
     LoadVendor();

@@ -296,7 +296,7 @@ int32_t DispatchRequest(int32_t cmd, struct HdfSBuf *data)
     }
     switch (cmd) {
         case HRIL_ADAPTER_RADIO_INDICATION: {
-            HdfRemoteService *serviceCallbackInd = HdfSBufReadRemoteService(data);
+            HdfRemoteService *serviceCallbackInd = HdfSbufReadRemoteService(data);
             if (serviceCallbackInd == nullptr) {
                 TELEPHONY_LOGE("miss callback parameter");
                 return HDF_ERR_INVALID_PARAM;
@@ -305,7 +305,7 @@ int32_t DispatchRequest(int32_t cmd, struct HdfSBuf *data)
             break;
         }
         case HRIL_ADAPTER_RADIO_RESPONSE: {
-            HdfRemoteService *serviceCallback = HdfSBufReadRemoteService(data);
+            HdfRemoteService *serviceCallback = HdfSbufReadRemoteService(data);
             if (serviceCallback == nullptr) {
                 TELEPHONY_LOGE("miss callback parameter");
                 return HDF_ERR_INVALID_PARAM;

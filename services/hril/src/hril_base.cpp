@@ -49,7 +49,7 @@ int32_t HRilBase::ResponseHeader(
 
 int32_t HRilBase::ReportHeader(std::shared_ptr<struct HdfSBuf> &dataSbuf, MessageParcel &parcel)
 {
-    dataSbuf.reset(ParcelToSbuf(&parcel), [](struct HdfSBuf *d) { HdfSBufRecycle(d); });
+    dataSbuf.reset(ParcelToSbuf(&parcel), [](struct HdfSBuf *d) { HdfSbufRecycle(d); });
     if (dataSbuf == nullptr) {
         TELEPHONY_LOGE("dataSbuf is null!!!");
         return HRIL_ERR_NULL_POINT;
@@ -64,83 +64,83 @@ int32_t HRilBase::ReportHeader(std::shared_ptr<struct HdfSBuf> &dataSbuf, Messag
 int32_t HRilBase::ResponseBuffer(
     int32_t requestNum, const void *responseInfo, uint32_t reqLen, const void *event, uint32_t eventLen)
 {
-    struct HdfSBuf *dataSbuf = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *dataSbuf = HdfSbufTypedObtain(SBUF_IPC);
     if (dataSbuf == nullptr) {
         return HRIL_ERR_NULL_POINT;
     }
     if (!HdfSbufWriteInt32(dataSbuf, slotId_)) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)responseInfo, reqLen)) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)event, eventLen)) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     int32_t ret = ServiceDispatcher(requestNum, dataSbuf);
     if (ret != HRIL_ERR_SUCCESS) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     if (dataSbuf != nullptr) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
     }
     return HRIL_ERR_SUCCESS;
 }
 
 int32_t HRilBase::ResponseInt32(int32_t requestNum, const void *responseInfo, uint32_t reqLen, uint32_t value)
 {
-    struct HdfSBuf *dataSbuf = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *dataSbuf = HdfSbufTypedObtain(SBUF_IPC);
     if (dataSbuf == nullptr) {
         return HRIL_ERR_NULL_POINT;
     }
     if (!HdfSbufWriteInt32(dataSbuf, slotId_)) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)responseInfo, reqLen)) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     if (!HdfSbufWriteInt32(dataSbuf, value)) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     int32_t ret = ServiceDispatcher(requestNum, dataSbuf);
     if (ret != HRIL_ERR_SUCCESS) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     if (dataSbuf != nullptr) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
     }
     return HRIL_ERR_SUCCESS;
 }
 
 int32_t HRilBase::ResponseRequestInfo(int32_t requestNum, const void *responseInfo, uint32_t reqLen)
 {
-    struct HdfSBuf *dataSbuf = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *dataSbuf = HdfSbufTypedObtain(SBUF_IPC);
     if (dataSbuf == nullptr) {
         return HRIL_ERR_NULL_POINT;
     }
     if (!HdfSbufWriteInt32(dataSbuf, slotId_)) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)responseInfo, reqLen)) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     int32_t ret = ServiceDispatcher(requestNum, dataSbuf);
     if (ret != HRIL_ERR_SUCCESS) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     if (dataSbuf != nullptr) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
     }
     return HRIL_ERR_SUCCESS;
 }

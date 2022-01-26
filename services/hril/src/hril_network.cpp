@@ -601,28 +601,28 @@ int32_t HRilNetwork::NetworkCsRegStatusUpdated(
         return HRIL_ERR_NULL_POINT;
     }
     if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     if (!regStatusInfoNotify.Marshalling(*parcel.get())) {
         TELEPHONY_LOGE("Marshalling is fail");
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     indType = static_cast<int32_t>(ConvertIntToRadioNoticeType(indType));
     if (!HdfSbufWriteInt32(dataSbuf, indType)) {
         TELEPHONY_LOGE("HdfSbufWriteInt32 in NetworkCsRegStatusUpdated is failed!");
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     int32_t ret = ServiceNotifyDispatcher(HNOTI_NETWORK_CS_REG_STATUS_UPDATED, dataSbuf);
     if (ret != HRIL_ERR_SUCCESS) {
         TELEPHONY_LOGE("ret is not equal to HRIL_ERR_SUCCESS!");
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     if (dataSbuf != nullptr) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
     }
     return HRIL_ERR_SUCCESS;
 }
@@ -659,21 +659,21 @@ int32_t HRilNetwork::NetworkPhyChnlCfgUpdated(
         return HRIL_ERR_NULL_POINT;
     }
     if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     if (!phyChnlCfgList.Marshalling(*parcel.get())) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     indType = static_cast<int32_t>(ConvertIntToRadioNoticeType(indType));
     if (!HdfSbufWriteInt32(dataSbuf, indType)) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     ServiceNotifyDispatcher(HNOTI_NETWORK_PHY_CHNL_CFG_UPDATED, dataSbuf);
     if (dataSbuf != nullptr) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
     }
     return HRIL_ERR_SUCCESS;
 }
@@ -727,12 +727,12 @@ int32_t HRilNetwork::NetworkCurrentCellUpdated(
     }
     indType = static_cast<int32_t>(ConvertIntToRadioNoticeType(indType));
     if (!HdfSbufWriteInt32(dataSbuf, indType)) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     ServiceNotifyDispatcher(HNOTI_NETWORK_CURRENT_CELL_UPDATED, dataSbuf);
     if (dataSbuf != nullptr) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
     }
     return HRIL_ERR_SUCCESS;
 }
@@ -762,28 +762,28 @@ int32_t HRilNetwork::NetworkPsRegStatusUpdated(
         return HRIL_ERR_NULL_POINT;
     }
     if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     if (!regStatusInfoNotify.Marshalling(*parcel.get())) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         TELEPHONY_LOGE("Marshalling is fail");
         return HRIL_ERR_GENERIC_FAILURE;
     }
     indType = static_cast<int32_t>(ConvertIntToRadioNoticeType(indType));
     if (!HdfSbufWriteInt32(dataSbuf, indType)) {
         TELEPHONY_LOGE("HdfSbufWriteInt32 in NetworkPsRegStatusUpdated is failed!");
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     int32_t ret = ServiceNotifyDispatcher(HNOTI_NETWORK_PS_REG_STATUS_UPDATED, dataSbuf);
     if (ret != HRIL_ERR_SUCCESS) {
         TELEPHONY_LOGE("ret is not equal to HRIL_ERR_SUCCESS!");
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     if (dataSbuf != nullptr) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
     }
     return HRIL_ERR_SUCCESS;
 }
@@ -811,27 +811,27 @@ int32_t HRilNetwork::NetworkImsRegStatusUpdated(
         return HRIL_ERR_NULL_POINT;
     }
     if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     if (!imsRegStatusInfoNotify.Marshalling(*parcel.get())) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     indType = static_cast<int32_t>(ConvertIntToRadioNoticeType(indType));
     if (!HdfSbufWriteInt32(dataSbuf, indType)) {
         TELEPHONY_LOGE("HdfSbufWriteInt32 in NetworkImsRegStatusUpdated is failed!");
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     int32_t ret = ServiceNotifyDispatcher(HNOTI_NETWORK_IMS_REG_STATUS_UPDATED, dataSbuf);
     if (ret != HRIL_ERR_SUCCESS) {
         TELEPHONY_LOGE("ret is not equal to HRIL_ERR_SUCCESS!");
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     if (dataSbuf != nullptr) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
     }
     return HRIL_ERR_SUCCESS;
 }
@@ -847,32 +847,32 @@ int32_t HRilNetwork::SignalStrengthUpdated(
     } else {
         ExchangeRilRssiToHdf(response, responseLen, rssi);
     }
-    struct HdfSBuf *dataSbuf = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *dataSbuf = HdfSbufTypedObtain(SBUF_IPC);
     if (dataSbuf == nullptr) {
         TELEPHONY_LOGE("dataSbuf is nullptr");
         return HRIL_ERR_NULL_POINT;
     }
     if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&rssi, sizeof(rssi))) {
         TELEPHONY_LOGE("HdfSbufWriteUnpadBuffer in SignalStrengthUpdated is failed!");
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     if (!HdfSbufWriteInt32(dataSbuf, indType)) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     int32_t ret = ServiceNotifyDispatcher(HNOTI_NETWORK_SIGNAL_STRENGTH_UPDATED, dataSbuf);
     if (ret != HRIL_ERR_SUCCESS) {
         TELEPHONY_LOGE("ret is not equal to HRIL_ERR_SUCCESS!");
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     if (dataSbuf != nullptr) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
     }
     return HRIL_ERR_SUCCESS;
 }
@@ -882,33 +882,33 @@ int32_t HRilNetwork::NetworkTimeUpdated(
 {
     indType = static_cast<int32_t>(ConvertIntToRadioNoticeType(indType));
 
-    struct HdfSBuf *dataSbuf = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *dataSbuf = HdfSbufTypedObtain(SBUF_IPC);
     if (dataSbuf == nullptr) {
         TELEPHONY_LOGE("dataSbuf is nullptr");
         return HRIL_ERR_NULL_POINT;
     }
     if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     if (!HdfSbufWriteString(dataSbuf, (const char *)response)) {
         TELEPHONY_LOGE("HdfSbufWriteString in NetworkTimeUpdated is failed!");
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     if (!HdfSbufWriteInt32(dataSbuf, indType)) {
         TELEPHONY_LOGE("HdfSbufWriteInt32 in NetworkTimeUpdated is failed!");
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     int32_t ret = ServiceNotifyDispatcher(HNOTI_NETWORK_TIME_UPDATED, dataSbuf);
     if (ret != HRIL_ERR_SUCCESS) {
         TELEPHONY_LOGE("ret is not equal to HRIL_ERR_SUCCESS!");
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     if (dataSbuf != nullptr) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
     }
     return HRIL_ERR_SUCCESS;
 }
@@ -918,35 +918,35 @@ int32_t HRilNetwork::NetworkTimeZoneUpdated(
 {
     indType = static_cast<int32_t>(ConvertIntToRadioNoticeType(indType));
 
-    struct HdfSBuf *dataSbuf = HdfSBufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *dataSbuf = HdfSbufTypedObtain(SBUF_IPC);
     if (dataSbuf == nullptr) {
         TELEPHONY_LOGE("dataSbuf is nullptr");
         return HRIL_ERR_NULL_POINT;
     }
     if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     if (!HdfSbufWriteString(dataSbuf, (const char *)response)) {
         TELEPHONY_LOGE("HdfSbufWriteString in NetworkTimeZoneUpdated is failed!");
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
 
     if (!HdfSbufWriteInt32(dataSbuf, indType)) {
         TELEPHONY_LOGE("HdfSbufWriteInt32 in NetworkTimeZoneUpdated is failed!");
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     int32_t ret = ServiceNotifyDispatcher(HNOTI_NETWORK_TIME_ZONE_UPDATED, dataSbuf);
     if (ret != HRIL_ERR_SUCCESS) {
         TELEPHONY_LOGE("ret is not equal to HRIL_ERR_SUCCESS!");
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
     TELEPHONY_LOGI("serviceCallbackNotify_->dispatcher->Dispatch ret %{public}d", ret);
     if (dataSbuf != nullptr) {
-        HdfSBufRecycle(dataSbuf);
+        HdfSbufRecycle(dataSbuf);
     }
     return HRIL_ERR_SUCCESS;
 }
@@ -960,7 +960,7 @@ int32_t HRilNetwork::GetPsRegStatus(struct HdfSBuf *data)
     int32_t serial = 0;
     if (!HdfSbufReadInt32(data, &serial)) {
         TELEPHONY_LOGE("miss serial parameter");
-        HdfSBufRecycle(data);
+        HdfSbufRecycle(data);
         return HRIL_ERR_INVALID_PARAMETER;
     }
     ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_NETWORK_GET_PS_REG_STATUS);

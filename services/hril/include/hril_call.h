@@ -177,11 +177,11 @@ private:
             return HDF_FAILURE;
         }
         if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
-            HdfSBufRecycle(dataSbuf);
+            HdfSbufRecycle(dataSbuf);
             return HRIL_ERR_GENERIC_FAILURE;
         }
         if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&responseInfo, sizeof(responseInfo))) {
-            HdfSBufRecycle(dataSbuf);
+            HdfSbufRecycle(dataSbuf);
             return HDF_FAILURE;
         }
 
@@ -189,11 +189,11 @@ private:
 
         int32_t ret = ServiceDispatcher(requestNum, dataSbuf);
         if (ret != HDF_SUCCESS) {
-            HdfSBufRecycle(dataSbuf);
+            HdfSbufRecycle(dataSbuf);
             return HDF_FAILURE;
         }
         if (dataSbuf != nullptr) {
-            HdfSBufRecycle(dataSbuf);
+            HdfSbufRecycle(dataSbuf);
         }
         return HDF_SUCCESS;
     }
