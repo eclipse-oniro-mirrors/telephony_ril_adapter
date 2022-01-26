@@ -343,6 +343,7 @@ int32_t HRilData::GetPdpContextListResponse(
     if (response != nullptr) {
         SwitchHRilDataListToHal(response, responseLen, dataCallResultList.dcList);
     }
+    dataCallResultList.size = dataCallResultList.dcList.size();
     return ResponseMessageParcel(responseInfo, dataCallResultList, requestNum);
 }
 
