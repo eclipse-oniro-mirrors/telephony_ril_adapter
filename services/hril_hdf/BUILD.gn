@@ -47,6 +47,7 @@ ohos_shared_library("hril_hdf") {
     external_deps = [ "hilog:libhilog" ]
   }
 
+  install_images = [ chipset_base_dir ]
   part_name = "ril_adapter"
   subsystem_name = "telephony"
 }
