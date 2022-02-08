@@ -26,8 +26,8 @@
         "adapted_system_type": [
             "standard"
         ],
-        "rom": "",
-        "ram": "",
+        "rom": "700KB",
+        "ram": "1MB",
         "deps": {
             "components": [
                 "aafwk_standard",
@@ -50,6 +50,7 @@
         },
         "build": {
             "sub_component": [
+                "//base/telephony/ril_adapter/interfaces/innerkits:hril_innerkits",
                 "//base/telephony/ril_adapter/services/hril:hril",
                 "//base/telephony/ril_adapter/services/hril_hdf:hril_hdf",
                 "//base/telephony/ril_adapter/services/vendor:ril_vendor"
