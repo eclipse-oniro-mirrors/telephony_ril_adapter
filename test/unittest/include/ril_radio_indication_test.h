@@ -30,16 +30,20 @@ public:
     int32_t OnRemoteRequest(
         uint32_t code, OHOS::MessageParcel &data, OHOS::MessageParcel &reply, OHOS::MessageOption &option) override;
     void RadioStateChange(OHOS::MessageParcel &data);
-    void CallStateChgInd(OHOS::MessageParcel &data);
+    void CallStateUpdated(OHOS::MessageParcel &data);
+    void CallCRingReport(OHOS::MessageParcel &data);
+    void CallRingbackVoiceReport(OHOS::MessageParcel &data);
+    void CallSrvccStatusReport(OHOS::MessageParcel &data);
+    void CallEmergencyNumberReport(OHOS::MessageParcel &data);
     void NetworkStateNotify(OHOS::MessageParcel &data);
     void NewSmsNotify(OHOS::MessageParcel &data);
     void NewCdmaSmsNotify(OHOS::MessageParcel &data);
     void SmsStatusReportNotify(OHOS::MessageParcel &data);
     void NewSmsStoredOnSimNotify(OHOS::MessageParcel &data);
     void GetSignalStrength(OHOS::MessageParcel &data);
-    void ChangedDataCallList(OHOS::MessageParcel &data);
+    void PdpContextListChangedNotify(OHOS::MessageParcel &data);
     void UpdatedSimFile(OHOS::MessageParcel &data);
-    void ChangedSimState(OHOS::MessageParcel &data);
+    void SimStateChanged(OHOS::MessageParcel &data);
     void ConnectedReturnRilVersion(OHOS::MessageParcel &data);
     void ChangedImsNetworkState(OHOS::MessageParcel &data);
 

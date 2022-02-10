@@ -30,42 +30,72 @@ public:
 
     void OnInit();
     void OnInitForRegister(const std::unique_ptr<AppExecFwk::EventHandler> &handler);
-    void GetRilCmCurrentCallsTest(const AppExecFwk::InnerEvent::Pointer &result);
-    void IccRilCmIoForAppTest(const AppExecFwk::InnerEvent::Pointer &result);
-    void GetRilCmImsiForAppTest(const AppExecFwk::InnerEvent::Pointer &result);
-    void GetRilCmSignalIntensityTest(const AppExecFwk::InnerEvent::Pointer &result);
-    void GetLastCallErrorCodeTest(const AppExecFwk::InnerEvent::Pointer &result);
-    void GetRilCmIccCardStatusTest(const AppExecFwk::InnerEvent::Pointer &result);
-    void RilCmDialByUusInfoTest(const AppExecFwk::InnerEvent::Pointer &result);
+
+    void GetImeiStressTest(const AppExecFwk::InnerEvent::Pointer &result);
+    void RilCmDialStressTest(const AppExecFwk::InnerEvent::Pointer &result);
+    void SetRilCmRadioPowerStressTest(const AppExecFwk::InnerEvent::Pointer &result);
+
+    void GetCallListTest(const AppExecFwk::InnerEvent::Pointer &result);
     void RilCmDialTest(const AppExecFwk::InnerEvent::Pointer &result);
-    void RilCmRejectCallTest(const AppExecFwk::InnerEvent::Pointer &result);
-    void RilCmHoldCallTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
-    void RilCmActiveCallTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
-    void RilCmSwapCallTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void HangupTest(const AppExecFwk::InnerEvent::Pointer &result);
+    void RejectTest(const AppExecFwk::InnerEvent::Pointer &result);
+    void AnswerCallTest(const AppExecFwk::InnerEvent::Pointer &result);
+    void HoldCallTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void UnHoldCallTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void SwitchCallTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void RilCmJoinCallTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void RilCmSplitCallTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
-    void HangupRilCmConnectionTest(const AppExecFwk::InnerEvent::Pointer &result);
-    void AcceptRilCmCallTest(const AppExecFwk::InnerEvent::Pointer &result);
+    void CallSupplementTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void SendDtmfTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void StartDtmfTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void StopDtmfTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void SetUssdCusdTest(const AppExecFwk::InnerEvent::Pointer &result);
+    void GetUssdCusdTest(const AppExecFwk::InnerEvent::Pointer &result);
+    void SetMuteTest(const AppExecFwk::InnerEvent::Pointer &result);
+    void GetMuteTest(const AppExecFwk::InnerEvent::Pointer &result);
+    void GetEmergencyListTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void GetFailReasonTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+
+    void IccRilSimIoForAppTest(const AppExecFwk::InnerEvent::Pointer &result);
+    void GetRilCmImsiForAppTest(const AppExecFwk::InnerEvent::Pointer &result);
+    void GetRilCmSignalIntensityTest(const AppExecFwk::InnerEvent::Pointer &result);
+    void GetRilCmIccCardStatusTest(const AppExecFwk::InnerEvent::Pointer &result);
     void GetRilCmCsRegStatusTest(const AppExecFwk::InnerEvent::Pointer &result);
     void GetRilCmPsRegStatusTest(const AppExecFwk::InnerEvent::Pointer &result);
     void GetRilCmOperatorTest(const AppExecFwk::InnerEvent::Pointer &result);
     void SendRilCmSmsTest(const AppExecFwk::InnerEvent::Pointer &result);
     void SendRilCmSmsMoreModeTest(const AppExecFwk::InnerEvent::Pointer &result);
     void SetRilCmRadioPowerTest(const AppExecFwk::InnerEvent::Pointer &result);
+    void GetRilRadioPowerTest(const AppExecFwk::InnerEvent::Pointer &result);
+    void GetImeiTest(const AppExecFwk::InnerEvent::Pointer &result);
     void AcknowledgeRilCmLastIncomingGsmSmsTest(const AppExecFwk::InnerEvent::Pointer &result);
-    void SetupRilCmDataCallTest(const AppExecFwk::InnerEvent::Pointer &result);
     void GetRilCmCellInfoListTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void GetRilCurrentCellInfoTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void GetRilNetworkSearchInfoTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void GetRilNetworkSelectionModeTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void GetRilPreferredNetwrokTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void GetRilImsRegStatusTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void GetRilImeiTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void GetVoiceRadioTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void GetRilPsAttachStatusTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void SetRilPreferredNetwrokTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void SetRilPsAttachStatusTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void SetRilNetworkSelectionModeTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void SetRilLocationUpdateTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void SetupRilCmDataCallTest(const AppExecFwk::InnerEvent::Pointer &result);
     void DeactivateRilCmDataCallTest(const AppExecFwk::InnerEvent::Pointer &result);
+    void GetRilCmDataCallListTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void SetInitialApnTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void OnProcessInput(int32_t what, const OHOS::AppExecFwk::InnerEvent::Pointer &event);
-    void SetUssdTest(const AppExecFwk::InnerEvent::Pointer &result);
-    void GetUssdTest(const AppExecFwk::InnerEvent::Pointer &result);
+    void OnStressInput(int32_t what, const OHOS::AppExecFwk::InnerEvent::Pointer &event);
     void SimOpenLogicalChannel(const AppExecFwk::InnerEvent::Pointer &result);
     void SimCloseLogicalChannel(const AppExecFwk::InnerEvent::Pointer &result);
     void SimTransmitApduLogicalChannel(const AppExecFwk::InnerEvent::Pointer &result);
     void UnlockSimLock(const AppExecFwk::InnerEvent::Pointer &result);
     void GetLinkBandwidthInfoTest(const AppExecFwk::InnerEvent::Pointer &result);
     void OnInitInterface();
+    void OnInitStressInterface();
+    void OnInitProcessInterface();
 
     class DemoHandler : public AppExecFwk::EventHandler {
     public:
@@ -79,6 +109,7 @@ public:
     int32_t slotId_;
     using RilManagerAndResponseTestFun = void (RilUnitTest::*)(const OHOS::AppExecFwk::InnerEvent::Pointer &event);
     std::map<uint32_t, RilManagerAndResponseTestFun> memberFuncMap_;
+    std::map<uint32_t, RilManagerAndResponseTestFun> stressMemberFuncMap_;
 };
 } // namespace
 } // namespace Telephony

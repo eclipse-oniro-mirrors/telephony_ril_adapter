@@ -20,6 +20,9 @@
 
 #include "hril_notification.h"
 
+#include <iostream>
+
+using namespace std;
 using namespace OHOS::Telephony;
 
 RilRadioIndicationTest::RilRadioIndicationTest(RilManagerTest *mRilManager) : IPCObjectStub(std::u16string(u""))
@@ -32,16 +35,39 @@ RilRadioIndicationTest::~RilRadioIndicationTest() {}
 int32_t RilRadioIndicationTest::OnRemoteRequest(
     uint32_t code, OHOS::MessageParcel &data, OHOS::MessageParcel &reply, OHOS::MessageOption &option)
 {
+    int32_t slotId = data.ReadInt32();
+    TELEPHONY_LOGI("RilAdapterTest ntf OnRemoteRequest code:%{public}d, slotId:%{public}d", code, slotId);
+    if (slotId != HRIL_SIM_SLOT_0) {
+        TELEPHONY_LOGE("RilAdapterTest ntf slotid abnormal");
+    }
     const int32_t DEFAULT_VALUE = 1;
     switch (code) {
         case HNOTI_MODEM_RADIO_STATE_UPDATED:
             RadioStateChange(data);
             break;
         case HNOTI_CALL_STATE_UPDATED:
-            CallStateChgInd(data);
+            CallStateUpdated(data);
+            break;
+        case HNOTI_CALL_CRING_REPORT:
+            CallCRingReport(data);
+            break;
+        case HNOTI_CALL_RINGBACK_VOICE_REPORT:
+            CallRingbackVoiceReport(data);
+            break;
+        case HNOTI_CALL_SRVCC_STATUS_REPORT:
+            CallSrvccStatusReport(data);
+            break;
+        case HNOTI_CALL_EMERGENCY_NUMBER_REPORT:
+            CallEmergencyNumberReport(data);
             break;
         case HNOTI_NETWORK_CS_REG_STATUS_UPDATED:
             NetworkStateNotify(data);
+            break;
+        case HNOTI_NETWORK_SIGNAL_STRENGTH_UPDATED:
+            GetSignalStrength(data);
+            break;
+        case HNOTI_NETWORK_IMS_REG_STATUS_UPDATED:
+            ChangedImsNetworkState(data);
             break;
         case HNOTI_SMS_NEW_SMS:
             NewSmsNotify(data);
@@ -52,6 +78,12 @@ int32_t RilRadioIndicationTest::OnRemoteRequest(
         case HNOTI_SMS_STATUS_REPORT:
             SmsStatusReportNotify(data);
             break;
+        case HNOTI_SIM_STATUS_CHANGED:
+            SimStateChanged(data);
+            break;
+        case HNOTI_DATA_PDP_CONTEXT_LIST_UPDATED:
+            PdpContextListChangedNotify(data);
+            break;
         default:
             break;
     }
@@ -60,17 +92,70 @@ int32_t RilRadioIndicationTest::OnRemoteRequest(
 
 void RilRadioIndicationTest::RadioStateChange(OHOS::MessageParcel &data)
 {
-    (void)data;
+    int32_t radioState = data.ReadInt32();
+    int32_t indicationType = data.ReadInt32();
+    std::cout << "---->[NTF] RadioStateChange:" << endl
+        << "====> [radioState]: " << radioState << endl;
+    TELEPHONY_LOGI(
+        "func :%{public}s indicationType: %{public}d state:%{public}d", __func__, indicationType, radioState);
 }
 
-void RilRadioIndicationTest::CallStateChgInd(OHOS::MessageParcel &data)
+void RilRadioIndicationTest::CallStateUpdated(OHOS::MessageParcel &data)
 {
+    cout << endl << "---->[NTF] CallStateUpdated" << endl;
     int32_t indicationType = data.ReadInt32();
     TELEPHONY_LOGI("func :%{public}s indicationType: %{public}d", __func__, indicationType);
 }
 
+void RilRadioIndicationTest::CallCRingReport(OHOS::MessageParcel &data)
+{
+    cout << endl << "---->[NTF] CallCRingReport: RING!" << endl;
+    int32_t indicationType = data.ReadInt32();
+    TELEPHONY_LOGI("func :%{public}s indicationType: %{public}d", __func__, indicationType);
+}
+
+void RilRadioIndicationTest::CallRingbackVoiceReport(OHOS::MessageParcel &data)
+{
+    cout << endl << "---->[NTF] CallRingbackVoiceReport: " << endl;
+    std::shared_ptr<RingbackVoice> ringbackVoice = std::make_shared<RingbackVoice>();
+    if (ringbackVoice == nullptr) {
+        TELEPHONY_LOGE("ERROR : ringbackVoice == nullptr !!!");
+        return;
+    }
+    ringbackVoice->ReadFromParcel(data);
+    cout << "====>status: " << ringbackVoice->status << endl;
+}
+
+void RilRadioIndicationTest::CallSrvccStatusReport(OHOS::MessageParcel &data)
+{
+    cout << endl << "---->[NTF] CallSrvccStatusReport: " << endl;
+    std::shared_ptr<SrvccStatus> srvccStatus = std::make_shared<SrvccStatus>();
+    if (srvccStatus == nullptr) {
+        TELEPHONY_LOGE("ERROR : srvccStatus == nullptr !!!");
+        return;
+    }
+    srvccStatus->ReadFromParcel(data);
+    cout << "====>status: " << srvccStatus->status << endl;
+}
+
+void RilRadioIndicationTest::CallEmergencyNumberReport(OHOS::MessageParcel &data)
+{
+    cout << endl << "---->[NTF] CallEmergencyNumberReport: " << endl;
+    std::shared_ptr<EmergencyInfo> emcInfo = std::make_shared<EmergencyInfo>();
+    if (emcInfo == nullptr) {
+        TELEPHONY_LOGE("ERROR : emcInfo == nullptr !!!");
+        return;
+    }
+    emcInfo->ReadFromParcel(data);
+    cout << "====> [index]: " << emcInfo->index << "/" << emcInfo->total
+        << "\tcategory: " << emcInfo->category
+        << "\tmcc: " << emcInfo->mcc
+        << "\teccNum: " << emcInfo->eccNum << endl;
+}
+
 void RilRadioIndicationTest::NetworkStateNotify(OHOS::MessageParcel &data)
 {
+    cout << endl << "---->[NTF] NetworkStateNotify" << endl;
     int32_t indicationType = data.ReadInt32();
     TELEPHONY_LOGI("func :%{public}s indicationType: %{public}d", __func__, indicationType);
 }
@@ -138,28 +223,57 @@ void RilRadioIndicationTest::GetSignalStrength(OHOS::MessageParcel &data)
         TELEPHONY_LOGE("GetSignalStrength memcpy_s failed");
         return;
     }
+
+    cout << "---->[NTF] Network Signal Strength updated:" << endl;
+    cout << "====> [lte.rsrp]: " << mSignalStrength->lte.rsrp << endl;
 }
 
-void RilRadioIndicationTest::ChangedDataCallList(OHOS::MessageParcel &data)
+void RilRadioIndicationTest::PdpContextListChangedNotify(OHOS::MessageParcel &data)
 {
-    std::unique_ptr<SetupDataCallResultInfo> setupDataCallResultInfo = std::make_unique<SetupDataCallResultInfo>();
-    if (setupDataCallResultInfo == nullptr) {
+    std::unique_ptr<DataCallResultList> dataCallList = std::make_unique<DataCallResultList>();
+    if (dataCallList == nullptr) {
+        TELEPHONY_LOGE("dataCallList is null ptr!");
         return;
     }
-    setupDataCallResultInfo.get()->ReadFromParcel(data);
-    const size_t READ_SP_SIZE = sizeof(struct HRilRadioResponseInfo);
-    const uint8_t *SP_BUFFER = data.ReadBuffer(READ_SP_SIZE);
-    if (SP_BUFFER == nullptr) {
-        TELEPHONY_LOGE("RilRadioResponseTest ChangedDataCallList read SP_BUFFER failed");
+    if (!dataCallList.get()->ReadFromParcel(data)) {
+        TELEPHONY_LOGE(
+            "ERROR : PdpContextListChangedNotify --> dataCallList.ReadFromParcel(data) failed !!!");
         return;
     }
+    TELEPHONY_LOGI("PdpContextListChangedNotify --> dataCallList.ReadFromParcel(data) success");
+
+    for (auto &setupDataCallResultInfo : dataCallList->dcList) {
+        cout << "PdpContextListChangedNotify: flag = " << setupDataCallResultInfo.flag << endl;
+        cout << "PdpContextListChangedNotify: reason = " << setupDataCallResultInfo.reason << endl;
+        cout << "PdpContextListChangedNotify: retryTime = " << setupDataCallResultInfo.retryTime << endl;
+        cout << "PdpContextListChangedNotify: cid = " << setupDataCallResultInfo.cid << endl;
+        cout << "PdpContextListChangedNotify: active = " << setupDataCallResultInfo.active << endl;
+        cout << "PdpContextListChangedNotify: type = " << setupDataCallResultInfo.type << endl;
+        cout << "PdpContextListChangedNotify: netPortName = " << setupDataCallResultInfo.netPortName << endl;
+        cout << "PdpContextListChangedNotify: address = " << setupDataCallResultInfo.address << endl;
+        cout << "PdpContextListChangedNotify: dns = " << setupDataCallResultInfo.dns << endl;
+        cout << "PdpContextListChangedNotify: dnsSec = " << setupDataCallResultInfo.dnsSec << endl;
+        cout << "PdpContextListChangedNotify: gateway = " << setupDataCallResultInfo.gateway << endl;
+        cout << "PdpContextListChangedNotify: pCscfPrimAddr = " << setupDataCallResultInfo.pCscfPrimAddr << endl;
+        cout << "PdpContextListChangedNotify: pCscfSecAddr = " << setupDataCallResultInfo.pCscfSecAddr << endl;
+        cout << "PdpContextListChangedNotify: maxTransferUnit = " << setupDataCallResultInfo.maxTransferUnit << endl;
+    }
+    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
+    const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("ERROR : PdpContextListChangedNotify --> data.ReadBuffer(readSpSize) failed !!!");
+        return;
+    }
+
     int32_t indicationType = data.ReadInt32();
+    cout << "PdpContextListChangedNotify: indicate type =" << indicationType << endl;
     TELEPHONY_LOGI("func :%{public}s indicationType: %{public}d", __func__, indicationType);
 }
 
-void RilRadioIndicationTest::ChangedSimState(OHOS::MessageParcel &data)
+void RilRadioIndicationTest::SimStateChanged(OHOS::MessageParcel &data)
 {
-    TELEPHONY_LOGI("RilRadioIndicationTest::ChangedSimState --> ");
+    TELEPHONY_LOGI("RilRadioIndicationTest::SimStateChanged --> ");
+    cout << "---->[NTF] Sim State Changed" << endl;
     int32_t indicationType = data.ReadInt32();
     if (mRilManager_ == nullptr) {
         TELEPHONY_LOGE("mRilManager_ is null!");
@@ -177,6 +291,12 @@ void RilRadioIndicationTest::ConnectedReturnRilVersion(OHOS::MessageParcel &data
 
 void RilRadioIndicationTest::ChangedImsNetworkState(OHOS::MessageParcel &data)
 {
-    int32_t indicationType = data.ReadInt32();
-    TELEPHONY_LOGI("func :%{public}s indicationType: %{public}d", __func__, indicationType);
+    cout << endl << "---->[NTF] ImsNetworkState: " << endl;
+    std::shared_ptr<ImsRegStatusInfo> imsState = std::make_shared<ImsRegStatusInfo>();
+    if (imsState == nullptr) {
+        TELEPHONY_LOGE("ERROR : imsState == nullptr !!!");
+        return;
+    }
+    imsState->ReadFromParcel(data);
+    cout << "====>ims reg status: " << imsState->regInfo << endl;
 }
