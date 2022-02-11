@@ -54,7 +54,7 @@ ohos_shared_library("hril") {
   ]
 
   external_deps = [
-    "ability_runtime:want",
+    "ability_base:want",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
