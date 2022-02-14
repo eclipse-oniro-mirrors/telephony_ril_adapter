@@ -30,7 +30,7 @@
         "ram": "1MB",
         "deps": {
             "components": [
-                "aafwk_standard",
+                "ability_base",
                 "ans_standard",
                 "core_service",
                 "device_driver_framework",
