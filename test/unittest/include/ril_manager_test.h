@@ -119,10 +119,12 @@ public:
         const AppExecFwk::InnerEvent::Pointer &response);
     void SendSmsMoreMode(std::string smscPdu, std::string pdu,
         const std::shared_ptr<AppExecFwk::EventHandler> &handler, const AppExecFwk::InnerEvent::Pointer &response);
+    void SendSmsAck(bool success, int32_t cause, const AppExecFwk::InnerEvent::Pointer &response);
+    void GetSmscAddr(const AppExecFwk::InnerEvent::Pointer &response);
+    void SetSmscAddr(int32_t tosca, std::string address, const AppExecFwk::InnerEvent::Pointer &response);
     void SetRadioState(int32_t fan, int32_t rst, const AppExecFwk::InnerEvent::Pointer &response);
     void GetRadioState(const AppExecFwk::InnerEvent::Pointer &response);
     void GetImei(const AppExecFwk::InnerEvent::Pointer &response);
-    void SendSmsAck(bool success, int32_t cause, const AppExecFwk::InnerEvent::Pointer &response);
     void GetSimIO(int32_t command, int32_t fileId, int32_t p1, int32_t p2, int32_t p3, std::string data,
         std::string path, const AppExecFwk::InnerEvent::Pointer &response);
     void ActivatePdpContext(int32_t radioTechnology, RilDataProfileTest dataProfile, bool isRoaming,

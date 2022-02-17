@@ -469,15 +469,72 @@ void RilUnitTest::SetRilNetworkSelectionModeTest(const OHOS::AppExecFwk::InnerEv
 void RilUnitTest::SendRilCmSmsTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("RilUnitTest::SendRilCmSmsTest -->");
-    mRilManager_->SendSms("smscPDU", "pdu", result->GetOwner(), result);
+    string smscPdu;
+    string pdu;
+    cout << "please entry smsc(Pdu):" << endl;
+    cin >> smscPdu;
+    cout << "please entry sms message(Pdu):" << endl;
+    cin >> pdu;
+
+    mRilManager_->SendSms(smscPdu, pdu, result->GetOwner(), result);
     TELEPHONY_LOGI("RilUnitTest::SendRilCmSmsTest --> SendRilCmSmsTest finished");
 }
 
 void RilUnitTest::SendRilCmSmsMoreModeTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("RilUnitTest::SendRilCmSmsMoreModeTest -->");
-    mRilManager_->SendSmsMoreMode("smscPDU", "pdu", result->GetOwner(), result);
+    string smscPdu;
+    string pdu;
+    cout << "please entry smsc(Pdu):" << endl;
+    cin >> smscPdu;
+    cout << "please entry sms message(Pdu):" << endl;
+    cin >> pdu;
+
+    mRilManager_->SendSmsMoreMode(smscPdu, pdu, result->GetOwner(), result);
     TELEPHONY_LOGI("RilUnitTest::SendRilCmSmsMoreModeTest --> SendRilCmSmsMoreModeTest finished");
+}
+
+void RilUnitTest::SendSmsAckTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::SendSmsAckTest -->");
+    const int32_t memExceededCause = 0xD3;
+    bool success;
+    int32_t cause;
+
+    cout << "send sms ack types are as follows:" << endl <<
+            "\t[0]: report OK" << endl <<
+            "\t[1]: report ERROR(Memory Capacity Exceeded)" << endl;
+    int32_t ackType = InputInt32(0, 1, "ack type");
+    if (ackType == 1) {
+        success = 0;
+        cause = memExceededCause;
+    } else {
+        success = 1;
+        cause = 0;
+    }
+
+    mRilManager_->SendSmsAck(success, cause, result);
+    TELEPHONY_LOGI("RilUnitTest::SendSmsAckTest --> SendSmsAckTest finished");
+}
+
+void RilUnitTest::GetSmscAddrTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::GetSmscAddrTest -->");
+    mRilManager_->GetSmscAddr(result);
+    TELEPHONY_LOGI("RilUnitTest::GetSmscAddrTest --> GetSmscAddrTest finished");
+}
+
+void RilUnitTest::SetSmscAddrTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::SetSmscAddrTest -->");
+    int32_t tosca;
+    string address;
+    cout << "please entry tosca:" << endl;
+    cin >> tosca;
+    cout << "please entry smsc:" << endl;
+    cin >> address;
+    mRilManager_->SetSmscAddr(tosca, address, result);
+    TELEPHONY_LOGI("RilUnitTest::SetSmscAddrTest --> SetSmscAddrTest finished");
 }
 
 void RilUnitTest::SetRilCmRadioPowerTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
@@ -721,6 +778,9 @@ void RilUnitTest::OnInitProcessInterface()
     // sms
     memberFuncMap_[HREQ_SMS_SEND_GSM_SMS] = &RilUnitTest::SendRilCmSmsTest;
     memberFuncMap_[HREQ_SMS_SEND_SMS_MORE_MODE] = &RilUnitTest::SendRilCmSmsMoreModeTest;
+    memberFuncMap_[HREQ_SMS_SEND_SMS_ACK] = &RilUnitTest::SendSmsAckTest;
+    memberFuncMap_[HREQ_SMS_SET_SMSC_ADDR] = &RilUnitTest::SetSmscAddrTest;
+    memberFuncMap_[HREQ_SMS_GET_SMSC_ADDR] = &RilUnitTest::GetSmscAddrTest;
 
     // sim
     memberFuncMap_[HREQ_SIM_GET_SIM_STATUS] = &RilUnitTest::GetRilCmIccCardStatusTest;
@@ -830,9 +890,12 @@ static int32_t PrintCallMenu()
 static int32_t PrintSmsMenu()
 {
     cout << "---->[MODULE]SMS:" << endl;
-    cout << "----> [" << HREQ_SMS_BASE                  << "] ---->Back to the previous menu."      << endl;
-    cout << "----> [" << HREQ_SMS_SEND_GSM_SMS          << "] ---->[ HREQ_SMS_SEND_GSM_SMS ]"       << endl;
-    cout << "----> [" << HREQ_SMS_SEND_SMS_MORE_MODE    << "] ---->[ HREQ_SMS_SEND_SMS_MORE_MODE ]" << endl;
+    cout << "----> [" << HREQ_SMS_BASE << "] ---->Back to the previous menu." << endl;
+    cout << "----> [" << HREQ_SMS_SEND_GSM_SMS << "] ---->[ HREQ_SMS_SEND_GSM_SMS ]" << endl;
+    cout << "----> [" << HREQ_SMS_SEND_SMS_MORE_MODE << "] ---->[ HREQ_SMS_SEND_SMS_MORE_MODE ]" << endl;
+    cout << "----> [" << HREQ_SMS_SEND_SMS_ACK << "] ---->[ HREQ_SMS_SEND_SMS_ACK ]" << endl;
+    cout << "----> [" << HREQ_SMS_SET_SMSC_ADDR << "] ---->[ HREQ_SMS_SET_SMSC_ADDR ]" << endl;
+    cout << "----> [" << HREQ_SMS_GET_SMSC_ADDR << "] ---->[ HREQ_SMS_GET_SMSC_ADDR ]" << endl;
 
     int32_t choice = InputInt32(HREQ_SMS_BASE, HREQ_SIM_BASE - 1, "Command");
     cout << "---->You choose: " << choice << endl;

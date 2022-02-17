@@ -772,6 +772,50 @@ void RilManagerTest::SendSmsMoreMode(std::string smscPdu, std::string pdu,
     }
 }
 
+void RilManagerTest::SendSmsAck(bool success, int32_t cause, const AppExecFwk::InnerEvent::Pointer &response)
+{
+    std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_SMS_SEND_SMS_ACK, response);
+    /* Do not log function arg for privacy */
+    OHOS::MessageParcel data;
+    data.WriteInt32(slotId_);
+    ModeData mModeData;
+    mModeData.serial = request->serialId_;
+    mModeData.result = success;
+    mModeData.mode = cause;
+    if (!mModeData.Marshalling(data)) {
+        TELEPHONY_LOGE("SendSmsAck Marshalling failed!!!");
+        return;
+    }
+    SendBufferEvent(HREQ_SMS_SEND_SMS_ACK, data);
+}
+
+void RilManagerTest::GetSmscAddr(const AppExecFwk::InnerEvent::Pointer &response)
+{
+    std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_SMS_GET_SMSC_ADDR, response);
+    /* Do not log function arg for privacy */
+    OHOS::MessageParcel data;
+    data.WriteInt32(slotId_);
+    data.WriteInt32(request->serialId_);
+    SendBufferEvent(HREQ_SMS_GET_SMSC_ADDR, data);
+}
+
+void RilManagerTest::SetSmscAddr(int32_t tosca, std::string address, const AppExecFwk::InnerEvent::Pointer &response)
+{
+    std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_SMS_SET_SMSC_ADDR, response);
+    /* Do not log function arg for privacy */
+    OHOS::MessageParcel data;
+    data.WriteInt32(slotId_);
+    ServiceCenterAddress serCenterAddress;
+    serCenterAddress.serial = request->serialId_;
+    serCenterAddress.address = address.empty() ? "" : address;
+    serCenterAddress.tosca = tosca;
+    if (!serCenterAddress.Marshalling(data)) {
+        TELEPHONY_LOGE("SetSmscAddr Marshalling failed!!!");
+        return;
+    }
+    SendBufferEvent(HREQ_SMS_SET_SMSC_ADDR, data);
+}
+
 GsmSmsMessageInfo RilManagerTest::ConstructGsmSendSmsRilRequest(string smscPdu, string pdu)
 {
     GsmSmsMessageInfo msg;
@@ -817,24 +861,6 @@ void RilManagerTest::GetImei(const AppExecFwk::InnerEvent::Pointer &response)
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_MODEM_GET_IMEI, response);
         SendInt32Event(HREQ_MODEM_GET_IMEI, request->serialId_);
-    }
-}
-
-void RilManagerTest::SendSmsAck(bool success, int32_t cause, const AppExecFwk::InnerEvent::Pointer &response)
-{
-    if (cellularRadio_ != nullptr) {
-        std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_SMS_SEND_SMS_ACK, response);
-        OHOS::MessageParcel wData;
-        UniInfo mUniversalInfo;
-        mUniversalInfo.serial = request->serialId_;
-        mUniversalInfo.flag = success;
-        mUniversalInfo.gsmIndex = cause;
-        wData.WriteInt32(slotId_);
-        if (!mUniversalInfo.Marshalling(wData)) {
-            TELEPHONY_LOGE("RilManagerTest UniversalInfo Marshalling failed!!!");
-            return;
-        }
-        SendBufferEvent(HREQ_SMS_SEND_SMS_ACK, wData);
     }
 }
 

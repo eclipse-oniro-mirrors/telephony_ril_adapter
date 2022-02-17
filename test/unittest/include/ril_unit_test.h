@@ -65,6 +65,9 @@ public:
     void GetRilCmOperatorTest(const AppExecFwk::InnerEvent::Pointer &result);
     void SendRilCmSmsTest(const AppExecFwk::InnerEvent::Pointer &result);
     void SendRilCmSmsMoreModeTest(const AppExecFwk::InnerEvent::Pointer &result);
+    void SendSmsAckTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void GetSmscAddrTest(const AppExecFwk::InnerEvent::Pointer &result);
+    void SetSmscAddrTest(const AppExecFwk::InnerEvent::Pointer &result);
     void SetRilCmRadioPowerTest(const AppExecFwk::InnerEvent::Pointer &result);
     void GetRilRadioPowerTest(const AppExecFwk::InnerEvent::Pointer &result);
     void GetImeiTest(const AppExecFwk::InnerEvent::Pointer &result);
