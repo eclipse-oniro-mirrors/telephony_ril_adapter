@@ -76,6 +76,11 @@ public:
     void OnRequestGetModemVoiceRadioTest(OHOS::MessageParcel &data);
     void OnRequestSetNetworkSelectionModeTest(OHOS::MessageParcel &data);
     void OnRequestGetLinkBandwidthInfoTest(OHOS::MessageParcel &data);
+    void OnResponseSendRilCmSms(OHOS::MessageParcel &data);
+    void OnResponseSendRilCmSmsMoreMode(OHOS::MessageParcel &data);
+    void OnResponseSendSmsAck(OHOS::MessageParcel &data);
+    void OnResponseGetSmscAddr(OHOS::MessageParcel &data);
+    void OnResponseSetSmscAddr(OHOS::MessageParcel &data);
 
 private:
     RilManagerTest *mRilManager_;

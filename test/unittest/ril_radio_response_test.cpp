@@ -162,6 +162,21 @@ int32_t RilRadioResponseTest::OnRemoteRequest(
         case HREQ_NETWORK_GET_CURRENT_CELL_INFO:
             OnResponseGetRilCurrentCellInfo(data);
             break;
+        case HREQ_SMS_SEND_GSM_SMS:
+            OnResponseSendRilCmSms(data);
+            break;
+        case HREQ_SMS_SEND_SMS_MORE_MODE:
+            OnResponseSendRilCmSmsMoreMode(data);
+            break;
+        case HREQ_SMS_SEND_SMS_ACK:
+            OnResponseSendSmsAck(data);
+            break;
+        case HREQ_SMS_GET_SMSC_ADDR:
+            OnResponseGetSmscAddr(data);
+            break;
+        case HREQ_SMS_SET_SMSC_ADDR:
+            OnResponseSetSmscAddr(data);
+            break;
         default:
             break;
     }
@@ -1023,4 +1038,83 @@ void RilRadioResponseTest::OnRequestGetLinkBandwidthInfoTest(OHOS::MessageParcel
         TELEPHONY_LOGE("ERROR : OnRequestGetLinkBandwidthInfoTest --> data.ReadBuffer(readSpSize) failed !!!");
         return;
     }
+}
+
+void RilRadioResponseTest::OnResponseSendRilCmSms(OHOS::MessageParcel &data)
+{
+    TELEPHONY_LOGI("RilRadioResponseTest::OnResponseSendRilCmSms --> ");
+    std::shared_ptr<SendSmsResultInfo> sendSmsResultInfo = std::make_shared<SendSmsResultInfo>();
+    sendSmsResultInfo->ReadFromParcel(data);
+    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
+    const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("ERROR : OnResponseSendRilCmSms --> data.ReadBuffer(readSpSize) failed !!!");
+        return;
+    }
+    cout << "---->OnResponseSendRilCmSms Result:" << endl
+        << "----> [msgRef]: " << sendSmsResultInfo->msgRef << endl
+        << "----> [pdu]: " << sendSmsResultInfo->pdu.c_str() << endl
+        << "----> [errCode]: " << sendSmsResultInfo->errCode << endl;
+    PrintResponseInfo((struct HRilRadioResponseInfo *)spBuffer);
+}
+
+void RilRadioResponseTest::OnResponseSendRilCmSmsMoreMode(OHOS::MessageParcel &data)
+{
+    TELEPHONY_LOGI("RilRadioResponseTest::OnResponseSendRilCmSmsMoreMode --> ");
+    std::shared_ptr<SendSmsResultInfo> sendSmsResultInfo = std::make_shared<SendSmsResultInfo>();
+    sendSmsResultInfo->ReadFromParcel(data);
+    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
+    const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("ERROR : OnResponseSendRilCmSmsMoreMode --> data.ReadBuffer(readSpSize) failed !!!");
+        return;
+    }
+    cout << "---->OnResponseSendRilCmSmsMoreMode Result:" << endl
+        << "----> [msgRef]: " << sendSmsResultInfo->msgRef << endl
+        << "----> [pdu]: " << sendSmsResultInfo->pdu.c_str() << endl
+        << "----> [errCode]: " << sendSmsResultInfo->errCode << endl;
+    PrintResponseInfo((struct HRilRadioResponseInfo *)spBuffer);
+}
+
+void RilRadioResponseTest::OnResponseSendSmsAck(OHOS::MessageParcel &data)
+{
+    TELEPHONY_LOGI("RilRadioResponseTest::OnResponseSendSmsAck --> ");
+    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
+    const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("ERROR : OnResponseSendSmsAck --> data.ReadBuffer(readSpSize) failed !!!");
+        return;
+    }
+    cout << "---->OnResponseSendSmsAck Result:" << endl;
+    PrintResponseInfo((struct HRilRadioResponseInfo *)spBuffer);
+}
+
+void RilRadioResponseTest::OnResponseGetSmscAddr(OHOS::MessageParcel &data)
+{
+    TELEPHONY_LOGI("RilRadioResponseTest::OnResponseGetSmscAddr --> ");
+    std::shared_ptr<ServiceCenterAddress> serCenterAddress = std::make_shared<ServiceCenterAddress>();
+    serCenterAddress->ReadFromParcel(data);
+    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
+    const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("ERROR : OnResponseGetSmscAddr --> data.ReadBuffer(readSpSize) failed !!!");
+        return;
+    }
+    cout << "---->OnResponseGetSmscAddr Result:" << endl
+        << "----> [tosca]: " << serCenterAddress->tosca << endl
+        << "----> [address]: " << serCenterAddress->address.c_str() << endl;
+    PrintResponseInfo((struct HRilRadioResponseInfo *)spBuffer);
+}
+
+void RilRadioResponseTest::OnResponseSetSmscAddr(OHOS::MessageParcel &data)
+{
+    TELEPHONY_LOGI("RilRadioResponseTest::OnResponseSetSmscAddr --> ");
+    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
+    const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("ERROR : OnResponseSetSmscAddr --> data.ReadBuffer(readSpSize) failed !!!");
+        return;
+    }
+    cout << "---->OnResponseSetSmscAddr Result:" << endl;
+    PrintResponseInfo((struct HRilRadioResponseInfo *)spBuffer);
 }

@@ -40,7 +40,7 @@ int32_t RilRadioIndicationTest::OnRemoteRequest(
     if (slotId != HRIL_SIM_SLOT_0) {
         TELEPHONY_LOGE("RilAdapterTest ntf slotid abnormal");
     }
-    const int32_t DEFAULT_VALUE = 1;
+    const int32_t DEFAULT_VALUE = HRIL_ERR_SUCCESS;
     switch (code) {
         case HNOTI_MODEM_RADIO_STATE_UPDATED:
             RadioStateChange(data);
@@ -162,13 +162,21 @@ void RilRadioIndicationTest::NetworkStateNotify(OHOS::MessageParcel &data)
 
 void RilRadioIndicationTest::NewSmsNotify(OHOS::MessageParcel &data)
 {
-    TELEPHONY_LOGI("NewSmsNotify");
-    std::unique_ptr<SmsMessageInfo> smsMessageInfo = std::make_unique<SmsMessageInfo>();
+    TELEPHONY_LOGI("entry");
+    unique_ptr<SmsMessageInfo> smsMessageInfo = make_unique<SmsMessageInfo>();
     if (smsMessageInfo == nullptr) {
         return;
     }
     smsMessageInfo.get()->ReadFromParcel(data);
     int32_t indicationType = smsMessageInfo->indicationType;
+    cout << "---->[NTF] NewSms:" << endl
+        << "====> [indicationType]: " << smsMessageInfo->indicationType << endl
+        << "====> [size]: " << smsMessageInfo->size << endl
+        << "====> [pdu]: ";
+    for (int i = 0; i < smsMessageInfo->pdu.size(); i++) {
+        printf("%02x", smsMessageInfo->pdu[i]);
+    }
+    cout << endl;
     TELEPHONY_LOGI("func :%{public}s indicationType: %{public}d", __func__, indicationType);
 }
 
@@ -186,13 +194,21 @@ void RilRadioIndicationTest::NewCdmaSmsNotify(OHOS::MessageParcel &data)
 
 void RilRadioIndicationTest::SmsStatusReportNotify(OHOS::MessageParcel &data)
 {
-    TELEPHONY_LOGI("SmsStatusReportNotify");
-    std::unique_ptr<SmsMessageInfo> smsMessageInfo = std::make_unique<SmsMessageInfo>();
+    TELEPHONY_LOGI("entry");
+    unique_ptr<SmsMessageInfo> smsMessageInfo = make_unique<SmsMessageInfo>();
     if (smsMessageInfo == nullptr) {
         return;
     }
     smsMessageInfo.get()->ReadFromParcel(data);
     int32_t indicationType = smsMessageInfo.get()->indicationType;
+    cout << "---->[NTF] SmsStatusReport:" << endl
+        << "====> [indicationType]: " << smsMessageInfo->indicationType << endl
+        << "====> [size]: " << smsMessageInfo->size << endl
+        << "====> [pdu]: ";
+    for (int i = 0; i < smsMessageInfo->pdu.size(); i++) {
+        printf("%02x", smsMessageInfo->pdu[i]);
+    }
+    cout << endl;
     TELEPHONY_LOGI("func :%{public}s indicationType: %{public}d", __func__, indicationType);
 }
 
