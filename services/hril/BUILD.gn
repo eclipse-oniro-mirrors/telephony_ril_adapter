@@ -45,7 +45,6 @@ ohos_shared_library("hril") {
 
   deps = [
     "//base/miscservices/time/services:time_service",
-    "//base/notification/ans_standard/frameworks/wantagent:wantagent_innerkits",
     "//base/telephony/ril_adapter/interfaces/innerkits:hril_innerkits",
     "//drivers/adapter/uhdf2/host:libhdf_host",
     "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
@@ -55,6 +54,7 @@ ohos_shared_library("hril") {
 
   external_deps = [
     "ability_base:want",
+    "ability_runtime:wantagent_innerkits",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
