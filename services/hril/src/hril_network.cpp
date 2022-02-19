@@ -53,12 +53,9 @@ void HRilNetwork::AddHandlerToMap()
     reqMemberFuncMap_[HREQ_NETWORK_SET_NETWORK_SELECTION_MODE] = &HRilNetwork::SetNetworkSelectionMode;
     reqMemberFuncMap_[HREQ_NETWORK_SET_PREFERRED_NETWORK] = &HRilNetwork::SetPreferredNetwork;
     reqMemberFuncMap_[HREQ_NETWORK_GET_PREFERRED_NETWORK] = &HRilNetwork::GetPreferredNetwork;
-    reqMemberFuncMap_[HREQ_NETWORK_SET_PS_ATTACH_STATUS] = &HRilNetwork::SetPsAttachStatus;
-    reqMemberFuncMap_[HREQ_NETWORK_GET_PS_ATTACH_STATUS] = &HRilNetwork::GetPsAttachStatus;
     reqMemberFuncMap_[HREQ_NETWORK_GET_NEIGHBORING_CELLINFO_LIST] = &HRilNetwork::GetNeighboringCellInfoList;
     reqMemberFuncMap_[HREQ_NETWORK_GET_CURRENT_CELL_INFO] = &HRilNetwork::GetCurrentCellInfo;
     reqMemberFuncMap_[HREQ_NETWORK_GET_RADIO_CAPABILITY] = &HRilNetwork::GetRadioCapability;
-    reqMemberFuncMap_[HREQ_NETWORK_SET_RADIO_CAPABILITY] = &HRilNetwork::SetRadioCapability;
     reqMemberFuncMap_[HREQ_NETWORK_GET_PHYSICAL_CHANNEL_CONFIG] = &HRilNetwork::GetPhysicalChannelConfig;
     reqMemberFuncMap_[HREQ_NETWORK_SET_LOCATE_UPDATES] = &HRilNetwork::SetLocateUpdates;
 
@@ -74,12 +71,9 @@ void HRilNetwork::AddHandlerToMap()
     respMemberFuncMap_[HREQ_NETWORK_SET_NETWORK_SELECTION_MODE] = &HRilNetwork::SetNetworkSelectionModeResponse;
     respMemberFuncMap_[HREQ_NETWORK_SET_PREFERRED_NETWORK] = &HRilNetwork::SetPreferredNetworkResponse;
     respMemberFuncMap_[HREQ_NETWORK_GET_PREFERRED_NETWORK] = &HRilNetwork::GetPreferredNetworkResponse;
-    respMemberFuncMap_[HREQ_NETWORK_SET_PS_ATTACH_STATUS] = &HRilNetwork::SetPsAttachStatusResponse;
-    respMemberFuncMap_[HREQ_NETWORK_GET_PS_ATTACH_STATUS] = &HRilNetwork::GetPsAttachStatusResponse;
     respMemberFuncMap_[HREQ_NETWORK_GET_NEIGHBORING_CELLINFO_LIST] = &HRilNetwork::GetNeighboringCellInfoListResponse;
     respMemberFuncMap_[HREQ_NETWORK_GET_CURRENT_CELL_INFO] = &HRilNetwork::GetCurrentCellInfoResponse;
     respMemberFuncMap_[HREQ_NETWORK_GET_RADIO_CAPABILITY] = &HRilNetwork::GetRadioCapabilityResponse;
-    respMemberFuncMap_[HREQ_NETWORK_SET_RADIO_CAPABILITY] = &HRilNetwork::SetRadioCapabilityResponse;
     respMemberFuncMap_[HREQ_NETWORK_GET_PHYSICAL_CHANNEL_CONFIG] = &HRilNetwork::GetPhysicalChannelConfigResponse;
     respMemberFuncMap_[HREQ_NETWORK_SET_LOCATE_UPDATES] = &HRilNetwork::SetLocateUpdatesResponse;
 }
@@ -141,38 +135,6 @@ int32_t HRilNetwork::GetRadioCapability(struct HdfSBuf *data)
         return HRIL_ERR_INVALID_PARAMETER;
     }
     networkFuncs_->GetRadioCapability(requestInfo);
-    return HRIL_ERR_SUCCESS;
-}
-
-int32_t HRilNetwork::SetRadioCapability(struct HdfSBuf *data)
-{
-    if ((networkFuncs_ == nullptr) || (networkFuncs_->SetRadioCapability == nullptr)) {
-        TELEPHONY_LOGE("SetRadioCapability::networkFuncs_:%{public}p", networkFuncs_);
-        return HRIL_ERR_NULL_POINT;
-    }
-    struct RadioCapabilityInfo setRadioCapabilityInfo = {};
-    MessageParcel *parcel = nullptr;
-    if (SbufToParcel(data, &parcel)) {
-        TELEPHONY_LOGE("RilAdapter failed to do SbufToParcel");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    int32_t serial = 0;
-    if (!HdfSbufReadInt32(data, &serial)) {
-        TELEPHONY_LOGE("miss serial parameter");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    HRilRadioCapability setRadioInfo = {};
-    setRadioInfo.ratFamily = setRadioCapabilityInfo.ratFamily;
-    strcpy_s(setRadioInfo.modemId, strlen(setRadioCapabilityInfo.modemId.c_str()) + 1,
-        setRadioCapabilityInfo.modemId.c_str());
-    TELEPHONY_LOGI("setRadioInfo = %{public}d", setRadioInfo.ratFamily);
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_NETWORK_SET_RADIO_CAPABILITY);
-    if (requestInfo == nullptr) {
-        TELEPHONY_LOGE("SetRadioCapability::Create Request is fail");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    TELEPHONY_LOGI("SetRadioCapability selectMode:%{public}s", setRadioInfo.modemId);
-    networkFuncs_->SetRadioCapability(requestInfo, &setRadioInfo);
     return HRIL_ERR_SUCCESS;
 }
 
@@ -448,54 +410,6 @@ int32_t HRilNetwork::SetPreferredNetwork(struct HdfSBuf *data)
     }
     TELEPHONY_LOGI("SetPreferredNetwork netType:%{public}d", netType);
     networkFuncs_->SetPreferredNetwork(requestInfo, &netType);
-    return HRIL_ERR_SUCCESS;
-}
-
-int32_t HRilNetwork::SetPsAttachStatus(struct HdfSBuf *data)
-{
-    if ((networkFuncs_ == nullptr) || (networkFuncs_->SetPsAttachStatus == nullptr)) {
-        TELEPHONY_LOGE("SetPsAttachStatus::networkFuncs_:%{public}p", networkFuncs_);
-        return HRIL_ERR_NULL_POINT;
-    }
-    int32_t psAttachStatus = 0;
-    int32_t serial = 0;
-
-    if (!HdfSbufReadInt32(data, &serial)) {
-        TELEPHONY_LOGE("miss serial parameter");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-
-    if (!HdfSbufReadInt32(data, &psAttachStatus)) {
-        TELEPHONY_LOGE("miss psAttachStatus parameter");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_NETWORK_SET_PS_ATTACH_STATUS);
-    if (requestInfo == nullptr) {
-        TELEPHONY_LOGE("SetPsAttachStatus::Create Request is fail");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    TELEPHONY_LOGI("SetPsAttachStatus psAttachStatus:%{public}d", psAttachStatus);
-    networkFuncs_->SetPsAttachStatus(requestInfo, &psAttachStatus);
-    return HRIL_ERR_SUCCESS;
-}
-
-int32_t HRilNetwork::GetPsAttachStatus(struct HdfSBuf *data)
-{
-    if ((networkFuncs_ == nullptr) || (networkFuncs_->GetPsAttachStatus == nullptr)) {
-        TELEPHONY_LOGE("GetPsAttachStatus::networkFuncs_:%{public}p", networkFuncs_);
-        return HRIL_ERR_NULL_POINT;
-    }
-    int32_t serial = 0;
-    if (!HdfSbufReadInt32(data, &serial)) {
-        TELEPHONY_LOGE("GetPsAttachStatus::miss serial parameter");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_NETWORK_GET_PS_ATTACH_STATUS);
-    if (requestInfo == nullptr) {
-        TELEPHONY_LOGE("GetPsAttachStatus::Create Request is fail");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    networkFuncs_->GetPsAttachStatus(requestInfo);
     return HRIL_ERR_SUCCESS;
 }
 
@@ -1420,41 +1334,6 @@ int32_t HRilNetwork::SetNetworkSelectionModeResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));
-}
-
-int32_t HRilNetwork::SetRadioCapabilityResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
-{
-    return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));
-}
-
-int32_t HRilNetwork::SetPsAttachStatusResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
-{
-    return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));
-}
-
-int32_t HRilNetwork::GetPsAttachStatusResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
-{
-    PsAttachStatusInfo psAttachStatusInfo = {};
-
-    TELEPHONY_LOGI("GetPsAttachStatusResponse ---> response %{public}p", response);
-    if (((response == nullptr) && (responseLen != 0)) ||
-        ((response != nullptr) && (responseLen != sizeof(int32_t)))) {
-        TELEPHONY_LOGE("GetPsAttachStatusResponse check data: error");
-        return HRIL_ERR_GENERIC_FAILURE;
-    } else if ((response == nullptr) && (responseLen == 0)) {
-        TELEPHONY_LOGE("response is nullptr");
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
-        }
-    } else {
-        int32_t *resp = static_cast<int32_t *>(const_cast<void *>(response));
-        psAttachStatusInfo.psAttachStatus = *resp;
-        TELEPHONY_LOGI("psAttachStatusInfo.psAttachStatus: %{public}d", *resp);
-    }
-    return ResponseMessageParcel(responseInfo, psAttachStatusInfo, requestNum);
 }
 
 int32_t HRilNetwork::GetRadioCapabilityResponse(

@@ -88,5 +88,7 @@ int32_t ConvertCharToInt32(const char *s);
 
 int32_t FindCommaCharNum(const char *srcStr);
 
+int32_t GetSimSlotCount(void);
+
 int32_t GetSlotId(const ReqDataInfo *requestInfo);
 #endif // OHOS_VENDOR_UTIL_H

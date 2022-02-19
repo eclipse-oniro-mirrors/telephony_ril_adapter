@@ -1307,37 +1307,6 @@ std::shared_ptr<PreferredNetworkTypeInfo> PreferredNetworkTypeInfo::UnMarshallin
     return param;
 }
 
-bool PsAttachStatusInfo::ReadFromParcel(Parcel &parcel)
-{
-    if (!ReadBaseInt32(parcel, psAttachStatus)) {
-        return false;
-    }
-    if (!ReadBaseInt64(parcel, flag)) {
-        return false;
-    }
-    return true;
-}
-
-bool PsAttachStatusInfo::Marshalling(Parcel &parcel) const
-{
-    if (!WriteBaseInt32(parcel, psAttachStatus)) {
-        return false;
-    }
-    if (!WriteBaseInt64(parcel, flag)) {
-        return false;
-    }
-    return true;
-}
-
-std::shared_ptr<PsAttachStatusInfo> PsAttachStatusInfo::UnMarshalling(Parcel &parcel)
-{
-    std::shared_ptr<PsAttachStatusInfo> param = std::make_shared<PsAttachStatusInfo>();
-    if (param == nullptr || !param->ReadFromParcel(parcel)) {
-        param = nullptr;
-    }
-    return param;
-}
-
 bool ImsRegStatusInfo::ReadFromParcel(Parcel &parcel)
 {
     if (!ReadBaseInt32(parcel, notifyType)) {

@@ -27,16 +27,8 @@
 #define DEFAULT_TIMEOUT_CLCK 50000
 
 CallNotify g_callNotifyTab[] = {
-    {"^CEND:", ReportCallEndInfo},
-    {"+CRING:", ReportCallCringInfo},
-    {"^CONN:", ReportCallConnectInfo},
-    {"^CCALLSTATE:", ReportCallStatusInfo},
-    {"^CCWA:", ReportCallWaitingInfo},
-    {"+CCWA:", ReportCallWaitingInfo},
+    {"^CCALLSTATE:", ReportCallStateUpdated},
     {"^IMSSRVSTATUS:", ReportImsServiceStatusInfo},
-    {"RING", ReportCallStatusUpdate},
-    {"IRING", ReportCallStatusUpdate},
-    {"NO CARRIER", ReportCallStatusUpdate},
     {"+CUSD:", ReportCallUssdNotice},
     {"+CIREPH:", ReportSrvccStatusUpdate},
     {"^CSCHANNELINFO:", ReportCsChannelInfo},
@@ -168,11 +160,13 @@ void ReportImsServiceStatusInfo(const char *str)
     OnCallReport(GetSlotId(NULL), reportInfo, (const uint8_t *)&imsSrvStatus, sizeof(HRilImsServiceStatus));
 }
 
-void ReportCallStatusInfo(const char *str)
+void ReportCallStateUpdated(const char *str)
 {
     int32_t err = HRIL_ERR_SUCCESS;
     char *pStr = (char *)str;
-    HRilCallStatusInfo callStatus = {0};
+    int callId = 0;
+    int voiceDomain = 0;
+    int state = 0;
     struct ReportInfo reportInfo = {0};
     ReqDataInfo requestInfo = {0};
     ModemReportErrorInfo errInfo = InitModemReportErrorInfo();
@@ -180,148 +174,16 @@ void ReportCallStatusInfo(const char *str)
     if (SkipATPrefix(&pStr) < 0) {
         err = HRIL_ERR_INVALID_MODEM_PARAMETER;
     }
-    if (NextInt(&pStr, &callStatus.callId) < 0) {
+    if (NextInt(&pStr, &callId) < 0) {
         err = HRIL_ERR_INVALID_MODEM_PARAMETER;
     }
-    if (NextInt(&pStr, &callStatus.status) < 0) {
+    if (NextInt(&pStr, &state) < 0) {
         err = HRIL_ERR_INVALID_MODEM_PARAMETER;
     }
-    if (NextInt(&pStr, &callStatus.voiceDomain) < 0) {
-        err = HRIL_ERR_INVALID_MODEM_PARAMETER;
-    }
-
-    reportInfo = CreateReportInfo(&requestInfo, err, HRIL_NOTIFICATION, HNOTI_CALL_STATUS_INFO_REPORT);
-    reportInfo.modemErrInfo = errInfo;
-    OnCallReport(GetSlotId(NULL), reportInfo, (const uint8_t *)&callStatus, sizeof(HRilCallStatusInfo));
-}
-
-void ReportCallEndInfo(const char *str)
-{
-    int32_t err = HRIL_ERR_SUCCESS;
-    char *pStr = (char *)str;
-    HRilCallEndInfo endInfo = {0};
-    struct ReportInfo reportInfo = {0};
-    ReqDataInfo requestInfo = {0};
-    ModemReportErrorInfo errInfo = InitModemReportErrorInfo();
-
-    if (SkipATPrefix(&pStr) < 0) {
-        err = HRIL_ERR_INVALID_MODEM_PARAMETER;
-    }
-    if (NextInt(&pStr, &endInfo.callId) < 0) {
-        err = HRIL_ERR_INVALID_MODEM_PARAMETER;
-    }
-    if (NextInt(&pStr, &endInfo.duration) < 0) {
-        err = HRIL_ERR_INVALID_MODEM_PARAMETER;
-    }
-    if (NextInt(&pStr, &endInfo.noCliCause) < 0) {
-        err = HRIL_ERR_INVALID_MODEM_PARAMETER;
-    }
-    if (NextInt(&pStr, &endInfo.ccCause) < 0) {
-        err = HRIL_ERR_INVALID_MODEM_PARAMETER;
-        lastCcCause = HRIL_ERR_CALL_CAUSE;
-    } else {
-        lastCcCause = endInfo.ccCause;
-    }
-
-    reportInfo = CreateReportInfo(&requestInfo, err, HRIL_NOTIFICATION, HNOTI_CALL_END_REPORT);
-    reportInfo.modemErrInfo = errInfo;
-    OnCallReport(GetSlotId(NULL), reportInfo, (const uint8_t *)&endInfo, sizeof(HRilCallEndInfo));
-}
-
-void ReportCallConnectInfo(const char *str)
-{
-    int32_t err = HRIL_ERR_SUCCESS;
-    char *pStr = (char *)str;
-    HRilCallConnectInfo connectInfo = {0};
-    struct ReportInfo reportInfo = {0};
-    ReqDataInfo requestInfo = {0};
-    ModemReportErrorInfo errInfo = InitModemReportErrorInfo();
-
-    if (SkipATPrefix(&pStr) < 0) {
-        err = HRIL_ERR_INVALID_MODEM_PARAMETER;
-    }
-    if (NextInt(&pStr, &connectInfo.callId) < 0) {
-        err = HRIL_ERR_INVALID_MODEM_PARAMETER;
-    }
-    if (NextInt(&pStr, &connectInfo.type) < 0) {
+    if (NextInt(&pStr, &voiceDomain) < 0) {
         err = HRIL_ERR_INVALID_MODEM_PARAMETER;
     }
 
-    reportInfo = CreateReportInfo(&requestInfo, err, HRIL_NOTIFICATION, HNOTI_CALL_CONNECT_REPORT);
-    reportInfo.modemErrInfo = errInfo;
-    OnCallReport(GetSlotId(NULL), reportInfo, (const uint8_t *)&connectInfo, sizeof(HRilCallConnectInfo));
-}
-
-void ReportCallCringInfo(const char *str)
-{
-    int32_t err = HRIL_ERR_SUCCESS;
-    char *pStr = (char *)str;
-    HRilCallCringInfo ringInfo = {0};
-    struct ReportInfo reportInfo = {0};
-    ReqDataInfo requestInfo = {0};
-    ModemReportErrorInfo errInfo = InitModemReportErrorInfo();
-
-    if (SkipATPrefix(&pStr) < 0) {
-        err = HRIL_ERR_INVALID_MODEM_PARAMETER;
-    }
-    if (NextTxtStr(&pStr, &ringInfo.type) < 0) {
-        err = HRIL_ERR_INVALID_MODEM_PARAMETER;
-    }
-    if (pStr != NULL && (NextStr(&pStr, &ringInfo.pdpType) < 0)) {
-        err = HRIL_ERR_INVALID_MODEM_PARAMETER;
-    }
-    if (pStr != NULL && (NextStr(&pStr, &ringInfo.pdpAddress) < 0)) {
-        err = HRIL_ERR_INVALID_MODEM_PARAMETER;
-    }
-    if (pStr != NULL && (NextStr(&pStr, &ringInfo.l2p) < 0)) {
-        err = HRIL_ERR_INVALID_MODEM_PARAMETER;
-    }
-    if (pStr != NULL && (NextStr(&pStr, &ringInfo.apn) < 0)) {
-        err = HRIL_ERR_INVALID_MODEM_PARAMETER;
-    }
-    reportInfo = CreateReportInfo(&requestInfo, err, HRIL_NOTIFICATION, HNOTI_CALL_CRING_REPORT);
-    reportInfo.modemErrInfo = errInfo;
-    OnCallReport(GetSlotId(NULL), reportInfo, (const uint8_t *)&ringInfo, sizeof(HRilCallCringInfo));
-}
-
-void ReportCallWaitingInfo(const char *str)
-{
-    int32_t err = HRIL_ERR_SUCCESS;
-    char *pStr = (char *)str;
-    HRilCallWaitInfo waitInfo = {0};
-    struct ReportInfo reportInfo = {0};
-    ReqDataInfo requestInfo = {0};
-    ModemReportErrorInfo errInfo = InitModemReportErrorInfo();
-
-    if (SkipATPrefix(&pStr) < 0) {
-        err = HRIL_ERR_INVALID_MODEM_PARAMETER;
-    }
-    if (NextStr(&pStr, &waitInfo.number) < 0) {
-        err = HRIL_ERR_INVALID_MODEM_PARAMETER;
-    }
-    if (NextInt(&pStr, &waitInfo.type) < 0) {
-        err = HRIL_ERR_INVALID_MODEM_PARAMETER;
-    }
-    if (NextInt(&pStr, &waitInfo.businessClass) < 0) {
-        err = HRIL_ERR_INVALID_MODEM_PARAMETER;
-    }
-
-    reportInfo = CreateReportInfo(&requestInfo, err, HRIL_NOTIFICATION, HNOTI_CALL_WAITING_REPORT);
-    reportInfo.modemErrInfo = errInfo;
-    OnCallReport(GetSlotId(NULL), reportInfo, (const uint8_t *)&waitInfo, sizeof(HRilCallWaitInfo));
-}
-
-void ReportCallStatusUpdate(const char *str)
-{
-    int32_t err = HRIL_ERR_SUCCESS;
-    char *pStr = (char *)str;
-    struct ReportInfo reportInfo = {0};
-    ReqDataInfo requestInfo = {0};
-    ModemReportErrorInfo errInfo = InitModemReportErrorInfo();
-
-    if (pStr == NULL) {
-        TELEPHONY_LOGI("The parameter is null.");
-    }
     reportInfo = CreateReportInfo(&requestInfo, err, HRIL_NOTIFICATION, HNOTI_CALL_STATE_UPDATED);
     reportInfo.modemErrInfo = errInfo;
     OnCallReport(GetSlotId(NULL), reportInfo, NULL, 0);

@@ -741,7 +741,8 @@ void GetNetworkSearchInformationPause(void)
     TELEPHONY_LOGI("enter to [%{public}s]:%{public}d", __func__, __LINE__);
     pthread_mutex_lock(&g_networkSearchInformationMutex);
     g_reportInfoForOperListToUse.error = HRIL_ERR_NETWORK_SEARCHING_INTERRUPTED;
-    OnNetworkReport(g_reportInfoForOperListToUse.requestInfo->slotId, g_reportInfoForOperListToUse, NULL, 0);
+    OnNetworkReport(g_reportInfoForOperListToUse.requestInfo->slotId,
+        g_reportInfoForOperListToUse, NULL, 0);
     SetAtPauseFlag(false);
     if (g_reportInfoForOperListToUse.requestInfo != NULL) {
         g_reportInfoForOperListToUse.requestInfo = NULL;
@@ -757,7 +758,8 @@ void PerformTimeOut(int32_t sigFlag)
         TELEPHONY_LOGI("enter to [%{public}s]:%{public}d", __func__, __LINE__);
         if (sendFlag) {
             g_reportInfoForOperListToUse.error = HRIL_ERR_NETWORK_SEARCH_TIMEOUT;
-            OnNetworkReport(g_reportInfoForOperListToUse.requestInfo->slotId, g_reportInfoForOperListToUse, NULL, 0);
+            OnNetworkReport(g_reportInfoForOperListToUse.requestInfo->slotId,
+                g_reportInfoForOperListToUse, NULL, 0);
             SetAtPauseFlag(false);
             if (g_reportInfoForOperListToUse.requestInfo != NULL) {
                 g_reportInfoForOperListToUse.requestInfo = NULL;
@@ -1470,7 +1472,8 @@ int32_t ProcessCurrentCellList(struct ReportInfo reportInfo, const char *s)
         reportInfo.error = HRIL_ERR_SUCCESS;
         reportInfo.type = HRIL_NOTIFICATION;
         reportInfo.notifyId = HNOTI_NETWORK_CURRENT_CELL_UPDATED;
-        OnNetworkReport(GetSlotId(NULL), reportInfo, (const uint8_t *)&cellList, sizeof(CurrentCellInfoList));
+        OnNetworkReport(GetSlotId(NULL), reportInfo, (const uint8_t *)&cellList,
+            sizeof(CurrentCellInfoList));
         if (cellList.currentCellInfo != NULL) {
             free(cellList.currentCellInfo);
         }
@@ -1879,128 +1882,6 @@ void ReqGetRadioCapability(const ReqDataInfo *requestInfo)
         requestInfo->slotId, reportInfo, (const uint8_t *)GetRadioCapability(), sizeof(HRilRadioCapability));
 }
 
-void ReqSetRadioCapability(const ReqDataInfo *requestInfo, const HRilRadioCapability *data)
-{
-    int32_t err = HRIL_ERR_SUCCESS;
-    struct ReportInfo reportInfo;
-    HRilRadioCapability *hRilRadioCapability = (HRilRadioCapability *)data;
-    if (hRilRadioCapability == NULL) {
-        reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_NULL_POINT, HRIL_RESPONSE, 0);
-        OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 0);
-        TELEPHONY_LOGE("ReqSetRadioCapability HRIL_ERR_NULL_POINT");
-        return;
-    }
-    GetRadioCapability()->ratFamily = hRilRadioCapability->ratFamily;
-    strcpy_s(GetRadioCapability()->modemId, strlen(hRilRadioCapability->modemId) + 1, hRilRadioCapability->modemId);
-    TELEPHONY_LOGI("ReqSetRadioCapability OnNetworkReport ");
-    reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-    OnNetworkReport(
-        requestInfo->slotId, reportInfo, (const uint8_t *)GetRadioCapability(), sizeof(HRilRadioCapability));
-}
-
-void ReqSetPsAttachStatus(const ReqDataInfo *requestInfo, const int32_t *data)
-{
-    const long TIME_OUT = DEFAULT_TIMEOUT;
-    ResponseInfo *responseInfo = NULL;
-    struct ReportInfo reportInfo;
-    if (data == NULL) {
-        reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_PARAMETER, HRIL_RESPONSE, 0);
-        OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 0);
-        TELEPHONY_LOGE("ReqSetPsAttachStatus  HRIL_ERR_INVALID_PARAMETER data NULL");
-        return;
-    }
-    int32_t setPsAttachStatus = *(int32_t *)data;
-    char *cmd = NULL;
-    if (setPsAttachStatus == 1) {
-        cmd = "AT+CGATT=1";
-    } else if (setPsAttachStatus == 0) {
-        cmd = "AT+CGATT=0";
-    } else {
-        reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_PARAMETER, HRIL_RESPONSE, 0);
-        OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 0);
-        TELEPHONY_LOGE("ReqSetPsAttachStatus:  setPsAttachStatus > 1");
-        return;
-    }
-    TELEPHONY_LOGI("ReqSetPsAttachStatus, cmd = %{public}s", cmd);
-    int32_t err = SendCommandLock(cmd, NULL, TIME_OUT, &responseInfo);
-    if (responseInfo == NULL) {
-        reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
-        OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 0);
-        TELEPHONY_LOGE("ReqSetPsAttachStatus responseInfo == NULL");
-        return;
-    }
-    TELEPHONY_LOGI("ReqSetPsAttachStatus, responseInfo->success = %{public}d", responseInfo->success);
-    if (err != 0 || responseInfo->success == 0) {
-        err = GetResponseErrorCode(responseInfo);
-        TELEPHONY_LOGE("ReqSetPsAttachStatus errcode = %{public}d", err);
-    }
-    reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-    OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 0);
-    FreeResponseInfo(responseInfo);
-}
-
-static int32_t ParsePsAttachStatusStr(const Line *pLine)
-{
-    const char *psAttachedStr = "1";
-    const char *psDetachedStr = "0";
-
-    if (pLine == NULL) {
-        return -1;
-    }
-    char *line = pLine->data;
-    int32_t ret = SkipATPrefix(&line);
-    if (ret < 0) {
-        return -1;
-    }
-    char *psAttachStatusStr = NULL;
-    ret = NextStr(&line, &psAttachStatusStr);
-    if (ret < 0) {
-        return -1;
-    }
-    if (psAttachStatusStr == NULL) {
-        return -1;
-    }
-    TELEPHONY_LOGI("psAttachStatusStr： [%{public}s]", psAttachStatusStr);
-    int32_t psAttachStatus = -1;
-    if (strcmp(psAttachStatusStr, psAttachedStr) == 0) {
-        psAttachStatus = 1;
-    } else if (strcmp(psAttachStatusStr, psDetachedStr) == 0) {
-        psAttachStatus = 0;
-    } else {
-    }
-    return psAttachStatus;
-}
-
-void ReqGetPsAttachStatus(const ReqDataInfo *requestInfo)
-{
-    const long TIME_OUT = DEFAULT_TIMEOUT;
-    int32_t err = HRIL_ERR_SUCCESS;
-    ResponseInfo *responseInfo = NULL;
-    int32_t ret = SendCommandLock("AT+CGATT?", "+CGATT:", TIME_OUT, &responseInfo);
-    struct ResponseAck respDataAck = {responseInfo, NULL, 0};
-    if (responseInfo == NULL) {
-        TELEPHONY_LOGE("responseInfo is null");
-        ResponseNetworkReport(requestInfo->slotId, requestInfo, HRIL_ERR_NULL_POINT, &respDataAck);
-        return;
-    }
-    respDataAck.responseInfo = responseInfo;
-    if (ret != 0 || !responseInfo->success) {
-        err = GetResponseErrorCode(responseInfo);
-        TELEPHONY_LOGE("send AT CMD failed!");
-        ResponseNetworkReport(requestInfo->slotId, requestInfo, err, &respDataAck);
-        return;
-    }
-    int32_t psAttachStatus = ParsePsAttachStatusStr(responseInfo->head);
-    if (psAttachStatus < 0) {
-        TELEPHONY_LOGE("ReqGetPsAttachStatus: psAttachStatus < 0");
-        ResponseNetworkReport(requestInfo->slotId, requestInfo, HRIL_ERR_INVALID_RESPONSE, &respDataAck);
-        return;
-    }
-    respDataAck.respDataPointer = (uint8_t *)&psAttachStatus;
-    respDataAck.respDataLen = sizeof(int32_t);
-    ResponseNetworkReport(requestInfo->slotId, requestInfo, HRIL_ERR_SUCCESS, &respDataAck);
-}
-
 static int32_t ExtractConfigInfo(const char *str, const HRilPhyChannelConfig *config)
 {
     HRilPhyChannelConfig *cfg = (HRilPhyChannelConfig *)config;
@@ -2082,7 +1963,8 @@ void ProcessPhyChnlCfgNotify(struct ReportInfo reportInfo, char *srcStr)
         reportInfo.error = HRIL_ERR_SUCCESS;
         reportInfo.type = HRIL_NOTIFICATION;
         reportInfo.notifyId = HNOTI_NETWORK_PHY_CHNL_CFG_UPDATED;
-        OnNetworkReport(GetSlotId(NULL), reportInfo, (const uint8_t *)&configInfoList, sizeof(HRilChannelConfigList));
+        OnNetworkReport(GetSlotId(NULL), reportInfo, (const uint8_t *)&configInfoList,
+            sizeof(HRilChannelConfigList));
         for (int32_t i = 0; i < configInfoList.itemNum; i++) {
             if (configInfoList.channelConfigs[i].contextIds != NULL) {
                 free(configInfoList.channelConfigs[i].contextIds);

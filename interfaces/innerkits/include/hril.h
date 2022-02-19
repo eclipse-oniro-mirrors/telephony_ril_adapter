@@ -16,6 +16,8 @@
 #ifndef OHOS_RIL_H
 #define OHOS_RIL_H
 
+#include <sys/time.h>
+
 #include "hril_vendor_call_defs.h"
 #include "hril_vendor_data_defs.h"
 #include "hril_vendor_modem_defs.h"
@@ -41,6 +43,8 @@ typedef struct {
     char *vendorError; /* Error codes of vendor. */
 } HRilLastCallErrorCodeInfo;
 
+typedef void (*HRilCallbackFun)(uint8_t *param);
+
 struct HRilReport {
     void (*OnCallReport)(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *data, size_t dataLen);
     void (*OnDataReport)(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *data, size_t dataLen);
@@ -48,6 +52,7 @@ struct HRilReport {
     void (*OnNetworkReport)(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *data, size_t dataLen);
     void (*OnSimReport)(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *data, size_t dataLen);
     void (*OnSmsReport)(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *data, size_t dataLen);
+    void (*OnTimerCallback)(HRilCallbackFun func, uint8_t *param, const struct timeval *tv);
 };
 
 typedef struct {

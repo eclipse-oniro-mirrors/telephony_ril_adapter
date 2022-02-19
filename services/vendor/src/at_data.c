@@ -713,6 +713,17 @@ void ReqGetPdpContextList(const ReqDataInfo *requestInfo)
     InquirePdpContextList(DEFAULT_CID, requestInfo);
 }
 
+static void PdpContextListCallback(uint8_t *param)
+{
+    InquirePdpContextList(DEFAULT_CID, NULL);
+}
+
+void PdpContextListUpdate(void)
+{
+    struct timeval tv = {0, CALLBACK_DELAY_MS * DELAY_US_OFFSET};
+    OnTimerCallback(PdpContextListCallback, NULL, &tv);
+}
+
 static int32_t SetDataProfileInfo(int32_t cid, const ReqDataInfo *requestInfo, const HRilDataInfo *pDataInfo)
 {
     int32_t ret;

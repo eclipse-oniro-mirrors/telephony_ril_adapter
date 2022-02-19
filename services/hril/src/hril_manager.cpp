@@ -15,6 +15,8 @@
 
 #include "hril_manager.h"
 
+#include "parameter.h"
+
 #include "hril_base.h"
 #include "hril_request.h"
 
@@ -55,6 +57,11 @@ static int32_t RegisterManagerResponseCallback(const HdfRemoteService *serviceCa
     }
     g_manager->RegisterModulesResponseCallback(serviceCallbackResp);
     return HRIL_ERR_SUCCESS;
+}
+
+int32_t HRilManager::GetMaxSimSlotCount()
+{
+    return hrilSimSlotCount_;
 }
 
 int32_t HRilManager::Dispatch(int32_t slotId, int32_t code, struct HdfSBuf *data)
@@ -271,8 +278,9 @@ void HRilManager::OnSmsReport(
 }
 
 HRilManager::HRilManager()
+    : hrilSimSlotCount_(GetSimSlotCount())
 {
-    for (int32_t slotId = HRIL_SIM_SLOT_0; slotId < HRIL_SIM_SLOT_NUM; slotId++) {
+    for (int32_t slotId = HRIL_SIM_SLOT_0; slotId < hrilSimSlotCount_; slotId++) {
         hrilCall_.push_back(std::make_unique<HRilCall>(slotId, *this));
         hrilModem_.push_back(std::make_unique<HRilModem>(slotId, *this));
         hrilNetwork_.push_back(std::make_unique<HRilNetwork>(slotId, *this));
@@ -280,6 +288,7 @@ HRilManager::HRilManager()
         hrilSms_.push_back(std::make_unique<HRilSms>(slotId, *this));
         hrilData_.push_back(std::make_unique<HRilData>(slotId, *this));
     }
+    timerCallback_ = std::make_unique<HRilTimerCallback>();
 }
 
 HRilManager::~HRilManager() {}
@@ -287,6 +296,14 @@ HRilManager::~HRilManager() {}
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+int32_t GetSimSlotCount()
+{
+    char simSlotCount[HRIL_SYSPARA_SIZE] = {0};
+    GetParameter(HRIL_TEL_SIM_SLOT_COUNT.c_str(),
+        HRIL_DEFAULT_SLOT_COUNT.c_str(), simSlotCount, HRIL_SYSPARA_SIZE);
+    return std::atoi(simSlotCount);
+}
 
 int32_t DispatchRequest(int32_t cmd, struct HdfSBuf *data)
 {
@@ -323,13 +340,18 @@ int32_t DispatchRequest(int32_t cmd, struct HdfSBuf *data)
     return HRIL_ERR_SUCCESS;
 }
 
+static void HRilBootUpEventLoop()
+{
+    g_manager->timerCallback_->EventLoop();
+}
+
 void HRilRegOps(const HRilOps *hrilOps)
 {
     static HRilOps callBacks = {0};
     static RegisterState rilRegisterStatus = RIL_REGISTER_IS_NONE;
 
     if (hrilOps == nullptr) {
-        TELEPHONY_LOGE("HRilRegOps: HRilRegOps * nullptr");
+        TELEPHONY_LOGE("HRilRegOps: param is nullptr");
         return;
     }
     if (rilRegisterStatus > RIL_REGISTER_IS_NONE) {
@@ -337,9 +359,9 @@ void HRilRegOps(const HRilOps *hrilOps)
         return;
     }
     rilRegisterStatus = RIL_REGISTER_IS_RUNNING;
-
+    g_manager->eventLoop_ = std::make_unique<std::thread>(HRilBootUpEventLoop);
     (void)memcpy_s(&callBacks, sizeof(HRilOps), hrilOps, sizeof(HRilOps));
-    for (int32_t slotId = HRIL_SIM_SLOT_0; slotId < HRIL_SIM_SLOT_NUM; slotId++) {
+    for (int32_t slotId = HRIL_SIM_SLOT_0; slotId < g_manager->GetMaxSimSlotCount(); slotId++) {
         if (callBacks.smsOps != nullptr) {
             g_manager->RegisterSmsFuncs(slotId, callBacks.smsOps);
         }
@@ -414,6 +436,16 @@ void OnSmsReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *re
     }
     g_manager->OnSmsReport(slotId, &reportInfo, response, responseLen);
 }
+
+void OnTimerCallback(HRilCallbackFun func, uint8_t *param, const struct timeval *tv)
+{
+    if (g_manager == nullptr || g_manager->timerCallback_ == nullptr) {
+        TELEPHONY_LOGE("HrilManager or timerCallback is nullptr, addr:%{public}p!", &g_manager);
+        return;
+    }
+    g_manager->timerCallback_->HRilSetTimerCallbackInfo(func, param, tv);
+}
+
 #ifdef __cplusplus
 }
 #endif

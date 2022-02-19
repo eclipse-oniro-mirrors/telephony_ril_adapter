@@ -341,15 +341,6 @@ struct RadioCapabilityInfo : public HrilBaseParcel {
     void Dump(std::string, int32_t);
 };
 
-struct PsAttachStatusInfo : public HrilBaseParcel {
-    int32_t psAttachStatus;
-    int64_t flag;
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<PsAttachStatusInfo> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
-};
-
 struct ImsRegStatusInfo : public HrilBaseParcel {
     int32_t notifyType;
     int32_t regInfo;

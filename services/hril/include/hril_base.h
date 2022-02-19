@@ -272,33 +272,32 @@ int32_t HRilBase::ResponseMessageParcel(const HRilRadioResponseInfo &responseInf
     struct HdfSBuf *dataSbuf;
     std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
     if (parcel == nullptr) {
-        return HRIL_ERR_NULL_POINT;
+        return HDF_FAILURE;
     }
-    // step1:Get the address of dataSbuf.
     dataSbuf = ParcelToSbuf(parcel.get());
     if (dataSbuf == nullptr) {
-        return HRIL_ERR_NULL_POINT;
+        return HDF_FAILURE;
     }
-    // step2:Write slotId into serialization.
-    if (!HdfSbufWriteInt32(dataSbuf, slotId_)) {
+    if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
         HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
-    // step3:Write data to serialization.
-    data.Marshalling(*parcel.get());
-    // step4:Write responseInfo into serialization.
     if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&responseInfo, sizeof(responseInfo))) {
         HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
+        return HDF_FAILURE;
     }
-    // step5:Dispatch to telRil.
+
+    data.Marshalling(*parcel.get());
+
     int32_t ret = ServiceDispatcher(requestNum, dataSbuf);
-    if (ret != HRIL_ERR_SUCCESS) {
+    if (ret != HDF_SUCCESS) {
         HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
+        return HDF_FAILURE;
     }
-    HdfSbufRecycle(dataSbuf);
-    return HRIL_ERR_SUCCESS;
+    if (dataSbuf != nullptr) {
+        HdfSbufRecycle(dataSbuf);
+    }
+    return HDF_SUCCESS;
 }
 
 template<typename T>

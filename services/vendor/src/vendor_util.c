@@ -23,6 +23,8 @@
 #define COUNT 1000
 
 #define SUPPORT_SLOT_ID "persist.sys.support.slotid"
+#define DEFAULT_SLOT_COUNT "1"
+#define TEL_SIM_SLOT_COUNT "const.telephony.slotCount"
 
 const int32_t G_RESP_ERRORS = 7;
 const int32_t G_RESP_SUCCESS = 2;
@@ -472,6 +474,13 @@ int32_t FindCommaCharNum(const char *srcStr)
     return charNum;
 }
 
+int32_t GetSimSlotCount(void)
+{
+    char simSlotCount[PARAMETER_SIZE] = {0};
+    GetParameter(TEL_SIM_SLOT_COUNT, DEFAULT_SLOT_COUNT, simSlotCount, PARAMETER_SIZE);
+    return atoi(simSlotCount);
+}
+
 int32_t GetSlotId(const ReqDataInfo *requestInfo)
 {
     int32_t slotId = HRIL_SIM_SLOT_0;
@@ -484,7 +493,7 @@ int32_t GetSlotId(const ReqDataInfo *requestInfo)
             slotId = atoi(strSlotId);
         }
     }
-    if (slotId >= HRIL_SIM_SLOT_NUM) {
+    if (slotId >= GetSimSlotCount()) {
         slotId = HRIL_SIM_SLOT_0;
         TELEPHONY_LOGE("slotId is invalid, slotId0 will be used. slotId:%{public}d", slotId);
     }

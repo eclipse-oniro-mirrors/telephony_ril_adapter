@@ -161,63 +161,6 @@ struct CallForwardQueryResult : public HrilBaseParcel {
     void Dump(std::string, int32_t);
 };
 
-struct CallCringInfo : public HrilBaseParcel {
-    std::string type;
-    std::string pdpType;
-    std::string pdpAddress;
-    std::string l2p;
-    std::string apn;
-
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<CallCringInfo> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
-};
-
-struct CallWaitInfo : public HrilBaseParcel {
-    std::string number;
-    int32_t type;
-    int32_t businessClass;
-
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<CallWaitInfo> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
-};
-
-struct CallConnectInfo : public HrilBaseParcel {
-    int32_t callId;
-    int32_t type;
-
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<CallConnectInfo> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
-};
-
-struct CallEndInfo : public HrilBaseParcel {
-    int32_t callId;
-    int32_t duration;
-    int32_t noCliCause;
-    int32_t ccCause;
-
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<CallEndInfo> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
-};
-
-struct CallStatusInfo : public HrilBaseParcel {
-    int32_t callId;
-    int32_t status;
-    int32_t voiceDomain;
-
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<CallStatusInfo> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
-};
-
 struct CallImsServiceStatus : public HrilBaseParcel {
     int32_t smsSrvStatus;
     int32_t smsSrvRat;
