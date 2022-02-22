@@ -52,11 +52,6 @@ void HRilCall::AddCallNotificationToMap()
 {
     // Notification
     notiMemberFuncMap_[HNOTI_CALL_STATE_UPDATED] = &HRilCall::CallStateUpdated;
-    notiMemberFuncMap_[HNOTI_CALL_CRING_REPORT] = &HRilCall::CallCringNotice;
-    notiMemberFuncMap_[HNOTI_CALL_WAITING_REPORT] = &HRilCall::CallWaitingNotice;
-    notiMemberFuncMap_[HNOTI_CALL_CONNECT_REPORT] = &HRilCall::CallConnectNotice;
-    notiMemberFuncMap_[HNOTI_CALL_END_REPORT] = &HRilCall::CallEndNotice;
-    notiMemberFuncMap_[HNOTI_CALL_STATUS_INFO_REPORT] = &HRilCall::CallStatusInfoNotice;
     notiMemberFuncMap_[HNOTI_CALL_IMS_SERVICE_STATUS_REPORT] = &HRilCall::CallImsServiceStatusNotice;
     notiMemberFuncMap_[HNOTI_CALL_USSD_REPORT] = &HRilCall::CallUssdNotice;
     notiMemberFuncMap_[HNOTI_CALL_SRVCC_STATUS_REPORT] = &HRilCall::CallSrvccStatusNotice;
@@ -1192,23 +1187,6 @@ int32_t HRilCall::SetLteImsSwitchStatusResponse(
     return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));
 }
 
-int32_t HRilCall::CallStateUpdated(int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen)
-{
-    struct HdfSBuf *dataSbuf = HdfSbufTypedObtain(SBUF_IPC);
-
-    if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    int32_t ret = ServiceNotifyDispatcher(HNOTI_CALL_STATE_UPDATED, dataSbuf);
-    if (ret != HRIL_ERR_SUCCESS) {
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    HdfSbufRecycle(dataSbuf);
-    return HRIL_ERR_SUCCESS;
-}
-
 int32_t HRilCall::SetUssd(struct HdfSBuf *data)
 {
     if (callFuncs_ == nullptr || callFuncs_->SetUssd == nullptr || data == nullptr) {
@@ -1441,79 +1419,21 @@ int32_t HRilCall::GetEmergencyCallListResponse(
     return ResponseMessageParcel(responseInfo, callList, requestNum);
 }
 
-int32_t HRilCall::CallCringNotice(int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen)
+int32_t HRilCall::CallStateUpdated(int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen)
 {
-    if ((response == nullptr) || (responseLen % sizeof(HRilCallCringInfo)) != 0) {
-        TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    CallCringInfo cringInfo = {};
-    const HRilCallCringInfo *hCringInfo = reinterpret_cast<const HRilCallCringInfo *>(response);
-    cringInfo.type = hCringInfo->type == nullptr ? "" : hCringInfo->type;
-    cringInfo.pdpType = hCringInfo->pdpType == nullptr ? "" : hCringInfo->pdpType;
-    cringInfo.pdpAddress = hCringInfo->pdpAddress == nullptr ? "" : hCringInfo->pdpAddress;
-    cringInfo.l2p = hCringInfo->l2p == nullptr ? "" : hCringInfo->l2p;
-    cringInfo.apn = hCringInfo->apn == nullptr ? "" : hCringInfo->apn;
-    return NotifyMessageParcel(cringInfo, HNOTI_CALL_CRING_REPORT);
-}
+    struct HdfSBuf *dataSbuf = HdfSbufTypedObtain(SBUF_IPC);
 
-int32_t HRilCall::CallWaitingNotice(
-    int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen)
-{
-    if ((response == nullptr) || (responseLen % sizeof(HRilCallWaitInfo)) != 0) {
-        TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
-        return HRIL_ERR_INVALID_PARAMETER;
+    if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
+        HdfSbufRecycle(dataSbuf);
+        return HRIL_ERR_GENERIC_FAILURE;
     }
-    CallWaitInfo waitInfo = {};
-    const HRilCallWaitInfo *hWaitInfo = reinterpret_cast<const HRilCallWaitInfo *>(response);
-    waitInfo.number = hWaitInfo->number == nullptr ? "" : hWaitInfo->number;
-    waitInfo.type = hWaitInfo->type;
-    waitInfo.businessClass = hWaitInfo->businessClass;
-    return NotifyMessageParcel(waitInfo, HNOTI_CALL_WAITING_REPORT);
-}
-
-int32_t HRilCall::CallConnectNotice(
-    int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen)
-{
-    if ((response == nullptr) || (responseLen % sizeof(HRilCallConnectInfo)) != 0) {
-        TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
-        return HRIL_ERR_INVALID_PARAMETER;
+    int32_t ret = ServiceNotifyDispatcher(HNOTI_CALL_STATE_UPDATED, dataSbuf);
+    if (ret != HRIL_ERR_SUCCESS) {
+        HdfSbufRecycle(dataSbuf);
+        return HRIL_ERR_GENERIC_FAILURE;
     }
-    CallConnectInfo connectInfo = {};
-    const HRilCallConnectInfo *hConnectInfo = reinterpret_cast<const HRilCallConnectInfo *>(response);
-    connectInfo.type = hConnectInfo->type;
-    connectInfo.callId = hConnectInfo->callId;
-    return NotifyMessageParcel(connectInfo, HNOTI_CALL_CONNECT_REPORT);
-}
-
-int32_t HRilCall::CallEndNotice(int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen)
-{
-    if ((response == nullptr) || (responseLen % sizeof(HRilCallEndInfo)) != 0) {
-        TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    CallEndInfo endInfo = {};
-    const HRilCallEndInfo *hEndInfo = reinterpret_cast<const HRilCallEndInfo *>(response);
-    endInfo.callId = hEndInfo->callId;
-    endInfo.duration = hEndInfo->duration;
-    endInfo.noCliCause = hEndInfo->noCliCause;
-    endInfo.ccCause = hEndInfo->ccCause;
-    return NotifyMessageParcel(endInfo, HNOTI_CALL_END_REPORT);
-}
-
-int32_t HRilCall::CallStatusInfoNotice(
-    int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen)
-{
-    if ((response == nullptr) || (responseLen % sizeof(HRilCallStatusInfo)) != 0) {
-        TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    CallStatusInfo statusInfo = {};
-    const HRilCallStatusInfo *hStatusInfo = reinterpret_cast<const HRilCallStatusInfo *>(response);
-    statusInfo.callId = hStatusInfo->callId;
-    statusInfo.status = hStatusInfo->status;
-    statusInfo.voiceDomain = hStatusInfo->voiceDomain;
-    return NotifyMessageParcel(statusInfo, HNOTI_CALL_STATUS_INFO_REPORT);
+    HdfSbufRecycle(dataSbuf);
+    return HRIL_ERR_SUCCESS;
 }
 
 int32_t HRilCall::CallImsServiceStatusNotice(

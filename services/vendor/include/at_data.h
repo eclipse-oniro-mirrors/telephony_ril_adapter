@@ -49,6 +49,8 @@
 #define QUERY_DELAY_MS 500
 #define DELAY_US_OFFSET 1000
 
+#define CALLBACK_DELAY_MS 50
+
 #define VERIFY_TYPE_MIN 0
 #define VERIFY_TYPE_MAX 2
 
@@ -94,4 +96,5 @@ void ReqDeactivatePdpContext(const ReqDataInfo *requestInfo, const HRilDataInfo 
 void ReqGetPdpContextList(const ReqDataInfo *requestInfo);
 void ReqGetLinkBandwidthInfo(const ReqDataInfo *requestInfo, const int32_t cid);
 void ReqSetLinkBandwidthReportingRule(const ReqDataInfo *requestInfo, const HRilLinkBandwidthReportingRule *data);
+void PdpContextListUpdate(void);
 #endif // OHOS_AT_DATA_H

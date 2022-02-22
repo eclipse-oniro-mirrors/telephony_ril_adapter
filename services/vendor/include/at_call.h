@@ -75,12 +75,7 @@ void ReqGetEmergencyCallList(const ReqDataInfo *requestInfo);
 void ReqGetCallFailReason(const ReqDataInfo *requestInfo);
 
 void ReportImsServiceStatusInfo(const char *str);
-void ReportCallStatusInfo(const char *str);
-void ReportCallEndInfo(const char *str);
-void ReportCallConnectInfo(const char *str);
-void ReportCallCringInfo(const char *str);
-void ReportCallWaitingInfo(const char *str);
-void ReportCallStatusUpdate(const char *str);
+void ReportCallStateUpdated(const char *str);
 void ReportSrvccStatusUpdate(const char *str);
 void ReportCsChannelInfo(const char *str);
 void CallReportInfoProcess(const char *str);

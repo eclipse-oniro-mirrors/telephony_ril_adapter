@@ -148,11 +148,6 @@ private:
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
 
     int32_t CallStateUpdated(int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
-    int32_t CallCringNotice(int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
-    int32_t CallWaitingNotice(int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
-    int32_t CallConnectNotice(int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
-    int32_t CallEndNotice(int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
-    int32_t CallStatusInfoNotice(int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
     int32_t CallImsServiceStatusNotice(int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
     int32_t CallUssdNotice(int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
     int32_t CallRingbackVoiceNotice(int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);

@@ -42,10 +42,7 @@ public:
     int32_t SetNetworkSelectionMode(struct HdfSBuf *data);
     int32_t SetPreferredNetwork(struct HdfSBuf *data);
     int32_t GetPreferredNetwork(struct HdfSBuf *data);
-    int32_t SetPsAttachStatus(struct HdfSBuf *data);
-    int32_t GetPsAttachStatus(struct HdfSBuf *data);
     int32_t GetRadioCapability(struct HdfSBuf *data);
-    int32_t SetRadioCapability(struct HdfSBuf *data);
     int32_t GetPhysicalChannelConfig(struct HdfSBuf *data);
     int32_t SetLocateUpdates(struct HdfSBuf *data);
 
@@ -69,13 +66,7 @@ public:
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t GetPreferredNetworkResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
-    int32_t SetPsAttachStatusResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
-    int32_t GetPsAttachStatusResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t GetRadioCapabilityResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
-    int32_t SetRadioCapabilityResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t GetNeighboringCellInfoListResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);

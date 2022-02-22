@@ -23,11 +23,13 @@ ohos_shared_library("hril") {
     "$RIL_HRIL/hril_base.cpp",
     "$RIL_HRIL/hril_call.cpp",
     "$RIL_HRIL/hril_data.cpp",
+    "$RIL_HRIL/hril_event.cpp",
     "$RIL_HRIL/hril_manager.cpp",
     "$RIL_HRIL/hril_modem.cpp",
     "$RIL_HRIL/hril_network.cpp",
     "$RIL_HRIL/hril_sim.cpp",
     "$RIL_HRIL/hril_sms.cpp",
+    "$RIL_HRIL/hril_timer_callback.cpp",
   ]
 
   include_dirs = [
@@ -45,6 +47,7 @@ ohos_shared_library("hril") {
 
   deps = [
     "//base/miscservices/time/services:time_service",
+    "//base/startup/syspara_lite/interfaces/innerkits/native/syspara:syspara",
     "//base/telephony/ril_adapter/interfaces/innerkits:hril_innerkits",
     "//drivers/adapter/uhdf2/host:libhdf_host",
     "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",

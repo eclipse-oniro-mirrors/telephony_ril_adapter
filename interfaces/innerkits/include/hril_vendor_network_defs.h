@@ -299,10 +299,7 @@ typedef struct {
     void (*SetNetworkSelectionMode)(const ReqDataInfo *requestInfo, const HRilSetNetworkModeInfo *data);
     void (*GetPreferredNetwork)(const ReqDataInfo *requestInfo);
     void (*SetPreferredNetwork)(const ReqDataInfo *requestInfo, const int32_t *data);
-    void (*SetPsAttachStatus)(const ReqDataInfo *requestInfo, const int32_t *data);
-    void (*GetPsAttachStatus)(const ReqDataInfo *requestInfo);
     void (*GetRadioCapability)(const ReqDataInfo *requestInfo);
-    void (*SetRadioCapability)(const ReqDataInfo *requestInfo, const HRilRadioCapability *data);
     void (*GetPhysicalChannelConfig)(const ReqDataInfo *requestInfo);
     void (*SetLocateUpdates)(const ReqDataInfo *requestInfo, HRilRegNotifyMode mode);
 } HRilNetworkReq;

@@ -26,6 +26,7 @@
 #include "hril_network.h"
 #include "hril_sim.h"
 #include "hril_sms.h"
+#include "hril_timer_callback.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -38,6 +39,11 @@ class HRilManager : public IHRilReporter {
 public:
     HRilManager();
     virtual ~HRilManager();
+
+    std::unique_ptr<HRilTimerCallback> timerCallback_ = nullptr;
+    std::unique_ptr<std::thread> eventLoop_ = nullptr;
+
+    int32_t GetMaxSimSlotCount();
 
     virtual int32_t ReportToParent(int32_t requestNum, const HdfSBuf *dataSbuf) override;
     virtual int32_t NotifyToParent(int32_t requestNum, const HdfSBuf *dataSbuf) override;
@@ -69,7 +75,7 @@ private:
     void OnReport(std::vector<std::unique_ptr<T>> &subModules, int32_t slotId, const ReportInfo *reportInfo,
         const uint8_t *response, size_t responseLen);
 
-private:
+    const int32_t hrilSimSlotCount_;
     std::vector<std::unique_ptr<HRilCall>> hrilCall_;
     std::vector<std::unique_ptr<HRilModem>> hrilModem_;
     std::vector<std::unique_ptr<HRilNetwork>> hrilNetwork_;
@@ -87,6 +93,7 @@ private:
 extern "C" {
 #endif
 
+int32_t GetSimSlotCount(void);
 int32_t DispatchRequest(int32_t cmd, struct HdfSBuf *data);
 void HRilRegOps(const HRilOps *hrilOps);
 void OnCallReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen);
@@ -95,6 +102,7 @@ void OnModemReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *
 void OnNetworkReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen);
 void OnSimReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen);
 void OnSmsReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen);
+void OnTimerCallback(HRilCallbackFun func, uint8_t *param, const struct timeval *tv);
 
 #ifdef __cplusplus
 }

@@ -75,7 +75,15 @@ void OnSimReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *re
         g_reportOps->OnSimReport(slotId, reportInfo, response, responseLen);
     } else {
         TELEPHONY_LOGE("g_reportOps is NULL");
-        return;
+    }
+}
+
+void OnTimerCallback(HRilCallbackFun func, uint8_t *param, const struct timeval *tv)
+{
+    if (g_reportOps != NULL) {
+        g_reportOps->OnTimerCallback(func, param, tv);
+    } else {
+        TELEPHONY_LOGE("g_reportOps is NULL");
     }
 }
 
@@ -210,6 +218,8 @@ void OnNotifyOps(const char *s, const char *smsPdu)
         OnSimReport(GetSlotId(NULL), reportInfo, NULL, 0);
     } else if (ReportStrWith(s, "^MONSC:")) {
         ProcessCurrentCellList(reportInfo, str);
+    } else if (ReportStrWith(s, "^DATACONNECT") || ReportStrWith(s, "^DATADISCONN")) {
+        PdpContextListUpdate();
     } else if (OnNotifyStkOps(s, str)) {
         TELEPHONY_LOGI("STK notify completed.");
     } else {

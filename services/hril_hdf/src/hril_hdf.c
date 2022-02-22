@@ -34,7 +34,8 @@ static struct HRilReport g_reportOps = {
     OnModemReport,
     OnNetworkReport,
     OnSimReport,
-    OnSmsReport
+    OnSmsReport,
+    OnTimerCallback
 };
 
 static int32_t GetVendorLibPath(char *path)
@@ -147,8 +148,8 @@ static void LoadVendor(void)
         return;
     }
     ops = rilInitOps(&g_reportOps);
-    TELEPHONY_LOGI("RilInit completed");
     HRilRegOps(ops);
+    TELEPHONY_LOGI("HRilRegOps completed");
 }
 
 static int32_t RilAdapterDispatch(

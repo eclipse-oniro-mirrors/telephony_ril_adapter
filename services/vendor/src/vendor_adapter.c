@@ -130,8 +130,6 @@ static const HRilNetworkReq g_networkReqOps = {
     .GetCsRegStatus = ReqGetCsRegStatus,
     .GetPsRegStatus = ReqGetPsRegStatus,
     .GetOperatorInfo = ReqGetOperatorInfo,
-    .SetPsAttachStatus = ReqSetPsAttachStatus,
-    .GetPsAttachStatus = ReqGetPsAttachStatus,
     .GetNetworkSearchInformation = ReqGetNetworkSearchInformation,
     .GetNetworkSelectionMode = ReqGetNetworkSelectionMode,
     .SetNetworkSelectionMode = ReqSetNetworkSelectionMode,
@@ -140,7 +138,6 @@ static const HRilNetworkReq g_networkReqOps = {
     .GetNeighboringCellInfoList = ReqGetNeighboringCellInfoList,
     .GetCurrentCellInfo = ReqGetCurrentCellInfo,
     .GetRadioCapability = ReqGetRadioCapability,
-    .SetRadioCapability = ReqSetRadioCapability,
     .GetPhysicalChannelConfig = ReqGetPhysicalChannelConfig,
     .SetLocateUpdates = ReqSetLocateUpdates,
 };

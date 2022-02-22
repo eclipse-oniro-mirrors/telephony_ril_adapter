@@ -32,6 +32,7 @@ void OnDataReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *r
 void OnSimReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen);
 void OnSmsReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen);
 void OnNetworkReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen);
+void OnTimerCallback(HRilCallbackFun func, uint8_t *param, const struct timeval *tv);
 void OnNotifyOps(const char *s, const char *smsPdu);
 void OnNotifyNetWorksOps(const char *s, const char *infoStr);
 bool OnNotifyStkOps(const char *s, const char *infoStr);

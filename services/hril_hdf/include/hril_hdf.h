@@ -45,4 +45,5 @@ extern void OnSimReport(
     int32_t slotId, const struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen);
 extern void OnSmsReport(
     int32_t slotId, const struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen);
+extern void OnTimerCallback(HRilCallbackFun func, uint8_t *param, const struct timeval *tv);
 #endif // OHOS_RIL_ADAPTER_RIL_INIT_H
