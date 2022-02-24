@@ -47,7 +47,6 @@ ohos_shared_library("hril") {
 
   deps = [
     "//base/miscservices/time/services:time_service",
-    "//base/startup/syspara_lite/interfaces/innerkits/native/syspara:syspara",
     "//base/telephony/ril_adapter/interfaces/innerkits:hril_innerkits",
     "//drivers/adapter/uhdf2/host:libhdf_host",
     "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
@@ -61,6 +60,7 @@ ohos_shared_library("hril") {
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
+    "startup_l2:syspara",
   ]
 
   public_deps = [ "//utils/native/base:utils" ]

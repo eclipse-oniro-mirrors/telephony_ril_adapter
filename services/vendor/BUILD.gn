@@ -37,15 +37,16 @@ ohos_shared_library("ril_vendor") {
     "LOG_DOMAIN = 0xD002B01",
   ]
   deps = [
-    "//base/startup/syspara_lite/interfaces/innerkits/native/syspara:syspara",
     "//base/telephony/ril_adapter/interfaces/innerkits:hril_innerkits",
     "//utils/native/base:utils",
   ]
 
+  external_deps = [ "startup_l2:syspara" ]
+
   if (is_standard_system) {
-    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
   } else {
-    external_deps = [ "hilog:libhilog" ]
+    external_deps += [ "hilog:libhilog" ]
   }
 
   part_name = "ril_adapter"

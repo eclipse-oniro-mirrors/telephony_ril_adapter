@@ -38,13 +38,15 @@ ohos_shared_library("hril_hdf") {
     "${hdf_uhdf_path}/ipc:libhdf_ipc_adapter",
     "${hdf_uhdf_path}/utils:libhdf_utils",
     "//base/hiviewdfx/faultloggerd/interfaces/innerkits/signal_handler:dfx_signalhandler",
-    "//base/startup/syspara_lite/interfaces/innerkits/native/syspara:syspara",
     "//utils/native/base:utils",
   ]
+
+  external_deps = [ "startup_l2:syspara" ]
+
   if (is_standard_system) {
-    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
   } else {
-    external_deps = [ "hilog:libhilog" ]
+    external_deps += [ "hilog:libhilog" ]
   }
 
   install_images = [ chipset_base_dir ]
