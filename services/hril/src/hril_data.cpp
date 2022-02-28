@@ -302,11 +302,13 @@ int32_t HRilData::SetLinkBandwidthReportingRule(struct HdfSBuf *data)
     ReqDataInfo *requestInfo =
         CreateHRilRequest(linkBandwidthRule.serial, HREQ_DATA_SET_LINK_BANDWIDTH_REPORTING_RULE);
     if (requestInfo == nullptr) {
-        SafeFrees(hLinkBandwidthRule.maximumUplinkKbps, hLinkBandwidthRule.maximumDownlinkKbps);
+        delete [] hLinkBandwidthRule.maximumUplinkKbps;
+        delete [] hLinkBandwidthRule.maximumDownlinkKbps;
         return HRIL_ERR_NULL_POINT;
     }
     dataFuncs_->SetLinkBandwidthReportingRule(requestInfo, &hLinkBandwidthRule);
-    SafeFrees(hLinkBandwidthRule.maximumUplinkKbps, hLinkBandwidthRule.maximumDownlinkKbps);
+    delete [] hLinkBandwidthRule.maximumUplinkKbps;
+    delete [] hLinkBandwidthRule.maximumDownlinkKbps;
     return HRIL_ERR_SUCCESS;
 }
 
