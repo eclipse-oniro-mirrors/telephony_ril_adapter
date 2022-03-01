@@ -761,6 +761,11 @@ int32_t HRilSms::SendSmsAckResponse(
         TELEPHONY_LOGE("dataSbuf in SendSmsAckResponse is nullptr!");
         return HRIL_ERR_NULL_POINT;
     }
+    if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
+        TELEPHONY_LOGE("HdfSbufWriteInt32 in SendSmsAckResponse failed!");
+        HdfSbufRecycle(dataSbuf);
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
     if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&responseInfo, sizeof(HRilRadioResponseInfo))) {
         TELEPHONY_LOGE("HdfSbufWriteUnpadBuffer in SendSmsAckResponse is failed!");
         HdfSbufRecycle(dataSbuf);
