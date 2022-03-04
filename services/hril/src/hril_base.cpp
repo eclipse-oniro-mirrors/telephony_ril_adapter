@@ -49,6 +49,10 @@ int32_t HRilBase::ResponseHeader(
 
 int32_t HRilBase::ReportHeader(std::shared_ptr<struct HdfSBuf> &dataSbuf, MessageParcel &parcel)
 {
+    if (!parcel.WriteInterfaceToken(HRIL_INTERFACE_TOKEN)) {
+        TELEPHONY_LOGE("write interface token failed.");
+        return HDF_FAILURE;
+    }
     dataSbuf.reset(ParcelToSbuf(&parcel), [](struct HdfSBuf *d) { HdfSbufRecycle(d); });
     if (dataSbuf == nullptr) {
         TELEPHONY_LOGE("dataSbuf is null!!!");
@@ -64,7 +68,16 @@ int32_t HRilBase::ReportHeader(std::shared_ptr<struct HdfSBuf> &dataSbuf, Messag
 int32_t HRilBase::ResponseBuffer(
     int32_t requestNum, const void *responseInfo, uint32_t reqLen, const void *event, uint32_t eventLen)
 {
-    struct HdfSBuf *dataSbuf = HdfSbufTypedObtain(SBUF_IPC);
+    std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
+    if (parcel == nullptr) {
+        TELEPHONY_LOGE("parcel is nullptr");
+        return HRIL_ERR_NULL_POINT;
+    }
+    if (!parcel->WriteInterfaceToken(HRIL_INTERFACE_TOKEN)) {
+        TELEPHONY_LOGE("write interface token failed.");
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
+    struct HdfSBuf *dataSbuf = ParcelToSbuf(parcel.get());
     if (dataSbuf == nullptr) {
         return HRIL_ERR_NULL_POINT;
     }
@@ -93,7 +106,16 @@ int32_t HRilBase::ResponseBuffer(
 
 int32_t HRilBase::ResponseInt32(int32_t requestNum, const void *responseInfo, uint32_t reqLen, uint32_t value)
 {
-    struct HdfSBuf *dataSbuf = HdfSbufTypedObtain(SBUF_IPC);
+    std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
+    if (parcel == nullptr) {
+        TELEPHONY_LOGE("parcel is nullptr");
+        return HRIL_ERR_NULL_POINT;
+    }
+    if (!parcel->WriteInterfaceToken(HRIL_INTERFACE_TOKEN)) {
+        TELEPHONY_LOGE("write interface token failed.");
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
+    struct HdfSBuf *dataSbuf = ParcelToSbuf(parcel.get());
     if (dataSbuf == nullptr) {
         return HRIL_ERR_NULL_POINT;
     }
@@ -122,7 +144,16 @@ int32_t HRilBase::ResponseInt32(int32_t requestNum, const void *responseInfo, ui
 
 int32_t HRilBase::ResponseRequestInfo(int32_t requestNum, const void *responseInfo, uint32_t reqLen)
 {
-    struct HdfSBuf *dataSbuf = HdfSbufTypedObtain(SBUF_IPC);
+    std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
+    if (parcel == nullptr) {
+        TELEPHONY_LOGE("parcel is nullptr");
+        return HRIL_ERR_NULL_POINT;
+    }
+    if (!parcel->WriteInterfaceToken(HRIL_INTERFACE_TOKEN)) {
+        TELEPHONY_LOGE("write interface token failed.");
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
+    struct HdfSBuf *dataSbuf = ParcelToSbuf(parcel.get());
     if (dataSbuf == nullptr) {
         return HRIL_ERR_NULL_POINT;
     }

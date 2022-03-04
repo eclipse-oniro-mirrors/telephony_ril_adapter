@@ -274,6 +274,10 @@ int32_t HRilBase::ResponseMessageParcel(const HRilRadioResponseInfo &responseInf
     if (parcel == nullptr) {
         return HDF_FAILURE;
     }
+    if (!parcel->WriteInterfaceToken(HRIL_INTERFACE_TOKEN)) {
+        TELEPHONY_LOGE("write interface token failed.");
+        return HDF_FAILURE;
+    }
     dataSbuf = ParcelToSbuf(parcel.get());
     if (dataSbuf == nullptr) {
         return HDF_FAILURE;
@@ -310,6 +314,10 @@ int32_t HRilBase::NotifyMessageParcel(T &data, int32_t requestNum)
     dataSbuf = ParcelToSbuf(parcel.get());
     if (dataSbuf == nullptr) {
         return HRIL_ERR_NULL_POINT;
+    }
+    if (!parcel->WriteInterfaceToken(HRIL_INTERFACE_TOKEN)) {
+        TELEPHONY_LOGE("write interface token failed.");
+        return HDF_FAILURE;
     }
     // step2:Write slotId into serialization.
     if (!HdfSbufWriteInt32(dataSbuf, slotId_)) {

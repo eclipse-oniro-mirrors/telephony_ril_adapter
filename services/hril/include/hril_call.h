@@ -167,6 +167,9 @@ private:
         if (parcel == nullptr) {
             return HDF_FAILURE;
         }
+        if (!parcel->WriteInterfaceToken(HRIL_INTERFACE_TOKEN)) {
+            return HDF_FAILURE;
+        }
         dataSbuf = ParcelToSbuf(parcel.get());
         if (dataSbuf == nullptr) {
             return HDF_FAILURE;
