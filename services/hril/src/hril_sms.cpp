@@ -756,7 +756,16 @@ int32_t HRilSms::SendSmsMoreModeResponse(
 int32_t HRilSms::SendSmsAckResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    struct HdfSBuf *dataSbuf = HdfSbufTypedObtain(SBUF_IPC);
+    std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
+    if (parcel == nullptr) {
+        TELEPHONY_LOGE("parcel in SendSmsAckResponse is nullptr");
+        return HRIL_ERR_NULL_POINT;
+    }
+    if (!parcel->WriteInterfaceToken(HRIL_INTERFACE_TOKEN)) {
+        TELEPHONY_LOGE("write interface token failed.");
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
+    struct HdfSBuf *dataSbuf = ParcelToSbuf(parcel.get());
     if (dataSbuf == nullptr) {
         TELEPHONY_LOGE("dataSbuf in SendSmsAckResponse is nullptr!");
         return HRIL_ERR_NULL_POINT;
@@ -825,7 +834,11 @@ int32_t HRilSms::SmsStatusReportNotify(
     free(bytes);
     std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
     if (parcel == nullptr) {
-        TELEPHONY_LOGE("parcel in  SmsStatusReportNotify is nullptr!");
+        TELEPHONY_LOGE("parcel in SmsStatusReportNotify is nullptr");
+        return HRIL_ERR_NULL_POINT;
+    }
+    if (!parcel->WriteInterfaceToken(HRIL_INTERFACE_TOKEN)) {
+        TELEPHONY_LOGE("write interface token failed.");
         return HRIL_ERR_GENERIC_FAILURE;
     }
     struct HdfSBuf *dataSbuf = nullptr;
@@ -860,7 +873,16 @@ int32_t HRilSms::NewSmsStoredOnSimNotify(
     }
     indType = (int32_t)ConvertIntToRadioNoticeType(indType);
     int32_t recordNumber = *(static_cast<const int32_t *>(response));
-    struct HdfSBuf *dataSbuf = HdfSbufTypedObtain(SBUF_IPC);
+    std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
+    if (parcel == nullptr) {
+        TELEPHONY_LOGE("parcel in NewSmsStoredOnSimNotify is nullptr");
+        return HRIL_ERR_NULL_POINT;
+    }
+    if (!parcel->WriteInterfaceToken(HRIL_INTERFACE_TOKEN)) {
+        TELEPHONY_LOGE("write interface token failed.");
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
+    struct HdfSBuf *dataSbuf = ParcelToSbuf(parcel.get());
     if (dataSbuf == nullptr) {
         TELEPHONY_LOGE("HdfSbufTypedObtain in NewSmsStoredOnSimNotify is failed!");
         return HRIL_ERR_NULL_POINT;
@@ -924,6 +946,10 @@ int32_t HRilSms::NewSmsNotify(int32_t indType, const HRilErrNumber e, const void
         TELEPHONY_LOGE("parcel in NewSmsNotify is nullptr!");
         return HRIL_ERR_GENERIC_FAILURE;
     }
+    if (!parcel->WriteInterfaceToken(HRIL_INTERFACE_TOKEN)) {
+        TELEPHONY_LOGE("write interface token failed.");
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
     struct HdfSBuf *dataSbuf = nullptr;
     parcel->WriteInt32(GetSlotId());
     smsMessageInfo.Marshalling(*parcel.get());
@@ -962,6 +988,11 @@ int32_t HRilSms::NewCdmaSmsNotify(int32_t indType, const HRilErrNumber e, const 
 
     std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
     if (parcel == nullptr) {
+        TELEPHONY_LOGE("parcel in NewCdmaSmsNotify is nullptr");
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
+    if (!parcel->WriteInterfaceToken(HRIL_INTERFACE_TOKEN)) {
+        TELEPHONY_LOGE("write interface token failed.");
         return HRIL_ERR_GENERIC_FAILURE;
     }
     struct HdfSBuf *dataSbuf = nullptr;
@@ -994,6 +1025,10 @@ int32_t HRilSms::CBConfigNotify(int32_t indType, const HRilErrNumber e, const vo
     if (parcel == nullptr) {
         TELEPHONY_LOGE("parcel in CBConfigNotify is nullptr!");
         return HRIL_ERR_NULL_POINT;
+    }
+    if (!parcel->WriteInterfaceToken(HRIL_INTERFACE_TOKEN)) {
+        TELEPHONY_LOGE("write interface token failed.");
+        return HRIL_ERR_GENERIC_FAILURE;
     }
     struct HdfSBuf *dataSbuf = nullptr;
     parcel->WriteInt32(GetSlotId());

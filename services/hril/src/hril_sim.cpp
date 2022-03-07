@@ -769,7 +769,16 @@ int32_t HRilSim::GetImsiResponse(
             responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
         }
     }
-    struct HdfSBuf *dataSbuf = HdfSbufTypedObtain(SBUF_IPC);
+    std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
+    if (parcel == nullptr) {
+        TELEPHONY_LOGE("parcel is nullptr");
+        return HRIL_ERR_NULL_POINT;
+    }
+    if (!parcel->WriteInterfaceToken(HRIL_INTERFACE_TOKEN)) {
+        TELEPHONY_LOGE("write interface token failed.");
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
+    struct HdfSBuf *dataSbuf = ParcelToSbuf(parcel.get());
     if (dataSbuf == nullptr) {
         TELEPHONY_LOGE("Error : dataSbuf in GetImsiResponse is nullptr!");
         return HRIL_ERR_NULL_POINT;
@@ -811,7 +820,16 @@ int32_t HRilSim::GetSimLockStatusResponse(
     } else {
         simLockStatus = *(static_cast<const int32_t *>(response));
     }
-    struct HdfSBuf *dataSbuf = HdfSbufTypedObtain(SBUF_IPC);
+    std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
+    if (parcel == nullptr) {
+        TELEPHONY_LOGE("parcel is nullptr");
+        return HRIL_ERR_NULL_POINT;
+    }
+    if (!parcel->WriteInterfaceToken(HRIL_INTERFACE_TOKEN)) {
+        TELEPHONY_LOGE("write interface token failed.");
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
+    struct HdfSBuf *dataSbuf = ParcelToSbuf(parcel.get());
     if (dataSbuf == nullptr) {
         TELEPHONY_LOGE("GetSimLockStatusResponse dataSbuf is NULL.");
         return HRIL_ERR_NULL_POINT;
@@ -1026,7 +1044,20 @@ IccIoResultInfo HRilSim::ProcessIccIoResponse(
 
 int32_t HRilSim::SimStateUpdated(int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen)
 {
-    struct HdfSBuf *dataSbuf = HdfSbufTypedObtain(SBUF_IPC);
+    std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
+    if (parcel == nullptr) {
+        TELEPHONY_LOGE("parcel is nullptr");
+        return HRIL_ERR_NULL_POINT;
+    }
+    if (!parcel->WriteInterfaceToken(HRIL_INTERFACE_TOKEN)) {
+        TELEPHONY_LOGE("write interface token failed.");
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
+    struct HdfSBuf *dataSbuf = ParcelToSbuf(parcel.get());
+    if (dataSbuf == nullptr) {
+        TELEPHONY_LOGE("GetSimLockStatusResponse dataSbuf is NULL.");
+        return HRIL_ERR_NULL_POINT;
+    }
     if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
         HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
@@ -1047,7 +1078,20 @@ int32_t HRilSim::SimStateUpdated(int32_t notifyType, const HRilErrNumber e, cons
 int32_t HRilSim::SimStkSessionEndNotify(
     int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen)
 {
-    struct HdfSBuf *dataSbuf = HdfSbufTypedObtain(SBUF_IPC);
+    std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
+    if (parcel == nullptr) {
+        TELEPHONY_LOGE("parcel is nullptr");
+        return HRIL_ERR_NULL_POINT;
+    }
+    if (!parcel->WriteInterfaceToken(HRIL_INTERFACE_TOKEN)) {
+        TELEPHONY_LOGE("write interface token failed.");
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
+    struct HdfSBuf *dataSbuf = ParcelToSbuf(parcel.get());
+    if (dataSbuf == nullptr) {
+        TELEPHONY_LOGE("GetSimLockStatusResponse dataSbuf is NULL.");
+        return HRIL_ERR_NULL_POINT;
+    }
     if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
         HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
@@ -1068,7 +1112,16 @@ int32_t HRilSim::SimStkSessionEndNotify(
 int32_t HRilSim::SimStkProactiveNotify(
     int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen)
 {
-    struct HdfSBuf *dataSbuf = HdfSbufTypedObtain(SBUF_IPC);
+    std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
+    if (parcel == nullptr) {
+        TELEPHONY_LOGE("parcel in is nullptr");
+        return HRIL_ERR_NULL_POINT;
+    }
+    if (!parcel->WriteInterfaceToken(HRIL_INTERFACE_TOKEN)) {
+        TELEPHONY_LOGE("write interface token failed.");
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
+    struct HdfSBuf *dataSbuf = ParcelToSbuf(parcel.get());
     if (dataSbuf == nullptr) {
         TELEPHONY_LOGE("Error : dataSbuf in SimStkProactiveNotify is nullptr!");
         return HRIL_ERR_NULL_POINT;
@@ -1095,7 +1148,20 @@ int32_t HRilSim::SimStkProactiveNotify(
 
 int32_t HRilSim::SimStkAlphaNotify(int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen)
 {
-    struct HdfSBuf *dataSbuf = HdfSbufTypedObtain(SBUF_IPC);
+    std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
+    if (parcel == nullptr) {
+        TELEPHONY_LOGE("parcel in is nullptr");
+        return HRIL_ERR_NULL_POINT;
+    }
+    if (!parcel->WriteInterfaceToken(HRIL_INTERFACE_TOKEN)) {
+        TELEPHONY_LOGE("write interface token failed.");
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
+    struct HdfSBuf *dataSbuf = ParcelToSbuf(parcel.get());
+    if (dataSbuf == nullptr) {
+        TELEPHONY_LOGE("Error : dataSbuf in SimStkProactiveNotify is nullptr!");
+        return HRIL_ERR_NULL_POINT;
+    }
     if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
         HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;

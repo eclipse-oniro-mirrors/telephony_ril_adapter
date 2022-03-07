@@ -509,6 +509,10 @@ int32_t HRilNetwork::NetworkCsRegStatusUpdated(
         TELEPHONY_LOGE("parcel is nullptr");
         return HRIL_ERR_NULL_POINT;
     }
+    if (!parcel->WriteInterfaceToken(HRIL_INTERFACE_TOKEN)) {
+        TELEPHONY_LOGE("write interface token failed.");
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
     struct HdfSBuf *dataSbuf = ParcelToSbuf(parcel.get());
     if (dataSbuf == nullptr) {
         TELEPHONY_LOGE("dataSbuf is nullptr");
@@ -567,6 +571,9 @@ int32_t HRilNetwork::NetworkPhyChnlCfgUpdated(
     std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
     if (parcel == nullptr) {
         return HRIL_ERR_NULL_POINT;
+    }
+    if (!parcel->WriteInterfaceToken(HRIL_INTERFACE_TOKEN)) {
+        return HRIL_ERR_GENERIC_FAILURE;
     }
     struct HdfSBuf *dataSbuf = ParcelToSbuf(parcel.get());
     if (dataSbuf == nullptr) {
@@ -630,18 +637,29 @@ int32_t HRilNetwork::NetworkCurrentCellUpdated(
     }
     std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
     if (parcel == nullptr) {
+        TELEPHONY_LOGE("parcel is nullptr");
         return HRIL_ERR_NULL_POINT;
     }
-    if (!cellListCurrentInfo.Marshalling(*parcel.get())) {
+    if (!parcel->WriteInterfaceToken(HRIL_INTERFACE_TOKEN)) {
+        TELEPHONY_LOGE("write interface token failed.");
         return HRIL_ERR_GENERIC_FAILURE;
     }
     struct HdfSBuf *dataSbuf = ParcelToSbuf(parcel.get());
     if (dataSbuf == nullptr) {
+        TELEPHONY_LOGE("dataSbuf is nullptr");
         return HRIL_ERR_NULL_POINT;
+    }
+    if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
+        HdfSbufRecycle(dataSbuf);
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
+    if (!cellListCurrentInfo.Marshalling(*parcel.get())) {
+        return HRIL_ERR_GENERIC_FAILURE;
     }
     indType = static_cast<int32_t>(ConvertIntToRadioNoticeType(indType));
     if (!HdfSbufWriteInt32(dataSbuf, indType)) {
         HdfSbufRecycle(dataSbuf);
+        TELEPHONY_LOGE("Marshalling is fail");
         return HRIL_ERR_GENERIC_FAILURE;
     }
     ServiceNotifyDispatcher(HNOTI_NETWORK_CURRENT_CELL_UPDATED, dataSbuf);
@@ -669,6 +687,10 @@ int32_t HRilNetwork::NetworkPsRegStatusUpdated(
     if (parcel == nullptr) {
         TELEPHONY_LOGE("parcel is nullptr");
         return HRIL_ERR_NULL_POINT;
+    }
+    if (!parcel->WriteInterfaceToken(HRIL_INTERFACE_TOKEN)) {
+        TELEPHONY_LOGE("write interface token failed.");
+        return HRIL_ERR_GENERIC_FAILURE;
     }
     struct HdfSBuf *dataSbuf = ParcelToSbuf(parcel.get());
     if (dataSbuf == nullptr) {
@@ -719,6 +741,10 @@ int32_t HRilNetwork::NetworkImsRegStatusUpdated(
         TELEPHONY_LOGE("parcel is nullptr");
         return HRIL_ERR_NULL_POINT;
     }
+    if (!parcel->WriteInterfaceToken(HRIL_INTERFACE_TOKEN)) {
+        TELEPHONY_LOGE("write interface token failed.");
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
     struct HdfSBuf *dataSbuf = ParcelToSbuf(parcel.get());
     if (dataSbuf == nullptr) {
         TELEPHONY_LOGE("dataSbuf is nullptr");
@@ -761,7 +787,16 @@ int32_t HRilNetwork::SignalStrengthUpdated(
     } else {
         ExchangeRilRssiToHdf(response, responseLen, rssi);
     }
-    struct HdfSBuf *dataSbuf = HdfSbufTypedObtain(SBUF_IPC);
+    std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
+    if (parcel == nullptr) {
+        TELEPHONY_LOGE("parcel is nullptr");
+        return HRIL_ERR_NULL_POINT;
+    }
+    if (!parcel->WriteInterfaceToken(HRIL_INTERFACE_TOKEN)) {
+        TELEPHONY_LOGE("write interface token failed.");
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
+    struct HdfSBuf *dataSbuf = ParcelToSbuf(parcel.get());
     if (dataSbuf == nullptr) {
         TELEPHONY_LOGE("dataSbuf is nullptr");
         return HRIL_ERR_NULL_POINT;
@@ -796,7 +831,16 @@ int32_t HRilNetwork::NetworkTimeUpdated(
 {
     indType = static_cast<int32_t>(ConvertIntToRadioNoticeType(indType));
 
-    struct HdfSBuf *dataSbuf = HdfSbufTypedObtain(SBUF_IPC);
+    std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
+    if (parcel == nullptr) {
+        TELEPHONY_LOGE("parcel is nullptr");
+        return HRIL_ERR_NULL_POINT;
+    }
+    if (!parcel->WriteInterfaceToken(HRIL_INTERFACE_TOKEN)) {
+        TELEPHONY_LOGE("write interface token failed.");
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
+    struct HdfSBuf *dataSbuf = ParcelToSbuf(parcel.get());
     if (dataSbuf == nullptr) {
         TELEPHONY_LOGE("dataSbuf is nullptr");
         return HRIL_ERR_NULL_POINT;
@@ -832,7 +876,16 @@ int32_t HRilNetwork::NetworkTimeZoneUpdated(
 {
     indType = static_cast<int32_t>(ConvertIntToRadioNoticeType(indType));
 
-    struct HdfSBuf *dataSbuf = HdfSbufTypedObtain(SBUF_IPC);
+    std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
+    if (parcel == nullptr) {
+        TELEPHONY_LOGE("parcel is nullptr");
+        return HRIL_ERR_NULL_POINT;
+    }
+    if (!parcel->WriteInterfaceToken(HRIL_INTERFACE_TOKEN)) {
+        TELEPHONY_LOGE("write interface token failed.");
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
+    struct HdfSBuf *dataSbuf = ParcelToSbuf(parcel.get());
     if (dataSbuf == nullptr) {
         TELEPHONY_LOGE("dataSbuf is nullptr");
         return HRIL_ERR_NULL_POINT;

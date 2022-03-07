@@ -247,6 +247,8 @@ static constexpr uint32_t HRIL_NETWORKS_SELECT_MODE = 0;
 inline const int32_t HRIL_SYSPARA_SIZE = 128;
 inline const std::string HRIL_DEFAULT_SLOT_COUNT = "1";
 inline const std::string HRIL_TEL_SIM_SLOT_COUNT = "const.telephony.slotCount";
+// interface token
+inline const std::u16string HRIL_INTERFACE_TOKEN = u"ohos.telephony.hril";
 } // namespace Telephony
 } // namespace OHOS
 #endif // TELEPHONY_N_TYPE_H

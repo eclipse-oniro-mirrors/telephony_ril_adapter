@@ -375,6 +375,10 @@ int32_t HRilData::PdpContextListUpdated(
         TELEPHONY_LOGE("parcel is null.");
         return HRIL_ERR_NULL_POINT;
     }
+    if (!parcel->WriteInterfaceToken(HRIL_INTERFACE_TOKEN)) {
+        TELEPHONY_LOGE("write interface token failed.");
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
     struct HdfSBuf *dataSbuf = nullptr;
     dataSbuf = ParcelToSbuf(parcel.get());
     if (dataSbuf == nullptr) {
