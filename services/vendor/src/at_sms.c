@@ -198,7 +198,7 @@ void ReqSendCdmaSms(const ReqDataInfo *requestInfo, const char *data, size_t dat
         return;
     }
     err = SendCommandLock("AT$QCMGF=0", "$QCMGF=0", 0, &responseInfo);
-    if (err != 0 || (responseInfo == NULL && !responseInfo->success)) {
+    if (err != 0 || responseInfo == NULL || !responseInfo->success) {
         response.msgRef = HRIL_ERR_GENERIC_FAILURE;
         reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
         OnSmsReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
