@@ -166,6 +166,7 @@ int32_t HRilSms::AddSimMessage(struct HdfSBuf *data)
     (void)(int32_t) strcpy_s(msg.pdu, pduLen + 1, message.pdu.c_str());
     smscPduLen = message.smscPdu.length() + 1;
     if (smscPduLen <= 0) {
+        free(msg.pdu);
         return HRIL_ERR_INVALID_PARAMETER;
     }
     msg.smsc = (char *)malloc(smscPduLen * sizeof(char));
@@ -536,6 +537,7 @@ int32_t HRilSms::AddCdmaSimMessage(struct HdfSBuf *data)
     (void)(int32_t) strcpy_s(msg.pdu, pduLen + 1, mSmsMessageIOInfo.pdu.c_str());
     ReqDataInfo *requestInfo = CreateHRilRequest(mSmsMessageIOInfo.serial, HREQ_SMS_ADD_CDMA_SIM_MESSAGE);
     if (requestInfo == nullptr) {
+        free(msg.pdu);
         return HRIL_ERR_INVALID_PARAMETER;
     }
     smsFuncs_->AddCdmaSimMessage(requestInfo, &msg, sizeof(HRilSmsWriteSms));
