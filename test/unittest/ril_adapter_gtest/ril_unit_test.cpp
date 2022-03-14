@@ -401,6 +401,7 @@ void RilUnitTest::GetLinkBandwidthInfoTest(const OHOS::AppExecFwk::InnerEvent::P
     ASSERT_EQ(0, ret);
 }
 
+#ifndef TEL_TEST_UNSUPPORT
 HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetCallListTest_0100, Function | MediumTest | Level3)
 {
     OnInit();
@@ -608,5 +609,12 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetLinkBandwidthInfoTest_0100, Functi
     event->SetOwner(GetHandler());
     OnProcessTest(HREQ_DATA_GET_LINK_BANDWIDTH_INFO, event);
 }
+#else // TEL_TEST_UNSUPPORT
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetLinkBandwidthInfoTest_0100, Function | MediumTest | Level3)
+{
+    EXPECT_TRUE(true);
+}
+#endif // TEL_TEST_UNSUPPORT
 } // namespace Telephony
 } // namespace OHOS
