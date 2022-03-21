@@ -28,7 +28,7 @@ static int32_t GetSimType(void)
     ResponseInfo *pResponse = NULL;
 
     ret = SendCommandLock("AT^CARDMODE", "^CARDMODE:", 0, &pResponse);
-    if (ret != 0 || (pResponse != NULL && !pResponse->success)) {
+    if (ret != 0 || pResponse == NULL || !pResponse->success) {
         TELEPHONY_LOGE("AT^CARDMODE send failed");
         return HRIL_SIM_TYPE_UNKNOWN;
     }
@@ -115,6 +115,9 @@ static int32_t ParseSimPinInputTimesResult(char *pLine, HRilPinInputTimes *pinIn
         return err;
     }
     err = NextInt(&pLine, &pinInputTimes->times);
+    if (err != 0) {
+        return err;
+    }
     err = NextInt(&pLine, &pinInputTimes->pukTimes);
     if (err != 0) {
         return err;
@@ -146,6 +149,9 @@ static int32_t ParseUnlockSimLockResult(char *pLine, HRilLockStatus *lockStatus)
         return err;
     }
     err = NextInt(&pLine, &lockStatus->result);
+    if (err != 0) {
+        return err;
+    }
     err = NextInt(&pLine, &lockStatus->remain);
     TELEPHONY_LOGI("ParseUnlockSimLockResult, lockStatus->result: %{public}d", lockStatus->result);
     TELEPHONY_LOGI("ParseUnlockSimLockResult, lockStatus->remain: %{public}d", lockStatus->remain);
@@ -170,7 +176,7 @@ void ReqGetSimStatus(const ReqDataInfo *requestInfo)
     }
     cardState.simType = GetSimType();
     ret = SendCommandLock("AT+CPIN?", "+CPIN:", 0, &pResponse);
-    if (ret != 0 || (pResponse != NULL && !pResponse->success)) {
+    if (ret != 0 || pResponse == NULL || !pResponse->success) {
         TELEPHONY_LOGE("AT+CPIN? send failed");
         if (pResponse && pResponse->result) {
             pLine = pResponse->result;
@@ -238,7 +244,7 @@ static int32_t ReqGetSimIOFDN(HRilSimIO *pSim, ResponseInfo **ppResponse, size_t
 {
     const char *queryCmd = "AT+CLCK=\"FD\",2";
     int32_t ret = SendCommandLock(queryCmd, "+CLCK", 0, ppResponse);
-    if (ret != 0 || (ppResponse != NULL && !(*ppResponse)->success)) {
+    if (ret != 0 || ppResponse == NULL || *ppResponse == NULL || !(*ppResponse)->success) {
         TELEPHONY_LOGE("AT+CLCK failed");
         return HRIL_ERR_CMD_SEND_FAILURE;
     }
@@ -326,7 +332,7 @@ void ReqGetSimIO(const ReqDataInfo *requestInfo, const HRilSimIO *data, size_t d
         TELEPHONY_LOGE("GenerateCommand is failed");
     }
     ret = SendCommandLock(cmd, "+CRSM", 0, &pResponse);
-    if (ret != HRIL_ERR_SUCCESS || (pResponse != NULL && !pResponse->success)) {
+    if (ret != HRIL_ERR_SUCCESS || pResponse == NULL || !pResponse->success) {
         TELEPHONY_LOGE("send failed  dataLen:%{public}zu", dataLen);
         HandlerSimIOResult(pResponse, NULL, requestInfo, pLine, &ret);
         return;
@@ -372,7 +378,7 @@ void ReqGetSimImsi(const ReqDataInfo *requestInfo)
     struct ReportInfo reportInfo = {0};
 
     ret = SendCommandLock("AT+CIMI", NULL, 0, &pResponse);
-    if (ret != 0 || (pResponse != NULL && !pResponse->success)) {
+    if (ret != 0 || pResponse == NULL || !pResponse->success) {
         TELEPHONY_LOGE("AT+CIMI send failed");
         HandlerSimImsiResult(pResponse, reportInfo, requestInfo, pLine, &ret);
         return;
@@ -429,7 +435,7 @@ void ReqGetSimLockStatus(const ReqDataInfo *requestInfo, const HRilSimClock *dat
         TELEPHONY_LOGE("GenerateCommand is failed");
     }
     ret = SendCommandLock(cmd, "+CLCK", 0, &pResponse);
-    if (ret != 0 || (pResponse != NULL && !pResponse->success)) {
+    if (ret != 0 || pResponse == NULL || !pResponse->success) {
         TELEPHONY_LOGE("AT+CLCK send failed  dataLen:%{public}zu", dataLen);
         HandlerSimLockStatusResult(pResponse, reportInfo, requestInfo, pLine, &ret);
         return;
@@ -608,7 +614,7 @@ void ReqGetSimPinInputTimes(const ReqDataInfo *requestInfo)
     struct ReportInfo reportInfo = {0};
 
     ret = SendCommandLock("AT^CPIN?", "^CPIN", 0, &pResponse);
-    if (ret != 0 || (pResponse != NULL && !pResponse->success)) {
+    if (ret != 0 || pResponse == NULL || !pResponse->success) {
         TELEPHONY_LOGE("AT^CPIN? send failed");
         if (pResponse && pResponse->result) {
             pLine = pResponse->result;
@@ -991,7 +997,7 @@ void ReqSimTransmitApduLogicalChannel(const ReqDataInfo *requestInfo, HRilApduSi
         TELEPHONY_LOGE("GenerateCommand is failed");
     }
     ret = SendCommandLock(cmd, "+CGLA", 0, &pResponse);
-    if (ret != 0 || (pResponse != NULL && !pResponse->success)) {
+    if (ret != 0 || pResponse == NULL || !pResponse->success) {
         TELEPHONY_LOGE("AT+CGLA send failed  dataLen:%{public}zu", dataLen);
         if (pResponse && pResponse->result) {
             pLine = pResponse->result;

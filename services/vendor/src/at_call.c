@@ -408,10 +408,8 @@ void ReqGetCallList(const ReqDataInfo *requestInfo)
     int32_t ret;
     ResponseInfo *pResponse = NULL;
     int32_t err = HRIL_ERR_SUCCESS;
-    ModemReportErrorInfo errInfo;
     long timeOut = DEFAULT_TIMEOUT;
 
-    errInfo = InitModemReportErrorInfo();
     ret = SendCommandLock("AT+CLCC", "+CLCC:", timeOut, &pResponse);
     if (ret || (pResponse != NULL && !pResponse->success)) {
         err = ret ? ret : err;
@@ -1138,10 +1136,8 @@ void ReqGetImsCallList(const ReqDataInfo *requestInfo)
     int32_t ret;
     ResponseInfo *pResponse = NULL;
     int32_t err = HRIL_ERR_SUCCESS;
-    ModemReportErrorInfo errInfo = {};
     long timeOut = DEFAULT_TIMEOUT;
 
-    errInfo = InitModemReportErrorInfo();
     ret = SendCommandLock("AT^CLCC?", "^CLCC:", timeOut, &pResponse);
     if (ret || (pResponse != NULL && !pResponse->success)) {
         err = (ret != HRIL_ERR_SUCCESS) ? HRIL_ERR_CMD_SEND_FAILURE : err;
@@ -1168,7 +1164,7 @@ void ReqGetCallPreferenceMode(const ReqDataInfo *requestInfo)
 
     errInfo = InitModemReportErrorInfo();
     ret = SendCommandLock("AT+CEVDP?", "+CEVDP:", 0, &pResponse);
-    if (ret || (pResponse != NULL && !pResponse->success)) {
+    if (ret || pResponse == NULL || !pResponse->success) {
         err = (ret != HRIL_ERR_SUCCESS) ? HRIL_ERR_CMD_SEND_FAILURE : err;
         TELEPHONY_LOGE("cmd send failed, err:%{public}d", err);
         OnCallReportErrorMessages(requestInfo, err, pResponse);
@@ -1177,8 +1173,12 @@ void ReqGetCallPreferenceMode(const ReqDataInfo *requestInfo)
     if (pResponse->head) {
         line = pResponse->head->data;
         err = SkipATPrefix(&line);
-        err = NextInt(&line, &mode);
-        TELEPHONY_LOGI("mode:%{public}d", mode);
+        if (err == 0) {
+            err = NextInt(&line, &mode);
+            TELEPHONY_LOGI("mode:%{public}d", mode);
+        } else {
+            TELEPHONY_LOGE("response error");
+        }
     } else {
         TELEPHONY_LOGE("ERROR: pResponse->head is null");
         err = HRIL_ERR_GENERIC_FAILURE;
@@ -1231,7 +1231,7 @@ void ReqGetLteImsSwitchStatus(const ReqDataInfo *requestInfo)
 
     errInfo = InitModemReportErrorInfo();
     ret = SendCommandLock("AT^LTEIMSSWITCH?", "^LTEIMSSWITCH:", 0, &pResponse);
-    if (ret || (pResponse != NULL && !pResponse->success)) {
+    if (ret || pResponse == NULL || !pResponse->success) {
         err = (ret != HRIL_ERR_SUCCESS) ? HRIL_ERR_CMD_SEND_FAILURE : err;
         TELEPHONY_LOGE("cmd send failed, err:%{public}d", err);
         OnCallReportErrorMessages(requestInfo, err, pResponse);
@@ -1240,8 +1240,12 @@ void ReqGetLteImsSwitchStatus(const ReqDataInfo *requestInfo)
     if (pResponse->head) {
         line = pResponse->head->data;
         err = SkipATPrefix(&line);
-        err = NextInt(&line, &value);
-        TELEPHONY_LOGI("value:%{public}d", value);
+        if (err == 0) {
+            err = NextInt(&line, &value);
+            TELEPHONY_LOGI("value:%{public}d", value);
+        } else {
+            TELEPHONY_LOGE("response error");
+        }
     } else {
         TELEPHONY_LOGE("ERROR: pResponse->head is null");
         err = HRIL_ERR_GENERIC_FAILURE;
@@ -1320,7 +1324,7 @@ void ReqGetUssd(const ReqDataInfo *requestInfo)
     ModemReportErrorInfo errInfo = {};
 
     ret = SendCommandLock("AT+CUSD?", "+CUSD:", 0, &pResponse);
-    if (ret || (pResponse != NULL && !pResponse->success)) {
+    if (ret || pResponse == NULL || !pResponse->success) {
         err = ret ? ret : err;
         TELEPHONY_LOGE("cmd send failed, err:%{public}d", err);
         OnCallReportErrorMessages(requestInfo, err, pResponse);
@@ -1329,8 +1333,12 @@ void ReqGetUssd(const ReqDataInfo *requestInfo)
     if (pResponse->head) {
         line = pResponse->head->data;
         err = SkipATPrefix(&line);
-        err = NextInt(&line, &cusd);
-        TELEPHONY_LOGI("+CUSD:%{public}d", cusd);
+        if (err == 0) {
+            err = NextInt(&line, &cusd);
+            TELEPHONY_LOGI("+CUSD:%{public}d", cusd);
+        } else {
+            TELEPHONY_LOGE("response error");
+        }
     } else {
         TELEPHONY_LOGE("ERROR: pResponse->head is null");
         err = HRIL_ERR_GENERIC_FAILURE;
@@ -1379,7 +1387,7 @@ void ReqGetMute(const ReqDataInfo *requestInfo)
     ModemReportErrorInfo errInfo = {};
 
     ret = SendCommandLock("AT+CMUT?", "+CMUT:", 0, &pResponse);
-    if (ret || (pResponse != NULL && !pResponse->success)) {
+    if (ret || pResponse == NULL || !pResponse->success) {
         err = ret ? ret : err;
         TELEPHONY_LOGE("cmd send failed, err:%{public}d", err);
         OnCallReportErrorMessages(requestInfo, err, pResponse);
@@ -1388,8 +1396,12 @@ void ReqGetMute(const ReqDataInfo *requestInfo)
     if (pResponse->head) {
         line = pResponse->head->data;
         err = SkipATPrefix(&line);
-        err = NextInt(&line, &mute);
-        TELEPHONY_LOGI("+CMUT:%{public}d", mute);
+        if (err == 0) {
+            err = NextInt(&line, &mute);
+            TELEPHONY_LOGI("+CMUT:%{public}d", mute);
+        } else {
+            TELEPHONY_LOGE("response error");
+        }
     } else {
         TELEPHONY_LOGE("ERROR: pResponse->head is null");
         err = HRIL_ERR_GENERIC_FAILURE;
@@ -1523,10 +1535,8 @@ void ReqGetEmergencyCallList(const ReqDataInfo *requestInfo)
     int32_t ret;
     ResponseInfo *pResponse = NULL;
     int32_t err = HRIL_ERR_SUCCESS;
-    ModemReportErrorInfo errInfo;
     long timeOut = DEFAULT_TIMEOUT;
 
-    errInfo = InitModemReportErrorInfo();
     ret = SendCommandLock("AT^XLEMA?", "^XLEMA:", timeOut, &pResponse);
     if (ret || (pResponse != NULL && !pResponse->success)) {
         err = (ret != HRIL_ERR_SUCCESS) ? HRIL_ERR_CMD_SEND_FAILURE : err;

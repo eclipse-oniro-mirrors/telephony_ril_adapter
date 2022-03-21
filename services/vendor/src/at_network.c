@@ -538,7 +538,7 @@ void ReqGetImsRegStatus(const ReqDataInfo *requestInfo)
     if (responseInfo->head != NULL) {
         result = responseInfo->head->data;
     }
-    HRilImsRegStatusInfo imsRegStatusInfo;
+    HRilImsRegStatusInfo imsRegStatusInfo = {0};
     ret = ProcessImsRegStatus(result, &imsRegStatusInfo, MAX_IMS_INFO_ITEM);
     if (ret != 0) {
         TELEPHONY_LOGE("GetImsRegStatusResponse CIREGU format  unexpected: %{public}s", result);
@@ -621,7 +621,7 @@ void ReqGetCsRegStatus(const ReqDataInfo *requestInfo)
     if (responseInfo->head != NULL) {
         result = responseInfo->head->data;
     }
-    HRilRegStatusInfo regStatusInfo;
+    HRilRegStatusInfo regStatusInfo = {0};
     ret = ProcessRegStatus(result, &regStatusInfo);
     if (ret != 0) {
         TELEPHONY_LOGE("ReqGetCsRegStatus CREG format  unexpected: %{public}s", result);
@@ -657,7 +657,7 @@ void ReqGetPsRegStatus(const ReqDataInfo *requestInfo)
     if (responseInfo->head != NULL) {
         result = responseInfo->head->data;
     }
-    HRilRegStatusInfo regStatusInfo;
+    HRilRegStatusInfo regStatusInfo = {0};
     ret = ProcessRegStatus(result, &regStatusInfo);
     if (ret != 0) {
         TELEPHONY_LOGE("ReqGetPsRegStatus CGREG format  unexpected: %{public}s", result);
@@ -741,8 +741,10 @@ void GetNetworkSearchInformationPause(void)
     TELEPHONY_LOGI("enter to [%{public}s]:%{public}d", __func__, __LINE__);
     pthread_mutex_lock(&g_networkSearchInformationMutex);
     g_reportInfoForOperListToUse.error = HRIL_ERR_NETWORK_SEARCHING_INTERRUPTED;
-    OnNetworkReport(g_reportInfoForOperListToUse.requestInfo->slotId,
-        g_reportInfoForOperListToUse, NULL, 0);
+    if (g_reportInfoForOperListToUse.requestInfo != NULL) {
+        OnNetworkReport(g_reportInfoForOperListToUse.requestInfo->slotId,
+            g_reportInfoForOperListToUse, NULL, 0);
+    }
     SetAtPauseFlag(false);
     if (g_reportInfoForOperListToUse.requestInfo != NULL) {
         g_reportInfoForOperListToUse.requestInfo = NULL;
@@ -758,8 +760,10 @@ void PerformTimeOut(int32_t sigFlag)
         TELEPHONY_LOGI("enter to [%{public}s]:%{public}d", __func__, __LINE__);
         if (sendFlag) {
             g_reportInfoForOperListToUse.error = HRIL_ERR_NETWORK_SEARCH_TIMEOUT;
-            OnNetworkReport(g_reportInfoForOperListToUse.requestInfo->slotId,
-                g_reportInfoForOperListToUse, NULL, 0);
+            if (g_reportInfoForOperListToUse.requestInfo != NULL) {
+                OnNetworkReport(g_reportInfoForOperListToUse.requestInfo->slotId,
+                    g_reportInfoForOperListToUse, NULL, 0);
+            }
             SetAtPauseFlag(false);
             if (g_reportInfoForOperListToUse.requestInfo != NULL) {
                 g_reportInfoForOperListToUse.requestInfo = NULL;
@@ -1920,6 +1924,7 @@ static int32_t ExtractConfigInfo(const char *str, const HRilPhyChannelConfig *co
         }
         for (int32_t i = 0; i < cfg->contextIdNum; i++) {
             if (NextInt(&pStr, &(contextIds[i])) < 0) {
+                free(contextIds);
                 return HRIL_ERR_INVALID_RESPONSE;
             }
         }
