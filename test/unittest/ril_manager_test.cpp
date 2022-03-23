@@ -193,6 +193,9 @@ void RilManagerTest::GetCallList(const AppExecFwk::InnerEvent::Pointer &result)
     TELEPHONY_LOGI("GetCallList");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_CALL_GET_CALL_LIST, result);
+        if (request == nullptr) {
+            return;
+        }
         SendInt32Event(HREQ_CALL_GET_CALL_LIST, request->serialId_);
     } else {
         TELEPHONY_LOGE("GetCallList  cellularRadio_ == nullptr");
@@ -204,6 +207,9 @@ void RilManagerTest::RilCmDial(std::string address, int32_t clirMode, const AppE
     TELEPHONY_LOGI("RilCmDial");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_CALL_DIAL, result);
+        if (request == nullptr) {
+            return;
+        }
         OHOS::MessageParcel wData;
         DialInfo dialInfo;
         dialInfo.address = ConvertNullToEmptyString(address);
@@ -226,6 +232,9 @@ void RilManagerTest::Hangup(int32_t gsmIndex, const AppExecFwk::InnerEvent::Poin
     TELEPHONY_LOGI("Hangup");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_CALL_HANGUP, result);
+        if (request == nullptr) {
+            return;
+        }
         OHOS::MessageParcel data;
         OHOS::MessageParcel reply;
         data.WriteInt32(slotId_);
@@ -243,6 +252,9 @@ void RilManagerTest::Reject(const AppExecFwk::InnerEvent::Pointer &result)
     TELEPHONY_LOGI("Reject");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_CALL_REJECT, result);
+        if (request == nullptr) {
+            return;
+        }
         SendInt32Event(HREQ_CALL_REJECT, request->serialId_);
     } else {
         TELEPHONY_LOGE("Reject  cellularRadio_ == nullptr");
@@ -254,6 +266,9 @@ void RilManagerTest::Answer(const AppExecFwk::InnerEvent::Pointer &result)
     TELEPHONY_LOGI("Answer");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_CALL_ANSWER, result);
+        if (request == nullptr) {
+            return;
+        }
         SendInt32Event(HREQ_CALL_ANSWER, request->serialId_);
     } else {
         TELEPHONY_LOGE("Answer  cellularRadio_ == nullptr");
@@ -265,6 +280,9 @@ void RilManagerTest::HoldCall(const AppExecFwk::InnerEvent::Pointer &result)
     TELEPHONY_LOGI("Hold");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_CALL_HOLD_CALL, result);
+        if (request == nullptr) {
+            return;
+        }
         SendInt32Event(HREQ_CALL_HOLD_CALL, request->serialId_);
     } else {
         TELEPHONY_LOGE("Hold  cellularRadio_ == nullptr");
@@ -276,6 +294,9 @@ void RilManagerTest::UnHoldCall(const AppExecFwk::InnerEvent::Pointer &result)
     TELEPHONY_LOGI("Unhold");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_CALL_UNHOLD_CALL, result);
+        if (request == nullptr) {
+            return;
+        }
         SendInt32Event(HREQ_CALL_UNHOLD_CALL, request->serialId_);
     } else {
         TELEPHONY_LOGE("Unhold  cellularRadio_ == nullptr");
@@ -287,6 +308,9 @@ void RilManagerTest::SwitchCall(const AppExecFwk::InnerEvent::Pointer &result)
     TELEPHONY_LOGI("Switch Call");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_CALL_SWITCH_CALL, result);
+        if (request == nullptr) {
+            return;
+        }
         SendInt32Event(HREQ_CALL_SWITCH_CALL, request->serialId_);
     } else {
         TELEPHONY_LOGE("Switch Call  cellularRadio_ == nullptr");
@@ -298,6 +322,9 @@ void RilManagerTest::RilCmJoin(int32_t callType, const AppExecFwk::InnerEvent::P
     TELEPHONY_LOGI("RilCmJoin");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_CALL_COMBINE_CONFERENCE, result);
+        if (request == nullptr) {
+            return;
+        }
         OHOS::MessageParcel data;
         OHOS::MessageParcel reply;
         data.WriteInt32(slotId_);
@@ -315,6 +342,9 @@ void RilManagerTest::RilCmSplit(int32_t callIndex, int32_t callType, const AppEx
     TELEPHONY_LOGI("RilCmSplit");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_CALL_SEPARATE_CONFERENCE, result);
+        if (request == nullptr) {
+            return;
+        }
         OHOS::MessageParcel data;
         OHOS::MessageParcel reply;
         data.WriteInt32(slotId_);
@@ -333,6 +363,9 @@ void RilManagerTest::CallSupplement(int32_t hangupType, const AppExecFwk::InnerE
     TELEPHONY_LOGI("CallSupplement");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_CALL_CALL_SUPPLEMENT, result);
+        if (request == nullptr) {
+            return;
+        }
         OHOS::MessageParcel data;
         OHOS::MessageParcel reply;
         data.WriteInt32(slotId_);
@@ -350,6 +383,9 @@ void RilManagerTest::SendDtmf(char dtmfKey, int32_t index, const AppExecFwk::Inn
     TELEPHONY_LOGI("RilManagerTest::SendDtmf -->");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_CALL_SEND_DTMF, result);
+        if (request == nullptr) {
+            return;
+        }
         OHOS::MessageParcel data;
         OHOS::MessageParcel reply;
         data.WriteInt32(slotId_);
@@ -377,6 +413,9 @@ void RilManagerTest::StartDtmf(char dtmfKey, int32_t index, const AppExecFwk::In
     TELEPHONY_LOGI("RilManagerTest::StartDtmf -->");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_CALL_START_DTMF, result);
+        if (request == nullptr) {
+            return;
+        }
         OHOS::MessageParcel data;
         OHOS::MessageParcel reply;
         data.WriteInt32(slotId_);
@@ -398,6 +437,9 @@ void RilManagerTest::StopDtmf(int32_t index, const AppExecFwk::InnerEvent::Point
     TELEPHONY_LOGI("RilManagerTest::StopDtmf -->");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_CALL_STOP_DTMF, result);
+        if (request == nullptr) {
+            return;
+        }
         OHOS::MessageParcel data;
         OHOS::MessageParcel reply;
         data.WriteInt32(slotId_);
@@ -419,6 +461,9 @@ void RilManagerTest::SetUssd(std::string str, const AppExecFwk::InnerEvent::Poin
     TELEPHONY_LOGI("RilManagerTest::SetUssdCusd -->");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_CALL_SET_USSD, result);
+        if (request == nullptr) {
+            return;
+        }
         OHOS::MessageParcel data;
         OHOS::MessageParcel reply;
         data.WriteInt32(slotId_);
@@ -436,6 +481,9 @@ void RilManagerTest::GetUssd(const AppExecFwk::InnerEvent::Pointer &result)
     TELEPHONY_LOGI("RilManagerTest::GetUssdCusd -->");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_CALL_GET_USSD, result);
+        if (request == nullptr) {
+            return;
+        }
         SendInt32Event(HREQ_CALL_GET_USSD, request->serialId_);
     } else {
         TELEPHONY_LOGE("GetUssdCusd  cellularRadio_ == nullptr !!!");
@@ -447,6 +495,9 @@ void RilManagerTest::SetMute(int32_t mute, const AppExecFwk::InnerEvent::Pointer
     TELEPHONY_LOGI("RilManagerTest::SetMute -->");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_CALL_SET_MUTE, result);
+        if (request == nullptr) {
+            return;
+        }
         OHOS::MessageParcel data;
         OHOS::MessageParcel reply;
         data.WriteInt32(slotId_);
@@ -464,6 +515,9 @@ void RilManagerTest::GetMute(const AppExecFwk::InnerEvent::Pointer &result)
     TELEPHONY_LOGI("RilManagerTest::GetMute -->");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_CALL_GET_MUTE, result);
+        if (request == nullptr) {
+            return;
+        }
         SendInt32Event(HREQ_CALL_GET_MUTE, request->serialId_);
     } else {
         TELEPHONY_LOGE("GetMute  cellularRadio_ == nullptr");
@@ -475,6 +529,9 @@ void RilManagerTest::GetEmergencyList(const AppExecFwk::InnerEvent::Pointer &res
     TELEPHONY_LOGI("RilManagerTest::GetEmergencyList -->");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_CALL_GET_EMERGENCY_LIST, result);
+        if (request == nullptr) {
+            return;
+        }
         SendInt32Event(HREQ_CALL_GET_EMERGENCY_LIST, request->serialId_);
     } else {
         TELEPHONY_LOGE("GetEmergencyList  cellularRadio_ == nullptr");
@@ -486,6 +543,9 @@ void RilManagerTest::GetFailReason(const AppExecFwk::InnerEvent::Pointer &result
     TELEPHONY_LOGI("RilManagerTest::GetFailReason -->");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_CALL_GET_FAIL_REASON, result);
+        if (request == nullptr) {
+            return;
+        }
         SendInt32Event(HREQ_CALL_GET_FAIL_REASON, request->serialId_);
     } else {
         TELEPHONY_LOGE("GetFailReason  cellularRadio_ == nullptr");
@@ -530,6 +590,9 @@ void RilManagerTest::GetImsi(std::string aid, const AppExecFwk::InnerEvent::Poin
     TELEPHONY_LOGI("RilManagerTest::GetImsi -->");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_SIM_GET_IMSI, result);
+        if (request == nullptr) {
+            return;
+        }
         UniInfo imsi;
         imsi.serial = request->serialId_;
         imsi.strTmp = ConvertNullToEmptyString(aid);
@@ -553,6 +616,9 @@ void RilManagerTest::GetRilCmSignalStrength(const std::shared_ptr<AppExecFwk::Ev
     if (cellularRadio_ != nullptr) {
         auto event = AppExecFwk::InnerEvent::Get(what);
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_NETWORK_GET_SIGNAL_STRENGTH, event);
+        if (request == nullptr) {
+            return;
+        }
         SendInt32Event(HREQ_NETWORK_GET_SIGNAL_STRENGTH, request->serialId_);
     }
 }
@@ -562,6 +628,9 @@ void RilManagerTest::GetSimStatus(const AppExecFwk::InnerEvent::Pointer &result)
     TELEPHONY_LOGI("RilManagerTest::GetSimStatus -->");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_SIM_GET_SIM_STATUS, result);
+        if (request == nullptr) {
+            return;
+        }
         SendInt32Event(HREQ_SIM_GET_SIM_STATUS, request->serialId_);
     } else {
         TELEPHONY_LOGE("ERROR : GetSimStatus --> cellularRadio_ == nullptr !!!");
@@ -573,6 +642,9 @@ void RilManagerTest::GetCsRegStatus(const AppExecFwk::InnerEvent::Pointer &respo
     TELEPHONY_LOGI("RilManagerTest GetCsRegStatus");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_NETWORK_GET_CS_REG_STATUS, response);
+        if (request == nullptr) {
+            return;
+        }
         SendInt32Event(HREQ_NETWORK_GET_CS_REG_STATUS, request->serialId_);
     }
 }
@@ -581,6 +653,9 @@ void RilManagerTest::GetPsRegStatus(const AppExecFwk::InnerEvent::Pointer &respo
 {
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_NETWORK_GET_PS_REG_STATUS, response);
+        if (request == nullptr) {
+            return;
+        }
         SendInt32Event(HREQ_NETWORK_GET_PS_REG_STATUS, request->serialId_);
     }
 }
@@ -589,6 +664,9 @@ void RilManagerTest::GetNetworkSearchInfo(const AppExecFwk::InnerEvent::Pointer 
 {
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_NETWORK_GET_NETWORK_SEARCH_INFORMATION, response);
+        if (request == nullptr) {
+            return;
+        }
         SendInt32Event(HREQ_NETWORK_GET_NETWORK_SEARCH_INFORMATION, request->serialId_);
     }
 }
@@ -597,6 +675,9 @@ void RilManagerTest::GetNetworkSelectionMode(const AppExecFwk::InnerEvent::Point
 {
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_NETWORK_GET_NETWORK_SELECTION_MODE, response);
+        if (request == nullptr) {
+            return;
+        }
         SendInt32Event(HREQ_NETWORK_GET_NETWORK_SELECTION_MODE, request->serialId_);
     }
 }
@@ -605,6 +686,9 @@ void RilManagerTest::GetPreferredNetwork(const AppExecFwk::InnerEvent::Pointer &
 {
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_NETWORK_GET_PREFERRED_NETWORK, response);
+        if (request == nullptr) {
+            return;
+        }
         SendInt32Event(HREQ_NETWORK_GET_PREFERRED_NETWORK, request->serialId_);
     }
 }
@@ -613,6 +697,9 @@ void RilManagerTest::GetImsRegStatus(const AppExecFwk::InnerEvent::Pointer &resp
 {
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_NETWORK_GET_IMS_REG_STATUS, response);
+        if (request == nullptr) {
+            return;
+        }
         SendInt32Event(HREQ_NETWORK_GET_IMS_REG_STATUS, request->serialId_);
     }
 }
@@ -621,6 +708,9 @@ void RilManagerTest::GetVoiceRadio(const AppExecFwk::InnerEvent::Pointer &respon
 {
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_MODEM_GET_VOICE_RADIO, response);
+        if (request == nullptr) {
+            return;
+        }
         SendInt32Event(HREQ_MODEM_GET_VOICE_RADIO, request->serialId_);
     }
 }
@@ -629,6 +719,9 @@ void RilManagerTest::GetPsAttachStatus(const AppExecFwk::InnerEvent::Pointer &re
 {
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_NETWORK_GET_PS_ATTACH_STATUS, response);
+        if (request == nullptr) {
+            return;
+        }
         SendInt32Event(HREQ_NETWORK_GET_PS_ATTACH_STATUS, request->serialId_);
     }
 }
@@ -638,6 +731,9 @@ void RilManagerTest::SetPreferredNetwrok(int32_t preferredNetwork, const AppExec
     TELEPHONY_LOGI("SetRilPreferredNetwrok  Request ");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_NETWORK_SET_PREFERRED_NETWORK, result);
+        if (request == nullptr) {
+            return;
+        }
         MessageParcel data;
         MessageParcel reply;
         data.WriteInt32(slotId_);
@@ -655,6 +751,9 @@ void RilManagerTest::SetLocationUpdate(int32_t enableFlg, const AppExecFwk::Inne
     TELEPHONY_LOGI("SetRilLocationUpdate  Request ");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_NETWORK_SET_LOCATE_UPDATES, result);
+        if (request == nullptr) {
+            return;
+        }
         MessageParcel data;
         MessageParcel reply;
         data.WriteInt32(slotId_);
@@ -672,6 +771,9 @@ void RilManagerTest::SetPsAttachStatus(int32_t attachFlg, const AppExecFwk::Inne
     TELEPHONY_LOGI("SetRilPsAttachStatus  Request ");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_NETWORK_SET_PS_ATTACH_STATUS, result);
+        if (request == nullptr) {
+            return;
+        }
         MessageParcel data;
         MessageParcel reply;
         data.WriteInt32(slotId_);
@@ -715,6 +817,9 @@ void RilManagerTest::GetCellInfoList(const AppExecFwk::InnerEvent::Pointer &resp
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request =
             CreateRequest(HREQ_NETWORK_GET_NEIGHBORING_CELLINFO_LIST, response);
+        if (request == nullptr) {
+            return;
+        }
         SendInt32Event(HREQ_NETWORK_GET_NEIGHBORING_CELLINFO_LIST, request->serialId_);
     }
 }
@@ -723,6 +828,9 @@ void RilManagerTest::GetCurrentCellInfo(const AppExecFwk::InnerEvent::Pointer &r
 {
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_NETWORK_GET_CURRENT_CELL_INFO, response);
+        if (request == nullptr) {
+            return;
+        }
         SendInt32Event(HREQ_NETWORK_GET_CURRENT_CELL_INFO, request->serialId_);
     }
 }
@@ -733,6 +841,9 @@ void RilManagerTest::GetOperatorInfo(const std::shared_ptr<AppExecFwk::EventHand
     if (cellularRadio_ != nullptr) {
         auto event = AppExecFwk::InnerEvent::Get(what);
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_NETWORK_GET_OPERATOR_INFO, event);
+        if (request == nullptr) {
+            return;
+        }
         SendInt32Event(HREQ_NETWORK_GET_OPERATOR_INFO, request->serialId_);
     }
 }
@@ -742,6 +853,9 @@ void RilManagerTest::SendSms(std::string smscPdu, std::string pdu,
 {
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_SMS_SEND_GSM_SMS, response);
+        if (request == nullptr) {
+            return;
+        }
         OHOS::MessageParcel data;
         GsmSmsMessageInfo mGsmSmsMessageInfo = ConstructGsmSendSmsRilRequest(smscPdu, pdu);
         mGsmSmsMessageInfo.serial = request->serialId_;
@@ -759,6 +873,9 @@ void RilManagerTest::SendSmsMoreMode(std::string smscPdu, std::string pdu,
 {
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_SMS_SEND_SMS_MORE_MODE, response);
+        if (request == nullptr) {
+            return;
+        }
         /* Do not log function arg for privacy */
         OHOS::MessageParcel data;
         GsmSmsMessageInfo mGsmSmsMessageInfo = ConstructGsmSendSmsRilRequest(smscPdu, pdu);
@@ -775,6 +892,9 @@ void RilManagerTest::SendSmsMoreMode(std::string smscPdu, std::string pdu,
 void RilManagerTest::SendSmsAck(bool success, int32_t cause, const AppExecFwk::InnerEvent::Pointer &response)
 {
     std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_SMS_SEND_SMS_ACK, response);
+    if (request == nullptr) {
+        return;
+    }
     /* Do not log function arg for privacy */
     OHOS::MessageParcel data;
     data.WriteInt32(slotId_);
@@ -792,6 +912,9 @@ void RilManagerTest::SendSmsAck(bool success, int32_t cause, const AppExecFwk::I
 void RilManagerTest::GetSmscAddr(const AppExecFwk::InnerEvent::Pointer &response)
 {
     std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_SMS_GET_SMSC_ADDR, response);
+    if (request == nullptr) {
+        return;
+    }
     /* Do not log function arg for privacy */
     OHOS::MessageParcel data;
     data.WriteInt32(slotId_);
@@ -802,6 +925,9 @@ void RilManagerTest::GetSmscAddr(const AppExecFwk::InnerEvent::Pointer &response
 void RilManagerTest::SetSmscAddr(int32_t tosca, std::string address, const AppExecFwk::InnerEvent::Pointer &response)
 {
     std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_SMS_SET_SMSC_ADDR, response);
+    if (request == nullptr) {
+        return;
+    }
     /* Do not log function arg for privacy */
     OHOS::MessageParcel data;
     data.WriteInt32(slotId_);
@@ -828,6 +954,9 @@ void RilManagerTest::SetRadioState(int32_t fan, int32_t rst, const AppExecFwk::I
 {
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_MODEM_SET_RADIO_STATUS, result);
+        if (request == nullptr) {
+            return;
+        }
         OHOS::MessageParcel data;
         OHOS::MessageParcel reply;
         data.WriteInt32(slotId_);
@@ -845,6 +974,9 @@ void RilManagerTest::GetRadioState(const AppExecFwk::InnerEvent::Pointer &result
 {
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_MODEM_GET_RADIO_STATUS, result);
+        if (request == nullptr) {
+            return;
+        }
         OHOS::MessageParcel data;
         OHOS::MessageParcel reply;
         data.WriteInt32(slotId_);
@@ -860,6 +992,9 @@ void RilManagerTest::GetImei(const AppExecFwk::InnerEvent::Pointer &response)
 {
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_MODEM_GET_IMEI, response);
+        if (request == nullptr) {
+            return;
+        }
         SendInt32Event(HREQ_MODEM_GET_IMEI, request->serialId_);
     }
 }
@@ -870,6 +1005,9 @@ void RilManagerTest::ActivatePdpContext(int32_t radioTechnology, RilDataProfileT
     TELEPHONY_LOGI("RilManagerTest::ActivatePdpContext -->");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_DATA_ACTIVATE_PDP_CONTEXT, response);
+        if (request == nullptr) {
+            return;
+        }
         DataCallInfo dataCallInfo;
         dataCallInfo.serial = request->serialId_;
         dataCallInfo.radioTechnology = radioTechnology;
@@ -893,6 +1031,9 @@ void RilManagerTest::DeactivatePdpContext(int32_t ci, int32_t reason, const AppE
     TELEPHONY_LOGI("RilBaseCommands::DeactivatePdpContext -->");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_DATA_DEACTIVATE_PDP_CONTEXT, response);
+        if (request == nullptr) {
+            return;
+        }
         UniInfo uniInfo;
         uniInfo.serial = request->serialId_;
         uniInfo.gsmIndex = ci;
@@ -913,6 +1054,9 @@ void RilManagerTest::SetInitApnInfo(RilDataProfileTest dataProfile, const AppExe
 {
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_DATA_SET_INIT_APN_INFO, response);
+        if (request == nullptr) {
+            return;
+        }
 
         DataProfileDataInfo dataInfo = ConvertToHalDataProfile(dataProfile);
         dataInfo.serial = request->serialId_;
@@ -933,6 +1077,9 @@ void RilManagerTest::GetPdpContext(const AppExecFwk::InnerEvent::Pointer &respon
 {
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_DATA_GET_PDP_CONTEXT_LIST, response);
+        if (request == nullptr) {
+            return;
+        }
         UniInfo uniInfo;
         uniInfo.serial = request->serialId_;
         OHOS::MessageParcel wData;
@@ -1075,6 +1222,9 @@ void RilManagerTest::GetLinkBandwidthInfo(const int32_t cid, const AppExecFwk::I
     TELEPHONY_LOGI("RilManagerTest::GetLinkBandwidthInfo -->");
     if (cellularRadio_ != nullptr) {
         std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_DATA_GET_LINK_BANDWIDTH_INFO, result);
+        if (request == nullptr) {
+            return;
+        }
         MessageParcel data;
         MessageParcel reply;
         data.WriteInt32(slotId_);

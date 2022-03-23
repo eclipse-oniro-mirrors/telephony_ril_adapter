@@ -361,9 +361,5 @@ const HRilOps *RilInitOps(const struct HRilReport *reportOps)
     if (ret < 0) {
         TELEPHONY_LOGE("EventListeners create failed %d \n", ret);
     }
-    if (g_hrilOps.smsOps == NULL) {
-        TELEPHONY_LOGE("g_hrilOps.smsOps is null");
-    }
-    TELEPHONY_LOGI("g_hrilOps.smsOps:%{public}p", g_hrilOps.smsOps);
     return &g_hrilOps;
 }

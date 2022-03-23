@@ -864,7 +864,7 @@ void ReqGetLinkBandwidthInfo(const ReqDataInfo *requestInfo, const int32_t cid)
         return;
     }
     ret = SendCommandLock(cmd, "+C5GQOSRDP:", 0, &pResponse);
-    if (ret || (pResponse != NULL && !pResponse->success)) {
+    if (ret || pResponse == NULL || !pResponse->success) {
         err = ret ? ret : err;
         TELEPHONY_LOGE("cmd send failed, err:%{public}d", err);
         OnDataReportErrorMessages(requestInfo, err, pResponse);

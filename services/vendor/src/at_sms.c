@@ -174,7 +174,6 @@ void ReqSendSmsAck(const ReqDataInfo *requestInfo, const int32_t *data, size_t d
 void ReqSendCdmaSms(const ReqDataInfo *requestInfo, const char *data, size_t dataLen)
 {
     char *result = NULL;
-    char *msg = NULL;
     int32_t err;
     ResponseInfo *responseInfo = NULL;
     struct ReportInfo reportInfo = {0};
@@ -186,7 +185,6 @@ void ReqSendCdmaSms(const ReqDataInfo *requestInfo, const char *data, size_t dat
         FreeResponseInfo(responseInfo);
         return;
     }
-    msg = (char *)data;
     responseInfo = (ResponseInfo *)malloc(sizeof(ResponseInfo));
     if (responseInfo == NULL) {
         err = HRIL_ERR_GENERIC_FAILURE;
@@ -255,18 +253,18 @@ static void WriteSimMessage(const ReqDataInfo *requestInfo, const HRilSmsWriteSm
     }
     msg = ((HRilSmsWriteSms *)data);
     if (msg->smsc == NULL || (strcmp(msg->smsc, "") == 0)) {
-        strcpy_s(msg->smsc, strlen("00"), "00");
+        strcpy_s(msg->smsc, strlen("00") + 1, "00");
     }
     int32_t ret = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CMGW=%d,%d", strlen(msg->pdu) / g_cmdLength, msg->state);
     if (ret < 0) {
         TELEPHONY_LOGE("GenerateCommand failed, err = %{public}d\n", ret);
-        SimMessageError(&reportInfo, requestInfo, &err, responseInfo);
+        SimMessageError(&reportInfo, requestInfo, &ret, responseInfo);
         return;
     }
     int32_t tmp = GenerateCommand(smsPdu, MAX_CMD_LENGTH, "%s%s", msg->smsc, msg->pdu);
     if (tmp < 0) {
         TELEPHONY_LOGE("GenerateCommand failed, err = %{public}d\n", tmp);
-        SimMessageError(&reportInfo, requestInfo, &err, responseInfo);
+        SimMessageError(&reportInfo, requestInfo, &tmp, responseInfo);
         return;
     }
     err = SendCommandSmsLock(cmd, smsPdu, "+CMGW:", 0, &responseInfo);
@@ -438,7 +436,7 @@ void ReqGetSmscAddr(const ReqDataInfo *requestInfo)
     struct ReportInfo reportInfo = {0};
 
     err = SendCommandLock("AT+CSCA?", "+CSCA:", 0, &responseInfo);
-    if (err != 0 || (responseInfo != NULL && !responseInfo->success)) {
+    if (err != 0 || responseInfo == NULL || !responseInfo->success) {
         err = HRIL_ERR_GENERIC_FAILURE;
         reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
         OnSmsReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
@@ -477,7 +475,7 @@ void ReqGetCBConfig(const ReqDataInfo *requestInfo)
     struct ReportInfo reportInfo = {0};
 
     err = SendCommandLock("AT+CSCB?", "+CSCB:", 0, &responseInfo);
-    if (err != 0 || (responseInfo != NULL && !responseInfo->success)) {
+    if (err != 0 || responseInfo == NULL || !responseInfo->success) {
         reportInfo = CreateReportInfo(requestInfo, AT_ERR_GENERIC, HRIL_RESPONSE, 0);
         OnSmsReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
         FreeResponseInfo(responseInfo);
@@ -618,7 +616,6 @@ void ReqGetCdmaCBConfig(const ReqDataInfo *requestInfo)
 void ReqSetCdmaCBConfig(const ReqDataInfo *requestInfo, const HRilCdmaCBConfigInfo *data, size_t dataLen)
 {
     int32_t err;
-    HRilCdmaCBConfigInfo *cdmaCBConfig = NULL;
     ResponseInfo *responseInfo = NULL;
     struct ReportInfo reportInfo = {0};
 
@@ -628,7 +625,6 @@ void ReqSetCdmaCBConfig(const ReqDataInfo *requestInfo, const HRilCdmaCBConfigIn
         FreeResponseInfo(responseInfo);
         return;
     }
-    cdmaCBConfig = ((HRilCdmaCBConfigInfo *)data);
     int32_t size = dataLen / sizeof(HRilCdmaCBConfigInfo);
     if (size <= 0) {
         err = HRIL_ERR_GENERIC_FAILURE;
