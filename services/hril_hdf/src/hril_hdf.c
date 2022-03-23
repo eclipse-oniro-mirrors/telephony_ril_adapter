@@ -80,6 +80,7 @@ static UsbDeviceInfo *GetUsbDeviceInfo(void)
     enumerate = udev_enumerate_new(udev);
     if (enumerate == NULL) {
         TELEPHONY_LOGE("Can't create enumerate");
+        udev_unref(udev);
         return uDevInfo;
     }
     udev_enumerate_add_match_subsystem(enumerate, "tty");
@@ -134,6 +135,13 @@ static void LoadVendor(void)
         TELEPHONY_LOGE("dynamic library path is empty");
         return;
     }
+
+    char pathBuf[PATH_MAX] = {'\0'};
+    if (realpath(rilLibPath, pathBuf) == NULL) {
+        TELEPHONY_LOGE("dynamic library path is unvalid");
+        return;
+    }
+    rilLibPath = pathBuf;
 
     TELEPHONY_LOGI("RilInit LoadVendor start with rilLibPath:%{public}s", rilLibPath);
     g_dlHandle = dlopen(rilLibPath, RTLD_NOW);

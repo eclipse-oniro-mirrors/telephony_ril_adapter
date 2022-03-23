@@ -899,10 +899,10 @@ int32_t HRilCall::SetLteImsSwitchStatus(struct HdfSBuf *data)
 void HRilCall::BuildCallList(
     CallInfoList &callInfoList, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    int32_t num = responseLen / sizeof(HRilCallInfo);
+    size_t num = responseLen / sizeof(HRilCallInfo);
     CallInfo callInfo;
     callInfoList.callSize = num;
-    for (int32_t i = 0; i < num; i++) {
+    for (size_t i = 0; i < num; i++) {
         HRilCallInfo *curPtr = ((HRilCallInfo *)response + i);
         if (curPtr != nullptr) {
             callInfo.index = curPtr->index;
@@ -1383,10 +1383,10 @@ int32_t HRilCall::GetEmergencyCallList(struct HdfSBuf *data)
 void HRilCall::BuildEmergencyCallList(EmergencyInfoList &emergencyCallInfoList, HRilRadioResponseInfo &responseInfo,
     const void *response, size_t responseLen)
 {
-    int32_t num = responseLen / sizeof(HRilEmergencyInfo);
+    size_t num = responseLen / sizeof(HRilEmergencyInfo);
     EmergencyInfo callInfo;
     emergencyCallInfoList.callSize = num;
-    for (int32_t i = 0; i < num; i++) {
+    for (size_t i = 0; i < num; i++) {
         HRilEmergencyInfo *curPtr = ((HRilEmergencyInfo *)response + i);
         if (curPtr != nullptr) {
             callInfo.index = curPtr->index;

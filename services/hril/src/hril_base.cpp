@@ -255,7 +255,9 @@ bool HRilBase::ConvertToString(char **dest, const std::string &srcStr)
         TELEPHONY_LOGE("ConvertToString malloc fail");
         return false;
     }
-    (void)strncpy_s(*dest, len, reinterpret_cast<const char *>(srcStr.c_str()), size);
+    if (strncpy_s(*dest, len, reinterpret_cast<const char *>(srcStr.c_str()), size) != EOK) {
+        return false;
+    }
     return true;
 }
 

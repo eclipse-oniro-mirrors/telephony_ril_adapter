@@ -253,7 +253,10 @@ static void WriteSimMessage(const ReqDataInfo *requestInfo, const HRilSmsWriteSm
     }
     msg = ((HRilSmsWriteSms *)data);
     if (msg->smsc == NULL || (strcmp(msg->smsc, "") == 0)) {
-        strcpy_s(msg->smsc, strlen("00") + 1, "00");
+        if (strcpy_s(msg->smsc, strlen("00") + 1, "00") != EOK) {
+            TELEPHONY_LOGE("Set smsc failed");
+            return;
+        }
     }
     int32_t ret = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CMGW=%d,%d", strlen(msg->pdu) / g_cmdLength, msg->state);
     if (ret < 0) {
@@ -268,7 +271,7 @@ static void WriteSimMessage(const ReqDataInfo *requestInfo, const HRilSmsWriteSm
         return;
     }
     err = SendCommandSmsLock(cmd, smsPdu, "+CMGW:", 0, &responseInfo);
-    memset_s(cmd, MAX_CMD_LENGTH, 0, MAX_CMD_LENGTH);
+    (void)memset_s(cmd, MAX_CMD_LENGTH, 0, MAX_CMD_LENGTH);
     if (err != 0 || (responseInfo != NULL && !responseInfo->success)) {
         err = HRIL_ERR_GENERIC_FAILURE;
         SimMessageError(&reportInfo, requestInfo, &err, responseInfo);
@@ -453,7 +456,9 @@ void ReqGetSmscAddr(const ReqDataInfo *requestInfo)
         err = NextStr(&result, &response.address);
         if (err == -1) {
             TELEPHONY_LOGE("NextStr in ReqGetSmscAddr is failed!");
-            (void)strcpy_s(response.address, strlen("") + 1, "");
+            if (strcpy_s(response.address, strlen("") + 1, "") != EOK) {
+                return;
+            }
         }
         err = NextInt(&result, &response.tosca);
         if (err == -1) {

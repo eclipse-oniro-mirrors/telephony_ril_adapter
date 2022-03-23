@@ -271,7 +271,7 @@ int32_t ProcessRegStatus(const char *s, const HRilRegStatusInfo *hrilRegStateInf
         TELEPHONY_LOGE("ProcessRegStatus s or regStateInfo param is null");
         return HRIL_ERR_NULL_POINT;
     } else {
-        memset_s(regStateInfo, sizeof(HRilRegStatusInfo), 0, sizeof(HRilRegStatusInfo));
+        (void)memset_s(regStateInfo, sizeof(HRilRegStatusInfo), 0, sizeof(HRilRegStatusInfo));
         return ParseRegStatusStr(str, regStateInfo);
     }
 }
@@ -952,7 +952,7 @@ static int32_t ParseCellInfoGsm(const char *str, CellInfo *ci)
 {
     char *pStr = (char *)str;
     char *pat = NULL;
-    memset_s(ci, sizeof(CellInfo), 0, sizeof(CellInfo));
+    (void)memset_s(ci, sizeof(CellInfo), 0, sizeof(CellInfo));
     TELEPHONY_LOGI("ParseCellInfoGsm %{public}s", pStr);
     if (SkipATPrefix(&pStr) < 0) {
         return ErrorHandling();
@@ -986,7 +986,7 @@ static int32_t ParseCellInfoLte(const char *str, CellInfo *ci)
 {
     char *pStr = (char *)str;
     char *pat = NULL;
-    memset_s(ci, sizeof(CellInfo), 0, sizeof(CellInfo));
+    (void)memset_s(ci, sizeof(CellInfo), 0, sizeof(CellInfo));
     TELEPHONY_LOGI("ParseCellInfoLte %{public}s", pStr);
     if (SkipATPrefix(&pStr) < 0) {
         return ErrorHandling();
@@ -1017,7 +1017,7 @@ static int32_t ParseCellInfoWcdma(const char *str, CellInfo *ci)
 {
     char *pStr = (char *)str;
     char *pat = NULL;
-    memset_s(ci, sizeof(CellInfo), 0, sizeof(CellInfo));
+    (void)memset_s(ci, sizeof(CellInfo), 0, sizeof(CellInfo));
     TELEPHONY_LOGI("ParseCellInfoWcdma %{public}s", pStr);
     if (SkipATPrefix(&pStr) < 0) {
         return ErrorHandling();
@@ -1045,7 +1045,7 @@ static int32_t ParseCellInfoCdma(const char *str, CellInfo *ci)
 {
     char *pStr = (char *)str;
     char *pat = NULL;
-    memset_s(ci, sizeof(CellInfo), 0, sizeof(CellInfo));
+    (void)memset_s(ci, sizeof(CellInfo), 0, sizeof(CellInfo));
     TELEPHONY_LOGI("ParseCellInfoCdma %{public}s", pStr);
     if (SkipATPrefix(&pStr) < 0) {
         return ErrorHandling();
@@ -1088,7 +1088,7 @@ static int32_t ParseCellInfoTdscdma(const char *str, CellInfo *ci)
 {
     char *pStr = (char *)str;
     char *pat = NULL;
-    memset_s(ci, sizeof(CellInfo), 0, sizeof(CellInfo));
+    (void)memset_s(ci, sizeof(CellInfo), 0, sizeof(CellInfo));
     TELEPHONY_LOGI("ParseCellInfoTdscdma %{public}s", pStr);
     if (SkipATPrefix(&pStr) < 0) {
         return ErrorHandling();
@@ -1131,7 +1131,7 @@ static int32_t ParseCellInfoNr(const char *str, CellInfo *ci)
 {
     char *pStr = (char *)str;
     char *pat = NULL;
-    memset_s(ci, sizeof(CellInfo), 0, sizeof(CellInfo));
+    (void)memset_s(ci, sizeof(CellInfo), 0, sizeof(CellInfo));
     TELEPHONY_LOGI("ParseCellInfoNr %{public}s", pStr);
     if (SkipATPrefix(&pStr) < 0) {
         return ErrorHandling();
@@ -1195,7 +1195,7 @@ static int32_t ParseCellInfos(const char *str, const CellInfo *cellInfo)
             return HRIL_ERR_GENERIC_FAILURE;
         }
     } else if (ReportStrWith(pStr, "^MONNC: NONE")) {
-        memset_s(ci, sizeof(CellInfo), 0, sizeof(CellInfo));
+        (void)memset_s(ci, sizeof(CellInfo), 0, sizeof(CellInfo));
         TELEPHONY_LOGI("ParseCellInfos ^MONNC: NONE branch");
     } else {
         TELEPHONY_LOGE("%{public}s This command resolution not supported.", pStr);
@@ -1425,7 +1425,7 @@ static int32_t ParseGetCurrentCellInfoResponseLine(char *line, CurrentCellInfoVe
     } else if (!strcmp(c, "NR")) {
         response->ratType = NETWORK_TYPE_NR;
     } else if (!strcmp(c, "NONE")) {
-        memset_s(response, sizeof(CurrentCellInfoVendor), 0, sizeof(CurrentCellInfoVendor));
+        (void)memset_s(response, sizeof(CurrentCellInfoVendor), 0, sizeof(CurrentCellInfoVendor));
         response->ratType = NETWORK_TYPE_UNKNOWN;
         return HRIL_ERR_SUCCESS;
     } else {

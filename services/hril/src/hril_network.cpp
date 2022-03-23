@@ -1314,7 +1314,7 @@ int32_t HRilNetwork::GetNetworkSelectionModeResponse(
 void HRilNetwork::BuildOperatorList(AvailableNetworkList &availableNetworkList, HRilRadioResponseInfo &responseInfo,
     const void *response, size_t responseLen)
 {
-    int32_t numStrings = responseLen / sizeof(AvailableOperInfo *);
+    size_t numStrings = responseLen / sizeof(AvailableOperInfo *);
     if (response == nullptr) {
         TELEPHONY_LOGE("response is nullptr");
         if (responseInfo.error == HRilErrType::NONE) {
@@ -1324,7 +1324,7 @@ void HRilNetwork::BuildOperatorList(AvailableNetworkList &availableNetworkList, 
         AvailableNetworkInfo operInfo = {};
         availableNetworkList.itemNum = numStrings;
         TELEPHONY_LOGI("availableNetworkList.itemNum: %{public}d", numStrings);
-        for (int32_t i = 0; i < numStrings; i++) {
+        for (size_t i = 0; i < numStrings; i++) {
             AvailableOperInfo *curPtr = ((AvailableOperInfo **)response)[i];
             if (curPtr != nullptr) {
                 operInfo.status = curPtr->status;

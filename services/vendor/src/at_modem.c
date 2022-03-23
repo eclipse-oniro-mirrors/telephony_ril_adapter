@@ -246,7 +246,7 @@ int32_t ProcessVoiceRadioInfo(const char *s, const HRilVoiceRadioInfo *hrilVoice
         TELEPHONY_LOGE("ProcessVoiceRadioInfo s or voiceRadioInfo param is null");
         return HRIL_ERR_NULL_POINT;
     } else {
-        memset_s(voiceRadioInfo, sizeof(HRilVoiceRadioInfo), 0, sizeof(HRilVoiceRadioInfo));
+        (void)memset_s(voiceRadioInfo, sizeof(HRilVoiceRadioInfo), 0, sizeof(HRilVoiceRadioInfo));
         TELEPHONY_LOGI("result: %{public}s", str);
         int32_t err = SkipATPrefix(&str);
         if (err < 0) {
