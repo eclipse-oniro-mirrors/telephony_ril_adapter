@@ -95,11 +95,11 @@ void HRilData::SwitchHRilDataListToHal(
         TELEPHONY_LOGE("SwitchHRilDataListToHal response is null!!!");
         return;
     }
-    int32_t dataNum = responseLen / sizeof(HRilDataCallResponse);
+    size_t dataNum = responseLen / sizeof(HRilDataCallResponse);
     const HRilDataCallResponse *dataCallResponse = (const HRilDataCallResponse *)response;
     dcResultList.resize(dataNum);
 
-    int32_t i = 0;
+    size_t i = 0;
     while (i < dataNum) {
         SwitchRilDataToHal(&dataCallResponse[i], dcResultList[i]);
         i++;

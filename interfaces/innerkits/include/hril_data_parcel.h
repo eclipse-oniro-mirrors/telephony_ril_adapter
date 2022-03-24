@@ -71,7 +71,7 @@ struct SetupDataCallResultInfo : public HrilBaseParcel {
 };
 
 struct DataCallResultList : public HrilBaseParcel {
-    int32_t size; /* Size of DataCall List */
+    size_t size; /* Size of DataCall List */
     std::vector<SetupDataCallResultInfo> dcList; /* DataCall List */
 
     bool ReadFromParcel(Parcel &parcel);
