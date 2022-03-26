@@ -401,9 +401,9 @@ void OnNotifyNetWorksOps(const char *s, const char *infoStr)
             OnNetworkReport(
                 GetSlotId(NULL), reportInfo, (const uint8_t *)(&imsRegStatusInfo), sizeof(HRilImsRegStatusInfo));
         } else {
-            TELEPHONY_LOGW("CIREGU notify str format  unexpected: %{public}s", s);
+            TELEPHONY_LOGW("CIREGU notify str format unexpected");
         }
     } else {
-        TELEPHONY_LOGW("enter to  is unrecognized command: %{public}s", s);
+        TELEPHONY_LOGW("enter to  is unrecognized command");
     }
 }
