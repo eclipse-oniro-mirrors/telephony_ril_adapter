@@ -1323,7 +1323,7 @@ void HRilNetwork::BuildOperatorList(AvailableNetworkList &availableNetworkList, 
     } else {
         AvailableNetworkInfo operInfo = {};
         availableNetworkList.itemNum = numStrings;
-        TELEPHONY_LOGI("availableNetworkList.itemNum: %{public}d", numStrings);
+        TELEPHONY_LOGI("availableNetworkList.itemNum: %{public}lu", (unsigned long)numStrings);
         for (size_t i = 0; i < numStrings; i++) {
             AvailableOperInfo *curPtr = ((AvailableOperInfo **)response)[i];
             if (curPtr != nullptr) {
