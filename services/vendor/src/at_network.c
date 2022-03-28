@@ -2069,7 +2069,6 @@ void ReqSetLocateUpdates(const ReqDataInfo *requestInfo, HRilRegNotifyMode mode)
         TELEPHONY_LOGE("ReqSetLocateUpdates:  locateUpdateMode > 1");
         return;
     }
-    TELEPHONY_LOGI("ReqSetLocateUpdates, cmd = %{public}s", cmd);
     int32_t err = SendCommandLock(cmd, NULL, TIME_OUT, &responseInfo);
     if (responseInfo == NULL) {
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);

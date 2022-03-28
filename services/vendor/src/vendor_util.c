@@ -169,7 +169,7 @@ int32_t NextInt(char **s, int32_t *out)
     }
     *out = (int32_t)strtol(ret, &end, HRIL_DEC);
     if (ret == end) {
-        TELEPHONY_LOGE("strtol is fail, err:%{public}d, ret:%{public}s", *out, ret);
+        TELEPHONY_LOGE("strtol is fail, err:%{public}d", *out);
         return -1;
     }
     return 0;
@@ -194,7 +194,7 @@ int64_t NextInt64(char **s, int64_t *out)
     }
     *out = (int64_t)strtoll(ret, &end, HRIL_DEC);
     if (ret == end) {
-        TELEPHONY_LOGE("NextInt64 strtoll is fail, ret:%{public}s", ret);
+        TELEPHONY_LOGE("NextInt64 strtoll is fail");
         return -1;
     }
     return 0;
@@ -216,7 +216,7 @@ int32_t NextIntNotSkipNextComma(char **s, int32_t *out)
     ret = strsep(s, ",");
     *out = (int32_t)strtol(ret, &end, HRIL_DEC);
     if (ret == end) {
-        TELEPHONY_LOGE("strtol is fail, err:%{public}d, ret:%{public}s", *out, ret);
+        TELEPHONY_LOGE("strtol is fail, err:%{public}d", *out);
         return -1;
     }
     return 0;
@@ -241,7 +241,7 @@ int32_t NextIntByRightBracket(char **s, int32_t *out)
     }
     *out = (int32_t)strtol(ret, &end, HRIL_DEC);
     if (ret == end) {
-        TELEPHONY_LOGE("strtol is fail, err:%{public}d, ret:%{public}s", *out, ret);
+        TELEPHONY_LOGE("strtol is fail, err:%{public}d", *out);
         return -1;
     }
     return 0;
@@ -282,7 +282,7 @@ int32_t NextIntFromHex(char **s, int32_t *out)
     }
     *out = (int32_t)strtol(ret, &end, HRIL_HEX);
     if (ret == end) {
-        TELEPHONY_LOGE("strtol is fail, err:%{public}d, ret:%{public}s", *out, ret);
+        TELEPHONY_LOGE("strtol is fail, err:%{public}d", *out);
         return -1;
     }
     return 0;
@@ -309,7 +309,7 @@ uint64_t NextULongFromHex(char **s, uint64_t *out)
     }
     *out = (uint64_t)strtoul(ret, &end, HRIL_HEX);
     if (ret == end) {
-        TELEPHONY_LOGE("strtoul is fail, ret:%{public}s", ret);
+        TELEPHONY_LOGE("strtoul is fail");
         return -1;
     }
     return 0;
@@ -365,7 +365,7 @@ int32_t NextBool(char **s, char *out)
     }
     ret = NextInt(s, &result);
     if (ret < 0) {
-        TELEPHONY_LOGE("NextInt is fail, ret:%{public}d, src:%{public}s", ret, *s);
+        TELEPHONY_LOGE("NextInt is fail, ret:%{public}d", ret);
         return -1;
     }
     // booleans should be 0 or 1

@@ -130,7 +130,6 @@ void ReaderLoop(void)
         if (IsSmsNotify(str)) {
             TELEPHONY_LOGI("new sms notify :%{public}s", str);
             pdu = ReadResponse(g_atFd);
-            TELEPHONY_LOGI("pdu :%{public}s", pdu);
         }
         ProcessResponse(str, pdu);
     }
@@ -225,13 +224,12 @@ int32_t SendCommandLock(const char *command, const char *prefix, long long timeo
         return AT_ERR_INVALID_THREAD;
     }
 
-    TELEPHONY_LOGI("command %{public}s, NeedATPause:%{public}d, atCmd:%{public}s", command, g_isNeedATPause, atCmd);
     pthread_mutex_lock(&g_commandmutex);
     if (g_isNeedATPause) {
         pthread_cond_signal(&g_commandcond);
         err = SendCommandNoLock(atCmd, timeout, outResponse);
         if (err != 0) {
-            TELEPHONY_LOGI("NeedATPause err = %{public}d cmd:%{public}s", err, command);
+            TELEPHONY_LOGI("NeedATPause err = %{public}d", err);
         }
         if (g_atWatch != NULL) {
             g_atWatch();
@@ -242,7 +240,7 @@ int32_t SendCommandLock(const char *command, const char *prefix, long long timeo
     g_prefix = prefix;
     err = SendCommandNoLock(command, timeout, outResponse);
     pthread_mutex_unlock(&g_commandmutex);
-    TELEPHONY_LOGI("err = %{public}d, cmd:%{public}s", err, command);
+    TELEPHONY_LOGI("err = %{public}d", err);
     // when timeout to process
     if (err == AT_ERR_TIMEOUT && g_onTimeout != NULL) {
         g_onTimeout();
@@ -265,7 +263,7 @@ int32_t SendCommandNetWorksLock(const char *command, const char *prefix, long lo
     g_prefix = prefix;
     err = SendCommandNoLock(command, timeout, outResponse);
     pthread_mutex_unlock(&g_commandmutex);
-    TELEPHONY_LOGI("err = %{public}d, cmd:%{public}s", err, command);
+    TELEPHONY_LOGI("err = %{public}d", err);
     // when timeout to process
     if (err == AT_ERR_TIMEOUT) {
         err = AT_ERR_WAITING;
@@ -286,7 +284,7 @@ int32_t SendCommandSmsLock(
     g_smsPdu = smsPdu;
     err = SendCommandNoLock(command, timeout, outResponse);
     pthread_mutex_unlock(&g_commandmutex);
-    TELEPHONY_LOGI("err = %{public}d, cmd:%{public}s", err, command);
+    TELEPHONY_LOGI("err = %{public}d", err);
     // when timeout to process
     if (err == AT_ERR_TIMEOUT && g_onTimeout != NULL) {
         g_onTimeout();
