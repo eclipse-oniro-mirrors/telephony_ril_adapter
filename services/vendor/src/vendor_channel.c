@@ -54,7 +54,6 @@ static char *ProcessLastResponse(char **processed)
 {
     char *endLine = NULL;
     if (*g_bufferCur == '\0') {
-        TELEPHONY_LOGI("g_bufferCur is end %{public}s\n", g_buffer);
         ClearCurBuffer(processed);
     } else {
         SkipUnUseChar();
@@ -88,7 +87,6 @@ const char *ReadResponse(int32_t atFd)
         } while (size < 0 && errno == EINTR);
         if (size > 0) {
             processed[size] = '\0';
-            TELEPHONY_LOGI("g_bufferCur : %{public}s\n", g_bufferCur);
             SkipUnUseChar();
             endEol = FindEndOfLine(g_bufferCur);
             processed += size;
@@ -108,7 +106,6 @@ const char *ReadResponse(int32_t atFd)
 
 int32_t WriteATCommand(const char *s, int32_t isPdu, int32_t atFd)
 {
-    TELEPHONY_LOGI("cmd:%{public}s", s);
     ssize_t ret;
     size_t i = 0;
     size_t len = strlen(s);
