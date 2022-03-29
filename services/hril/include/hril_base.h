@@ -45,7 +45,8 @@ public:
         int32_t code, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     // The "Active reporting" event processing entry.
     template<typename T>
-    int32_t ProcessNotify(const struct ReportInfo *reportInfo, const void *response, size_t responseLen);
+    int32_t ProcessNotify(
+        int32_t notifyType, const struct ReportInfo *reportInfo, const void *response, size_t responseLen);
     // The "request" event processing entry.
     template<typename T>
     int32_t ProcessRequest(int32_t code, struct HdfSBuf *data);
@@ -54,10 +55,11 @@ protected:
     HRilBase(int32_t slotId, IHRilReporter &hrilReporter) : hrilReporter_(hrilReporter), slotId_(slotId) {}
     virtual ~HRilBase() {}
 
-    int32_t ResponseBuffer(
-        int32_t requestNum, const void *responseInfo, uint32_t reqLen, const void *event, uint32_t eventLen);
-    int32_t ResponseRequestInfo(int32_t requestNum, const void *responseInfo, uint32_t reqLen);
-    int32_t ResponseInt32(int32_t requestNum, const void *responseInfo, uint32_t reqLen, uint32_t value);
+    int32_t ResponseBuffer(int32_t requestNum, const HRilRadioResponseInfo *responseInfo, uint32_t reqLen,
+        const void *event, uint32_t eventLen);
+    int32_t ResponseRequestInfo(int32_t requestNum, const HRilRadioResponseInfo *responseInfo, uint32_t reqLen);
+    int32_t ResponseInt32(
+        int32_t requestNum, const HRilRadioResponseInfo *responseInfo, uint32_t reqLen, uint32_t value);
 
     HRilNotiType ConvertIntToRadioNoticeType(int32_t indicationType);
     uint8_t ConvertHexCharToInt(uint8_t c);
@@ -88,11 +90,11 @@ protected:
      *  C++-style data structures, and transfer the encapsulated data into HDF services.
      */
     template<typename SourceType, typename ToType>
-    int32_t Notify(const SourceType *notifyData, size_t notifyDataLen, int32_t notifyId);
+    int32_t Notify(int32_t indType, const SourceType *notifyData, size_t notifyDataLen, int32_t notifyId);
     template<typename T>
     int32_t ResponseMessageParcel(const HRilRadioResponseInfo &responseInfo, const T &data, int32_t requestNum);
     template<typename T>
-    int32_t NotifyMessageParcel(T &data, int32_t requestNum);
+    int32_t NotifyMessageParcel(int32_t notifyType, T &data, int32_t requestNum);
 
     int32_t ConvertHexStringToInt(char **response, int32_t index, int32_t length);
     inline char *StringToCString(const std::string &src)
@@ -131,7 +133,7 @@ private:
     template<typename F>
     F GetFunc(std::map<uint32_t, std::any> &funcs, uint32_t code);
     // Write the report message header.
-    int32_t ReportHeader(std::shared_ptr<struct HdfSBuf> &dataSbuf, MessageParcel &parcel);
+    int32_t ReportHeader(int32_t responseType, std::shared_ptr<struct HdfSBuf> &dataSbuf, MessageParcel &parcel);
     // Write reply message header
     int32_t ResponseHeader(
         const HRilRadioResponseInfo &responseInfo, std::shared_ptr<struct HdfSBuf> &dataSbuf, MessageParcel &parcel);
@@ -198,14 +200,15 @@ int32_t HRilBase::ProcessResponse(
 }
 
 template<typename T>
-int32_t HRilBase::ProcessNotify(const struct ReportInfo *reportInfo, const void *response, size_t responseLen)
+int32_t HRilBase::ProcessNotify(
+    int32_t notifyType, const struct ReportInfo *reportInfo, const void *response, size_t responseLen)
 {
     using NotiFunc = int32_t (T::*)(int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
     int32_t code = reportInfo->notifyId;
     HRilErrNumber e = (HRilErrNumber)reportInfo->error;
     auto func = GetFunc<NotiFunc>(notiMemberFuncMap_, code);
     if (func != nullptr) {
-        return (static_cast<T *>(this)->*func)((int32_t)reportInfo->type, e, response, responseLen);
+        return (static_cast<T *>(this)->*func)(notifyType, e, response, responseLen);
     }
     return HRIL_ERR_INVALID_PARAMETER;
 }
@@ -242,7 +245,7 @@ int32_t HRilBase::Response(const HRilRadioResponseInfo &responseInfo, T &&data, 
 }
 
 template<typename SourceType, typename ToType>
-int32_t HRilBase::Notify(const SourceType *notifyData, size_t notifyDataLen, int32_t notifyId)
+int32_t HRilBase::Notify(int32_t indType, const SourceType *notifyData, size_t notifyDataLen, int32_t notifyId)
 {
     if (notifyData == nullptr || notifyDataLen == 0 || (notifyDataLen % sizeof(SourceType)) != 0) {
         TELEPHONY_LOGE("notify to tel-ril error: data=%{public}p(len=%{public}zu)", notifyData, notifyDataLen);
@@ -251,7 +254,7 @@ int32_t HRilBase::Notify(const SourceType *notifyData, size_t notifyDataLen, int
 
     std::shared_ptr<struct HdfSBuf> dataSbuf;
     MessageParcel parcel = {};
-    int32_t ret = ReportHeader(dataSbuf, parcel);
+    int32_t ret = ReportHeader(indType, dataSbuf, parcel);
     if (ret == HRIL_ERR_SUCCESS) {
         ToType data = *notifyData;
         data.Marshalling(parcel);
@@ -269,63 +272,65 @@ int32_t HRilBase::Notify(const SourceType *notifyData, size_t notifyDataLen, int
 template<typename T>
 int32_t HRilBase::ResponseMessageParcel(const HRilRadioResponseInfo &responseInfo, const T &data, int32_t requestNum)
 {
-    struct HdfSBuf *dataSbuf;
     std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
     if (parcel == nullptr) {
-        return HDF_FAILURE;
-    }
-    if (!parcel->WriteInterfaceToken(HRIL_INTERFACE_TOKEN)) {
-        TELEPHONY_LOGE("write interface token failed.");
-        return HDF_FAILURE;
-    }
-    dataSbuf = ParcelToSbuf(parcel.get());
-    if (dataSbuf == nullptr) {
-        return HDF_FAILURE;
-    }
-    if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&responseInfo, sizeof(responseInfo))) {
-        HdfSbufRecycle(dataSbuf);
-        return HDF_FAILURE;
-    }
-
-    data.Marshalling(*parcel.get());
-
-    int32_t ret = ServiceDispatcher(requestNum, dataSbuf);
-    if (ret != HDF_SUCCESS) {
-        HdfSbufRecycle(dataSbuf);
-        return HDF_FAILURE;
-    }
-    if (dataSbuf != nullptr) {
-        HdfSbufRecycle(dataSbuf);
-    }
-    return HDF_SUCCESS;
-}
-
-template<typename T>
-int32_t HRilBase::NotifyMessageParcel(T &data, int32_t requestNum)
-{
-    struct HdfSBuf *dataSbuf;
-    std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
-
-    // step1:Get the address of dataSbuf.
-    dataSbuf = ParcelToSbuf(parcel.get());
-    if (dataSbuf == nullptr) {
         return HRIL_ERR_NULL_POINT;
     }
     if (!parcel->WriteInterfaceToken(HRIL_INTERFACE_TOKEN)) {
         TELEPHONY_LOGE("write interface token failed.");
-        return HDF_FAILURE;
+        return HRIL_ERR_GENERIC_FAILURE;
     }
-    // step2:Write slotId into serialization.
-    if (!HdfSbufWriteInt32(dataSbuf, slotId_)) {
+    HRilResponseHeadInfo headInfo = {0};
+    headInfo.slotId = slotId_;
+    headInfo.type = responseInfo.type;
+    if (!parcel->WriteUnpadBuffer(&headInfo, sizeof(HRilResponseHeadInfo))) {
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
+    if (!parcel->WriteUnpadBuffer(&responseInfo, sizeof(responseInfo))) {
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
+    data.Marshalling(*parcel.get());
+
+    struct HdfSBuf *dataSbuf = ParcelToSbuf(parcel.get());
+    if (dataSbuf == nullptr) {
+        return HRIL_ERR_NULL_POINT;
+    }
+    int32_t ret = ServiceDispatcher(requestNum, dataSbuf);
+    if (ret != HRIL_ERR_SUCCESS) {
         HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
-    // step3:Write data to serialization.
+    if (dataSbuf != nullptr) {
+        HdfSbufRecycle(dataSbuf);
+    }
+    return HRIL_ERR_SUCCESS;
+}
+
+template<typename T>
+int32_t HRilBase::NotifyMessageParcel(int32_t notifyType, T &data, int32_t requestNum)
+{
+    std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
+    if (parcel == nullptr) {
+        return HRIL_ERR_NULL_POINT;
+    }
+    if (!parcel->WriteInterfaceToken(HRIL_INTERFACE_TOKEN)) {
+        TELEPHONY_LOGE("write interface token failed.");
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
+    // step1:Write slotId into serialization.
+    HRilResponseHeadInfo headInfo = {0};
+    headInfo.slotId = slotId_;
+    headInfo.type = (HRilResponseTypes)(notifyType);
+    if (!parcel->WriteUnpadBuffer(&headInfo, sizeof(HRilResponseHeadInfo))) {
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
+    // step2:Write data to serialization.
     data.Marshalling(*parcel.get());
+    // step3:Get the address of dataSbuf.
+    struct HdfSBuf *dataSbuf = ParcelToSbuf(parcel.get());
+    if (dataSbuf == nullptr) {
+        return HRIL_ERR_NULL_POINT;
+    }
     // step4:Dispatch to telRil.
     int32_t ret = ServiceNotifyDispatcher(requestNum, dataSbuf);
     if (ret != HRIL_ERR_SUCCESS) {

@@ -35,7 +35,7 @@ bool HRilBase::ReadFromHdfBuf(struct HdfSBuf *data, const char *&val)
 int32_t HRilBase::ResponseHeader(
     const HRilRadioResponseInfo &responseInfo, std::shared_ptr<struct HdfSBuf> &dataSbuf, MessageParcel &parcel)
 {
-    int32_t ret = ReportHeader(dataSbuf, parcel);
+    int32_t ret = ReportHeader(responseInfo.type, dataSbuf, parcel);
     if (ret != HRIL_ERR_SUCCESS) {
         TELEPHONY_LOGE("write fail for report header!!!");
         return ret;
@@ -47,7 +47,7 @@ int32_t HRilBase::ResponseHeader(
     return HRIL_ERR_SUCCESS;
 }
 
-int32_t HRilBase::ReportHeader(std::shared_ptr<struct HdfSBuf> &dataSbuf, MessageParcel &parcel)
+int32_t HRilBase::ReportHeader(int32_t responseType, std::shared_ptr<struct HdfSBuf> &dataSbuf, MessageParcel &parcel)
 {
     if (!parcel.WriteInterfaceToken(HRIL_INTERFACE_TOKEN)) {
         TELEPHONY_LOGE("write interface token failed.");
@@ -58,15 +58,17 @@ int32_t HRilBase::ReportHeader(std::shared_ptr<struct HdfSBuf> &dataSbuf, Messag
         TELEPHONY_LOGE("dataSbuf is null!!!");
         return HRIL_ERR_NULL_POINT;
     }
-    if (!HdfSbufWriteInt32(dataSbuf.get(), GetSlotId())) {
-        TELEPHONY_LOGE("write failed for slot id");
+    HRilResponseHeadInfo headInfo = {0};
+    headInfo.slotId = slotId_;
+    headInfo.type = (HRilResponseTypes)(responseType);
+    if (!HdfSbufWriteUnpadBuffer(dataSbuf.get(), (const uint8_t *)&headInfo, sizeof(HRilResponseHeadInfo))) {
         return HRIL_ERR_GENERIC_FAILURE;
     }
     return HRIL_ERR_SUCCESS;
 }
 
-int32_t HRilBase::ResponseBuffer(
-    int32_t requestNum, const void *responseInfo, uint32_t reqLen, const void *event, uint32_t eventLen)
+int32_t HRilBase::ResponseBuffer(int32_t requestNum, const HRilRadioResponseInfo *responseInfo, uint32_t reqLen,
+    const void *event, uint32_t eventLen)
 {
     std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
     if (parcel == nullptr) {
@@ -81,7 +83,10 @@ int32_t HRilBase::ResponseBuffer(
     if (dataSbuf == nullptr) {
         return HRIL_ERR_NULL_POINT;
     }
-    if (!HdfSbufWriteInt32(dataSbuf, slotId_)) {
+    HRilResponseHeadInfo headInfo = {0};
+    headInfo.slotId = slotId_;
+    headInfo.type = responseInfo->type;
+    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&headInfo, sizeof(HRilResponseHeadInfo))) {
         HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
@@ -104,7 +109,8 @@ int32_t HRilBase::ResponseBuffer(
     return HRIL_ERR_SUCCESS;
 }
 
-int32_t HRilBase::ResponseInt32(int32_t requestNum, const void *responseInfo, uint32_t reqLen, uint32_t value)
+int32_t HRilBase::ResponseInt32(
+    int32_t requestNum, const HRilRadioResponseInfo *responseInfo, uint32_t reqLen, uint32_t value)
 {
     std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
     if (parcel == nullptr) {
@@ -119,7 +125,10 @@ int32_t HRilBase::ResponseInt32(int32_t requestNum, const void *responseInfo, ui
     if (dataSbuf == nullptr) {
         return HRIL_ERR_NULL_POINT;
     }
-    if (!HdfSbufWriteInt32(dataSbuf, slotId_)) {
+    HRilResponseHeadInfo headInfo = {0};
+    headInfo.slotId = slotId_;
+    headInfo.type = responseInfo->type;
+    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&headInfo, sizeof(HRilResponseHeadInfo))) {
         HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
@@ -142,7 +151,7 @@ int32_t HRilBase::ResponseInt32(int32_t requestNum, const void *responseInfo, ui
     return HRIL_ERR_SUCCESS;
 }
 
-int32_t HRilBase::ResponseRequestInfo(int32_t requestNum, const void *responseInfo, uint32_t reqLen)
+int32_t HRilBase::ResponseRequestInfo(int32_t requestNum, const HRilRadioResponseInfo *responseInfo, uint32_t reqLen)
 {
     std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
     if (parcel == nullptr) {
@@ -157,7 +166,10 @@ int32_t HRilBase::ResponseRequestInfo(int32_t requestNum, const void *responseIn
     if (dataSbuf == nullptr) {
         return HRIL_ERR_NULL_POINT;
     }
-    if (!HdfSbufWriteInt32(dataSbuf, slotId_)) {
+    HRilResponseHeadInfo headInfo = {0};
+    headInfo.slotId = slotId_;
+    headInfo.type = responseInfo->type;
+    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&headInfo, sizeof(HRilResponseHeadInfo))) {
         HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }

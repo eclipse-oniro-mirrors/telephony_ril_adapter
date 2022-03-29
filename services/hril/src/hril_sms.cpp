@@ -791,8 +791,10 @@ int32_t HRilSms::SendSmsAckResponse(
         TELEPHONY_LOGE("dataSbuf in SendSmsAckResponse is nullptr!");
         return HRIL_ERR_NULL_POINT;
     }
-    if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
-        TELEPHONY_LOGE("HdfSbufWriteInt32 in SendSmsAckResponse failed!");
+    HRilResponseHeadInfo headInfo = {0};
+    headInfo.slotId = GetSlotId();
+    headInfo.type = responseInfo.type;
+    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&headInfo, sizeof(HRilResponseHeadInfo))) {
         HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
@@ -862,14 +864,19 @@ int32_t HRilSms::SmsStatusReportNotify(
         TELEPHONY_LOGE("write interface token failed.");
         return HRIL_ERR_GENERIC_FAILURE;
     }
-    struct HdfSBuf *dataSbuf = nullptr;
-    parcel->WriteInt32(GetSlotId());
-    smsMessageInfo.Marshalling(*parcel.get());
-    dataSbuf = ParcelToSbuf(parcel.get());
+    struct HdfSBuf *dataSbuf = ParcelToSbuf(parcel.get());
     if (dataSbuf == nullptr) {
         TELEPHONY_LOGE("ParcelToSbuf in SmsStatusReportNotify is failed!");
         return HRIL_ERR_NULL_POINT;
     }
+    HRilResponseHeadInfo headInfo = {0};
+    headInfo.slotId = GetSlotId();
+    headInfo.type = (HRilResponseTypes)indType;
+    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&headInfo, sizeof(HRilResponseHeadInfo))) {
+        HdfSbufRecycle(dataSbuf);
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
+    smsMessageInfo.Marshalling(*parcel.get());
     if (!HdfSbufWriteInt32(dataSbuf, indType)) {
         TELEPHONY_LOGE("HdfSbufWriteInt32 in SmsStatusReportNotify is failed!");
         HdfSbufRecycle(dataSbuf);
@@ -892,7 +899,6 @@ int32_t HRilSms::NewSmsStoredOnSimNotify(
         TELEPHONY_LOGE("invalid response");
         return HRIL_ERR_SUCCESS;
     }
-    indType = (int32_t)ConvertIntToRadioNoticeType(indType);
     int32_t recordNumber = *(static_cast<const int32_t *>(response));
     std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
     if (parcel == nullptr) {
@@ -908,8 +914,10 @@ int32_t HRilSms::NewSmsStoredOnSimNotify(
         TELEPHONY_LOGE("HdfSbufTypedObtain in NewSmsStoredOnSimNotify is failed!");
         return HRIL_ERR_NULL_POINT;
     }
-    if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
-        TELEPHONY_LOGE("HdfSbufWriteInt32 in SmsStatusReportNotify is failed!");
+    HRilResponseHeadInfo headInfo = {0};
+    headInfo.slotId = GetSlotId();
+    headInfo.type = (HRilResponseTypes)indType;
+    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&headInfo, sizeof(HRilResponseHeadInfo))) {
         HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
@@ -918,6 +926,7 @@ int32_t HRilSms::NewSmsStoredOnSimNotify(
         HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
+    indType = (int32_t)ConvertIntToRadioNoticeType(indType);
     if (!HdfSbufWriteInt32(dataSbuf, indType)) {
         TELEPHONY_LOGE("HdfSbufWriteInt32 in NewSmsStoredOnSimNotify is failed!");
         HdfSbufRecycle(dataSbuf);
@@ -946,7 +955,6 @@ int32_t HRilSms::NewSmsNotify(int32_t indType, const HRilErrNumber e, const void
     } else {
         smsResponse = (HRilSmsResponse *)response;
     }
-    indType = static_cast<int32_t>(ConvertIntToRadioNoticeType(indType));
     uint8_t *bytes = ConvertHexStringToBytes(smsResponse->pdu, responseLen);
     if (bytes == nullptr) {
         TELEPHONY_LOGE("NewSmsNotify: ConvertHexStringToBytes failed");
@@ -971,10 +979,16 @@ int32_t HRilSms::NewSmsNotify(int32_t indType, const HRilErrNumber e, const void
         TELEPHONY_LOGE("write interface token failed.");
         return HRIL_ERR_GENERIC_FAILURE;
     }
-    struct HdfSBuf *dataSbuf = nullptr;
-    parcel->WriteInt32(GetSlotId());
+    struct HdfSBuf *dataSbuf = ParcelToSbuf(parcel.get());
+    HRilResponseHeadInfo headInfo = {0};
+    headInfo.slotId = GetSlotId();
+    headInfo.type = (HRilResponseTypes)indType;
+    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&headInfo, sizeof(HRilResponseHeadInfo))) {
+        HdfSbufRecycle(dataSbuf);
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
     smsMessageInfo.Marshalling(*parcel.get());
-    dataSbuf = ParcelToSbuf(parcel.get());
+    indType = static_cast<int32_t>(ConvertIntToRadioNoticeType(indType));
     if (DataSbuf(dataSbuf, indType) == HRIL_ERR_GENERIC_FAILURE) {
         TELEPHONY_LOGE("DataSbuf in NewSmsNotify is failed!");
         return HRIL_ERR_GENERIC_FAILURE;
@@ -1016,13 +1030,18 @@ int32_t HRilSms::NewCdmaSmsNotify(int32_t indType, const HRilErrNumber e, const 
         TELEPHONY_LOGE("write interface token failed.");
         return HRIL_ERR_GENERIC_FAILURE;
     }
-    struct HdfSBuf *dataSbuf = nullptr;
-    parcel->WriteInt32(GetSlotId());
-    messageInfo.Marshalling(*parcel.get());
-    dataSbuf = ParcelToSbuf(parcel.get());
+    struct HdfSBuf *dataSbuf = ParcelToSbuf(parcel.get());
     if (dataSbuf == nullptr) {
         return HRIL_ERR_NULL_POINT;
     }
+    HRilResponseHeadInfo headInfo = {0};
+    headInfo.slotId = GetSlotId();
+    headInfo.type = (HRilResponseTypes)indType;
+    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&headInfo, sizeof(HRilResponseHeadInfo))) {
+        HdfSbufRecycle(dataSbuf);
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
+    messageInfo.Marshalling(*parcel.get());
     if (!HdfSbufWriteInt32(dataSbuf, indType)) {
         HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
@@ -1051,14 +1070,19 @@ int32_t HRilSms::CBConfigNotify(int32_t indType, const HRilErrNumber e, const vo
         TELEPHONY_LOGE("write interface token failed.");
         return HRIL_ERR_GENERIC_FAILURE;
     }
-    struct HdfSBuf *dataSbuf = nullptr;
-    parcel->WriteInt32(GetSlotId());
-    result.Marshalling(*parcel.get());
-    dataSbuf = ParcelToSbuf(parcel.get());
+    struct HdfSBuf *dataSbuf = ParcelToSbuf(parcel.get());
     if (dataSbuf == nullptr) {
         TELEPHONY_LOGE("ParcelToSbuf in CBConfigNotify is failed!");
         return HRIL_ERR_GENERIC_FAILURE;
     }
+    HRilResponseHeadInfo headInfo = {0};
+    headInfo.slotId = GetSlotId();
+    headInfo.type = (HRilResponseTypes)indType;
+    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&headInfo, sizeof(HRilResponseHeadInfo))) {
+        HdfSbufRecycle(dataSbuf);
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
+    result.Marshalling(*parcel.get());
     if (!HdfSbufWriteInt32(dataSbuf, indType)) {
         TELEPHONY_LOGE("HdfSbufWriteInt32 in CBConfigNotify is failed!");
         HdfSbufRecycle(dataSbuf);

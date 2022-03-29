@@ -389,4 +389,7 @@ typedef enum {
 } HRilSendEventCount;
 
 typedef enum { HRIL_SIM_TYPE_UNKNOWN = 0, HRIL_SIM_TYPE_SIM, HRIL_SIM_TYPE_USIM } HRilSimType;
+
+typedef enum { HRIL_UNNEED_ACK = 0, HRIL_NEED_ACK } HRilAckTypes;
+
 #endif // OHOS_HRIL_ENUM_H

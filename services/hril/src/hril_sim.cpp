@@ -783,7 +783,10 @@ int32_t HRilSim::GetImsiResponse(
         TELEPHONY_LOGE("Error : dataSbuf in GetImsiResponse is nullptr!");
         return HRIL_ERR_NULL_POINT;
     }
-    if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
+    HRilResponseHeadInfo headInfo = {0};
+    headInfo.slotId = GetSlotId();
+    headInfo.type = responseInfo.type;
+    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&headInfo, sizeof(HRilResponseHeadInfo))) {
         HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
@@ -834,7 +837,10 @@ int32_t HRilSim::GetSimLockStatusResponse(
         TELEPHONY_LOGE("GetSimLockStatusResponse dataSbuf is NULL.");
         return HRIL_ERR_NULL_POINT;
     }
-    if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
+    HRilResponseHeadInfo headInfo = {0};
+    headInfo.slotId = GetSlotId();
+    headInfo.type = responseInfo.type;
+    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&headInfo, sizeof(HRilResponseHeadInfo))) {
         HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
@@ -1058,7 +1064,10 @@ int32_t HRilSim::SimStateUpdated(int32_t notifyType, const HRilErrNumber e, cons
         TELEPHONY_LOGE("GetSimLockStatusResponse dataSbuf is NULL.");
         return HRIL_ERR_NULL_POINT;
     }
-    if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
+    HRilResponseHeadInfo headInfo = {0};
+    headInfo.slotId = GetSlotId();
+    headInfo.type = (HRilResponseTypes)notifyType;
+    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&headInfo, sizeof(HRilResponseHeadInfo))) {
         HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
@@ -1092,7 +1101,10 @@ int32_t HRilSim::SimStkSessionEndNotify(
         TELEPHONY_LOGE("GetSimLockStatusResponse dataSbuf is NULL.");
         return HRIL_ERR_NULL_POINT;
     }
-    if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
+    HRilResponseHeadInfo headInfo = {0};
+    headInfo.slotId = GetSlotId();
+    headInfo.type = (HRilResponseTypes)notifyType;
+    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&headInfo, sizeof(HRilResponseHeadInfo))) {
         HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
@@ -1126,7 +1138,10 @@ int32_t HRilSim::SimStkProactiveNotify(
         TELEPHONY_LOGE("Error : dataSbuf in SimStkProactiveNotify is nullptr!");
         return HRIL_ERR_NULL_POINT;
     }
-    if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
+    HRilResponseHeadInfo headInfo = {0};
+    headInfo.slotId = GetSlotId();
+    headInfo.type = (HRilResponseTypes)notifyType;
+    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&headInfo, sizeof(HRilResponseHeadInfo))) {
         HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
@@ -1162,7 +1177,10 @@ int32_t HRilSim::SimStkAlphaNotify(int32_t notifyType, const HRilErrNumber e, co
         TELEPHONY_LOGE("Error : dataSbuf in SimStkProactiveNotify is nullptr!");
         return HRIL_ERR_NULL_POINT;
     }
-    if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
+    HRilResponseHeadInfo headInfo = {0};
+    headInfo.slotId = GetSlotId();
+    headInfo.type = (HRilResponseTypes)notifyType;
+    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&headInfo, sizeof(HRilResponseHeadInfo))) {
         HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }

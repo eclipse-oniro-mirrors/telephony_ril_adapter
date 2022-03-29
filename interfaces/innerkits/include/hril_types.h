@@ -63,6 +63,16 @@ enum class HRilApnTypes : int32_t {
     ALL = 1023,
 };
 
+enum HRilRunningLockTypes { UNNEED_LOCK, NEED_LOCK };
+
+enum HRilResponseTypes {
+    HRIL_RESPONSE_REQUEST,
+    HRIL_RESPONSE_NOTICE,
+    HRIL_RESPONSE_REQUEST_ACK,
+    HRIL_RESPONSE_REQUEST_MUST_ACK,
+    HRIL_RESPONSE_NOTICE_MUST_ACK,
+};
+
 /* From 3GPP TS 27.007 V4.3.0 (2001-12) 8.5, AT + CSQ */
 struct GsmRssi {
     int32_t rxlev; /* Received Signal Strength Indication, value range 0 ~ 31, max is 99, if unknown then set to
@@ -129,10 +139,16 @@ struct GetCallWaitingInfo {
     int32_t typeClass; /* <classx> default, SLM790 is 255 */
 };
 
+struct HRilResponseHeadInfo {
+    int32_t slotId;
+    HRilResponseTypes type;
+};
+
 struct HRilRadioResponseInfo {
     int32_t flag = -1;
     int32_t serial = -1;
     HRilErrType error;
+    HRilResponseTypes type;
 
     bool IsInvalid(void) const
     {
@@ -150,7 +166,8 @@ enum HRilCommonNumber {
     HRIL_INVALID_HEX_CHAR = 16,
     HRIL_UPPER_CASE_LETTERS_OFFSET = 32,
     HRIL_ADAPTER_RADIO_INDICATION = 2001,
-    HRIL_ADAPTER_RADIO_RESPONSE = 2002
+    HRIL_ADAPTER_RADIO_RESPONSE = 2002,
+    HRIL_ADAPTER_RADIO_SEND_ACK,
 };
 
 enum HRilOperatorInfoResult {
