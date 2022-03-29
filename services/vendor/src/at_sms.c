@@ -69,6 +69,9 @@ int32_t ProcessCellBroadcast(char *pBuff, HRilCBConfigReportInfo *response)
 static void HandlerSmsResult(HRilSmsResponse *response, struct ReportInfo *reportInfo, const ReqDataInfo *requestInfo,
     int32_t *err, ResponseInfo *responseInfo)
 {
+    if (reportInfo == NULL || err == NULL) {
+        return;
+    }
     char *pLine = NULL;
     *err = HRIL_ERR_GENERIC_FAILURE;
     if (responseInfo && responseInfo->result) {
@@ -86,7 +89,7 @@ static void HandlerSmsResult(HRilSmsResponse *response, struct ReportInfo *repor
 
 static void HandleResult(int32_t *err, char *result, const ResponseInfo *responseInfo, HRilSmsResponse *response)
 {
-    if (response == NULL) {
+    if (response == NULL || err == NULL || responseInfo == NULL) {
         TELEPHONY_LOGE("response is NULL");
         return;
     }
@@ -104,6 +107,9 @@ static void HandleResult(int32_t *err, char *result, const ResponseInfo *respons
 
 void ReqSendGsmSms(const ReqDataInfo *requestInfo, const char *const *data, size_t dataLen)
 {
+    if (data == NULL) {
+        return;
+    }
     char *smsc = NULL;
     char smscTemp[MAX_CMD_LENGTH] = {0};
     const char *pdu = NULL;
@@ -232,6 +238,9 @@ void ReqSendCdmaSmsAck(const ReqDataInfo *requestInfo, const char *data, size_t 
 static void SimMessageError(
     struct ReportInfo *reportInfo, const ReqDataInfo *requestInfo, int32_t *err, ResponseInfo *responseInfo)
 {
+    if (reportInfo == NULL || err == NULL) {
+        return;
+    }
     *reportInfo = CreateReportInfo(requestInfo, *err, HRIL_RESPONSE, 0);
     OnSmsReport(GetSlotId(requestInfo), *reportInfo, NULL, 0);
     FreeResponseInfo(responseInfo);

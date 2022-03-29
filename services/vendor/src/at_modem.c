@@ -63,6 +63,9 @@ static int32_t GetResponseErrorCode(ResponseInfo *pResponseInfo)
 
 void ReqSetRadioState(const ReqDataInfo *requestInfo, int32_t function, int32_t reset)
 {
+    if (requestInfo == NULL) {
+        return;
+    }
     struct ReportInfo reportInfo;
     int32_t ret = SetRadioState(function, reset);
     if (ret == HRIL_ERR_SUCCESS) {
@@ -80,6 +83,9 @@ void ReqSetRadioState(const ReqDataInfo *requestInfo, int32_t function, int32_t 
 
 static void ErrorHandler(const ReqDataInfo *requestInfo, ResponseInfo *pResponse)
 {
+    if (requestInfo == NULL) {
+        return;
+    }
     struct ReportInfo reportInfo;
     reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
     OnModemReport(requestInfo->slotId, reportInfo, NULL, 0);
@@ -88,6 +94,9 @@ static void ErrorHandler(const ReqDataInfo *requestInfo, ResponseInfo *pResponse
 
 void ReqGetRadioState(const ReqDataInfo *requestInfo)
 {
+    if (requestInfo == NULL) {
+        return;
+    }
     const long long timeOut = DEFAULT_TIMEOUT;
     char *pLine = NULL;
     int32_t radioState = -1;
@@ -120,6 +129,9 @@ void ReqGetRadioState(const ReqDataInfo *requestInfo)
 
 void ReqGetImei(const ReqDataInfo *requestInfo)
 {
+    if (requestInfo == NULL) {
+        return;
+    }
     const long TIME_OUT = DEFAULT_TIMEOUT;
     int32_t err = HRIL_ERR_SUCCESS;
     ResponseInfo *responseInfo = NULL;
@@ -156,6 +168,9 @@ void ReqGetImei(const ReqDataInfo *requestInfo)
 
 void ReqGetMeid(const ReqDataInfo *requestInfo)
 {
+    if (requestInfo == NULL) {
+        return;
+    }
     const long TIME_OUT = DEFAULT_TIMEOUT;
     int32_t err = HRIL_ERR_SUCCESS;
     ResponseInfo *responseInfo = NULL;
@@ -284,6 +299,9 @@ int32_t ProcessVoiceRadioInfo(const char *s, const HRilVoiceRadioInfo *hrilVoice
 
 void ReqGetVoiceRadioTechnology(const ReqDataInfo *requestInfo)
 {
+    if (requestInfo == NULL) {
+        return;
+    }
     int32_t err = HRIL_ERR_SUCCESS;
     struct ReportInfo reportInfo;
     ResponseInfo *responseInfo = NULL;

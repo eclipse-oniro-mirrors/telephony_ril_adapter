@@ -50,6 +50,9 @@ static int32_t GetVendorLibPath(char *path)
 
 static UsbDeviceInfo *GetPresetInformation(const char *vId, const char *pId)
 {
+    if (vId == NULL || pId == NULL) {
+        return NULL;
+    }
     char *out = NULL;
     UsbDeviceInfo *uDevInfo = NULL;
     int32_t idVendor = (int32_t)strtol(vId, &out, BASE_HEX);

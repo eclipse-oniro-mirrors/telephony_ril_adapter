@@ -26,10 +26,10 @@ base/telephony/ril_adapter
 │   ├── hril                            # hril层的各个业务模块接口实现
 │   ├── hril_hdf                        # HDF服务
 │   └── vendor                          # 厂商库文件
-└── test                                # 测试代码
-    ├── BUILD.gn
-    ├── mock
-    └── unittest                        # 单元测试代码
+│── test                                # 测试代码
+│   ├── BUILD.gn
+│   └── unittest                        # 单元测试代码
+└── utils                               # 通用工具类
 ```
 
 ## 约束<a name="section126mcpsimp"></a>

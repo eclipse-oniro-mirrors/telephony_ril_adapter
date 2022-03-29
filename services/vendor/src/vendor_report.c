@@ -155,6 +155,9 @@ static void ReportInfoInit(struct ReportInfo *reportInfo)
 
 static int32_t CdmaSmsNotifyMock(const char *s, HRilSmsResponse *smsResponse)
 {
+    if (s == NULL || smsResponse == NULL) {
+        return 0;
+    }
     char *testDataStr = ("0101020004081300031008d00106102c2870e1420801c00c01c0");
     char *testDataTmp =
         ("0000021002040602448d159e240601fc081b0003200010010910461c58d8b266a9180306211024102051080100");
@@ -170,6 +173,9 @@ static int32_t CdmaSmsNotifyMock(const char *s, HRilSmsResponse *smsResponse)
 
 static int32_t WapPushNotifyMock(const char *s, HRilSmsResponse *smsResponse)
 {
+    if (s == NULL || smsResponse == NULL) {
+        return 0;
+    }
     char *testDataStr =
         ("0891683108200105f04408a0015608860104216092902512236e0605040b8423f0120601ae020"
          "56a0045c60c033231312e3133362e3130372e37382f646f776e2e7068703f703d413063303026"
@@ -190,6 +196,9 @@ static int32_t WapPushNotifyMock(const char *s, HRilSmsResponse *smsResponse)
 
 void OnNotifyOps(const char *s, const char *smsPdu)
 {
+    if (s == NULL) {
+        return;
+    }
     char *str = NULL;
     struct ReportInfo reportInfo = {0};
     ReportInfoInit(&reportInfo);
@@ -197,6 +206,9 @@ void OnNotifyOps(const char *s, const char *smsPdu)
         return;
     }
     str = strdup(s);
+    if (str == NULL) {
+        return;
+    }
     if (IsCallNoticeCmd(s)) {
         CallReportInfoProcess(s);
     } else if (ReportStrWith(s, "+CMT:")) {

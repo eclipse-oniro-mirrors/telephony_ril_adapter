@@ -195,7 +195,7 @@ void ProcessResponse(const char *responseLine, const char *pdu)
 
 void AddLinkListNode(const char *responseLine)
 {
-    if (g_response == NULL) {
+    if (g_response == NULL || responseLine == NULL) {
         TELEPHONY_LOGE("response is null");
         return;
     }

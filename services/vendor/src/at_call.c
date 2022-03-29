@@ -53,6 +53,9 @@ static void OnCallReportErrorMessages(const ReqDataInfo *requestInfo, uint32_t e
 
 static int32_t ParseDiffPart(int32_t isAllInfo, char **pLine, HRilCallInfo *outCall)
 {
+    if (outCall == NULL) {
+        return HRIL_ERR_NULL_POINT;
+    }
     int32_t tmp = 0;
     if (isAllInfo) {
         if (NextInt(pLine, &outCall->voiceDomain) < 0) {

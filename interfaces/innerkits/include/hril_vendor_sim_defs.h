@@ -37,7 +37,7 @@ typedef struct {
                       * 203	RETRIEVE DATA
                       * 219	SET DATA
                       */
-    int32_t fileid; /* this is the identifier of a elementary datafile on SIM.
+    int32_t fileid; /* this is the identifier of an elementary datafile on SIM.
                      * Mandatory for every command except STATUS. */
     int32_t p1; /* parameters passed on by the MT to the SIM. These parameters are mandatory for every command,
                  * except GET RESPONSE and STATUS. The values are described in 3GPP TS 51.011 [28]. */

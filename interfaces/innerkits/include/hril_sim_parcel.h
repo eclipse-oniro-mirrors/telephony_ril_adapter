@@ -34,7 +34,7 @@ struct CardStatusInfo : public HrilBaseParcel {
 /* Form 3GPP TS 27.007 V4.3.0 (2001-12) 8.18, + CRSM */
 struct SimIoRequestInfo : public HrilBaseParcel {
     int32_t command; /* command passed on by the ME to the SIM; refer GSM 51.011 [28] */
-    int32_t fileId; /* this is the identifier of a elementary datafile on SIM.
+    int32_t fileId; /* this is the identifier of an elementary datafile on SIM.
                      * Mandatory for every command except STATUS */
     int32_t p1; /* parameters passed on by the MT to the SIM.
                  * These parameters are mandatory for every command,

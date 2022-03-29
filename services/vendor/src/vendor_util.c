@@ -94,6 +94,9 @@ int32_t IsResponseError(const char *s)
 
 int32_t IsSms(const char *s)
 {
+    if (s == NULL) {
+        return 0;
+    }
     if (s[0] == '>') {
         return 1;
     }
@@ -102,6 +105,9 @@ int32_t IsSms(const char *s)
 
 int32_t IsSmsNotify(const char *s)
 {
+    if (s == NULL) {
+        return 0;
+    }
     size_t i;
     for (i = 0; i < G_RESP_SMS_NOTIFY; i++) {
         if (ReportStrWith(s, g_respSmsNotify[i])) {
@@ -113,6 +119,9 @@ int32_t IsSmsNotify(const char *s)
 
 void SetWaitTimeout(struct timespec *time, long long msec)
 {
+    if (time == NULL) {
+        return;
+    }
     struct timeval now;
     long def = 1000L;
     gettimeofday(&now, (struct timezone *)NULL);
@@ -126,7 +135,7 @@ void SetWaitTimeout(struct timespec *time, long long msec)
 
 int32_t SkipATPrefix(char **s)
 {
-    if (*s == NULL) {
+    if (s == NULL || *s == NULL) {
         TELEPHONY_LOGE("str parameter is null.");
         return -1;
     }
@@ -141,7 +150,7 @@ int32_t SkipATPrefix(char **s)
 
 void SkipSpace(char **s)
 {
-    if (*s == NULL) {
+    if (s == NULL || *s == NULL) {
         TELEPHONY_LOGE("str parameter is null.");
         return;
     }
@@ -154,7 +163,7 @@ int32_t NextInt(char **s, int32_t *out)
 {
     char *ret = NULL;
     char *end = NULL;
-    if (*s == NULL) {
+    if (s == NULL || *s == NULL || out == NULL) {
         TELEPHONY_LOGE("str parameter is null.");
         return -1;
     }
@@ -179,7 +188,7 @@ int64_t NextInt64(char **s, int64_t *out)
 {
     char *ret = NULL;
     char *end = NULL;
-    if (*s == NULL) {
+    if (s == NULL || *s == NULL || out == NULL) {
         TELEPHONY_LOGE("str parameter is null.");
         return -1;
     }
@@ -204,7 +213,7 @@ int32_t NextIntNotSkipNextComma(char **s, int32_t *out)
 {
     char *ret = NULL;
     char *end = NULL;
-    if (*s == NULL) {
+    if (s == NULL || *s == NULL || out == NULL) {
         TELEPHONY_LOGE("str parameter is null.");
         return -1;
     }
@@ -226,7 +235,7 @@ int32_t NextIntByRightBracket(char **s, int32_t *out)
 {
     char *ret = NULL;
     char *end = NULL;
-    if (*s == NULL) {
+    if (s == NULL || *s == NULL || out == NULL) {
         TELEPHONY_LOGE("str parameter is null.");
         return -1;
     }
@@ -249,7 +258,7 @@ int32_t NextIntByRightBracket(char **s, int32_t *out)
 
 void SkipNextComma(char **s)
 {
-    if (*s == NULL) {
+    if (s == NULL || *s == NULL) {
         TELEPHONY_LOGE("str parameter is null.");
         return;
     }
@@ -265,7 +274,7 @@ int32_t NextIntFromHex(char **s, int32_t *out)
 {
     char *ret = NULL;
     char *end = NULL;
-    if (*s == NULL) {
+    if (s == NULL || *s == NULL || out == NULL) {
         TELEPHONY_LOGE("str parameter is null.");
         return -1;
     }
@@ -292,7 +301,7 @@ uint64_t NextULongFromHex(char **s, uint64_t *out)
 {
     char *ret = NULL;
     char *end = NULL;
-    if (*s == NULL) {
+    if (s == NULL || *s == NULL || out == NULL) {
         TELEPHONY_LOGE("str parameter is null.");
         return -1;
     }
@@ -317,7 +326,7 @@ uint64_t NextULongFromHex(char **s, uint64_t *out)
 
 int32_t NextStr(char **s, char **out)
 {
-    if (*s == NULL) {
+    if (s == NULL || *s == NULL || out == NULL) {
         TELEPHONY_LOGE("str parameter is null.");
         return -1;
     }
@@ -340,7 +349,7 @@ int32_t NextStr(char **s, char **out)
  */
 int32_t NextTxtStr(char **s, char **out)
 {
-    if (*s == NULL) {
+    if (s == NULL || *s == NULL || out == NULL) {
         TELEPHONY_LOGE("str parameter is null.");
         return -1;
     }
@@ -429,6 +438,9 @@ ModemReportErrorInfo InitModemReportErrorInfo(void)
 
 int32_t ConvertCharToInt32(const char *s)
 {
+    if (s == NULL) {
+        return 0;
+    }
     char *str = (char *)s;
     int32_t ret = 0;
     char firstChar = *str;

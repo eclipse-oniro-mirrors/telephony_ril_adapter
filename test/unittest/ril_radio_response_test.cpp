@@ -185,6 +185,9 @@ int32_t RilRadioResponseTest::OnRemoteRequest(
 
 void PrintResponseInfo(const struct HRilRadioResponseInfo *rspInfo)
 {
+    if (rspInfo == nullptr) {
+        return;
+    }
     cout << endl
         // << "----> [flag]: " << rspInfo->flag << endl
         << "----> [serial]: " << rspInfo->serial << endl

@@ -433,6 +433,9 @@ int32_t DispatchRequest(int32_t cmd, struct HdfSBuf *data)
 
 static void HRilBootUpEventLoop()
 {
+    if (g_manager == nullptr || g_manager->timerCallback_ == nullptr) {
+        return;
+    }
     g_manager->timerCallback_->EventLoop();
 }
 
@@ -441,7 +444,7 @@ void HRilRegOps(const HRilOps *hrilOps)
     static HRilOps callBacks = {0};
     static RegisterState rilRegisterStatus = RIL_REGISTER_IS_NONE;
 
-    if (hrilOps == nullptr) {
+    if (hrilOps == nullptr || g_manager == nullptr) {
         TELEPHONY_LOGE("HRilRegOps: param is nullptr");
         return;
     }

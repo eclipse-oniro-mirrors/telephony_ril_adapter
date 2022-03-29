@@ -370,6 +370,9 @@ void RilUnitTest::DeactivatePdpContextTest(const OHOS::AppExecFwk::InnerEvent::P
 
 void RilUnitTest::DemoHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        return;
+    }
     event->GetInnerEventId();
 }
 
