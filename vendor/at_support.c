@@ -209,7 +209,6 @@ int SendCommandLock(const char *command, const char *prefix, long long timeout, 
         pthread_cond_signal(&g_commandcond);
         TELEPHONY_LOGD("SendCommandLock() NeedATPause :%{public}d", g_isNeedATPause);
         pthread_mutex_lock(&g_commandmutex);
-        TELEPHONY_LOGD("SendCommandLock() atCmd %{public}s", command);
         err = SendCommandNoLock(atCmd, timeout, outResponse);
         TELEPHONY_LOGE("SendCommandLock() err = %{public}d", err);
         pthread_mutex_unlock(&g_commandmutex);
@@ -220,7 +219,6 @@ int SendCommandLock(const char *command, const char *prefix, long long timeout, 
         alarm(0);
     }
     pthread_mutex_lock(&g_commandmutex);
-    TELEPHONY_LOGD("SendCommandLock() command %{public}s", command);
     g_prefix = prefix;
     err = SendCommandNoLock(command, timeout, outResponse);
     TELEPHONY_LOGD("SendCommandLock() err = %{public}d", err);
