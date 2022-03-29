@@ -55,14 +55,15 @@ int32_t HRilModem::GetVoiceRadioTechnology(struct HdfSBuf *data)
 int32_t HRilModem::RadioStateUpdated(
     const int32_t indType, const HRilErrNumber e, const void *response, size_t responselen)
 {
-    return Notify<int32_t, HRilInt32Parcel>((const int32_t *)response, responselen, HNOTI_MODEM_RADIO_STATE_UPDATED);
+    return Notify<int32_t, HRilInt32Parcel>(
+        indType, (const int32_t *)response, responselen, HNOTI_MODEM_RADIO_STATE_UPDATED);
 }
 
 int32_t HRilModem::VoiceRadioTechUpdated(
     const int32_t indType, const HRilErrNumber e, const void *response, size_t responselen)
 {
     return Notify<HRilVoiceRadioInfo, VoiceRadioTechnology>(
-        (const HRilVoiceRadioInfo *)response, responselen, HNOTI_MODEM_VOICE_TECH_UPDATED);
+        indType, (const HRilVoiceRadioInfo *)response, responselen, HNOTI_MODEM_VOICE_TECH_UPDATED);
 }
 
 int32_t HRilModem::SetRadioStateResponse(

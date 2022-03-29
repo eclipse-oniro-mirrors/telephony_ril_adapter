@@ -1436,7 +1436,10 @@ int32_t HRilCall::CallStateUpdated(int32_t notifyType, const HRilErrNumber e, co
         return HRIL_ERR_GENERIC_FAILURE;
     }
 
-    if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
+    HRilResponseHeadInfo headInfo = {0};
+    headInfo.slotId = GetSlotId();
+    headInfo.type = (HRilResponseTypes)notifyType;
+    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&headInfo, sizeof(HRilResponseHeadInfo))) {
         HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
@@ -1466,7 +1469,7 @@ int32_t HRilCall::CallImsServiceStatusNotice(
     imsServiceStatusInfo.vtSrvRat = hImsServiceStatusInfo->vtSrvRat;
     imsServiceStatusInfo.vsSrvStatus = hImsServiceStatusInfo->vsSrvStatus;
     imsServiceStatusInfo.vsSrvRat = hImsServiceStatusInfo->vsSrvRat;
-    return NotifyMessageParcel(imsServiceStatusInfo, HNOTI_CALL_IMS_SERVICE_STATUS_REPORT);
+    return NotifyMessageParcel(notifyType, imsServiceStatusInfo, HNOTI_CALL_IMS_SERVICE_STATUS_REPORT);
 }
 
 int32_t HRilCall::CallUssdNotice(int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen)
@@ -1480,7 +1483,7 @@ int32_t HRilCall::CallUssdNotice(int32_t notifyType, const HRilErrNumber e, cons
     ussdNoticeInfo.m = hUssdNoticeInfo->m;
     ussdNoticeInfo.str = hUssdNoticeInfo->str == nullptr ? "" : hUssdNoticeInfo->str;
     ussdNoticeInfo.dcs = hUssdNoticeInfo->dcs;
-    return NotifyMessageParcel(ussdNoticeInfo, HNOTI_CALL_USSD_REPORT);
+    return NotifyMessageParcel(notifyType, ussdNoticeInfo, HNOTI_CALL_USSD_REPORT);
 }
 
 int32_t HRilCall::CallSrvccStatusNotice(int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen)
@@ -1492,7 +1495,7 @@ int32_t HRilCall::CallSrvccStatusNotice(int32_t notifyType, HRilErrNumber e, con
     SrvccStatus srvccStatus = {};
     const HRilCallSrvccStatus *hSrvccStatus = reinterpret_cast<const HRilCallSrvccStatus *>(response);
     srvccStatus.status = hSrvccStatus->status;
-    return NotifyMessageParcel(srvccStatus, HNOTI_CALL_SRVCC_STATUS_REPORT);
+    return NotifyMessageParcel(notifyType, srvccStatus, HNOTI_CALL_SRVCC_STATUS_REPORT);
 }
 
 int32_t HRilCall::CallRingbackVoiceNotice(
@@ -1505,7 +1508,7 @@ int32_t HRilCall::CallRingbackVoiceNotice(
     RingbackVoice ringbackVoice = {};
     const int32_t *ringbackVoiceFlag = reinterpret_cast<const int32_t *>(response);
     ringbackVoice.status = *ringbackVoiceFlag;
-    return NotifyMessageParcel(ringbackVoice, HNOTI_CALL_RINGBACK_VOICE_REPORT);
+    return NotifyMessageParcel(notifyType, ringbackVoice, HNOTI_CALL_RINGBACK_VOICE_REPORT);
 }
 
 int32_t HRilCall::CallEmergencyNotice(
@@ -1524,7 +1527,7 @@ int32_t HRilCall::CallEmergencyNotice(
     emergencyInfo.simpresent = hEmergencyInfo->simpresent;
     emergencyInfo.mcc = hEmergencyInfo->mcc;
     emergencyInfo.abnormalService = hEmergencyInfo->abnormalService;
-    return NotifyMessageParcel(emergencyInfo, HNOTI_CALL_EMERGENCY_NUMBER_REPORT);
+    return NotifyMessageParcel(notifyType, emergencyInfo, HNOTI_CALL_EMERGENCY_NUMBER_REPORT);
 }
 
 void HRilCall::RegisterCallFuncs(const HRilCallReq *callFuncs)

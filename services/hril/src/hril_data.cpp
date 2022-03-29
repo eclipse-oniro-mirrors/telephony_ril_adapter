@@ -370,35 +370,8 @@ int32_t HRilData::PdpContextListUpdated(
     }
     DataCallResultList dataCallResultList = {};
     SwitchHRilDataListToHal(response, responseLen, dataCallResultList.dcList);
-    std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
-    if (parcel == nullptr) {
-        TELEPHONY_LOGE("parcel is null.");
-        return HRIL_ERR_NULL_POINT;
-    }
-    if (!parcel->WriteInterfaceToken(HRIL_INTERFACE_TOKEN)) {
-        TELEPHONY_LOGE("write interface token failed.");
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    struct HdfSBuf *dataSbuf = nullptr;
-    dataSbuf = ParcelToSbuf(parcel.get());
-    if (dataSbuf == nullptr) {
-        TELEPHONY_LOGE("dataSbuf is null.");
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
     dataCallResultList.size = dataCallResultList.dcList.size();
-    dataCallResultList.Marshalling(*parcel.get());
-    int32_t ret = ServiceNotifyDispatcher(HNOTI_DATA_PDP_CONTEXT_LIST_UPDATED, dataSbuf);
-    if (ret != HRIL_ERR_SUCCESS) {
-        HdfSbufRecycle(dataSbuf);
-        TELEPHONY_LOGE("Call Dispatch is failed. ret:%{public}d", ret);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    HdfSbufRecycle(dataSbuf);
-    return HRIL_ERR_SUCCESS;
+    return NotifyMessageParcel(notifyType, dataCallResultList, HNOTI_DATA_PDP_CONTEXT_LIST_UPDATED);
 }
 
 int32_t HRilData::GetLinkBandwidthInfoResponse(

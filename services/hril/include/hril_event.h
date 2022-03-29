@@ -64,6 +64,7 @@ private:
     int32_t nfds_;
     const int32_t DEFAULT_INDEX = -1;
     const int32_t LISTEN_FD_EVENTS_MAX = 8;
+    const int32_t TIME_UNIT = 1000;
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -518,7 +518,10 @@ int32_t HRilNetwork::NetworkCsRegStatusUpdated(
         TELEPHONY_LOGE("dataSbuf is nullptr");
         return HRIL_ERR_NULL_POINT;
     }
-    if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
+    HRilResponseHeadInfo headInfo = {0};
+    headInfo.slotId = GetSlotId();
+    headInfo.type = (HRilResponseTypes)indType;
+    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&headInfo, sizeof(HRilResponseHeadInfo))) {
         HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
@@ -579,7 +582,10 @@ int32_t HRilNetwork::NetworkPhyChnlCfgUpdated(
     if (dataSbuf == nullptr) {
         return HRIL_ERR_NULL_POINT;
     }
-    if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
+    HRilResponseHeadInfo headInfo = {0};
+    headInfo.slotId = GetSlotId();
+    headInfo.type = (HRilResponseTypes)indType;
+    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&headInfo, sizeof(HRilResponseHeadInfo))) {
         HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
@@ -649,7 +655,10 @@ int32_t HRilNetwork::NetworkCurrentCellUpdated(
         TELEPHONY_LOGE("dataSbuf is nullptr");
         return HRIL_ERR_NULL_POINT;
     }
-    if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
+    HRilResponseHeadInfo headInfo = {0};
+    headInfo.slotId = GetSlotId();
+    headInfo.type = (HRilResponseTypes)indType;
+    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&headInfo, sizeof(HRilResponseHeadInfo))) {
         HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
@@ -697,7 +706,10 @@ int32_t HRilNetwork::NetworkPsRegStatusUpdated(
         TELEPHONY_LOGE("dataSbuf is nullptr");
         return HRIL_ERR_NULL_POINT;
     }
-    if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
+    HRilResponseHeadInfo headInfo = {0};
+    headInfo.slotId = GetSlotId();
+    headInfo.type = (HRilResponseTypes)indType;
+    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&headInfo, sizeof(HRilResponseHeadInfo))) {
         HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
@@ -750,7 +762,10 @@ int32_t HRilNetwork::NetworkImsRegStatusUpdated(
         TELEPHONY_LOGE("dataSbuf is nullptr");
         return HRIL_ERR_NULL_POINT;
     }
-    if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
+    HRilResponseHeadInfo headInfo = {0};
+    headInfo.slotId = GetSlotId();
+    headInfo.type = (HRilResponseTypes)indType;
+    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&headInfo, sizeof(HRilResponseHeadInfo))) {
         HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
@@ -779,7 +794,6 @@ int32_t HRilNetwork::NetworkImsRegStatusUpdated(
 int32_t HRilNetwork::SignalStrengthUpdated(
     int32_t indType, const HRilErrNumber e, const void *response, size_t responseLen)
 {
-    indType = static_cast<int32_t>(ConvertIntToRadioNoticeType(indType));
     Rssi rssi = {0};
 
     if (response == nullptr || responseLen != sizeof(HRilRssi)) {
@@ -801,7 +815,10 @@ int32_t HRilNetwork::SignalStrengthUpdated(
         TELEPHONY_LOGE("dataSbuf is nullptr");
         return HRIL_ERR_NULL_POINT;
     }
-    if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
+    HRilResponseHeadInfo headInfo = {0};
+    headInfo.slotId = GetSlotId();
+    headInfo.type = (HRilResponseTypes)indType;
+    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&headInfo, sizeof(HRilResponseHeadInfo))) {
         HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
@@ -810,6 +827,7 @@ int32_t HRilNetwork::SignalStrengthUpdated(
         HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
+    indType = static_cast<int32_t>(ConvertIntToRadioNoticeType(indType));
     if (!HdfSbufWriteInt32(dataSbuf, indType)) {
         HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
@@ -829,8 +847,6 @@ int32_t HRilNetwork::SignalStrengthUpdated(
 int32_t HRilNetwork::NetworkTimeUpdated(
     int32_t indType, const HRilErrNumber e, const void *response, size_t responseLen)
 {
-    indType = static_cast<int32_t>(ConvertIntToRadioNoticeType(indType));
-
     std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
     if (parcel == nullptr) {
         TELEPHONY_LOGE("parcel is nullptr");
@@ -845,7 +861,10 @@ int32_t HRilNetwork::NetworkTimeUpdated(
         TELEPHONY_LOGE("dataSbuf is nullptr");
         return HRIL_ERR_NULL_POINT;
     }
-    if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
+    HRilResponseHeadInfo headInfo = {0};
+    headInfo.slotId = GetSlotId();
+    headInfo.type = (HRilResponseTypes)indType;
+    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&headInfo, sizeof(HRilResponseHeadInfo))) {
         HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
@@ -854,6 +873,7 @@ int32_t HRilNetwork::NetworkTimeUpdated(
         HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
+    indType = static_cast<int32_t>(ConvertIntToRadioNoticeType(indType));
     if (!HdfSbufWriteInt32(dataSbuf, indType)) {
         TELEPHONY_LOGE("HdfSbufWriteInt32 in NetworkTimeUpdated is failed!");
         HdfSbufRecycle(dataSbuf);
@@ -874,8 +894,6 @@ int32_t HRilNetwork::NetworkTimeUpdated(
 int32_t HRilNetwork::NetworkTimeZoneUpdated(
     int32_t indType, const HRilErrNumber e, const void *response, size_t responseLen)
 {
-    indType = static_cast<int32_t>(ConvertIntToRadioNoticeType(indType));
-
     std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
     if (parcel == nullptr) {
         TELEPHONY_LOGE("parcel is nullptr");
@@ -890,7 +908,10 @@ int32_t HRilNetwork::NetworkTimeZoneUpdated(
         TELEPHONY_LOGE("dataSbuf is nullptr");
         return HRIL_ERR_NULL_POINT;
     }
-    if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
+    HRilResponseHeadInfo headInfo = {0};
+    headInfo.slotId = GetSlotId();
+    headInfo.type = (HRilResponseTypes)indType;
+    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&headInfo, sizeof(HRilResponseHeadInfo))) {
         HdfSbufRecycle(dataSbuf);
         return HRIL_ERR_GENERIC_FAILURE;
     }
@@ -900,6 +921,7 @@ int32_t HRilNetwork::NetworkTimeZoneUpdated(
         return HRIL_ERR_GENERIC_FAILURE;
     }
 
+    indType = static_cast<int32_t>(ConvertIntToRadioNoticeType(indType));
     if (!HdfSbufWriteInt32(dataSbuf, indType)) {
         TELEPHONY_LOGE("HdfSbufWriteInt32 in NetworkTimeZoneUpdated is failed!");
         HdfSbufRecycle(dataSbuf);

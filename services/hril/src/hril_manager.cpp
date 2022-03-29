@@ -19,10 +19,15 @@
 
 #include "hril_base.h"
 #include "hril_request.h"
+#include "hril_notification.h"
 
 namespace OHOS {
 namespace Telephony {
 static std::unique_ptr<HRilManager> g_manager = std::make_unique<HRilManager>();
+
+std::unordered_map<int32_t, int32_t> HRilManager::notificationMap_ = {
+#include "hril_notification_map.h"
+};
 
 // Distribute the request event to a specific card slot processing flow
 static int32_t DispatchModule(int32_t slotId, int32_t cmd, struct HdfSBuf *data)
@@ -213,6 +218,70 @@ void HRilManager::RegisterSmsFuncs(int32_t slotId, const HRilSmsReq *smsFuncs)
     }
 }
 
+static void RunningLockCallback(uint8_t *param)
+{
+    if (g_manager == nullptr || param == nullptr) {
+        TELEPHONY_LOGE("check nullptr fail.");
+        return;
+    }
+    int serialNum = *((int *)param);
+    delete param;
+    param = nullptr;
+    std::lock_guard<std::mutex> lockRequest(g_manager->mutexRunningLock_);
+    TELEPHONY_LOGI("RunningLockCallback, serialNum:%{public}d, runningSerialNum_:%{public}d",
+        serialNum, (int)g_manager->runningSerialNum_);
+    if (g_manager->runningLock_ == nullptr || serialNum != (int)g_manager->runningSerialNum_) {
+        return;
+    }
+    g_manager->runningLockCount_ = 0;
+    g_manager->runningLock_->UnLock();
+    TELEPHONY_LOGI("RunningLockCallback, UnLock");
+}
+
+void HRilManager::ApplyRunningLock(void)
+{
+    if (g_manager == nullptr || timerCallback_ == nullptr) {
+        TELEPHONY_LOGE("check nullptr fail.");
+        return;
+    }
+    std::lock_guard<std::mutex> lockRequest(mutexRunningLock_);
+    if (runningLock_ != nullptr) {
+        runningLock_->Lock();
+        struct timeval tv = {RUNNING_LOCK_DEFAULT_TIMEOUT_S, 0};
+        runningLockCount_++;
+        runningSerialNum_++;
+        int *serialNum = new int((int)runningSerialNum_);
+        timerCallback_->HRilSetTimerCallbackInfo(RunningLockCallback, (uint8_t *)serialNum, &tv);
+        TELEPHONY_LOGI("ApplyRunningLock, runningLockCount_:%{public}d, runningSerialNum_:%{public}d",
+            (int)runningLockCount_, (int)runningSerialNum_);
+    } else {
+        /* Since the power management subsystem starts slower than the RilAdapter,
+         * the wakelock needs to be recreated.
+         */
+        TELEPHONY_LOGW("The runningLock is nullptr, needs to be recreated.");
+        auto &powerMgrClient = PowerMgr::PowerMgrClient::GetInstance();
+        g_manager->runningLock_ =
+            powerMgrClient.CreateRunningLock("HRilRunningLock", PowerMgr::RunningLockType::RUNNINGLOCK_BACKGROUND);
+    }
+}
+
+void HRilManager::ReleaseRunningLock(void)
+{
+    std::lock_guard<std::mutex> lockRequest(mutexRunningLock_);
+    TELEPHONY_LOGI("ReleaseRunningLock, runningLockCount_:%{public}d", (int)runningLockCount_);
+    if (runningLock_ == nullptr) {
+        TELEPHONY_LOGE("runningLock_ is nullptr");
+        return;
+    }
+    if (runningLockCount_ > 1) {
+        runningLockCount_--;
+    } else {
+        runningLockCount_ = 0;
+        runningLock_->UnLock();
+        TELEPHONY_LOGI("ReleaseRunningLock UnLock");
+    }
+}
+
 template<typename T>
 void HRilManager::OnReport(std::vector<std::unique_ptr<T>> &subModules, int32_t slotId, const ReportInfo *reportInfo,
     const uint8_t *response, size_t responseLen)
@@ -227,13 +296,27 @@ void HRilManager::OnReport(std::vector<std::unique_ptr<T>> &subModules, int32_t 
             HRilRadioResponseInfo responseInfo = {};
             responseInfo.serial = reqInfo->serial;
             responseInfo.error = (HRilErrType)reportInfo->error;
+            responseInfo.type = HRIL_RESPONSE_REQUEST;
+            if (HRIL_NEED_ACK == reportInfo->ack) {
+                ApplyRunningLock();
+                responseInfo.type = HRIL_RESPONSE_REQUEST_MUST_ACK;
+            }
             int32_t requestId = reqInfo->request;
             ReleaseHRilRequest(requestId, reqInfo);
             subModules[slotId]->template ProcessResponse<T>(requestId, responseInfo, response, responseLen);
             break;
         }
         case (int32_t)ReportType::HRIL_NOTIFICATION: {
-            subModules[slotId]->template ProcessNotify<T>(reportInfo, response, responseLen);
+            int32_t notifyType = HRIL_RESPONSE_NOTICE;
+            auto iter = notificationMap_.find(reportInfo->notifyId);
+            if (iter != notificationMap_.end()) {
+                TELEPHONY_LOGI("OnReport notifyId:%{public}d, value:%{public}d", reportInfo->notifyId, iter->second);
+                if (NEED_LOCK == iter->second) {
+                    ApplyRunningLock();
+                    notifyType = HRIL_RESPONSE_NOTICE_MUST_ACK;
+                }
+            }
+            subModules[slotId]->template ProcessNotify<T>(notifyType, reportInfo, response, responseLen);
             break;
         }
         default:
@@ -312,6 +395,14 @@ int32_t DispatchRequest(int32_t cmd, struct HdfSBuf *data)
         return HDF_ERR_INVALID_PARAM;
     }
     switch (cmd) {
+        case HRIL_ADAPTER_RADIO_SEND_ACK: {
+            if (g_manager == nullptr) {
+                TELEPHONY_LOGE("g_manager is nullptr! cmd:%{public}d", cmd);
+                return HDF_ERR_INVALID_OBJECT;
+            }
+            g_manager->ReleaseRunningLock();
+            break;
+        }
         case HRIL_ADAPTER_RADIO_INDICATION: {
             HdfRemoteService *serviceCallbackInd = HdfSbufReadRemoteService(data);
             if (serviceCallbackInd == nullptr) {
@@ -359,6 +450,9 @@ void HRilRegOps(const HRilOps *hrilOps)
         return;
     }
     rilRegisterStatus = RIL_REGISTER_IS_RUNNING;
+    auto &powerMgrClient = PowerMgr::PowerMgrClient::GetInstance();
+    g_manager->runningLock_ =
+        powerMgrClient.CreateRunningLock("HRilRunningLock", PowerMgr::RunningLockType::RUNNINGLOCK_BACKGROUND);
     g_manager->eventLoop_ = std::make_unique<std::thread>(HRilBootUpEventLoop);
     (void)memcpy_s(&callBacks, sizeof(HRilOps), hrilOps, sizeof(HRilOps));
     for (int32_t slotId = HRIL_SIM_SLOT_0; slotId < g_manager->GetMaxSimSlotCount(); slotId++) {

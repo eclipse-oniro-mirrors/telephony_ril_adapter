@@ -159,43 +159,6 @@ private:
     void BuildEmergencyCallList(EmergencyInfoList &EmergencyCallInfoList, HRilRadioResponseInfo &responseInfo,
         const void *response, size_t responseLen);
 
-    template<typename T>
-    int32_t ResponseMessageParcel(const HRilRadioResponseInfo &responseInfo, const T &data, int32_t requestNum)
-    {
-        struct HdfSBuf *dataSbuf;
-        std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
-        if (parcel == nullptr) {
-            return HDF_FAILURE;
-        }
-        if (!parcel->WriteInterfaceToken(HRIL_INTERFACE_TOKEN)) {
-            return HDF_FAILURE;
-        }
-        dataSbuf = ParcelToSbuf(parcel.get());
-        if (dataSbuf == nullptr) {
-            return HDF_FAILURE;
-        }
-        if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
-            HdfSbufRecycle(dataSbuf);
-            return HRIL_ERR_GENERIC_FAILURE;
-        }
-        if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&responseInfo, sizeof(responseInfo))) {
-            HdfSbufRecycle(dataSbuf);
-            return HDF_FAILURE;
-        }
-
-        data.Marshalling(*parcel.get());
-
-        int32_t ret = ServiceDispatcher(requestNum, dataSbuf);
-        if (ret != HDF_SUCCESS) {
-            HdfSbufRecycle(dataSbuf);
-            return HDF_FAILURE;
-        }
-        if (dataSbuf != nullptr) {
-            HdfSbufRecycle(dataSbuf);
-        }
-        return HDF_SUCCESS;
-    }
-
 private:
     const HRilCallReq *callFuncs_ = nullptr;
 };

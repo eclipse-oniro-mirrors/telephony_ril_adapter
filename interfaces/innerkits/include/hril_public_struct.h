@@ -35,5 +35,6 @@ typedef struct ReportInfo {
     ReportType type;
     HRilErrNumber error;
     ModemReportErrorInfo modemErrInfo;
+    HRilAckTypes ack;
 } ReportInfo;
 #endif // OHOS_RIL_PUBLIC_STRUCT_H

@@ -18,7 +18,6 @@
 #include <cerrno>
 #include <fcntl.h>
 #include <sys/select.h>
-#include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
 
@@ -30,7 +29,6 @@ namespace OHOS {
 namespace Telephony {
 void HRilEvent::GetNowTime(struct timeval &tv)
 {
-    const int32_t TIME_UNIT = 1000;
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);
     tv.tv_sec = ts.tv_sec;

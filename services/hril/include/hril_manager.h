@@ -27,6 +27,7 @@
 #include "hril_sim.h"
 #include "hril_sms.h"
 #include "hril_timer_callback.h"
+#include "power_mgr_client.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -42,7 +43,11 @@ public:
 
     std::unique_ptr<HRilTimerCallback> timerCallback_ = nullptr;
     std::unique_ptr<std::thread> eventLoop_ = nullptr;
-
+    std::shared_ptr<PowerMgr::RunningLock> runningLock_ = nullptr;
+    static const uint32_t RUNNING_LOCK_DEFAULT_TIMEOUT_S = 60; // 60s
+    std::mutex mutexRunningLock_;
+    std::atomic_uint runningLockCount_ = 0;
+    std::atomic_int runningSerialNum_ = 0;
     int32_t GetMaxSimSlotCount();
 
     virtual int32_t ReportToParent(int32_t requestNum, const HdfSBuf *dataSbuf) override;
@@ -56,6 +61,8 @@ public:
     void RegisterNetworkFuncs(int32_t slotId, const HRilNetworkReq *networkFuncs);
     void RegisterSimFuncs(int32_t slotId, const HRilSimReq *simFuncs);
     void RegisterSmsFuncs(int32_t slotId, const HRilSmsReq *smsFuncs);
+    void ApplyRunningLock(void);
+    void ReleaseRunningLock(void);
 
     int32_t Dispatch(int32_t slotId, int32_t cmd, struct HdfSBuf *data);
 
@@ -86,6 +93,7 @@ private:
     const struct HdfRemoteService *serviceCallback_ = nullptr;
     const struct HdfRemoteService *serviceCallbackNotify_ = nullptr;
     std::unordered_map<int32_t, std::list<ReqDataInfo *>> requestList_;
+    static std::unordered_map<int32_t, int32_t> notificationMap_;
     std::mutex requestListLock_;
 };
 
