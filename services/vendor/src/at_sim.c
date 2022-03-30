@@ -77,6 +77,9 @@ static int32_t GetSimState(char *pLine, char *pResult, ResponseInfo *pResponse)
 
 static int32_t ParseSimResponseResult(char *pLine, HRilSimIOResponse *pSimResponse)
 {
+    if (pSimResponse == NULL) {
+        return -1;
+    }
     int32_t err = SkipATPrefix(&pLine);
     if (err != 0) {
         return err;
@@ -272,7 +275,7 @@ static int32_t ReqGetSimIOFDN(HRilSimIO *pSim, ResponseInfo **ppResponse, size_t
 static void HandlerSimIOResult(ResponseInfo *pResponse, HRilSimIOResponse *simResponse,
     const ReqDataInfo *requestInfo, char *pLine, int32_t *ret)
 {
-    if (pResponse == NULL) {
+    if (pResponse == NULL || ret == NULL) {
         TELEPHONY_LOGE("pResponse is NULL");
         return;
     }
@@ -353,7 +356,7 @@ void ReqGetSimIO(const ReqDataInfo *requestInfo, const HRilSimIO *data, size_t d
 static void HandlerSimImsiResult(
     ResponseInfo *pResponse, struct ReportInfo reportInfo, const ReqDataInfo *requestInfo, char *pLine, int32_t *ret)
 {
-    if (pResponse == NULL) {
+    if (pResponse == NULL || ret == NULL) {
         TELEPHONY_LOGE("pResponse is NULL");
         return;
     }
@@ -397,7 +400,7 @@ void ReqGetSimImsi(const ReqDataInfo *requestInfo)
 static void HandlerSimLockStatusResult(
     ResponseInfo *pResponse, struct ReportInfo reportInfo, const ReqDataInfo *requestInfo, char *pLine, int32_t *ret)
 {
-    if (pResponse == NULL) {
+    if (pResponse == NULL || ret == NULL) {
         TELEPHONY_LOGE("pResponse is NULL");
         return;
     }

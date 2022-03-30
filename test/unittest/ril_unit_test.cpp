@@ -659,6 +659,9 @@ void RilUnitTest::SetInitialApnTest(const OHOS::AppExecFwk::InnerEvent::Pointer 
 
 void RilUnitTest::DemoHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        return;
+    }
     event->GetInnerEventId();
 }
 
@@ -1011,7 +1014,9 @@ static int32_t SwitchMenu(int32_t module, bool *loopFlag)
     int32_t mWhat = -1;
     switch (module) {
         case 0: /* exit */
-            *loopFlag = false;
+            if (loopFlag != nullptr) {
+                *loopFlag = false;
+            }
             break;
         case 1: /* modem */
             mWhat = PrintModemMenu();

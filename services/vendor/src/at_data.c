@@ -174,6 +174,9 @@ static HRilDataCallResponse *CreatDataCallResponseAndInit(int32_t count)
         return newDcr;
     }
     newDcr = (HRilDataCallResponse *)malloc(size);
+    if (newDcr == NULL) {
+        return NULL;
+    }
     (void)memset_s(newDcr, size, 0, size);
     return newDcr;
 }
@@ -187,7 +190,7 @@ static ModemReportErrorInfo SendInquireCGACT(int32_t *outDataNum, HRilDataCallRe
     ModemReportErrorInfo errInfo = {};
 
     ret = SendCommandLock("AT+CGACT?", "+CGACT:", 0, &pResponse);
-    if (ret != 0 || !pResponse->success) {
+    if (ret != 0 || pResponse == NULL || !pResponse->success || outDataNum == NULL || ppDcr == NULL) {
         errInfo = GetReportErrorInfo(pResponse);
         errInfo.errorNo = (ret != HRIL_ERR_SUCCESS) ? ret : errInfo.errorNo;
         TELEPHONY_LOGE("send AT CMD failed! ret:%{public}d", errInfo.errorNo);
@@ -216,6 +219,9 @@ static ModemReportErrorInfo SendInquireCGACT(int32_t *outDataNum, HRilDataCallRe
 static void BuildDataInfoList(
     int32_t *validCount, int32_t dataNum, ResponseInfo *response, HRilDataCallResponse **ppDcr)
 {
+    if (validCount == NULL || response == NULL || ppDcr == NULL || *ppDcr == NULL) {
+        return;
+    }
     int32_t ret;
     int32_t i = 0;
     int32_t count = 0;
@@ -288,11 +294,18 @@ static ModemReportErrorInfo GetLinkInformation(int32_t activeIndex, HRilDataCall
     ModemReportErrorInfo errInfo = {};
 
     ret = SendCommandLock("AT^DHCP?", "^DHCP:", 0, &pResponse);
-    if (ret != 0 || !pResponse->success) {
+    if (ret != 0 || pResponse == NULL || !pResponse->success) {
         errInfo = GetReportErrorInfo(pResponse);
         errInfo.errorNo = (ret != HRIL_ERR_SUCCESS) ? ret : errInfo.errorNo;
         TELEPHONY_LOGE("send AT CMD failed! ret:%{public}d", errInfo.errorNo);
         FreeResponseInfo(pResponse);
+        return errInfo;
+    }
+    if (ppDcr == NULL || *ppDcr == NULL) {
+        pResponse->success = 0;
+        errInfo = GetReportErrorInfo(pResponse);
+        FreeResponseInfo(pResponse);
+        TELEPHONY_LOGE("ppDcr is NULL! ret:%{public}d", errInfo.errorNo);
         return errInfo;
     }
     pLine = pResponse->head;
@@ -327,7 +340,7 @@ static ModemReportErrorInfo SendInquireCGDCONT(int32_t *validCount, int32_t data
     ModemReportErrorInfo errInfo = {};
 
     ret = SendCommandLock("AT+CGDCONT?", "+CGDCONT:", 0, &pResponse);
-    if (ret != 0 || !pResponse->success) {
+    if (ret != 0 || pResponse == NULL || !pResponse->success) {
         errInfo = GetReportErrorInfo(pResponse);
         errInfo.errorNo = (ret != HRIL_ERR_SUCCESS) ? ret : errInfo.errorNo;
         TELEPHONY_LOGE("send AT CMD failed! ret:%{public}d", errInfo.errorNo);
@@ -349,6 +362,9 @@ static ModemReportErrorInfo SendInquireCGDCONT(int32_t *validCount, int32_t data
 
 static int32_t QueryAllSupportPDNInfos(PDNInfo *pdnInfo)
 {
+    if (pdnInfo == NULL) {
+        return -1;
+    }
     char *pStr = NULL;
     int32_t ret = -1;
     int32_t err = HRIL_ERR_SUCCESS;
@@ -358,7 +374,7 @@ static int32_t QueryAllSupportPDNInfos(PDNInfo *pdnInfo)
     ModemReportErrorInfo errInfo = {};
 
     ret = SendCommandLock("AT+CGDCONT?", "+CGDCONT:", 0, &pResponse);
-    if (ret != 0 || !pResponse->success) {
+    if (ret != 0 || pResponse == NULL || !pResponse->success) {
         errInfo = GetReportErrorInfo(pResponse);
         errInfo.errorNo = (ret != HRIL_ERR_SUCCESS) ? ret : errInfo.errorNo;
         TELEPHONY_LOGE("send AT CMD failed! ret:%{public}d", err);
@@ -576,11 +592,13 @@ static void InquirePdpContextList(int32_t cid, const ReqDataInfo *requestInfo)
 
 static int32_t SendCmdCGDCONT(int32_t cid, const ReqDataInfo *requestInfo, const HRilDataInfo *pDataInfo)
 {
+    if (pDataInfo == NULL) {
+        return -1;
+    }
     int32_t ret;
     int32_t err = HRIL_ERR_SUCCESS;
     char cmd[MAX_CMD_LENGTH] = {0};
     ResponseInfo *pResponse = NULL;
-
     ret = GenerateCommand(
         cmd, MAX_CMD_LENGTH, "AT+CGDCONT=%d,\"%s\",\"%s\",\"\",0,0", cid, pDataInfo->type, pDataInfo->apn);
     if (ret < 0) {
@@ -589,7 +607,7 @@ static int32_t SendCmdCGDCONT(int32_t cid, const ReqDataInfo *requestInfo, const
         return ret;
     }
     ret = SendCommandLock(cmd, NULL, 0, &pResponse);
-    if (ret != 0 || !pResponse->success) {
+    if (ret != 0 || pResponse == NULL || !pResponse->success) {
         err = (ret != HRIL_ERR_SUCCESS) ? ret : err;
         ret = OnDataReportPdpErrorMessages(requestInfo, err, pResponse);
         TELEPHONY_LOGE("cmd send failed, err:%{public}d", ret);
@@ -613,7 +631,7 @@ static int32_t SendCmdNDISDUP(int32_t cid, int32_t activate, const ReqDataInfo *
         return ret;
     }
     ret = SendCommandLock(cmd, NULL, 0, &pResponse);
-    if ((ret != HRIL_ERR_SUCCESS) || !pResponse->success) {
+    if ((ret != HRIL_ERR_SUCCESS) || pResponse == NULL || !pResponse->success) {
         err = (ret != HRIL_ERR_SUCCESS) ? ret : err;
         ret = OnDataReportPdpErrorMessages(requestInfo, err, pResponse);
         TELEPHONY_LOGE("cmd send failed, err:%{public}d", ret);
@@ -726,6 +744,9 @@ void PdpContextListUpdate(void)
 
 static int32_t SetDataProfileInfo(int32_t cid, const ReqDataInfo *requestInfo, const HRilDataInfo *pDataInfo)
 {
+    if (pDataInfo == NULL) {
+        return -1;
+    }
     int32_t ret;
     int32_t err = HRIL_ERR_SUCCESS;
     char cmd[MAX_CMD_LENGTH] = {0};
@@ -739,7 +760,7 @@ static int32_t SetDataProfileInfo(int32_t cid, const ReqDataInfo *requestInfo, c
         return ret;
     }
     ret = SendCommandLock(cmd, NULL, 0, &pResponse);
-    if (ret != 0 || !pResponse->success) {
+    if (ret != 0 || pResponse == NULL || !pResponse->success) {
         err = (ret != HRIL_ERR_SUCCESS) ? ret : err;
         ret = OnDataReportErrorMessages(requestInfo, err, pResponse);
         TELEPHONY_LOGE("cmd send failed, err:%{public}d", err);
@@ -755,7 +776,7 @@ static int32_t SetDataProfileInfo(int32_t cid, const ReqDataInfo *requestInfo, c
             return ret;
         }
         ret = SendCommandLock(cmd, NULL, 0, &pResponse);
-        if (ret != 0 || !pResponse->success) {
+        if (ret != 0 || pResponse == NULL || !pResponse->success) {
             err = (ret != HRIL_ERR_SUCCESS) ? ret : err;
             ret = OnDataReportErrorMessages(requestInfo, err, pResponse);
             TELEPHONY_LOGE("cmd send failed, err:%{public}d", err);

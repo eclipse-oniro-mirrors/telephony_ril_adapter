@@ -45,6 +45,9 @@ static void SkipUnUseChar(void)
 
 static void ClearCurBuffer(char **processed)
 {
+    if (processed == NULL) {
+        return;
+    }
     g_buffer[0] = '\0';
     g_bufferCur = g_buffer;
     *processed = g_bufferCur;
@@ -52,6 +55,9 @@ static void ClearCurBuffer(char **processed)
 
 static char *ProcessLastResponse(char **processed)
 {
+    if (processed == NULL) {
+        return NULL;
+    }
     char *endLine = NULL;
     if (*g_bufferCur == '\0') {
         ClearCurBuffer(processed);
@@ -106,6 +112,9 @@ const char *ReadResponse(int32_t atFd)
 
 int32_t WriteATCommand(const char *s, int32_t isPdu, int32_t atFd)
 {
+    if (s == NULL) {
+        return AT_ERR_GENERIC;
+    }
     ssize_t ret;
     size_t i = 0;
     size_t len = strlen(s);

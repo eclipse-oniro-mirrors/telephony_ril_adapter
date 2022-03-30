@@ -517,6 +517,9 @@ int32_t ProcessImsRegStatus(const char *s, const HRilImsRegStatusInfo *imsRegSta
 
 void ReqGetImsRegStatus(const ReqDataInfo *requestInfo)
 {
+    if (requestInfo == NULL) {
+        return;
+    }
     int32_t err = HRIL_ERR_SUCCESS;
     char *result = NULL;
     struct ReportInfo reportInfo;
@@ -555,6 +558,9 @@ void ReqGetImsRegStatus(const ReqDataInfo *requestInfo)
 
 void ReqGetSignalStrength(const ReqDataInfo *requestInfo)
 {
+    if (requestInfo == NULL) {
+        return;
+    }
     int32_t err = HRIL_ERR_SUCCESS;
     struct ReportInfo reportInfo;
     const long TIME_OUT = DEFAULT_TIMEOUT;
@@ -601,6 +607,9 @@ void ReqGetSignalStrength(const ReqDataInfo *requestInfo)
 
 void ReqGetCsRegStatus(const ReqDataInfo *requestInfo)
 {
+    if (requestInfo == NULL) {
+        return;
+    }
     int32_t err = HRIL_ERR_SUCCESS;
     struct ReportInfo reportInfo;
     ResponseInfo *responseInfo = NULL;
@@ -637,6 +646,9 @@ void ReqGetCsRegStatus(const ReqDataInfo *requestInfo)
 
 void ReqGetPsRegStatus(const ReqDataInfo *requestInfo)
 {
+    if (requestInfo == NULL) {
+        return;
+    }
     int32_t err = HRIL_ERR_SUCCESS;
     struct ReportInfo reportInfo;
     ResponseInfo *responseInfo = NULL;
@@ -673,6 +685,9 @@ void ReqGetPsRegStatus(const ReqDataInfo *requestInfo)
 
 void ReqGetOperatorInfo(const ReqDataInfo *requestInfo)
 {
+    if (requestInfo == NULL) {
+        return;
+    }
     int32_t err = HRIL_ERR_SUCCESS;
     struct ReportInfo reportInfo;
     ResponseInfo *responseInfo = NULL;
@@ -777,6 +792,9 @@ void PerformTimeOut(int32_t sigFlag)
 
 void ReqGetNetworkSearchInformation(const ReqDataInfo *requestInfo)
 {
+    if (requestInfo == NULL) {
+        return;
+    }
     const long TIME_OUT = 1000;
     ResponseInfo *responseInfo = NULL;
     const int32_t SECOND = 120;
@@ -823,6 +841,9 @@ void ReqGetNetworkSearchInformation(const ReqDataInfo *requestInfo)
 static int32_t ParseOperInfoItem(
     char **lineInfo, char **const longNameInfo, char **const shortNameInfo, char **const numericInfo)
 {
+    if (lineInfo == NULL || longNameInfo == NULL || shortNameInfo == NULL || numericInfo == NULL) {
+        return -1;
+    }
     char *data = *lineInfo;
     char **longNameInfoStr = (char **)longNameInfo;
     char **shortNameInfoStr = (char **)shortNameInfo;
@@ -851,6 +872,9 @@ static int32_t ParseOperInfoItem(
 int32_t ParseOperListInfo(
     const char *lineInfo, int32_t count, AvailableOperInfo *pOperInfo, AvailableOperInfo **ppOperInfo)
 {
+    if (lineInfo == NULL || pOperInfo == NULL) {
+        return 0;
+    }
     int32_t state = 0;
     int32_t rat = 0;
     int32_t operCount = 0;
@@ -950,6 +974,9 @@ static int32_t ErrorHandling(void)
 
 static int32_t ParseCellInfoGsm(const char *str, CellInfo *ci)
 {
+    if (str == NULL || ci == NULL) {
+        return -1;
+    }
     char *pStr = (char *)str;
     char *pat = NULL;
     (void)memset_s(ci, sizeof(CellInfo), 0, sizeof(CellInfo));
@@ -984,6 +1011,9 @@ static int32_t ParseCellInfoGsm(const char *str, CellInfo *ci)
 
 static int32_t ParseCellInfoLte(const char *str, CellInfo *ci)
 {
+    if (str == NULL || ci == NULL) {
+        return -1;
+    }
     char *pStr = (char *)str;
     char *pat = NULL;
     (void)memset_s(ci, sizeof(CellInfo), 0, sizeof(CellInfo));
@@ -1015,6 +1045,9 @@ static int32_t ParseCellInfoLte(const char *str, CellInfo *ci)
 
 static int32_t ParseCellInfoWcdma(const char *str, CellInfo *ci)
 {
+    if (str == NULL || ci == NULL) {
+        return -1;
+    }
     char *pStr = (char *)str;
     char *pat = NULL;
     (void)memset_s(ci, sizeof(CellInfo), 0, sizeof(CellInfo));
@@ -1043,6 +1076,9 @@ static int32_t ParseCellInfoWcdma(const char *str, CellInfo *ci)
 
 static int32_t ParseCellInfoCdma(const char *str, CellInfo *ci)
 {
+    if (str == NULL || ci == NULL) {
+        return -1;
+    }
     char *pStr = (char *)str;
     char *pat = NULL;
     (void)memset_s(ci, sizeof(CellInfo), 0, sizeof(CellInfo));
@@ -1086,6 +1122,9 @@ static int32_t ParseCellInfoCdma(const char *str, CellInfo *ci)
 
 static int32_t ParseCellInfoTdscdma(const char *str, CellInfo *ci)
 {
+    if (str == NULL || ci == NULL) {
+        return -1;
+    }
     char *pStr = (char *)str;
     char *pat = NULL;
     (void)memset_s(ci, sizeof(CellInfo), 0, sizeof(CellInfo));
@@ -1129,6 +1168,9 @@ static int32_t ParseCellInfoTdscdma(const char *str, CellInfo *ci)
 
 static int32_t ParseCellInfoNr(const char *str, CellInfo *ci)
 {
+    if (str == NULL || ci == NULL) {
+        return -1;
+    }
     char *pStr = (char *)str;
     char *pat = NULL;
     (void)memset_s(ci, sizeof(CellInfo), 0, sizeof(CellInfo));
@@ -1206,6 +1248,9 @@ static int32_t ParseCellInfos(const char *str, const CellInfo *cellInfo)
 
 void ReqGetNeighboringCellInfoList(const ReqDataInfo *requestInfo)
 {
+    if (requestInfo == NULL) {
+        return;
+    }
     const long TIME_OUT = DEFAULT_TIMEOUT;
     int32_t err = HRIL_ERR_SUCCESS;
     int32_t countCellInfo = 0;
@@ -1261,6 +1306,9 @@ void ReqGetNeighboringCellInfoList(const ReqDataInfo *requestInfo)
 
 static void ParseGetGsmCellInfoLine(char *line, CurrentCellInfoVendor *response)
 {
+    if (line == NULL || response == NULL) {
+        return;
+    }
     NextInt(&line, &response->ServiceCellParas.gsm.band);
     NextInt(&line, &response->ServiceCellParas.gsm.arfcn);
     NextInt(&line, &response->ServiceCellParas.gsm.bsic);
@@ -1280,6 +1328,9 @@ static void ParseGetGsmCellInfoLine(char *line, CurrentCellInfoVendor *response)
 
 static void ParseGetLteCellInfoLine(char *line, CurrentCellInfoVendor *response)
 {
+    if (line == NULL || response == NULL) {
+        return;
+    }
     NextInt(&line, &response->ServiceCellParas.lte.arfcn);
     NextIntFromHex(&line, &response->ServiceCellParas.lte.cellId);
     NextIntFromHex(&line, &response->ServiceCellParas.lte.pci);
@@ -1297,6 +1348,9 @@ static void ParseGetLteCellInfoLine(char *line, CurrentCellInfoVendor *response)
 
 static void ParseGetWcdmaCellInfoLine(char *line, CurrentCellInfoVendor *response)
 {
+    if (line == NULL || response == NULL) {
+        return;
+    }
     NextInt(&line, &response->ServiceCellParas.wcdma.arfcn);
     NextInt(&line, &response->ServiceCellParas.wcdma.psc);
     NextIntFromHex(&line, &response->ServiceCellParas.wcdma.cellId);
@@ -1318,6 +1372,9 @@ static void ParseGetWcdmaCellInfoLine(char *line, CurrentCellInfoVendor *respons
 
 static void ParseGetCdmaCellInfoLine(char *line, CurrentCellInfoVendor *response)
 {
+    if (line == NULL || response == NULL) {
+        return;
+    }
     NextInt(&line, &response->ServiceCellParas.cdma.systemId);
     NextInt(&line, &response->ServiceCellParas.cdma.networkId);
     NextIntFromHex(&line, &response->ServiceCellParas.cdma.baseId);
@@ -1339,6 +1396,9 @@ static void ParseGetCdmaCellInfoLine(char *line, CurrentCellInfoVendor *response
 
 static void ParseGetTdscdmaCellInfoLine(char *line, CurrentCellInfoVendor *response)
 {
+    if (line == NULL || response == NULL) {
+        return;
+    }
     NextInt(&line, &response->ServiceCellParas.tdscdma.arfcn);
     NextInt(&line, &response->ServiceCellParas.tdscdma.syncId);
     NextInt(&line, &response->ServiceCellParas.tdscdma.sc);
@@ -1360,6 +1420,9 @@ static void ParseGetTdscdmaCellInfoLine(char *line, CurrentCellInfoVendor *respo
 
 static void ParseGetNrCellInfoLine(char *line, CurrentCellInfoVendor *response)
 {
+    if (line == NULL || response == NULL) {
+        return;
+    }
     NextInt(&line, &response->ServiceCellParas.nr.nrArfcn);
     NextInt(&line, &response->ServiceCellParas.nr.pci);
     NextInt(&line, &response->ServiceCellParas.nr.tac);
@@ -1402,6 +1465,9 @@ static int32_t ParseGetCurrentCellInfoResponseLineSwitch(const char *str, const 
 
 static int32_t ParseGetCurrentCellInfoResponseLine(char *line, CurrentCellInfoVendor *response)
 {
+    if (line == NULL || response == NULL) {
+        return -1;
+    }
     char *c = NULL;
     TELEPHONY_LOGI("ParseGetCurrentCellInfoResponseLine  line %{public}s", line);
     int32_t err = SkipATPrefix(&line);
@@ -1490,6 +1556,9 @@ int32_t ProcessCurrentCellList(struct ReportInfo reportInfo, const char *s)
 
 void ReqGetCurrentCellInfo(const ReqDataInfo *requestInfo)
 {
+    if (requestInfo == NULL) {
+        return;
+    }
     const long TIME_OUT = DEFAULT_TIMEOUT;
     int32_t err = HRIL_ERR_SUCCESS;
     int32_t countCellInfo = 0;
@@ -1591,6 +1660,9 @@ int32_t ProcessOperListToUse(const char *list)
 
 static bool PrepareSetNetworkSelectionMode(char *cmd, const HRilSetNetworkModeInfo *setModeInfo)
 {
+    if (cmd == NULL || setModeInfo == NULL) {
+        return false;
+    }
     bool ret = true;
     TELEPHONY_LOGI("setModeInfo, serial123 = %{public}d", setModeInfo->selectMode);
     if (setModeInfo->selectMode == 0) {
@@ -1609,10 +1681,13 @@ static bool PrepareSetNetworkSelectionMode(char *cmd, const HRilSetNetworkModeIn
 
 void ReqSetNetworkSelectionMode(const ReqDataInfo *requestInfo, const HRilSetNetworkModeInfo *data)
 {
+    if (requestInfo == NULL) {
+        return;
+    }
+
     ResponseInfo *responseInfo = NULL;
     char cmd[MAX_CMD_LENGTH] = {0};
     char *cmdBuff = cmd;
-
     struct ReportInfo reportInfo;
     HRilSetNetworkModeInfo *setModeInfo = (HRilSetNetworkModeInfo *)data;
     if (setModeInfo == NULL) {
@@ -1653,6 +1728,9 @@ void ReqSetNetworkSelectionMode(const ReqDataInfo *requestInfo, const HRilSetNet
 
 void ReqGetNetworkSelectionMode(const ReqDataInfo *requestInfo)
 {
+    if (requestInfo == NULL) {
+        return;
+    }
     const long TIME_OUT = DEFAULT_TIMEOUT;
     int32_t err = HRIL_ERR_SUCCESS;
     ResponseInfo *responseInfo = NULL;
@@ -1746,7 +1824,7 @@ static char *PrepareCommandByNetworkType(HRilPreferredNetworkType net)
             GenerateCommand(cmd, MAX_CMD_LENGTH, "%s", "AT^SYSCFGEX=\"0302\",3FFFFFFF,1,2,7FFFFFFFFFFFFFFF,0,0");
         } else {
             if (((net > HRIL_NETWORK_WCDMA_GSM) && (net <= HRIL_NETWORK_LTE_TDSCDMA_WCDMA_GSM_EVDO_CDMA)) ||
-                ((net >= HRIL_NETWORK_NR_ONLY) && (net <= HRIL_NETWORK_NR_LTE_TDSCDMA_CDMA_EVDO_GSM_WCDMA))) {
+                ((net >= HRIL_NETWORK_NR) && (net <= HRIL_NETWORK_NR_LTE_TDSCDMA_WCDMA_GSM_EVDO_CDMA))) {
                 char dst[MAX_CMD_LENGTH] = {0};
                 IntToNetTypeCmd(net, dst, MAX_CMD_LENGTH);
                 GenerateCommand(cmd, MAX_CMD_LENGTH, "%s", dst);
@@ -1761,6 +1839,9 @@ static char *PrepareCommandByNetworkType(HRilPreferredNetworkType net)
 
 void ReqSetPreferredNetwork(const ReqDataInfo *requestInfo, const int32_t *data)
 {
+    if (requestInfo == NULL) {
+        return;
+    }
     ResponseInfo *responseInfo = NULL;
     struct ReportInfo reportInfo;
     if (data == NULL) {
@@ -1802,7 +1883,7 @@ static int32_t ParseNetTypeStr(const char *netType)
         TELEPHONY_LOGE("ParseNetTypeStr netType is null");
         return -1;
     }
-    TELEPHONY_LOGI("netType： [%{public}s]", netType);
+    TELEPHONY_LOGI("netType: [%{public}s]", netType);
     if (strcmp(netType, AUTO_TYPE) == 0) {
         return HRIL_NETWORK_AUTO;
     } else if (strcmp(netType, GSM_TYPE) == 0) {
@@ -1820,7 +1901,7 @@ static int32_t ParseNetTypeStr(const char *netType)
     } else {
         int32_t net = ConvertCharToInt32(netType);
         if (((net > HRIL_NETWORK_WCDMA_GSM) && (net <= HRIL_NETWORK_LTE_TDSCDMA_WCDMA_GSM_EVDO_CDMA)) ||
-            ((net >= HRIL_NETWORK_NR_ONLY) && (net <= HRIL_NETWORK_NR_LTE_TDSCDMA_CDMA_EVDO_GSM_WCDMA))) {
+            ((net >= HRIL_NETWORK_NR) && (net <= HRIL_NETWORK_NR_LTE_TDSCDMA_WCDMA_GSM_EVDO_CDMA))) {
             return net;
         } else {
             return -1;
@@ -1830,6 +1911,9 @@ static int32_t ParseNetTypeStr(const char *netType)
 
 void ReqGetPreferredNetwork(const ReqDataInfo *requestInfo)
 {
+    if (requestInfo == NULL) {
+        return;
+    }
     const long TIME_OUT = DEFAULT_TIMEOUT;
     int32_t err = HRIL_ERR_SUCCESS;
     ResponseInfo *responseInfo = NULL;
@@ -2005,6 +2089,9 @@ static int32_t ParseConfigInfo(const char *str, const HRilPhyChannelConfig *conf
 
 void ReqGetPhysicalChannelConfig(const ReqDataInfo *requestInfo)
 {
+    if (requestInfo == NULL) {
+        return;
+    }
     const long TIME_OUT = DEFAULT_TIMEOUT;
     int32_t err = HRIL_ERR_SUCCESS;
     int32_t configCount = 0;
@@ -2055,6 +2142,9 @@ void ReqGetPhysicalChannelConfig(const ReqDataInfo *requestInfo)
 
 void ReqSetLocateUpdates(const ReqDataInfo *requestInfo, HRilRegNotifyMode mode)
 {
+    if (requestInfo == NULL) {
+        return;
+    }
     const long TIME_OUT = DEFAULT_TIMEOUT;
     ResponseInfo *responseInfo = NULL;
     struct ReportInfo reportInfo = {};

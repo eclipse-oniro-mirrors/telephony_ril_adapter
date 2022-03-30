@@ -203,6 +203,9 @@ template<typename T>
 int32_t HRilBase::ProcessNotify(
     int32_t notifyType, const struct ReportInfo *reportInfo, const void *response, size_t responseLen)
 {
+    if (reportInfo == nullptr) {
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
     using NotiFunc = int32_t (T::*)(int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
     int32_t code = reportInfo->notifyId;
     HRilErrNumber e = (HRilErrNumber)reportInfo->error;

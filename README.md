@@ -27,10 +27,10 @@ base/telephony/ril_adapter
 │   ├── hril                            # Implementation of each business module interface of the hri layer
 │   ├── hril_hdf                        # HDF service
 │   └── vendor                          # vendor file
-└── test                                # Test code
-    ├── BUILD.gn
-    ├── mock
-    └── unittest                        # Unit test code
+│── test                                # Test code
+│   ├── BUILD.gn
+│   └── unittest                        # Unit test code
+└── utils                               # Utilities
 ```
 
 ## Constraints<a name="section126mcpsimp"></a>
