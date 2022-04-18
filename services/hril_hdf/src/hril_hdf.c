@@ -139,13 +139,6 @@ static void LoadVendor(void)
         return;
     }
 
-    char pathBuf[PATH_MAX] = {'\0'};
-    if (realpath(rilLibPath, pathBuf) == NULL) {
-        TELEPHONY_LOGE("dynamic library path is unvalid");
-        return;
-    }
-    rilLibPath = pathBuf;
-
     TELEPHONY_LOGI("RilInit LoadVendor start with rilLibPath:%{public}s", rilLibPath);
     g_dlHandle = dlopen(rilLibPath, RTLD_NOW);
     if (g_dlHandle == NULL) {
