@@ -23,7 +23,6 @@
 
 #include "hdf_base.h"
 #include "hdf_device_desc.h"
-#include "hdf_load_hdi.h"
 #include "hdf_remote_service.h"
 
 #include "hril.h"
