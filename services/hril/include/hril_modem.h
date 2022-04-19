@@ -31,6 +31,7 @@ public:
     int32_t GetImei(struct HdfSBuf *data);
     int32_t GetMeid(struct HdfSBuf *data);
     int32_t GetVoiceRadioTechnology(struct HdfSBuf *data);
+    int32_t GetBasebandVersion(struct HdfSBuf *data);
     int32_t SetRadioStateResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t GetRadioStateResponse(
@@ -40,6 +41,8 @@ public:
     int32_t GetMeidResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t GetVoiceRadioTechnologyResponse(
+        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t GetBasebandVersionResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t RadioStateUpdated(int32_t indType, HRilErrNumber e, const void *response, size_t responseLen);
     int32_t VoiceRadioTechUpdated(int32_t indType, HRilErrNumber e, const void *response, size_t responseLen);
