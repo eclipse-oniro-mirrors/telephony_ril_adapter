@@ -40,6 +40,7 @@ typedef struct {
     void (*GetImei)(const ReqDataInfo *requestInfo);
     void (*GetMeid)(const ReqDataInfo *requestInfo);
     void (*GetVoiceRadioTechnology)(const ReqDataInfo *requestInfo);
+    void (*GetBasebandVersion)(const ReqDataInfo *requestInfo);
 } HRilModemReq;
 #ifdef __cplusplus
 }

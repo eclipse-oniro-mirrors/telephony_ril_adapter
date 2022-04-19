@@ -52,6 +52,11 @@ int32_t HRilModem::GetVoiceRadioTechnology(struct HdfSBuf *data)
     return RequestVendor(data, HREQ_MODEM_GET_VOICE_RADIO, modemFuncs_, &HRilModemReq::GetVoiceRadioTechnology);
 }
 
+int32_t HRilModem::GetBasebandVersion(struct HdfSBuf *data)
+{
+    return RequestVendor(data, HREQ_MODEM_GET_BASEBAND_VERSION, modemFuncs_, &HRilModemReq::GetBasebandVersion);
+}
+
 int32_t HRilModem::RadioStateUpdated(
     const int32_t indType, const HRilErrNumber e, const void *response, size_t responselen)
 {
@@ -105,6 +110,12 @@ int32_t HRilModem::GetVoiceRadioTechnologyResponse(
     return Response(responseInfo, voiceRadioTech, requestNum);
 }
 
+int32_t HRilModem::GetBasebandVersionResponse(
+    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+{
+    return Response(responseInfo, HRilStringParcel((const char *)response), requestNum);
+}
+
 bool HRilModem::IsModemResponse(uint32_t code)
 {
     return ((code >= HREQ_COMMON_BASE) && (code <= HREQ_MODEM_GET_VOICE_RADIO));
@@ -131,12 +142,14 @@ void HRilModem::AddHandlerToMap()
     respMemberFuncMap_[HREQ_MODEM_GET_IMEI] = &HRilModem::GetImeiResponse;
     respMemberFuncMap_[HREQ_MODEM_GET_MEID] = &HRilModem::GetMeidResponse;
     respMemberFuncMap_[HREQ_MODEM_GET_VOICE_RADIO] = &HRilModem::GetVoiceRadioTechnologyResponse;
+    respMemberFuncMap_[HREQ_MODEM_GET_BASEBAND_VERSION] = &HRilModem::GetBasebandVersionResponse;
     // request
     reqMemberFuncMap_[HREQ_MODEM_SET_RADIO_STATUS] = &HRilModem::SetRadioState;
     reqMemberFuncMap_[HREQ_MODEM_GET_RADIO_STATUS] = &HRilModem::GetRadioState;
     reqMemberFuncMap_[HREQ_MODEM_GET_IMEI] = &HRilModem::GetImei;
     reqMemberFuncMap_[HREQ_MODEM_GET_MEID] = &HRilModem::GetMeid;
     reqMemberFuncMap_[HREQ_MODEM_GET_VOICE_RADIO] = &HRilModem::GetVoiceRadioTechnology;
+    reqMemberFuncMap_[HREQ_MODEM_GET_BASEBAND_VERSION] = &HRilModem::GetBasebandVersion;
 }
 
 void HRilModem::RegisterModemFuncs(const HRilModemReq *modemFuncs)
