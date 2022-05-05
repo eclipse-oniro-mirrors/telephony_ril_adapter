@@ -25,6 +25,11 @@ HRilModem::HRilModem(int32_t slotId, IHRilReporter &hrilReporter) : HRilBase(slo
     AddHandlerToMap();
 }
 
+int32_t HRilModem::ShutDown(struct HdfSBuf *data)
+{
+    return RequestVendor(data, HREQ_MODEM_SHUT_DOWN, modemFuncs_, &HRilModemReq::ShutDown);
+}
+
 int32_t HRilModem::SetRadioState(struct HdfSBuf *data)
 {
     int32_t fun = -1;
@@ -69,6 +74,12 @@ int32_t HRilModem::VoiceRadioTechUpdated(
 {
     return Notify<HRilVoiceRadioInfo, VoiceRadioTechnology>(
         indType, (const HRilVoiceRadioInfo *)response, responselen, HNOTI_MODEM_VOICE_TECH_UPDATED);
+}
+
+int32_t HRilModem::ShutDownResponse(
+    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+{
+    return Response(responseInfo, HrilEmptyParcel(), requestNum);
 }
 
 int32_t HRilModem::SetRadioStateResponse(
@@ -137,6 +148,7 @@ void HRilModem::AddHandlerToMap()
     notiMemberFuncMap_[HNOTI_MODEM_RADIO_STATE_UPDATED] = &HRilModem::RadioStateUpdated;
     notiMemberFuncMap_[HNOTI_MODEM_VOICE_TECH_UPDATED] = &HRilModem::VoiceRadioTechUpdated;
     // response
+    respMemberFuncMap_[HREQ_MODEM_SHUT_DOWN] = &HRilModem::ShutDownResponse;
     respMemberFuncMap_[HREQ_MODEM_SET_RADIO_STATUS] = &HRilModem::SetRadioStateResponse;
     respMemberFuncMap_[HREQ_MODEM_GET_RADIO_STATUS] = &HRilModem::GetRadioStateResponse;
     respMemberFuncMap_[HREQ_MODEM_GET_IMEI] = &HRilModem::GetImeiResponse;
@@ -144,6 +156,7 @@ void HRilModem::AddHandlerToMap()
     respMemberFuncMap_[HREQ_MODEM_GET_VOICE_RADIO] = &HRilModem::GetVoiceRadioTechnologyResponse;
     respMemberFuncMap_[HREQ_MODEM_GET_BASEBAND_VERSION] = &HRilModem::GetBasebandVersionResponse;
     // request
+    reqMemberFuncMap_[HREQ_MODEM_SHUT_DOWN] = &HRilModem::ShutDown;
     reqMemberFuncMap_[HREQ_MODEM_SET_RADIO_STATUS] = &HRilModem::SetRadioState;
     reqMemberFuncMap_[HREQ_MODEM_GET_RADIO_STATUS] = &HRilModem::GetRadioState;
     reqMemberFuncMap_[HREQ_MODEM_GET_IMEI] = &HRilModem::GetImei;

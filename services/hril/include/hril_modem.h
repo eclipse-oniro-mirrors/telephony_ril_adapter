@@ -26,12 +26,15 @@ public:
     HRilModem(int32_t slotId, IHRilReporter &hrilReporter);
     virtual ~HRilModem() = default;
 
+    int32_t ShutDown(struct HdfSBuf *data);
     int32_t SetRadioState(struct HdfSBuf *data);
     int32_t GetRadioState(struct HdfSBuf *data);
     int32_t GetImei(struct HdfSBuf *data);
     int32_t GetMeid(struct HdfSBuf *data);
     int32_t GetVoiceRadioTechnology(struct HdfSBuf *data);
     int32_t GetBasebandVersion(struct HdfSBuf *data);
+    int32_t ShutDownResponse(
+        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t SetRadioStateResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t GetRadioStateResponse(
