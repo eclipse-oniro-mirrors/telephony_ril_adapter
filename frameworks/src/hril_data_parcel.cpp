@@ -134,7 +134,7 @@ bool DataCallResultList::ReadFromParcel(Parcel &parcel)
         return false;
     }
     dcList.resize(size);
-    for (int32_t i = 0; i < size; i++) {
+    for (int32_t i = 0; i < (int32_t)size; i++) {
         dcList[i].ReadFromParcel(parcel);
     }
     return true;
