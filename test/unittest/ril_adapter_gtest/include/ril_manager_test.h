@@ -98,7 +98,7 @@ public:
     int32_t SetUssd(std::string str, const AppExecFwk::InnerEvent::Pointer &result);
     int32_t GetUssd(const AppExecFwk::InnerEvent::Pointer &result);
     int32_t GetLinkBandwidthInfo(const int32_t cid, const AppExecFwk::InnerEvent::Pointer &result);
-
+    int32_t SetEmergencyCallList(const AppExecFwk::InnerEvent::Pointer &result);
     static const int32_t INVALID_WAKELOCK = -1;
     static const int32_t FOR_WAKELOCK = 0;
     static const int32_t FOR_ACK_WAKELOCK = 1;

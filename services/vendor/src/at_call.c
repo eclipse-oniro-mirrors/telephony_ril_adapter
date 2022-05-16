@@ -1554,6 +1554,39 @@ void ReqGetEmergencyCallList(const ReqDataInfo *requestInfo)
     }
 }
 
+void ReqSetEmergencyCallList(const ReqDataInfo *requestInfo, HRilEmergencyInfo *emergencyInfo, const int len)
+{
+    TELEPHONY_LOGI("ReqSetEmergencyCallList start");
+    int32_t ret = 0;
+    int32_t err = HRIL_ERR_SUCCESS;
+    char cmd[MAX_CMD_LENGTH] = {0};
+    struct ReportInfo reportInfo;
+    ResponseInfo *pResponse = NULL;
+    ModemReportErrorInfo errInfo = {};
+    for (int i = 0; i  < len; i++) {
+        ret = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT^NVM=%d,%d,\"%s\",%d,%d,%s,%d",
+            emergencyInfo[i].index, emergencyInfo[i].total,
+            emergencyInfo[i].eccNum, emergencyInfo[i].category,
+            emergencyInfo[i].simpresent, emergencyInfo[i].mcc, emergencyInfo[i].abnormalService);
+        if (ret < 0) {
+            TELEPHONY_LOGE("GenerateCommand is failed!");
+            OnCallReportErrorMessages(requestInfo, HRIL_ERR_GENERIC_FAILURE, NULL);
+            return;
+        }
+        ret = SendCommandLock(cmd, NULL, 0, &pResponse);
+        if (ret || (pResponse != NULL && !pResponse->success)) {
+            errInfo = GetReportErrorInfo(pResponse);
+            err = errInfo.errorNo;
+            TELEPHONY_LOGE("cmd send failed, err:%{public}d", ret ? ret : err);
+        }
+    }
+    TELEPHONY_LOGI("ReqSetEmergencyCallList end");
+    reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
+    reportInfo.modemErrInfo = errInfo;
+    OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
+    FreeResponseInfo(pResponse);
+}
+
 void ReqGetCallFailReason(const ReqDataInfo *requestInfo)
 {
     int32_t err = HRIL_ERR_SUCCESS;

@@ -50,7 +50,6 @@ void RilUnitTest::OnInit()
     TELEPHONY_LOGI("RilUnitTest OnInit");
     std::shared_ptr<AppExecFwk::EventRunner> runner = OHOS::AppExecFwk::EventRunner::Create("DemoHandler");
     handler_ = std::make_shared<RilUnitTest::DemoHandler>(runner);
-
     const int32_t cdmaSubscription = 1;
     mRilManager_ = std::make_unique<RilManagerTest>(0, cdmaSubscription);
     if (mRilManager_ == nullptr) {
@@ -86,6 +85,7 @@ void RilUnitTest::AddRequestToMap()
     memberFuncMap_[HREQ_CALL_HOLD_CALL] = &RilUnitTest::HoldCallTest;
     memberFuncMap_[HREQ_CALL_UNHOLD_CALL] = &RilUnitTest::UnHoldCallTest;
     memberFuncMap_[HREQ_CALL_SWITCH_CALL] = &RilUnitTest::SwitchCallTest;
+    memberFuncMap_[HREQ_CALL_SET_EMERGENCY_LIST] = &RilUnitTest::SetEmergencyCallListTest;
     memberFuncMap_[HREQ_CALL_COMBINE_CONFERENCE] = &RilUnitTest::RilCmJoinCallTest;
     memberFuncMap_[HREQ_CALL_SEPARATE_CONFERENCE] = &RilUnitTest::RilCmSplitCallTest;
     memberFuncMap_[HREQ_NETWORK_GET_OPERATOR_INFO] = &RilUnitTest::GetRilCmOperatorTest;
@@ -265,6 +265,15 @@ void RilUnitTest::RilCmSplitCallTest(const OHOS::AppExecFwk::InnerEvent::Pointer
     ASSERT_EQ(0, ret);
 }
 
+void RilUnitTest::SetEmergencyCallListTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::SetEmergencyCallListTest -->");
+    int32_t ret = mRilManager_->SetEmergencyCallList(result);
+    TELEPHONY_LOGI("RilUnitTest::SetEmergencyCallListTest --> SetEmergencyCallListTest finished");
+    TELEPHONY_LOGI("RilUnitTest::SetEmergencyCallListTest return: %{public}d", ret);
+    ASSERT_EQ(0, ret);
+}
+
 void RilUnitTest::HangupRilCmConnectionTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("RilUnitTest::HangupRilCmConnectionTest -->");
@@ -411,6 +420,14 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetCallListTest_0100, Function | Medi
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_GET_CALL_LIST);
     event->SetOwner(GetHandler());
     OnProcessTest(HREQ_CALL_GET_CALL_LIST, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetEmergencyCallListTest_0100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_SET_EMERGENCY_LIST);
+    event->SetOwner(GetHandler());
+    OnProcessTest(HREQ_CALL_SET_EMERGENCY_LIST, event);
 }
 
 HWTEST_F(RilUnitTest, Telephony_RilAdapter_RilCmDialTest_0100, Function | MediumTest | Level3)
