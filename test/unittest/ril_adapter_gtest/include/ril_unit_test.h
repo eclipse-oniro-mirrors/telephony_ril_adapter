@@ -72,7 +72,7 @@ private:
     void SetUssdTest(const AppExecFwk::InnerEvent::Pointer &result);
     void GetUssdTest(const AppExecFwk::InnerEvent::Pointer &result);
     void GetLinkBandwidthInfoTest(const AppExecFwk::InnerEvent::Pointer &result);
-
+    void SetEmergencyCallListTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
 private:
     std::unique_ptr<RilManagerTest> mRilManager_;
     using RilManagerAndResponseTestFun = void (RilUnitTest::*)(const OHOS::AppExecFwk::InnerEvent::Pointer &event);

@@ -96,6 +96,7 @@ void HRilCall::AddCallResponseToMap()
     respMemberFuncMap_[HREQ_CALL_SET_MUTE] = &HRilCall::SetMuteResponse;
     respMemberFuncMap_[HREQ_CALL_GET_MUTE] = &HRilCall::GetMuteResponse;
     respMemberFuncMap_[HREQ_CALL_GET_EMERGENCY_LIST] = &HRilCall::GetEmergencyCallListResponse;
+    respMemberFuncMap_[HREQ_CALL_SET_EMERGENCY_LIST] = &HRilCall::SetEmergencyCallListResponse;
     respMemberFuncMap_[HREQ_CALL_GET_FAIL_REASON] = &HRilCall::GetCallFailReasonResponse;
 }
 
@@ -136,6 +137,7 @@ void HRilCall::AddCallRequestToMap()
     reqMemberFuncMap_[HREQ_CALL_SET_MUTE] = &HRilCall::SetMute;
     reqMemberFuncMap_[HREQ_CALL_GET_MUTE] = &HRilCall::GetMute;
     reqMemberFuncMap_[HREQ_CALL_GET_EMERGENCY_LIST] = &HRilCall::GetEmergencyCallList;
+    reqMemberFuncMap_[HREQ_CALL_SET_EMERGENCY_LIST] = &HRilCall::SetEmergencyCallList;
     reqMemberFuncMap_[HREQ_CALL_GET_FAIL_REASON] = &HRilCall::GetCallFailReason;
 }
 
@@ -1418,6 +1420,75 @@ int32_t HRilCall::GetEmergencyCallListResponse(
 
     return ResponseMessageParcel(responseInfo, callList, requestNum);
 }
+
+int32_t HRilCall::SetEmergencyCallList(struct HdfSBuf *data)
+{
+    if (callFuncs_ == nullptr || callFuncs_->SetEmergencyCallList == nullptr || data == nullptr) {
+        TELEPHONY_LOGE("SetEmergencyCallList callFuncs %{public}p or SetFunc or data:%{public}p null",
+            callFuncs_, data);
+        return HRIL_ERR_NULL_POINT;
+    }
+    MessageParcel *parcel = nullptr;
+    if (SbufToParcel(data, &parcel)) {
+        TELEPHONY_LOGE("SetEmergencyCallList RilAdapter failed to do SbufToParcel");
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    if (parcel == nullptr) {
+        TELEPHONY_LOGE(":SetEmergencyCallList parcel in SetEmergencyCallList is nullptr!");
+        return HRIL_ERR_NULL_POINT;
+    }
+    EmergencyInfoList emergencyInfoList;
+    if (!emergencyInfoList.ReadFromParcel(*parcel)) {
+        TELEPHONY_LOGE(":SetEmergencyCallList RilAdapter failed to do ReadFromParcel!");
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    int size = emergencyInfoList.calls.size();
+    if (size <= 0) {
+        TELEPHONY_LOGE("SetEmergencyCallList RilAdapter failed to do ReadFromParcel! calls len 0");
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    HRilEmergencyInfo emergencyInfoCalls[size];
+    int32_t serial =  emergencyInfoList.flag;
+    CopyToHRilEmergencyInfoArray(emergencyInfoCalls, emergencyInfoList.calls);
+    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_CALL_SET_EMERGENCY_LIST);
+    if (requestInfo == nullptr) {
+        TELEPHONY_LOGE("SetEmergencyCallList RilAdapter failed to do Create HRilRequest!");
+        return HRIL_ERR_NULL_POINT;
+    }
+    callFuncs_->SetEmergencyCallList(requestInfo, emergencyInfoCalls, size);
+    return HRIL_ERR_SUCCESS;
+}
+
+void HRilCall::CopyToHRilEmergencyInfoArray(HRilEmergencyInfo *emergencyInfoCalls, std::vector<EmergencyInfo> calls)
+{
+    for (unsigned int i = 0; i < calls.size(); i++) {
+        auto call = calls.at(i);
+        emergencyInfoCalls[i].index = call.index;
+        emergencyInfoCalls[i].total = call.total;
+        char *eccNum = new char[call.eccNum.size() + 1];
+        if (strcpy_s(eccNum, call.eccNum.size() + 1, call.eccNum.c_str()) == EOK) {
+            emergencyInfoCalls[i].eccNum = eccNum;
+        } else {
+            delete []eccNum;
+        }
+        emergencyInfoCalls[i].category = call.category;
+        emergencyInfoCalls[i].simpresent = call.simpresent;
+        char *mcc = new char[call.mcc.size() + 1];
+        if (strcpy_s(mcc, call.mcc.size() + 1, call.mcc.c_str()) == EOK) {
+            emergencyInfoCalls[i].mcc = mcc;
+        } else {
+            delete []mcc;
+        }
+        emergencyInfoCalls[i].abnormalService = call.abnormalService;
+    }
+}
+
+int32_t HRilCall::SetEmergencyCallListResponse(
+    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+{
+    return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));
+}
+
 
 int32_t HRilCall::CallStateUpdated(int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen)
 {

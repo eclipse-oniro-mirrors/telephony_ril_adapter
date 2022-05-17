@@ -72,6 +72,7 @@ void ReqGetUssd(const ReqDataInfo *requestInfo);
 void ReqGetMute(const ReqDataInfo *requestInfo);
 void ReqSetMute(const ReqDataInfo *requestInfo, int32_t mute);
 void ReqGetEmergencyCallList(const ReqDataInfo *requestInfo);
+void ReqSetEmergencyCallList(const ReqDataInfo *requestInfo, HRilEmergencyInfo *emergencyInfo, const int len);
 void ReqGetCallFailReason(const ReqDataInfo *requestInfo);
 
 void ReportImsServiceStatusInfo(const char *str);

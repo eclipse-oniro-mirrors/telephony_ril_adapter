@@ -73,6 +73,7 @@ private:
     int32_t GetMute(struct HdfSBuf *data);
     int32_t GetEmergencyCallList(struct HdfSBuf *data);
     int32_t GetCallFailReason(struct HdfSBuf *data);
+    int32_t SetEmergencyCallList(struct HdfSBuf *data);
 
     int32_t GetCallListResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
@@ -146,6 +147,8 @@ private:
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t GetCallFailReasonResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t SetEmergencyCallListResponse(
+        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
 
     int32_t CallStateUpdated(int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
     int32_t CallImsServiceStatusNotice(int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
@@ -161,6 +164,7 @@ private:
 
 private:
     const HRilCallReq *callFuncs_ = nullptr;
+    void CopyToHRilEmergencyInfoArray(HRilEmergencyInfo *emergencyInfoCalls, std::vector<EmergencyInfo> calls);
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -79,6 +79,7 @@ static const HRilCallReq g_callReqOps = {
     .SetMute = ReqSetMute,
     .GetEmergencyCallList = ReqGetEmergencyCallList,
     .GetCallFailReason = ReqGetCallFailReason,
+    .SetEmergencyCallList = ReqSetEmergencyCallList,
 };
 
 static const HRilSimReq g_simReqOps = {

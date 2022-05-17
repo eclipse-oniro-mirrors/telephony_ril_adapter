@@ -295,6 +295,7 @@ typedef struct {
     void (*GetMute)(const ReqDataInfo *requestInfo);
     void (*GetEmergencyCallList)(const ReqDataInfo *requestInfo);
     void (*GetCallFailReason)(const ReqDataInfo *requestInfo);
+    void (*SetEmergencyCallList)(const ReqDataInfo *requestInfo, HRilEmergencyInfo *emergencyInfo, const int len);
 } HRilCallReq;
 #ifdef __cplusplus
 }
