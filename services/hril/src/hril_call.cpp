@@ -1442,7 +1442,7 @@ int32_t HRilCall::SetEmergencyCallList(struct HdfSBuf *data)
         TELEPHONY_LOGE(":SetEmergencyCallList RilAdapter failed to do ReadFromParcel!");
         return HRIL_ERR_INVALID_PARAMETER;
     }
-    int size = emergencyInfoList.calls.size();
+    int size = (int)emergencyInfoList.calls.size();
     if (size <= 0) {
         TELEPHONY_LOGE("SetEmergencyCallList RilAdapter failed to do ReadFromParcel! calls len 0");
         return HRIL_ERR_INVALID_PARAMETER;
