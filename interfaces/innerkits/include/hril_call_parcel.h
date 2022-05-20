@@ -154,10 +154,23 @@ struct CallForwardQueryResult : public HrilBaseParcel {
     int32_t classx;
     std::string number;
     int32_t type;
+    int32_t reason;
+    int32_t time;
 
     bool ReadFromParcel(Parcel &parcel);
     virtual bool Marshalling(Parcel &parcel) const override;
     std::shared_ptr<CallForwardQueryResult> UnMarshalling(Parcel &parcel);
+    void Dump(std::string, int32_t);
+};
+
+struct CallForwardQueryInfoList : public HrilBaseParcel {
+    int32_t callSize;
+    int32_t flag;
+    std::vector<CallForwardQueryResult> calls;
+
+    bool ReadFromParcel(Parcel &parcel);
+    virtual bool Marshalling(Parcel &parcel) const override;
+    std::shared_ptr<CallForwardQueryInfoList> UnMarshalling(Parcel &parcel);
     void Dump(std::string, int32_t);
 };
 
@@ -213,6 +226,18 @@ struct UssdNoticeInfo : public HrilBaseParcel {
     bool ReadFromParcel(Parcel &parcel);
     virtual bool Marshalling(Parcel &parcel) const override;
     std::shared_ptr<UssdNoticeInfo> UnMarshalling(Parcel &parcel);
+    void Dump(std::string, int32_t);
+};
+
+struct SsNoticeInfo : public HrilBaseParcel {
+    int32_t serviceType;
+    int32_t requestType;
+    int32_t serviceClass;
+    int32_t result; /* the result of the SS request */
+
+    bool ReadFromParcel(Parcel &parcel);
+    virtual bool Marshalling(Parcel &parcel) const override;
+    std::shared_ptr<SsNoticeInfo> UnMarshalling(Parcel &parcel);
     void Dump(std::string, int32_t);
 };
 

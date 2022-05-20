@@ -46,6 +46,7 @@ public:
     void SimStateChanged(OHOS::MessageParcel &data);
     void ConnectedReturnRilVersion(OHOS::MessageParcel &data);
     void ChangedImsNetworkState(OHOS::MessageParcel &data);
+    void CallSsReport(OHOS::MessageParcel &data);
 
 private:
     RilManagerTest *mRilManager_;

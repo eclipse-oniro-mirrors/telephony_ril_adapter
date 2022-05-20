@@ -156,11 +156,14 @@ private:
     int32_t CallRingbackVoiceNotice(int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
     int32_t CallSrvccStatusNotice(int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
     int32_t CallEmergencyNotice(int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
+    int32_t CallSsNotice(int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
 
     void BuildCallList(
         CallInfoList &callInfoList, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
-    void BuildEmergencyCallList(EmergencyInfoList &EmergencyCallInfoList, HRilRadioResponseInfo &responseInfo,
+    void BuildEmergencyCallList(EmergencyInfoList &EmergencyCallInfoList,
         const void *response, size_t responseLen);
+    void BuildCallForwardQueryInfoList(CallForwardQueryInfoList &callForwardQueryInfoList,
+        HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
 
 private:
     const HRilCallReq *callFuncs_ = nullptr;

@@ -57,6 +57,7 @@ void HRilCall::AddCallNotificationToMap()
     notiMemberFuncMap_[HNOTI_CALL_SRVCC_STATUS_REPORT] = &HRilCall::CallSrvccStatusNotice;
     notiMemberFuncMap_[HNOTI_CALL_RINGBACK_VOICE_REPORT] = &HRilCall::CallRingbackVoiceNotice;
     notiMemberFuncMap_[HNOTI_CALL_EMERGENCY_NUMBER_REPORT] = &HRilCall::CallEmergencyNotice;
+    notiMemberFuncMap_[HNOTI_CALL_SS_REPORT] = &HRilCall::CallSsNotice;
 }
 
 void HRilCall::AddCallResponseToMap()
@@ -1052,17 +1053,37 @@ int32_t HRilCall::GetCallTransferInfoResponse(
         TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
         return HRIL_ERR_INVALID_PARAMETER;
     }
-    CallForwardQueryResult cFQueryResult = {};
-    cFQueryResult.result = static_cast<int32_t>(responseInfo.error);
+    CallForwardQueryInfoList cFQueryList = {};
     if (response != nullptr) {
-        const HRilCFQueryInfo *pCFQueryInfo = static_cast<const HRilCFQueryInfo *>(response);
-        cFQueryResult.serial = responseInfo.serial;
-        cFQueryResult.status = pCFQueryInfo->status;
-        cFQueryResult.classx = pCFQueryInfo->classx;
-        cFQueryResult.type = pCFQueryInfo->type;
-        cFQueryResult.number = ((pCFQueryInfo->number == nullptr) ? "" : pCFQueryInfo->number);
+        BuildCallForwardQueryInfoList(cFQueryList, responseInfo, response, responseLen);
     }
-    return ResponseMessageParcel(responseInfo, cFQueryResult, requestNum);
+
+    return ResponseMessageParcel(responseInfo, cFQueryList, requestNum);
+}
+
+void HRilCall::BuildCallForwardQueryInfoList(CallForwardQueryInfoList &callForwardQueryInfoList,
+    HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+{
+    size_t num = responseLen / sizeof(HRilCFQueryInfo);
+    CallForwardQueryResult cFQueryResult;
+    callForwardQueryInfoList.callSize = num;
+    for (size_t i = 0; i < num; i++) {
+        HRilCFQueryInfo *curPtr = ((HRilCFQueryInfo *)response + i);
+        if (curPtr != nullptr) {
+            cFQueryResult.result = static_cast<int32_t>(responseInfo.error);
+            cFQueryResult.serial = responseInfo.serial;
+            cFQueryResult.status = curPtr->status;
+            cFQueryResult.classx = curPtr->classx;
+            cFQueryResult.type = curPtr->type;
+            cFQueryResult.number = ((curPtr->number == nullptr) ? "" : curPtr->number);
+            cFQueryResult.reason = curPtr->reason;
+            cFQueryResult.time = curPtr->time;
+            callForwardQueryInfoList.calls.push_back(cFQueryResult);
+        } else {
+            TELEPHONY_LOGE("BuildCallForwardQueryInfoList: Invalid curPtr");
+            break;
+        }
+    }
 }
 
 int32_t HRilCall::SetCallTransferInfoResponse(
@@ -1382,7 +1403,7 @@ int32_t HRilCall::GetEmergencyCallList(struct HdfSBuf *data)
     return HRIL_ERR_SUCCESS;
 }
 
-void HRilCall::BuildEmergencyCallList(EmergencyInfoList &emergencyCallInfoList, HRilRadioResponseInfo &responseInfo,
+void HRilCall::BuildEmergencyCallList(EmergencyInfoList &emergencyCallInfoList,
     const void *response, size_t responseLen)
 {
     size_t num = responseLen / sizeof(HRilEmergencyInfo);
@@ -1415,7 +1436,7 @@ int32_t HRilCall::GetEmergencyCallListResponse(
     }
     EmergencyInfoList callList = {};
     if (response != nullptr) {
-        BuildEmergencyCallList(callList, responseInfo, response, responseLen);
+        BuildEmergencyCallList(callList, response, responseLen);
     }
 
     return ResponseMessageParcel(responseInfo, callList, requestNum);
@@ -1442,7 +1463,7 @@ int32_t HRilCall::SetEmergencyCallList(struct HdfSBuf *data)
         TELEPHONY_LOGE(":SetEmergencyCallList RilAdapter failed to do ReadFromParcel!");
         return HRIL_ERR_INVALID_PARAMETER;
     }
-    int size = (int)emergencyInfoList.calls.size();
+    int size = emergencyInfoList.calls.size();
     if (size <= 0) {
         TELEPHONY_LOGE("SetEmergencyCallList RilAdapter failed to do ReadFromParcel! calls len 0");
         return HRIL_ERR_INVALID_PARAMETER;
@@ -1557,6 +1578,21 @@ int32_t HRilCall::CallUssdNotice(int32_t notifyType, const HRilErrNumber e, cons
     return NotifyMessageParcel(notifyType, ussdNoticeInfo, HNOTI_CALL_USSD_REPORT);
 }
 
+int32_t HRilCall::CallSsNotice(int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen)
+{
+    if ((response == nullptr) || (responseLen % sizeof(HRilSsNoticeInfo)) != 0) {
+        TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    SsNoticeInfo ssNoticeInfo = {};
+    const HRilSsNoticeInfo *hSsNoticeInfo = reinterpret_cast<const HRilSsNoticeInfo *>(response);
+    ssNoticeInfo.serviceType = hSsNoticeInfo->serviceType;
+    ssNoticeInfo.requestType = hSsNoticeInfo->requestType;
+    ssNoticeInfo.serviceClass = hSsNoticeInfo->serviceClass;
+    ssNoticeInfo.result = hSsNoticeInfo->result;
+    return NotifyMessageParcel(notifyType, ssNoticeInfo, HNOTI_CALL_SS_REPORT);
+}
+
 int32_t HRilCall::CallSrvccStatusNotice(int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen)
 {
     if ((response == nullptr) || (responseLen % sizeof(HRilCallSrvccStatus)) != 0) {
@@ -1585,20 +1621,16 @@ int32_t HRilCall::CallRingbackVoiceNotice(
 int32_t HRilCall::CallEmergencyNotice(
     int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen)
 {
-    if ((response == nullptr) || (responseLen % sizeof(HRilEmergencyInfo)) != 0) {
+    TELEPHONY_LOGI("CallEmergencyNotice");
+    if ((response == nullptr && responseLen != 0) || (responseLen % sizeof(HRilEmergencyInfo)) != 0) {
         TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
         return HRIL_ERR_INVALID_PARAMETER;
     }
-    EmergencyInfo emergencyInfo = {};
-    const HRilEmergencyInfo *hEmergencyInfo = reinterpret_cast<const HRilEmergencyInfo *>(response);
-    emergencyInfo.index = hEmergencyInfo->index;
-    emergencyInfo.total = hEmergencyInfo->total;
-    emergencyInfo.eccNum = hEmergencyInfo->eccNum;
-    emergencyInfo.category = hEmergencyInfo->category;
-    emergencyInfo.simpresent = hEmergencyInfo->simpresent;
-    emergencyInfo.mcc = hEmergencyInfo->mcc;
-    emergencyInfo.abnormalService = hEmergencyInfo->abnormalService;
-    return NotifyMessageParcel(notifyType, emergencyInfo, HNOTI_CALL_EMERGENCY_NUMBER_REPORT);
+    EmergencyInfoList callList = {};
+    if (response != nullptr) {
+        BuildEmergencyCallList(callList, response, responseLen);
+    }
+    return NotifyMessageParcel(notifyType, callList, HNOTI_CALL_EMERGENCY_NUMBER_REPORT);
 }
 
 void HRilCall::RegisterCallFuncs(const HRilCallReq *callFuncs)

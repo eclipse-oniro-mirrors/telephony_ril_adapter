@@ -377,6 +377,12 @@ bool CallForwardQueryResult::ReadFromParcel(Parcel &parcel)
     if (!Read(parcel, type)) {
         return false;
     }
+    if (!Read(parcel, reason)) {
+        return false;
+    }
+    if (!Read(parcel, time)) {
+        return false;
+    }
     return true;
 }
 
@@ -400,6 +406,12 @@ bool CallForwardQueryResult::Marshalling(Parcel &parcel) const
     if (!Write(parcel, type)) {
         return false;
     }
+    if (!Write(parcel, reason)) {
+        return false;
+    }
+    if (!Write(parcel, time)) {
+        return false;
+    }
     return true;
 }
 
@@ -413,6 +425,46 @@ std::shared_ptr<CallForwardQueryResult> CallForwardQueryResult::UnMarshalling(Pa
 }
 
 void CallForwardQueryResult::Dump(std::string, int32_t) {}
+
+bool CallForwardQueryInfoList::ReadFromParcel(Parcel &parcel)
+{
+    if (!Read(parcel, callSize)) {
+        return false;
+    }
+    if (!Read(parcel, flag)) {
+        return false;
+    }
+    calls.resize(callSize);
+    for (int32_t i = 0; i < callSize; i++) {
+        calls[i].ReadFromParcel(parcel);
+    }
+    return true;
+}
+
+bool CallForwardQueryInfoList::Marshalling(Parcel &parcel) const
+{
+    if (!Write(parcel, callSize)) {
+        return false;
+    }
+    if (!Write(parcel, flag)) {
+        return false;
+    }
+    for (int32_t i = 0; i < callSize; i++) {
+        calls[i].Marshalling(parcel);
+    }
+    return true;
+}
+
+std::shared_ptr<CallForwardQueryInfoList> CallForwardQueryInfoList::UnMarshalling(Parcel &parcel)
+{
+    std::shared_ptr<CallForwardQueryInfoList> param = std::make_shared<CallForwardQueryInfoList>();
+    if (param == nullptr || !param->ReadFromParcel(parcel)) {
+        return nullptr;
+    }
+    return param;
+}
+
+void CallForwardQueryInfoList::Dump(std::string, int32_t) {}
 
 bool GetClipResult::ReadFromParcel(Parcel &parcel)
 {
@@ -716,6 +768,51 @@ std::shared_ptr<UssdNoticeInfo> UssdNoticeInfo::UnMarshalling(Parcel &parcel)
 }
 
 void UssdNoticeInfo::Dump(std::string, int32_t) {}
+
+bool SsNoticeInfo::ReadFromParcel(Parcel &parcel)
+{
+    if (!Read(parcel, serviceType)) {
+        return false;
+    }
+    if (!Read(parcel, requestType)) {
+        return false;
+    }
+    if (!Read(parcel, serviceClass)) {
+        return false;
+    }
+    if (!Read(parcel, result)) {
+        return false;
+    }
+    return true;
+}
+
+bool SsNoticeInfo::Marshalling(Parcel &parcel) const
+{
+    if (!Write(parcel, serviceType)) {
+        return false;
+    }
+    if (!Write(parcel, requestType)) {
+        return false;
+    }
+    if (!Write(parcel, serviceClass)) {
+        return false;
+    }
+    if (!Write(parcel, result)) {
+        return false;
+    }
+    return true;
+}
+
+std::shared_ptr<SsNoticeInfo> SsNoticeInfo::UnMarshalling(Parcel &parcel)
+{
+    std::shared_ptr<SsNoticeInfo> param = std::make_shared<SsNoticeInfo>();
+    if (param == nullptr || !param->ReadFromParcel(parcel)) {
+        param = nullptr;
+    }
+    return param;
+}
+
+void SsNoticeInfo::Dump(std::string, int32_t) {}
 
 bool SrvccStatus::ReadFromParcel(Parcel &parcel)
 {
