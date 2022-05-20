@@ -136,6 +136,8 @@ public:
     void SimOpenLogicalChannel(std::string appID, int32_t p2, const AppExecFwk::InnerEvent::Pointer &response);
     void SimCloseLogicalChannel(int32_t channelId, const AppExecFwk::InnerEvent::Pointer &response);
     void SimTransmitApduLogicalChannel(ApduSimIORequestInfo reqInfo, const AppExecFwk::InnerEvent::Pointer &response);
+    void SimTransmitApduBasicChannel(ApduSimIORequestInfo reqInfo, const AppExecFwk::InnerEvent::Pointer &response);
+    void SimAuthentication(SimAuthenticationRequestInfo reqInfo, const AppExecFwk::InnerEvent::Pointer &response);
     void UnlockSimLock(int32_t lockType, std::string password, const AppExecFwk::InnerEvent::Pointer &response);
     void GetLinkBandwidthInfo(const int32_t cid, const AppExecFwk::InnerEvent::Pointer &result);
 

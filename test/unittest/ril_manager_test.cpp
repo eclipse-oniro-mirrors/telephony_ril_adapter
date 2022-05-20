@@ -1192,6 +1192,66 @@ void RilManagerTest::SimTransmitApduLogicalChannel(
     }
 }
 
+void RilManagerTest::SimTransmitApduBasicChannel(
+    ApduSimIORequestInfo reqInfo, const AppExecFwk::InnerEvent::Pointer &response)
+{
+    TELEPHONY_LOGI("RilManagerTest::SimTransmitApduBasicChannel -->");
+    if (cellularRadio_ != nullptr) {
+        std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_SIM_TRANSMIT_APDU_LOGICAL_CHANNEL, response);
+        if (request == nullptr) {
+            TELEPHONY_LOGE("request is nullptr");
+            return;
+        }
+
+        MessageParcel data;
+        ApduSimIORequestInfo ApduRequestInfo;
+        ApduRequestInfo.serial = request->serialId_;
+        ApduRequestInfo.type = reqInfo.type;
+        ApduRequestInfo.instruction = reqInfo.instruction;
+        ApduRequestInfo.p1 = reqInfo.p1;
+        ApduRequestInfo.p2 = reqInfo.p2;
+        ApduRequestInfo.p3 = reqInfo.p3;
+        ApduRequestInfo.data = reqInfo.data;
+
+        data.WriteInt32(slotId_);
+        ApduRequestInfo.Marshalling(data);
+
+        if (SendBufferEvent(HREQ_SIM_TRANSMIT_APDU_BASIC_CHANNEL, data) < 0) {
+            TELEPHONY_LOGE("cellularRadio_->SendRequest fail");
+        }
+    } else {
+        TELEPHONY_LOGE("ERROR : SimTransmitApduBasicChannel --> cellularRadio_ == nullptr !!!");
+    }
+}
+
+void RilManagerTest::SimAuthentication(
+    SimAuthenticationRequestInfo reqInfo, const AppExecFwk::InnerEvent::Pointer &response)
+{
+    TELEPHONY_LOGI("RilManagerTest::SimAuthentication -->");
+    if (cellularRadio_ != nullptr) {
+        std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_SIM_AUTHENTICATION, response);
+        if (request == nullptr) {
+            TELEPHONY_LOGE("request is nullptr");
+            return;
+        }
+
+        MessageParcel data;
+        SimAuthenticationRequestInfo simAuthinfo;
+        simAuthinfo.serial = request->serialId_;
+        simAuthinfo.aid = reqInfo.aid;
+        simAuthinfo.authData = reqInfo.authData;
+        data.WriteInt32(slotId_);
+        simAuthinfo.Marshalling(data);
+
+        if (SendBufferEvent(HREQ_SIM_AUTHENTICATION, data) < 0) {
+            TELEPHONY_LOGE("cellularRadio_->SendRequest fail");
+        }
+    } else {
+        TELEPHONY_LOGE("ERROR : SimAuthentication --> cellularRadio_ == nullptr !!!");
+    }
+}
+
+
 void RilManagerTest::UnlockSimLock(
     int32_t lockType, std::string password, const AppExecFwk::InnerEvent::Pointer &response)
 {

@@ -35,6 +35,7 @@ public:
 
 private:
     void AddHandlerToMap();
+    void AddNotificationHandlerToMap();
 
     int32_t GetSimIO(struct HdfSBuf *data);
     int32_t GetSimStatus(struct HdfSBuf *data);
@@ -56,6 +57,8 @@ private:
     int32_t SimOpenLogicalChannel(struct HdfSBuf *data);
     int32_t SimCloseLogicalChannel(struct HdfSBuf *data);
     int32_t SimTransmitApduLogicalChannel(struct HdfSBuf *data);
+    int32_t SimTransmitApduBasicChannel(struct HdfSBuf *data);
+    int32_t SimAuthentication(struct HdfSBuf *data);
     int32_t UnlockSimLock(struct HdfSBuf *data);
 
     int32_t GetSimIOResponse(
@@ -98,6 +101,10 @@ private:
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t SimTransmitApduLogicalChannelResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t SimTransmitApduBasicChannelResponse(
+        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t SimAuthenticationResponse(
+        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t UnlockSimLockResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     IccIoResultInfo ProcessIccIoResponse(
@@ -108,6 +115,7 @@ private:
         int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen);
     int32_t SimStkProactiveNotify(int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen);
     int32_t SimStkAlphaNotify(int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen);
+    int32_t SimRefreshNotify(int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen);
 
 private:
     bool IsSimResponse(uint32_t code);

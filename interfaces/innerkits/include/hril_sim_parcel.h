@@ -174,6 +174,16 @@ struct ApduSimIORequestInfo : public HrilBaseParcel {
     void Dump(std::string, int32_t);
 };
 
+struct SimAuthenticationRequestInfo : public HrilBaseParcel {
+    int32_t serial;
+    std::string aid;
+    std::string authData;
+    bool ReadFromParcel(Parcel &parcel);
+    virtual bool Marshalling(Parcel &parcel) const override;
+    std::shared_ptr<SimAuthenticationRequestInfo> UnMarshalling(Parcel &parcel);
+    void Dump(std::string, int32_t);
+};
+
 struct LockStatusResp : public HrilBaseParcel {
     int32_t result;
     int32_t remain;

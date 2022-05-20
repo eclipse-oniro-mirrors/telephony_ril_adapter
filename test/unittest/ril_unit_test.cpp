@@ -723,6 +723,32 @@ void RilUnitTest::SimTransmitApduLogicalChannel(const AppExecFwk::InnerEvent::Po
     TELEPHONY_LOGI("RilUnitTest::SimTransmitApduLogicalChannel --> SimTransmitApduLogicalChannel finished");
 }
 
+void RilUnitTest::SimTransmitApduBasicChannel(const AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::SimTransmitApduBasicChannel -->");
+    ApduSimIORequestInfo reqInfo = ApduSimIORequestInfo();
+    reqInfo.serial = 0;
+    reqInfo.type = 0;
+    reqInfo.instruction = 1;
+    reqInfo.p1 = 1;
+    reqInfo.p2 = REQ_INFO_P2;
+    reqInfo.p3 = REQ_INFO_P3;
+    reqInfo.data = "apdu";
+    mRilManager_->SimTransmitApduBasicChannel(reqInfo, result);
+    TELEPHONY_LOGI("RilUnitTest::SimTransmitApduBasicChannel --> SimTransmitApduBasicChannel finished");
+}
+
+void RilUnitTest::SimAuthentication(const AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::SimAuthentication -->");
+    SimAuthenticationRequestInfo reqInfo = SimAuthenticationRequestInfo();
+    reqInfo.serial = 0;
+    reqInfo.aid = "testaid";
+    reqInfo.authData = "simauth";
+    mRilManager_->SimAuthentication(reqInfo, result);
+    TELEPHONY_LOGI("RilUnitTest::SimAuthentication --> SimAuthentication finished");
+}
+
 void RilUnitTest::UnlockSimLock(const AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("RilUnitTest::UnlockSimLock -->");
@@ -792,6 +818,8 @@ void RilUnitTest::OnInitProcessInterface()
     memberFuncMap_[HREQ_SIM_OPEN_LOGICAL_CHANNEL] = &RilUnitTest::SimOpenLogicalChannel;
     memberFuncMap_[HREQ_SIM_CLOSE_LOGICAL_CHANNEL] = &RilUnitTest::SimCloseLogicalChannel;
     memberFuncMap_[HREQ_SIM_TRANSMIT_APDU_LOGICAL_CHANNEL] = &RilUnitTest::SimTransmitApduLogicalChannel;
+    memberFuncMap_[HREQ_SIM_TRANSMIT_APDU_BASIC_CHANNEL] = &RilUnitTest::SimTransmitApduBasicChannel;
+    memberFuncMap_[HREQ_SIM_AUTHENTICATION] = &RilUnitTest::SimAuthentication;
     memberFuncMap_[HREQ_SIM_UNLOCK_SIM_LOCK] = &RilUnitTest::UnlockSimLock;
 
     // data
@@ -917,8 +945,10 @@ static int32_t PrintSimMenu()
     cout << "----> [" << HREQ_SIM_CLOSE_LOGICAL_CHANNEL << "] ---->[ HREQ_SIM_CLOSE_LOGICAL_CHANNEL ]"  << endl;
     cout << "----> [" << HREQ_SIM_TRANSMIT_APDU_LOGICAL_CHANNEL
         << "] ---->[ HREQ_SIM_TRANSMIT_APDU_LOGICAL_CHANNEL ]" << endl;
+    cout << "----> [" << HREQ_SIM_TRANSMIT_APDU_BASIC_CHANNEL
+        << "] ---->[ HREQ_SIM_TRANSMIT_APDU_BASIC_CHANNEL ]" << endl;
+    cout << "----> [" << HREQ_SIM_AUTHENTICATION       << "] ---->[ HREQ_SIM_AUTHENTICATION ]"        << endl;
     cout << "----> [" << HREQ_SIM_UNLOCK_SIM_LOCK       << "] ---->[ HREQ_SIM_UNLOCK_SIM_LOCK ]"        << endl;
-
     int32_t choice = InputInt32(HREQ_SIM_BASE, HREQ_DATA_BASE - 1, "Command");
     cout << "---->You choose: " << choice << endl;
     choice = (choice == HREQ_SIM_BASE) ? -1 : choice;

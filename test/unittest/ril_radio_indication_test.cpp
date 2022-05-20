@@ -84,6 +84,8 @@ int32_t RilRadioIndicationTest::OnRemoteRequest(
         case HNOTI_DATA_PDP_CONTEXT_LIST_UPDATED:
             PdpContextListChangedNotify(data);
             break;
+        case HNOTI_SIM_REFRESH_NOTIFY:
+            SimRefreshNotify(data);
         case HNOTI_CALL_SS_REPORT:
             CallSsReport(data);
             break;
@@ -318,6 +320,18 @@ void RilRadioIndicationTest::ChangedImsNetworkState(OHOS::MessageParcel &data)
     }
     imsState->ReadFromParcel(data);
     cout << "====>ims reg status: " << imsState->regInfo << endl;
+}
+
+void RilRadioIndicationTest::SimRefreshNotify(OHOS::MessageParcel &data)
+{
+    TELEPHONY_LOGI("RilRadioIndicationTest::SimRefreshNotify --> ");
+    cout << "---->[NTF] ICC Refresh Changed" << endl;
+    int32_t indicationType = data.ReadInt32();
+    if (mRilManager_ == nullptr) {
+        TELEPHONY_LOGE("mRilManager_ is null!");
+        return;
+    }
+    TELEPHONY_LOGI("func :%{public}s indicationType: %{public}d", __func__, indicationType);
 }
 
 void RilRadioIndicationTest::CallSsReport(OHOS::MessageParcel &data)
