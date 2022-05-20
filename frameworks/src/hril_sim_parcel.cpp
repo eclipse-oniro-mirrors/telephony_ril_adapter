@@ -482,6 +482,43 @@ std::shared_ptr<ApduSimIORequestInfo> ApduSimIORequestInfo::UnMarshalling(Parcel
     return param;
 }
 
+bool SimAuthenticationRequestInfo::ReadFromParcel(Parcel &parcel)
+{
+    if (!ReadBaseInt32(parcel, serial)) {
+        return false;
+    }
+    if (!ReadBaseString(parcel, aid)) {
+        return false;
+    }
+    if (!ReadBaseString(parcel, authData)) {
+        return false;
+    }
+    return true;
+}
+
+bool SimAuthenticationRequestInfo::Marshalling(Parcel &parcel) const
+{
+    if (!WriteBaseInt32(parcel, serial)) {
+        return false;
+    }
+    if (!WriteBaseString(parcel, aid)) {
+        return false;
+    }
+    if (!WriteBaseString(parcel, authData)) {
+        return false;
+    }
+    return true;
+}
+
+std::shared_ptr<SimAuthenticationRequestInfo> SimAuthenticationRequestInfo::UnMarshalling(Parcel &parcel)
+{
+    std::shared_ptr<SimAuthenticationRequestInfo> param = std::make_shared<SimAuthenticationRequestInfo>();
+    if (param == nullptr || !param->ReadFromParcel(parcel)) {
+        param = nullptr;
+    }
+    return param;
+}
+
 bool LockStatusResp::ReadFromParcel(Parcel &parcel)
 {
     if (!ReadBaseInt32(parcel, result)) {

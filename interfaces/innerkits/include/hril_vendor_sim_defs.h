@@ -140,6 +140,12 @@ typedef struct {
 } HRilApduSimIO;
 
 typedef struct {
+    int32_t serial;
+    char *aid;
+    char *data;
+} HRilSimAuthenticationRequestInfo;
+
+typedef struct {
     void (*GetSimStatus)(const ReqDataInfo *requestInfo);
     void (*GetSimIO)(const ReqDataInfo *requestInfo, const HRilSimIO *data, size_t dataLen);
     void (*GetSimImsi)(const ReqDataInfo *requestInfo);
@@ -160,6 +166,8 @@ typedef struct {
     void (*SimOpenLogicalChannel)(const ReqDataInfo *requestInfo, const char *appID, int32_t p2);
     void (*SimCloseLogicalChannel)(const ReqDataInfo *requestInfo, int32_t channelId);
     void (*SimTransmitApduLogicalChannel)(const ReqDataInfo *requestInfo, HRilApduSimIO *data, size_t dataLen);
+    void (*SimTransmitApduBasicChannel)(const ReqDataInfo *requestInfo, HRilApduSimIO *data, size_t dataLen);
+    void (*SimAuthentication)(const ReqDataInfo *requestInfo, HRilSimAuthenticationRequestInfo *data, size_t dataLen);
     void (*UnlockSimLock)(const ReqDataInfo *requestInfo, int32_t lockType, const char *password);
 } HRilSimReq;
 #ifdef __cplusplus

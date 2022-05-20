@@ -94,6 +94,8 @@ public:
     void SimOpenLogicalChannel(const AppExecFwk::InnerEvent::Pointer &result);
     void SimCloseLogicalChannel(const AppExecFwk::InnerEvent::Pointer &result);
     void SimTransmitApduLogicalChannel(const AppExecFwk::InnerEvent::Pointer &result);
+    void SimAuthentication(const AppExecFwk::InnerEvent::Pointer &result);
+    void SimTransmitApduBasicChannel(const AppExecFwk::InnerEvent::Pointer &result);
     void UnlockSimLock(const AppExecFwk::InnerEvent::Pointer &result);
     void GetLinkBandwidthInfoTest(const AppExecFwk::InnerEvent::Pointer &result);
     void OnInitInterface();
