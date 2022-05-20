@@ -137,6 +137,7 @@ typedef struct {
 } CallRestrictionInfo;
 
 typedef struct {
+    int32_t reason; /* call forwarding type <0-5> */
     int32_t status;
     int32_t classx;
     char *number;
@@ -144,6 +145,7 @@ typedef struct {
                    * character "+", otherwise 129,
                    * other value refer TS 24.008 [8] sub-clause 10.5.4.7
                    */
+    int32_t time;
 } HRilCFQueryInfo;
 
 typedef struct {
@@ -202,6 +204,13 @@ typedef struct {
                                 68: 8bit encoding (not supported temporarily);
                                 72: UCS2 encoding (not supported temporarily). */
 } HRilUssdNoticeInfo;
+
+typedef struct {
+    int32_t serviceType;
+    int32_t requestType;
+    int32_t serviceClass;
+    int32_t result; /* the result of the SS request */
+} HRilSsNoticeInfo;
 
 typedef struct {
     int32_t index; /* Number index */

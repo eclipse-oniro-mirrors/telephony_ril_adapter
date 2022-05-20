@@ -84,6 +84,9 @@ int32_t RilRadioIndicationTest::OnRemoteRequest(
         case HNOTI_DATA_PDP_CONTEXT_LIST_UPDATED:
             PdpContextListChangedNotify(data);
             break;
+        case HNOTI_CALL_SS_REPORT:
+            CallSsReport(data);
+            break;
         default:
             break;
     }
@@ -315,4 +318,19 @@ void RilRadioIndicationTest::ChangedImsNetworkState(OHOS::MessageParcel &data)
     }
     imsState->ReadFromParcel(data);
     cout << "====>ims reg status: " << imsState->regInfo << endl;
+}
+
+void RilRadioIndicationTest::CallSsReport(OHOS::MessageParcel &data)
+{
+    cout << endl << "---->[NTF] CallSsReport: " << endl;
+    std::shared_ptr<SsNoticeInfo> ssInfo = std::make_shared<SsNoticeInfo>();
+    if (ssInfo == nullptr) {
+        TELEPHONY_LOGE("ERROR : ssInfo == nullptr !!!");
+        return;
+    }
+    ssInfo->ReadFromParcel(data);
+    cout << "====> serviceType: " << ssInfo->serviceType
+        << "\trequestType: " << ssInfo->requestType
+        << "\tserviceClass: " << ssInfo->serviceClass
+        << "\tresult: " << ssInfo->result << endl;
 }
