@@ -34,6 +34,7 @@ void ReqChangeSimPassword(const ReqDataInfo *requestInfo, const HRilSimPassword 
 void ReqUnlockPin(const ReqDataInfo *requestInfo, const char *pin);
 void ReqUnlockPuk(const ReqDataInfo *requestInfo, const char *puk, const char *pin);
 void ReqGetSimPinInputTimes(const ReqDataInfo *requestInfo);
+void ReqGetSimPinInputTimesRemain(const ReqDataInfo *requestInfo, HRilPinInputTimes *pinInputTimes);
 void ReqUnlockPin2(const ReqDataInfo *requestInfo, const char *pin2);
 void ReqUnlockPuk2(const ReqDataInfo *requestInfo, const char *puk2, const char *pin2);
 void ReqGetSimPin2InputTimes(const ReqDataInfo *requestInfo);

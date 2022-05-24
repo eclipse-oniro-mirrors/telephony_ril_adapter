@@ -45,10 +45,8 @@ private:
     int32_t ChangeSimPassword(struct HdfSBuf *data);
     int32_t UnlockPin(struct HdfSBuf *data);
     int32_t UnlockPuk(struct HdfSBuf *data);
-    int32_t GetSimPinInputTimes(struct HdfSBuf *data);
     int32_t UnlockPin2(struct HdfSBuf *data);
     int32_t UnlockPuk2(struct HdfSBuf *data);
-    int32_t GetSimPin2InputTimes(struct HdfSBuf *data);
     int32_t SetActiveSim(struct HdfSBuf *data);
     int32_t SimStkSendTerminalResponse(struct HdfSBuf *data);
     int32_t SimStkSendEnvelope(struct HdfSBuf *data);
@@ -77,13 +75,9 @@ private:
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t UnlockPukResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
-    int32_t GetSimPinInputTimesResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t UnlockPin2Response(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t UnlockPuk2Response(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
-    int32_t GetSimPin2InputTimesResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t SetActiveSimResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
