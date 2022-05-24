@@ -46,10 +46,8 @@ void HRilSim::AddHandlerToMap()
     respMemberFuncMap_[HREQ_SIM_CHANGE_SIM_PASSWORD] = &HRilSim::ChangeSimPasswordResponse;
     respMemberFuncMap_[HREQ_SIM_UNLOCK_PIN] = &HRilSim::UnlockPinResponse;
     respMemberFuncMap_[HREQ_SIM_UNLOCK_PUK] = &HRilSim::UnlockPukResponse;
-    respMemberFuncMap_[HREQ_SIM_GET_SIM_PIN_INPUT_TIMES] = &HRilSim::GetSimPinInputTimesResponse;
     respMemberFuncMap_[HREQ_SIM_UNLOCK_PIN2] = &HRilSim::UnlockPin2Response;
     respMemberFuncMap_[HREQ_SIM_UNLOCK_PUK2] = &HRilSim::UnlockPuk2Response;
-    respMemberFuncMap_[HREQ_SIM_GET_SIM_PIN2_INPUT_TIMES] = &HRilSim::GetSimPin2InputTimesResponse;
     respMemberFuncMap_[HREQ_SIM_SET_ACTIVE_SIM] = &HRilSim::SetActiveSimResponse;
     respMemberFuncMap_[HREQ_SIM_STK_SEND_TERMINAL_RESPONSE] = &HRilSim::SimStkSendTerminalResponseResponse;
     respMemberFuncMap_[HREQ_SIM_STK_SEND_ENVELOPE] = &HRilSim::SimStkSendEnvelopeResponse;
@@ -71,10 +69,8 @@ void HRilSim::AddHandlerToMap()
     reqMemberFuncMap_[HREQ_SIM_CHANGE_SIM_PASSWORD] = &HRilSim::ChangeSimPassword;
     reqMemberFuncMap_[HREQ_SIM_UNLOCK_PIN] = &HRilSim::UnlockPin;
     reqMemberFuncMap_[HREQ_SIM_UNLOCK_PUK] = &HRilSim::UnlockPuk;
-    reqMemberFuncMap_[HREQ_SIM_GET_SIM_PIN_INPUT_TIMES] = &HRilSim::GetSimPinInputTimes;
     reqMemberFuncMap_[HREQ_SIM_UNLOCK_PIN2] = &HRilSim::UnlockPin2;
     reqMemberFuncMap_[HREQ_SIM_UNLOCK_PUK2] = &HRilSim::UnlockPuk2;
-    reqMemberFuncMap_[HREQ_SIM_GET_SIM_PIN2_INPUT_TIMES] = &HRilSim::GetSimPin2InputTimes;
     reqMemberFuncMap_[HREQ_SIM_SET_ACTIVE_SIM] = &HRilSim::SetActiveSim;
     reqMemberFuncMap_[HREQ_SIM_STK_SEND_TERMINAL_RESPONSE] = &HRilSim::SimStkSendTerminalResponse;
     reqMemberFuncMap_[HREQ_SIM_STK_SEND_ENVELOPE] = &HRilSim::SimStkSendEnvelope;
@@ -352,26 +348,6 @@ int32_t HRilSim::UnlockPuk(struct HdfSBuf *data)
     return HRIL_ERR_SUCCESS;
 }
 
-int32_t HRilSim::GetSimPinInputTimes(struct HdfSBuf *data)
-{
-    if ((simFuncs_ == nullptr) || (simFuncs_->GetSimPinInputTimes == nullptr)) {
-        TELEPHONY_LOGE("GetSimPinInputTimes::simFuncs_:%{public}p", simFuncs_);
-        return HRIL_ERR_NULL_POINT;
-    }
-    int32_t serial = 0;
-    if (!HdfSbufReadInt32(data, &serial)) {
-        TELEPHONY_LOGE("miss serial parameter");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_SIM_GET_SIM_PIN_INPUT_TIMES);
-    if (requestInfo == nullptr) {
-        TELEPHONY_LOGE("RilAdapter failed to do Create GetSimPinInputTimes HRilRequest!");
-        return HRIL_ERR_NULL_POINT;
-    }
-    simFuncs_->GetSimPinInputTimes(requestInfo);
-    return HRIL_ERR_SUCCESS;
-}
-
 int32_t HRilSim::UnlockPin2(struct HdfSBuf *data)
 {
     if ((simFuncs_ == nullptr) || (simFuncs_->UnlockPin2 == nullptr)) {
@@ -432,26 +408,6 @@ int32_t HRilSim::UnlockPuk2(struct HdfSBuf *data)
         return HRIL_ERR_NULL_POINT;
     }
     simFuncs_->UnlockPuk2(requestInfo, puk2, pin2);
-    return HRIL_ERR_SUCCESS;
-}
-
-int32_t HRilSim::GetSimPin2InputTimes(struct HdfSBuf *data)
-{
-    if ((simFuncs_ == nullptr) || (simFuncs_->GetSimPin2InputTimes == nullptr)) {
-        TELEPHONY_LOGE("GetSimPin2InputTimes::simFuncs_:%{public}p", simFuncs_);
-        return HRIL_ERR_NULL_POINT;
-    }
-    int32_t serial = 0;
-    if (!HdfSbufReadInt32(data, &serial)) {
-        TELEPHONY_LOGE("miss serial parameter");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_SIM_GET_SIM_PIN2_INPUT_TIMES);
-    if (requestInfo == nullptr) {
-        TELEPHONY_LOGE("RilAdapter failed to do Create GetSimPin2InputTimes HRilRequest!");
-        return HRIL_ERR_NULL_POINT;
-    }
-    simFuncs_->GetSimPin2InputTimes(requestInfo);
     return HRIL_ERR_SUCCESS;
 }
 
@@ -951,83 +907,115 @@ int32_t HRilSim::GetSimLockStatusResponse(
 int32_t HRilSim::SetSimLockResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));
+    LockStatusResp lockStatus = {};
+
+    if (response == nullptr || responseLen != sizeof(HRilLockStatus)) {
+        TELEPHONY_LOGE("Invalid response: response is nullptr");
+        if (responseInfo.error == HRilErrType::NONE) {
+            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
+        }
+    } else {
+        const HRilLockStatus *resp = static_cast<const HRilLockStatus *>(response);
+        lockStatus.result = resp->result;
+        lockStatus.remain = resp->remain;
+        TELEPHONY_LOGE("lockStatus.result: %{public}d, remain: %{public}d", lockStatus.result, lockStatus.remain);
+    }
+    return ResponseMessageParcel(responseInfo, lockStatus, requestNum);
 }
 
 int32_t HRilSim::ChangeSimPasswordResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));
+    LockStatusResp lockStatus = {};
+
+    if (response == nullptr || responseLen != sizeof(HRilLockStatus)) {
+        TELEPHONY_LOGE("Invalid response: response is nullptr");
+        if (responseInfo.error == HRilErrType::NONE) {
+            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
+        }
+    } else {
+        const HRilLockStatus *resp = static_cast<const HRilLockStatus *>(response);
+        lockStatus.result = resp->result;
+        lockStatus.remain = resp->remain;
+        TELEPHONY_LOGE("lockStatus.result: %{public}d, remain: %{public}d", lockStatus.result, lockStatus.remain);
+    }
+    return ResponseMessageParcel(responseInfo, lockStatus, requestNum);
 }
 
 int32_t HRilSim::UnlockPinResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));
+    LockStatusResp lockStatus = {};
+
+    if (response == nullptr || responseLen != sizeof(HRilLockStatus)) {
+        TELEPHONY_LOGE("Invalid response: response is nullptr");
+        if (responseInfo.error == HRilErrType::NONE) {
+            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
+        }
+    } else {
+        const HRilLockStatus *resp = static_cast<const HRilLockStatus *>(response);
+        lockStatus.result = resp->result;
+        lockStatus.remain = resp->remain;
+        TELEPHONY_LOGE("lockStatus.result: %{public}d, remain: %{public}d", lockStatus.result, lockStatus.remain);
+    }
+    return ResponseMessageParcel(responseInfo, lockStatus, requestNum);
 }
 
 int32_t HRilSim::UnlockPukResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));
-}
+    LockStatusResp lockStatus = {};
 
-int32_t HRilSim::GetSimPinInputTimesResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
-{
-    SimPinInputTimes pinInputTimesResult = {};
-    if ((response == nullptr && responseLen != 0) ||
-        (response != nullptr && responseLen != sizeof(HRilPinInputTimes))) {
-        TELEPHONY_LOGE("Invalid response: Vendor exception!");
-        return HRIL_ERR_GENERIC_FAILURE;
-    } else if (response == nullptr && responseLen == 0) {
+    if (response == nullptr || responseLen != sizeof(HRilLockStatus)) {
+        TELEPHONY_LOGE("Invalid response: response is nullptr");
         if (responseInfo.error == HRilErrType::NONE) {
             responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
         }
     } else {
-        const HRilPinInputTimes *pPinInputTimes = static_cast<const HRilPinInputTimes *>(response);
-        pinInputTimesResult.code = pPinInputTimes->code;
-        pinInputTimesResult.times = pPinInputTimes->times;
-        pinInputTimesResult.pukTimes = pPinInputTimes->pukTimes;
-        pinInputTimesResult.pinTimes = pPinInputTimes->pinTimes;
-        pinInputTimesResult.puk2Times = pPinInputTimes->puk2Times;
-        pinInputTimesResult.pin2Times = pPinInputTimes->pin2Times;
+        const HRilLockStatus *resp = static_cast<const HRilLockStatus *>(response);
+        lockStatus.result = resp->result;
+        lockStatus.remain = resp->remain;
+        TELEPHONY_LOGE("lockStatus.result: %{public}d, remain: %{public}d", lockStatus.result, lockStatus.remain);
     }
-
-    return ResponseMessageParcel(responseInfo, pinInputTimesResult, requestNum);
+    return ResponseMessageParcel(responseInfo, lockStatus, requestNum);
 }
 
 int32_t HRilSim::UnlockPin2Response(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));
+    LockStatusResp lockStatus = {};
+
+    if (response == nullptr || responseLen != sizeof(HRilLockStatus)) {
+        TELEPHONY_LOGE("Invalid response: response is nullptr");
+        if (responseInfo.error == HRilErrType::NONE) {
+            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
+        }
+    } else {
+        const HRilLockStatus *resp = static_cast<const HRilLockStatus *>(response);
+        lockStatus.result = resp->result;
+        lockStatus.remain = resp->remain;
+        TELEPHONY_LOGE("lockStatus.result: %{public}d, remain: %{public}d", lockStatus.result, lockStatus.remain);
+    }
+    return ResponseMessageParcel(responseInfo, lockStatus, requestNum);
 }
 
 int32_t HRilSim::UnlockPuk2Response(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));
-}
+    LockStatusResp lockStatus = {};
 
-int32_t HRilSim::GetSimPin2InputTimesResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
-{
-    SimPinInputTimes pin2InputTimesResult = {};
-    if (response == nullptr) {
+    if (response == nullptr || responseLen != sizeof(HRilLockStatus)) {
+        TELEPHONY_LOGE("Invalid response: response is nullptr");
         if (responseInfo.error == HRilErrType::NONE) {
             responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
         }
     } else {
-        const HRilPinInputTimes *pPin2InputTimes = static_cast<const HRilPinInputTimes *>(response);
-        pin2InputTimesResult.code = pPin2InputTimes->code;
-        pin2InputTimesResult.times = pPin2InputTimes->times;
-        pin2InputTimesResult.pukTimes = pPin2InputTimes->pukTimes;
-        pin2InputTimesResult.pinTimes = pPin2InputTimes->pinTimes;
-        pin2InputTimesResult.puk2Times = pPin2InputTimes->puk2Times;
-        pin2InputTimesResult.pin2Times = pPin2InputTimes->pin2Times;
+        const HRilLockStatus *resp = static_cast<const HRilLockStatus *>(response);
+        lockStatus.result = resp->result;
+        lockStatus.remain = resp->remain;
+        TELEPHONY_LOGE("lockStatus.result: %{public}d, remain: %{public}d", lockStatus.result, lockStatus.remain);
     }
-
-    return ResponseMessageParcel(responseInfo, pin2InputTimesResult, requestNum);
+    return ResponseMessageParcel(responseInfo, lockStatus, requestNum);
 }
 
 int32_t HRilSim::SetActiveSimResponse(
