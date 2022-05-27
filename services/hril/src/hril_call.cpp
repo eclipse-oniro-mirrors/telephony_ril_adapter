@@ -1066,7 +1066,7 @@ void HRilCall::BuildCallForwardQueryInfoList(CallForwardQueryInfoList &callForwa
 {
     size_t num = responseLen / sizeof(HRilCFQueryInfo);
     CallForwardQueryResult cFQueryResult;
-    callForwardQueryInfoList.callSize = num;
+    callForwardQueryInfoList.callSize = static_cast<int32_t>(num);
     for (size_t i = 0; i < num; i++) {
         HRilCFQueryInfo *curPtr = ((HRilCFQueryInfo *)response + i);
         if (curPtr != nullptr) {
