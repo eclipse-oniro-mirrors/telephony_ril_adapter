@@ -1197,7 +1197,7 @@ void RilManagerTest::SimTransmitApduBasicChannel(
 {
     TELEPHONY_LOGI("RilManagerTest::SimTransmitApduBasicChannel -->");
     if (cellularRadio_ != nullptr) {
-        std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_SIM_TRANSMIT_APDU_LOGICAL_CHANNEL, response);
+        std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_SIM_TRANSMIT_APDU_BASIC_CHANNEL, response);
         if (request == nullptr) {
             TELEPHONY_LOGE("request is nullptr");
             return;

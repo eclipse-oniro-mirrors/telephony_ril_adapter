@@ -103,6 +103,10 @@ void RilUnitTest::AddRequestToMap()
     memberFuncMap_[HREQ_CALL_SET_USSD] = &RilUnitTest::SetUssdTest;
     memberFuncMap_[HREQ_CALL_GET_USSD] = &RilUnitTest::GetUssdTest;
     memberFuncMap_[HREQ_DATA_GET_LINK_BANDWIDTH_INFO] = &RilUnitTest::GetLinkBandwidthInfoTest;
+    memberFuncMap_[HREQ_SIM_OPEN_LOGICAL_CHANNEL] = &RilUnitTest::SimOpenLogicalChannelTest;
+    memberFuncMap_[HREQ_SIM_TRANSMIT_APDU_LOGICAL_CHANNEL] = &RilUnitTest::SimTransmitApduLogicalChannelTest;
+    memberFuncMap_[HREQ_SIM_TRANSMIT_APDU_BASIC_CHANNEL] = &RilUnitTest::SimTransmitApduBasicChannelTest;
+    memberFuncMap_[HREQ_SIM_CLOSE_LOGICAL_CHANNEL] = &RilUnitTest::SimCloseLogicalChannelTest;
 }
 
 void RilUnitTest::GetCallListTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
@@ -358,6 +362,72 @@ void RilUnitTest::SendSmsAckTest(const OHOS::AppExecFwk::InnerEvent::Pointer &re
     ASSERT_EQ(0, ret);
 }
 
+void RilUnitTest::SimOpenLogicalChannelTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::SimOpenLogicalChannelTest -->");
+    int32_t ret = mRilManager_->SimOpenLogicalChannel("appID", 0, result);
+    TELEPHONY_LOGI(
+        "RilUnitTest::SimOpenLogicalChannelTest --> SimOpenLogicalChannelTest "
+        "finished");
+    TELEPHONY_LOGI("RilUnitTest::SimOpenLogicalChannelTest return: %{public}d", ret);
+    ASSERT_EQ(0, ret);
+}
+
+void RilUnitTest::SimTransmitApduLogicalChannelTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::SimTransmitApduLogicalChannelTest -->");
+    const int32_t REQ_INFO_P2 = 2;
+    const int32_t REQ_INFO_P3 = 3;
+    ApduSimIORequestInfo reqInfo = ApduSimIORequestInfo();
+    reqInfo.serial = 0;
+    reqInfo.channelId = 1;
+    reqInfo.type = 0;
+    reqInfo.instruction = 1;
+    reqInfo.p1 = 1;
+    reqInfo.p2 = REQ_INFO_P2;
+    reqInfo.p3 = REQ_INFO_P3;
+    reqInfo.data = "apdu";
+    int32_t ret = mRilManager_->SimTransmitApduLogicalChannel(reqInfo, result);
+    TELEPHONY_LOGI(
+        "RilUnitTest::SimTransmitApduLogicalChannelTest --> SimTransmitApduLogicalChannelTest "
+        "finished");
+    TELEPHONY_LOGI("RilUnitTest::SimTransmitApduLogicalChannelTest return: %{public}d", ret);
+    ASSERT_EQ(0, ret);
+}
+
+void RilUnitTest::SimTransmitApduBasicChannelTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::SimTransmitApduBasicChannelTest -->");
+    const int32_t REQ_INFO_P2 = 2;
+    const int32_t REQ_INFO_P3 = 3;
+    ApduSimIORequestInfo reqInfo = ApduSimIORequestInfo();
+    reqInfo.serial = 0;
+    reqInfo.channelId = 1;
+    reqInfo.type = 0;
+    reqInfo.instruction = 1;
+    reqInfo.p1 = 1;
+    reqInfo.p2 = REQ_INFO_P2;
+    reqInfo.p3 = REQ_INFO_P3;
+    reqInfo.data = "apdu";
+    int32_t ret = mRilManager_->SimTransmitApduBasicChannel(reqInfo, result);
+    TELEPHONY_LOGI(
+        "RilUnitTest::SimTransmitApduBasicChannelTest --> SimTransmitApduBasicChannelTest "
+        "finished");
+    TELEPHONY_LOGI("RilUnitTest::SimTransmitApduBasicChannelTest return: %{public}d", ret);
+    ASSERT_EQ(0, ret);
+}
+
+void RilUnitTest::SimCloseLogicalChannelTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::SimCloseLogicalChannelTest -->");
+    int32_t ret = mRilManager_->SimCloseLogicalChannel(0, result);
+    TELEPHONY_LOGI(
+        "RilUnitTest::SimCloseLogicalChannelTest --> SimCloseLogicalChannelTest "
+        "finished");
+    TELEPHONY_LOGI("RilUnitTest::SimCloseLogicalChannelTest return: %{public}d", ret);
+    ASSERT_EQ(0, ret);
+}
+
 void RilUnitTest::ActivatePdpContextTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("RilUnitTest::ActivatePdpContextTest -->");
@@ -564,6 +634,38 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_SendSmsAckTest_0100, Function | Mediu
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_SMS_SEND_SMS_ACK);
     event->SetOwner(GetHandler());
     OnProcessTest(HREQ_SMS_SEND_SMS_ACK, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_SimOpenLogicalChannelTest_0100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_SIM_OPEN_LOGICAL_CHANNEL);
+    event->SetOwner(GetHandler());
+    OnProcessTest(HREQ_SIM_OPEN_LOGICAL_CHANNEL, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_SimTransmitApduLogicalChannelTest_0100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_SIM_TRANSMIT_APDU_LOGICAL_CHANNEL);
+    event->SetOwner(GetHandler());
+    OnProcessTest(HREQ_SIM_TRANSMIT_APDU_LOGICAL_CHANNEL, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_SimTransmitApduBasicChannelTest_0100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_SIM_TRANSMIT_APDU_BASIC_CHANNEL);
+    event->SetOwner(GetHandler());
+    OnProcessTest(HREQ_SIM_TRANSMIT_APDU_BASIC_CHANNEL, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_SimCloseLogicalChannelTest_0100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_SIM_CLOSE_LOGICAL_CHANNEL);
+    event->SetOwner(GetHandler());
+    OnProcessTest(HREQ_SIM_CLOSE_LOGICAL_CHANNEL, event);
 }
 
 HWTEST_F(RilUnitTest, Telephony_RilAdapter_ActivatePdpContextTest_0100, Function | MediumTest | Level3)

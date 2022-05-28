@@ -99,6 +99,12 @@ public:
     int32_t GetUssd(const AppExecFwk::InnerEvent::Pointer &result);
     int32_t GetLinkBandwidthInfo(const int32_t cid, const AppExecFwk::InnerEvent::Pointer &result);
     int32_t SetEmergencyCallList(const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t SimOpenLogicalChannel(std::string appID, int32_t p2, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t SimCloseLogicalChannel(int32_t channelId, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t SimTransmitApduLogicalChannel(ApduSimIORequestInfo reqInfo,
+        const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t SimTransmitApduBasicChannel(ApduSimIORequestInfo reqInfo,
+        const AppExecFwk::InnerEvent::Pointer &response);
     static const int32_t INVALID_WAKELOCK = -1;
     static const int32_t FOR_WAKELOCK = 0;
     static const int32_t FOR_ACK_WAKELOCK = 1;

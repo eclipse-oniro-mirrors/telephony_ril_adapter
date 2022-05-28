@@ -73,6 +73,10 @@ private:
     void GetUssdTest(const AppExecFwk::InnerEvent::Pointer &result);
     void GetLinkBandwidthInfoTest(const AppExecFwk::InnerEvent::Pointer &result);
     void SetEmergencyCallListTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void SimOpenLogicalChannelTest(const AppExecFwk::InnerEvent::Pointer &result);
+    void SimTransmitApduLogicalChannelTest(const AppExecFwk::InnerEvent::Pointer &result);
+    void SimTransmitApduBasicChannelTest(const AppExecFwk::InnerEvent::Pointer &result);
+    void SimCloseLogicalChannelTest(const AppExecFwk::InnerEvent::Pointer &result);
 private:
     std::unique_ptr<RilManagerTest> mRilManager_;
     using RilManagerAndResponseTestFun = void (RilUnitTest::*)(const OHOS::AppExecFwk::InnerEvent::Pointer &event);

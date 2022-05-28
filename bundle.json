@@ -84,7 +84,8 @@
                 }
             ],
             "test": [
-                "//base/telephony/ril_adapter/test:unittest"
+                "//base/telephony/ril_adapter/test:unittest",
+                "//base/telephony/ril_adapter/test/fuzztest:fuzztest"
             ]
         }
     }
