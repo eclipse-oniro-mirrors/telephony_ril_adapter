@@ -645,6 +645,111 @@ int32_t RilManagerTest::SendSmsAck(bool success, int32_t cause, const AppExecFwk
     return HRIL_ERR_NULL_POINT;
 }
 
+int32_t RilManagerTest::SimOpenLogicalChannel(
+    std::string appID, int32_t p2, const AppExecFwk::InnerEvent::Pointer &response)
+{
+    TELEPHONY_LOGI("RilManagerTest::SimOpenLogicalChannel -->");
+    if (cellularRadio_ != nullptr) {
+        std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_SIM_OPEN_LOGICAL_CHANNEL, response);
+        if (request == nullptr) {
+            TELEPHONY_LOGE("request is nullptr");
+            return HRIL_ERR_NULL_POINT;
+        }
+        MessageParcel data;
+        data.WriteInt32(0);
+        data.WriteInt32(request->serialId_);
+        data.WriteCString(appID.c_str());
+        data.WriteInt32(p2);
+        int32_t ret = SendBufferEvent(HREQ_SIM_OPEN_LOGICAL_CHANNEL, data);
+        TELEPHONY_LOGI("SendBufferEvent(ID:%{public}d) return: %{public}d", HREQ_SIM_OPEN_LOGICAL_CHANNEL, ret);
+        return ret;
+    }
+    return HRIL_ERR_NULL_POINT;
+}
+
+int32_t RilManagerTest::SimCloseLogicalChannel(int32_t channelId, const AppExecFwk::InnerEvent::Pointer &response)
+{
+    TELEPHONY_LOGI("RilManagerTest::SimCloseLogicalChannel -->");
+    if (cellularRadio_ != nullptr) {
+        std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_SIM_CLOSE_LOGICAL_CHANNEL, response);
+        if (request == nullptr) {
+            TELEPHONY_LOGE("request is nullptr");
+            return HRIL_ERR_NULL_POINT;
+        }
+        MessageParcel data;
+        data.WriteInt32(0);
+        data.WriteInt32(request->serialId_);
+        data.WriteInt32(channelId);
+        int32_t ret = SendBufferEvent(HREQ_SIM_CLOSE_LOGICAL_CHANNEL, data);
+        TELEPHONY_LOGI("SendBufferEvent(ID:%{public}d) return: %{public}d", HREQ_SIM_CLOSE_LOGICAL_CHANNEL, ret);
+        return ret;
+    }
+    return HRIL_ERR_NULL_POINT;
+}
+
+int32_t RilManagerTest::SimTransmitApduLogicalChannel(
+    ApduSimIORequestInfo reqInfo, const AppExecFwk::InnerEvent::Pointer &response)
+{
+    TELEPHONY_LOGI("RilManagerTest::SimTransmitApduLogicalChannel -->");
+    if (cellularRadio_ != nullptr) {
+        std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_SIM_TRANSMIT_APDU_LOGICAL_CHANNEL, response);
+        if (request == nullptr) {
+            TELEPHONY_LOGE("request is nullptr");
+            return HRIL_ERR_NULL_POINT;
+        }
+
+        MessageParcel data;
+        ApduSimIORequestInfo ApduRequestInfo;
+        ApduRequestInfo.serial = request->serialId_;
+        ApduRequestInfo.channelId = reqInfo.channelId;
+        ApduRequestInfo.type = reqInfo.type;
+        ApduRequestInfo.instruction = reqInfo.instruction;
+        ApduRequestInfo.p1 = reqInfo.p1;
+        ApduRequestInfo.p2 = reqInfo.p2;
+        ApduRequestInfo.p3 = reqInfo.p3;
+        ApduRequestInfo.data = reqInfo.data;
+
+        data.WriteInt32(0);
+        ApduRequestInfo.Marshalling(data);
+        int32_t ret = SendBufferEvent(HREQ_SIM_TRANSMIT_APDU_LOGICAL_CHANNEL, data);
+        TELEPHONY_LOGI("SendBufferEvent(ID:%{public}d) return: %{public}d",
+            HREQ_SIM_TRANSMIT_APDU_LOGICAL_CHANNEL, ret);
+        return ret;
+    }
+    return HRIL_ERR_NULL_POINT;
+}
+
+int32_t RilManagerTest::SimTransmitApduBasicChannel(
+    ApduSimIORequestInfo reqInfo, const AppExecFwk::InnerEvent::Pointer &response)
+{
+    TELEPHONY_LOGI("RilManagerTest::SimTransmitApduBasicChannel -->");
+    if (cellularRadio_ != nullptr) {
+        std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_SIM_TRANSMIT_APDU_BASIC_CHANNEL, response);
+        if (request == nullptr) {
+            TELEPHONY_LOGE("request is nullptr");
+            return HRIL_ERR_NULL_POINT;
+        }
+
+        MessageParcel data;
+        ApduSimIORequestInfo ApduRequestInfo;
+        ApduRequestInfo.serial = request->serialId_;
+        ApduRequestInfo.type = reqInfo.type;
+        ApduRequestInfo.instruction = reqInfo.instruction;
+        ApduRequestInfo.p1 = reqInfo.p1;
+        ApduRequestInfo.p2 = reqInfo.p2;
+        ApduRequestInfo.p3 = reqInfo.p3;
+        ApduRequestInfo.data = reqInfo.data;
+
+        data.WriteInt32(0);
+        ApduRequestInfo.Marshalling(data);
+        int32_t ret = SendBufferEvent(HREQ_SIM_TRANSMIT_APDU_BASIC_CHANNEL, data);
+        TELEPHONY_LOGI("SendBufferEvent(ID:%{public}d) return: %{public}d",
+            HREQ_SIM_TRANSMIT_APDU_BASIC_CHANNEL, ret);
+        return ret;
+    }
+    return HRIL_ERR_NULL_POINT;
+}
+
 int32_t RilManagerTest::ActivatePdpContext(int32_t radioTechnology, RilDataProfileTest dataProfile, bool isRoaming,
     bool allowRoaming, const AppExecFwk::InnerEvent::Pointer &response)
 {

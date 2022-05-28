@@ -285,6 +285,7 @@ static void ParseGetGsmSignalStrength(const char *line, HRilRssi *hrilRssi)
     }
     NextInt(&lineStr, &hrilRssi->gsmRssi.rxlev);
     NextInt(&lineStr, &hrilRssi->gsmRssi.ber);
+    hrilRssi->gsmRssi.rxlev = -hrilRssi->gsmRssi.rxlev;
 }
 
 static void ParseGetLteSignalStrength(const char *line, HRilRssi *hrilRssi)
@@ -298,6 +299,9 @@ static void ParseGetLteSignalStrength(const char *line, HRilRssi *hrilRssi)
     NextInt(&lineStr, &hrilRssi->lteRssi.rsrq);
     NextInt(&lineStr, &hrilRssi->lteRssi.rsrp);
     NextInt(&lineStr, &hrilRssi->lteRssi.snr);
+    hrilRssi->lteRssi.rxlev = -hrilRssi->lteRssi.rxlev;
+    hrilRssi->lteRssi.rsrq = -hrilRssi->lteRssi.rsrq;
+    hrilRssi->lteRssi.rsrp = -hrilRssi->lteRssi.rsrp;
 }
 
 static void ParseGetWcdmaSignalStrength(const char *line, HRilRssi *hrilRssi)
@@ -311,6 +315,9 @@ static void ParseGetWcdmaSignalStrength(const char *line, HRilRssi *hrilRssi)
     NextInt(&lineStr, &hrilRssi->wcdmaRssi.ecio);
     NextInt(&lineStr, &hrilRssi->wcdmaRssi.rscp);
     NextInt(&lineStr, &hrilRssi->wcdmaRssi.ber);
+    hrilRssi->wcdmaRssi.rxlev = -hrilRssi->wcdmaRssi.rxlev;
+    hrilRssi->wcdmaRssi.ecio = -hrilRssi->wcdmaRssi.ecio;
+    hrilRssi->wcdmaRssi.rscp = -hrilRssi->wcdmaRssi.rscp;
 }
 
 static void ParseGetTdScdmaSignalStrength(const char *line, HRilRssi *hrilRssi)
@@ -321,6 +328,7 @@ static void ParseGetTdScdmaSignalStrength(const char *line, HRilRssi *hrilRssi)
         return;
     }
     NextInt(&lineStr, &hrilRssi->tdScdmaRssi.rscp);
+    hrilRssi->tdScdmaRssi.rscp = -hrilRssi->tdScdmaRssi.rscp;
 }
 
 static void ParseGetCdmaSignalStrength(const char *line, HRilRssi *hrilRssi)
@@ -332,6 +340,8 @@ static void ParseGetCdmaSignalStrength(const char *line, HRilRssi *hrilRssi)
     }
     NextInt(&lineStr, &hrilRssi->cdmaRssi.absoluteRssi);
     NextInt(&lineStr, &hrilRssi->cdmaRssi.ecno);
+    hrilRssi->cdmaRssi.absoluteRssi = -hrilRssi->cdmaRssi.absoluteRssi;
+    hrilRssi->cdmaRssi.ecno = -hrilRssi->cdmaRssi.ecno;
 }
 
 static void ParseGetNrSignalStrength(const char *line, HRilRssi *hrilRssi)
@@ -344,6 +354,8 @@ static void ParseGetNrSignalStrength(const char *line, HRilRssi *hrilRssi)
     NextInt(&lineStr, &hrilRssi->nrRssi.rsrp);
     NextInt(&lineStr, &hrilRssi->nrRssi.rsrq);
     NextInt(&lineStr, &hrilRssi->nrRssi.sinr);
+    hrilRssi->nrRssi.rsrp = -hrilRssi->nrRssi.rsrp;
+    hrilRssi->nrRssi.rsrq = -hrilRssi->nrRssi.rsrq;
 }
 
 int32_t ProcessParamSignalStrength(const char *result, HRilRssi *hrilRssi)
