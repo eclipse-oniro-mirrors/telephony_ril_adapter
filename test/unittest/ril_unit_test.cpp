@@ -749,6 +749,20 @@ void RilUnitTest::SimAuthentication(const AppExecFwk::InnerEvent::Pointer &resul
     TELEPHONY_LOGI("RilUnitTest::SimAuthentication --> SimAuthentication finished");
 }
 
+void RilUnitTest::SetActiveSimTest(const AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::SetActiveSimTest -->");
+    int32_t slotId;
+    cout << "please enter the slotId:";
+    cin >> slotId;
+
+    int32_t enable;
+    cout << "please enter the enable:";
+    cin >> enable;
+    mRilManager_->SetActiveSim(slotId, enable, result);
+    TELEPHONY_LOGI("RilUnitTest::SetActiveSimTest --> SetActiveSimTest finished");
+}
+
 void RilUnitTest::UnlockSimLock(const AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("RilUnitTest::UnlockSimLock -->");
@@ -762,6 +776,106 @@ void RilUnitTest::GetLinkBandwidthInfoTest(const OHOS::AppExecFwk::InnerEvent::P
     int32_t cid = 1;
     mRilManager_->GetLinkBandwidthInfo(cid, result);
     TELEPHONY_LOGI("RilUnitTest::GetLinkBandwidthInfoTest --> GetLinkBandwidthInfoTest finished");
+}
+
+void RilUnitTest::UnLockPINTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::UnLockPINTest -->");
+    std::string pin;
+    cout << "please enter the pin:";
+    cin >> pin;
+
+    mRilManager_->UnLockPin(pin, result);
+    TELEPHONY_LOGI("RilUnitTest::UnLockPINTest --> UnLockPINTest finished");
+}
+
+void RilUnitTest::UnLockPIN2Test(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::UnLockPIN2Test -->");
+    std::string pin2;
+    cout << "please enter the pin2:";
+    cin >> pin2;
+
+    mRilManager_->UnLockPin2(pin2, result);
+    TELEPHONY_LOGI("RilUnitTest::UnLockPIN2Test --> UnLockPIN2Test finished");
+}
+
+void RilUnitTest::UnLockPUKTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::UnLockPUKTest -->");
+    std::string pin;
+    cout << "please enter the pin:";
+    cin >> pin;
+
+    std::string puk;
+    cout << "please enter the puk:";
+    cin >> puk;
+    mRilManager_->UnLockPuk(pin, puk, result);
+    TELEPHONY_LOGI("RilUnitTest::UnLockPUKTest --> UnLockPUKTest finished");
+}
+
+void RilUnitTest::UnLockPUK2Test(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::UnLockPUK2Test -->");
+    std::string pin2;
+    cout << "please enter the pin2:";
+    cin >> pin2;
+
+    std::string puk2;
+    cout << "please enter the puk2:";
+    cin >> puk2;
+    mRilManager_->UnLockPuk2(pin2, puk2, result);
+    TELEPHONY_LOGI("RilUnitTest::UnLockPUK2Test --> UnLockPUK2Test finished");
+}
+
+void RilUnitTest::ChangeSimPasswordTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::ChangeSimPasswordTest -->");
+    std::string fac;
+    cout << "please enter the fac, SC for pin1, FD for pin2:";
+    cin >> fac;
+
+    std::string oldPassword;
+    cout << "please enter the oldPassword:";
+    cin >> oldPassword;
+
+    std::string newPassword;
+    cout << "please enter the newPassword:";
+    cin >> newPassword;
+
+    int32_t passwordLength = newPassword.length();
+    mRilManager_->ChangeSimPassword(fac, oldPassword, newPassword, passwordLength, result);
+    TELEPHONY_LOGI("RilUnitTest::ChangeSimPasswordTest --> ChangeSimPasswordTest finished");
+}
+
+void RilUnitTest::SetSimLockTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::SetSimLockTest -->");
+    std::string fac;
+    cout << "please enter the fac, SC for pin1, FD for pin2:";
+    cin >> fac;
+
+    int32_t mode;
+    cout << "please enter the mode:";
+    cin >> mode;
+
+    std::string password;
+    cout << "please enter the password:";
+    cin >> password;
+    mRilManager_->SetSimLock(fac, mode, password, result);
+    TELEPHONY_LOGI("RilUnitTest::SetSimLockTest --> SetSimLockTest finished");
+}
+
+void RilUnitTest::GetSimLockStatusTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::GetSimLockStatusTest -->");
+    std::string fac;
+    cout << "please enter the fac, SC for pin1, FD for pin2:";
+    cin >> fac;
+
+    int32_t mode = 2;
+    mRilManager_->GetSimLockStatus(fac, mode, result);
+    TELEPHONY_LOGI("RilUnitTest::GetSimLockStatusTest --> GetSimLockStatusTest finished");
 }
 
 void RilUnitTest::OnInitStressInterface()
@@ -820,7 +934,15 @@ void RilUnitTest::OnInitProcessInterface()
     memberFuncMap_[HREQ_SIM_TRANSMIT_APDU_LOGICAL_CHANNEL] = &RilUnitTest::SimTransmitApduLogicalChannel;
     memberFuncMap_[HREQ_SIM_TRANSMIT_APDU_BASIC_CHANNEL] = &RilUnitTest::SimTransmitApduBasicChannel;
     memberFuncMap_[HREQ_SIM_AUTHENTICATION] = &RilUnitTest::SimAuthentication;
+    memberFuncMap_[HREQ_SIM_SET_ACTIVE_SIM] = &RilUnitTest::SetActiveSimTest;
     memberFuncMap_[HREQ_SIM_UNLOCK_SIM_LOCK] = &RilUnitTest::UnlockSimLock;
+    memberFuncMap_[HREQ_SIM_UNLOCK_PIN] = &RilUnitTest::UnLockPINTest;
+    memberFuncMap_[HREQ_SIM_UNLOCK_PIN2] = &RilUnitTest::UnLockPIN2Test;
+    memberFuncMap_[HREQ_SIM_UNLOCK_PUK] = &RilUnitTest::UnLockPUKTest;
+    memberFuncMap_[HREQ_SIM_UNLOCK_PUK2] = &RilUnitTest::UnLockPUK2Test;
+    memberFuncMap_[HREQ_SIM_CHANGE_SIM_PASSWORD] = &RilUnitTest::ChangeSimPasswordTest;
+    memberFuncMap_[HREQ_SIM_SET_SIM_LOCK] = &RilUnitTest::SetSimLockTest;
+    memberFuncMap_[HREQ_SIM_GET_SIM_LOCK_STATUS] = &RilUnitTest::GetSimLockStatusTest;
 
     // data
     memberFuncMap_[HREQ_DATA_ACTIVATE_PDP_CONTEXT] = &RilUnitTest::SetupRilCmDataCallTest;
@@ -941,6 +1063,7 @@ static int32_t PrintSimMenu()
     cout << "----> [" << HREQ_SIM_GET_SIM_STATUS        << "] ---->[ HREQ_SIM_GET_SIM_STATUS ]"         << endl;
     cout << "----> [" << HREQ_SIM_GET_IMSI              << "] ---->[ HREQ_SIM_GET_IMSI ]"               << endl;
     cout << "----> [" << HREQ_SIM_GET_SIM_IO            << "] ---->[ HREQ_SIM_GET_SIM_IO ]"             << endl;
+    cout << "----> [" << HREQ_SIM_SET_ACTIVE_SIM       << "] ---->[ HREQ_SIM_SET_ACTIVE_SIM ]"        << endl;
     cout << "----> [" << HREQ_SIM_OPEN_LOGICAL_CHANNEL  << "] ---->[ HREQ_SIM_OPEN_LOGICAL_CHANNEL ]"   << endl;
     cout << "----> [" << HREQ_SIM_CLOSE_LOGICAL_CHANNEL << "] ---->[ HREQ_SIM_CLOSE_LOGICAL_CHANNEL ]"  << endl;
     cout << "----> [" << HREQ_SIM_TRANSMIT_APDU_LOGICAL_CHANNEL
@@ -949,6 +1072,13 @@ static int32_t PrintSimMenu()
         << "] ---->[ HREQ_SIM_TRANSMIT_APDU_BASIC_CHANNEL ]" << endl;
     cout << "----> [" << HREQ_SIM_AUTHENTICATION       << "] ---->[ HREQ_SIM_AUTHENTICATION ]"        << endl;
     cout << "----> [" << HREQ_SIM_UNLOCK_SIM_LOCK       << "] ---->[ HREQ_SIM_UNLOCK_SIM_LOCK ]"        << endl;
+    cout << "----> [" << HREQ_SIM_UNLOCK_PIN       << "] ---->[ HREQ_SIM_UNLOCK_PIN ]"        << endl;
+    cout << "----> [" << HREQ_SIM_UNLOCK_PIN2       << "] ---->[ HREQ_SIM_UNLOCK_PIN2 ]"        << endl;
+    cout << "----> [" << HREQ_SIM_UNLOCK_PUK       << "] ---->[ HREQ_SIM_UNLOCK_PUK ]"        << endl;
+    cout << "----> [" << HREQ_SIM_UNLOCK_PUK2       << "] ---->[ HREQ_SIM_UNLOCK_PUK2 ]"        << endl;
+    cout << "----> [" << HREQ_SIM_CHANGE_SIM_PASSWORD       << "] ---->[ HREQ_SIM_CHANGE_SIM_PASSWORD ]"        << endl;
+    cout << "----> [" << HREQ_SIM_SET_SIM_LOCK       << "] ---->[ HREQ_SIM_SET_SIM_LOCK ]"        << endl;
+    cout << "----> [" << HREQ_SIM_GET_SIM_LOCK_STATUS       << "] ---->[ HREQ_SIM_GET_SIM_LOCK_STATUS ]"        << endl;
     int32_t choice = InputInt32(HREQ_SIM_BASE, HREQ_DATA_BASE - 1, "Command");
     cout << "---->You choose: " << choice << endl;
     choice = (choice == HREQ_SIM_BASE) ? -1 : choice;

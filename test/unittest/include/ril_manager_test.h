@@ -138,8 +138,19 @@ public:
     void SimTransmitApduLogicalChannel(ApduSimIORequestInfo reqInfo, const AppExecFwk::InnerEvent::Pointer &response);
     void SimTransmitApduBasicChannel(ApduSimIORequestInfo reqInfo, const AppExecFwk::InnerEvent::Pointer &response);
     void SimAuthentication(SimAuthenticationRequestInfo reqInfo, const AppExecFwk::InnerEvent::Pointer &response);
+    void SetActiveSim(int32_t slotId, int32_t enable, const AppExecFwk::InnerEvent::Pointer &response);
     void UnlockSimLock(int32_t lockType, std::string password, const AppExecFwk::InnerEvent::Pointer &response);
     void GetLinkBandwidthInfo(const int32_t cid, const AppExecFwk::InnerEvent::Pointer &result);
+    void UnLockPin(const std::string &pin, const AppExecFwk::InnerEvent::Pointer &result);
+    void UnLockPin2(const std::string &pin2, const AppExecFwk::InnerEvent::Pointer &result);
+    void UnLockPuk(const std::string &puk, const std::string &pin, const AppExecFwk::InnerEvent::Pointer &result);
+    void UnLockPuk2(const std::string &puk2, const std::string &pin2, const AppExecFwk::InnerEvent::Pointer &result);
+    void ChangeSimPassword(const std::string &fac, const std::string &oldPassword, const std::string &newPassword,
+        int32_t passwordLength, const AppExecFwk::InnerEvent::Pointer &result);
+    void SetSimLock(const std::string &fac, int32_t mode, const std::string &password,
+        const AppExecFwk::InnerEvent::Pointer &result);
+    void GetSimLockStatus(const std::string &fac, int32_t mode,
+        const AppExecFwk::InnerEvent::Pointer &result);
 
     static const int32_t INVALID_WAKELOCK = -1;
     static const int32_t FOR_WAKELOCK = 0;
