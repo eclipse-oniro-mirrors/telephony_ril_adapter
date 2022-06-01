@@ -95,9 +95,17 @@ public:
     void SimCloseLogicalChannel(const AppExecFwk::InnerEvent::Pointer &result);
     void SimTransmitApduLogicalChannel(const AppExecFwk::InnerEvent::Pointer &result);
     void SimAuthentication(const AppExecFwk::InnerEvent::Pointer &result);
+    void SetActiveSimTest(const AppExecFwk::InnerEvent::Pointer &result);
     void SimTransmitApduBasicChannel(const AppExecFwk::InnerEvent::Pointer &result);
     void UnlockSimLock(const AppExecFwk::InnerEvent::Pointer &result);
     void GetLinkBandwidthInfoTest(const AppExecFwk::InnerEvent::Pointer &result);
+    void UnLockPINTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void UnLockPIN2Test(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void UnLockPUKTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void UnLockPUK2Test(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void ChangeSimPasswordTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void SetSimLockTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void GetSimLockStatusTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void OnInitInterface();
     void OnInitStressInterface();
     void OnInitProcessInterface();
