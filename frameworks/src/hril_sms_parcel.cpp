@@ -382,62 +382,6 @@ std::shared_ptr<CBConfigReportInfo> CBConfigReportInfo::UnMarshalling(Parcel &pa
     return param;
 }
 
-bool ImsSmsMessageInfo::ReadFromParcel(Parcel &parcel)
-{
-    if (!ReadBaseInt32(parcel, serial)) {
-        return false;
-    }
-    if (!ReadBaseInt32(parcel, technology)) {
-        return false;
-    }
-    if (!ReadBaseBool(parcel, retry)) {
-        return false;
-    }
-    if (!ReadBaseInt32(parcel, msgRef)) {
-        return false;
-    }
-    if (!ReadBaseInt32(parcel, gsmMessageSize)) {
-        return false;
-    }
-    gsmMessage.resize(gsmMessageSize);
-    for (int32_t i = 0; i < gsmMessageSize; i++) {
-        gsmMessage[i].ReadFromParcel(parcel);
-    }
-    return true;
-}
-
-bool ImsSmsMessageInfo::Marshalling(Parcel &parcel) const
-{
-    if (!WriteBaseInt32(parcel, serial)) {
-        return false;
-    }
-    if (!WriteBaseInt32(parcel, technology)) {
-        return false;
-    }
-    if (!WriteBaseBool(parcel, retry)) {
-        return false;
-    }
-    if (!WriteBaseInt32(parcel, msgRef)) {
-        return false;
-    }
-    if (!WriteBaseInt32(parcel, gsmMessageSize)) {
-        return false;
-    }
-    for (int32_t i = 0; i < gsmMessageSize; i++) {
-        gsmMessage[i].Marshalling(parcel);
-    }
-    return true;
-}
-
-std::shared_ptr<ImsSmsMessageInfo> ImsSmsMessageInfo::UnMarshalling(Parcel &parcel)
-{
-    std::shared_ptr<ImsSmsMessageInfo> param = std::make_shared<ImsSmsMessageInfo>();
-    if (param == nullptr || !param->ReadFromParcel(parcel)) {
-        param = nullptr;
-    }
-    return param;
-}
-
 bool SendSmsResultInfo::ReadFromParcel(Parcel &parcel)
 {
     if (!ReadBaseInt32(parcel, msgRef)) {
