@@ -17,7 +17,6 @@
 
 #include "hril_hdf.h"
 #include <pthread.h>
-#include "dfx_signal_handler.h"
 #include "telephony_log_c.h"
 
 #define RIL_LIB_PATH "/system/lib/libril_vendor.z.so"
@@ -84,7 +83,6 @@ static int32_t RilAdapterInit(struct HdfDeviceObject *device)
     if (device == NULL) {
         return HDF_ERR_INVALID_OBJECT;
     }
-    DFX_InstallSignalHandler();
     struct HdfSBuf *sbuf = HdfSBufTypedObtain(SBUF_IPC);
     if (sbuf == NULL) {
         TELEPHONY_LOGE("HdfSampleDriverBind, failed to obtain ipc sbuf");
