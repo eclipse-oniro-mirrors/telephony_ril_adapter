@@ -115,19 +115,6 @@ struct CBConfigReportInfo : public HrilBaseParcel {
     std::shared_ptr<CBConfigReportInfo> UnMarshalling(Parcel &parcel);
 };
 
-struct ImsSmsMessageInfo : public HrilBaseParcel {
-    int32_t serial;
-    int32_t technology;
-    bool retry; /* if errorCode != 0, suggested retry time */
-    int32_t msgRef; /* TP-Message-Reference for GSM, and BearerData MessageId for CDMA
-                     * from 3GPP2 C.S0015-B, v2.0, 4.5-1 */
-    int32_t gsmMessageSize;
-    std::vector<GsmSmsMessageInfo> gsmMessage;
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<ImsSmsMessageInfo> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
-};
 
 struct SmsMessageInfo : public HrilBaseParcel {
     int32_t indicationType;
