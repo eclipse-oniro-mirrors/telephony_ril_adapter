@@ -29,7 +29,6 @@ ohos_shared_library("hril_hdf") {
   ]
   deps = [
     "$RIL_ADAPTER/ril_adapter/hril:hril",
-    "//base/hiviewdfx/faultloggerd/interfaces/innerkits/signal_handler:dfx_signalhandler",
     "//base/telephony/core_service/common:libtelephony_common",
     "//drivers/adapter/uhdf2/host:libhdf_host",
     "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
