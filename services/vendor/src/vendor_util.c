@@ -26,9 +26,9 @@
 #define DEFAULT_SLOT_COUNT "1"
 #define TEL_SIM_SLOT_COUNT "const.telephony.slotCount"
 
-const int32_t G_RESP_ERRORS = 7;
-const int32_t G_RESP_SUCCESS = 2;
-const int32_t G_RESP_SMS_NOTIFY = 3;
+#define G_RESP_ERRORS 7
+#define G_RESP_SUCCESS 2
+#define G_RESP_SMS_NOTIFY 3
 const int32_t G_CHAR_TO_INT = 10;
 static const char *g_respErrors[G_RESP_ERRORS] = {
     "ERROR", "NO ANSWER", "+CME ERROR:", "NO CARRIER", "NO DIALTONE", "+CMS ERROR:", "COMMAND NOT SUPPORT"};

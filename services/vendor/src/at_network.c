@@ -22,6 +22,9 @@
 
 #include "hril_notification.h"
 
+#define numCount 3
+#define TIME_VALUE_LEN 30
+
 static struct ReportInfo g_reportInfoForOperListToUse;
 static pthread_mutex_t g_networkSearchInformationMutex = PTHREAD_MUTEX_INITIALIZER;
 
@@ -704,7 +707,6 @@ void ReqGetOperatorInfo(const ReqDataInfo *requestInfo)
     struct ReportInfo reportInfo;
     ResponseInfo *responseInfo = NULL;
     char *result = NULL;
-    const int32_t numCount = 3;
     char *response[numCount] = {"", "", ""};
     const long TIME_OUT = DEFAULT_TIMEOUT;
 
@@ -2192,7 +2194,6 @@ void NotifyNetWorkTime(int32_t slotId)
 {
     const long TIME_OUT = DEFAULT_TIMEOUT;
     ResponseInfo *responseInfo = NULL;
-    const int32_t TIME_VALUE_LEN = 30;
     const size_t TIME_VALUE_OFFSET = 2;
     char timeStr[TIME_VALUE_LEN] = {0};
     struct ReportInfo reportInfo = {0};
