@@ -15,12 +15,11 @@
 
 #include "ril_radio_indication_test.h"
 
-#include "ril_manager_test.h"
-#include "telephony_log_wrapper.h"
+#include <iostream>
 
 #include "hril_notification.h"
-
-#include <iostream>
+#include "ril_manager_test.h"
+#include "telephony_log_wrapper.h"
 
 using namespace std;
 using namespace OHOS::Telephony;
@@ -35,11 +34,22 @@ RilRadioIndicationTest::~RilRadioIndicationTest() {}
 int32_t RilRadioIndicationTest::OnRemoteRequest(
     uint32_t code, OHOS::MessageParcel &data, OHOS::MessageParcel &reply, OHOS::MessageOption &option)
 {
-    int32_t slotId = data.ReadInt32();
-    TELEPHONY_LOGI("RilAdapterTest ntf OnRemoteRequest code:%{public}d, slotId:%{public}d", code, slotId);
-    if (slotId != HRIL_SIM_SLOT_0) {
-        TELEPHONY_LOGE("RilAdapterTest ntf slotid abnormal");
+    auto reqToken = data.ReadInterfaceToken();
+    HRilResponseTypes responseType = HRIL_RESPONSE_NOTICE;
+    int32_t slotId = 0;
+    const uint8_t *spBuffer = data.ReadUnpadBuffer(sizeof(HRilResponseHeadInfo));
+    const HRilResponseHeadInfo *headInfo = reinterpret_cast<const HRilResponseHeadInfo *>(spBuffer);
+    if (headInfo != nullptr) {
+        slotId = headInfo->slotId;
+        responseType = headInfo->type;
+    } else {
+        TELEPHONY_LOGW("code:%{public}d, headInfo parsed is failed.", code);
     }
+    TELEPHONY_LOGI("TOnRemoteRequest code:%{public}d, slotId:%{public}d, type:%{public}d", code, slotId, responseType);
+    if (slotId != HRIL_SIM_SLOT_0) {
+        TELEPHONY_LOGE("RilAdapterTest rsp slotid abnormal");
+    }
+
     const int32_t DEFAULT_VALUE = HRIL_ERR_SUCCESS;
     switch (code) {
         case HNOTI_MODEM_RADIO_STATE_UPDATED:
@@ -99,8 +109,7 @@ void RilRadioIndicationTest::RadioStateChange(OHOS::MessageParcel &data)
 {
     int32_t radioState = data.ReadInt32();
     int32_t indicationType = data.ReadInt32();
-    std::cout << "---->[NTF] RadioStateChange:" << endl
-        << "====> [radioState]: " << radioState << endl;
+    std::cout << "---->[NTF] RadioStateChange:" << endl << "====> [radioState]: " << radioState << endl;
     TELEPHONY_LOGI(
         "func :%{public}s indicationType: %{public}d state:%{public}d", __func__, indicationType, radioState);
 }
@@ -152,10 +161,8 @@ void RilRadioIndicationTest::CallEmergencyNumberReport(OHOS::MessageParcel &data
         return;
     }
     emcInfo->ReadFromParcel(data);
-    cout << "====> [index]: " << emcInfo->index << "/" << emcInfo->total
-        << "\tcategory: " << emcInfo->category
-        << "\tmcc: " << emcInfo->mcc
-        << "\teccNum: " << emcInfo->eccNum << endl;
+    cout << "====> [index]: " << emcInfo->index << "/" << emcInfo->total << "\tcategory: " << emcInfo->category
+         << "\tmcc: " << emcInfo->mcc << "\teccNum: " << emcInfo->eccNum << endl;
 }
 
 void RilRadioIndicationTest::NetworkStateNotify(OHOS::MessageParcel &data)
@@ -175,9 +182,9 @@ void RilRadioIndicationTest::NewSmsNotify(OHOS::MessageParcel &data)
     smsMessageInfo.get()->ReadFromParcel(data);
     int32_t indicationType = smsMessageInfo->indicationType;
     cout << "---->[NTF] NewSms:" << endl
-        << "====> [indicationType]: " << smsMessageInfo->indicationType << endl
-        << "====> [size]: " << smsMessageInfo->size << endl
-        << "====> [pdu]: ";
+         << "====> [indicationType]: " << smsMessageInfo->indicationType << endl
+         << "====> [size]: " << smsMessageInfo->size << endl
+         << "====> [pdu]: ";
     for (int i = 0; i < smsMessageInfo->pdu.size(); i++) {
         printf("%02x", smsMessageInfo->pdu[i]);
     }
@@ -207,9 +214,9 @@ void RilRadioIndicationTest::SmsStatusReportNotify(OHOS::MessageParcel &data)
     smsMessageInfo.get()->ReadFromParcel(data);
     int32_t indicationType = smsMessageInfo.get()->indicationType;
     cout << "---->[NTF] SmsStatusReport:" << endl
-        << "====> [indicationType]: " << smsMessageInfo->indicationType << endl
-        << "====> [size]: " << smsMessageInfo->size << endl
-        << "====> [pdu]: ";
+         << "====> [indicationType]: " << smsMessageInfo->indicationType << endl
+         << "====> [size]: " << smsMessageInfo->size << endl
+         << "====> [pdu]: ";
     for (int i = 0; i < smsMessageInfo->pdu.size(); i++) {
         printf("%02x", smsMessageInfo->pdu[i]);
     }
@@ -244,9 +251,7 @@ void RilRadioIndicationTest::GetSignalStrength(OHOS::MessageParcel &data)
         TELEPHONY_LOGE("GetSignalStrength memcpy_s failed");
         return;
     }
-
-    cout << "---->[NTF] Network Signal Strength updated:" << endl;
-    cout << "====> [lte.rsrp]: " << mSignalStrength->lte.rsrp << endl;
+    TELEPHONY_LOGI("Network Signal Strength updated [lte.rsrp]: %{public}d", mSignalStrength->lte.rsrp);
 }
 
 void RilRadioIndicationTest::PdpContextListChangedNotify(OHOS::MessageParcel &data)
@@ -257,8 +262,7 @@ void RilRadioIndicationTest::PdpContextListChangedNotify(OHOS::MessageParcel &da
         return;
     }
     if (!dataCallList.get()->ReadFromParcel(data)) {
-        TELEPHONY_LOGE(
-            "ERROR : PdpContextListChangedNotify --> dataCallList.ReadFromParcel(data) failed !!!");
+        TELEPHONY_LOGE("ERROR : PdpContextListChangedNotify --> dataCallList.ReadFromParcel(data) failed !!!");
         return;
     }
     TELEPHONY_LOGI("PdpContextListChangedNotify --> dataCallList.ReadFromParcel(data) success");
@@ -343,8 +347,6 @@ void RilRadioIndicationTest::CallSsReport(OHOS::MessageParcel &data)
         return;
     }
     ssInfo->ReadFromParcel(data);
-    cout << "====> serviceType: " << ssInfo->serviceType
-        << "\trequestType: " << ssInfo->requestType
-        << "\tserviceClass: " << ssInfo->serviceClass
-        << "\tresult: " << ssInfo->result << endl;
+    cout << "====> serviceType: " << ssInfo->serviceType << "\trequestType: " << ssInfo->requestType
+         << "\tserviceClass: " << ssInfo->serviceClass << "\tresult: " << ssInfo->result << endl;
 }

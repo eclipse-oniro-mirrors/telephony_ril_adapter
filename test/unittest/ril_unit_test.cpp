@@ -18,8 +18,8 @@
 #include <iostream>
 #include <unistd.h>
 
-#include "telephony_log_wrapper.h"
 #include "hril_request.h"
+#include "telephony_log_wrapper.h"
 
 using namespace std;
 
@@ -501,9 +501,9 @@ void RilUnitTest::SendSmsAckTest(const OHOS::AppExecFwk::InnerEvent::Pointer &re
     bool success;
     int32_t cause;
 
-    cout << "send sms ack types are as follows:" << endl <<
-            "\t[0]: report OK" << endl <<
-            "\t[1]: report ERROR(Memory Capacity Exceeded)" << endl;
+    cout << "send sms ack types are as follows:" << endl
+         << "\t[0]: report OK" << endl
+         << "\t[1]: report ERROR(Memory Capacity Exceeded)" << endl;
     int32_t ackType = InputInt32(0, 1, "ack type");
     if (ackType == 1) {
         success = 0;
@@ -1008,31 +1008,31 @@ static int32_t PrintMenu()
 static int32_t PrintCallMenu()
 {
     cout << "---->[MODULE]CALL:" << endl;
-    cout << "----> [" << HREQ_CALL_BASE             << "] ---->Back to the previous menu."      << endl;
-    cout << "----> [" << HREQ_CALL_GET_CALL_LIST    << "] ---->[ HREQ_CALL_GET_CALL_LIST ]"     << endl;
-    cout << "----> [" << HREQ_CALL_DIAL             << "] ---->[ HREQ_CALL_DIAL ]"              << endl;
-    cout << "----> [" << HREQ_CALL_HANGUP           << "] ---->[ HREQ_CALL_HANGUP ]"            << endl;
-    cout << "----> [" << HREQ_CALL_REJECT           << "] ---->[ HREQ_CALL_REJECT ]"            << endl;
-    cout << "----> [" << HREQ_CALL_ANSWER           << "] ---->[ HREQ_CALL_ANSWER ]"            << endl;
-    cout << "----> [" << HREQ_CALL_HOLD_CALL        << "] ---->[ HREQ_CALL_HOLD_CALL ]"         << endl;
-    cout << "----> [" << HREQ_CALL_UNHOLD_CALL      << "] ---->[ HREQ_CALL_UNHOLD_CALL ]"       << endl;
-    cout << "----> [" << HREQ_CALL_SWITCH_CALL      << "] ---->[ HREQ_CALL_SWITCH_CALL ]"       << endl;
+    cout << "----> [" << HREQ_CALL_BASE << "] ---->Back to the previous menu." << endl;
+    cout << "----> [" << HREQ_CALL_GET_CALL_LIST << "] ---->[ HREQ_CALL_GET_CALL_LIST ]" << endl;
+    cout << "----> [" << HREQ_CALL_DIAL << "] ---->[ HREQ_CALL_DIAL ]" << endl;
+    cout << "----> [" << HREQ_CALL_HANGUP << "] ---->[ HREQ_CALL_HANGUP ]" << endl;
+    cout << "----> [" << HREQ_CALL_REJECT << "] ---->[ HREQ_CALL_REJECT ]" << endl;
+    cout << "----> [" << HREQ_CALL_ANSWER << "] ---->[ HREQ_CALL_ANSWER ]" << endl;
+    cout << "----> [" << HREQ_CALL_HOLD_CALL << "] ---->[ HREQ_CALL_HOLD_CALL ]" << endl;
+    cout << "----> [" << HREQ_CALL_UNHOLD_CALL << "] ---->[ HREQ_CALL_UNHOLD_CALL ]" << endl;
+    cout << "----> [" << HREQ_CALL_SWITCH_CALL << "] ---->[ HREQ_CALL_SWITCH_CALL ]" << endl;
 
-    cout << "----> [" << HREQ_CALL_COMBINE_CONFERENCE   << "] ---->[ HREQ_CALL_COMBINE_CONFERENCE ]"    << endl;
-    cout << "----> [" << HREQ_CALL_SEPARATE_CONFERENCE  << "] ---->[ HREQ_CALL_SEPARATE_CONFERENCE ]"   << endl;
+    cout << "----> [" << HREQ_CALL_COMBINE_CONFERENCE << "] ---->[ HREQ_CALL_COMBINE_CONFERENCE ]" << endl;
+    cout << "----> [" << HREQ_CALL_SEPARATE_CONFERENCE << "] ---->[ HREQ_CALL_SEPARATE_CONFERENCE ]" << endl;
 
-    cout << "----> [" << HREQ_CALL_CALL_SUPPLEMENT  << "] ---->[ HREQ_CALL_CALL_SUPPLEMENT ]"   << endl;
-    cout << "----> [" << HREQ_CALL_SEND_DTMF        << "] ---->[ HREQ_CALL_SEND_DTMF ]"         << endl;
-    cout << "----> [" << HREQ_CALL_START_DTMF       << "] ---->[ HREQ_CALL_START_DTMF ]"        << endl;
-    cout << "----> [" << HREQ_CALL_STOP_DTMF        << "] ---->[ HREQ_CALL_STOP_DTMF ]"         << endl;
+    cout << "----> [" << HREQ_CALL_CALL_SUPPLEMENT << "] ---->[ HREQ_CALL_CALL_SUPPLEMENT ]" << endl;
+    cout << "----> [" << HREQ_CALL_SEND_DTMF << "] ---->[ HREQ_CALL_SEND_DTMF ]" << endl;
+    cout << "----> [" << HREQ_CALL_START_DTMF << "] ---->[ HREQ_CALL_START_DTMF ]" << endl;
+    cout << "----> [" << HREQ_CALL_STOP_DTMF << "] ---->[ HREQ_CALL_STOP_DTMF ]" << endl;
 
-    cout << "----> [" << HREQ_CALL_SET_USSD         << "] ---->[ HREQ_CALL_SET_USSD ]"          << endl;
-    cout << "----> [" << HREQ_CALL_GET_USSD         << "] ---->[ HREQ_CALL_GET_USSD ]"          << endl;
+    cout << "----> [" << HREQ_CALL_SET_USSD << "] ---->[ HREQ_CALL_SET_USSD ]" << endl;
+    cout << "----> [" << HREQ_CALL_GET_USSD << "] ---->[ HREQ_CALL_GET_USSD ]" << endl;
 
-    cout << "----> [" << HREQ_CALL_SET_MUTE         << "] ---->[ HREQ_CALL_SET_MUTE ]"          << endl;
-    cout << "----> [" << HREQ_CALL_GET_MUTE         << "] ---->[ HREQ_CALL_GET_MUTE ]"          << endl;
-    cout << "----> [" << HREQ_CALL_GET_EMERGENCY_LIST   << "] ---->[ HREQ_CALL_GET_EMERGENCY_LIST ]"     << endl;
-    cout << "----> [" << HREQ_CALL_GET_FAIL_REASON  << "] ---->[ HREQ_CALL_GET_FAIL_REASON ]"   << endl;
+    cout << "----> [" << HREQ_CALL_SET_MUTE << "] ---->[ HREQ_CALL_SET_MUTE ]" << endl;
+    cout << "----> [" << HREQ_CALL_GET_MUTE << "] ---->[ HREQ_CALL_GET_MUTE ]" << endl;
+    cout << "----> [" << HREQ_CALL_GET_EMERGENCY_LIST << "] ---->[ HREQ_CALL_GET_EMERGENCY_LIST ]" << endl;
+    cout << "----> [" << HREQ_CALL_GET_FAIL_REASON << "] ---->[ HREQ_CALL_GET_FAIL_REASON ]" << endl;
 
     int32_t choice = InputInt32(HREQ_CALL_BASE, HREQ_SMS_BASE - 1, "Command");
     cout << "---->You choose: " << choice << endl;
@@ -1059,26 +1059,26 @@ static int32_t PrintSmsMenu()
 static int32_t PrintSimMenu()
 {
     cout << "---->[MODULE]SIM:" << endl;
-    cout << "----> [" << HREQ_SIM_BASE                  << "] ---->Back to the previous menu."          << endl;
-    cout << "----> [" << HREQ_SIM_GET_SIM_STATUS        << "] ---->[ HREQ_SIM_GET_SIM_STATUS ]"         << endl;
-    cout << "----> [" << HREQ_SIM_GET_IMSI              << "] ---->[ HREQ_SIM_GET_IMSI ]"               << endl;
-    cout << "----> [" << HREQ_SIM_GET_SIM_IO            << "] ---->[ HREQ_SIM_GET_SIM_IO ]"             << endl;
-    cout << "----> [" << HREQ_SIM_SET_ACTIVE_SIM       << "] ---->[ HREQ_SIM_SET_ACTIVE_SIM ]"        << endl;
-    cout << "----> [" << HREQ_SIM_OPEN_LOGICAL_CHANNEL  << "] ---->[ HREQ_SIM_OPEN_LOGICAL_CHANNEL ]"   << endl;
-    cout << "----> [" << HREQ_SIM_CLOSE_LOGICAL_CHANNEL << "] ---->[ HREQ_SIM_CLOSE_LOGICAL_CHANNEL ]"  << endl;
-    cout << "----> [" << HREQ_SIM_TRANSMIT_APDU_LOGICAL_CHANNEL
-        << "] ---->[ HREQ_SIM_TRANSMIT_APDU_LOGICAL_CHANNEL ]" << endl;
-    cout << "----> [" << HREQ_SIM_TRANSMIT_APDU_BASIC_CHANNEL
-        << "] ---->[ HREQ_SIM_TRANSMIT_APDU_BASIC_CHANNEL ]" << endl;
-    cout << "----> [" << HREQ_SIM_AUTHENTICATION       << "] ---->[ HREQ_SIM_AUTHENTICATION ]"        << endl;
-    cout << "----> [" << HREQ_SIM_UNLOCK_SIM_LOCK       << "] ---->[ HREQ_SIM_UNLOCK_SIM_LOCK ]"        << endl;
-    cout << "----> [" << HREQ_SIM_UNLOCK_PIN       << "] ---->[ HREQ_SIM_UNLOCK_PIN ]"        << endl;
-    cout << "----> [" << HREQ_SIM_UNLOCK_PIN2       << "] ---->[ HREQ_SIM_UNLOCK_PIN2 ]"        << endl;
-    cout << "----> [" << HREQ_SIM_UNLOCK_PUK       << "] ---->[ HREQ_SIM_UNLOCK_PUK ]"        << endl;
-    cout << "----> [" << HREQ_SIM_UNLOCK_PUK2       << "] ---->[ HREQ_SIM_UNLOCK_PUK2 ]"        << endl;
-    cout << "----> [" << HREQ_SIM_CHANGE_SIM_PASSWORD       << "] ---->[ HREQ_SIM_CHANGE_SIM_PASSWORD ]"        << endl;
-    cout << "----> [" << HREQ_SIM_SET_SIM_LOCK       << "] ---->[ HREQ_SIM_SET_SIM_LOCK ]"        << endl;
-    cout << "----> [" << HREQ_SIM_GET_SIM_LOCK_STATUS       << "] ---->[ HREQ_SIM_GET_SIM_LOCK_STATUS ]"        << endl;
+    cout << "----> [" << HREQ_SIM_BASE << "] ---->Back to the previous menu." << endl;
+    cout << "----> [" << HREQ_SIM_GET_SIM_STATUS << "] ---->[ HREQ_SIM_GET_SIM_STATUS ]" << endl;
+    cout << "----> [" << HREQ_SIM_GET_IMSI << "] ---->[ HREQ_SIM_GET_IMSI ]" << endl;
+    cout << "----> [" << HREQ_SIM_GET_SIM_IO << "] ---->[ HREQ_SIM_GET_SIM_IO ]" << endl;
+    cout << "----> [" << HREQ_SIM_SET_ACTIVE_SIM << "] ---->[ HREQ_SIM_SET_ACTIVE_SIM ]" << endl;
+    cout << "----> [" << HREQ_SIM_OPEN_LOGICAL_CHANNEL << "] ---->[ HREQ_SIM_OPEN_LOGICAL_CHANNEL ]" << endl;
+    cout << "----> [" << HREQ_SIM_CLOSE_LOGICAL_CHANNEL << "] ---->[ HREQ_SIM_CLOSE_LOGICAL_CHANNEL ]" << endl;
+    cout << "----> [" << HREQ_SIM_TRANSMIT_APDU_LOGICAL_CHANNEL << "] ---->[ HREQ_SIM_TRANSMIT_APDU_LOGICAL_CHANNEL ]"
+         << endl;
+    cout << "----> [" << HREQ_SIM_TRANSMIT_APDU_BASIC_CHANNEL << "] ---->[ HREQ_SIM_TRANSMIT_APDU_BASIC_CHANNEL ]"
+         << endl;
+    cout << "----> [" << HREQ_SIM_AUTHENTICATION << "] ---->[ HREQ_SIM_AUTHENTICATION ]" << endl;
+    cout << "----> [" << HREQ_SIM_UNLOCK_SIM_LOCK << "] ---->[ HREQ_SIM_UNLOCK_SIM_LOCK ]" << endl;
+    cout << "----> [" << HREQ_SIM_UNLOCK_PIN << "] ---->[ HREQ_SIM_UNLOCK_PIN ]" << endl;
+    cout << "----> [" << HREQ_SIM_UNLOCK_PIN2 << "] ---->[ HREQ_SIM_UNLOCK_PIN2 ]" << endl;
+    cout << "----> [" << HREQ_SIM_UNLOCK_PUK << "] ---->[ HREQ_SIM_UNLOCK_PUK ]" << endl;
+    cout << "----> [" << HREQ_SIM_UNLOCK_PUK2 << "] ---->[ HREQ_SIM_UNLOCK_PUK2 ]" << endl;
+    cout << "----> [" << HREQ_SIM_CHANGE_SIM_PASSWORD << "] ---->[ HREQ_SIM_CHANGE_SIM_PASSWORD ]" << endl;
+    cout << "----> [" << HREQ_SIM_SET_SIM_LOCK << "] ---->[ HREQ_SIM_SET_SIM_LOCK ]" << endl;
+    cout << "----> [" << HREQ_SIM_GET_SIM_LOCK_STATUS << "] ---->[ HREQ_SIM_GET_SIM_LOCK_STATUS ]" << endl;
     int32_t choice = InputInt32(HREQ_SIM_BASE, HREQ_DATA_BASE - 1, "Command");
     cout << "---->You choose: " << choice << endl;
     choice = (choice == HREQ_SIM_BASE) ? -1 : choice;
@@ -1088,12 +1088,12 @@ static int32_t PrintSimMenu()
 static int32_t PrintDataMenu()
 {
     cout << "---->[MODULE]DATA:" << endl;
-    cout << "----> [" << HREQ_DATA_BASE                     << "] ---->Back to the previous menu."             << endl;
-    cout << "----> [" << HREQ_DATA_ACTIVATE_PDP_CONTEXT     << "] ---->[ HREQ_DATA_ACTIVATE_PDP_CONTEXT ]"     << endl;
-    cout << "----> [" << HREQ_DATA_DEACTIVATE_PDP_CONTEXT   << "] ---->[ HREQ_DATA_DEACTIVATE_PDP_CONTEXT ]"   << endl;
-    cout << "----> [" << HREQ_DATA_GET_LINK_BANDWIDTH_INFO  << "] ---->[ HREQ_DATA_GET_LINK_BANDWIDTH_INFO ]"  << endl;
-    cout << "----> [" << HREQ_DATA_GET_PDP_CONTEXT_LIST     << "] ---->[ HREQ_DATA_GET_PDP_CONTEXT_LIST ]"     << endl;
-    cout << "----> [" << HREQ_DATA_SET_INIT_APN_INFO        << "] ---->[ HREQ_DATA_SET_INIT_APN_INFO ]"        << endl;
+    cout << "----> [" << HREQ_DATA_BASE << "] ---->Back to the previous menu." << endl;
+    cout << "----> [" << HREQ_DATA_ACTIVATE_PDP_CONTEXT << "] ---->[ HREQ_DATA_ACTIVATE_PDP_CONTEXT ]" << endl;
+    cout << "----> [" << HREQ_DATA_DEACTIVATE_PDP_CONTEXT << "] ---->[ HREQ_DATA_DEACTIVATE_PDP_CONTEXT ]" << endl;
+    cout << "----> [" << HREQ_DATA_GET_LINK_BANDWIDTH_INFO << "] ---->[ HREQ_DATA_GET_LINK_BANDWIDTH_INFO ]" << endl;
+    cout << "----> [" << HREQ_DATA_GET_PDP_CONTEXT_LIST << "] ---->[ HREQ_DATA_GET_PDP_CONTEXT_LIST ]" << endl;
+    cout << "----> [" << HREQ_DATA_SET_INIT_APN_INFO << "] ---->[ HREQ_DATA_SET_INIT_APN_INFO ]" << endl;
 
     int32_t choice = InputInt32(HREQ_DATA_BASE, HREQ_NETWORK_BASE - 1, "Command");
     cout << "---->You choose: " << choice << endl;
@@ -1104,32 +1104,31 @@ static int32_t PrintDataMenu()
 static int32_t PrintNetworkMenu()
 {
     cout << "---->[MODULE]NETWORK:" << endl;
-    cout << "----> [" << HREQ_NETWORK_BASE                  << "] ---->Back to the previous menu."           << endl;
-    cout << "----> [" << HREQ_NETWORK_GET_SIGNAL_STRENGTH   << "] ---->[ HREQ_NETWORK_GET_SIGNAL_STRENGTH ]" << endl;
-    cout << "----> [" << HREQ_NETWORK_GET_CS_REG_STATUS     << "] ---->[ HREQ_NETWORK_GET_CS_REG_STATUS ]"   << endl;
-    cout << "----> [" << HREQ_NETWORK_GET_PS_REG_STATUS     << "] ---->[ HREQ_NETWORK_GET_PS_REG_STATUS ]"   << endl;
-    cout << "----> [" << HREQ_NETWORK_GET_OPERATOR_INFO     << "] ---->[ HREQ_NETWORK_GET_OPERATOR_INFO ]"   << endl;
+    cout << "----> [" << HREQ_NETWORK_BASE << "] ---->Back to the previous menu." << endl;
+    cout << "----> [" << HREQ_NETWORK_GET_SIGNAL_STRENGTH << "] ---->[ HREQ_NETWORK_GET_SIGNAL_STRENGTH ]" << endl;
+    cout << "----> [" << HREQ_NETWORK_GET_CS_REG_STATUS << "] ---->[ HREQ_NETWORK_GET_CS_REG_STATUS ]" << endl;
+    cout << "----> [" << HREQ_NETWORK_GET_PS_REG_STATUS << "] ---->[ HREQ_NETWORK_GET_PS_REG_STATUS ]" << endl;
+    cout << "----> [" << HREQ_NETWORK_GET_OPERATOR_INFO << "] ---->[ HREQ_NETWORK_GET_OPERATOR_INFO ]" << endl;
 
     cout << "----> [" << HREQ_NETWORK_GET_NETWORK_SEARCH_INFORMATION
-        << "] ---->[ HREQ_NETWORK_GET_NETWORK_SEARCH_INFORMATION ]" << endl;
+         << "] ---->[ HREQ_NETWORK_GET_NETWORK_SEARCH_INFORMATION ]" << endl;
 
-    cout << "----> [" << HREQ_NETWORK_GET_NETWORK_SELECTION_MODE
-        << "] ---->[ HREQ_NETWORK_GET_NETWORK_SELECTION_MODE ]"     << endl;
+    cout << "----> [" << HREQ_NETWORK_GET_NETWORK_SELECTION_MODE << "] ---->[ HREQ_NETWORK_GET_NETWORK_SELECTION_MODE ]"
+         << endl;
 
-    cout << "----> [" << HREQ_NETWORK_SET_NETWORK_SELECTION_MODE
-        << "] ---->[ HREQ_NETWORK_SET_NETWORK_SELECTION_MODE ]"     << endl;
+    cout << "----> [" << HREQ_NETWORK_SET_NETWORK_SELECTION_MODE << "] ---->[ HREQ_NETWORK_SET_NETWORK_SELECTION_MODE ]"
+         << endl;
 
     cout << "----> [" << HREQ_NETWORK_GET_NEIGHBORING_CELLINFO_LIST
-        << "] ---->[ HREQ_NETWORK_GET_NEIGHBORING_CELLINFO_LIST ]"  << endl;
+         << "] ---->[ HREQ_NETWORK_GET_NEIGHBORING_CELLINFO_LIST ]" << endl;
 
     cout << "----> [" << HREQ_NETWORK_GET_CURRENT_CELL_INFO << "] ---->[ HREQ_NETWORK_GET_CURRENT_CELL_INFO ]" << endl;
     cout << "----> [" << HREQ_NETWORK_GET_PREFERRED_NETWORK << "] ---->[ HREQ_NETWORK_GET_PREFERRED_NETWORK ]" << endl;
     cout << "----> [" << HREQ_NETWORK_SET_PREFERRED_NETWORK << "] ---->[ HREQ_NETWORK_SET_PREFERRED_NETWORK ]" << endl;
-    cout << "----> [" << HREQ_NETWORK_GET_IMS_REG_STATUS    << "] ---->[ HREQ_NETWORK_GET_IMS_REG_STATUS ]"    << endl;
-    cout << "----> [" << HREQ_NETWORK_SET_PS_ATTACH_STATUS  << "] ---->[ HREQ_NETWORK_SET_PS_ATTACH_STATUS ]"  << endl;
-    cout << "----> [" << HREQ_NETWORK_GET_PS_ATTACH_STATUS  << "] ---->[ HREQ_NETWORK_GET_PS_ATTACH_STATUS ]"  << endl;
-    cout << "----> [" << HREQ_NETWORK_SET_LOCATE_UPDATES    << "] ---->[ HREQ_NETWORK_SET_LOCATE_UPDATES ]"    << endl;
-
+    cout << "----> [" << HREQ_NETWORK_GET_IMS_REG_STATUS << "] ---->[ HREQ_NETWORK_GET_IMS_REG_STATUS ]" << endl;
+    cout << "----> [" << HREQ_NETWORK_SET_PS_ATTACH_STATUS << "] ---->[ HREQ_NETWORK_SET_PS_ATTACH_STATUS ]" << endl;
+    cout << "----> [" << HREQ_NETWORK_GET_PS_ATTACH_STATUS << "] ---->[ HREQ_NETWORK_GET_PS_ATTACH_STATUS ]" << endl;
+    cout << "----> [" << HREQ_NETWORK_SET_LOCATE_UPDATES << "] ---->[ HREQ_NETWORK_SET_LOCATE_UPDATES ]" << endl;
     int32_t choice = InputInt32(HREQ_NETWORK_BASE, HREQ_COMMON_BASE - 1, "Command");
     cout << "---->You choose: " << choice << endl;
     choice = (choice == HREQ_NETWORK_BASE) ? -1 : choice;
@@ -1139,7 +1138,7 @@ static int32_t PrintNetworkMenu()
 static int32_t PrintModemMenu()
 {
     cout << "---->[MODULE]MODEM:" << endl;
-    cout << "----> [" << HREQ_COMMON_BASE << "] ---->Back to the previous menu."      << endl;
+    cout << "----> [" << HREQ_COMMON_BASE << "] ---->Back to the previous menu." << endl;
     cout << "----> [" << HREQ_MODEM_SET_RADIO_STATUS << "] ---->[ HREQ_MODEM_SET_RADIO_STATUS ]" << endl;
     cout << "----> [" << HREQ_MODEM_GET_RADIO_STATUS << "] ---->[ HREQ_MODEM_GET_RADIO_STATUS ]" << endl;
     cout << "----> [" << HREQ_MODEM_GET_IMEI << "] ---->[ HREQ_MODEM_GET_IMEI ]" << endl;
