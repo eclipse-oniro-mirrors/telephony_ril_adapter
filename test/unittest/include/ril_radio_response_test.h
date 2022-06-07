@@ -17,6 +17,7 @@
 #define OHOS_RIL_RADIO_RESPONSE_TEST_H
 
 #include <ipc_object_stub.h>
+
 #include "ril_manager_test.h"
 namespace OHOS {
 namespace Telephony {
@@ -81,6 +82,8 @@ public:
     void OnResponseSendSmsAck(OHOS::MessageParcel &data);
     void OnResponseGetSmscAddr(OHOS::MessageParcel &data);
     void OnResponseSetSmscAddr(OHOS::MessageParcel &data);
+    void OnResponseLockStatus(OHOS::MessageParcel &data);
+    void OnResponseGetSimLockStatus(OHOS::MessageParcel &data);
 
 private:
     RilManagerTest *mRilManager_;

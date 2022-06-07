@@ -17,8 +17,8 @@
 
 #include <iostream>
 
-#include "telephony_log_wrapper.h"
 #include "hril_request.h"
+#include "telephony_log_wrapper.h"
 
 using namespace std;
 using namespace OHOS::Telephony;
@@ -32,12 +32,21 @@ RilRadioResponseTest::~RilRadioResponseTest() {}
 int32_t RilRadioResponseTest::OnRemoteRequest(
     uint32_t code, OHOS::MessageParcel &data, OHOS::MessageParcel &reply, OHOS::MessageOption &option)
 {
-    int32_t slotId = data.ReadInt32();
-    TELEPHONY_LOGI("RilAdapterTest rsp OnRemoteRequest code:%{public}d, slotId:%{public}d", code, slotId);
+    auto reqToken = data.ReadInterfaceToken();
+    HRilResponseTypes responseType = HRIL_RESPONSE_NOTICE;
+    int32_t slotId = 0;
+    const uint8_t *spBuffer = data.ReadUnpadBuffer(sizeof(HRilResponseHeadInfo));
+    const HRilResponseHeadInfo *headInfo = reinterpret_cast<const HRilResponseHeadInfo *>(spBuffer);
+    if (headInfo != nullptr) {
+        slotId = headInfo->slotId;
+        responseType = headInfo->type;
+    } else {
+        TELEPHONY_LOGW("code:%{public}d, headInfo parsed is failed.", code);
+    }
+    TELEPHONY_LOGI("TOnRemoteRequest code:%{public}d, slotId:%{public}d, type:%{public}d", code, slotId, responseType);
     if (slotId != HRIL_SIM_SLOT_0) {
         TELEPHONY_LOGE("RilAdapterTest rsp slotid abnormal");
     }
-
     switch (code) {
         case HREQ_CALL_GET_CALL_LIST:
             OnResponseGetCallList(data);
@@ -80,6 +89,21 @@ int32_t RilRadioResponseTest::OnRemoteRequest(
             break;
         case HREQ_CALL_GET_MUTE:
             OnResponseGetMute(data);
+            break;
+        case HREQ_SIM_CLOSE_LOGICAL_CHANNEL:
+            OnResponseNullPara("Set Sim Close Logical Channel Result", data);
+            break;
+        case HREQ_SIM_OPEN_LOGICAL_CHANNEL:
+            OnResponseNullPara("Set Sim Open Logical Channel Result", data);
+            break;
+        case HREQ_SIM_TRANSMIT_APDU_BASIC_CHANNEL:
+            OnResponseNullPara("Set Sim Transmit apdu basic channel Result", data);
+            break;
+        case HREQ_SIM_TRANSMIT_APDU_LOGICAL_CHANNEL:
+            OnResponseNullPara("Set sim transmit apdu logical channel Result", data);
+            break;
+        case HREQ_SIM_AUTHENTICATION:
+            OnResponseNullPara("Set Sim Authentication Result", data);
             break;
         case HREQ_CALL_GET_EMERGENCY_LIST:
             OnResponseGetEmergencyList(data);
@@ -142,7 +166,7 @@ int32_t RilRadioResponseTest::OnRemoteRequest(
             OnRequestSetNetworkPreferredNetworkModeTest(data);
             break;
         case HREQ_NETWORK_GET_PREFERRED_NETWORK:
-             OnRequestGetNetworkPreferredNetworkModeTest(data);
+            OnRequestGetNetworkPreferredNetworkModeTest(data);
             break;
         case HREQ_NETWORK_SET_PS_ATTACH_STATUS:
             OnRequestSetNetworkPsAttachStatusTest(data);
@@ -177,6 +201,33 @@ int32_t RilRadioResponseTest::OnRemoteRequest(
         case HREQ_SMS_SET_SMSC_ADDR:
             OnResponseSetSmscAddr(data);
             break;
+        case HREQ_SIM_CHANGE_SIM_PASSWORD:
+            OnResponseLockStatus(data);
+            break;
+        case HREQ_SIM_SET_SIM_LOCK:
+            OnResponseLockStatus(data);
+            break;
+        case HREQ_SIM_UNLOCK_SIM_LOCK:
+            OnResponseLockStatus(data);
+            break;
+        case HREQ_SIM_SET_ACTIVE_SIM:
+            OnResponseNullPara("Set active sim Result", data);
+            break;
+        case HREQ_SIM_GET_SIM_LOCK_STATUS:
+            OnResponseGetSimLockStatus(data);
+            break;
+        case HREQ_SIM_UNLOCK_PIN:
+            OnResponseLockStatus(data);
+            break;
+        case HREQ_SIM_UNLOCK_PUK:
+            OnResponseLockStatus(data);
+            break;
+        case HREQ_SIM_UNLOCK_PIN2:
+            OnResponseLockStatus(data);
+            break;
+        case HREQ_SIM_UNLOCK_PUK2:
+            OnResponseLockStatus(data);
+            break;
         default:
             break;
     }
@@ -189,10 +240,10 @@ void PrintResponseInfo(const struct HRilRadioResponseInfo *rspInfo)
         return;
     }
     cout << endl
-        // << "----> [flag]: " << rspInfo->flag << endl
-        << "----> [serial]: " << rspInfo->serial << endl
-        << "----> [error]: " << static_cast<int>(rspInfo->error) << endl
-        << endl;
+         // << "----> [flag]: " << rspInfo->flag << endl
+         << "----> [serial]: " << rspInfo->serial << endl
+         << "----> [error]: " << static_cast<int>(rspInfo->error) << endl
+         << endl;
 }
 
 void RilRadioResponseTest::OnResponseNullPara(std::string command, OHOS::MessageParcel &data)
@@ -212,6 +263,30 @@ void RilRadioResponseTest::OnResponseNullPara(std::string command, OHOS::Message
     TELEPHONY_LOGI("RilRadioResponseTest::OnResponseNullPara --> finished");
 }
 
+void RilRadioResponseTest::OnResponseLockStatus(MessageParcel &data)
+{
+    TELEPHONY_LOGI("RilRadioResponseTest::OnResponseLockStatus -->");
+    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
+    const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("OnResponseLockStatus -->data.ReadBuffer(readSpSize) failed");
+        return;
+    }
+    const struct HRilRadioResponseInfo *responseInfo = reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
+
+    const size_t readLockStatusSize = sizeof(HRilLockStatus);
+    const uint8_t *lockStatusBuffer = data.ReadBuffer(readLockStatusSize);
+    if (lockStatusBuffer == nullptr) {
+        TELEPHONY_LOGE("OnResponseLockStatus -->data.ReadBuffer(readLockStatusSize) failed");
+        return;
+    }
+    const HRilLockStatus *resp = reinterpret_cast<const HRilLockStatus *>(lockStatusBuffer);
+    cout << endl << "====>result: " << resp->result << endl;
+    cout << endl << "====>remain: " << resp->remain << endl;
+    cout << endl << "---->OnResponseLockStatus";
+    PrintResponseInfo(responseInfo);
+}
+
 void RilRadioResponseTest::OnResponseGetCallList(OHOS::MessageParcel &data)
 {
     TELEPHONY_LOGI("RilRadioResponseTest::OnResponseGetCallList -->");
@@ -222,8 +297,7 @@ void RilRadioResponseTest::OnResponseGetCallList(OHOS::MessageParcel &data)
         return;
     }
 
-    const struct HRilRadioResponseInfo *responseInfo =
-        reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
+    const struct HRilRadioResponseInfo *responseInfo = reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
     if (responseInfo->error == HRilErrType::NONE) {
         std::shared_ptr<CallInfoList> callInfos = std::make_shared<CallInfoList>();
         if (callInfos == nullptr) {
@@ -233,10 +307,8 @@ void RilRadioResponseTest::OnResponseGetCallList(OHOS::MessageParcel &data)
         callInfos.get()->ReadFromParcel(data);
         cout << endl << "====>Call List Num: " << callInfos->callSize << endl;
         for (int32_t i = 0; i < callInfos->callSize; i++) {
-            cout << "====> [index]: " << callInfos->calls[i].index
-                << "\tdir: " << callInfos->calls[i].dir
-                << "\tstate: " << callInfos->calls[i].state
-                << "\tnumber: " << callInfos->calls[i].number << endl;
+            cout << "====> [index]: " << callInfos->calls[i].index << "\tdir: " << callInfos->calls[i].dir
+                 << "\tstate: " << callInfos->calls[i].state << "\tnumber: " << callInfos->calls[i].number << endl;
         }
     }
 
@@ -254,8 +326,7 @@ void RilRadioResponseTest::OnResponseGetMute(OHOS::MessageParcel &data)
         return;
     }
 
-    const struct HRilRadioResponseInfo *responseInfo =
-        reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
+    const struct HRilRadioResponseInfo *responseInfo = reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
     if (responseInfo->error == HRilErrType::NONE) {
         int32_t mute = data.ReadInt32();
         cout << endl << "====>Mute State: " << mute << endl;
@@ -265,6 +336,25 @@ void RilRadioResponseTest::OnResponseGetMute(OHOS::MessageParcel &data)
     PrintResponseInfo(responseInfo);
 }
 
+void RilRadioResponseTest::OnResponseGetSimLockStatus(OHOS::MessageParcel &data)
+{
+    TELEPHONY_LOGI("RilRadioResponseTest::OnResponseGetSimLockStatus -->");
+    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
+    const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("OnResponseGetSimLockStatus -->data.ReadBuffer(readSpSize) failed");
+        return;
+    }
+
+    const struct HRilRadioResponseInfo *responseInfo = reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
+    if (responseInfo->error == HRilErrType::NONE) {
+        int32_t simLockStatus = data.ReadInt32();
+        cout << endl << "====>Sim Lock Status: " << simLockStatus << endl;
+    }
+
+    cout << endl << "---->Get Sim Lock Status :";
+    PrintResponseInfo(responseInfo);
+}
 void RilRadioResponseTest::OnResponseGetEmergencyList(OHOS::MessageParcel &data)
 {
     TELEPHONY_LOGI("RilRadioResponseTest::OnResponseGetEmergencyList -->");
@@ -275,8 +365,7 @@ void RilRadioResponseTest::OnResponseGetEmergencyList(OHOS::MessageParcel &data)
         return;
     }
 
-    const struct HRilRadioResponseInfo *responseInfo =
-        reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
+    const struct HRilRadioResponseInfo *responseInfo = reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
     if (responseInfo->error == HRilErrType::NONE) {
         std::shared_ptr<EmergencyInfoList> emergencyCallList = std::make_shared<EmergencyInfoList>();
         if (emergencyCallList == nullptr) {
@@ -288,9 +377,9 @@ void RilRadioResponseTest::OnResponseGetEmergencyList(OHOS::MessageParcel &data)
         cout << endl << "====>Emergency List Num: " << emergencyCallList->callSize << endl;
         for (int32_t i = 0; i < emergencyCallList->callSize; i++) {
             cout << "====> [index]: " << emergencyCallList->calls[i].index
-                << "\tcategory: " << emergencyCallList->calls[i].category
-                << "\tmcc: " << emergencyCallList->calls[i].mcc
-                << "\teccNum: " << emergencyCallList->calls[i].eccNum << endl;
+                 << "\tcategory: " << emergencyCallList->calls[i].category
+                 << "\tmcc: " << emergencyCallList->calls[i].mcc << "\teccNum: " << emergencyCallList->calls[i].eccNum
+                 << endl;
         }
     }
 
@@ -308,8 +397,7 @@ void RilRadioResponseTest::OnResponseGetFailReason(OHOS::MessageParcel &data)
         return;
     }
 
-    const struct HRilRadioResponseInfo *responseInfo =
-        reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
+    const struct HRilRadioResponseInfo *responseInfo = reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
     if (responseInfo->error == HRilErrType::NONE) {
         int32_t reason = data.ReadInt32();
         cout << endl << "====>Fail Reason: " << reason << endl;
@@ -418,8 +506,7 @@ void RilRadioResponseTest::OnResponseGetRilCurrentCellInfo(OHOS::MessageParcel &
         return;
     }
     if (!curCellInfo.get()->ReadFromParcel(data)) {
-        TELEPHONY_LOGE(
-            "ERROR : OnResponseGetRilCurrentCellInfo --> CurrentCellInfo.ReadFromParcel(data) failed !!!");
+        TELEPHONY_LOGE("ERROR : OnResponseGetRilCurrentCellInfo --> CurrentCellInfo.ReadFromParcel(data) failed !!!");
         return;
     }
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
@@ -438,7 +525,7 @@ void RilRadioResponseTest::OnResponseGetRilCurrentCellInfo(OHOS::MessageParcel &
         cout << "OnResponseGetRilCurrentCellInfo: psc = " << curCellInfo->ServiceCellParas.wcdma.psc << endl;
         cout << "OnResponseGetRilCurrentCellInfo: cellId = " << curCellInfo->ServiceCellParas.wcdma.cellId << endl;
         cout << "OnResponseGetRilCurrentCellInfo: lac = " << curCellInfo->ServiceCellParas.wcdma.lac << endl;
-        cout << "OnResponseGetRilCurrentCellInfo: rscp = " << curCellInfo->ServiceCellParas.wcdma.rscp<< endl;
+        cout << "OnResponseGetRilCurrentCellInfo: rscp = " << curCellInfo->ServiceCellParas.wcdma.rscp << endl;
         cout << "OnResponseGetRilCurrentCellInfo: rxlev = " << curCellInfo->ServiceCellParas.wcdma.rxlev << endl;
         cout << "OnResponseGetRilCurrentCellInfo: ecno = " << curCellInfo->ServiceCellParas.wcdma.ecno << endl;
         cout << "OnResponseGetRilCurrentCellInfo: drx = " << curCellInfo->ServiceCellParas.wcdma.drx << endl;
@@ -635,8 +722,7 @@ void RilRadioResponseTest::OnResponseGetRadioState(OHOS::MessageParcel &data)
     int32_t radioState = data.ReadInt32();
     TELEPHONY_LOGI("OnResponseGetRadioStateResponse back");
 
-    cout << "---->OnResponseGetRadioStateResponse Result:" << endl
-        << "----> [radioState]: " << radioState;
+    cout << "---->OnResponseGetRadioStateResponse Result:" << endl << "----> [radioState]: " << radioState;
     PrintResponseInfo((struct HRilRadioResponseInfo *)spBuffer);
 }
 
@@ -653,8 +739,7 @@ void RilRadioResponseTest::OnResponseGetImei(OHOS::MessageParcel &data)
 
     TELEPHONY_LOGI("OnResponseGetImeiResponse back");
 
-    cout << "---->OnResponseGetImeiResponse Result:" << endl
-        << "----> [imeiId]: " << imeiId;
+    cout << "---->OnResponseGetImeiResponse Result:" << endl << "----> [imeiId]: " << imeiId;
     PrintResponseInfo((struct HRilRadioResponseInfo *)spBuffer);
 }
 
@@ -746,8 +831,7 @@ void RilRadioResponseTest::OnResponseGetPdpContextList(OHOS::MessageParcel &data
         return;
     }
     if (!dataCallList.get()->ReadFromParcel(data)) {
-        TELEPHONY_LOGE(
-            "ERROR : OnResponseGetPdpContextList --> dataCallList.ReadFromParcel(data) failed !!!");
+        TELEPHONY_LOGE("ERROR : OnResponseGetPdpContextList --> dataCallList.ReadFromParcel(data) failed !!!");
         return;
     }
     TELEPHONY_LOGI("OnResponseGetPdpContextList --> dataCallList.ReadFromParcel(data) success");
@@ -874,8 +958,7 @@ void RilRadioResponseTest::OnRequestGetNetworkSelectionModeTest(OHOS::MessagePar
     }
 
     if (!networkMode.get()->ReadFromParcel(data)) {
-        TELEPHONY_LOGE(
-            "ERROR : OnRequestGetNetworkSelectionModeTest --> ReadFromParcel(data) failed !!!");
+        TELEPHONY_LOGE("ERROR : OnRequestGetNetworkSelectionModeTest --> ReadFromParcel(data) failed !!!");
         return;
     }
 
@@ -952,7 +1035,7 @@ void RilRadioResponseTest::OnRequestGetNetworkPreferredNetworkModeTest(OHOS::Mes
         return;
     }
     cout << "OnRequestGetNetworkPreferredNetworkModeTest: preferredNetworkType = "
-        << preferNetworkType->preferredNetworkType << endl;
+         << preferNetworkType->preferredNetworkType << endl;
 }
 
 void RilRadioResponseTest::OnRequestGetModemVoiceRadioTest(OHOS::MessageParcel &data)
@@ -965,8 +1048,7 @@ void RilRadioResponseTest::OnRequestGetModemVoiceRadioTest(OHOS::MessageParcel &
         return;
     }
 
-    const struct HRilRadioResponseInfo *responseInfo =
-        reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
+    const struct HRilRadioResponseInfo *responseInfo = reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
     if (responseInfo->error == HRilErrType::NONE) {
         std::shared_ptr<VoiceRadioTechnology> voiceRadioTech = std::make_shared<VoiceRadioTechnology>();
         if (voiceRadioTech == nullptr) {
@@ -1028,8 +1110,8 @@ void RilRadioResponseTest::OnRequestGetPreferredNetworkTypeInfoTest(OHOS::Messag
         return;
     }
     networkType.get()->ReadFromParcel(data);
-    cout << "OnRequestGetPreferredNetworkTypeInfoTest: preferredNetworkType = "
-        << networkType->preferredNetworkType << endl;
+    cout << "OnRequestGetPreferredNetworkTypeInfoTest: preferredNetworkType = " << networkType->preferredNetworkType
+         << endl;
 }
 
 void RilRadioResponseTest::OnRequestGetLinkBandwidthInfoTest(OHOS::MessageParcel &data)
@@ -1055,9 +1137,9 @@ void RilRadioResponseTest::OnResponseSendRilCmSms(OHOS::MessageParcel &data)
         return;
     }
     cout << "---->OnResponseSendRilCmSms Result:" << endl
-        << "----> [msgRef]: " << sendSmsResultInfo->msgRef << endl
-        << "----> [pdu]: " << sendSmsResultInfo->pdu.c_str() << endl
-        << "----> [errCode]: " << sendSmsResultInfo->errCode << endl;
+         << "----> [msgRef]: " << sendSmsResultInfo->msgRef << endl
+         << "----> [pdu]: " << sendSmsResultInfo->pdu.c_str() << endl
+         << "----> [errCode]: " << sendSmsResultInfo->errCode << endl;
     PrintResponseInfo((struct HRilRadioResponseInfo *)spBuffer);
 }
 
@@ -1073,9 +1155,9 @@ void RilRadioResponseTest::OnResponseSendRilCmSmsMoreMode(OHOS::MessageParcel &d
         return;
     }
     cout << "---->OnResponseSendRilCmSmsMoreMode Result:" << endl
-        << "----> [msgRef]: " << sendSmsResultInfo->msgRef << endl
-        << "----> [pdu]: " << sendSmsResultInfo->pdu.c_str() << endl
-        << "----> [errCode]: " << sendSmsResultInfo->errCode << endl;
+         << "----> [msgRef]: " << sendSmsResultInfo->msgRef << endl
+         << "----> [pdu]: " << sendSmsResultInfo->pdu.c_str() << endl
+         << "----> [errCode]: " << sendSmsResultInfo->errCode << endl;
     PrintResponseInfo((struct HRilRadioResponseInfo *)spBuffer);
 }
 
@@ -1104,8 +1186,8 @@ void RilRadioResponseTest::OnResponseGetSmscAddr(OHOS::MessageParcel &data)
         return;
     }
     cout << "---->OnResponseGetSmscAddr Result:" << endl
-        << "----> [tosca]: " << serCenterAddress->tosca << endl
-        << "----> [address]: " << serCenterAddress->address.c_str() << endl;
+         << "----> [tosca]: " << serCenterAddress->tosca << endl
+         << "----> [address]: " << serCenterAddress->address.c_str() << endl;
     PrintResponseInfo((struct HRilRadioResponseInfo *)spBuffer);
 }
 
