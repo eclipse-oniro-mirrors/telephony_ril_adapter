@@ -84,6 +84,8 @@ public:
     int32_t GetCsRegStatus(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetPsRegStatus(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetOperatorInfo(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int32_t what);
+    int32_t SetNotificationFilter(int32_t filter, const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t SetDeviceState(int32_t deviceStateType, bool deviceStateOn, const AppExecFwk::InnerEvent::Pointer &result);
     int32_t SendSms(std::string smscPdu, std::string pdu, const std::shared_ptr<AppExecFwk::EventHandler> &handler,
         const AppExecFwk::InnerEvent::Pointer &response);
     int32_t SendSmsMoreMode(std::string smscPdu, std::string pdu,
@@ -105,6 +107,7 @@ public:
         const AppExecFwk::InnerEvent::Pointer &response);
     int32_t SimTransmitApduBasicChannel(ApduSimIORequestInfo reqInfo,
         const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t SetActiveSim(int32_t index, int32_t enable, const AppExecFwk::InnerEvent::Pointer &response);
     static const int32_t INVALID_WAKELOCK = -1;
     static const int32_t FOR_WAKELOCK = 0;
     static const int32_t FOR_ACK_WAKELOCK = 1;

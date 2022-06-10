@@ -38,6 +38,12 @@ int32_t RilRadioResponseTest::OnRemoteRequest(
         case HREQ_NETWORK_GET_CURRENT_CELL_INFO:
             OnResponseGetRilCurrentCellInfo(data);
             break;
+        case HREQ_NETWORK_SET_NOTIFICATION_FILTER:
+            OnRequestSetNotificationFilterTest(data);
+            break;
+        case HREQ_NETWORK_SET_DEVICE_STATE:
+            OnRequestSetDeviceStateTest(data);
+            break;
         default:
             break;
     }
@@ -479,6 +485,28 @@ void RilRadioResponseTest::OnRequestSetNetworkSelectionModeTest(MessageParcel &d
         TELEPHONY_LOGE("ERROR : OnRequestSetNetworkSelectionModeTest --> data.ReadBuffer(readSpSize) failed !!!");
         return;
     }
+}
+
+void RilRadioResponseTest::OnRequestSetNotificationFilterTest(OHOS::MessageParcel &data)
+{
+    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
+    const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("ERROR : OnRequestSetNotificationFilterTest --> data.ReadBuffer(readSpSize) failed !!!");
+        return;
+    }
+    TELEPHONY_LOGI("RilRadioResponseTest::OnRequestSetNotificationFilterTest --> ");
+}
+
+void RilRadioResponseTest::OnRequestSetDeviceStateTest(OHOS::MessageParcel &data)
+{
+    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
+    const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("ERROR : OnRequestSetDeviceStateTest --> data.ReadBuffer(readSpSize) failed !!!");
+        return;
+    }
+    TELEPHONY_LOGI("RilRadioResponseTest::OnRequestSetDeviceStateTest --> ");
 }
 
 void RilRadioResponseTest::OnRequestSetUssdTest(MessageParcel &data)

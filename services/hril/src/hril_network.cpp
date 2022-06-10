@@ -58,6 +58,8 @@ void HRilNetwork::AddHandlerToMap()
     reqMemberFuncMap_[HREQ_NETWORK_GET_RADIO_CAPABILITY] = &HRilNetwork::GetRadioCapability;
     reqMemberFuncMap_[HREQ_NETWORK_GET_PHYSICAL_CHANNEL_CONFIG] = &HRilNetwork::GetPhysicalChannelConfig;
     reqMemberFuncMap_[HREQ_NETWORK_SET_LOCATE_UPDATES] = &HRilNetwork::SetLocateUpdates;
+    reqMemberFuncMap_[HREQ_NETWORK_SET_NOTIFICATION_FILTER] = &HRilNetwork::SetNotificationFilter;
+    reqMemberFuncMap_[HREQ_NETWORK_SET_DEVICE_STATE] = &HRilNetwork::SetDeviceState;
 
     // Response
     respMemberFuncMap_[HREQ_NETWORK_GET_IMS_REG_STATUS] = &HRilNetwork::GetImsRegStatusResponse;
@@ -76,6 +78,8 @@ void HRilNetwork::AddHandlerToMap()
     respMemberFuncMap_[HREQ_NETWORK_GET_RADIO_CAPABILITY] = &HRilNetwork::GetRadioCapabilityResponse;
     respMemberFuncMap_[HREQ_NETWORK_GET_PHYSICAL_CHANNEL_CONFIG] = &HRilNetwork::GetPhysicalChannelConfigResponse;
     respMemberFuncMap_[HREQ_NETWORK_SET_LOCATE_UPDATES] = &HRilNetwork::SetLocateUpdatesResponse;
+    respMemberFuncMap_[HREQ_NETWORK_SET_NOTIFICATION_FILTER] = &HRilNetwork::SetNotificationFilterResponse;
+    respMemberFuncMap_[HREQ_NETWORK_SET_DEVICE_STATE] = &HRilNetwork::SetDeviceStateResponse;
 }
 
 int32_t HRilNetwork::GetImsRegStatus(struct HdfSBuf *data)
@@ -462,6 +466,61 @@ int32_t HRilNetwork::SetLocateUpdates(struct HdfSBuf *data)
         return HRIL_ERR_INVALID_PARAMETER;
     }
     networkFuncs_->SetLocateUpdates(requestInfo, mode);
+    return HRIL_ERR_SUCCESS;
+}
+
+int32_t HRilNetwork::SetNotificationFilter(struct HdfSBuf *data)
+{
+    if ((networkFuncs_ == nullptr) || (networkFuncs_->SetNotificationFilter == nullptr)) {
+        TELEPHONY_LOGE("SetNotificationFilter::networkFuncs_:%{public}p", networkFuncs_);
+        return HRIL_ERR_NULL_POINT;
+    }
+    int32_t serial = 0;
+    if (!HdfSbufReadInt32(data, &serial)) {
+        TELEPHONY_LOGE("SetNotificationFilter::miss serial parameter");
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    int32_t newFilter = 0;
+    if (!HdfSbufReadInt32(data, &newFilter)) {
+        TELEPHONY_LOGE("SetNotificationFilter::miss newFilter parameter");
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_NETWORK_SET_NOTIFICATION_FILTER);
+    if (requestInfo == nullptr) {
+        TELEPHONY_LOGE("SetNotificationFilter::Create Request is fail");
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    networkFuncs_->SetNotificationFilter(requestInfo, &newFilter);
+    return HRIL_ERR_SUCCESS;
+}
+
+int32_t HRilNetwork::SetDeviceState(struct HdfSBuf *data)
+{
+    if ((networkFuncs_ == nullptr) || (networkFuncs_->SetDeviceState == nullptr)) {
+        TELEPHONY_LOGE("SetDeviceState::networkFuncs_:%{public}p", networkFuncs_);
+        return HRIL_ERR_NULL_POINT;
+    }
+    int32_t serial = 0;
+    if (!HdfSbufReadInt32(data, &serial)) {
+        TELEPHONY_LOGE("SetDeviceState::miss serial parameter");
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    int32_t deviceStateType = 0;
+    if (!HdfSbufReadInt32(data, &deviceStateType)) {
+        TELEPHONY_LOGE("SetDeviceState::miss deviceStateType parameter");
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    int32_t deviceStateOn = 0;
+    if (!HdfSbufReadInt32(data, &deviceStateOn)) {
+        TELEPHONY_LOGE("SetDeviceState::miss deviceStateOn parameter");
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_NETWORK_SET_DEVICE_STATE);
+    if (requestInfo == nullptr) {
+        TELEPHONY_LOGE("SetDeviceState::Create Request is fail");
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    networkFuncs_->SetDeviceState(requestInfo, &deviceStateType, &deviceStateOn);
     return HRIL_ERR_SUCCESS;
 }
 
@@ -1477,6 +1536,18 @@ int32_t HRilNetwork::GetPhysicalChannelConfigResponse(
 }
 
 int32_t HRilNetwork::SetLocateUpdatesResponse(
+    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+{
+    return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));
+}
+
+int32_t HRilNetwork::SetNotificationFilterResponse(
+    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+{
+    return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));
+}
+
+int32_t HRilNetwork::SetDeviceStateResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));

@@ -29,7 +29,7 @@ struct Tmp1 {
 
 class RilRadioResponseTest : public IPCObjectStub {
 public:
-    RilRadioResponseTest(RilManagerTest *mRilManager);
+    explicit RilRadioResponseTest(RilManagerTest *mRilManager);
     ~RilRadioResponseTest();
 
     int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
@@ -67,6 +67,8 @@ public:
     void OnRequestGetNetworkSelectionModeTest(MessageParcel &data);
     void OnRequestGetNetworkSearchInformationTest(MessageParcel &data);
     void OnRequestSetNetworkSelectionModeTest(MessageParcel &data);
+    void OnRequestSetNotificationFilterTest(MessageParcel &data);
+    void OnRequestSetDeviceStateTest(MessageParcel &data);
     void OnRequestSetUssdTest(MessageParcel &data);
     void OnRequestGetUssdTest(MessageParcel &data);
     void OnRequestGetLinkBandwidthInfoTest(MessageParcel &data);
