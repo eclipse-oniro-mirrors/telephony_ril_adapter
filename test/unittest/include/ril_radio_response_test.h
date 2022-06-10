@@ -73,6 +73,8 @@ public:
     void OnRequestGetNetworkPreferredNetworkModeTest(OHOS::MessageParcel &data);
     void OnRequestSetNetworkPsAttachStatusTest(OHOS::MessageParcel &data);
     void OnRequestSetLocationUpdatesTest(OHOS::MessageParcel &data);
+    void OnRequestSetNotificationFilterTest(OHOS::MessageParcel &data);
+    void OnRequestSetDeviceStateTest(OHOS::MessageParcel &data);
     void OnRequestGetPreferredNetworkTypeInfoTest(OHOS::MessageParcel &data);
     void OnRequestGetModemVoiceRadioTest(OHOS::MessageParcel &data);
     void OnRequestSetNetworkSelectionModeTest(OHOS::MessageParcel &data);

@@ -15,8 +15,8 @@
 
 #include "ril_unit_test.h"
 
-#include <iostream>
 #include <unistd.h>
+#include <iostream>
 
 #include "hril_request.h"
 #include "telephony_log_wrapper.h"
@@ -432,6 +432,33 @@ void RilUnitTest::SetRilLocationUpdateTest(const OHOS::AppExecFwk::InnerEvent::P
 
     mRilManager_->SetLocationUpdate(enableFlg, result);
     TELEPHONY_LOGI("RilUnitTest::SetRilLocationUpdateTest --> SetRilLocationUpdateTest finished");
+}
+
+void RilUnitTest::SetRilNotificationFilterTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    int32_t filter;
+
+    TELEPHONY_LOGI("RilUnitTest::SetRilNotificationFilterTest -->");
+    cout << "please enter the filter:";
+    cin >> filter;
+
+    mRilManager_->SetNotificationFilter(filter, result);
+    TELEPHONY_LOGI("RilUnitTest::SetRilNotificationFilterTest --> SetRilNotificationFilterTest finished");
+}
+
+void RilUnitTest::SetRilDeviceStateTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    int32_t deviceStateType;
+    bool deviceStateOn;
+
+    TELEPHONY_LOGI("RilUnitTest::SetRilDeviceStateTest -->");
+    cout << "please enter the deviceStateType:" << endl;
+    cin >> deviceStateType;
+    cout << "please enter the deviceStateOn:" << endl;
+    cin >> deviceStateOn;
+
+    mRilManager_->SetDeviceState(deviceStateType, deviceStateOn, result);
+    TELEPHONY_LOGI("RilUnitTest::SetRilDeviceStateTest --> SetRilDeviceStateTest finished");
 }
 
 void RilUnitTest::SetRilPsAttachStatusTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
@@ -967,6 +994,8 @@ void RilUnitTest::OnInitProcessInterface()
     memberFuncMap_[HREQ_NETWORK_SET_PS_ATTACH_STATUS] = &RilUnitTest::SetRilPsAttachStatusTest;
     memberFuncMap_[HREQ_NETWORK_GET_PS_ATTACH_STATUS] = &RilUnitTest::GetRilPsAttachStatusTest;
     memberFuncMap_[HREQ_NETWORK_SET_LOCATE_UPDATES] = &RilUnitTest::SetRilLocationUpdateTest;
+    memberFuncMap_[HREQ_NETWORK_SET_NOTIFICATION_FILTER] = &RilUnitTest::SetRilNotificationFilterTest;
+    memberFuncMap_[HREQ_NETWORK_SET_DEVICE_STATE] = &RilUnitTest::SetRilDeviceStateTest;
 
     // modem
     memberFuncMap_[HREQ_MODEM_SET_RADIO_STATUS] = &RilUnitTest::SetRilCmRadioPowerTest;
@@ -1129,6 +1158,9 @@ static int32_t PrintNetworkMenu()
     cout << "----> [" << HREQ_NETWORK_SET_PS_ATTACH_STATUS << "] ---->[ HREQ_NETWORK_SET_PS_ATTACH_STATUS ]" << endl;
     cout << "----> [" << HREQ_NETWORK_GET_PS_ATTACH_STATUS << "] ---->[ HREQ_NETWORK_GET_PS_ATTACH_STATUS ]" << endl;
     cout << "----> [" << HREQ_NETWORK_SET_LOCATE_UPDATES << "] ---->[ HREQ_NETWORK_SET_LOCATE_UPDATES ]" << endl;
+    cout << "----> [" << HREQ_NETWORK_SET_NOTIFICATION_FILTER
+         << "] ---->[ HREQ_NETWORK_SET_NOTIFICATION_FILTER ]" << endl;
+    cout << "----> [" << HREQ_NETWORK_SET_DEVICE_STATE << "] ---->[ HREQ_NETWORK_SET_DEVICE_STATE ]" << endl;
     int32_t choice = InputInt32(HREQ_NETWORK_BASE, HREQ_COMMON_BASE - 1, "Command");
     cout << "---->You choose: " << choice << endl;
     choice = (choice == HREQ_NETWORK_BASE) ? -1 : choice;

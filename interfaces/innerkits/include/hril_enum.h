@@ -393,4 +393,18 @@ typedef enum { HRIL_SIM_TYPE_UNKNOWN = 0, HRIL_SIM_TYPE_SIM, HRIL_SIM_TYPE_USIM 
 
 typedef enum { HRIL_UNNEED_ACK = 0, HRIL_NEED_ACK } HRilAckTypes;
 
+typedef enum {
+    NONE = 0,
+    SIGNAL_STRENGTH = 1,
+    NETWORK_STATE = 2,
+    DATA_CALL = 4,
+    PHYSICAL_CHANNEL_CONFIG = 8
+} HRilNotificationFilter;
+
+typedef enum {
+    POWER_SAVE_MODE,
+    CHARGING_STATE,
+    LOW_DATA_STATE
+} HRilDeviceStateType;
+
 #endif // OHOS_HRIL_ENUM_H

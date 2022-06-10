@@ -174,6 +174,12 @@ int32_t RilRadioResponseTest::OnRemoteRequest(
         case HREQ_NETWORK_SET_LOCATE_UPDATES:
             OnRequestSetLocationUpdatesTest(data);
             break;
+        case HREQ_NETWORK_SET_NOTIFICATION_FILTER:
+            OnRequestSetNotificationFilterTest(data);
+            break;
+        case HREQ_NETWORK_SET_DEVICE_STATE:
+            OnRequestSetDeviceStateTest(data);
+            break;
         case HREQ_MODEM_GET_VOICE_RADIO:
             OnRequestGetModemVoiceRadioTest(data);
             break;
@@ -1093,6 +1099,32 @@ void RilRadioResponseTest::OnRequestSetLocationUpdatesTest(OHOS::MessageParcel &
     }
 
     cout << "---->SetLocationUpdates Result:";
+    PrintResponseInfo((struct HRilRadioResponseInfo *)spBuffer);
+}
+
+void RilRadioResponseTest::OnRequestSetNotificationFilterTest(OHOS::MessageParcel &data)
+{
+    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
+    const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("RilRadioResponseTest OnRequestSetNotificationFilterTest read spBuffer failed");
+        return;
+    }
+
+    cout << "---->SetNotificationFilter Result:";
+    PrintResponseInfo((struct HRilRadioResponseInfo *)spBuffer);
+}
+
+void RilRadioResponseTest::OnRequestSetDeviceStateTest(OHOS::MessageParcel &data)
+{
+    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
+    const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("RilRadioResponseTest OnRequestSetDeviceStateTest read spBuffer failed");
+        return;
+    }
+
+    cout << "---->SetDeviceState Result:";
     PrintResponseInfo((struct HRilRadioResponseInfo *)spBuffer);
 }
 

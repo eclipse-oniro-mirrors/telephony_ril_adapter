@@ -27,7 +27,8 @@ class RilUnitTest : public testing::Test {
 public:
     class DemoHandler : public AppExecFwk::EventHandler {
     public:
-        DemoHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner) : AppExecFwk::EventHandler(runner) {}
+        explicit DemoHandler(
+            const std::shared_ptr<AppExecFwk::EventRunner> &runner) : AppExecFwk::EventHandler(runner) {}
         ~DemoHandler() {}
 
         void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
@@ -63,6 +64,8 @@ private:
     void GetRilCmCsRegStatusTest(const AppExecFwk::InnerEvent::Pointer &result);
     void GetRilCmPsRegStatusTest(const AppExecFwk::InnerEvent::Pointer &result);
     void GetRilCmOperatorTest(const AppExecFwk::InnerEvent::Pointer &result);
+    void SetRilNotificationFilterTest(const AppExecFwk::InnerEvent::Pointer &result);
+    void SetRilDeviceStateTest(const AppExecFwk::InnerEvent::Pointer &result);
     void SendRilCmSmsTest(const AppExecFwk::InnerEvent::Pointer &result);
     void SendRilCmSmsMoreModeTest(const AppExecFwk::InnerEvent::Pointer &result);
     void SetRilCmRadioPowerTest(const AppExecFwk::InnerEvent::Pointer &result);
@@ -77,6 +80,8 @@ private:
     void SimTransmitApduLogicalChannelTest(const AppExecFwk::InnerEvent::Pointer &result);
     void SimTransmitApduBasicChannelTest(const AppExecFwk::InnerEvent::Pointer &result);
     void SimCloseLogicalChannelTest(const AppExecFwk::InnerEvent::Pointer &result);
+    void SetActiveSimTest(const AppExecFwk::InnerEvent::Pointer &result);
+
 private:
     std::unique_ptr<RilManagerTest> mRilManager_;
     using RilManagerAndResponseTestFun = void (RilUnitTest::*)(const OHOS::AppExecFwk::InnerEvent::Pointer &event);

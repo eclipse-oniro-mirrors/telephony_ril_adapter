@@ -111,6 +111,8 @@ public:
     void GetPsAttachStatus(const AppExecFwk::InnerEvent::Pointer &response);
     void SetPreferredNetwrok(int32_t preferredNetwork, const AppExecFwk::InnerEvent::Pointer &result);
     void SetLocationUpdate(int32_t enableFlg, const AppExecFwk::InnerEvent::Pointer &result);
+    void SetNotificationFilter(int32_t filter, const AppExecFwk::InnerEvent::Pointer &result);
+    void SetDeviceState(int32_t deviceStateType, bool deviceStateOn, const AppExecFwk::InnerEvent::Pointer &result);
     void SetPsAttachStatus(int32_t attachFlg, const AppExecFwk::InnerEvent::Pointer &result);
     void SetNetworkSelectionMode(int32_t mode, std::string plmn, const AppExecFwk::InnerEvent::Pointer &result);
     void GetVoiceRadio(const AppExecFwk::InnerEvent::Pointer &response);

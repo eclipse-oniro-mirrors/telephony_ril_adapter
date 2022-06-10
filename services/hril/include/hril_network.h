@@ -45,6 +45,8 @@ public:
     int32_t GetRadioCapability(struct HdfSBuf *data);
     int32_t GetPhysicalChannelConfig(struct HdfSBuf *data);
     int32_t SetLocateUpdates(struct HdfSBuf *data);
+    int32_t SetNotificationFilter(struct HdfSBuf *data);
+    int32_t SetDeviceState(struct HdfSBuf *data);
 
     int32_t GetImsRegStatusResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
@@ -75,6 +77,10 @@ public:
     int32_t GetPhysicalChannelConfigResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t SetLocateUpdatesResponse(
+        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t SetNotificationFilterResponse(
+        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t SetDeviceStateResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t NetworkCsRegStatusUpdated(int32_t indType, HRilErrNumber e, const void *response, size_t responseLen);
     int32_t NetworkPsRegStatusUpdated(int32_t indType, HRilErrNumber e, const void *response, size_t responseLen);

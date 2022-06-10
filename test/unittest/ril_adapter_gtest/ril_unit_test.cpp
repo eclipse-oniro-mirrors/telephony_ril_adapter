@@ -89,6 +89,8 @@ void RilUnitTest::AddRequestToMap()
     memberFuncMap_[HREQ_CALL_COMBINE_CONFERENCE] = &RilUnitTest::RilCmJoinCallTest;
     memberFuncMap_[HREQ_CALL_SEPARATE_CONFERENCE] = &RilUnitTest::RilCmSplitCallTest;
     memberFuncMap_[HREQ_NETWORK_GET_OPERATOR_INFO] = &RilUnitTest::GetRilCmOperatorTest;
+    memberFuncMap_[HREQ_NETWORK_SET_NOTIFICATION_FILTER] = &RilUnitTest::SetRilNotificationFilterTest;
+    memberFuncMap_[HREQ_NETWORK_SET_DEVICE_STATE] = &RilUnitTest::SetRilDeviceStateTest;
     memberFuncMap_[HREQ_SMS_SEND_GSM_SMS] = &RilUnitTest::SendRilCmSmsTest;
     memberFuncMap_[HREQ_SMS_SEND_SMS_MORE_MODE] = &RilUnitTest::SendRilCmSmsMoreModeTest;
     memberFuncMap_[HREQ_MODEM_SET_RADIO_STATUS] = &RilUnitTest::SetRilCmRadioPowerTest;
@@ -107,6 +109,7 @@ void RilUnitTest::AddRequestToMap()
     memberFuncMap_[HREQ_SIM_TRANSMIT_APDU_LOGICAL_CHANNEL] = &RilUnitTest::SimTransmitApduLogicalChannelTest;
     memberFuncMap_[HREQ_SIM_TRANSMIT_APDU_BASIC_CHANNEL] = &RilUnitTest::SimTransmitApduBasicChannelTest;
     memberFuncMap_[HREQ_SIM_CLOSE_LOGICAL_CHANNEL] = &RilUnitTest::SimCloseLogicalChannelTest;
+    memberFuncMap_[HREQ_SIM_SET_ACTIVE_SIM] = &RilUnitTest::SetActiveSimTest;
 }
 
 void RilUnitTest::GetCallListTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
@@ -323,6 +326,24 @@ void RilUnitTest::GetRilCmOperatorTest(const OHOS::AppExecFwk::InnerEvent::Point
     ASSERT_EQ(0, ret);
 }
 
+void RilUnitTest::SetRilNotificationFilterTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::SetRilNotificationFilterTest -->");
+    int32_t ret = mRilManager_->SetNotificationFilter(15, result);
+    TELEPHONY_LOGI("RilUnitTest::SetRilNotificationFilterTest --> SetRilNotificationFilterTest finished");
+    TELEPHONY_LOGI("RilUnitTest::SetRilNotificationFilterTest return: %{public}d", ret);
+    ASSERT_EQ(0, ret);
+}
+
+void RilUnitTest::SetRilDeviceStateTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::SetRilDeviceStateTest -->");
+    int32_t ret = mRilManager_->SetDeviceState(0, 1, result);
+    TELEPHONY_LOGI("RilUnitTest::SetRilDeviceStateTest --> SetRilDeviceStateTest finished");
+    TELEPHONY_LOGI("RilUnitTest::SetRilDeviceStateTest return: %{public}d", ret);
+    ASSERT_EQ(0, ret);
+}
+
 void RilUnitTest::SendRilCmSmsTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("RilUnitTest::SendRilCmSmsTest -->");
@@ -425,6 +446,19 @@ void RilUnitTest::SimCloseLogicalChannelTest(const OHOS::AppExecFwk::InnerEvent:
         "RilUnitTest::SimCloseLogicalChannelTest --> SimCloseLogicalChannelTest "
         "finished");
     TELEPHONY_LOGI("RilUnitTest::SimCloseLogicalChannelTest return: %{public}d", ret);
+    ASSERT_EQ(0, ret);
+}
+
+void RilUnitTest::SetActiveSimTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::SetActiveSimTest -->");
+    int32_t index = 1;
+    int32_t enable = 1;
+    int32_t ret = mRilManager_->SetActiveSim(index, enable, result);
+    TELEPHONY_LOGI(
+        "RilUnitTest::SetActiveSimTest --> SetActiveSimTest "
+        "finished");
+    TELEPHONY_LOGI("RilUnitTest::SetActiveSimTest return: %{public}d", ret);
     ASSERT_EQ(0, ret);
 }
 
@@ -604,6 +638,22 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetRilCmPsRegStatusTest_0100, Functio
     OnProcessTest(HREQ_NETWORK_GET_PS_REG_STATUS, event);
 }
 
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetRilNotificationFilterTest_0100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_NETWORK_SET_NOTIFICATION_FILTER);
+    event->SetOwner(GetHandler());
+    OnProcessTest(HREQ_NETWORK_SET_NOTIFICATION_FILTER, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetRilDeviceStateTest_0100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_NETWORK_SET_DEVICE_STATE);
+    event->SetOwner(GetHandler());
+    OnProcessTest(HREQ_NETWORK_SET_DEVICE_STATE, event);
+}
+
 HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetSimIOTest_0100, Function | MediumTest | Level3)
 {
     OnInit();
@@ -666,6 +716,14 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_SimCloseLogicalChannelTest_0100, Func
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_SIM_CLOSE_LOGICAL_CHANNEL);
     event->SetOwner(GetHandler());
     OnProcessTest(HREQ_SIM_CLOSE_LOGICAL_CHANNEL, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetActiveSimTest_0100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_SIM_SET_ACTIVE_SIM);
+    event->SetOwner(GetHandler());
+    OnProcessTest(HREQ_SIM_SET_ACTIVE_SIM, event);
 }
 
 HWTEST_F(RilUnitTest, Telephony_RilAdapter_ActivatePdpContextTest_0100, Function | MediumTest | Level3)

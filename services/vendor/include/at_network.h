@@ -49,6 +49,8 @@ void ReqSetPreferredNetwork(const ReqDataInfo *requestInfo, const int32_t *data)
 void ReqGetPreferredNetwork(const ReqDataInfo *requestInfo);
 void ReqGetPhysicalChannelConfig(const ReqDataInfo *requestInfo);
 void ReqSetLocateUpdates(const ReqDataInfo *requestInfo, HRilRegNotifyMode mode);
+void ReqSetNotificationFilter(const ReqDataInfo *requestInfo, const int32_t *newFilter);
+void ReqSetDeviceState(const ReqDataInfo *requestInfo, const int32_t *deviceStateType, const int32_t *deviceStateOn);
 void ProcessPhyChnlCfgNotify(struct ReportInfo reportInfo, char *srcStr);
 int32_t ProcessCurrentCellList(struct ReportInfo reportInfo, const char *s);
 int32_t ProcessRegStatus(const char *s, const HRilRegStatusInfo *hrilRegStateInfo);
@@ -61,4 +63,6 @@ int32_t ParseOperListInfo(
     const char *lineInfo, int32_t count, AvailableOperInfo *pOperInfo, AvailableOperInfo **ppOperInfo);
 void NotifyNetWorkTime(int32_t slotId);
 void GetNetworkSearchInformationPause(void);
+int32_t SendNotificationFilterCommand(
+    const ReqDataInfo *requestInfo, struct ReportInfo reportInfo, const char *command);
 #endif

@@ -25,7 +25,7 @@ const int32_t NUM_CIRCLES = 4;
 namespace {
 class RilUnitTest {
 public:
-    RilUnitTest(int32_t opt);
+    explicit RilUnitTest(int32_t opt);
     ~RilUnitTest();
 
     void OnInit();
@@ -85,6 +85,8 @@ public:
     void SetRilPsAttachStatusTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void SetRilNetworkSelectionModeTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void SetRilLocationUpdateTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void SetRilNotificationFilterTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void SetRilDeviceStateTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void SetupRilCmDataCallTest(const AppExecFwk::InnerEvent::Pointer &result);
     void DeactivateRilCmDataCallTest(const AppExecFwk::InnerEvent::Pointer &result);
     void GetRilCmDataCallListTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
@@ -112,7 +114,8 @@ public:
 
     class DemoHandler : public AppExecFwk::EventHandler {
     public:
-        DemoHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner) : AppExecFwk::EventHandler(runner) {}
+        explicit DemoHandler(
+            const std::shared_ptr<AppExecFwk::EventRunner> &runner) : AppExecFwk::EventHandler(runner) {}
         ~DemoHandler() {}
 
         void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;

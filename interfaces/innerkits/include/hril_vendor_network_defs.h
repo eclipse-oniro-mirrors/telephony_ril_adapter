@@ -302,6 +302,8 @@ typedef struct {
     void (*GetRadioCapability)(const ReqDataInfo *requestInfo);
     void (*GetPhysicalChannelConfig)(const ReqDataInfo *requestInfo);
     void (*SetLocateUpdates)(const ReqDataInfo *requestInfo, HRilRegNotifyMode mode);
+    void (*SetNotificationFilter)(const ReqDataInfo *requestInfo, const int32_t *newFilter);
+    void (*SetDeviceState)(const ReqDataInfo *requestInfo, const int32_t *deviceStateType, const int32_t *deviceState);
 } HRilNetworkReq;
 #ifdef __cplusplus
 }

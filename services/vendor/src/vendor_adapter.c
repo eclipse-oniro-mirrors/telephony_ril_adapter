@@ -139,6 +139,8 @@ static const HRilNetworkReq g_networkReqOps = {
     .GetRadioCapability = ReqGetRadioCapability,
     .GetPhysicalChannelConfig = ReqGetPhysicalChannelConfig,
     .SetLocateUpdates = ReqSetLocateUpdates,
+    .SetNotificationFilter = ReqSetNotificationFilter,
+    .SetDeviceState = ReqSetDeviceState,
 };
 
 static const HRilDataReq g_dataReqOps = {

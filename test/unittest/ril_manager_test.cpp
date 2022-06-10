@@ -765,6 +765,48 @@ void RilManagerTest::SetLocationUpdate(int32_t enableFlg, const AppExecFwk::Inne
     }
 }
 
+void RilManagerTest::SetNotificationFilter(int32_t filter, const AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("SetRilNotificationFilter Request ");
+    if (cellularRadio_ != nullptr) {
+        std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_NETWORK_SET_NOTIFICATION_FILTER, result);
+        if (request == nullptr) {
+            return;
+        }
+        MessageParcel data;
+        MessageParcel reply;
+        data.WriteInt32(slotId_);
+        data.WriteInt32(request->serialId_);
+        data.WriteInt32(filter);
+        MessageOption option;
+        cellularRadio_->SendRequest(HREQ_NETWORK_SET_NOTIFICATION_FILTER, data, reply, option);
+    } else {
+        TELEPHONY_LOGE("SetRilNotificationFilter cellularRadio_ == nullptr");
+    }
+}
+
+void RilManagerTest::SetDeviceState(
+    int32_t deviceStateType, bool deviceStateOn, const AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("SetRilDeviceState Request ");
+    if (cellularRadio_ != nullptr) {
+        std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_NETWORK_SET_DEVICE_STATE, result);
+        if (request == nullptr) {
+            return;
+        }
+        MessageParcel data;
+        MessageParcel reply;
+        data.WriteInt32(slotId_);
+        data.WriteInt32(request->serialId_);
+        data.WriteInt32(deviceStateType);
+        data.WriteInt32(deviceStateOn);
+        MessageOption option;
+        cellularRadio_->SendRequest(HREQ_NETWORK_SET_DEVICE_STATE, data, reply, option);
+    } else {
+        TELEPHONY_LOGE("SetRilDeviceState cellularRadio_ == nullptr");
+    }
+}
+
 void RilManagerTest::SetPsAttachStatus(int32_t attachFlg, const AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("SetRilPsAttachStatus  Request ");
