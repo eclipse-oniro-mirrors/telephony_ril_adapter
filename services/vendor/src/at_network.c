@@ -2204,7 +2204,7 @@ void ReqSetNotificationFilter(const ReqDataInfo *requestInfo, const int32_t *new
     }
     int32_t filter = *(int32_t *)newFilter;
     // Currently only support the control for network state
-    bool setNotificationOn = (filter & NETWORK_STATE) == NETWORK_STATE;
+    bool setNotificationOn = (filter & NOTIFICATION_FILTER_NETWORK_STATE) == NOTIFICATION_FILTER_NETWORK_STATE;
     char *csCommand = setNotificationOn ? "AT+CREG=2" : "AT+CREG=0";
     char *psCommand = setNotificationOn ? "AT+CGREG=2" : "AT+CGREG=0";
     int32_t err = SendNotificationFilterCommand(requestInfo, reportInfo, csCommand);
