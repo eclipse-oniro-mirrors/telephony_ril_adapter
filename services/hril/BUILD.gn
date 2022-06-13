@@ -15,7 +15,7 @@ import("//base/telephony/core_service/telephony.gni")
 import("//build/ohos.gni")
 import("//drivers/adapter/uhdf2/uhdf.gni")
 
-RIL_ADAPTER = "//base/telephony"
+RIL_ADAPTER = "//base/telephony/ril_adapter"
 RIL_HRIL = "//base/telephony/ril_adapter/services/hril/src"
 
 ohos_shared_library("hril") {
@@ -33,12 +33,12 @@ ohos_shared_library("hril") {
   ]
 
   include_dirs = [
-    "$RIL_ADAPTER/ril_adapter/services/hril/include",
+    "$RIL_ADAPTER/services/hril/include",
     "//drivers/adapter/uhdf2/include/hdi",
     "//third_party/json/include",
   ]
 
-  configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
+  configs = [ "$RIL_ADAPTER/utils:utils_config" ]
 
   defines += [
     "TELEPHONY_LOG_TAG = \"Hril\"",
@@ -46,7 +46,6 @@ ohos_shared_library("hril") {
   ]
 
   deps = [
-    "//base/miscservices/time/services:time_service",
     "//base/telephony/ril_adapter/interfaces/innerkits:hril_innerkits",
     "//drivers/adapter/uhdf2/host:libhdf_host",
     "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
@@ -54,12 +53,8 @@ ohos_shared_library("hril") {
   ]
 
   external_deps = [
-    "ability_base:want",
-    "ability_runtime:wantagent_innerkits",
     "ipc:ipc_core",
     "power_manager_native:powermgr_client",
-    "safwk:system_ability_fwk",
-    "samgr_standard:samgr_proxy",
     "startup_l2:syspara",
   ]
 
@@ -71,8 +66,7 @@ ohos_shared_library("hril") {
     external_deps += [ "hilog:libhilog" ]
   }
 
-  #install_images = [ "vendor" ]
-
+  install_images = [ chipset_base_dir ]
   part_name = "ril_adapter"
   subsystem_name = "telephony"
 }

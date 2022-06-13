@@ -26,7 +26,7 @@ ohos_shared_library("hril_hdf") {
 
   include_dirs = [ "$HRIL_HDF_ROOT/include" ]
 
-  configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
+  configs = [ "$RIL_ADAPTER/utils:utils_config" ]
 
   public_deps = [ "//third_party/eudev:libudev" ]
 

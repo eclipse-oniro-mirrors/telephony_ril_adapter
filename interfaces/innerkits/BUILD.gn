@@ -13,11 +13,11 @@
 
 import("//build/ohos.gni")
 
-RIL_ADAPTER = "//base/telephony"
+RIL_ADAPTER = "//base/telephony/ril_adapter"
 RIL_FRAMEWORKS = "//base/telephony/ril_adapter/frameworks/src"
 
 config("hril_config") {
-  include_dirs = [ "$RIL_ADAPTER/ril_adapter/interfaces/innerkits/include" ]
+  include_dirs = [ "$RIL_ADAPTER/interfaces/innerkits/include" ]
 
   cflags = []
   if (is_double_framework) {
@@ -45,11 +45,9 @@ ohos_shared_library("hril_innerkits") {
     "$RIL_FRAMEWORKS/hril_sms_parcel.cpp",
   ]
 
-  configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
-
   public_configs = [
     ":hril_config",
-    "$RIL_ADAPTER/ril_adapter/utils:utils_config",
+    "$RIL_ADAPTER/utils:utils_config",
   ]
 
   defines = [

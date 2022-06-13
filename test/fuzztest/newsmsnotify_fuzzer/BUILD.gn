@@ -25,7 +25,7 @@ ohos_fuzztest("NewSmsNotifyFuzzTest") {
       "//base/telephony/ril_adapter/test/fuzztest/newsmsnotify_fuzzer"
   include_dirs = [ "//base/telephony/ril_adapter/services/hril/include" ]
 
-  configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
+  configs = [ "//base/telephony/ril_adapter/utils:utils_config" ]
 
   deps = [
     "//base/telephony/ril_adapter/interfaces/innerkits:hril_innerkits",

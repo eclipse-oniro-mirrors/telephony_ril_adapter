@@ -14,7 +14,7 @@
 #import("//build/test.gni")
 import("//build/ohos.gni")
 import("//drivers/adapter/uhdf2/uhdf.gni")
-RIL_ADAPTER = "//base/telephony"
+RIL_ADAPTER = "//base/telephony/ril_adapter"
 
 ohos_executable("ril_adapter_test") {
   install_enable = true
@@ -25,21 +25,21 @@ ohos_executable("ril_adapter_test") {
     "ril_unit_test.cpp",
   ]
   include_dirs = [
-    "$RIL_ADAPTER/ril_adapter/services/hril/include",
-    "$RIL_ADAPTER/ril_adapter/test/unittest/include",
+    "$RIL_ADAPTER/services/hril/include",
+    "$RIL_ADAPTER/test/unittest/include",
     "//drivers/adapter/uhdf2/include/hdi",
     "//third_party/json/include",
     "//base/telephony/ril_adapter/include",
   ]
-  configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
+  configs = [ "$RIL_ADAPTER/utils:utils_config" ]
   defines = [
     "TELEPHONY_LOG_TAG = \"HrilTest\"",
     "LOG_DOMAIN = 0xD002B01",
   ]
   deps = [
-    "$RIL_ADAPTER/ril_adapter/interfaces/innerkits:hril_innerkits",
-    "$RIL_ADAPTER/ril_adapter/services/hril:hril",
-    "$RIL_ADAPTER/ril_adapter/services/vendor:ril_vendor",
+    "$RIL_ADAPTER/interfaces/innerkits:hril_innerkits",
+    "$RIL_ADAPTER/services/hril:hril",
+    "$RIL_ADAPTER/services/vendor:ril_vendor",
     "$hdf_uhdf_path/hdi:libhdi",
     "//drivers/adapter/uhdf2/host:libhdf_host",
     "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
