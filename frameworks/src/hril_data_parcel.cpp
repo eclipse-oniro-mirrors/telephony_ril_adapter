@@ -130,6 +130,9 @@ std::shared_ptr<SetupDataCallResultInfo> SetupDataCallResultInfo::UnMarshalling(
 
 bool DataCallResultList::ReadFromParcel(Parcel &parcel)
 {
+    if (size > TELEPHONY_PARCEL_MAX_COUNT) {
+        return false;
+    }
     if (!Read(parcel, size)) {
         return false;
     }
@@ -142,6 +145,9 @@ bool DataCallResultList::ReadFromParcel(Parcel &parcel)
 
 bool DataCallResultList::Marshalling(Parcel &parcel) const
 {
+    if (size > TELEPHONY_PARCEL_MAX_COUNT) {
+        return false;
+    }
     if (!Write(parcel, size)) {
         return false;
     }

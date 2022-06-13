@@ -211,6 +211,8 @@ using HRilInt32Parcel = struct HRilCommonParcel<int32_t>;
 using HRilInt64Parcel = struct HRilCommonParcel<int64_t>;
 using HRilBoolParcel = struct HRilCommonParcel<bool>;
 using HRilStringParcel = struct HRilCommonParcel<std::string>;
+
+static constexpr uint32_t TELEPHONY_PARCEL_MAX_COUNT = 1024;
 } // namespace Telephony
 } // namespace OHOS
 #endif // OHOS_RIL_BASE_PARCEL_H
