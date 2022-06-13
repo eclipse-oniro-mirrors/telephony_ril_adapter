@@ -190,6 +190,9 @@ std::shared_ptr<PsRegStatusResultInfo> PsRegStatusResultInfo::UnMarshalling(Parc
 
 bool PhysicalChannelConfig::ReadFromParcel(Parcel &parcel)
 {
+    if (contextIdNum > TELEPHONY_PARCEL_MAX_COUNT) {
+        return false;
+    }
     if (!ReadBaseInt32(parcel, cellConnStatus)) {
         return false;
     }
@@ -222,6 +225,9 @@ bool PhysicalChannelConfig::ReadFromParcel(Parcel &parcel)
 
 bool PhysicalChannelConfig::Marshalling(Parcel &parcel) const
 {
+    if (contextIdNum > TELEPHONY_PARCEL_MAX_COUNT) {
+        return false;
+    }
     if (!WriteBaseInt32(parcel, cellConnStatus)) {
         return false;
     }
@@ -262,6 +268,9 @@ std::shared_ptr<PhysicalChannelConfig> PhysicalChannelConfig::UnMarshalling(Parc
 
 bool ChannelConfigInfoList::ReadFromParcel(Parcel &parcel)
 {
+    if (itemNum > TELEPHONY_PARCEL_MAX_COUNT) {
+        return false;
+    }
     if (!ReadBaseInt32(parcel, itemNum)) {
         return false;
     }
@@ -276,6 +285,9 @@ bool ChannelConfigInfoList::ReadFromParcel(Parcel &parcel)
 
 bool ChannelConfigInfoList::Marshalling(Parcel &parcel) const
 {
+    if (itemNum > TELEPHONY_PARCEL_MAX_COUNT) {
+        return false;
+    }
     if (!WriteBaseInt32(parcel, itemNum)) {
         return false;
     }
@@ -390,6 +402,9 @@ std::shared_ptr<SetNetworkModeInfo> SetNetworkModeInfo::UnMarshalling(Parcel &pa
 
 bool AvailableNetworkList::ReadFromParcel(Parcel &parcel)
 {
+    if (itemNum > TELEPHONY_PARCEL_MAX_COUNT) {
+        return false;
+    }
     if (!ReadBaseInt32(parcel, itemNum)) {
         return false;
     }
@@ -405,6 +420,9 @@ bool AvailableNetworkList::ReadFromParcel(Parcel &parcel)
 
 bool AvailableNetworkList::Marshalling(Parcel &parcel) const
 {
+    if (itemNum > TELEPHONY_PARCEL_MAX_COUNT) {
+        return false;
+    }
     if (!WriteBaseInt32(parcel, itemNum)) {
         return false;
     }
@@ -847,6 +865,9 @@ std::shared_ptr<CurrentCellInfo> CurrentCellInfo::UnMarshalling(Parcel &parcel)
 
 bool CellListCurrentInfo::ReadFromParcel(Parcel &parcel)
 {
+    if (itemNum > TELEPHONY_PARCEL_MAX_COUNT) {
+        return false;
+    }
     if (!ReadBaseInt32(parcel, itemNum)) {
         return false;
     }
@@ -865,6 +886,9 @@ bool CellListCurrentInfo::ReadFromParcel(Parcel &parcel)
 
 bool CellListCurrentInfo::Marshalling(Parcel &parcel) const
 {
+    if (itemNum > TELEPHONY_PARCEL_MAX_COUNT) {
+        return false;
+    }
     if (!WriteBaseInt32(parcel, itemNum)) {
         return false;
     }
@@ -887,6 +911,9 @@ std::shared_ptr<CellListCurrentInfo> CellListCurrentInfo::UnMarshalling(Parcel &
 
 bool CellListNearbyInfo::ReadFromParcel(Parcel &parcel)
 {
+    if (itemNum > TELEPHONY_PARCEL_MAX_COUNT) {
+        return false;
+    }
     if (!ReadBaseInt32(parcel, itemNum)) {
         return false;
     }
@@ -905,6 +932,9 @@ bool CellListNearbyInfo::ReadFromParcel(Parcel &parcel)
 
 bool CellListNearbyInfo::Marshalling(Parcel &parcel) const
 {
+    if (itemNum > TELEPHONY_PARCEL_MAX_COUNT) {
+        return false;
+    }
     if (!WriteBaseInt32(parcel, itemNum)) {
         return false;
     }

@@ -273,6 +273,9 @@ std::shared_ptr<CdmaCBConfigInfo> CdmaCBConfigInfo::UnMarshalling(Parcel &parcel
 
 bool CdmaCBConfigInfoList::ReadFromParcel(Parcel &parcel)
 {
+    if (size > TELEPHONY_PARCEL_MAX_COUNT) {
+        return false;
+    }
     if (!ReadBaseInt32(parcel, serial)) {
         return false;
     }
@@ -288,6 +291,9 @@ bool CdmaCBConfigInfoList::ReadFromParcel(Parcel &parcel)
 
 bool CdmaCBConfigInfoList::Marshalling(Parcel &parcel) const
 {
+    if (size > TELEPHONY_PARCEL_MAX_COUNT) {
+        return false;
+    }
     if (!WriteBaseInt32(parcel, serial)) {
         return false;
     }
@@ -470,6 +476,9 @@ std::shared_ptr<ModeData> ModeData::UnMarshalling(Parcel &parcel)
 
 bool SmsMessageInfo::ReadFromParcel(Parcel &parcel)
 {
+    if (size > TELEPHONY_PARCEL_MAX_COUNT) {
+        return false;
+    }
     if (!ReadBaseInt32(parcel, indicationType)) {
         return false;
     }
@@ -487,6 +496,9 @@ bool SmsMessageInfo::ReadFromParcel(Parcel &parcel)
 
 bool SmsMessageInfo::Marshalling(Parcel &parcel) const
 {
+    if (size > TELEPHONY_PARCEL_MAX_COUNT) {
+        return false;
+    }
     if (!WriteBaseInt32(parcel, indicationType)) {
         return false;
     }
