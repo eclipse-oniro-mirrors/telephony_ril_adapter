@@ -19,9 +19,7 @@
     "component": {
         "name": "ril_adapter",
         "subsystem": "telephony",
-        "syscap": [
-            "SystemCapability.Telephony.DCall"
-        ],
+        "syscap": [ "" ],
         "features": [],
         "adapted_system_type": [
             "standard"
@@ -30,17 +28,10 @@
         "ram": "1MB",
         "deps": {
             "components": [
-                "ability_base",
-                "ability_runtime",
-                "ans_standard",
-                "core_service",
                 "device_driver_framework",
-                "dmsfwk_standard",
                 "faultloggerd",
                 "hiviewdfx_hilog_native",
                 "ipc",
-                "safwk",
-                "samgr_standard",
                 "startup_l2",
                 "utils_base"
             ],

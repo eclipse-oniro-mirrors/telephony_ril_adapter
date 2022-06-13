@@ -14,7 +14,7 @@
 import("//build/test.gni")
 import("//drivers/adapter/uhdf2/uhdf.gni")
 
-RIL_ADAPTER = "//base/telephony/"
+RIL_ADAPTER = "//base/telephony/ril_adapter"
 
 ohos_unittest("tel_ril_adapter_gtest") {
   install_enable = true
@@ -38,10 +38,10 @@ ohos_unittest("tel_ril_adapter_gtest") {
     "//drivers/adapter/uhdf2/include/hdi",
     "include",
   ]
-  configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
+  configs = [ "$RIL_ADAPTER/utils:utils_config" ]
   deps = [
-    "$RIL_ADAPTER/ril_adapter/services/hril:hril",
-    "$RIL_ADAPTER/ril_adapter/services/vendor:ril_vendor",
+    "$RIL_ADAPTER/services/hril:hril",
+    "$RIL_ADAPTER/services/vendor:ril_vendor",
     "$hdf_uhdf_path/hdi:libhdi",
     "//base/telephony/core_service:tel_core_service",
     "//drivers/adapter/uhdf2/host:libhdf_host",

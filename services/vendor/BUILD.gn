@@ -13,7 +13,7 @@
 
 import("//base/telephony/core_service/telephony.gni")
 import("//build/ohos.gni")
-RIL_ADAPTER = "//base/telephony"
+RIL_ADAPTER = "//base/telephony/ril_adapter"
 RIL_VENDOR = "//base/telephony/ril_adapter/services/vendor/src"
 
 ohos_shared_library("ril_vendor") {
@@ -30,8 +30,8 @@ ohos_shared_library("ril_vendor") {
     "$RIL_VENDOR/vendor_report.c",
     "$RIL_VENDOR/vendor_util.c",
   ]
-  include_dirs = [ "$RIL_ADAPTER/ril_adapter/services/vendor/include" ]
-  configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
+  include_dirs = [ "$RIL_ADAPTER/services/vendor/include" ]
+  configs = [ "$RIL_ADAPTER/utils:utils_config" ]
   defines += [
     "LOG_TAG = \"RilVendor\"",
     "LOG_DOMAIN = 0xD002B01",
