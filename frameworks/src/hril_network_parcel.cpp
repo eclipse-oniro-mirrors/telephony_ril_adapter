@@ -191,6 +191,7 @@ std::shared_ptr<PsRegStatusResultInfo> PsRegStatusResultInfo::UnMarshalling(Parc
 bool PhysicalChannelConfig::ReadFromParcel(Parcel &parcel)
 {
     if (contextIdNum > TELEPHONY_PARCEL_MAX_COUNT) {
+        TELEPHONY_LOGE("PhysicalChannelConfig, ReadFromParcel contextIdNum:%{public}d is invalid", contextIdNum);
         return false;
     }
     if (!ReadBaseInt32(parcel, cellConnStatus)) {
@@ -226,6 +227,7 @@ bool PhysicalChannelConfig::ReadFromParcel(Parcel &parcel)
 bool PhysicalChannelConfig::Marshalling(Parcel &parcel) const
 {
     if (contextIdNum > TELEPHONY_PARCEL_MAX_COUNT) {
+        TELEPHONY_LOGE("PhysicalChannelConfig, Marshalling contextIdNum:%{public}d is invalid", contextIdNum);
         return false;
     }
     if (!WriteBaseInt32(parcel, cellConnStatus)) {
@@ -269,6 +271,7 @@ std::shared_ptr<PhysicalChannelConfig> PhysicalChannelConfig::UnMarshalling(Parc
 bool ChannelConfigInfoList::ReadFromParcel(Parcel &parcel)
 {
     if (itemNum > TELEPHONY_PARCEL_MAX_COUNT) {
+        TELEPHONY_LOGE("ChannelConfigInfoList, ReadFromParcel itemNum:%{public}d is invalid", itemNum);
         return false;
     }
     if (!ReadBaseInt32(parcel, itemNum)) {
@@ -286,6 +289,7 @@ bool ChannelConfigInfoList::ReadFromParcel(Parcel &parcel)
 bool ChannelConfigInfoList::Marshalling(Parcel &parcel) const
 {
     if (itemNum > TELEPHONY_PARCEL_MAX_COUNT) {
+        TELEPHONY_LOGE("ChannelConfigInfoList, Marshalling itemNum:%{public}d is invalid", itemNum);
         return false;
     }
     if (!WriteBaseInt32(parcel, itemNum)) {
@@ -403,6 +407,7 @@ std::shared_ptr<SetNetworkModeInfo> SetNetworkModeInfo::UnMarshalling(Parcel &pa
 bool AvailableNetworkList::ReadFromParcel(Parcel &parcel)
 {
     if (itemNum > TELEPHONY_PARCEL_MAX_COUNT) {
+        TELEPHONY_LOGE("AvailableNetworkList, ReadFromParcel itemNum:%{public}d is invalid", itemNum);
         return false;
     }
     if (!ReadBaseInt32(parcel, itemNum)) {
@@ -421,6 +426,7 @@ bool AvailableNetworkList::ReadFromParcel(Parcel &parcel)
 bool AvailableNetworkList::Marshalling(Parcel &parcel) const
 {
     if (itemNum > TELEPHONY_PARCEL_MAX_COUNT) {
+        TELEPHONY_LOGE("AvailableNetworkList, Marshalling itemNum:%{public}d is invalid", itemNum);
         return false;
     }
     if (!WriteBaseInt32(parcel, itemNum)) {
@@ -866,6 +872,7 @@ std::shared_ptr<CurrentCellInfo> CurrentCellInfo::UnMarshalling(Parcel &parcel)
 bool CellListCurrentInfo::ReadFromParcel(Parcel &parcel)
 {
     if (itemNum > TELEPHONY_PARCEL_MAX_COUNT) {
+        TELEPHONY_LOGE("CellListCurrentInfo, ReadFromParcel itemNum:%{public}d is invalid", itemNum);
         return false;
     }
     if (!ReadBaseInt32(parcel, itemNum)) {
@@ -887,6 +894,7 @@ bool CellListCurrentInfo::ReadFromParcel(Parcel &parcel)
 bool CellListCurrentInfo::Marshalling(Parcel &parcel) const
 {
     if (itemNum > TELEPHONY_PARCEL_MAX_COUNT) {
+        TELEPHONY_LOGE("CellListCurrentInfo, Marshalling itemNum:%{public}d is invalid", itemNum);
         return false;
     }
     if (!WriteBaseInt32(parcel, itemNum)) {
@@ -912,6 +920,7 @@ std::shared_ptr<CellListCurrentInfo> CellListCurrentInfo::UnMarshalling(Parcel &
 bool CellListNearbyInfo::ReadFromParcel(Parcel &parcel)
 {
     if (itemNum > TELEPHONY_PARCEL_MAX_COUNT) {
+        TELEPHONY_LOGE("CellListNearbyInfo, ReadFromParcel itemNum:%{public}d is invalid", itemNum);
         return false;
     }
     if (!ReadBaseInt32(parcel, itemNum)) {
@@ -933,6 +942,7 @@ bool CellListNearbyInfo::ReadFromParcel(Parcel &parcel)
 bool CellListNearbyInfo::Marshalling(Parcel &parcel) const
 {
     if (itemNum > TELEPHONY_PARCEL_MAX_COUNT) {
+        TELEPHONY_LOGE("CellListNearbyInfo, Marshalling itemNum:%{public}d is invalid", itemNum);
         return false;
     }
     if (!WriteBaseInt32(parcel, itemNum)) {

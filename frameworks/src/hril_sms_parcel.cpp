@@ -274,6 +274,7 @@ std::shared_ptr<CdmaCBConfigInfo> CdmaCBConfigInfo::UnMarshalling(Parcel &parcel
 bool CdmaCBConfigInfoList::ReadFromParcel(Parcel &parcel)
 {
     if (size > TELEPHONY_PARCEL_MAX_COUNT) {
+        TELEPHONY_LOGE("CdmaCBConfigInfoList, ReadFromParcel size:%{public}d is invalid", size);
         return false;
     }
     if (!ReadBaseInt32(parcel, serial)) {
@@ -292,6 +293,7 @@ bool CdmaCBConfigInfoList::ReadFromParcel(Parcel &parcel)
 bool CdmaCBConfigInfoList::Marshalling(Parcel &parcel) const
 {
     if (size > TELEPHONY_PARCEL_MAX_COUNT) {
+        TELEPHONY_LOGE("CdmaCBConfigInfoList, Marshalling size:%{public}d is invalid", size);
         return false;
     }
     if (!WriteBaseInt32(parcel, serial)) {
@@ -477,6 +479,7 @@ std::shared_ptr<ModeData> ModeData::UnMarshalling(Parcel &parcel)
 bool SmsMessageInfo::ReadFromParcel(Parcel &parcel)
 {
     if (size > TELEPHONY_PARCEL_MAX_COUNT) {
+        TELEPHONY_LOGE("SmsMessageInfo, ReadFromParcel size:%{public}d is invalid", size);
         return false;
     }
     if (!ReadBaseInt32(parcel, indicationType)) {
@@ -497,6 +500,7 @@ bool SmsMessageInfo::ReadFromParcel(Parcel &parcel)
 bool SmsMessageInfo::Marshalling(Parcel &parcel) const
 {
     if (size > TELEPHONY_PARCEL_MAX_COUNT) {
+        TELEPHONY_LOGE("SmsMessageInfo, Marshalling size:%{public}d is invalid", size);
         return false;
     }
     if (!WriteBaseInt32(parcel, indicationType)) {
