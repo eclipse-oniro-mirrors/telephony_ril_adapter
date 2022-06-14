@@ -415,6 +415,51 @@ std::shared_ptr<SimProtocolResponse> SimProtocolResponse::UnMarshalling(Parcel &
     return param;
 }
 
+
+bool OpenLogicalChannelResponse::ReadFromParcel(Parcel &parcel)
+{
+    if (!ReadBaseInt32(parcel, sw1)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, sw2)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, channelId)) {
+        return false;
+    }
+    if (!ReadBaseString(parcel, response)) {
+        return false;
+    }
+    return true;
+}
+
+bool OpenLogicalChannelResponse::Marshalling(Parcel &parcel) const
+{
+    if (!WriteBaseInt32(parcel, sw1)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, sw2)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, channelId)) {
+        return false;
+    }
+    if (!WriteBaseString(parcel, response)) {
+        return false;
+    }
+    return true;
+}
+
+std::shared_ptr<OpenLogicalChannelResponse> OpenLogicalChannelResponse::UnMarshalling(Parcel &parcel)
+{
+    std::shared_ptr<OpenLogicalChannelResponse> param = std::make_shared<OpenLogicalChannelResponse>();
+    if (param == nullptr || !param->ReadFromParcel(parcel)) {
+        param = nullptr;
+    }
+    return param;
+}
+
+
 bool ApduSimIORequestInfo::ReadFromParcel(Parcel &parcel)
 {
     if (!ReadBaseInt32(parcel, serial)) {

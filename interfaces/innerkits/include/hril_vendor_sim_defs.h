@@ -71,6 +71,17 @@ typedef struct {
 } HRilSimIOResponse;
 
 typedef struct {
+    int32_t sw1; /* information from the SIM about the execution of the actual command.
+                  * These parameters are delivered to the TE in both cases,
+                  * on successful or failed execution of the command. */
+    int32_t sw2; /* information from the SIM about the execution of the actual command.
+                  * These parameters are delivered to the TE in both cases,
+                  * on successful or failed execution of the command. */
+    int32_t channelId;
+    char *response;
+} HRilOpenLogicalChannelResponse;
+
+typedef struct {
     int32_t index; /* sim index */
     HRilSimType simType;
     HRilSimState simState;

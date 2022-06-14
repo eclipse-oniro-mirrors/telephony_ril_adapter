@@ -94,7 +94,7 @@ int32_t RilRadioResponseTest::OnRemoteRequest(
             OnResponseNullPara("Set Sim Close Logical Channel Result", data);
             break;
         case HREQ_SIM_OPEN_LOGICAL_CHANNEL:
-            OnResponseNullPara("Set Sim Open Logical Channel Result", data);
+            OnResponseOpenLogicalChannel(data);
             break;
         case HREQ_SIM_TRANSMIT_APDU_BASIC_CHANNEL:
             OnResponseNullPara("Set Sim Transmit apdu basic channel Result", data);
@@ -116,6 +116,9 @@ int32_t RilRadioResponseTest::OnRemoteRequest(
             break;
         case HREQ_MODEM_SET_RADIO_STATUS:
             OnResponseNullPara("Set radio Result", data);
+            break;
+        case HREQ_MODEM_SHUT_DOWN:
+            OnResponseNullPara("shut down", data);
             break;
         case HREQ_MODEM_GET_RADIO_STATUS:
             OnResponseGetRadioState(data);
@@ -180,8 +183,14 @@ int32_t RilRadioResponseTest::OnRemoteRequest(
         case HREQ_NETWORK_SET_DEVICE_STATE:
             OnRequestSetDeviceStateTest(data);
             break;
+        case HREQ_MODEM_GET_MEID:
+            OnRequestGetMeidTest(data);
+            break;
         case HREQ_MODEM_GET_VOICE_RADIO:
             OnRequestGetModemVoiceRadioTest(data);
+            break;
+        case HREQ_MODEM_GET_BASEBAND_VERSION:
+            OnRequestGetBasebandVersionTest(data);
             break;
         case HREQ_SIM_GET_IMSI:
             OnResponseGetImsi(data);
@@ -290,6 +299,25 @@ void RilRadioResponseTest::OnResponseLockStatus(MessageParcel &data)
     cout << endl << "====>result: " << resp->result << endl;
     cout << endl << "====>remain: " << resp->remain << endl;
     cout << endl << "---->OnResponseLockStatus";
+    PrintResponseInfo(responseInfo);
+}
+
+void RilRadioResponseTest::OnResponseOpenLogicalChannel(MessageParcel &data)
+{
+    TELEPHONY_LOGI("RilRadioResponseTest::OnResponseOpenLogicalChannel -->");
+    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
+    const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("OnResponseOpenLogicalChannel -->data.ReadBuffer(readSpSize) failed");
+        return;
+    }
+    const struct HRilRadioResponseInfo *responseInfo =
+        reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
+
+    std::shared_ptr<OpenLogicalChannelResponse> resp = std::make_shared<OpenLogicalChannelResponse>();
+    resp.get()->ReadFromParcel(data);
+    cout << endl << "====>channelId: " << resp->channelId << endl;
+    cout << endl << "---->OnResponseOpenLogicalChannel";
     PrintResponseInfo(responseInfo);
 }
 
@@ -1044,6 +1072,19 @@ void RilRadioResponseTest::OnRequestGetNetworkPreferredNetworkModeTest(OHOS::Mes
          << preferNetworkType->preferredNetworkType << endl;
 }
 
+void RilRadioResponseTest::OnRequestGetMeidTest(OHOS::MessageParcel &data)
+{
+    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
+    const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("RilRadioResponseTest OnRequestGetMeidTest read spBuffer failed");
+        return;
+    }
+    std::string meid = data.ReadString();
+    cout << "---->OnRequestGetMeidTest Result:" << endl << "----> [imeid]: " << meid;
+    PrintResponseInfo((struct HRilRadioResponseInfo *)spBuffer);
+}
+
 void RilRadioResponseTest::OnRequestGetModemVoiceRadioTest(OHOS::MessageParcel &data)
 {
     TELEPHONY_LOGI("RilRadioResponseTest::OnRequestGetModemVoiceRadioTest -->");
@@ -1074,6 +1115,19 @@ void RilRadioResponseTest::OnRequestGetModemVoiceRadioTest(OHOS::MessageParcel &
 
     cout << endl << "---->Get ModemVoiceRadioTest Result:";
     PrintResponseInfo(responseInfo);
+}
+
+void RilRadioResponseTest::OnRequestGetBasebandVersionTest(OHOS::MessageParcel &data)
+{
+    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
+    const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("RilRadioResponseTest OnRequestGetBasebandVersionTest read spBuffer failed");
+        return;
+    }
+    std::string bandVersion = data.ReadString();
+    cout << "---->OnRequestGetBasebandVersionTest Result:" << endl << "----> [bandVersion]: " << bandVersion;
+    PrintResponseInfo((struct HRilRadioResponseInfo *)spBuffer);
 }
 
 void RilRadioResponseTest::OnRequestSetNetworkPsAttachStatusTest(OHOS::MessageParcel &data)

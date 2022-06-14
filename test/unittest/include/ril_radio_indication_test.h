@@ -18,6 +18,7 @@
 
 #include <ipc_object_stub.h>
 #include <securec.h>
+
 #include "ril_manager_test.h"
 
 namespace OHOS {
@@ -36,6 +37,9 @@ public:
     void CallSrvccStatusReport(OHOS::MessageParcel &data);
     void CallEmergencyNumberReport(OHOS::MessageParcel &data);
     void NetworkStateNotify(OHOS::MessageParcel &data);
+    void NetworkPhyChnlCfgUpdated(OHOS::MessageParcel &data);
+    void NetworkCurrentCellUpdated(OHOS::MessageParcel &data);
+    void VoiceRadioTechUpdated(OHOS::MessageParcel &data);
     void NewSmsNotify(OHOS::MessageParcel &data);
     void NewCdmaSmsNotify(OHOS::MessageParcel &data);
     void SmsStatusReportNotify(OHOS::MessageParcel &data);
