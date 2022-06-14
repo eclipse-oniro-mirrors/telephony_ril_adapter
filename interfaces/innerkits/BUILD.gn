@@ -57,6 +57,12 @@ ohos_shared_library("hril_innerkits") {
 
   external_deps = [ "utils_base:utils" ]
 
+  if (is_standard_system) {
+    external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
+  } else {
+    external_deps += [ "hilog:libhilog" ]
+  }
+
   part_name = "ril_adapter"
   subsystem_name = "telephony"
 }

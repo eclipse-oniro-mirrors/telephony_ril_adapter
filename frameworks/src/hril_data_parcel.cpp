@@ -131,6 +131,7 @@ std::shared_ptr<SetupDataCallResultInfo> SetupDataCallResultInfo::UnMarshalling(
 bool DataCallResultList::ReadFromParcel(Parcel &parcel)
 {
     if (size > TELEPHONY_PARCEL_MAX_COUNT) {
+        TELEPHONY_LOGE("DataCallResultList, ReadFromParcel size:%{public}d is invalid", (int)size);
         return false;
     }
     if (!Read(parcel, size)) {
@@ -146,6 +147,7 @@ bool DataCallResultList::ReadFromParcel(Parcel &parcel)
 bool DataCallResultList::Marshalling(Parcel &parcel) const
 {
     if (size > TELEPHONY_PARCEL_MAX_COUNT) {
+        TELEPHONY_LOGE("DataCallResultList, Marshalling size:%{public}d is invalid", (int)size);
         return false;
     }
     if (!Write(parcel, size)) {

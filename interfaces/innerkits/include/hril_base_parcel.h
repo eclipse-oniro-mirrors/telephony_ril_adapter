@@ -22,6 +22,7 @@
 #include "parcel.h"
 
 #include "hril_types.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {

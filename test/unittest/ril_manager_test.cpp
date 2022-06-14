@@ -1495,6 +1495,7 @@ void RilManagerTest::SetSimLock(
         simlockinfo.fac = fac;
         simlockinfo.mode = mode;
         simlockinfo.passwd = password;
+        simLockInfo.classx = 0;
 
         if (!simlockinfo.Marshalling(data)) {
             TELEPHONY_LOGE("RilManagerTest simlockinfo Marshalling failed!!!");
@@ -1523,6 +1524,7 @@ void RilManagerTest::GetSimLockStatus(
         simlockinfo.serial = request->serialId_;
         simlockinfo.fac = fac;
         simlockinfo.mode = mode;
+        simLockInfo.classx = 0;
 
         if (!simlockinfo.Marshalling(data)) {
             TELEPHONY_LOGE("RilManagerTest simlockinfo Marshalling failed!!!");
