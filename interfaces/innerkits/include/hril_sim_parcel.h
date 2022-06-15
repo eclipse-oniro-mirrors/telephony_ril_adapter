@@ -184,6 +184,19 @@ struct SimAuthenticationRequestInfo : public HrilBaseParcel {
     void Dump(std::string, int32_t);
 };
 
+struct OpenLogicalChannelResponse : public HrilBaseParcel {
+    int32_t sw1; /* information from the SIM about the execution of the actual command.
+                  * These parameters are delivered to the TE in both cases,
+                  * on successful or failed execution of the command */
+    int32_t sw2;
+    int32_t channelId;
+    std::string response;
+    bool ReadFromParcel(Parcel &parcel);
+    virtual bool Marshalling(Parcel &parcel) const override;
+    std::shared_ptr<OpenLogicalChannelResponse> UnMarshalling(Parcel &parcel);
+    void Dump(std::string, int32_t);
+};
+
 struct LockStatusResp : public HrilBaseParcel {
     int32_t result;
     int32_t remain;

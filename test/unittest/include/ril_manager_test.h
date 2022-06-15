@@ -19,7 +19,6 @@
 #include <iservmgr_hdi.h>
 
 #include "event_runner.h"
-
 #include "hril_call_parcel.h"
 #include "hril_data_parcel.h"
 #include "hril_modem_parcel.h"
@@ -32,9 +31,9 @@
 namespace OHOS {
 namespace Telephony {
 enum CellularRadioState {
-    RADIO_OFF, /* Radio explicitly powered off (eg CFUN=0) */
+    RADIO_OFF,         /* Radio explicitly powered off (eg CFUN=0) */
     RADIO_UNAVAILABLE, /* Radio unavailable (eg, resetting or not booted) */
-    RADIO_ON /* Radio is on */
+    RADIO_ON           /* Radio is on */
 };
 
 struct HRilRequestTest {
@@ -115,12 +114,14 @@ public:
     void SetDeviceState(int32_t deviceStateType, bool deviceStateOn, const AppExecFwk::InnerEvent::Pointer &result);
     void SetPsAttachStatus(int32_t attachFlg, const AppExecFwk::InnerEvent::Pointer &result);
     void SetNetworkSelectionMode(int32_t mode, std::string plmn, const AppExecFwk::InnerEvent::Pointer &result);
+    void ShutDown(const AppExecFwk::InnerEvent::Pointer &result);
+    void GetMeid(const AppExecFwk::InnerEvent::Pointer &response);
     void GetVoiceRadio(const AppExecFwk::InnerEvent::Pointer &response);
-
+    void GetBasebandVersion(const AppExecFwk::InnerEvent::Pointer &response);
     void SendSms(std::string smscPdu, std::string pdu, const std::shared_ptr<AppExecFwk::EventHandler> &handler,
         const AppExecFwk::InnerEvent::Pointer &response);
-    void SendSmsMoreMode(std::string smscPdu, std::string pdu,
-        const std::shared_ptr<AppExecFwk::EventHandler> &handler, const AppExecFwk::InnerEvent::Pointer &response);
+    void SendSmsMoreMode(std::string smscPdu, std::string pdu, const std::shared_ptr<AppExecFwk::EventHandler> &handler,
+        const AppExecFwk::InnerEvent::Pointer &response);
     void SendSmsAck(bool success, int32_t cause, const AppExecFwk::InnerEvent::Pointer &response);
     void GetSmscAddr(const AppExecFwk::InnerEvent::Pointer &response);
     void SetSmscAddr(int32_t tosca, std::string address, const AppExecFwk::InnerEvent::Pointer &response);
@@ -129,8 +130,8 @@ public:
     void GetImei(const AppExecFwk::InnerEvent::Pointer &response);
     void GetSimIO(int32_t command, int32_t fileId, int32_t p1, int32_t p2, int32_t p3, std::string data,
         std::string path, const AppExecFwk::InnerEvent::Pointer &response);
-    void ActivatePdpContext(int32_t radioTechnology, RilDataProfileTest dataProfile, bool isRoaming,
-        bool allowRoaming, const AppExecFwk::InnerEvent::Pointer &response);
+    void ActivatePdpContext(int32_t radioTechnology, RilDataProfileTest dataProfile, bool isRoaming, bool allowRoaming,
+        const AppExecFwk::InnerEvent::Pointer &response);
     void DeactivatePdpContext(int32_t ci, int32_t reason, const AppExecFwk::InnerEvent::Pointer &response);
     void SetInitApnInfo(RilDataProfileTest dataProfile, const AppExecFwk::InnerEvent::Pointer &response);
     void GetPdpContext(const AppExecFwk::InnerEvent::Pointer &response);
@@ -151,8 +152,7 @@ public:
         int32_t passwordLength, const AppExecFwk::InnerEvent::Pointer &result);
     void SetSimLock(const std::string &fac, int32_t mode, const std::string &password,
         const AppExecFwk::InnerEvent::Pointer &result);
-    void GetSimLockStatus(const std::string &fac, int32_t mode,
-        const AppExecFwk::InnerEvent::Pointer &result);
+    void GetSimLockStatus(const std::string &fac, int32_t mode, const AppExecFwk::InnerEvent::Pointer &result);
 
     static const int32_t INVALID_WAKELOCK = -1;
     static const int32_t FOR_WAKELOCK = 0;

@@ -76,7 +76,9 @@ public:
     void OnRequestSetNotificationFilterTest(OHOS::MessageParcel &data);
     void OnRequestSetDeviceStateTest(OHOS::MessageParcel &data);
     void OnRequestGetPreferredNetworkTypeInfoTest(OHOS::MessageParcel &data);
+    void OnRequestGetMeidTest(OHOS::MessageParcel &data);
     void OnRequestGetModemVoiceRadioTest(OHOS::MessageParcel &data);
+    void OnRequestGetBasebandVersionTest(OHOS::MessageParcel &data);
     void OnRequestSetNetworkSelectionModeTest(OHOS::MessageParcel &data);
     void OnRequestGetLinkBandwidthInfoTest(OHOS::MessageParcel &data);
     void OnResponseSendRilCmSms(OHOS::MessageParcel &data);
@@ -85,6 +87,7 @@ public:
     void OnResponseGetSmscAddr(OHOS::MessageParcel &data);
     void OnResponseSetSmscAddr(OHOS::MessageParcel &data);
     void OnResponseLockStatus(OHOS::MessageParcel &data);
+    void OnResponseOpenLogicalChannel(OHOS::MessageParcel &data);
     void OnResponseGetSimLockStatus(OHOS::MessageParcel &data);
 
 private:

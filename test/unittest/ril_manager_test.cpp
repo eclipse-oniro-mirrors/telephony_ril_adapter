@@ -703,6 +703,17 @@ void RilManagerTest::GetImsRegStatus(const AppExecFwk::InnerEvent::Pointer &resp
     }
 }
 
+void RilManagerTest::GetMeid(const AppExecFwk::InnerEvent::Pointer &response)
+{
+    if (cellularRadio_ != nullptr) {
+        std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_MODEM_GET_MEID, response);
+        if (request == nullptr) {
+            return;
+        }
+        SendInt32Event(HREQ_MODEM_GET_MEID, request->serialId_);
+    }
+}
+
 void RilManagerTest::GetVoiceRadio(const AppExecFwk::InnerEvent::Pointer &response)
 {
     if (cellularRadio_ != nullptr) {
@@ -711,6 +722,17 @@ void RilManagerTest::GetVoiceRadio(const AppExecFwk::InnerEvent::Pointer &respon
             return;
         }
         SendInt32Event(HREQ_MODEM_GET_VOICE_RADIO, request->serialId_);
+    }
+}
+
+void RilManagerTest::GetBasebandVersion(const AppExecFwk::InnerEvent::Pointer &response)
+{
+    if (cellularRadio_ != nullptr) {
+        std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_MODEM_GET_BASEBAND_VERSION, response);
+        if (request == nullptr) {
+            return;
+        }
+        SendInt32Event(HREQ_MODEM_GET_BASEBAND_VERSION, request->serialId_);
     }
 }
 
@@ -988,6 +1010,24 @@ GsmSmsMessageInfo RilManagerTest::ConstructGsmSendSmsRilRequest(string smscPdu, 
     msg.smscPdu = smscPdu.empty() ? "" : smscPdu;
     msg.pdu = pdu.empty() ? "" : pdu;
     return msg;
+}
+
+void RilManagerTest::ShutDown(const AppExecFwk::InnerEvent::Pointer &result)
+{
+    if (cellularRadio_ != nullptr) {
+        std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_MODEM_SHUT_DOWN, result);
+        if (request == nullptr) {
+            return;
+        }
+        OHOS::MessageParcel data;
+        OHOS::MessageParcel reply;
+        data.WriteInt32(slotId_);
+        data.WriteInt32(request->serialId_);
+        OHOS::MessageOption option = { OHOS::MessageOption::TF_ASYNC };
+        cellularRadio_->SendRequest(HREQ_MODEM_SHUT_DOWN, data, reply, option);
+    } else {
+        TELEPHONY_LOGE("ShutDown cellularRadio_ == nullptr");
+    }
 }
 
 void RilManagerTest::SetRadioState(int32_t fan, int32_t rst, const AppExecFwk::InnerEvent::Pointer &result)

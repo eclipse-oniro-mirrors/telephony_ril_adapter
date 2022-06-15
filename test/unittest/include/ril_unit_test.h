@@ -79,7 +79,10 @@ public:
     void GetRilPreferredNetwrokTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void GetRilImsRegStatusTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void GetRilImeiTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void ShutDownTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void GetMeidTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void GetVoiceRadioTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void GetBasebandVersionTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void GetRilPsAttachStatusTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void SetRilPreferredNetwrokTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void SetRilPsAttachStatusTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
@@ -114,8 +117,8 @@ public:
 
     class DemoHandler : public AppExecFwk::EventHandler {
     public:
-        explicit DemoHandler(
-            const std::shared_ptr<AppExecFwk::EventRunner> &runner) : AppExecFwk::EventHandler(runner) {}
+        explicit DemoHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner) : AppExecFwk::EventHandler(runner)
+        {}
         ~DemoHandler() {}
 
         void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;

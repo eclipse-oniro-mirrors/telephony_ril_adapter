@@ -1063,7 +1063,21 @@ int32_t HRilSim::SetRadioProtocolResponse(
 int32_t HRilSim::SimOpenLogicalChannelResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));
+    OpenLogicalChannelResponse pOpenLogicalChannelResponse = {};
+    if (response == nullptr) {
+        if (responseInfo.error == HRilErrType::NONE) {
+            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
+        }
+    } else {
+        const HRilOpenLogicalChannelResponse *pRilResponse =
+            static_cast<const HRilOpenLogicalChannelResponse *>(response);
+        pOpenLogicalChannelResponse.sw1 = pRilResponse->sw1;
+        pOpenLogicalChannelResponse.sw2 = pRilResponse->sw2;
+        pOpenLogicalChannelResponse.channelId = pRilResponse->channelId;
+        pOpenLogicalChannelResponse.response = pRilResponse->response;
+    }
+
+    return ResponseMessageParcel(responseInfo, pOpenLogicalChannelResponse, requestNum);
 }
 
 int32_t HRilSim::SimCloseLogicalChannelResponse(

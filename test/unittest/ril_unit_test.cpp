@@ -15,8 +15,8 @@
 
 #include "ril_unit_test.h"
 
-#include <unistd.h>
 #include <iostream>
+#include <unistd.h>
 
 #include "hril_request.h"
 #include "telephony_log_wrapper.h"
@@ -394,11 +394,25 @@ void RilUnitTest::GetRilImsRegStatusTest(const OHOS::AppExecFwk::InnerEvent::Poi
     TELEPHONY_LOGI("RilUnitTest::GetRilImsRegStatusTest --> GetRilImsRegStatusTest finished");
 }
 
+void RilUnitTest::GetMeidTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::GetMeidTest -->");
+    mRilManager_->GetMeid(result);
+    TELEPHONY_LOGI("RilUnitTest::GetMeidTest --> GetMeidTest finished");
+}
+
 void RilUnitTest::GetVoiceRadioTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("RilUnitTest::GetVoiceRadioTest -->");
     mRilManager_->GetVoiceRadio(result);
     TELEPHONY_LOGI("RilUnitTest::GetVoiceRadioTest --> GetVoiceRadioTest finished");
+}
+
+void RilUnitTest::GetBasebandVersionTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::GetBasebandVersionTest -->");
+    mRilManager_->GetBasebandVersion(result);
+    TELEPHONY_LOGI("RilUnitTest::GetBasebandVersionTest --> GetBasebandVersionTest finished");
 }
 
 void RilUnitTest::GetRilPsAttachStatusTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
@@ -562,6 +576,13 @@ void RilUnitTest::SetSmscAddrTest(const OHOS::AppExecFwk::InnerEvent::Pointer &r
     cin >> address;
     mRilManager_->SetSmscAddr(tosca, address, result);
     TELEPHONY_LOGI("RilUnitTest::SetSmscAddrTest --> SetSmscAddrTest finished");
+}
+
+void RilUnitTest::ShutDownTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::ShutDownTest -->");
+    mRilManager_->ShutDown(result);
+    TELEPHONY_LOGI("RilUnitTest::ShutDownTest finished");
 }
 
 void RilUnitTest::SetRilCmRadioPowerTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
@@ -998,10 +1019,13 @@ void RilUnitTest::OnInitProcessInterface()
     memberFuncMap_[HREQ_NETWORK_SET_DEVICE_STATE] = &RilUnitTest::SetRilDeviceStateTest;
 
     // modem
+    memberFuncMap_[HREQ_MODEM_SHUT_DOWN] = &RilUnitTest::ShutDownTest;
     memberFuncMap_[HREQ_MODEM_SET_RADIO_STATUS] = &RilUnitTest::SetRilCmRadioPowerTest;
     memberFuncMap_[HREQ_MODEM_GET_RADIO_STATUS] = &RilUnitTest::GetRilRadioPowerTest;
     memberFuncMap_[HREQ_MODEM_GET_IMEI] = &RilUnitTest::GetImeiTest;
+    memberFuncMap_[HREQ_MODEM_GET_MEID] = &RilUnitTest::GetMeidTest;
     memberFuncMap_[HREQ_MODEM_GET_VOICE_RADIO] = &RilUnitTest::GetVoiceRadioTest;
+    memberFuncMap_[HREQ_MODEM_GET_BASEBAND_VERSION] = &RilUnitTest::GetBasebandVersionTest;
 }
 
 void RilUnitTest::OnInitInterface()
@@ -1171,10 +1195,13 @@ static int32_t PrintModemMenu()
 {
     cout << "---->[MODULE]MODEM:" << endl;
     cout << "----> [" << HREQ_COMMON_BASE << "] ---->Back to the previous menu." << endl;
+    cout << "----> [" << HREQ_MODEM_SHUT_DOWN << "] ---->[ HREQ_MODEM_SHUT_DOWN ]" << endl;
     cout << "----> [" << HREQ_MODEM_SET_RADIO_STATUS << "] ---->[ HREQ_MODEM_SET_RADIO_STATUS ]" << endl;
     cout << "----> [" << HREQ_MODEM_GET_RADIO_STATUS << "] ---->[ HREQ_MODEM_GET_RADIO_STATUS ]" << endl;
     cout << "----> [" << HREQ_MODEM_GET_IMEI << "] ---->[ HREQ_MODEM_GET_IMEI ]" << endl;
+    cout << "----> [" << HREQ_MODEM_GET_MEID << "] ---->[ HREQ_MODEM_GET_MEID ]" << endl;
     cout << "----> [" << HREQ_MODEM_GET_VOICE_RADIO << "] ---->[ HREQ_MODEM_GET_VOICE_RADIO ]" << endl;
+    cout << "----> [" << HREQ_MODEM_GET_BASEBAND_VERSION << "] ---->[ HREQ_MODEM_GET_BASEBAND_VERSION ]" << endl;
 
     int32_t choice = InputInt32(HREQ_COMMON_BASE, HREQ_MODEM_EXIT - 1, "Command");
     cout << "---->You choose: " << choice << endl;
