@@ -12,7 +12,7 @@
 # limitations under the License.
 
 import("//build/test.gni")
-import("//drivers/adapter/uhdf2/uhdf.gni")
+import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 RIL_ADAPTER = "//base/telephony/ril_adapter"
 
@@ -35,7 +35,7 @@ ohos_unittest("tel_ril_adapter_gtest") {
     "//base/telephony/core_service/utils/common/include",
     "//utils/native/base/include",
     "//third_party/json/include",
-    "//drivers/adapter/uhdf2/include/hdi",
+    "//drivers/hdf_core/adapter/uhdf2/include/hdi",
     "include",
   ]
   configs = [ "$RIL_ADAPTER/utils:utils_config" ]
@@ -44,9 +44,9 @@ ohos_unittest("tel_ril_adapter_gtest") {
     "$RIL_ADAPTER/services/vendor:ril_vendor",
     "$hdf_uhdf_path/hdi:libhdi",
     "//base/telephony/core_service:tel_core_service",
-    "//drivers/adapter/uhdf2/host:libhdf_host",
-    "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
-    "//drivers/adapter/uhdf2/utils:libhdf_utils",
+    "//drivers/hdf_core/adapter/uhdf2/host:libhdf_host",
+    "//drivers/hdf_core/adapter/uhdf2/ipc:libhdf_ipc_adapter",
+    "//drivers/hdf_core/adapter/uhdf2/utils:libhdf_utils",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
   ]

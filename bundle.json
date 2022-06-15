@@ -28,7 +28,7 @@
         "ram": "1MB",
         "deps": {
             "components": [
-                "device_driver_framework",
+                "hdf_core",
                 "faultloggerd",
                 "hiviewdfx_hilog_native",
                 "ipc",

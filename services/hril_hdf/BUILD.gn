@@ -12,7 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//drivers/adapter/uhdf2/uhdf.gni")
+import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 RIL_ADAPTER = "//base/telephony/ril_adapter"
 HRIL_HDF_ROOT = "$RIL_ADAPTER/services/hril_hdf"
