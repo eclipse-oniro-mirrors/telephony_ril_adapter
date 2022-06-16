@@ -58,9 +58,6 @@ int32_t RilRadioIndicationTest::OnRemoteRequest(
         case HNOTI_CALL_STATE_UPDATED:
             CallStateUpdated(data);
             break;
-        case HNOTI_CALL_CRING_REPORT:
-            CallCRingReport(data);
-            break;
         case HNOTI_CALL_RINGBACK_VOICE_REPORT:
             CallRingbackVoiceReport(data);
             break;
@@ -127,13 +124,6 @@ void RilRadioIndicationTest::RadioStateChange(OHOS::MessageParcel &data)
 void RilRadioIndicationTest::CallStateUpdated(OHOS::MessageParcel &data)
 {
     cout << endl << "---->[NTF] CallStateUpdated" << endl;
-    int32_t indicationType = data.ReadInt32();
-    TELEPHONY_LOGI("func :%{public}s indicationType: %{public}d", __func__, indicationType);
-}
-
-void RilRadioIndicationTest::CallCRingReport(OHOS::MessageParcel &data)
-{
-    cout << endl << "---->[NTF] CallCRingReport: RING!" << endl;
     int32_t indicationType = data.ReadInt32();
     TELEPHONY_LOGI("func :%{public}s indicationType: %{public}d", __func__, indicationType);
 }
@@ -419,4 +409,3 @@ void RilRadioIndicationTest::CallSsReport(OHOS::MessageParcel &data)
     cout << "====> serviceType: " << ssInfo->serviceType << "\trequestType: " << ssInfo->requestType
          << "\tserviceClass: " << ssInfo->serviceClass << "\tresult: " << ssInfo->result << endl;
 }
-
