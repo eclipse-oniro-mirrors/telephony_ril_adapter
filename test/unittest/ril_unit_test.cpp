@@ -415,13 +415,6 @@ void RilUnitTest::GetBasebandVersionTest(const OHOS::AppExecFwk::InnerEvent::Poi
     TELEPHONY_LOGI("RilUnitTest::GetBasebandVersionTest --> GetBasebandVersionTest finished");
 }
 
-void RilUnitTest::GetRilPsAttachStatusTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
-{
-    TELEPHONY_LOGI("RilUnitTest::GetRilPsAttachStatusTest -->");
-    mRilManager_->GetPsAttachStatus(result);
-    TELEPHONY_LOGI("RilUnitTest::GetRilPsAttachStatusTest --> GetRilPsAttachStatusTest finished");
-}
-
 void RilUnitTest::SetRilPreferredNetwrokTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
 {
     int32_t preferredNetwork;
@@ -473,19 +466,6 @@ void RilUnitTest::SetRilDeviceStateTest(const OHOS::AppExecFwk::InnerEvent::Poin
 
     mRilManager_->SetDeviceState(deviceStateType, deviceStateOn, result);
     TELEPHONY_LOGI("RilUnitTest::SetRilDeviceStateTest --> SetRilDeviceStateTest finished");
-}
-
-void RilUnitTest::SetRilPsAttachStatusTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
-{
-    int32_t attachFlg;
-
-    TELEPHONY_LOGI("RilUnitTest::SetRilPsAttachStatusTest -->");
-
-    cout << "please enter the attachFlg:";
-    cin >> attachFlg;
-
-    mRilManager_->SetPsAttachStatus(attachFlg, result);
-    TELEPHONY_LOGI("RilUnitTest::SetRilPsAttachStatusTest --> SetRilPsAttachStatusTest finished");
 }
 
 void RilUnitTest::SetRilNetworkSelectionModeTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
@@ -1012,8 +992,6 @@ void RilUnitTest::OnInitProcessInterface()
     memberFuncMap_[HREQ_NETWORK_GET_PREFERRED_NETWORK] = &RilUnitTest::GetRilPreferredNetwrokTest;
     memberFuncMap_[HREQ_NETWORK_SET_PREFERRED_NETWORK] = &RilUnitTest::SetRilPreferredNetwrokTest;
     memberFuncMap_[HREQ_NETWORK_GET_IMS_REG_STATUS] = &RilUnitTest::GetRilImsRegStatusTest;
-    memberFuncMap_[HREQ_NETWORK_SET_PS_ATTACH_STATUS] = &RilUnitTest::SetRilPsAttachStatusTest;
-    memberFuncMap_[HREQ_NETWORK_GET_PS_ATTACH_STATUS] = &RilUnitTest::GetRilPsAttachStatusTest;
     memberFuncMap_[HREQ_NETWORK_SET_LOCATE_UPDATES] = &RilUnitTest::SetRilLocationUpdateTest;
     memberFuncMap_[HREQ_NETWORK_SET_NOTIFICATION_FILTER] = &RilUnitTest::SetRilNotificationFilterTest;
     memberFuncMap_[HREQ_NETWORK_SET_DEVICE_STATE] = &RilUnitTest::SetRilDeviceStateTest;
@@ -1179,8 +1157,6 @@ static int32_t PrintNetworkMenu()
     cout << "----> [" << HREQ_NETWORK_GET_PREFERRED_NETWORK << "] ---->[ HREQ_NETWORK_GET_PREFERRED_NETWORK ]" << endl;
     cout << "----> [" << HREQ_NETWORK_SET_PREFERRED_NETWORK << "] ---->[ HREQ_NETWORK_SET_PREFERRED_NETWORK ]" << endl;
     cout << "----> [" << HREQ_NETWORK_GET_IMS_REG_STATUS << "] ---->[ HREQ_NETWORK_GET_IMS_REG_STATUS ]" << endl;
-    cout << "----> [" << HREQ_NETWORK_SET_PS_ATTACH_STATUS << "] ---->[ HREQ_NETWORK_SET_PS_ATTACH_STATUS ]" << endl;
-    cout << "----> [" << HREQ_NETWORK_GET_PS_ATTACH_STATUS << "] ---->[ HREQ_NETWORK_GET_PS_ATTACH_STATUS ]" << endl;
     cout << "----> [" << HREQ_NETWORK_SET_LOCATE_UPDATES << "] ---->[ HREQ_NETWORK_SET_LOCATE_UPDATES ]" << endl;
     cout << "----> [" << HREQ_NETWORK_SET_NOTIFICATION_FILTER
          << "] ---->[ HREQ_NETWORK_SET_NOTIFICATION_FILTER ]" << endl;

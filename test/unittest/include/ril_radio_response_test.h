@@ -71,7 +71,6 @@ public:
     void OnRequestGetNetworkSearchInformationTest(OHOS::MessageParcel &data);
     void OnRequestSetNetworkPreferredNetworkModeTest(OHOS::MessageParcel &data);
     void OnRequestGetNetworkPreferredNetworkModeTest(OHOS::MessageParcel &data);
-    void OnRequestSetNetworkPsAttachStatusTest(OHOS::MessageParcel &data);
     void OnRequestSetLocationUpdatesTest(OHOS::MessageParcel &data);
     void OnRequestSetNotificationFilterTest(OHOS::MessageParcel &data);
     void OnRequestSetDeviceStateTest(OHOS::MessageParcel &data);

@@ -143,13 +143,6 @@ void RilManagerTest::OnInit()
     SetCellularRadioResponse();
 }
 
-void RilManagerTest::SetSlotId(int32_t slotId)
-{
-    if ((slotId >= HRIL_SIM_SLOT_0) && (slotId <= HRIL_SIM_SLOT_NUM)) {
-        slotId_ = slotId;
-    }
-}
-
 RilManagerTest::~RilManagerTest()
 {
     TELEPHONY_LOGI("~RilManagerTest!");
@@ -736,17 +729,6 @@ void RilManagerTest::GetBasebandVersion(const AppExecFwk::InnerEvent::Pointer &r
     }
 }
 
-void RilManagerTest::GetPsAttachStatus(const AppExecFwk::InnerEvent::Pointer &response)
-{
-    if (cellularRadio_ != nullptr) {
-        std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_NETWORK_GET_PS_ATTACH_STATUS, response);
-        if (request == nullptr) {
-            return;
-        }
-        SendInt32Event(HREQ_NETWORK_GET_PS_ATTACH_STATUS, request->serialId_);
-    }
-}
-
 void RilManagerTest::SetPreferredNetwrok(int32_t preferredNetwork, const AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("SetRilPreferredNetwrok  Request ");
@@ -826,26 +808,6 @@ void RilManagerTest::SetDeviceState(
         cellularRadio_->SendRequest(HREQ_NETWORK_SET_DEVICE_STATE, data, reply, option);
     } else {
         TELEPHONY_LOGE("SetRilDeviceState cellularRadio_ == nullptr");
-    }
-}
-
-void RilManagerTest::SetPsAttachStatus(int32_t attachFlg, const AppExecFwk::InnerEvent::Pointer &result)
-{
-    TELEPHONY_LOGI("SetRilPsAttachStatus  Request ");
-    if (cellularRadio_ != nullptr) {
-        std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_NETWORK_SET_PS_ATTACH_STATUS, result);
-        if (request == nullptr) {
-            return;
-        }
-        MessageParcel data;
-        MessageParcel reply;
-        data.WriteInt32(slotId_);
-        data.WriteInt32(request->serialId_);
-        data.WriteInt32(attachFlg);
-        MessageOption option;
-        cellularRadio_->SendRequest(HREQ_NETWORK_SET_PS_ATTACH_STATUS, data, reply, option);
-    } else {
-        TELEPHONY_LOGE("SetRilPsAttachStatus  cellularRadio_ == nullptr");
     }
 }
 
@@ -1535,7 +1497,7 @@ void RilManagerTest::SetSimLock(
         simlockinfo.fac = fac;
         simlockinfo.mode = mode;
         simlockinfo.passwd = password;
-        simLockInfo.classx = 0;
+        simlockinfo.classx = 0;
 
         if (!simlockinfo.Marshalling(data)) {
             TELEPHONY_LOGE("RilManagerTest simlockinfo Marshalling failed!!!");
@@ -1564,7 +1526,7 @@ void RilManagerTest::GetSimLockStatus(
         simlockinfo.serial = request->serialId_;
         simlockinfo.fac = fac;
         simlockinfo.mode = mode;
-        simLockInfo.classx = 0;
+        simlockinfo.classx = 0;
 
         if (!simlockinfo.Marshalling(data)) {
             TELEPHONY_LOGE("RilManagerTest simlockinfo Marshalling failed!!!");

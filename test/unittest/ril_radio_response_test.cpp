@@ -171,9 +171,6 @@ int32_t RilRadioResponseTest::OnRemoteRequest(
         case HREQ_NETWORK_GET_PREFERRED_NETWORK:
             OnRequestGetNetworkPreferredNetworkModeTest(data);
             break;
-        case HREQ_NETWORK_SET_PS_ATTACH_STATUS:
-            OnRequestSetNetworkPsAttachStatusTest(data);
-            break;
         case HREQ_NETWORK_SET_LOCATE_UPDATES:
             OnRequestSetLocationUpdatesTest(data);
             break;
@@ -1127,19 +1124,6 @@ void RilRadioResponseTest::OnRequestGetBasebandVersionTest(OHOS::MessageParcel &
     }
     std::string bandVersion = data.ReadString();
     cout << "---->OnRequestGetBasebandVersionTest Result:" << endl << "----> [bandVersion]: " << bandVersion;
-    PrintResponseInfo((struct HRilRadioResponseInfo *)spBuffer);
-}
-
-void RilRadioResponseTest::OnRequestSetNetworkPsAttachStatusTest(OHOS::MessageParcel &data)
-{
-    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
-    const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
-    if (spBuffer == nullptr) {
-        TELEPHONY_LOGE("RilRadioResponseTest OnRequestSetNetworkPsAttachStatusTest read spBuffer failed");
-        return;
-    }
-
-    cout << "---->SetNetworkPsAttachStatus Result:";
     PrintResponseInfo((struct HRilRadioResponseInfo *)spBuffer);
 }
 

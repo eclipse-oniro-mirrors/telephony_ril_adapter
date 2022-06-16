@@ -415,7 +415,6 @@ std::shared_ptr<SimProtocolResponse> SimProtocolResponse::UnMarshalling(Parcel &
     return param;
 }
 
-
 bool OpenLogicalChannelResponse::ReadFromParcel(Parcel &parcel)
 {
     if (!ReadBaseInt32(parcel, sw1)) {
@@ -458,7 +457,6 @@ std::shared_ptr<OpenLogicalChannelResponse> OpenLogicalChannelResponse::UnMarsha
     }
     return param;
 }
-
 
 bool ApduSimIORequestInfo::ReadFromParcel(Parcel &parcel)
 {

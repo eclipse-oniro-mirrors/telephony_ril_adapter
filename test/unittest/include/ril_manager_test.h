@@ -31,9 +31,9 @@
 namespace OHOS {
 namespace Telephony {
 enum CellularRadioState {
-    RADIO_OFF,         /* Radio explicitly powered off (eg CFUN=0) */
+    RADIO_OFF, /* Radio explicitly powered off (eg CFUN=0) */
     RADIO_UNAVAILABLE, /* Radio unavailable (eg, resetting or not booted) */
-    RADIO_ON           /* Radio is on */
+    RADIO_ON /* Radio is on */
 };
 
 struct HRilRequestTest {
@@ -59,7 +59,6 @@ public:
     ~RilManagerTest();
 
     void OnInit();
-    void SetSlotId(int32_t slotId);
 
     int32_t SendInt32Event(int32_t dispatchId, int32_t value);
     int32_t SendStringEvent(int32_t dispatchId, const char *value);
@@ -107,12 +106,10 @@ public:
     void GetNetworkSelectionMode(const AppExecFwk::InnerEvent::Pointer &response);
     void GetPreferredNetwork(const AppExecFwk::InnerEvent::Pointer &response);
     void GetImsRegStatus(const AppExecFwk::InnerEvent::Pointer &response);
-    void GetPsAttachStatus(const AppExecFwk::InnerEvent::Pointer &response);
     void SetPreferredNetwrok(int32_t preferredNetwork, const AppExecFwk::InnerEvent::Pointer &result);
     void SetLocationUpdate(int32_t enableFlg, const AppExecFwk::InnerEvent::Pointer &result);
     void SetNotificationFilter(int32_t filter, const AppExecFwk::InnerEvent::Pointer &result);
     void SetDeviceState(int32_t deviceStateType, bool deviceStateOn, const AppExecFwk::InnerEvent::Pointer &result);
-    void SetPsAttachStatus(int32_t attachFlg, const AppExecFwk::InnerEvent::Pointer &result);
     void SetNetworkSelectionMode(int32_t mode, std::string plmn, const AppExecFwk::InnerEvent::Pointer &result);
     void ShutDown(const AppExecFwk::InnerEvent::Pointer &result);
     void GetMeid(const AppExecFwk::InnerEvent::Pointer &response);
