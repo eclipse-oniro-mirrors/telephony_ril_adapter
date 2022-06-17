@@ -30,9 +30,9 @@ ohos_fuzztest("NewSmsNotifyFuzzTest") {
   deps = [
     "//base/telephony/ril_adapter/interfaces/innerkits:hril_innerkits",
     "//base/telephony/ril_adapter/services/hril:hril",
-    "//drivers/adapter/uhdf2/host:libhdf_host",
-    "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
-    "//drivers/adapter/uhdf2/utils:libhdf_utils",
+    "//drivers/hdf_core/adapter/uhdf2/host:libhdf_host",
+    "//drivers/hdf_core/adapter/uhdf2/ipc:libhdf_ipc_adapter",
+    "//drivers/hdf_core/adapter/uhdf2/utils:libhdf_utils",
   ]
 
   external_deps = [
