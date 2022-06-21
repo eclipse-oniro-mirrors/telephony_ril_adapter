@@ -62,7 +62,7 @@ ohos_shared_library("hril_innerkits") {
   } else {
     external_deps += [ "hilog:libhilog" ]
   }
-
+  relative_install_dir = "chipset-pub-sdk"
   part_name = "ril_adapter"
   subsystem_name = "telephony"
 }
