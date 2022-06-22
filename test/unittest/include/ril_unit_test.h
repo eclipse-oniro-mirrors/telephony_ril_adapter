@@ -112,6 +112,8 @@ public:
     void OnInitInterface();
     void OnInitStressInterface();
     void OnInitProcessInterface();
+    void GetTransmitApduChannelParam(
+        int32_t &channelId, int32_t &type, int32_t &instruction, int32_t &p1, int32_t &p2, int32_t &p3);
 
     class DemoHandler : public AppExecFwk::EventHandler {
     public:
