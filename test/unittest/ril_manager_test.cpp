@@ -1247,6 +1247,7 @@ void RilManagerTest::SimTransmitApduBasicChannel(
 
         MessageParcel data;
         ApduSimIORequestInfo ApduRequestInfo;
+        ApduRequestInfo.channelId = reqInfo.channelId;
         ApduRequestInfo.serial = request->serialId_;
         ApduRequestInfo.type = reqInfo.type;
         ApduRequestInfo.instruction = reqInfo.instruction;

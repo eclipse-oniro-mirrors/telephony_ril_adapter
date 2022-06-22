@@ -50,8 +50,6 @@ RilUnitTest::RilUnitTest(int32_t opt) : slotId_(opt) {}
 RilUnitTest::~RilUnitTest() {}
 
 const int32_t REASON = 2;
-const int32_t REQ_INFO_P2 = 2;
-const int32_t REQ_INFO_P3 = 3;
 
 const int32_t STRESS_TEST_NUM = 10000;
 const int32_t MAX_CALL_ID = 7;
@@ -724,29 +722,64 @@ void RilUnitTest::OnStressInput(int32_t what, const OHOS::AppExecFwk::InnerEvent
 void RilUnitTest::SimOpenLogicalChannel(const AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("RilUnitTest::SimOpenLogicalChannel -->");
-    mRilManager_->SimOpenLogicalChannel("appID", 0, result);
+    std::string appId;
+    int32_t p2;
+    cout << "----> input appId:" << endl;
+    cin >> appId;
+    cout << "----> input p2:" << endl;
+    cin >> p2;
+    mRilManager_->SimOpenLogicalChannel(appId, p2, result);
     TELEPHONY_LOGI("RilUnitTest::SimOpenLogicalChannel --> SimOpenLogicalChannel finished");
 }
 
 void RilUnitTest::SimCloseLogicalChannel(const AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("RilUnitTest::SimCloseLogicalChannel -->");
-    mRilManager_->SimCloseLogicalChannel(0, result);
+    int32_t channelId;
+    cout << "----> input channelId:" << endl;
+    cin >> channelId;
+    mRilManager_->SimCloseLogicalChannel(channelId, result);
     TELEPHONY_LOGI("RilUnitTest::SimCloseLogicalChannel --> SimCloseLogicalChannel finished");
+}
+
+void RilUnitTest::GetTransmitApduChannelParam(
+    int32_t &channelId, int32_t &type, int32_t &instruction, int32_t &p1, int32_t &p2, int32_t &p3)
+{
+    cout << "----> input channelId:" << endl;
+    cin >> channelId;
+
+    cout << "----> input type:" << endl;
+    cin >> type;
+
+    cout << "----> input instruction:" << endl;
+    cin >> instruction;
+
+    cout << "----> input p1:" << endl;
+    cin >> p1;
+
+    cout << "----> input p2:" << endl;
+    cin >> p2;
+
+    cout << "----> input p3:" << endl;
+    cin >> p3;
 }
 
 void RilUnitTest::SimTransmitApduLogicalChannel(const AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("RilUnitTest::SimTransmitApduLogicalChannel -->");
     ApduSimIORequestInfo reqInfo = ApduSimIORequestInfo();
+
+    int32_t channelId, type, instruction, p1, p2, p3;
+    GetTransmitApduChannelParam(channelId, type, instruction, p1, p2, p3);
+
     reqInfo.serial = 0;
-    reqInfo.channelId = 1;
-    reqInfo.type = 0;
-    reqInfo.instruction = 1;
-    reqInfo.p1 = 1;
-    reqInfo.p2 = REQ_INFO_P2;
-    reqInfo.p3 = REQ_INFO_P3;
-    reqInfo.data = "apdu";
+    reqInfo.channelId = channelId;
+    reqInfo.type = type;
+    reqInfo.instruction = instruction;
+    reqInfo.p1 = p1;
+    reqInfo.p2 = p2;
+    reqInfo.p3 = p3;
+    reqInfo.data = "";
     mRilManager_->SimTransmitApduLogicalChannel(reqInfo, result);
     TELEPHONY_LOGI("RilUnitTest::SimTransmitApduLogicalChannel --> SimTransmitApduLogicalChannel finished");
 }
@@ -755,13 +788,18 @@ void RilUnitTest::SimTransmitApduBasicChannel(const AppExecFwk::InnerEvent::Poin
 {
     TELEPHONY_LOGI("RilUnitTest::SimTransmitApduBasicChannel -->");
     ApduSimIORequestInfo reqInfo = ApduSimIORequestInfo();
+
+    int32_t channelId, type, instruction, p1, p2, p3;
+    GetTransmitApduChannelParam(channelId, type, instruction, p1, p2, p3);
+
+    reqInfo.channelId = channelId;
     reqInfo.serial = 0;
-    reqInfo.type = 0;
-    reqInfo.instruction = 1;
-    reqInfo.p1 = 1;
-    reqInfo.p2 = REQ_INFO_P2;
-    reqInfo.p3 = REQ_INFO_P3;
-    reqInfo.data = "apdu";
+    reqInfo.type = type;
+    reqInfo.instruction = instruction;
+    reqInfo.p1 = p1;
+    reqInfo.p2 = p2;
+    reqInfo.p3 = p3;
+    reqInfo.data = "";
     mRilManager_->SimTransmitApduBasicChannel(reqInfo, result);
     TELEPHONY_LOGI("RilUnitTest::SimTransmitApduBasicChannel --> SimTransmitApduBasicChannel finished");
 }
