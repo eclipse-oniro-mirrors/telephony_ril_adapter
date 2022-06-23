@@ -186,10 +186,12 @@ void RilRadioIndicationTest::NetworkPhyChnlCfgUpdated(OHOS::MessageParcel &data)
     std::vector<PhysicalChannelConfig> &configs = phyChnlCfgList->channelConfigInfos;
     for (int32_t i = 0; i < static_cast<int32_t>(configs.size()); i++) {
         cout << "====> [cellConnStatus]: " << configs[i].cellConnStatus << endl;
-        cout << "====> [cellBandwidth]: " << configs[i].cellBandwidth << endl;
+        cout << "====> [cellBandwidthDownlinkKhz]: " << configs[i].cellBandwidthDownlinkKhz << endl;
+        cout << "====> [cellBandwidthUplinkKhz]: " << configs[i].cellBandwidthUplinkKhz << endl;
         cout << "====> [ratType]: " << configs[i].ratType << endl;
         cout << "====> [freqRange]: " << configs[i].freqRange << endl;
-        cout << "====> [channelNum]: " << configs[i].channelNum << endl;
+        cout << "====> [downlinkChannelNum]: " << configs[i].downlinkChannelNum << endl;
+        cout << "====> [uplinkChannelNum]: " << configs[i].uplinkChannelNum << endl;
         cout << "====> [physicalCellId]: " << configs[i].physicalCellId << endl;
         cout << "====> [contextIdNum]: " << configs[i].contextIdNum << endl;
     }
