@@ -619,10 +619,12 @@ int32_t HRilNetwork::NetworkPhyChnlCfgUpdated(
     for (int32_t i = 0; i < phyChnlCfgList.itemNum; i++) {
         PhysicalChannelConfig cfg;
         cfg.cellConnStatus = hrilChannelConfigList->channelConfigs[i].cellConnStatus;
-        cfg.cellBandwidth = hrilChannelConfigList->channelConfigs[i].cellBandwidth;
+        cfg.cellBandwidthDownlinkKhz = hrilChannelConfigList->channelConfigs[i].cellBandwidthDownlinkKhz;
+        cfg.cellBandwidthUplinkKhz = hrilChannelConfigList->channelConfigs[i].cellBandwidthUplinkKhz;
         cfg.ratType = hrilChannelConfigList->channelConfigs[i].ratType;
         cfg.freqRange = hrilChannelConfigList->channelConfigs[i].freqRange;
-        cfg.channelNum = hrilChannelConfigList->channelConfigs[i].channelNum;
+        cfg.downlinkChannelNum = hrilChannelConfigList->channelConfigs[i].downlinkChannelNum;
+        cfg.uplinkChannelNum = hrilChannelConfigList->channelConfigs[i].uplinkChannelNum;
         cfg.physicalCellId = hrilChannelConfigList->channelConfigs[i].physicalCellId;
         cfg.contextIdNum = hrilChannelConfigList->channelConfigs[i].contextIdNum;
         for (int32_t j = 0; j < cfg.contextIdNum; j++) {
@@ -1513,17 +1515,22 @@ int32_t HRilNetwork::GetPhysicalChannelConfigResponse(
         for (int32_t i = 0; i < phyChnlCfgList.itemNum; i++) {
             PhysicalChannelConfig phyChnlCfg;
             phyChnlCfg.cellConnStatus = hrilChannelConfigList->channelConfigs[i].cellConnStatus;
-            phyChnlCfg.cellBandwidth = hrilChannelConfigList->channelConfigs[i].cellBandwidth;
+            phyChnlCfg.cellBandwidthDownlinkKhz = hrilChannelConfigList->channelConfigs[i].cellBandwidthDownlinkKhz;
+            phyChnlCfg.cellBandwidthUplinkKhz = hrilChannelConfigList->channelConfigs[i].cellBandwidthUplinkKhz;
             phyChnlCfg.ratType = hrilChannelConfigList->channelConfigs[i].ratType;
             phyChnlCfg.freqRange = hrilChannelConfigList->channelConfigs[i].freqRange;
-            phyChnlCfg.channelNum = hrilChannelConfigList->channelConfigs[i].channelNum;
+            phyChnlCfg.downlinkChannelNum = hrilChannelConfigList->channelConfigs[i].downlinkChannelNum;
+            phyChnlCfg.uplinkChannelNum = hrilChannelConfigList->channelConfigs[i].uplinkChannelNum;
             phyChnlCfg.physicalCellId = hrilChannelConfigList->channelConfigs[i].physicalCellId;
             phyChnlCfg.contextIdNum = hrilChannelConfigList->channelConfigs[i].contextIdNum;
             TELEPHONY_LOGI(
-                "cellConnStatus:%{public}d,cellBandwidth:%{public}d,physicalCellId:%{public}d,"
-                "ratType:%{public}d,freqRange:%{public}d,channelNum:%{public}d,contextIdNum:%{public}d",
-                phyChnlCfg.cellConnStatus, phyChnlCfg.cellBandwidth, phyChnlCfg.ratType, phyChnlCfg.freqRange,
-                phyChnlCfg.channelNum, phyChnlCfg.physicalCellId, phyChnlCfg.contextIdNum);
+                "HRilNetwork::GetPhysicalChannelConfigResponse cellConnStatus:%{public}d, "
+                "cellBandwidthDownlinkKhz:%{public}d, cellBandwidthUplinkKhz:%{public}d, physicalCellId:%{public}d, "
+                "ratType:%{public}d, freqRange:%{public}d, downlinkChannelNum:%{public}d, "
+                "uplinkChannelNum:%{public}d, contextIdNum:%{public}d",
+                phyChnlCfg.cellConnStatus, phyChnlCfg.cellBandwidthDownlinkKhz, phyChnlCfg.cellBandwidthUplinkKhz,
+                phyChnlCfg.ratType, phyChnlCfg.freqRange, phyChnlCfg.downlinkChannelNum, phyChnlCfg.uplinkChannelNum,
+                phyChnlCfg.physicalCellId, phyChnlCfg.contextIdNum);
             for (int32_t j = 0; j < phyChnlCfg.contextIdNum; j++) {
                 phyChnlCfg.contextIds.push_back(hrilChannelConfigList->channelConfigs[i].contextIds[j]);
                 TELEPHONY_LOGI("contextIds:%{public}d---contextId:%{public}d", j, phyChnlCfg.contextIds[j]);

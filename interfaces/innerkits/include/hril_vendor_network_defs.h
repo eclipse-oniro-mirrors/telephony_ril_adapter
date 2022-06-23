@@ -125,11 +125,13 @@ typedef struct {
 } HRilRegStatusInfo;
 
 typedef struct {
-    int32_t cellConnStatus;
-    int32_t cellBandwidth;
-    int32_t ratType;
+    HRilCellConnectionStatus cellConnStatus;
+    HRilRadioTech ratType;
+    int32_t cellBandwidthDownlinkKhz;
+    int32_t cellBandwidthUplinkKhz;
     int32_t freqRange;
-    int32_t channelNum;
+    int32_t downlinkChannelNum;
+    int32_t uplinkChannelNum;
     int32_t physicalCellId;
     int32_t contextIdNum;
     int32_t *contextIds;

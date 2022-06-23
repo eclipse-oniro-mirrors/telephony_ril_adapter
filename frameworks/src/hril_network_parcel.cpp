@@ -194,19 +194,33 @@ bool PhysicalChannelConfig::ReadFromParcel(Parcel &parcel)
         TELEPHONY_LOGE("PhysicalChannelConfig, ReadFromParcel contextIdNum:%{public}d is invalid", contextIdNum);
         return false;
     }
-    if (!ReadBaseInt32(parcel, cellConnStatus)) {
+    int32_t cellConnStatusValue = 0;
+    if (!ReadBaseInt32(parcel, cellConnStatusValue)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, cellBandwidth)) {
+    if ((cellConnStatusValue == HRIL_SERVING_CELL_PRIMARY) || (cellConnStatusValue == HRIL_SERVING_CELL_SECONDARY)) {
+        cellConnStatus = static_cast<HRilCellConnectionStatus>(cellConnStatusValue);
+    } else {
+        cellConnStatus = HRIL_SERVING_CELL_UNKNOWN;
+    }
+    if (!ReadBaseInt32(parcel, cellBandwidthDownlinkKhz)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, ratType)) {
+    if (!ReadBaseInt32(parcel, cellBandwidthUplinkKhz)) {
         return false;
     }
+    int radioTech = 0;
+    if (!ReadBaseInt32(parcel, radioTech)) {
+        return false;
+    }
+    ratType = static_cast<HRilRadioTech>(radioTech);
     if (!ReadBaseInt32(parcel, freqRange)) {
         return false;
     }
-    if (!ReadBaseInt32(parcel, channelNum)) {
+    if (!ReadBaseInt32(parcel, downlinkChannelNum)) {
+        return false;
+    }
+    if (!ReadBaseInt32(parcel, uplinkChannelNum)) {
         return false;
     }
     if (!ReadBaseInt32(parcel, physicalCellId)) {
@@ -233,7 +247,10 @@ bool PhysicalChannelConfig::Marshalling(Parcel &parcel) const
     if (!WriteBaseInt32(parcel, cellConnStatus)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, cellBandwidth)) {
+    if (!WriteBaseInt32(parcel, cellBandwidthDownlinkKhz)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, cellBandwidthUplinkKhz)) {
         return false;
     }
     if (!WriteBaseInt32(parcel, ratType)) {
@@ -242,7 +259,10 @@ bool PhysicalChannelConfig::Marshalling(Parcel &parcel) const
     if (!WriteBaseInt32(parcel, freqRange)) {
         return false;
     }
-    if (!WriteBaseInt32(parcel, channelNum)) {
+    if (!WriteBaseInt32(parcel, downlinkChannelNum)) {
+        return false;
+    }
+    if (!WriteBaseInt32(parcel, uplinkChannelNum)) {
         return false;
     }
     if (!WriteBaseInt32(parcel, physicalCellId)) {

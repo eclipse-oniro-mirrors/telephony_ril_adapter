@@ -1984,6 +1984,15 @@ void ReqGetRadioCapability(const ReqDataInfo *requestInfo)
         requestInfo->slotId, reportInfo, (const uint8_t *)GetRadioCapability(), sizeof(HRilRadioCapability));
 }
 
+static HRilCellConnectionStatus ConvertIntToHRilCellConnectionStatus(int32_t cellConnStatus)
+{
+    if ((cellConnStatus == HRIL_SERVING_CELL_PRIMARY) || (cellConnStatus == HRIL_SERVING_CELL_SECONDARY)) {
+        return (HRilCellConnectionStatus)cellConnStatus;
+    } else {
+        return HRIL_SERVING_CELL_UNKNOWN;
+    }
+}
+
 static int32_t ExtractConfigInfo(const char *str, const HRilPhyChannelConfig *config)
 {
     HRilPhyChannelConfig *cfg = (HRilPhyChannelConfig *)config;
@@ -1992,10 +2001,15 @@ static int32_t ExtractConfigInfo(const char *str, const HRilPhyChannelConfig *co
         TELEPHONY_LOGE("pStr or cfg is null.");
         return HRIL_ERR_GENERIC_FAILURE;
     }
-    if (NextInt(&pStr, &cfg->cellConnStatus) < 0) {
+    int32_t cellConnStatusValue = 0;
+    if (NextInt(&pStr, &cellConnStatusValue) < 0) {
         return HRIL_ERR_INVALID_RESPONSE;
     }
-    if (NextInt(&pStr, &cfg->cellBandwidth) < 0) {
+    cfg->cellConnStatus = ConvertIntToHRilCellConnectionStatus(cellConnStatusValue);
+    if (NextInt(&pStr, &cfg->cellBandwidthDownlinkKhz) < 0) {
+        return HRIL_ERR_INVALID_RESPONSE;
+    }
+    if (NextInt(&pStr, &cfg->cellBandwidthUplinkKhz) < 0) {
         return HRIL_ERR_INVALID_RESPONSE;
     }
     if (NextInt(&pStr, &cfg->ratType) < 0) {
@@ -2004,7 +2018,10 @@ static int32_t ExtractConfigInfo(const char *str, const HRilPhyChannelConfig *co
     if (NextInt(&pStr, &cfg->freqRange) < 0) {
         return HRIL_ERR_INVALID_RESPONSE;
     }
-    if (NextInt(&pStr, &cfg->channelNum) < 0) {
+    if (NextInt(&pStr, &cfg->downlinkChannelNum) < 0) {
+        return HRIL_ERR_INVALID_RESPONSE;
+    }
+    if (NextInt(&pStr, &cfg->uplinkChannelNum) < 0) {
         return HRIL_ERR_INVALID_RESPONSE;
     }
     if (NextInt(&pStr, &cfg->physicalCellId) < 0) {
@@ -2121,6 +2138,7 @@ void ReqGetPhysicalChannelConfig(const ReqDataInfo *requestInfo)
         err = (responseInfo->success == 0) ? HRIL_ERR_CMD_SEND_FAILURE : HRIL_ERR_GENERIC_FAILURE;
         ResponseNetworkReport(requestInfo->slotId, requestInfo, err, &respDataAck);
         TELEPHONY_LOGE("send AT CMD failed!");
+        return;
     }
     for (configCount = 0, pLine = responseInfo->head; pLine != NULL; pLine = pLine->next) {
         configCount++;
@@ -2151,7 +2169,6 @@ void ReqGetPhysicalChannelConfig(const ReqDataInfo *requestInfo)
     if (configInfoList.channelConfigs != NULL) {
         free(configInfoList.channelConfigs);
     }
-    return;
 }
 
 void ReqSetLocateUpdates(const ReqDataInfo *requestInfo, HRilRegNotifyMode mode)

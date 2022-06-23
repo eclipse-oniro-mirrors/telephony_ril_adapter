@@ -34,6 +34,29 @@
 #define WCDMA_GSM_TYPE "0201"
 #define LTE_WCDMA_TYPE "0302"
 
+typedef enum {
+    HRIL_RADIO_GSM = 0,
+    HRIL_RADIO_GSM_COMPACT = 1,
+    HRIL_RADIO_UTRAN = 2,
+    HRIL_RADIO_EGPRS = 3,
+    HRIL_RADIO_HSDPA = 4,
+    HRIL_RADIO_HSUPA = 5,
+    HRIL_RADIO_HSDPA_HSUPA = 6,
+    HRIL_RADIO_EUTRAN = 7,
+    HRIL_RADIO_CDMA = 8,
+    HRIL_RADIO_CDMA_IS95A = 9,
+    HRIL_RADIO_CDMA_IS95B = 10,
+    HRIL_RADIO_CDMA_EVDO_0 = 11,
+    HRIL_RADIO_CDMA_EVDO_A = 12,
+    HRIL_RADIO_CDMA_EVDO_B = 13,
+    HRIL_RADIO_CDMA_EHRPD = 14,
+    HRIL_RADIO_TDSCDMA = 15,
+    HRIL_RADIO_HSPAP = 16,
+    HRIL_RADIO_LTE = 17,
+    HRIL_RADIO_LTE_CA = 18,
+    HRIL_RADIO_NR = 19,
+} HRilActTech;
+
 void ReqGetImsRegStatus(const ReqDataInfo *requestInfo);
 void ReqGetSignalStrength(const ReqDataInfo *requestInfo);
 void ReqGetCsRegStatus(const ReqDataInfo *requestInfo);
