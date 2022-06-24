@@ -32,7 +32,7 @@
                 "faultloggerd",
                 "hiviewdfx_hilog_native",
                 "ipc",
-                "startup_l2",
+                "init",
                 "utils_base"
             ],
             "third_party": [

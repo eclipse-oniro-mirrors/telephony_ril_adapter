@@ -53,9 +53,9 @@ ohos_shared_library("hril") {
   ]
 
   external_deps = [
+    "init:libbegetutil",
     "ipc:ipc_core",
     "power_manager_native:powermgr_client",
-    "startup_l2:syspara",
   ]
 
   public_deps = [ "//utils/native/base:utils" ]
