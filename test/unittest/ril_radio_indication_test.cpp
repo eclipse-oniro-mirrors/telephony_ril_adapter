@@ -174,7 +174,6 @@ void RilRadioIndicationTest::NetworkStateNotify(OHOS::MessageParcel &data)
 
 void RilRadioIndicationTest::NetworkPhyChnlCfgUpdated(OHOS::MessageParcel &data)
 {
-    int32_t indicationType = data.ReadInt32();
     std::shared_ptr<ChannelConfigInfoList> phyChnlCfgList = std::make_shared<ChannelConfigInfoList>();
     if (phyChnlCfgList == nullptr) {
         TELEPHONY_LOGE("RilRadioIndicationTest::NetworkPhyChnlCfgUpdated phyChnlCfgList == nullptr");
@@ -193,6 +192,7 @@ void RilRadioIndicationTest::NetworkPhyChnlCfgUpdated(OHOS::MessageParcel &data)
         cout << "====> [physicalCellId]: " << configs[i].physicalCellId << endl;
         cout << "====> [contextIdNum]: " << configs[i].contextIdNum << endl;
     }
+    int32_t indicationType = data.ReadInt32();
     TELEPHONY_LOGI("func :%{public}s indicationType:%{public}d size:%{public}d", __func__, indicationType, size);
 }
 
