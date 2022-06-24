@@ -137,6 +137,12 @@ typedef struct {
 } CallRestrictionInfo;
 
 typedef struct {
+    const char *fac;
+    const char *oldPassword;
+    const char *newPassword;
+} HRilSetBarringInfo;
+
+typedef struct {
     int32_t reason; /* call forwarding type <0-5> */
     int32_t status;
     int32_t classx;
@@ -305,6 +311,7 @@ typedef struct {
     void (*GetEmergencyCallList)(const ReqDataInfo *requestInfo);
     void (*GetCallFailReason)(const ReqDataInfo *requestInfo);
     void (*SetEmergencyCallList)(const ReqDataInfo *requestInfo, HRilEmergencyInfo *emergencyInfo, const int len);
+    void (*SetBarringPassword)(const ReqDataInfo *requestInfo, HRilSetBarringInfo info);
 } HRilCallReq;
 #ifdef __cplusplus
 }

@@ -74,6 +74,7 @@ private:
     int32_t GetEmergencyCallList(struct HdfSBuf *data);
     int32_t GetCallFailReason(struct HdfSBuf *data);
     int32_t SetEmergencyCallList(struct HdfSBuf *data);
+    int32_t SetBarringPassword(struct HdfSBuf *data);
 
     int32_t GetCallListResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
@@ -164,6 +165,8 @@ private:
         const void *response, size_t responseLen);
     void BuildCallForwardQueryInfoList(CallForwardQueryInfoList &callForwardQueryInfoList,
         HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t SetBarringPasswordResponse(
+        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
 
 private:
     const HRilCallReq *callFuncs_ = nullptr;
