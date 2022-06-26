@@ -90,7 +90,6 @@ const char *ReadResponse(int atFd)
         } while (size < 0 && errno == EINTR);
         if (size > 0) {
             processed[size] = '\0';
-            TELEPHONY_LOGD("g_bufferCur : %{public}s\n", g_bufferCur);
             SkipUnUseChar();
             endEol = FindEndOfLine(g_bufferCur);
             processed += size;
@@ -105,7 +104,6 @@ const char *ReadResponse(int atFd)
     *endEol = '\0';
     ret = g_bufferCur;
     g_bufferCur = endEol + 1;
-    TELEPHONY_LOGD("AT< %{public}s\n", ret);
     return ret;
 }
 

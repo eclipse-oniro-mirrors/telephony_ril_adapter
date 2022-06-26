@@ -134,7 +134,6 @@ void ProcessResponse(const char *s, const char *pdu)
         TELEPHONY_LOGE("%{public}s enter s is null", __func__);
         return;
     }
-    TELEPHONY_LOGD("processLine line = %{public}s", s);
 
     if (g_response == NULL) {
         if (g_onNotifyFunc != NULL) {
