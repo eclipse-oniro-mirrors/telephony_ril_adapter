@@ -70,6 +70,10 @@ std::shared_ptr<HRilTimerCallbackMessage> HRilTimerCallback::HRilSetTimerCallbac
 {
     struct timeval timeout;
     std::shared_ptr<HRilTimerCallbackMessage> pCbMsg = std::make_shared<HRilTimerCallbackMessage>();
+    if (event_ == nullptr || pCbMsg == nullptr) {
+        TELEPHONY_LOGE("HRilSetTimerCallbackInfo event_ or pCbMsg is nullptr");
+        return nullptr;
+    }
     pCbMsg->func = func;
     pCbMsg->param = param;
 
