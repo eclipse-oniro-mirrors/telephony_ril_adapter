@@ -87,6 +87,7 @@ public:
     void OnResponseSetSmscAddr(OHOS::MessageParcel &data);
     void OnResponseLockStatus(OHOS::MessageParcel &data);
     void OnResponseOpenLogicalChannel(OHOS::MessageParcel &data);
+    void OnResponseSimTransmitApduChannelTest(OHOS::MessageParcel &data);
     void OnResponseGetSimLockStatus(OHOS::MessageParcel &data);
 
 private:

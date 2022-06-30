@@ -250,6 +250,13 @@ void RilUnitTest::GetEmergencyListTest(const OHOS::AppExecFwk::InnerEvent::Point
     TELEPHONY_LOGI("RilUnitTest::GetEmergencyListTest --> finished");
 }
 
+void RilUnitTest::SetEmergencyCallListTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::SetEmergencyCallListTest -->");
+    int32_t ret = mRilManager_->SetEmergencyCallList(result);
+    TELEPHONY_LOGI("RilUnitTest::SetEmergencyCallListTest return: %{public}d", ret);
+}
+
 void RilUnitTest::GetFailReasonTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("RilUnitTest::GetFailReasonTest -->");
@@ -615,9 +622,8 @@ void RilUnitTest::AcknowledgeRilCmLastIncomingGsmSmsTest(const OHOS::AppExecFwk:
     TELEPHONY_LOGI("RilUnitTest::AcknowledgeRilCmLastIncomingGsmSmsTest -->");
     int32_t cause = 2;
     mRilManager_->SendSmsAck(true, cause, result);
-    TELEPHONY_LOGI(
-        "RilUnitTest::AcknowledgeRilCmLastIncomingGsmSmsTest --> AcknowledgeRilCmLastIncomingGsmSmsTest "
-        "finished");
+    TELEPHONY_LOGI("RilUnitTest::AcknowledgeRilCmLastIncomingGsmSmsTest --> AcknowledgeRilCmLastIncomingGsmSmsTest "
+                   "finished");
 }
 
 void RilUnitTest::SetupRilCmDataCallTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
@@ -869,28 +875,28 @@ void RilUnitTest::UnLockPIN2Test(const OHOS::AppExecFwk::InnerEvent::Pointer &re
 void RilUnitTest::UnLockPUKTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("RilUnitTest::UnLockPUKTest -->");
-    std::string pin;
-    cout << "please enter the pin:";
-    cin >> pin;
-
     std::string puk;
     cout << "please enter the puk:";
     cin >> puk;
-    mRilManager_->UnLockPuk(pin, puk, result);
+
+    std::string pin;
+    cout << "please enter the pin:";
+    cin >> pin;
+    mRilManager_->UnLockPuk(puk, pin, result);
     TELEPHONY_LOGI("RilUnitTest::UnLockPUKTest --> UnLockPUKTest finished");
 }
 
 void RilUnitTest::UnLockPUK2Test(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("RilUnitTest::UnLockPUK2Test -->");
-    std::string pin2;
-    cout << "please enter the pin2:";
-    cin >> pin2;
-
     std::string puk2;
     cout << "please enter the puk2:";
     cin >> puk2;
-    mRilManager_->UnLockPuk2(pin2, puk2, result);
+
+    std::string pin2;
+    cout << "please enter the pin2:";
+    cin >> pin2;
+    mRilManager_->UnLockPuk2(puk2, pin2, result);
     TELEPHONY_LOGI("RilUnitTest::UnLockPUK2Test --> UnLockPUK2Test finished");
 }
 
@@ -982,6 +988,7 @@ void RilUnitTest::OnInitProcessInterface()
     memberFuncMap_[HREQ_CALL_SET_MUTE] = &RilUnitTest::SetMuteTest;
     memberFuncMap_[HREQ_CALL_GET_MUTE] = &RilUnitTest::GetMuteTest;
     memberFuncMap_[HREQ_CALL_GET_EMERGENCY_LIST] = &RilUnitTest::GetEmergencyListTest;
+    memberFuncMap_[HREQ_CALL_SET_EMERGENCY_LIST] = &RilUnitTest::SetEmergencyCallListTest;
     memberFuncMap_[HREQ_CALL_GET_FAIL_REASON] = &RilUnitTest::GetFailReasonTest;
 
     // sms
@@ -1101,6 +1108,7 @@ static int32_t PrintCallMenu()
     cout << "----> [" << HREQ_CALL_SET_MUTE << "] ---->[ HREQ_CALL_SET_MUTE ]" << endl;
     cout << "----> [" << HREQ_CALL_GET_MUTE << "] ---->[ HREQ_CALL_GET_MUTE ]" << endl;
     cout << "----> [" << HREQ_CALL_GET_EMERGENCY_LIST << "] ---->[ HREQ_CALL_GET_EMERGENCY_LIST ]" << endl;
+    cout << "----> [" << HREQ_CALL_SET_EMERGENCY_LIST << "] ---->[ HREQ_CALL_SET_EMERGENCY_LIST ]" << endl;
     cout << "----> [" << HREQ_CALL_GET_FAIL_REASON << "] ---->[ HREQ_CALL_GET_FAIL_REASON ]" << endl;
 
     int32_t choice = InputInt32(HREQ_CALL_BASE, HREQ_SMS_BASE - 1, "Command");

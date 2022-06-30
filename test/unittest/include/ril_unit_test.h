@@ -54,6 +54,7 @@ public:
     void SetMuteTest(const AppExecFwk::InnerEvent::Pointer &result);
     void GetMuteTest(const AppExecFwk::InnerEvent::Pointer &result);
     void GetEmergencyListTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void SetEmergencyCallListTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void GetFailReasonTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
 
     void IccRilSimIoForAppTest(const AppExecFwk::InnerEvent::Pointer &result);

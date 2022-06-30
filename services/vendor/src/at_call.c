@@ -313,9 +313,6 @@ void ReportCallUssdNotice(const char *str)
     if (NextStr(&pStr, &ussdNoticeInfo.str) < 0) {
         err = HRIL_ERR_INVALID_MODEM_PARAMETER;
     }
-    if (NextInt(&pStr, &ussdNoticeInfo.dcs) < 0) {
-        err = HRIL_ERR_INVALID_MODEM_PARAMETER;
-    }
     struct ReportInfo reportInfo = CreateReportInfo(&requestInfo, err, HRIL_NOTIFICATION, HNOTI_CALL_USSD_REPORT);
     reportInfo.modemErrInfo = errInfo;
     OnCallReport(GetSlotId(NULL), reportInfo, (const uint8_t *)&ussdNoticeInfo, sizeof(HRilUssdNoticeInfo));

@@ -530,6 +530,44 @@ void RilManagerTest::GetEmergencyList(const AppExecFwk::InnerEvent::Pointer &res
     }
 }
 
+int32_t RilManagerTest::SetEmergencyCallList(const AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("SetEmergencyInfoList");
+    if (cellularRadio_ != nullptr) {
+        std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_CALL_SET_EMERGENCY_LIST, result);
+        if (request == nullptr) {
+            return HRIL_ERR_NULL_POINT;
+        }
+        int32_t total = 1;
+        int32_t category = 2;
+        int32_t serviceType = 0;
+        EmergencyInfoList emergencyInfoList;
+        emergencyInfoList.callSize = total;
+        emergencyInfoList.flag = request->serialId_;
+        EmergencyInfo emergencyInfo = {};
+        emergencyInfo.index = 1;
+        emergencyInfo.total = total;
+        emergencyInfo.eccNum = "131";
+        emergencyInfo.category = category;
+        emergencyInfo.simpresent = serviceType;
+        emergencyInfo.mcc = "460";
+        emergencyInfo.abnormalService = 0;
+        emergencyInfoList.calls.push_back(emergencyInfo);
+        MessageParcel wData;
+        wData.WriteInt32(slotId_);
+        if (!emergencyInfoList.Marshalling(wData)) {
+            TELEPHONY_LOGE("ERROR : ActivatePdpContext --> emergencyInfoList.Marshalling(wData) failed !!!");
+            return HRIL_ERR_NULL_POINT;
+        }
+        int32_t ret = SendBufferEvent(HREQ_CALL_SET_EMERGENCY_LIST, wData);
+        TELEPHONY_LOGI("SendRequest(ID:%{public}d) return: %{public}d", HREQ_CALL_SET_EMERGENCY_LIST, ret);
+        return ret;
+    } else {
+        TELEPHONY_LOGE("RilCmJoin  cellularRadio_ == nullptr");
+        return HRIL_ERR_NULL_POINT;
+    }
+}
+
 void RilManagerTest::GetFailReason(const AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("RilManagerTest::GetFailReason -->");

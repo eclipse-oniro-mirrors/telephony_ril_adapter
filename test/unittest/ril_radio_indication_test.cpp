@@ -155,14 +155,18 @@ void RilRadioIndicationTest::CallSrvccStatusReport(OHOS::MessageParcel &data)
 void RilRadioIndicationTest::CallEmergencyNumberReport(OHOS::MessageParcel &data)
 {
     cout << endl << "---->[NTF] CallEmergencyNumberReport: " << endl;
-    std::shared_ptr<EmergencyInfo> emcInfo = std::make_shared<EmergencyInfo>();
-    if (emcInfo == nullptr) {
-        TELEPHONY_LOGE("ERROR : emcInfo == nullptr !!!");
+    std::shared_ptr<EmergencyInfoList> emergencyCallList = std::make_shared<EmergencyInfoList>();
+    if (emergencyCallList == nullptr) {
+        TELEPHONY_LOGE("ERROR : callInfo == nullptr !!!");
         return;
     }
-    emcInfo->ReadFromParcel(data);
-    cout << "====> [index]: " << emcInfo->index << "/" << emcInfo->total << "\tcategory: " << emcInfo->category
-         << "\tmcc: " << emcInfo->mcc << "\teccNum: " << emcInfo->eccNum << endl;
+    emergencyCallList->ReadFromParcel(data);
+    cout << endl << "====>Emergency List Num: " << emergencyCallList->callSize << endl;
+    for (int32_t i = 0; i < emergencyCallList->callSize; i++) {
+        cout << "====> [index]: " << emergencyCallList->calls[i].index
+             << "\tcategory: " << emergencyCallList->calls[i].category << "\tmcc: " << emergencyCallList->calls[i].mcc
+             << "\teccNum: " << emergencyCallList->calls[i].eccNum << endl;
+    }
 }
 
 void RilRadioIndicationTest::NetworkStateNotify(OHOS::MessageParcel &data)
@@ -390,7 +394,7 @@ void RilRadioIndicationTest::ChangedImsNetworkState(OHOS::MessageParcel &data)
 void RilRadioIndicationTest::SimRefreshNotify(OHOS::MessageParcel &data)
 {
     TELEPHONY_LOGI("RilRadioIndicationTest::SimRefreshNotify --> ");
-    cout << "---->[NTF] ICC Refresh Changed" << endl;
+    cout << "---->[NTF] SimRefreshNotify" << endl;
     int32_t indicationType = data.ReadInt32();
     if (mRilManager_ == nullptr) {
         TELEPHONY_LOGE("mRilManager_ is null!");

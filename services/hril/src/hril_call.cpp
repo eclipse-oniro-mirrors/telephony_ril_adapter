@@ -1613,7 +1613,6 @@ int32_t HRilCall::CallUssdNotice(int32_t notifyType, const HRilErrNumber e, cons
     const HRilUssdNoticeInfo *hUssdNoticeInfo = reinterpret_cast<const HRilUssdNoticeInfo *>(response);
     ussdNoticeInfo.m = hUssdNoticeInfo->m;
     ussdNoticeInfo.str = hUssdNoticeInfo->str == nullptr ? "" : hUssdNoticeInfo->str;
-    ussdNoticeInfo.dcs = hUssdNoticeInfo->dcs;
     return NotifyMessageParcel(notifyType, ussdNoticeInfo, HNOTI_CALL_USSD_REPORT);
 }
 
