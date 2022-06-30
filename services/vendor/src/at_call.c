@@ -15,12 +15,10 @@
 
 #include "at_call.h"
 
+#include "hril_notification.h"
 #include "securec.h"
-
 #include "vendor_report.h"
 #include "vendor_util.h"
-
-#include "hril_notification.h"
 
 #undef DEFAULT_TIMEOUT
 #define DEFAULT_TIMEOUT 5000
@@ -40,13 +38,11 @@ static int32_t lastCcCause = HRIL_ERR_CALL_CAUSE;
 static void OnCallReportErrorMessages(const ReqDataInfo *requestInfo, uint32_t err, ResponseInfo *pResponse)
 {
     uint32_t errorNo = HRIL_ERR_SUCCESS;
-    struct ReportInfo reportInfo;
-    ModemReportErrorInfo errInfo = {.errorNo = HRIL_ERR_SUCCESS, .errType = HRIL_REPORT_ERR_TYPE_NONE};
-    errInfo = GetReportErrorInfo(pResponse);
+    ModemReportErrorInfo errInfo = GetReportErrorInfo(pResponse);
     errorNo = (err != HRIL_ERR_SUCCESS) ? err : errInfo.errorNo;
     TELEPHONY_LOGW("Report error! ret:%{public}d", errorNo);
     FreeResponseInfo(pResponse);
-    reportInfo = CreateReportInfo(requestInfo, errorNo, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, errorNo, HRIL_RESPONSE, 0);
     reportInfo.modemErrInfo = errInfo;
     OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
 }
@@ -126,7 +122,6 @@ void ReportImsServiceStatusInfo(const char *str)
     int32_t err = HRIL_ERR_SUCCESS;
     char *pStr = (char *)str;
     HRilImsServiceStatus imsSrvStatus = {0};
-    struct ReportInfo reportInfo = {0};
     ReqDataInfo requestInfo = {0};
     ModemReportErrorInfo errInfo = InitModemReportErrorInfo();
 
@@ -158,7 +153,8 @@ void ReportImsServiceStatusInfo(const char *str)
         err = HRIL_ERR_INVALID_MODEM_PARAMETER;
     }
 
-    reportInfo = CreateReportInfo(&requestInfo, err, HRIL_NOTIFICATION, HNOTI_CALL_IMS_SERVICE_STATUS_REPORT);
+    struct ReportInfo reportInfo =
+        CreateReportInfo(&requestInfo, err, HRIL_NOTIFICATION, HNOTI_CALL_IMS_SERVICE_STATUS_REPORT);
     reportInfo.modemErrInfo = errInfo;
     OnCallReport(GetSlotId(NULL), reportInfo, (const uint8_t *)&imsSrvStatus, sizeof(HRilImsServiceStatus));
 }
@@ -170,7 +166,6 @@ void ReportCallStateUpdated(const char *str)
     int callId = 0;
     int voiceDomain = 0;
     int state = 0;
-    struct ReportInfo reportInfo = {0};
     ReqDataInfo requestInfo = {0};
     ModemReportErrorInfo errInfo = InitModemReportErrorInfo();
 
@@ -187,7 +182,7 @@ void ReportCallStateUpdated(const char *str)
         err = HRIL_ERR_INVALID_MODEM_PARAMETER;
     }
 
-    reportInfo = CreateReportInfo(&requestInfo, err, HRIL_NOTIFICATION, HNOTI_CALL_STATE_UPDATED);
+    struct ReportInfo reportInfo = CreateReportInfo(&requestInfo, err, HRIL_NOTIFICATION, HNOTI_CALL_STATE_UPDATED);
     reportInfo.modemErrInfo = errInfo;
     OnCallReport(GetSlotId(NULL), reportInfo, NULL, 0);
 }
@@ -197,7 +192,6 @@ void ReportSrvccStatusUpdate(const char *str)
     int32_t err = HRIL_ERR_SUCCESS;
     char *pStr = (char *)str;
     HRilCallSrvccStatus srvccStatus = {0};
-    struct ReportInfo reportInfo = {0};
     ReqDataInfo requestInfo = {0};
     ModemReportErrorInfo errInfo = InitModemReportErrorInfo();
 
@@ -208,7 +202,8 @@ void ReportSrvccStatusUpdate(const char *str)
         err = HRIL_ERR_INVALID_MODEM_PARAMETER;
     }
 
-    reportInfo = CreateReportInfo(&requestInfo, err, HRIL_NOTIFICATION, HNOTI_CALL_SRVCC_STATUS_REPORT);
+    struct ReportInfo reportInfo =
+        CreateReportInfo(&requestInfo, err, HRIL_NOTIFICATION, HNOTI_CALL_SRVCC_STATUS_REPORT);
     reportInfo.modemErrInfo = errInfo;
     OnCallReport(GetSlotId(NULL), reportInfo, (const uint8_t *)&srvccStatus, sizeof(HRilCallSrvccStatus));
 }
@@ -218,7 +213,6 @@ void ReportCsChannelInfo(const char *str)
     int32_t err = HRIL_ERR_SUCCESS;
     char *pStr = (char *)str;
     HRilCallCsChannelInfo csChannelInfo = {0};
-    struct ReportInfo reportInfo = {0};
     ReqDataInfo requestInfo = {0};
     ModemReportErrorInfo errInfo = InitModemReportErrorInfo();
     /* 0 network alerting; 1 local alerting */
@@ -235,7 +229,8 @@ void ReportCsChannelInfo(const char *str)
     }
 
     ringbackVoiceFlag = !csChannelInfo.status;
-    reportInfo = CreateReportInfo(&requestInfo, err, HRIL_NOTIFICATION, HNOTI_CALL_RINGBACK_VOICE_REPORT);
+    struct ReportInfo reportInfo =
+        CreateReportInfo(&requestInfo, err, HRIL_NOTIFICATION, HNOTI_CALL_RINGBACK_VOICE_REPORT);
     reportInfo.modemErrInfo = errInfo;
     OnCallReport(GetSlotId(NULL), reportInfo, (const uint8_t *)&ringbackVoiceFlag, sizeof(int32_t));
 }
@@ -267,7 +262,6 @@ void ReportEmergencyNumberList(const char *str)
     int32_t err = HRIL_ERR_SUCCESS;
     char *pStr = (char *)str;
     HRilEmergencyInfo pEmergencyInfo = {0};
-    struct ReportInfo reportInfo = {0};
     ReqDataInfo requestInfo = {0};
     ModemReportErrorInfo errInfo = InitModemReportErrorInfo();
 
@@ -296,7 +290,8 @@ void ReportEmergencyNumberList(const char *str)
         err = HRIL_ERR_INVALID_MODEM_PARAMETER;
     }
 
-    reportInfo = CreateReportInfo(&requestInfo, err, HRIL_NOTIFICATION, HNOTI_CALL_EMERGENCY_NUMBER_REPORT);
+    struct ReportInfo reportInfo =
+        CreateReportInfo(&requestInfo, err, HRIL_NOTIFICATION, HNOTI_CALL_EMERGENCY_NUMBER_REPORT);
     reportInfo.modemErrInfo = errInfo;
     OnCallReport(GetSlotId(NULL), reportInfo, (const uint8_t *)&pEmergencyInfo, sizeof(pEmergencyInfo));
 }
@@ -306,7 +301,6 @@ void ReportCallUssdNotice(const char *str)
     int32_t err = HRIL_ERR_SUCCESS;
     char *pStr = (char *)str;
     HRilUssdNoticeInfo ussdNoticeInfo = {0};
-    struct ReportInfo reportInfo = {0};
     ReqDataInfo requestInfo = {0};
     ModemReportErrorInfo errInfo = InitModemReportErrorInfo();
 
@@ -322,7 +316,7 @@ void ReportCallUssdNotice(const char *str)
     if (NextInt(&pStr, &ussdNoticeInfo.dcs) < 0) {
         err = HRIL_ERR_INVALID_MODEM_PARAMETER;
     }
-    reportInfo = CreateReportInfo(&requestInfo, err, HRIL_NOTIFICATION, HNOTI_CALL_USSD_REPORT);
+    struct ReportInfo reportInfo = CreateReportInfo(&requestInfo, err, HRIL_NOTIFICATION, HNOTI_CALL_USSD_REPORT);
     reportInfo.modemErrInfo = errInfo;
     OnCallReport(GetSlotId(NULL), reportInfo, (const uint8_t *)&ussdNoticeInfo, sizeof(HRilUssdNoticeInfo));
 }
@@ -370,7 +364,6 @@ int32_t BuildCallInfoList(const ReqDataInfo *requestInfo, ResponseInfo *response
     int32_t callNum = 0;
     int32_t validCallNum = 0;
     int32_t err = HRIL_ERR_SUCCESS;
-    struct ReportInfo reportInfo = {0};
     Line *pLine = NULL;
     ResponseInfo *pResponse = response;
     HRilCallInfo *pCalls = NULL;
@@ -399,7 +392,7 @@ int32_t BuildCallInfoList(const ReqDataInfo *requestInfo, ResponseInfo *response
         validCallNum++;
     }
 
-    reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
     OnCallReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)pCalls, sizeof(HRilCallInfo) * validCallNum);
     FreeResponseInfo(pResponse);
     free(pCalls);
@@ -434,7 +427,6 @@ void ReqDial(const ReqDataInfo *requestInfo, const HRilDial *data, size_t dataLe
     const char *clir = NULL;
     int32_t ret;
     int32_t err = HRIL_ERR_SUCCESS;
-    struct ReportInfo reportInfo = {0};
     ResponseInfo *pResponse = NULL;
 
     if (data == NULL) {
@@ -473,7 +465,7 @@ void ReqDial(const ReqDataInfo *requestInfo, const HRilDial *data, size_t dataLe
         }
     }
 
-    reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
     OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
 }
@@ -485,7 +477,6 @@ void ReqHangup(const ReqDataInfo *requestInfo, const uint32_t *data, size_t data
     int32_t err = HRIL_ERR_SUCCESS;
     char cmd[MAX_CMD_LENGTH] = {0};
     ResponseInfo *pResponse = NULL;
-    struct ReportInfo reportInfo = {0};
 
     if (data == NULL) {
         TELEPHONY_LOGE("data is null!!!");
@@ -504,14 +495,13 @@ void ReqHangup(const ReqDataInfo *requestInfo, const uint32_t *data, size_t data
         err = HRIL_ERR_GENERIC_FAILURE;
     }
 
-    reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
     OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
 }
 
 void ReqReject(const ReqDataInfo *requestInfo)
 {
-    struct ReportInfo reportInfo = {0};
     ResponseInfo *pResponse = NULL;
     int32_t ret;
     int32_t err = HRIL_ERR_SUCCESS;
@@ -522,7 +512,7 @@ void ReqReject(const ReqDataInfo *requestInfo)
         err = HRIL_ERR_GENERIC_FAILURE;
     }
 
-    reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
     OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
 }
@@ -531,7 +521,6 @@ void ReqAnswer(const ReqDataInfo *requestInfo)
 {
     int32_t ret;
     int32_t err = HRIL_ERR_SUCCESS;
-    struct ReportInfo reportInfo = {0};
     ResponseInfo *pResponse = NULL;
 
     ret = SendCommandLock("ATA", NULL, 0, &pResponse);
@@ -539,7 +528,7 @@ void ReqAnswer(const ReqDataInfo *requestInfo)
         err = HRIL_ERR_GENERIC_FAILURE;
     }
 
-    reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
     OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
 }
@@ -547,7 +536,6 @@ void ReqAnswer(const ReqDataInfo *requestInfo)
 // Calling line identification presentation
 void ReqGetClip(const ReqDataInfo *requestInfo)
 {
-    struct ReportInfo reportInfo = {0};
     HRilGetClipResult result = {0};
     int32_t err = HRIL_ERR_SUCCESS;
     ResponseInfo *pResponse = NULL;
@@ -568,19 +556,18 @@ void ReqGetClip(const ReqDataInfo *requestInfo)
                 err = HRIL_ERR_GENERIC_FAILURE;
             }
         }
-        reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
+        struct ReportInfo reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
         OnCallReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&result, sizeof(result));
         FreeResponseInfo(pResponse);
     } else {
         TELEPHONY_LOGE("ReqGetClip send failed");
-        reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_CMD_SEND_FAILURE, HRIL_RESPONSE, 0);
+        struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_CMD_SEND_FAILURE, HRIL_RESPONSE, 0);
         OnCallReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&result, 0);
     }
 }
 
 void ReqSetClip(const ReqDataInfo *requestInfo, int32_t action)
 {
-    struct ReportInfo reportInfo = {0};
     char cmd[MAX_CMD_LENGTH] = {0};
     int32_t err = HRIL_ERR_SUCCESS;
     ResponseInfo *pResponse = NULL;
@@ -603,13 +590,12 @@ void ReqSetClip(const ReqDataInfo *requestInfo, int32_t action)
         TELEPHONY_LOGE("ReqSetClip send failed");
         err = HRIL_ERR_GENERIC_FAILURE;
     }
-    reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
     OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
 }
 
 void ReqGetClir(const ReqDataInfo *requestInfo)
 {
-    struct ReportInfo reportInfo = {0};
     HRilGetCallClirResult result = {0};
     int32_t err = HRIL_ERR_SUCCESS;
     ResponseInfo *pResponse = NULL;
@@ -630,7 +616,7 @@ void ReqGetClir(const ReqDataInfo *requestInfo)
                 err = HRIL_ERR_GENERIC_FAILURE;
             }
         }
-        reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
+        struct ReportInfo reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
         OnCallReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&result, sizeof(result));
         FreeResponseInfo(pResponse);
     } else {
@@ -642,7 +628,6 @@ void ReqGetClir(const ReqDataInfo *requestInfo)
 
 void ReqSetClir(const ReqDataInfo *requestInfo, int32_t action)
 {
-    struct ReportInfo reportInfo = {0};
     char cmd[MAX_CMD_LENGTH] = {0};
     int32_t err = HRIL_ERR_SUCCESS;
     ResponseInfo *pResponse = NULL;
@@ -658,14 +643,13 @@ void ReqSetClir(const ReqDataInfo *requestInfo, int32_t action)
         TELEPHONY_LOGE("ReqSetClir send failed");
         err = HRIL_ERR_GENERIC_FAILURE;
     }
-    reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
     OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
 }
 
 void ReqStartDtmf(const ReqDataInfo *requestInfo, CallDtmfInfo info)
 {
-    struct ReportInfo reportInfo = {0};
     char cmd[MAX_CMD_LENGTH] = {0};
     int32_t err = HRIL_ERR_SUCCESS;
     ResponseInfo *pResponse = NULL;
@@ -681,14 +665,13 @@ void ReqStartDtmf(const ReqDataInfo *requestInfo, CallDtmfInfo info)
         TELEPHONY_LOGE("ReqStartDtmf send failed");
         err = HRIL_ERR_GENERIC_FAILURE;
     }
-    reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
     OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
 }
 
 void ReqSendDtmf(const ReqDataInfo *requestInfo, CallDtmfInfo info)
 {
-    struct ReportInfo reportInfo = {0};
     char cmd[MAX_CMD_LENGTH] = {0};
     int32_t err = HRIL_ERR_SUCCESS;
     ResponseInfo *pResponse = NULL;
@@ -715,14 +698,13 @@ void ReqSendDtmf(const ReqDataInfo *requestInfo, CallDtmfInfo info)
             break;
         }
     }
-    reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
     OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
 }
 
 void ReqStopDtmf(const ReqDataInfo *requestInfo, CallDtmfInfo info)
 {
-    struct ReportInfo reportInfo = {0};
     char cmd[MAX_CMD_LENGTH] = {0};
     int32_t err = HRIL_ERR_SUCCESS;
     ResponseInfo *pResponse = NULL;
@@ -738,14 +720,13 @@ void ReqStopDtmf(const ReqDataInfo *requestInfo, CallDtmfInfo info)
         TELEPHONY_LOGE("ReqStopDtmf send failed");
         err = HRIL_ERR_GENERIC_FAILURE;
     }
-    reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
     OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
 }
 
 static void HoldCallAndUnHoldCallAtSend(const ReqDataInfo *requestInfo)
 {
-    struct ReportInfo reportInfo = {0};
     int32_t ret;
     int32_t err = HRIL_ERR_SUCCESS;
     ResponseInfo *pResponse = NULL;
@@ -756,7 +737,7 @@ static void HoldCallAndUnHoldCallAtSend(const ReqDataInfo *requestInfo)
         err = HRIL_ERR_GENERIC_FAILURE;
     }
 
-    reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
     OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
 }
@@ -779,7 +760,6 @@ void ReqSwitchCall(const ReqDataInfo *requestInfo)
 void ReqCombineConference(const ReqDataInfo *requestInfo, int32_t callType)
 {
     char cmd[MAX_CMD_LENGTH] = {0};
-    struct ReportInfo reportInfo = {0};
     int32_t ret = 0;
     int32_t count = 3;
     int32_t err = HRIL_ERR_SUCCESS;
@@ -808,14 +788,13 @@ void ReqCombineConference(const ReqDataInfo *requestInfo, int32_t callType)
         TELEPHONY_LOGE("onRequest HREQ_CALL_COMBINE_CONFERENCE args error!!! \n");
         err = HRIL_ERR_INVALID_PARAMETER;
     }
-    reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
     OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
 }
 
 void ReqSeparateConference(const ReqDataInfo *requestInfo, int32_t callIndex, int32_t callType)
 {
     char cmd[MAX_CMD_LENGTH] = {0};
-    struct ReportInfo reportInfo = {0};
     int32_t ret = 0;
     int32_t count = 3;
     int32_t err = HRIL_ERR_SUCCESS;
@@ -845,7 +824,7 @@ void ReqSeparateConference(const ReqDataInfo *requestInfo, int32_t callIndex, in
         TELEPHONY_LOGE("onRequest req split args error!!!");
         err = HRIL_ERR_INVALID_PARAMETER;
     }
-    reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
     OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
 }
@@ -853,7 +832,6 @@ void ReqSeparateConference(const ReqDataInfo *requestInfo, int32_t callIndex, in
 void ReqCallSupplement(const ReqDataInfo *requestInfo, int32_t type)
 {
     char cmd[MAX_CMD_LENGTH] = {0};
-    struct ReportInfo reportInfo = {0};
     int32_t ret = 0;
     int32_t err = HRIL_ERR_SUCCESS;
     ResponseInfo *pResponse = NULL;
@@ -879,7 +857,7 @@ void ReqCallSupplement(const ReqDataInfo *requestInfo, int32_t type)
         }
         default: {
             TELEPHONY_LOGW("ReqCallSupplement warring, type is invalid");
-            reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_PARAMETER, HRIL_RESPONSE, 0);
+            struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_PARAMETER, HRIL_RESPONSE, 0);
             OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
             FreeResponseInfo(pResponse);
             return;
@@ -898,14 +876,13 @@ void ReqCallSupplement(const ReqDataInfo *requestInfo, int32_t type)
         }
     }
 
-    reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
     OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
 }
 
 void ReqGetCallWaiting(const ReqDataInfo *requestInfo)
 {
-    struct ReportInfo reportInfo = {0};
     int32_t err = HRIL_ERR_SUCCESS;
     ResponseInfo *pResponse = NULL;
     HRilCallWaitResult hrilCallWaitResult = {0};
@@ -915,7 +892,7 @@ void ReqGetCallWaiting(const ReqDataInfo *requestInfo)
     if (err != HRIL_ERR_SUCCESS) {
         TELEPHONY_LOGE("ReqGetCallWaiting return, CCWA send failed");
         err = HRIL_ERR_CMD_SEND_FAILURE;
-        reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
+        struct ReportInfo reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
         OnCallReport(
             GetSlotId(requestInfo), reportInfo, (const uint8_t *)&hrilCallWaitResult, sizeof(HRilCallWaitResult));
         return;
@@ -934,14 +911,13 @@ void ReqGetCallWaiting(const ReqDataInfo *requestInfo)
             err = HRIL_ERR_GENERIC_FAILURE;
         }
     }
-    reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
     OnCallReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&hrilCallWaitResult, sizeof(HRilCallWaitResult));
     FreeResponseInfo(pResponse);
 }
 
 void ReqSetCallWaiting(const ReqDataInfo *requestInfo, int32_t active)
 {
-    struct ReportInfo reportInfo = {0};
     char cmd[MAX_CMD_LENGTH] = {0};
     int32_t err = HRIL_ERR_SUCCESS;
     ResponseInfo *pResponse = NULL;
@@ -962,7 +938,7 @@ void ReqSetCallWaiting(const ReqDataInfo *requestInfo, int32_t active)
             err = HRIL_ERR_GENERIC_FAILURE;
         }
     }
-    reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
     OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
 }
@@ -974,12 +950,11 @@ void ReqSetCallTransferInfo(const ReqDataInfo *requestInfo, HRilCFInfo info)
     const int32_t NUM_S = 129;
     int32_t err = HRIL_ERR_SUCCESS;
     ResponseInfo *pResponse = NULL;
-    struct ReportInfo reportInfo = {0};
     char cmd[MAX_CMD_LENGTH] = {0};
 
     if (info.reason > CALL_FORWARD_REASON_ALL_CCF || info.mode > CALL_FORWARD_MODE_ERASURE) {
         TELEPHONY_LOGE("ReqSetCallTransferInfo call forwarding parameter err!!");
-        reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_PARAMETER, HRIL_RESPONSE, 0);
+        struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_PARAMETER, HRIL_RESPONSE, 0);
         OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
         return;
     }
@@ -1006,14 +981,13 @@ void ReqSetCallTransferInfo(const ReqDataInfo *requestInfo, HRilCFInfo info)
             err = HRIL_ERR_GENERIC_FAILURE;
         }
     }
-    reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
     OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
 }
 
 void ReqGetCallTransferInfo(const ReqDataInfo *requestInfo, int32_t reason)
 {
-    struct ReportInfo reportInfo = {0};
     char cmd[MAX_CMD_LENGTH] = {0};
     int32_t err = HRIL_ERR_SUCCESS;
     ResponseInfo *pResponse = NULL;
@@ -1022,7 +996,7 @@ void ReqGetCallTransferInfo(const ReqDataInfo *requestInfo, int32_t reason)
 
     if (reason > CALL_FORWARD_REASON_ALL_CCF) {
         TELEPHONY_LOGE("ReqGetCallTransferInfo call forwarding parameter err!!");
-        reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_PARAMETER, HRIL_RESPONSE, 0);
+        struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_PARAMETER, HRIL_RESPONSE, 0);
         OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
         return;
     }
@@ -1057,7 +1031,7 @@ void ReqGetCallTransferInfo(const ReqDataInfo *requestInfo, int32_t reason)
         TELEPHONY_LOGE("ERROR: ReqGetCallTransferInfo pResponse is null");
         err = HRIL_ERR_GENERIC_FAILURE;
     }
-    reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
     OnCallReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&queryInfo, sizeof(queryInfo));
     FreeResponseInfo(pResponse);
 }
@@ -1065,7 +1039,6 @@ void ReqGetCallTransferInfo(const ReqDataInfo *requestInfo, int32_t reason)
 void ReqGetCallRestriction(const ReqDataInfo *requestInfo, const char *fac)
 {
     long long timeOut = DEFAULT_TIMEOUT_CLCK;
-    struct ReportInfo reportInfo = {0};
     int32_t err = HRIL_ERR_SUCCESS;
     ResponseInfo *pResponse = NULL;
     HRilCallRestrictionResult result = {0};
@@ -1101,7 +1074,7 @@ void ReqGetCallRestriction(const ReqDataInfo *requestInfo, const char *fac)
         TELEPHONY_LOGE("ERROR: ReqGetCallRestriction pResponse is null");
         err = HRIL_ERR_GENERIC_FAILURE;
     }
-    reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
     OnCallReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&result, sizeof(HRilCallRestrictionResult));
     FreeResponseInfo(pResponse);
 }
@@ -1109,7 +1082,6 @@ void ReqGetCallRestriction(const ReqDataInfo *requestInfo, const char *fac)
 void ReqSetCallRestriction(const ReqDataInfo *requestInfo, CallRestrictionInfo info)
 {
     long long timeOut = DEFAULT_TIMEOUT;
-    struct ReportInfo reportInfo = {0};
     char cmd[MAX_CMD_LENGTH] = {0};
     int32_t err = HRIL_ERR_SUCCESS;
     ResponseInfo *pResponse = NULL;
@@ -1129,7 +1101,7 @@ void ReqSetCallRestriction(const ReqDataInfo *requestInfo, CallRestrictionInfo i
             err = HRIL_ERR_GENERIC_FAILURE;
         }
     }
-    reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
     OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
 }
@@ -1161,11 +1133,9 @@ void ReqGetCallPreferenceMode(const ReqDataInfo *requestInfo)
     int32_t mode = VENDOR_FAIL;
     int32_t ret = VENDOR_FAIL;
     int32_t err = HRIL_ERR_SUCCESS;
-    struct ReportInfo reportInfo = {0};
     ResponseInfo *pResponse = NULL;
-    ModemReportErrorInfo errInfo = {};
 
-    errInfo = InitModemReportErrorInfo();
+    ModemReportErrorInfo errInfo = InitModemReportErrorInfo();
     ret = SendCommandLock("AT+CEVDP?", "+CEVDP:", 0, &pResponse);
     if (ret || pResponse == NULL || !pResponse->success) {
         err = (ret != HRIL_ERR_SUCCESS) ? HRIL_ERR_CMD_SEND_FAILURE : err;
@@ -1186,7 +1156,7 @@ void ReqGetCallPreferenceMode(const ReqDataInfo *requestInfo)
         TELEPHONY_LOGE("ERROR: pResponse->head is null");
         err = HRIL_ERR_GENERIC_FAILURE;
     }
-    reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
     reportInfo.modemErrInfo = errInfo;
     OnCallReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&mode, sizeof(mode));
     FreeResponseInfo(pResponse);
@@ -1198,11 +1168,9 @@ void ReqSetCallPreferenceMode(const ReqDataInfo *requestInfo, int32_t mode)
     int32_t err = HRIL_ERR_SUCCESS;
     int32_t value = HRIL_CALL_MODE_CS_1ST_PS_2ND;
     char cmd[MAX_CMD_LENGTH] = {0};
-    struct ReportInfo reportInfo;
     ResponseInfo *pResponse = NULL;
-    ModemReportErrorInfo errInfo = {};
 
-    errInfo = InitModemReportErrorInfo();
+    ModemReportErrorInfo errInfo = InitModemReportErrorInfo();
     value = mode;
     ret = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CEVDP=%d", value);
     if (ret < 0) {
@@ -1216,7 +1184,7 @@ void ReqSetCallPreferenceMode(const ReqDataInfo *requestInfo, int32_t mode)
         err = errInfo.errorNo;
         TELEPHONY_LOGE("cmd send failed, err:%{public}d", ret ? ret : err);
     }
-    reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
     reportInfo.modemErrInfo = errInfo;
     OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
@@ -1228,11 +1196,9 @@ void ReqGetLteImsSwitchStatus(const ReqDataInfo *requestInfo)
     int32_t value = VENDOR_FAIL;
     int32_t ret = VENDOR_FAIL;
     int32_t err = HRIL_ERR_SUCCESS;
-    struct ReportInfo reportInfo = {0};
     ResponseInfo *pResponse = NULL;
-    ModemReportErrorInfo errInfo = {};
 
-    errInfo = InitModemReportErrorInfo();
+    ModemReportErrorInfo errInfo = InitModemReportErrorInfo();
     ret = SendCommandLock("AT^LTEIMSSWITCH?", "^LTEIMSSWITCH:", 0, &pResponse);
     if (ret || pResponse == NULL || !pResponse->success) {
         err = (ret != HRIL_ERR_SUCCESS) ? HRIL_ERR_CMD_SEND_FAILURE : err;
@@ -1253,7 +1219,7 @@ void ReqGetLteImsSwitchStatus(const ReqDataInfo *requestInfo)
         TELEPHONY_LOGE("ERROR: pResponse->head is null");
         err = HRIL_ERR_GENERIC_FAILURE;
     }
-    reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
     reportInfo.modemErrInfo = errInfo;
     OnCallReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&value, sizeof(value));
     FreeResponseInfo(pResponse);
@@ -1265,11 +1231,9 @@ void ReqSetLteImsSwitchStatus(const ReqDataInfo *requestInfo, int32_t active)
     int32_t err = HRIL_ERR_SUCCESS;
     int32_t value = INT_DEFAULT_VALUE;
     char cmd[MAX_CMD_LENGTH] = {0};
-    struct ReportInfo reportInfo = {0};
     ResponseInfo *pResponse = NULL;
-    ModemReportErrorInfo errInfo;
 
-    errInfo = InitModemReportErrorInfo();
+    ModemReportErrorInfo errInfo = InitModemReportErrorInfo();
     value = active;
     ret = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT^LTEIMSSWITCH=%d", value);
     if (ret < 0) {
@@ -1283,7 +1247,7 @@ void ReqSetLteImsSwitchStatus(const ReqDataInfo *requestInfo, int32_t active)
         err = errInfo.errorNo;
         TELEPHONY_LOGE("cmd send failed, err:%{public}d", ret ? ret : err);
     }
-    reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
     reportInfo.modemErrInfo = errInfo;
     OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
@@ -1294,7 +1258,6 @@ void ReqSetUssd(const ReqDataInfo *requestInfo, const char *str)
     int32_t ret;
     int32_t err = HRIL_ERR_SUCCESS;
     char cmd[MAX_CMD_LENGTH] = {0};
-    struct ReportInfo reportInfo;
     ResponseInfo *pResponse = NULL;
     ModemReportErrorInfo errInfo = {};
 
@@ -1310,7 +1273,7 @@ void ReqSetUssd(const ReqDataInfo *requestInfo, const char *str)
         err = errInfo.errorNo;
         TELEPHONY_LOGE("cmd send failed, err:%{public}d", ret ? ret : err);
     }
-    reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
     reportInfo.modemErrInfo = errInfo;
     OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
@@ -1322,7 +1285,6 @@ void ReqGetUssd(const ReqDataInfo *requestInfo)
     char *line = NULL;
     int32_t cusd = 0;
     int32_t err = HRIL_ERR_SUCCESS;
-    struct ReportInfo reportInfo;
     ResponseInfo *pResponse = NULL;
     ModemReportErrorInfo errInfo = {};
 
@@ -1346,7 +1308,7 @@ void ReqGetUssd(const ReqDataInfo *requestInfo)
         TELEPHONY_LOGE("ERROR: pResponse->head is null");
         err = HRIL_ERR_GENERIC_FAILURE;
     }
-    reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
     reportInfo.modemErrInfo = errInfo;
     OnCallReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&cusd, sizeof(cusd));
     FreeResponseInfo(pResponse);
@@ -1357,7 +1319,6 @@ void ReqSetMute(const ReqDataInfo *requestInfo, int32_t mute)
     int32_t ret;
     int32_t err = HRIL_ERR_SUCCESS;
     char cmd[MAX_CMD_LENGTH] = {0};
-    struct ReportInfo reportInfo;
     ResponseInfo *pResponse = NULL;
     ModemReportErrorInfo errInfo = {};
 
@@ -1373,7 +1334,7 @@ void ReqSetMute(const ReqDataInfo *requestInfo, int32_t mute)
         err = errInfo.errorNo;
         TELEPHONY_LOGE("cmd send failed, err:%{public}d", ret ? ret : err);
     }
-    reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
     reportInfo.modemErrInfo = errInfo;
     OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
@@ -1385,7 +1346,6 @@ void ReqGetMute(const ReqDataInfo *requestInfo)
     char *line = NULL;
     int32_t mute = 0;
     int32_t err = HRIL_ERR_SUCCESS;
-    struct ReportInfo reportInfo;
     ResponseInfo *pResponse = NULL;
     ModemReportErrorInfo errInfo = {};
 
@@ -1409,7 +1369,7 @@ void ReqGetMute(const ReqDataInfo *requestInfo)
         TELEPHONY_LOGE("ERROR: pResponse->head is null");
         err = HRIL_ERR_GENERIC_FAILURE;
     }
-    reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
     reportInfo.modemErrInfo = errInfo;
     OnCallReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&mute, sizeof(mute));
     FreeResponseInfo(pResponse);
@@ -1496,7 +1456,6 @@ int32_t BuildGetEmergencyCallList(const ReqDataInfo *requestInfo, ResponseInfo *
     int32_t callNum = 0;
     int32_t validCallNum = 0;
     int32_t err = HRIL_ERR_SUCCESS;
-    struct ReportInfo reportInfo = {0};
     Line *pLine = NULL;
     ResponseInfo *pResponse = response;
     HRilEmergencyInfo *pEmergencyCalls = NULL;
@@ -1525,9 +1484,9 @@ int32_t BuildGetEmergencyCallList(const ReqDataInfo *requestInfo, ResponseInfo *
         validCallNum++;
     }
 
-    reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-    OnCallReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)pEmergencyCalls,
-        sizeof(HRilEmergencyInfo) * validCallNum);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
+    OnCallReport(
+        GetSlotId(requestInfo), reportInfo, (const uint8_t *)pEmergencyCalls, sizeof(HRilEmergencyInfo) * validCallNum);
     FreeResponseInfo(pResponse);
     free(pEmergencyCalls);
     return HRIL_ERR_SUCCESS;
@@ -1560,14 +1519,12 @@ void ReqSetEmergencyCallList(const ReqDataInfo *requestInfo, HRilEmergencyInfo *
     int32_t ret = 0;
     int32_t err = HRIL_ERR_SUCCESS;
     char cmd[MAX_CMD_LENGTH] = {0};
-    struct ReportInfo reportInfo;
     ResponseInfo *pResponse = NULL;
     ModemReportErrorInfo errInfo = {};
     for (int i = 0; i  < len; i++) {
-        ret = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT^NVM=%d,%d,\"%s\",%d,%d,%s,%d",
-            emergencyInfo[i].index, emergencyInfo[i].total,
-            emergencyInfo[i].eccNum, emergencyInfo[i].category,
-            emergencyInfo[i].simpresent, emergencyInfo[i].mcc, emergencyInfo[i].abnormalService);
+        ret = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT^NVM=%d,%d,\"%s\",%d,%d,%s,%d", emergencyInfo[i].index,
+            emergencyInfo[i].total, emergencyInfo[i].eccNum, emergencyInfo[i].category, emergencyInfo[i].simpresent,
+            emergencyInfo[i].mcc, emergencyInfo[i].abnormalService);
         if (ret < 0) {
             TELEPHONY_LOGE("GenerateCommand is failed!");
             OnCallReportErrorMessages(requestInfo, HRIL_ERR_GENERIC_FAILURE, NULL);
@@ -1581,7 +1538,7 @@ void ReqSetEmergencyCallList(const ReqDataInfo *requestInfo, HRilEmergencyInfo *
         }
     }
     TELEPHONY_LOGI("ReqSetEmergencyCallList end");
-    reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
     reportInfo.modemErrInfo = errInfo;
     OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
@@ -1590,7 +1547,6 @@ void ReqSetEmergencyCallList(const ReqDataInfo *requestInfo, HRilEmergencyInfo *
 void ReqGetCallFailReason(const ReqDataInfo *requestInfo)
 {
     int32_t err = HRIL_ERR_SUCCESS;
-    struct ReportInfo reportInfo;
     ResponseInfo *pResponse = NULL;
     ModemReportErrorInfo errInfo = {};
 
@@ -1600,7 +1556,7 @@ void ReqGetCallFailReason(const ReqDataInfo *requestInfo)
         return;
     }
 
-    reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
     reportInfo.modemErrInfo = errInfo;
     OnCallReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&lastCcCause, sizeof(lastCcCause));
     FreeResponseInfo(pResponse);

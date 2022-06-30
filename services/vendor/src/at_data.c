@@ -17,12 +17,10 @@
 
 #include <stdlib.h>
 
-#include "securec.h"
-
 #include "at_support.h"
-#include "vendor_report.h"
-
 #include "hril_notification.h"
+#include "securec.h"
+#include "vendor_report.h"
 
 static int32_t ConvertPdpFailReason(int32_t errorCode)
 {
@@ -77,11 +75,9 @@ static int32_t ConvertPdpFailReason(int32_t errorCode)
 static int32_t OnDataReportErrorMessages(const ReqDataInfo *requestInfo, int32_t err, ResponseInfo *pResponse)
 {
     int32_t errorNo = HRIL_ERR_SUCCESS;
-    struct ReportInfo reportInfo = {};
-    ModemReportErrorInfo errInfo = {};
 
     int32_t slotId = GetSlotId(requestInfo);
-    errInfo = GetReportErrorInfo(pResponse);
+    ModemReportErrorInfo errInfo = GetReportErrorInfo(pResponse);
     if (err != HRIL_ERR_SUCCESS) {
         if (err == AT_ERR_CHANNEL_CLOSED) {
             err = HRIL_ERR_MODEM_DEVICE_CLOSE;
@@ -92,11 +88,12 @@ static int32_t OnDataReportErrorMessages(const ReqDataInfo *requestInfo, int32_t
     errorNo = (err != HRIL_ERR_SUCCESS) ? err : errInfo.errorNo;
     FreeResponseInfo(pResponse);
     if (requestInfo != NULL) {
-        reportInfo = CreateReportInfo(requestInfo, errorNo, HRIL_RESPONSE, 0);
+        struct ReportInfo reportInfo = CreateReportInfo(requestInfo, errorNo, HRIL_RESPONSE, 0);
         reportInfo.modemErrInfo = errInfo;
         OnDataReport(slotId, reportInfo, NULL, 0);
     } else {
-        reportInfo = CreateReportInfo(requestInfo, errorNo, HRIL_NOTIFICATION, HNOTI_DATA_PDP_CONTEXT_LIST_UPDATED);
+        struct ReportInfo reportInfo =
+            CreateReportInfo(requestInfo, errorNo, HRIL_NOTIFICATION, HNOTI_DATA_PDP_CONTEXT_LIST_UPDATED);
         reportInfo.modemErrInfo = errInfo;
         OnDataReport(GetSlotId(NULL), reportInfo, NULL, 0);
     }
@@ -105,11 +102,8 @@ static int32_t OnDataReportErrorMessages(const ReqDataInfo *requestInfo, int32_t
 
 static int32_t OnDataReportPdpErrorMessages(const ReqDataInfo *requestInfo, int32_t err, ResponseInfo *pResponse)
 {
-    struct ReportInfo reportInfo = {};
     HRilDataCallResponse pDataCall = {};
-    ModemReportErrorInfo errInfo = {};
-
-    errInfo = GetReportErrorInfo(pResponse);
+    ModemReportErrorInfo errInfo = GetReportErrorInfo(pResponse);
     FreeResponseInfo(pResponse);
     if (err != HRIL_ERR_SUCCESS) {
         if (err == AT_ERR_CHANNEL_CLOSED) {
@@ -118,7 +112,7 @@ static int32_t OnDataReportPdpErrorMessages(const ReqDataInfo *requestInfo, int3
             err = HRIL_ERR_CMD_SEND_FAILURE;
         }
     }
-    reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
     reportInfo.modemErrInfo = errInfo;
     pDataCall.reason = ConvertPdpFailReason(errInfo.errorNo);
     pDataCall.retryTime = INT_DEFAULT_VALUE;
@@ -371,11 +365,10 @@ static int32_t QueryAllSupportPDNInfos(PDNInfo *pdnInfo)
     Line *pLine = NULL;
     PDNInfo *pdns = pdnInfo;
     ResponseInfo *pResponse = NULL;
-    ModemReportErrorInfo errInfo = {};
 
     ret = SendCommandLock("AT+CGDCONT?", "+CGDCONT:", 0, &pResponse);
     if (ret != 0 || pResponse == NULL || !pResponse->success) {
-        errInfo = GetReportErrorInfo(pResponse);
+        ModemReportErrorInfo errInfo = GetReportErrorInfo(pResponse);
         errInfo.errorNo = (ret != HRIL_ERR_SUCCESS) ? ret : errInfo.errorNo;
         TELEPHONY_LOGE("send AT CMD failed! ret:%{public}d", err);
         FreeResponseInfo(pResponse);
@@ -537,8 +530,7 @@ static void DataReportMessage(int32_t cid, const ReqDataInfo *requestInfo, Modem
         reportInfo.modemErrInfo = errInfo;
         reportInfo.notifyId = HNOTI_DATA_PDP_CONTEXT_LIST_UPDATED;
         reportInfo.type = HRIL_NOTIFICATION;
-        OnDataReport(
-            GetSlotId(NULL), reportInfo, (const uint8_t *)pDataCalls, validNum * sizeof(HRilDataCallResponse));
+        OnDataReport(GetSlotId(NULL), reportInfo, (const uint8_t *)pDataCalls, validNum * sizeof(HRilDataCallResponse));
     }
     FreeDataCallResponse(pDataCalls, validNum);
 }
@@ -790,7 +782,6 @@ static int32_t SetDataProfileInfo(int32_t cid, const ReqDataInfo *requestInfo, c
 void ReqSetInitApnInfo(const ReqDataInfo *requestInfo, const HRilDataInfo *data)
 {
     int32_t cid = INT_DEFAULT_VALUE;
-    struct ReportInfo reportInfo = {};
     const HRilDataInfo *pDataInfo = data;
     ModemReportErrorInfo errInfo = {};
 
@@ -804,14 +795,13 @@ void ReqSetInitApnInfo(const ReqDataInfo *requestInfo, const HRilDataInfo *data)
         TELEPHONY_LOGE("Set data profile info is failed!");
         return;
     }
-    reportInfo = CreateReportInfo(requestInfo, errInfo.errorNo, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, errInfo.errorNo, HRIL_RESPONSE, 0);
     reportInfo.modemErrInfo = errInfo;
     OnDataReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
 }
 
 void ReqSetLinkBandwidthReportingRule(const ReqDataInfo *requestInfo, const HRilLinkBandwidthReportingRule *data)
 {
-    struct ReportInfo reportInfo = {};
     const HRilLinkBandwidthReportingRule *linkBandwidthRule = data;
     ModemReportErrorInfo errInfo = {};
 
@@ -821,7 +811,7 @@ void ReqSetLinkBandwidthReportingRule(const ReqDataInfo *requestInfo, const HRil
         return;
     }
     TELEPHONY_LOGI("rat:%{public}d, delayMs:%{public}d", linkBandwidthRule->rat, linkBandwidthRule->delayMs);
-    reportInfo = CreateReportInfo(requestInfo, errInfo.errorNo, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, errInfo.errorNo, HRIL_RESPONSE, 0);
     reportInfo.modemErrInfo = errInfo;
     OnDataReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
 }
@@ -872,12 +862,10 @@ void ReqGetLinkBandwidthInfo(const ReqDataInfo *requestInfo, const int32_t cid)
     char *line = NULL;
     int32_t err = HRIL_ERR_SUCCESS;
     HRilLinkBandwidthInfo uplinkAndDownlinkBandwidth = {0};
-    struct ReportInfo reportInfo = {};
     ResponseInfo *pResponse = NULL;
-    ModemReportErrorInfo errInfo = {};
     char cmd[MAX_CMD_LENGTH] = {0};
 
-    errInfo = InitModemReportErrorInfo();
+    ModemReportErrorInfo errInfo = InitModemReportErrorInfo();
     ret = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+C5GQOSRDP=%d", cid);
     if (ret < 0) {
         TELEPHONY_LOGE("GenerateCommand is failed!");
@@ -904,7 +892,7 @@ void ReqGetLinkBandwidthInfo(const ReqDataInfo *requestInfo, const int32_t cid)
         TELEPHONY_LOGE("ERROR: pResponse->head is null");
         err = HRIL_ERR_GENERIC_FAILURE;
     }
-    reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
     reportInfo.modemErrInfo = errInfo;
     OnDataReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&uplinkAndDownlinkBandwidth,
         sizeof(HRilLinkBandwidthInfo));

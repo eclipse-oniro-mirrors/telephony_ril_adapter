@@ -171,7 +171,6 @@ void ReqGetSimStatus(const ReqDataInfo *requestInfo)
     char *pResult = NULL;
     int32_t ret;
     ResponseInfo *pResponse = NULL;
-    struct ReportInfo reportInfo = {0};
     HRilCardState cardState = {0};
 
     HRilRadioState radioState = GetRadioState();
@@ -191,10 +190,10 @@ void ReqGetSimStatus(const ReqDataInfo *requestInfo)
         }
         if (ret == HRIL_ERR_NO_SIMCARD_INSERTED) {
             cardState.simState = HRIL_SIM_NOT_INSERTED;
-            reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
+            struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
             OnSimReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&cardState, sizeof(HRilCardState));
         } else {
-            reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
+            struct ReportInfo reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
             OnSimReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
         }
         FreeResponseInfo(pResponse);
@@ -204,7 +203,7 @@ void ReqGetSimStatus(const ReqDataInfo *requestInfo)
         pLine = pResponse->head->data;
     }
     cardState.simState = GetSimState(pLine, pResult, pResponse);
-    reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
     OnSimReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&cardState, sizeof(HRilCardState));
     FreeResponseInfo(pResponse);
 }
@@ -280,7 +279,6 @@ static void HandlerSimIOResult(ResponseInfo *pResponse, HRilSimIOResponse *simRe
         TELEPHONY_LOGE("pResponse is NULL");
         return;
     }
-    struct ReportInfo reportInfo = {0};
 
     if (*ret != HRIL_ERR_SUCCESS) {
         if (pResponse && pResponse->result) {
@@ -291,7 +289,7 @@ static void HandlerSimIOResult(ResponseInfo *pResponse, HRilSimIOResponse *simRe
             *ret = HRIL_ERR_GENERIC_FAILURE;
         }
     }
-    reportInfo = CreateReportInfo(requestInfo, *ret, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, *ret, HRIL_RESPONSE, 0);
     if (simResponse == NULL) {
         TELEPHONY_LOGE("simResponse is NULL");
         OnSimReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
@@ -307,11 +305,10 @@ void ReqGetSimIO(const ReqDataInfo *requestInfo, const HRilSimIO *data, size_t d
     int32_t ret;
     const int32_t FILEID = 0x6F3B;
     ResponseInfo *pResponse = NULL;
-    struct ReportInfo reportInfo = {};
     HRilSimIOResponse simResponse = {0};
     HRilSimIO *pSim = (HRilSimIO *)data;
     if (pSim == NULL) {
-        reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_RESPONSE, HRIL_RESPONSE, 0);
+        struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_RESPONSE, HRIL_RESPONSE, 0);
         OnSimReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
         FreeResponseInfo(pResponse);
         return;
@@ -349,7 +346,7 @@ void ReqGetSimIO(const ReqDataInfo *requestInfo, const HRilSimIO *data, size_t d
         HandlerSimIOResult(pResponse, NULL, requestInfo, pLine, &ret);
         return;
     }
-    reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
     OnSimReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&simResponse, sizeof(HRilSimIOResponse));
     FreeResponseInfo(pResponse);
 }
@@ -470,11 +467,10 @@ void ReqSetSimLock(const ReqDataInfo *requestInfo, const HRilSimClock *data, siz
     int32_t ret;
     HRilSimClock *pSimClck = NULL;
     ResponseInfo *pResponse = NULL;
-    struct ReportInfo reportInfo = {0};
 
     pSimClck = (HRilSimClock *)data;
     if (pSimClck == NULL) {
-        reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_RESPONSE, HRIL_RESPONSE, 0);
+        struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_RESPONSE, HRIL_RESPONSE, 0);
         OnSimReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
         FreeResponseInfo(pResponse);
         return;
@@ -500,20 +496,20 @@ void ReqSetSimLock(const ReqDataInfo *requestInfo, const HRilSimClock *data, siz
                 lockStatus.result = HRIL_UNLOCK_PASSWORD_ERR;
                 lockStatus.remain = pinInputTimes->pinTimes;
             }
-            reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
+            struct ReportInfo reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
             OnSimReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&lockStatus, sizeof(lockStatus));
             FreeResponseInfo(pResponse);
         } else {
             ret = HRIL_ERR_GENERIC_FAILURE;
 
-            reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
+            struct ReportInfo reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
             OnSimReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&lockStatus, sizeof(lockStatus));
             FreeResponseInfo(pResponse);
         }
         return;
     }
     lockStatus.result = HRIL_UNLOCK_SUCCESS;
-    reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
     OnSimReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&lockStatus, sizeof(lockStatus));
     FreeResponseInfo(pResponse);
 }
@@ -525,11 +521,10 @@ void ReqChangeSimPassword(const ReqDataInfo *requestInfo, const HRilSimPassword 
     HRilSimPassword *pSimPassword = NULL;
     int32_t ret;
     ResponseInfo *pResponse = NULL;
-    struct ReportInfo reportInfo = {0};
 
     pSimPassword = (HRilSimPassword *)data;
     if (pSimPassword == NULL) {
-        reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_RESPONSE, HRIL_RESPONSE, 0);
+        struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_RESPONSE, HRIL_RESPONSE, 0);
         OnSimReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
         FreeResponseInfo(pResponse);
         return;
@@ -555,19 +550,19 @@ void ReqChangeSimPassword(const ReqDataInfo *requestInfo, const HRilSimPassword 
                 lockStatus.result = HRIL_UNLOCK_PASSWORD_ERR;
                 lockStatus.remain = pinInputTimes->pinTimes;
             }
-            reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
+            struct ReportInfo reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
             OnSimReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&lockStatus, sizeof(lockStatus));
             FreeResponseInfo(pResponse);
         } else {
             ret = HRIL_ERR_GENERIC_FAILURE;
-            reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
+            struct ReportInfo reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
             OnSimReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&lockStatus, sizeof(lockStatus));
             FreeResponseInfo(pResponse);
         }
         return;
     }
     lockStatus.result = HRIL_UNLOCK_SUCCESS;
-    reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
     OnSimReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&lockStatus, sizeof(lockStatus));
     FreeResponseInfo(pResponse);
 }
@@ -578,7 +573,6 @@ void ReqUnlockPin(const ReqDataInfo *requestInfo, const char *pin)
     char *pLine = NULL;
     int32_t ret;
     ResponseInfo *pResponse = NULL;
-    struct ReportInfo reportInfo = {0};
 
     int32_t result = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CPIN=\"%s\"", pin);
     if (result <= 0) {
@@ -605,7 +599,7 @@ void ReqUnlockPin(const ReqDataInfo *requestInfo, const char *pin)
                 lockStatus.remain = -1;
                 TELEPHONY_LOGE("AT+CPWD send failed");
             }
-            reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
+            struct ReportInfo reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
             OnSimReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&lockStatus, sizeof(lockStatus));
             FreeResponseInfo(pResponse);
             return;
@@ -613,7 +607,7 @@ void ReqUnlockPin(const ReqDataInfo *requestInfo, const char *pin)
             ret = HRIL_ERR_GENERIC_FAILURE;
             lockStatus.result = HRIL_UNLOCK_OTHER_ERR;
             lockStatus.remain = -1;
-            reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
+            struct ReportInfo reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
             OnSimReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&lockStatus, sizeof(lockStatus));
             FreeResponseInfo(pResponse);
             return;
@@ -622,7 +616,7 @@ void ReqUnlockPin(const ReqDataInfo *requestInfo, const char *pin)
 
     lockStatus.result = HRIL_UNLOCK_SUCCESS;
     lockStatus.remain = -1;
-    reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
     OnSimReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&lockStatus, sizeof(lockStatus));
     FreeResponseInfo(pResponse);
 }
@@ -633,7 +627,6 @@ void ReqUnlockPuk(const ReqDataInfo *requestInfo, const char *puk, const char *p
     char *pLine = NULL;
     int32_t ret;
     ResponseInfo *pResponse = NULL;
-    struct ReportInfo reportInfo = {0};
 
     int32_t result = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CPIN=\"%s\",\"%s\"", puk, pin);
     if (result <= 0) {
@@ -660,7 +653,7 @@ void ReqUnlockPuk(const ReqDataInfo *requestInfo, const char *puk, const char *p
                 lockStatus.remain = -1;
                 TELEPHONY_LOGE("AT+CPWD send failed");
             }
-            reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
+            struct ReportInfo reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
             OnSimReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&lockStatus, sizeof(lockStatus));
             FreeResponseInfo(pResponse);
             return;
@@ -668,7 +661,7 @@ void ReqUnlockPuk(const ReqDataInfo *requestInfo, const char *puk, const char *p
             ret = HRIL_ERR_GENERIC_FAILURE;
             lockStatus.result = HRIL_UNLOCK_OTHER_ERR;
             lockStatus.remain = -1;
-            reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
+            struct ReportInfo reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
             OnSimReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&lockStatus, sizeof(lockStatus));
             FreeResponseInfo(pResponse);
             return;
@@ -677,7 +670,7 @@ void ReqUnlockPuk(const ReqDataInfo *requestInfo, const char *puk, const char *p
 
     lockStatus.result = HRIL_UNLOCK_SUCCESS;
     lockStatus.remain = -1;
-    reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
     OnSimReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&lockStatus, sizeof(lockStatus));
     FreeResponseInfo(pResponse);
 }
@@ -688,7 +681,6 @@ void ReqGetSimPinInputTimes(const ReqDataInfo *requestInfo)
     int32_t ret;
     HRilPinInputTimes pinInputTimes = {0};
     ResponseInfo *pResponse = NULL;
-    struct ReportInfo reportInfo = {0};
 
     ret = SendCommandLock("AT^CPIN?", "^CPIN", 0, &pResponse);
     if (ret != 0 || pResponse == NULL || !pResponse->success) {
@@ -700,7 +692,7 @@ void ReqGetSimPinInputTimes(const ReqDataInfo *requestInfo)
         } else {
             ret = HRIL_ERR_GENERIC_FAILURE;
         }
-        reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
+        struct ReportInfo reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
         OnSimReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
         FreeResponseInfo(pResponse);
         return;
@@ -717,12 +709,12 @@ void ReqGetSimPinInputTimes(const ReqDataInfo *requestInfo)
         } else {
             ret = HRIL_ERR_GENERIC_FAILURE;
         }
-        reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
+        struct ReportInfo reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
         OnSimReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
         FreeResponseInfo(pResponse);
         return;
     }
-    reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
     OnSimReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&pinInputTimes, sizeof(HRilPinInputTimes));
     FreeResponseInfo(pResponse);
 }
@@ -747,11 +739,11 @@ void ReqGetSimPinInputTimesRemain(const ReqDataInfo *requestInfo, HRilPinInputTi
         FreeResponseInfo(pResponse);
         return;
     }
-    if (pResponse->head) {
+    if (pResponse && pResponse->head) {
         pLine = pResponse->head->data;
     }
-    TELEPHONY_LOGI("ReqGetSimPinInputTimesRemain pLine:%{public}s, result:%{public}s, success:%{public}d",
-        pLine, pResponse->result, pResponse->success);
+    TELEPHONY_LOGI("ReqGetSimPinInputTimesRemain pLine:%{public}s, result:%{public}s, success:%{public}d", pLine,
+        pResponse->result, pResponse->success);
     ret = ParseSimPinInputTimesResult(pLine, pinInputTimes);
     TELEPHONY_LOGI("code:%{public}s, times:%{public}d, puk:%{public}d,"
         " pin:%{public}d, puk2:%{public}d, pin2:%{public}d",
@@ -777,7 +769,6 @@ void ReqUnlockPin2(const ReqDataInfo *requestInfo, const char *pin2)
     char *pLine = NULL;
     int32_t ret;
     ResponseInfo *pResponse = NULL;
-    struct ReportInfo reportInfo = {0};
 
     int32_t result = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT^CPIN2=\"%s\"", pin2);
     if (result <= 0) {
@@ -804,7 +795,7 @@ void ReqUnlockPin2(const ReqDataInfo *requestInfo, const char *pin2)
                 lockStatus.remain = -1;
                 TELEPHONY_LOGE("AT+CPWD send failed");
             }
-            reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
+            struct ReportInfo reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
             OnSimReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&lockStatus, sizeof(lockStatus));
             FreeResponseInfo(pResponse);
             return;
@@ -812,7 +803,7 @@ void ReqUnlockPin2(const ReqDataInfo *requestInfo, const char *pin2)
             ret = HRIL_ERR_GENERIC_FAILURE;
             lockStatus.result = HRIL_UNLOCK_OTHER_ERR;
             lockStatus.remain = -1;
-            reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
+            struct ReportInfo reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
             OnSimReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&lockStatus, sizeof(lockStatus));
             FreeResponseInfo(pResponse);
             return;
@@ -821,7 +812,7 @@ void ReqUnlockPin2(const ReqDataInfo *requestInfo, const char *pin2)
 
     lockStatus.result = HRIL_UNLOCK_SUCCESS;
     lockStatus.remain = -1;
-    reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
     OnSimReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&lockStatus, sizeof(lockStatus));
     FreeResponseInfo(pResponse);
 }
@@ -832,7 +823,6 @@ void ReqUnlockPuk2(const ReqDataInfo *requestInfo, const char *puk2, const char 
     char *pLine = NULL;
     int32_t ret;
     ResponseInfo *pResponse = NULL;
-    struct ReportInfo reportInfo = {0};
 
     int32_t result = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT^CPIN2=\"%s\",\"%s\"", puk2, pin2);
     if (result <= 0) {
@@ -859,7 +849,7 @@ void ReqUnlockPuk2(const ReqDataInfo *requestInfo, const char *puk2, const char 
                 lockStatus.remain = -1;
                 TELEPHONY_LOGE("AT+CPWD send failed");
             }
-            reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
+            struct ReportInfo reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
             OnSimReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&lockStatus, sizeof(lockStatus));
             FreeResponseInfo(pResponse);
             return;
@@ -867,7 +857,7 @@ void ReqUnlockPuk2(const ReqDataInfo *requestInfo, const char *puk2, const char 
             ret = HRIL_ERR_GENERIC_FAILURE;
             lockStatus.result = HRIL_UNLOCK_OTHER_ERR;
             lockStatus.remain = -1;
-            reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
+            struct ReportInfo reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
             OnSimReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&lockStatus, sizeof(lockStatus));
             FreeResponseInfo(pResponse);
             return;
@@ -876,7 +866,7 @@ void ReqUnlockPuk2(const ReqDataInfo *requestInfo, const char *puk2, const char 
 
     lockStatus.result = HRIL_UNLOCK_SUCCESS;
     lockStatus.remain = -1;
-    reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
     OnSimReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&lockStatus, sizeof(lockStatus));
     FreeResponseInfo(pResponse);
 }
@@ -887,7 +877,6 @@ void ReqGetSimPin2InputTimes(const ReqDataInfo *requestInfo)
     int32_t ret;
     HRilPinInputTimes pin2InputTimes = {0};
     ResponseInfo *pResponse = NULL;
-    struct ReportInfo reportInfo = {0};
 
     ret = SendCommandLock("AT^CPIN2?", "^CPIN2", 0, &pResponse);
     if (ret != 0 || (pResponse != NULL && !pResponse->success)) {
@@ -905,12 +894,12 @@ void ReqGetSimPin2InputTimes(const ReqDataInfo *requestInfo)
         } else {
             ret = HRIL_ERR_GENERIC_FAILURE;
         }
-        reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
+        struct ReportInfo reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
         OnSimReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
         FreeResponseInfo(pResponse);
         return;
     }
-    reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
     OnSimReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&pin2InputTimes, 0);
     FreeResponseInfo(pResponse);
 }
@@ -921,7 +910,6 @@ void ReqSetActiveSim(const ReqDataInfo *requestInfo, int32_t index, int32_t enab
     char *pLine = NULL;
     int32_t ret;
     ResponseInfo *pResponse = NULL;
-    struct ReportInfo reportInfo = {0};
 
     int32_t result = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT^HVSST=%d,%d", index, enable);
     if (result <= 0) {
@@ -937,12 +925,12 @@ void ReqSetActiveSim(const ReqDataInfo *requestInfo, int32_t index, int32_t enab
         } else {
             ret = HRIL_ERR_GENERIC_FAILURE;
         }
-        reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
+        struct ReportInfo reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
         OnSimReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
         FreeResponseInfo(pResponse);
         return;
     }
-    reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
     OnSimReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
 }
@@ -953,7 +941,6 @@ void ReqSimStkSendTerminalResponse(const ReqDataInfo *requestInfo, const char *s
     char *pLine = NULL;
     int32_t ret;
     ResponseInfo *pResponse = NULL;
-    struct ReportInfo reportInfo = {0};
 
     int32_t result = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+SPUSATTERMINAL=\"%s\"", strCmd);
     if (result < 0) {
@@ -969,12 +956,12 @@ void ReqSimStkSendTerminalResponse(const ReqDataInfo *requestInfo, const char *s
         } else {
             ret = HRIL_ERR_GENERIC_FAILURE;
         }
-        reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
+        struct ReportInfo reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
         OnSimReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
         FreeResponseInfo(pResponse);
         return;
     }
-    reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
     OnSimReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
 }
@@ -985,7 +972,6 @@ void ReqSimStkSendEnvelope(const ReqDataInfo *requestInfo, const char *strCmd)
     char *pLine = NULL;
     int32_t ret;
     ResponseInfo *pResponse = NULL;
-    struct ReportInfo reportInfo = {0};
 
     int32_t result = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+SPUSATENVECMD=\"%s\"", strCmd);
     if (result < 0) {
@@ -1001,12 +987,12 @@ void ReqSimStkSendEnvelope(const ReqDataInfo *requestInfo, const char *strCmd)
         } else {
             ret = HRIL_ERR_GENERIC_FAILURE;
         }
-        reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
+        struct ReportInfo reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
         OnSimReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
         FreeResponseInfo(pResponse);
         return;
     }
-    reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
     OnSimReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
 }
@@ -1016,7 +1002,6 @@ void ReqSimStkIsReady(const ReqDataInfo *requestInfo)
     char *pLine = NULL;
     int32_t ret;
     ResponseInfo *pResponse = NULL;
-    struct ReportInfo reportInfo = {0};
 
     ret = SendCommandLock("AT+SPUSATPROFILE?", "+SPUSATPROFILE", 0, &pResponse);
     if (ret != 0 || (pResponse != NULL && !pResponse->success)) {
@@ -1028,12 +1013,12 @@ void ReqSimStkIsReady(const ReqDataInfo *requestInfo)
         } else {
             ret = HRIL_ERR_GENERIC_FAILURE;
         }
-        reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
+        struct ReportInfo reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
         OnSimReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
         FreeResponseInfo(pResponse);
         return;
     }
-    reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
     OnSimReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
 }
@@ -1041,11 +1026,10 @@ void ReqSimStkIsReady(const ReqDataInfo *requestInfo)
 void ReqSetRadioProtocol(const ReqDataInfo *requestInfo, const HRilSimProtocolRequest *data, size_t dataLen)
 {
     ResponseInfo *pResponse = NULL;
-    struct ReportInfo reportInfo = {};
     HRilSimProtocolResponse simResponse = {0};
     HRilSimProtocolRequest *pSim = (HRilSimProtocolRequest *)data;
     if (pSim == NULL || dataLen == 0) {
-        reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_RESPONSE, HRIL_RESPONSE, 0);
+        struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_RESPONSE, HRIL_RESPONSE, 0);
         OnSimReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
         FreeResponseInfo(pResponse);
         return;
@@ -1067,12 +1051,12 @@ void ReqSetRadioProtocol(const ReqDataInfo *requestInfo, const HRilSimProtocolRe
         } else {
             ret = HRIL_ERR_GENERIC_FAILURE;
         }
-        reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
+        struct ReportInfo reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
         OnSimReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
         FreeResponseInfo(pResponse);
         return;
     }
-    reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
     OnSimReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&simResponse, sizeof(simResponse));
     FreeResponseInfo(pResponse);
 }
@@ -1081,15 +1065,13 @@ void ReqSimOpenLogicalChannel(const ReqDataInfo *requestInfo, const char *appID,
 {
     char cmd[MAX_CMD_LENGTH] = {0};
     char *pLine = NULL;
-    int32_t ret;
     ResponseInfo *pResponse = NULL;
-    struct ReportInfo reportInfo = {0};
 
     int32_t result = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+SPCCHO=\"%s\",%d", appID, p2);
     if (result <= 0) {
         TELEPHONY_LOGE("GenerateCommand is failed");
     }
-    ret = SendCommandLock(cmd, "+SPCCHO", 0, &pResponse);
+    int32_t ret = SendCommandLock(cmd, "+SPCCHO", 0, &pResponse);
     if (ret != 0 || (pResponse != NULL && !pResponse->success)) {
         TELEPHONY_LOGE("AT+SPCCHO send failed");
         if (pResponse && pResponse->result) {
@@ -1099,12 +1081,12 @@ void ReqSimOpenLogicalChannel(const ReqDataInfo *requestInfo, const char *appID,
         } else {
             ret = HRIL_ERR_GENERIC_FAILURE;
         }
-        reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
+        struct ReportInfo reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
         OnSimReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
         FreeResponseInfo(pResponse);
         return;
     }
-    reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
     OnSimReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
 }
@@ -1115,7 +1097,6 @@ void ReqSimCloseLogicalChannel(const ReqDataInfo *requestInfo, int32_t channelId
     char *pLine = NULL;
     int32_t ret;
     ResponseInfo *pResponse = NULL;
-    struct ReportInfo reportInfo = {0};
 
     int32_t result = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CCHC=%d", channelId);
     if (result <= 0) {
@@ -1131,12 +1112,12 @@ void ReqSimCloseLogicalChannel(const ReqDataInfo *requestInfo, int32_t channelId
         } else {
             ret = HRIL_ERR_GENERIC_FAILURE;
         }
-        reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
+        struct ReportInfo reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
         OnSimReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
         FreeResponseInfo(pResponse);
         return;
     }
-    reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
     OnSimReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
     FreeResponseInfo(pResponse);
 }
@@ -1147,12 +1128,11 @@ void ReqSimTransmitApduLogicalChannel(const ReqDataInfo *requestInfo, HRilApduSi
     char *pLine = NULL;
     int32_t ret;
     ResponseInfo *pResponse = NULL;
-    struct ReportInfo reportInfo = {0};
     HRilSimIOResponse apduSimResponse = {0};
     HRilApduSimIO *pApduSimIO = (HRilApduSimIO *)data;
 
     if (pApduSimIO == NULL) {
-        reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_RESPONSE, HRIL_RESPONSE, 0);
+        struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_RESPONSE, HRIL_RESPONSE, 0);
         OnSimReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
         FreeResponseInfo(pResponse);
         return;
@@ -1173,7 +1153,7 @@ void ReqSimTransmitApduLogicalChannel(const ReqDataInfo *requestInfo, HRilApduSi
         } else {
             ret = HRIL_ERR_GENERIC_FAILURE;
         }
-        reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
+        struct ReportInfo reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
         OnSimReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
         FreeResponseInfo(pResponse);
         return;
@@ -1186,7 +1166,7 @@ void ReqSimTransmitApduLogicalChannel(const ReqDataInfo *requestInfo, HRilApduSi
         HandlerSimIOResult(pResponse, NULL, requestInfo, pLine, &ret);
         return;
     }
-    reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
     OnSimReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&apduSimResponse, sizeof(HRilSimIOResponse));
     FreeResponseInfo(pResponse);
 }
@@ -1197,7 +1177,6 @@ void ReqUnlockSimLock(const ReqDataInfo *requestInfo, int32_t lockType, const ch
     char *pLine = NULL;
     int32_t ret;
     ResponseInfo *pResponse = NULL;
-    struct ReportInfo reportInfo = {0};
 
     int32_t result = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT^UNLOCKSIMLOCK=\"%d\",%s", lockType, password);
     if (result <= 0) {
@@ -1213,7 +1192,7 @@ void ReqUnlockSimLock(const ReqDataInfo *requestInfo, int32_t lockType, const ch
         } else {
             ret = HRIL_ERR_GENERIC_FAILURE;
         }
-        reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
+        struct ReportInfo reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
         OnSimReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
         FreeResponseInfo(pResponse);
         return;
@@ -1231,12 +1210,12 @@ void ReqUnlockSimLock(const ReqDataInfo *requestInfo, int32_t lockType, const ch
         } else {
             ret = HRIL_ERR_GENERIC_FAILURE;
         }
-        reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
+        struct ReportInfo reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
         OnSimReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
         FreeResponseInfo(pResponse);
         return;
     }
-    reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
     OnSimReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&lockStatus, sizeof(HRilLockStatus));
     FreeResponseInfo(pResponse);
 }
