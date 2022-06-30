@@ -18,8 +18,6 @@
 #include <fcntl.h>
 #include <termios.h>
 
-#include "parameter.h"
-
 #include "at_call.h"
 #include "at_data.h"
 #include "at_modem.h"
@@ -27,9 +25,9 @@
 #include "at_sim.h"
 #include "at_sms.h"
 #include "at_support.h"
-#include "vendor_report.h"
-
 #include "hril_notification.h"
+#include "parameter.h"
+#include "vendor_report.h"
 
 #define DEVICE_PATH "/dev/ttyUSB0"
 #define DEVICE_PATH_DEFAULT "/dev/ttyUSB"
@@ -184,7 +182,6 @@ int32_t SetRadioState(HRilRadioState newState, int32_t rst)
     struct ReportInfo reportInfo;
     (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
     if (g_atStatus > 0) {
-        newState = HRIL_RADIO_POWER_STATE_UNAVAILABLE;
         pthread_cond_signal(&g_statusCond);
         return -1;
     }
