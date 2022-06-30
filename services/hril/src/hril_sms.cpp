@@ -425,7 +425,7 @@ int32_t HRilSms::SetCdmaCBConfig(struct HdfSBuf *data)
         return HRIL_ERR_INVALID_PARAMETER;
     }
     HRilCdmaCBConfigInfo list[cellBroadcastInfoList.size];
-    for (size_t i = 0; i < cellBroadcastInfoList.size; i++) {
+    for (int32_t i = 0; i < cellBroadcastInfoList.size; i++) {
         list[i].service = cellBroadcastInfoList.list[i].service;
         list[i].language = cellBroadcastInfoList.list[i].language;
         list[i].checked = cellBroadcastInfoList.list[i].checked;
