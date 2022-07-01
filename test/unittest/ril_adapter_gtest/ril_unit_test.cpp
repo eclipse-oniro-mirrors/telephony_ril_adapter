@@ -86,6 +86,7 @@ void RilUnitTest::AddRequestToMap()
     memberFuncMap_[HREQ_CALL_UNHOLD_CALL] = &RilUnitTest::UnHoldCallTest;
     memberFuncMap_[HREQ_CALL_SWITCH_CALL] = &RilUnitTest::SwitchCallTest;
     memberFuncMap_[HREQ_CALL_SET_EMERGENCY_LIST] = &RilUnitTest::SetEmergencyCallListTest;
+    memberFuncMap_[HREQ_CALL_SET_BARRING_PASSWORD] = &RilUnitTest::SetBarringPasswordTest;
     memberFuncMap_[HREQ_CALL_COMBINE_CONFERENCE] = &RilUnitTest::RilCmJoinCallTest;
     memberFuncMap_[HREQ_CALL_SEPARATE_CONFERENCE] = &RilUnitTest::RilCmSplitCallTest;
     memberFuncMap_[HREQ_NETWORK_GET_OPERATOR_INFO] = &RilUnitTest::GetRilCmOperatorTest;
@@ -104,6 +105,16 @@ void RilUnitTest::AddRequestToMap()
     memberFuncMap_[HREQ_DATA_DEACTIVATE_PDP_CONTEXT] = &RilUnitTest::DeactivatePdpContextTest;
     memberFuncMap_[HREQ_CALL_SET_USSD] = &RilUnitTest::SetUssdTest;
     memberFuncMap_[HREQ_CALL_GET_USSD] = &RilUnitTest::GetUssdTest;
+    memberFuncMap_[HREQ_CALL_SET_CLIP] = &RilUnitTest::SetClipTest;
+    memberFuncMap_[HREQ_CALL_GET_CLIP] = &RilUnitTest::GetClipTest;
+    memberFuncMap_[HREQ_CALL_SET_CALL_WAITING] = &RilUnitTest::SetCallWaitingTest;
+    memberFuncMap_[HREQ_CALL_GET_CALL_WAITING] = &RilUnitTest::GetCallWaitingTest;
+    memberFuncMap_[HREQ_CALL_SET_CALL_RESTRICTION] = &RilUnitTest::SetCallRestrictionTest;
+    memberFuncMap_[HREQ_CALL_GET_CALL_RESTRICTION] = &RilUnitTest::GetCallRestrictionTest;
+    memberFuncMap_[HREQ_CALL_SET_CALL_TRANSFER_INFO] = &RilUnitTest::SetCallTransferInfoTest;
+    memberFuncMap_[HREQ_CALL_GET_CALL_TRANSFER_INFO] = &RilUnitTest::GetCallTransferInfoTest;
+    memberFuncMap_[HREQ_CALL_SET_CLIR] = &RilUnitTest::SetClirTest;
+    memberFuncMap_[HREQ_CALL_GET_CLIR] = &RilUnitTest::GetClirTest;
     memberFuncMap_[HREQ_DATA_GET_LINK_BANDWIDTH_INFO] = &RilUnitTest::GetLinkBandwidthInfoTest;
     memberFuncMap_[HREQ_SIM_OPEN_LOGICAL_CHANNEL] = &RilUnitTest::SimOpenLogicalChannelTest;
     memberFuncMap_[HREQ_SIM_TRANSMIT_APDU_LOGICAL_CHANNEL] = &RilUnitTest::SimTransmitApduLogicalChannelTest;
@@ -507,6 +518,101 @@ void RilUnitTest::GetUssdTest(const OHOS::AppExecFwk::InnerEvent::Pointer &resul
     ASSERT_EQ(0, ret);
 }
 
+void RilUnitTest::SetClipTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::SetClipTest -->");
+    int32_t ret = mRilManager_->SetClip(1, result);
+    TELEPHONY_LOGI("RilUnitTest::SetClipTest return: %{public}d", ret);
+    ASSERT_EQ(0, ret);
+}
+
+void RilUnitTest::GetClipTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::GetClipTest -->");
+    int32_t ret = mRilManager_->GetClip(result);
+    TELEPHONY_LOGI("RilUnitTest::GetClipTest return: %{public}d", ret);
+    ASSERT_EQ(0, ret);
+}
+
+void RilUnitTest::SetCallWaitingTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::SetCallWaitingTest -->");
+    int32_t ret = mRilManager_->SetCallWaiting(1, result);
+    TELEPHONY_LOGI("RilUnitTest::SetCallWaitingTest return: %{public}d", ret);
+    ASSERT_EQ(0, ret);
+}
+
+void RilUnitTest::SetBarringPasswordTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::SetBarringPasswordTest -->");
+    std::string fac = "AB";
+    std::string oldPwd = "1234";
+    std::string newPwd = "3456";
+    int32_t ret = mRilManager_->SetBarringPassword(fac, oldPwd, newPwd, result);
+    TELEPHONY_LOGI("RilUnitTest::SetBarringPasswordTest --> SetBarringPasswordTest finished return: %{public}d", ret);
+    ASSERT_EQ(0, ret);
+}
+
+void RilUnitTest::GetCallWaitingTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::GetCallWaitingTest -->");
+    int32_t ret = mRilManager_->GetCallWaiting(result);
+    TELEPHONY_LOGI("RilUnitTest::GetCallWaitingTest return: %{public}d", ret);
+    ASSERT_EQ(0, ret);
+}
+
+void RilUnitTest::SetCallRestrictionTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::SetCallRestrictionTest -->");
+    std::string fac = "AO";
+    std::string password = "123456";
+    int32_t ret = mRilManager_->SetCallRestriction(fac, 1, password, result);
+    TELEPHONY_LOGI("RilUnitTest::SetCallRestrictionTest return: %{public}d", ret);
+    ASSERT_EQ(0, ret);
+}
+
+void RilUnitTest::GetCallRestrictionTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::GetCallRestrictionTest -->");
+    std::string fac = "AO";
+    int32_t ret = mRilManager_->GetCallRestriction(fac, result);
+    TELEPHONY_LOGI("RilUnitTest::GetCallRestrictionTest return: %{public}d", ret);
+    ASSERT_EQ(0, ret);
+}
+
+void RilUnitTest::SetCallTransferInfoTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::SetCallTransferInfoTest -->");
+    std::string number = "123456789";
+    int32_t ret = mRilManager_->SetCallTransferInfo(1, 1, number, 1, result);
+    TELEPHONY_LOGI("RilUnitTest::SetCallTransferInfoTest return: %{public}d", ret);
+    ASSERT_EQ(0, ret);
+}
+
+void RilUnitTest::GetCallTransferInfoTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::GetCallTransferInfoTest -->");
+    int32_t ret = mRilManager_->GetCallTransferInfo(1, result);
+    TELEPHONY_LOGI("RilUnitTest::GetCallTransferInfoTest return: %{public}d", ret);
+    ASSERT_EQ(0, ret);
+}
+
+void RilUnitTest::SetClirTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::SetClirTest -->");
+    int32_t ret = mRilManager_->SetClir(1, result);
+    TELEPHONY_LOGI("RilUnitTest::SetClirTest return: %{public}d", ret);
+    ASSERT_EQ(0, ret);
+}
+
+void RilUnitTest::GetClirTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::GetClirTest -->");
+    int32_t ret = mRilManager_->GetClir(result);
+    TELEPHONY_LOGI("RilUnitTest::GetClirTest return: %{public}d", ret);
+    ASSERT_EQ(0, ret);
+}
+
 void RilUnitTest::GetLinkBandwidthInfoTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("RilUnitTest::GetLinkBandwidthInfoTest -->");
@@ -532,6 +638,14 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetEmergencyCallListTest_0100, Functi
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_SET_EMERGENCY_LIST);
     event->SetOwner(GetHandler());
     OnProcessTest(HREQ_CALL_SET_EMERGENCY_LIST, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetBarringPasswordTest_0100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_SET_BARRING_PASSWORD);
+    event->SetOwner(GetHandler());
+    OnProcessTest(HREQ_CALL_SET_BARRING_PASSWORD, event);
 }
 
 HWTEST_F(RilUnitTest, Telephony_RilAdapter_RilCmDialTest_0100, Function | MediumTest | Level3)
@@ -780,6 +894,87 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetUssdTest_0100, Function | MediumTe
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_GET_USSD);
     event->SetOwner(GetHandler());
     OnProcessTest(HREQ_CALL_GET_USSD, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetClipTest_0100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_SET_CLIP);
+    event->SetOwner(GetHandler());
+    OnProcessTest(HREQ_CALL_SET_CLIP, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetClipTest_0100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_GET_CLIP);
+    event->SetOwner(GetHandler());
+    OnProcessTest(HREQ_CALL_GET_CLIP, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetCallWaitingTest_0100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_SET_CALL_WAITING);
+    event->SetOwner(GetHandler());
+    OnProcessTest(HREQ_CALL_SET_CALL_WAITING, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetCallWaitingTest_0100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_GET_CALL_WAITING);
+    event->SetOwner(GetHandler());
+    OnProcessTest(HREQ_CALL_GET_CALL_WAITING, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetCallRestrictionTest_0100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_SET_CALL_RESTRICTION);
+    event->SetOwner(GetHandler());
+    OnProcessTest(HREQ_CALL_SET_CALL_RESTRICTION, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetCallRestrictionTest_0100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_GET_CALL_RESTRICTION);
+    event->SetOwner(GetHandler());
+    OnProcessTest(HREQ_CALL_GET_CALL_RESTRICTION, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetCallTransferInfoTest_0100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_SET_CALL_TRANSFER_INFO);
+    event->SetOwner(GetHandler());
+    OnProcessTest(HREQ_CALL_SET_CALL_TRANSFER_INFO, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetCallTransferInfoTest_0100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_GET_CALL_TRANSFER_INFO);
+    event->SetOwner(GetHandler());
+    OnProcessTest(HREQ_CALL_GET_CALL_TRANSFER_INFO, event);
+}
+
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetClirTest_0100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_SET_CLIR);
+    event->SetOwner(GetHandler());
+    OnProcessTest(HREQ_CALL_SET_CLIR, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetClirTest_0100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_GET_CLIR);
+    event->SetOwner(GetHandler());
+    OnProcessTest(HREQ_CALL_GET_CLIR, event);
 }
 
 HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetLinkBandwidthInfoTest_0100, Function | MediumTest | Level3)

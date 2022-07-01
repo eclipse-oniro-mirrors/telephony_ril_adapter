@@ -1103,6 +1103,37 @@ void ReqSetCallRestriction(const ReqDataInfo *requestInfo, CallRestrictionInfo i
     FreeResponseInfo(pResponse);
 }
 
+void ReqSetBarringPassword(const ReqDataInfo *requestInfo, HRilSetBarringInfo info)
+{
+    long long timeOut = DEFAULT_TIMEOUT;
+    char cmd[MAX_CMD_LENGTH] = { 0 };
+    ResponseInfo *pResponse = NULL;
+
+    int32_t ret = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CPWD=\"%s\",\"%s\",\"%s\"", info.fac,
+        info.oldPassword, info.newPassword);
+    if (ret < 0) {
+        TELEPHONY_LOGE("GenerateCommand is failed!");
+        OnCallReportErrorMessages(requestInfo, HRIL_ERR_GENERIC_FAILURE, NULL);
+        return;
+    }
+    int32_t err = SendCommandLock(cmd, NULL, timeOut, &pResponse);
+    if (err != HRIL_ERR_SUCCESS) {
+        TELEPHONY_LOGE("CPWD send failed");
+        err = HRIL_ERR_CMD_SEND_FAILURE;
+    } else if (pResponse != NULL) {
+        if (!pResponse->success) {
+            TELEPHONY_LOGE("ERROR: ReqSetBarringPassword return ERROR");
+            err = HRIL_ERR_GENERIC_FAILURE;
+        }
+    } else {
+        TELEPHONY_LOGE("ERROR: ReqSetBarringPassword pResponse is null");
+        err = HRIL_ERR_GENERIC_FAILURE;
+    }
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
+    OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
+    FreeResponseInfo(pResponse);
+}
+
 void ReqGetImsCallList(const ReqDataInfo *requestInfo)
 {
     int32_t ret;

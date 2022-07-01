@@ -72,6 +72,16 @@ public:
     void OnRequestSetUssdTest(MessageParcel &data);
     void OnRequestGetUssdTest(MessageParcel &data);
     void OnRequestGetLinkBandwidthInfoTest(MessageParcel &data);
+    void OnRequestSetClipTest(MessageParcel &data);
+    void OnRequestGetClipTest(MessageParcel &data);
+    void OnRequestSetCallWaitingTest(MessageParcel &data);
+    void OnRequestGetCallWaitingTest(MessageParcel &data);
+    void OnRequestSetCallRestrictionTest(MessageParcel &data);
+    void OnRequestGetCallRestrictionTest(MessageParcel &data);
+    void OnRequestSetCallTransferInfoTest(MessageParcel &data);
+    void OnRequestGetCallTransferInfoTest(MessageParcel &data);
+    void OnRequestSetClirTest(MessageParcel &data);
+    void OnRequestGetClirTest(MessageParcel &data);
 
 private:
     RilManagerTest *mRilManager_;

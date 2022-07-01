@@ -568,6 +568,29 @@ int32_t RilManagerTest::SetEmergencyCallList(const AppExecFwk::InnerEvent::Point
     }
 }
 
+void RilManagerTest::SetBarringPassword(const std::string &fac, const std::string &oldPwd, const std::string &newPwd,
+    const AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilManagerTest::SetBarringPassword -->");
+    if (cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("SetBarringPassword cellularRadio_ is nullptr");
+        return;
+    }
+    std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_CALL_SET_BARRING_PASSWORD, result);
+    if (request == nullptr) {
+        TELEPHONY_LOGE("SetBarringPassword request is nullptr");
+        return;
+    }
+    MessageParcel data;
+    MessageParcel reply;
+    data.WriteInt32(request->serialId_);
+    data.WriteCString(fac.c_str());
+    data.WriteCString(oldPwd.c_str());
+    data.WriteCString(newPwd.c_str());
+    MessageOption option;
+    cellularRadio_->SendRequest(HREQ_CALL_SET_BARRING_PASSWORD, data, reply, option);
+}
+
 void RilManagerTest::GetFailReason(const AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("RilManagerTest::GetFailReason -->");
