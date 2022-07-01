@@ -541,5 +541,115 @@ void RilRadioResponseTest::OnRequestGetLinkBandwidthInfoTest(MessageParcel &data
         return;
     }
 }
+
+void RilRadioResponseTest::OnRequestSetClipTest(MessageParcel &data)
+{
+    TELEPHONY_LOGI("RilRadioResponseTest::OnRequestSetClipTest --> ");
+    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
+    const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("ERROR : OnRequestSetClipTest --> data.ReadBuffer(readSpSize) failed !!!");
+        return;
+    }
+}
+
+void RilRadioResponseTest::OnRequestGetClipTest(MessageParcel &data)
+{
+    TELEPHONY_LOGI("RilRadioResponseTest::OnRequestGetClipTest --> ");
+    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
+    const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("ERROR : OnRequestGetClipTest --> data.ReadBuffer(readSpSize) failed !!!");
+        return;
+    }
+}
+
+void RilRadioResponseTest::OnRequestSetCallWaitingTest(MessageParcel &data)
+{
+    TELEPHONY_LOGI("RilRadioResponseTest::OnRequestSetCallWaitingTest --> ");
+    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
+    const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("ERROR : OnRequestSetCallWaitingTest --> data.ReadBuffer(readSpSize) failed !!!");
+        return;
+    }
+}
+
+void RilRadioResponseTest::OnRequestGetCallWaitingTest(MessageParcel &data)
+{
+    TELEPHONY_LOGI("RilRadioResponseTest::OnRequestGetCallWaitingTest --> ");
+    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
+    const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("ERROR : OnRequestGetCallWaitingTest --> data.ReadBuffer(readSpSize) failed !!!");
+        return;
+    }
+}
+
+void RilRadioResponseTest::OnRequestSetCallRestrictionTest(MessageParcel &data)
+{
+    TELEPHONY_LOGI("RilRadioResponseTest::OnRequestSetCallRestrictionTest --> ");
+    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
+    const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("ERROR : OnRequestSetCallRestrictionTest --> data.ReadBuffer(readSpSize) failed !!!");
+        return;
+    }
+}
+
+void RilRadioResponseTest::OnRequestGetCallRestrictionTest(MessageParcel &data)
+{
+    TELEPHONY_LOGI("RilRadioResponseTest::OnRequestGetCallRestrictionTest --> ");
+    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
+    const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("ERROR : OnRequestGetCallRestrictionTest --> data.ReadBuffer(readSpSize) failed !!!");
+        return;
+    }
+}
+
+void RilRadioResponseTest::OnRequestSetCallTransferInfoTest(MessageParcel &data)
+{
+    TELEPHONY_LOGI("RilRadioResponseTest::OnRequestSetCallTransferInfoTest --> ");
+    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
+    const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("ERROR : OnRequestSetCallTransferInfoTest --> data.ReadBuffer(readSpSize) failed !!!");
+        return;
+    }
+}
+
+void RilRadioResponseTest::OnRequestGetCallTransferInfoTest(MessageParcel &data)
+{
+    TELEPHONY_LOGI("RilRadioResponseTest::OnRequestGetCallTransferInfoTest --> ");
+    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
+    const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("ERROR : OnRequestGetCallTransferInfoTest --> data.ReadBuffer(readSpSize) failed !!!");
+        return;
+    }
+}
+
+void RilRadioResponseTest::OnRequestSetClirTest(MessageParcel &data)
+{
+    TELEPHONY_LOGI("RilRadioResponseTest::OnRequestSetClirTest --> ");
+    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
+    const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("ERROR : OnRequestSetClirTest --> data.ReadBuffer(readSpSize) failed !!!");
+        return;
+    }
+}
+
+void RilRadioResponseTest::OnRequestGetClirTest(MessageParcel &data)
+{
+    TELEPHONY_LOGI("RilRadioResponseTest::OnRequestGetClirTest --> ");
+    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
+    const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("ERROR : OnRequestGetClirTest --> data.ReadBuffer(readSpSize) failed !!!");
+        return;
+    }
+}
 } // namespace Telephony
 } // namespace OHOS

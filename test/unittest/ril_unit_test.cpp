@@ -257,6 +257,24 @@ void RilUnitTest::SetEmergencyCallListTest(const OHOS::AppExecFwk::InnerEvent::P
     TELEPHONY_LOGI("RilUnitTest::SetEmergencyCallListTest return: %{public}d", ret);
 }
 
+void RilUnitTest::SetBarringPasswordTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::SetBarringPasswordTest -->");
+    string fac = "AB";
+    cout << "Please input old password:";
+    string oldPassword;
+    cin >> oldPassword;
+    cout << "Your input old password is : " << oldPassword << endl;
+
+    cout << "Please input new password:";
+    string newPassword;
+    cin >> newPassword;
+    cout << "Your input new password is : " << newPassword << endl;
+
+    mRilManager_->SetBarringPassword(fac, oldPassword, newPassword, result);
+    TELEPHONY_LOGI("RilUnitTest::SetBarringPasswordTest --> finished");
+}
+
 void RilUnitTest::GetFailReasonTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("RilUnitTest::GetFailReasonTest -->");
@@ -622,8 +640,7 @@ void RilUnitTest::AcknowledgeRilCmLastIncomingGsmSmsTest(const OHOS::AppExecFwk:
     TELEPHONY_LOGI("RilUnitTest::AcknowledgeRilCmLastIncomingGsmSmsTest -->");
     int32_t cause = 2;
     mRilManager_->SendSmsAck(true, cause, result);
-    TELEPHONY_LOGI("RilUnitTest::AcknowledgeRilCmLastIncomingGsmSmsTest --> AcknowledgeRilCmLastIncomingGsmSmsTest "
-                   "finished");
+    TELEPHONY_LOGI("RilUnitTest::AcknowledgeRilCmLastIncomingGsmSmsTest --> finished");
 }
 
 void RilUnitTest::SetupRilCmDataCallTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
@@ -990,6 +1007,7 @@ void RilUnitTest::OnInitProcessInterface()
     memberFuncMap_[HREQ_CALL_GET_EMERGENCY_LIST] = &RilUnitTest::GetEmergencyListTest;
     memberFuncMap_[HREQ_CALL_SET_EMERGENCY_LIST] = &RilUnitTest::SetEmergencyCallListTest;
     memberFuncMap_[HREQ_CALL_GET_FAIL_REASON] = &RilUnitTest::GetFailReasonTest;
+    memberFuncMap_[HREQ_CALL_SET_BARRING_PASSWORD] = &RilUnitTest::SetBarringPasswordTest;
 
     // sms
     memberFuncMap_[HREQ_SMS_SEND_GSM_SMS] = &RilUnitTest::SendRilCmSmsTest;
@@ -1110,6 +1128,7 @@ static int32_t PrintCallMenu()
     cout << "----> [" << HREQ_CALL_GET_EMERGENCY_LIST << "] ---->[ HREQ_CALL_GET_EMERGENCY_LIST ]" << endl;
     cout << "----> [" << HREQ_CALL_SET_EMERGENCY_LIST << "] ---->[ HREQ_CALL_SET_EMERGENCY_LIST ]" << endl;
     cout << "----> [" << HREQ_CALL_GET_FAIL_REASON << "] ---->[ HREQ_CALL_GET_FAIL_REASON ]" << endl;
+    cout << "----> [" << HREQ_CALL_SET_BARRING_PASSWORD << "] ---->[ HREQ_CALL_SET_BARRING_PASSWORD ]" << endl;
 
     int32_t choice = InputInt32(HREQ_CALL_BASE, HREQ_SMS_BASE - 1, "Command");
     cout << "---->You choose: " << choice << endl;

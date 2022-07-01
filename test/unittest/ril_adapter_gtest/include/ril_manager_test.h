@@ -58,6 +58,7 @@ public:
 
     void OnInit();
     int32_t SendInt32Event(int32_t dispatchId, int32_t value);
+    int32_t SendInt32sEvent(int32_t dispatchId, int32_t argCount, ...);
     int32_t SendStringEvent(int32_t dispatchId, const char *value);
     int32_t SendBufferEvent(int32_t dispatchId, OHOS::MessageParcel &eventData);
     int32_t SendCommonBufferEvent(int32_t dispatchId, const void *eventData, size_t dataLength);
@@ -99,8 +100,22 @@ public:
     int32_t GetSimStatus(const AppExecFwk::InnerEvent::Pointer &result);
     int32_t SetUssd(std::string str, const AppExecFwk::InnerEvent::Pointer &result);
     int32_t GetUssd(const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t SetClip(int32_t action, const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t GetClip(const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t SetCallWaiting(int32_t activate, const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t GetCallWaiting(const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t SetCallRestriction(std::string fac, int32_t mode, std::string password,
+        const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t GetCallRestriction(std::string fac, const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t SetCallTransferInfo(int32_t reason, int32_t mode, std::string number, int32_t classx,
+        const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t GetCallTransferInfo(int32_t reason, const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t SetClir(int32_t action, const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t GetClir(const AppExecFwk::InnerEvent::Pointer &result);
     int32_t GetLinkBandwidthInfo(const int32_t cid, const AppExecFwk::InnerEvent::Pointer &result);
     int32_t SetEmergencyCallList(const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t SetBarringPassword(const std::string &fac, const std::string &oldPwd, const std::string &newPwd,
+        const AppExecFwk::InnerEvent::Pointer &result);
     int32_t SimOpenLogicalChannel(std::string appID, int32_t p2, const AppExecFwk::InnerEvent::Pointer &response);
     int32_t SimCloseLogicalChannel(int32_t channelId, const AppExecFwk::InnerEvent::Pointer &response);
     int32_t SimTransmitApduLogicalChannel(ApduSimIORequestInfo reqInfo,
@@ -115,6 +130,8 @@ public:
     static const int32_t HRIL_ADAPTER_RADIO_RESPONSE = 2002;
     static const int32_t RIL_ADAPTER_OEM_INDICATION = 2003;
     static const int32_t RIL_ADAPTER_OEM_RESPONSE = 2004;
+    static const int32_t TELEPHONY_ERR_LOCAL_PTR_NULL = -1;
+    static const int32_t TELEPHONY_ERR_SUCCESS = 0;
     sptr<IRemoteObject> cellularRadio_;
     int32_t cdmaSubscription_ = 0;
 

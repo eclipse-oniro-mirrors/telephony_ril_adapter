@@ -93,6 +93,8 @@ public:
     void GetEmergencyList(const AppExecFwk::InnerEvent::Pointer &result);
     int32_t SetEmergencyCallList(const AppExecFwk::InnerEvent::Pointer &result);
     void GetFailReason(const AppExecFwk::InnerEvent::Pointer &result);
+    void SetBarringPassword(const std::string &fac, const std::string &oldPwd, const std::string &newPwd,
+        const AppExecFwk::InnerEvent::Pointer &result);
 
     void GetImsi(std::string aid, const AppExecFwk::InnerEvent::Pointer &response);
 
