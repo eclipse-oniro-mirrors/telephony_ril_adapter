@@ -205,10 +205,6 @@ typedef struct {
                             4: The operation is not supported;
                             5: The network timed out. */
     char *str; /* USSD string, the maximum length is 160 characters. */
-    int32_t dcs; /* Integer value, encoding method.
-                                15: Not specified (default 7bit encoding);
-                                68: 8bit encoding (not supported temporarily);
-                                72: UCS2 encoding (not supported temporarily). */
 } HRilUssdNoticeInfo;
 
 typedef struct {
