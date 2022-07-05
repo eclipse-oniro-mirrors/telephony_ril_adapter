@@ -153,7 +153,7 @@ bool DataCallResultList::Marshalling(Parcel &parcel) const
     if (!Write(parcel, size)) {
         return false;
     }
-    for (int32_t i = 0; i < size; i++) {
+    for (int32_t i = 0; i < (int32_t)size; i++) {
         dcList[i].Marshalling(parcel);
     }
     return true;
