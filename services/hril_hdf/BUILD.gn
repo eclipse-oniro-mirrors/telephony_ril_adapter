@@ -41,7 +41,7 @@ ohos_shared_library("hril_hdf") {
     "//utils/native/base:utils",
   ]
 
-  external_deps = [ "startup_l2:syspara" ]
+  external_deps = [ "init:libbegetutil" ]
 
   if (is_standard_system) {
     external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
