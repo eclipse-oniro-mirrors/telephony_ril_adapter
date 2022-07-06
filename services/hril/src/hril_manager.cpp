@@ -439,6 +439,18 @@ static void HRilBootUpEventLoop()
     g_manager->timerCallback_->EventLoop();
 }
 
+void HRilInit(void)
+{
+    if (g_manager == nullptr) {
+        TELEPHONY_LOGE("HRilInit: g_manager is nullptr");
+        return;
+    }
+    auto &powerMgrClient = PowerMgr::PowerMgrClient::GetInstance();
+    g_manager->runningLock_ =
+        powerMgrClient.CreateRunningLock("HRilRunningLock", PowerMgr::RunningLockType::RUNNINGLOCK_BACKGROUND);
+    g_manager->eventLoop_ = std::make_unique<std::thread>(HRilBootUpEventLoop);
+}
+
 void HRilRegOps(const HRilOps *hrilOps)
 {
     static HRilOps callBacks = {0};
@@ -453,10 +465,6 @@ void HRilRegOps(const HRilOps *hrilOps)
         return;
     }
     rilRegisterStatus = RIL_REGISTER_IS_RUNNING;
-    auto &powerMgrClient = PowerMgr::PowerMgrClient::GetInstance();
-    g_manager->runningLock_ =
-        powerMgrClient.CreateRunningLock("HRilRunningLock", PowerMgr::RunningLockType::RUNNINGLOCK_BACKGROUND);
-    g_manager->eventLoop_ = std::make_unique<std::thread>(HRilBootUpEventLoop);
     (void)memcpy_s(&callBacks, sizeof(HRilOps), hrilOps, sizeof(HRilOps));
     for (int32_t slotId = HRIL_SIM_SLOT_0; slotId < g_manager->GetMaxSimSlotCount(); slotId++) {
         if (callBacks.smsOps != nullptr) {

@@ -151,6 +151,7 @@ static void LoadVendor(void)
         TELEPHONY_LOGE("RilInit not defined or exported");
         return;
     }
+    HRilInit();
     ops = rilInitOps(&g_reportOps);
     HRilRegOps(ops);
     TELEPHONY_LOGI("HRilRegOps completed");
