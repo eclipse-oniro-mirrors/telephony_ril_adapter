@@ -666,6 +666,45 @@ void RilUnitTest::SetupRilCmDataCallTest(const OHOS::AppExecFwk::InnerEvent::Poi
     TELEPHONY_LOGI("RilUnitTest::SetupRilCmDataCallTest --> SetupRilCmDataCallTest finished");
 }
 
+void RilUnitTest::SetDataProfileInfoTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::SetDataProfileInfoTest -->");
+    int32_t size = 0;
+    cout << "please enter the profile size:";
+    cin >> size;
+    DataProfilesInfo dataProfilesInfo;
+    dataProfilesInfo.profilesSize = size;
+    for (int32_t i = 0; i < size; i++) {
+        string apn;
+        cout << "please enter the apn:";
+        cin >> apn;
+        string username;
+
+        cout << "please enter the username:";
+        cin >> username;
+
+        string dataInfoPwd;
+        cout << "please enter the password:";
+        cin >> dataInfoPwd;
+
+        string protocol;
+        cout << "please enter the protocol:";
+        cin >> protocol;
+        DataProfileDataInfo dataInfo;
+        dataInfo.serial = i;
+        dataInfo.profileId = i;
+        dataInfo.apn = apn;
+        dataInfo.protocol = protocol;
+        dataInfo.roamingProtocol = "0";
+        dataInfo.verType = 0;
+        dataInfo.userName = username;
+        dataInfo.password = dataInfoPwd;
+        dataProfilesInfo.profiles.push_back(dataInfo);
+    }
+    mRilManager_->SetDataProfileInfo(dataProfilesInfo, result);
+    TELEPHONY_LOGI("RilUnitTest::SetInitialApnTest --> SetInitialApnTest finished");
+}
+
 void RilUnitTest::DeactivateRilCmDataCallTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
 {
     int32_t cid;
@@ -1039,6 +1078,7 @@ void RilUnitTest::OnInitProcessInterface()
     memberFuncMap_[HREQ_DATA_ACTIVATE_PDP_CONTEXT] = &RilUnitTest::SetupRilCmDataCallTest;
     memberFuncMap_[HREQ_DATA_DEACTIVATE_PDP_CONTEXT] = &RilUnitTest::DeactivateRilCmDataCallTest;
     memberFuncMap_[HREQ_DATA_GET_LINK_BANDWIDTH_INFO] = &RilUnitTest::GetLinkBandwidthInfoTest;
+    memberFuncMap_[HREQ_DATA_SET_DATA_PROFILE_INFO] = &RilUnitTest::SetDataProfileInfoTest;
     memberFuncMap_[HREQ_DATA_GET_PDP_CONTEXT_LIST] = &RilUnitTest::GetRilCmDataCallListTest;
     memberFuncMap_[HREQ_DATA_SET_INIT_APN_INFO] = &RilUnitTest::SetInitialApnTest;
 
@@ -1190,6 +1230,7 @@ static int32_t PrintDataMenu()
     cout << "----> [" << HREQ_DATA_GET_LINK_BANDWIDTH_INFO << "] ---->[ HREQ_DATA_GET_LINK_BANDWIDTH_INFO ]" << endl;
     cout << "----> [" << HREQ_DATA_GET_PDP_CONTEXT_LIST << "] ---->[ HREQ_DATA_GET_PDP_CONTEXT_LIST ]" << endl;
     cout << "----> [" << HREQ_DATA_SET_INIT_APN_INFO << "] ---->[ HREQ_DATA_SET_INIT_APN_INFO ]" << endl;
+    cout << "----> [" << HREQ_DATA_SET_DATA_PROFILE_INFO << "] ---->[ HREQ_DATA_SET_DATA_PROFILE_INFO ]" << endl;
 
     int32_t choice = InputInt32(HREQ_DATA_BASE, HREQ_NETWORK_BASE - 1, "Command");
     cout << "---->You choose: " << choice << endl;
