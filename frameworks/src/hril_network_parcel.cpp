@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1361,49 +1361,6 @@ bool PreferredNetworkTypeInfo::Marshalling(Parcel &parcel) const
 std::shared_ptr<PreferredNetworkTypeInfo> PreferredNetworkTypeInfo::UnMarshalling(Parcel &parcel)
 {
     std::shared_ptr<PreferredNetworkTypeInfo> param = std::make_shared<PreferredNetworkTypeInfo>();
-    if (param == nullptr || !param->ReadFromParcel(parcel)) {
-        param = nullptr;
-    }
-    return param;
-}
-
-bool ImsRegStatusInfo::ReadFromParcel(Parcel &parcel)
-{
-    if (!ReadBaseInt32(parcel, notifyType)) {
-        return false;
-    }
-    if (!ReadBaseInt32(parcel, regInfo)) {
-        return false;
-    }
-    if (!ReadBaseInt32(parcel, extInfo)) {
-        return false;
-    }
-    if (!ReadBaseInt64(parcel, flag)) {
-        return false;
-    }
-    return true;
-}
-
-bool ImsRegStatusInfo::Marshalling(Parcel &parcel) const
-{
-    if (!WriteBaseInt32(parcel, notifyType)) {
-        return false;
-    }
-    if (!WriteBaseInt32(parcel, regInfo)) {
-        return false;
-    }
-    if (!WriteBaseInt32(parcel, extInfo)) {
-        return false;
-    }
-    if (!WriteBaseInt64(parcel, flag)) {
-        return false;
-    }
-    return true;
-}
-
-std::shared_ptr<ImsRegStatusInfo> ImsRegStatusInfo::UnMarshalling(Parcel &parcel)
-{
-    std::shared_ptr<ImsRegStatusInfo> param = std::make_shared<ImsRegStatusInfo>();
     if (param == nullptr || !param->ReadFromParcel(parcel)) {
         param = nullptr;
     }

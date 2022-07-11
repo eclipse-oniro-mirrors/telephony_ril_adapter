@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,7 +19,6 @@
 typedef enum {
     HNOTI_CALL_BASE = 1000,
     HNOTI_CALL_STATE_UPDATED,
-    HNOTI_CALL_IMS_SERVICE_STATUS_REPORT,
     HNOTI_CALL_USSD_REPORT,
     HNOTI_CALL_RINGBACK_VOICE_REPORT,
     HNOTI_CALL_SRVCC_STATUS_REPORT,
@@ -48,7 +47,6 @@ typedef enum {
     HNOTI_NETWORK_SIGNAL_STRENGTH_UPDATED,
     HNOTI_NETWORK_TIME_UPDATED,
     HNOTI_NETWORK_TIME_ZONE_UPDATED,
-    HNOTI_NETWORK_IMS_REG_STATUS_UPDATED,
     HNOTI_NETWORK_PS_REG_STATUS_UPDATED,
     HNOTI_NETWORK_PHY_CHNL_CFG_UPDATED,
     HNOTI_NETWORK_CURRENT_CELL_UPDATED,

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -405,16 +405,6 @@ void OnNotifyNetWorksOps(const char *s, const char *infoStr)
         ProcessPhyChnlCfgNotify(reportInfo, str);
     } else if (ReportStrWith(s, "^SYSINFOEX:")) {
         VoiceRadioInfoNotify(reportInfo, ret, str, s);
-    } else if (ReportStrWith(s, "+CIREGU:")) {
-        HRilImsRegStatusInfo imsRegStatusInfo;
-        reportInfo.notifyId = HNOTI_NETWORK_IMS_REG_STATUS_UPDATED;
-        ret = ProcessImsRegStatus(str, &imsRegStatusInfo, MAX_IMS_REG_INFO_ITEM);
-        if (ret == 0) {
-            OnNetworkReport(
-                GetSlotId(NULL), reportInfo, (const uint8_t *)(&imsRegStatusInfo), sizeof(HRilImsRegStatusInfo));
-        } else {
-            TELEPHONY_LOGW("CIREGU notify str format unexpected");
-        }
     } else {
         TELEPHONY_LOGW("enter to  is unrecognized command");
     }

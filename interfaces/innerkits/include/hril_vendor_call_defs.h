@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -51,41 +51,6 @@ typedef struct {
     char *alpha; /* alphanumeric representation of <number> corresponding to the entry found in phonebook;
                   * used character set should be the one selected with command select TE character set +CSCS */
 } HRilCallInfo;
-
-typedef struct {
-    int32_t smsSrvStatus; /* Service status of IMS SMS.
-                           * 0: IMS SMS service is not available.
-                           * 1: IMS SMS is in limited service.
-                           * 2: IMS SMS is in full service. */
-    int32_t smsSrvRat; /* IMS SMS service domain.
-                        * 0: IMS service is registered on LTE.
-                        * 1: IMS service is registered on WIFI.
-                        * 2: Reserve. */
-    int32_t voipSrvStatus; /* Service status of IMS VoIP.
-                            * 0: IMS VoIP service is not available.
-                            * 1: IMS VoIP is in limited service.
-                            * 2: IMS VoIP is in full service. */
-    int32_t voipSrvRat; /* IMS VoIP service domain.
-                         * 0: IMS service is registered on LTE.
-                         * 1: IMS service is registered on WIFI.
-                         * 2: Reserve. */
-    int32_t vtSrvStatus; /* Service status of IMS VT.
-                          * 0: IMS VT service is not available.
-                          * 1: IMS VT is in limited service.
-                          * 2: IMS VT is in full service. */
-    int32_t vtSrvRat; /* IMS VT service domain.
-                       * 0: IMS service is registered on LTE.
-                       * 1: IMS service is registered on WIFI.
-                       * 2: Reserve. */
-    int32_t vsSrvStatus; /* Service status of IMS VS.
-                          * 0: IMS VS service is not available.
-                          * 1: IMS VS is in limited service.
-                          * 2: IMS VS is in full service. */
-    int32_t vsSrvRat; /* IMS VS service domain.
-                       * 0: IMS service is registered on LTE.
-                       * 1: IMS service is registered on WIFI.
-                       * 2: Reserve. */
-} HRilImsServiceStatus;
 
 /* From 3GPP TS 27.007 V4.3.0 (2001-12) ATD%s%s */
 typedef struct {
@@ -295,11 +260,8 @@ typedef struct {
     void (*StartDtmf)(const ReqDataInfo *requestInfo, CallDtmfInfo info);
     void (*SendDtmf)(const ReqDataInfo *requestInfo, CallDtmfInfo info);
     void (*StopDtmf)(const ReqDataInfo *requestInfo, CallDtmfInfo info);
-    void (*GetImsCallList)(const ReqDataInfo *requestInfo);
     void (*GetCallPreferenceMode)(const ReqDataInfo *requestInfo);
     void (*SetCallPreferenceMode)(const ReqDataInfo *requestInfo, int32_t mode);
-    void (*GetLteImsSwitchStatus)(const ReqDataInfo *requestInfo);
-    void (*SetLteImsSwitchStatus)(const ReqDataInfo *requestInfo, int32_t active);
     void (*SetUssd)(const ReqDataInfo *requestInfo, const char *str);
     void (*GetUssd)(const ReqDataInfo *requestInfo);
     void (*SetMute)(const ReqDataInfo *requestInfo, int32_t mute);

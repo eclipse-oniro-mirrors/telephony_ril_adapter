@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -164,9 +164,6 @@ int32_t RilRadioResponseTest::OnRemoteRequest(
             break;
         case HREQ_NETWORK_SET_NETWORK_SELECTION_MODE:
             OnRequestSetNetworkSelectionModeTest(data);
-            break;
-        case HREQ_NETWORK_GET_IMS_REG_STATUS:
-            OnResponseGetImsRegistrationState(data);
             break;
         case HREQ_NETWORK_GET_NEIGHBORING_CELLINFO_LIST:
             OnResponseGetRilNeighboringCellInfoList(data);
@@ -916,26 +913,6 @@ void RilRadioResponseTest::OnResponseSetInitialApn(OHOS::MessageParcel &data)
         TELEPHONY_LOGE("RilRadioResponseTest OnResponseSetInitialApn read spBuffer failed");
         return;
     }
-}
-
-void RilRadioResponseTest::OnResponseGetImsRegistrationState(OHOS::MessageParcel &data)
-{
-    std::unique_ptr<ImsRegStatusInfo> imsRegStatus = std::make_unique<ImsRegStatusInfo>();
-    if (imsRegStatus == nullptr) {
-        return;
-    }
-    imsRegStatus.get()->ReadFromParcel(data);
-
-    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
-    const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
-    if (spBuffer == nullptr) {
-        TELEPHONY_LOGE("RilRadioResponseTest OnResponseGetImsRegistrationState read spBuffer failed");
-        return;
-    }
-
-    cout << "OnResponseGetImsRegistrationState: notifyType = " << imsRegStatus->notifyType << endl;
-    cout << "OnResponseGetImsRegistrationState: regInfo = " << imsRegStatus->regInfo << endl;
-    cout << "OnResponseGetImsRegistrationState: extInfo = " << imsRegStatus->extInfo << endl;
 }
 
 void RilRadioResponseTest::OnResponseSendImsSms(OHOS::MessageParcel &data)

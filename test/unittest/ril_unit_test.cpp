@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -408,13 +408,6 @@ void RilUnitTest::GetRilPreferredNetwrokTest(const OHOS::AppExecFwk::InnerEvent:
     TELEPHONY_LOGI("RilUnitTest::GetRilPreferredNetwrokTest -->");
     mRilManager_->GetPreferredNetwork(result);
     TELEPHONY_LOGI("RilUnitTest::GetRilPreferredNetwrokTest --> GetRilPreferredNetwrokTest finished");
-}
-
-void RilUnitTest::GetRilImsRegStatusTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
-{
-    TELEPHONY_LOGI("RilUnitTest::GetRilImsRegStatusTest -->");
-    mRilManager_->GetImsRegStatus(result);
-    TELEPHONY_LOGI("RilUnitTest::GetRilImsRegStatusTest --> GetRilImsRegStatusTest finished");
 }
 
 void RilUnitTest::GetMeidTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
@@ -1094,7 +1087,6 @@ void RilUnitTest::OnInitProcessInterface()
     memberFuncMap_[HREQ_NETWORK_GET_CURRENT_CELL_INFO] = &RilUnitTest::GetRilCurrentCellInfoTest;
     memberFuncMap_[HREQ_NETWORK_GET_PREFERRED_NETWORK] = &RilUnitTest::GetRilPreferredNetwrokTest;
     memberFuncMap_[HREQ_NETWORK_SET_PREFERRED_NETWORK] = &RilUnitTest::SetRilPreferredNetwrokTest;
-    memberFuncMap_[HREQ_NETWORK_GET_IMS_REG_STATUS] = &RilUnitTest::GetRilImsRegStatusTest;
     memberFuncMap_[HREQ_NETWORK_SET_LOCATE_UPDATES] = &RilUnitTest::SetRilLocationUpdateTest;
     memberFuncMap_[HREQ_NETWORK_SET_NOTIFICATION_FILTER] = &RilUnitTest::SetRilNotificationFilterTest;
     memberFuncMap_[HREQ_NETWORK_SET_DEVICE_STATE] = &RilUnitTest::SetRilDeviceStateTest;
@@ -1262,7 +1254,6 @@ static int32_t PrintNetworkMenu()
     cout << "----> [" << HREQ_NETWORK_GET_CURRENT_CELL_INFO << "] ---->[ HREQ_NETWORK_GET_CURRENT_CELL_INFO ]" << endl;
     cout << "----> [" << HREQ_NETWORK_GET_PREFERRED_NETWORK << "] ---->[ HREQ_NETWORK_GET_PREFERRED_NETWORK ]" << endl;
     cout << "----> [" << HREQ_NETWORK_SET_PREFERRED_NETWORK << "] ---->[ HREQ_NETWORK_SET_PREFERRED_NETWORK ]" << endl;
-    cout << "----> [" << HREQ_NETWORK_GET_IMS_REG_STATUS << "] ---->[ HREQ_NETWORK_GET_IMS_REG_STATUS ]" << endl;
     cout << "----> [" << HREQ_NETWORK_SET_LOCATE_UPDATES << "] ---->[ HREQ_NETWORK_SET_LOCATE_UPDATES ]" << endl;
     cout << "----> [" << HREQ_NETWORK_SET_NOTIFICATION_FILTER
          << "] ---->[ HREQ_NETWORK_SET_NOTIFICATION_FILTER ]" << endl;

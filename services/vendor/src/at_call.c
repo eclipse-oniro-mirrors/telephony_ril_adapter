@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,7 +26,6 @@
 
 CallNotify g_callNotifyTab[] = {
     {"^CCALLSTATE:", ReportCallStateUpdated},
-    {"^IMSSRVSTATUS:", ReportImsServiceStatusInfo},
     {"+CUSD:", ReportCallUssdNotice},
     {"+CIREPH:", ReportSrvccStatusUpdate},
     {"^CSCHANNELINFO:", ReportCsChannelInfo},
@@ -115,48 +114,6 @@ static int32_t CallCmdCLCC(const char *lineCmd, HRilCallInfo *outCall)
         }
     }
     return HRIL_ERR_SUCCESS;
-}
-
-void ReportImsServiceStatusInfo(const char *str)
-{
-    int32_t err = HRIL_ERR_SUCCESS;
-    char *pStr = (char *)str;
-    HRilImsServiceStatus imsSrvStatus = {0};
-    ReqDataInfo requestInfo = {0};
-    ModemReportErrorInfo errInfo = InitModemReportErrorInfo();
-
-    if (SkipATPrefix(&pStr) < 0) {
-        err = HRIL_ERR_INVALID_MODEM_PARAMETER;
-    }
-    if (NextInt(&pStr, &imsSrvStatus.smsSrvStatus) < 0) {
-        err = HRIL_ERR_INVALID_MODEM_PARAMETER;
-    }
-    if (NextInt(&pStr, &imsSrvStatus.smsSrvRat) < 0) {
-        err = HRIL_ERR_INVALID_MODEM_PARAMETER;
-    }
-    if (NextInt(&pStr, &imsSrvStatus.voipSrvStatus) < 0) {
-        err = HRIL_ERR_INVALID_MODEM_PARAMETER;
-    }
-    if (NextInt(&pStr, &imsSrvStatus.voipSrvRat) < 0) {
-        err = HRIL_ERR_INVALID_MODEM_PARAMETER;
-    }
-    if (NextInt(&pStr, &imsSrvStatus.vtSrvStatus) < 0) {
-        err = HRIL_ERR_INVALID_MODEM_PARAMETER;
-    }
-    if (NextInt(&pStr, &imsSrvStatus.vtSrvRat) < 0) {
-        err = HRIL_ERR_INVALID_MODEM_PARAMETER;
-    }
-    if (NextInt(&pStr, &imsSrvStatus.vsSrvStatus) < 0) {
-        err = HRIL_ERR_INVALID_MODEM_PARAMETER;
-    }
-    if (NextInt(&pStr, &imsSrvStatus.vsSrvRat) < 0) {
-        err = HRIL_ERR_INVALID_MODEM_PARAMETER;
-    }
-
-    struct ReportInfo reportInfo =
-        CreateReportInfo(&requestInfo, err, HRIL_NOTIFICATION, HNOTI_CALL_IMS_SERVICE_STATUS_REPORT);
-    reportInfo.modemErrInfo = errInfo;
-    OnCallReport(GetSlotId(NULL), reportInfo, (const uint8_t *)&imsSrvStatus, sizeof(HRilImsServiceStatus));
 }
 
 void ReportCallStateUpdated(const char *str)
@@ -1134,27 +1091,6 @@ void ReqSetBarringPassword(const ReqDataInfo *requestInfo, HRilSetBarringInfo in
     FreeResponseInfo(pResponse);
 }
 
-void ReqGetImsCallList(const ReqDataInfo *requestInfo)
-{
-    int32_t ret;
-    ResponseInfo *pResponse = NULL;
-    int32_t err = HRIL_ERR_SUCCESS;
-    long timeOut = DEFAULT_TIMEOUT;
-
-    ret = SendCommandLock("AT^CLCC?", "^CLCC:", timeOut, &pResponse);
-    if (ret || (pResponse != NULL && !pResponse->success)) {
-        err = (ret != HRIL_ERR_SUCCESS) ? HRIL_ERR_CMD_SEND_FAILURE : err;
-        TELEPHONY_LOGE("cmd send failed, err:%{public}d", err);
-        OnCallReportErrorMessages(requestInfo, err, pResponse);
-        return;
-    }
-    err = BuildCallInfoList(requestInfo, pResponse);
-    if (err != HRIL_ERR_SUCCESS) {
-        TELEPHONY_LOGE("Build Call Info List is failed.");
-        OnCallReportErrorMessages(requestInfo, err, pResponse);
-    }
-}
-
 void ReqGetCallPreferenceMode(const ReqDataInfo *requestInfo)
 {
     char *line = NULL;
@@ -1201,69 +1137,6 @@ void ReqSetCallPreferenceMode(const ReqDataInfo *requestInfo, int32_t mode)
     ModemReportErrorInfo errInfo = InitModemReportErrorInfo();
     value = mode;
     ret = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CEVDP=%d", value);
-    if (ret < 0) {
-        TELEPHONY_LOGE("GenerateCommand is failed!");
-        OnCallReportErrorMessages(requestInfo, HRIL_ERR_GENERIC_FAILURE, NULL);
-        return;
-    }
-    ret = SendCommandLock(cmd, NULL, 0, &pResponse);
-    if (ret || (pResponse != NULL && !pResponse->success)) {
-        errInfo = GetReportErrorInfo(pResponse);
-        err = errInfo.errorNo;
-        TELEPHONY_LOGE("cmd send failed, err:%{public}d", ret ? ret : err);
-    }
-    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-    reportInfo.modemErrInfo = errInfo;
-    OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
-    FreeResponseInfo(pResponse);
-}
-
-void ReqGetLteImsSwitchStatus(const ReqDataInfo *requestInfo)
-{
-    char *line = NULL;
-    int32_t value = VENDOR_FAIL;
-    int32_t ret = VENDOR_FAIL;
-    int32_t err = HRIL_ERR_SUCCESS;
-    ResponseInfo *pResponse = NULL;
-
-    ModemReportErrorInfo errInfo = InitModemReportErrorInfo();
-    ret = SendCommandLock("AT^LTEIMSSWITCH?", "^LTEIMSSWITCH:", 0, &pResponse);
-    if (ret || pResponse == NULL || !pResponse->success) {
-        err = (ret != HRIL_ERR_SUCCESS) ? HRIL_ERR_CMD_SEND_FAILURE : err;
-        TELEPHONY_LOGE("cmd send failed, err:%{public}d", err);
-        OnCallReportErrorMessages(requestInfo, err, pResponse);
-        return;
-    }
-    if (pResponse->head) {
-        line = pResponse->head->data;
-        err = SkipATPrefix(&line);
-        if (err == 0) {
-            err = NextInt(&line, &value);
-            TELEPHONY_LOGI("value:%{public}d", value);
-        } else {
-            TELEPHONY_LOGE("response error");
-        }
-    } else {
-        TELEPHONY_LOGE("ERROR: pResponse->head is null");
-        err = HRIL_ERR_GENERIC_FAILURE;
-    }
-    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-    reportInfo.modemErrInfo = errInfo;
-    OnCallReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&value, sizeof(value));
-    FreeResponseInfo(pResponse);
-}
-
-void ReqSetLteImsSwitchStatus(const ReqDataInfo *requestInfo, int32_t active)
-{
-    int32_t ret = VENDOR_FAIL;
-    int32_t err = HRIL_ERR_SUCCESS;
-    int32_t value = INT_DEFAULT_VALUE;
-    char cmd[MAX_CMD_LENGTH] = {0};
-    ResponseInfo *pResponse = NULL;
-
-    ModemReportErrorInfo errInfo = InitModemReportErrorInfo();
-    value = active;
-    ret = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT^LTEIMSSWITCH=%d", value);
     if (ret < 0) {
         TELEPHONY_LOGE("GenerateCommand is failed!");
         OnCallReportErrorMessages(requestInfo, HRIL_ERR_GENERIC_FAILURE, NULL);

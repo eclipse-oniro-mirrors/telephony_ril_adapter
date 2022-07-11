@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -57,7 +57,6 @@ typedef enum {
     HRIL_RADIO_NR = 19,
 } HRilActTech;
 
-void ReqGetImsRegStatus(const ReqDataInfo *requestInfo);
 void ReqGetSignalStrength(const ReqDataInfo *requestInfo);
 void ReqGetCsRegStatus(const ReqDataInfo *requestInfo);
 void ReqGetPsRegStatus(const ReqDataInfo *requestInfo);
@@ -77,7 +76,6 @@ void ReqSetDeviceState(const ReqDataInfo *requestInfo, const int32_t *deviceStat
 void ProcessPhyChnlCfgNotify(struct ReportInfo reportInfo, char *srcStr);
 int32_t ProcessCurrentCellList(struct ReportInfo reportInfo, const char *s);
 int32_t ProcessRegStatus(const char *s, const HRilRegStatusInfo *hrilRegStateInfo);
-int32_t ProcessImsRegStatus(const char *s, const HRilImsRegStatusInfo *imsRegStatusInfo, int32_t expectInfoNum);
 int32_t ProcessParamSignalStrength(const char *result, HRilRssi *hrilRssi);
 int32_t ProcessParamSignalStrengthNotify(const char *result, HRilRssi *hrilRssi);
 int32_t ProcessOperListToUse(const char *list);

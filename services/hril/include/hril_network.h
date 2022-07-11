@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,7 +26,6 @@ public:
     HRilNetwork(int32_t slotId, IHRilReporter &hrilReporter);
     virtual ~HRilNetwork() = default;
 
-    int32_t GetImsRegStatus(struct HdfSBuf *data);
     /* Requests to get current signal intensity relevant information. */
     int32_t GetSignalStrength(struct HdfSBuf *data);
     /* Requests to get current voice registration status information. */
@@ -48,8 +47,6 @@ public:
     int32_t SetNotificationFilter(struct HdfSBuf *data);
     int32_t SetDeviceState(struct HdfSBuf *data);
 
-    int32_t GetImsRegStatusResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t GetSignalStrengthResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t GetCsRegStatusResponse(
@@ -89,10 +86,8 @@ public:
         const void *response, size_t responseLen);
     int32_t NetworkTimeUpdated(int32_t indType, HRilErrNumber e, const void *response, size_t responseLen);
     int32_t NetworkTimeZoneUpdated(int32_t indType, HRilErrNumber e, const void *response, size_t responseLen);
-    int32_t NetworkImsRegStatusUpdated(int32_t indType, HRilErrNumber e, const void *response, size_t responseLen);
     int32_t NetworkPhyChnlCfgUpdated(int32_t indType, const HRilErrNumber e, const void *response, size_t responseLen);
-    int32_t NetworkCurrentCellUpdated(
-        int32_t indType, const HRilErrNumber e, const void *response, size_t responseLen);
+    int32_t NetworkCurrentCellUpdated(int32_t indType, const HRilErrNumber e, const void *response, size_t responseLen);
     void RegisterNetworkFuncs(const HRilNetworkReq *networkFuncs);
     bool IsNetworkRespOrNotify(uint32_t code);
 

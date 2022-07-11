@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -79,7 +79,6 @@ public:
     void GetRilNetworkSearchInfoTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void GetRilNetworkSelectionModeTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void GetRilPreferredNetwrokTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
-    void GetRilImsRegStatusTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void GetRilImeiTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void ShutDownTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void GetMeidTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
@@ -94,7 +93,6 @@ public:
     void DeactivateRilCmDataCallTest(const AppExecFwk::InnerEvent::Pointer &result);
     void GetRilCmDataCallListTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void SetInitialApnTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
-    void SetDataProfileInfoTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void OnProcessInput(int32_t what, const OHOS::AppExecFwk::InnerEvent::Pointer &event);
     void OnStressInput(int32_t what, const OHOS::AppExecFwk::InnerEvent::Pointer &event);
     void SimOpenLogicalChannel(const AppExecFwk::InnerEvent::Pointer &result);

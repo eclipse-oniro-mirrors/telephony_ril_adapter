@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -81,9 +81,6 @@ int32_t RilRadioIndicationTest::OnRemoteRequest(
             break;
         case HNOTI_NETWORK_SIGNAL_STRENGTH_UPDATED:
             GetSignalStrength(data);
-            break;
-        case HNOTI_NETWORK_IMS_REG_STATUS_UPDATED:
-            ChangedImsNetworkState(data);
             break;
         case HNOTI_SMS_NEW_SMS:
             NewSmsNotify(data);
@@ -377,18 +374,6 @@ void RilRadioIndicationTest::ConnectedReturnRilVersion(OHOS::MessageParcel &data
     int32_t indicationType = data.ReadInt32();
     TELEPHONY_LOGI("func :%{public}s indicationType: %{public}d", __func__, indicationType);
     auto mResult_ = AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
-}
-
-void RilRadioIndicationTest::ChangedImsNetworkState(OHOS::MessageParcel &data)
-{
-    cout << endl << "---->[NTF] ImsNetworkState: " << endl;
-    std::shared_ptr<ImsRegStatusInfo> imsState = std::make_shared<ImsRegStatusInfo>();
-    if (imsState == nullptr) {
-        TELEPHONY_LOGE("ERROR : imsState == nullptr !!!");
-        return;
-    }
-    imsState->ReadFromParcel(data);
-    cout << "====>ims reg status: " << imsState->regInfo << endl;
 }
 
 void RilRadioIndicationTest::SimRefreshNotify(OHOS::MessageParcel &data)
