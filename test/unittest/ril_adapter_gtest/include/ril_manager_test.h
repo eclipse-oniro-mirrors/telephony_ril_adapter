@@ -113,6 +113,16 @@ public:
     int32_t SetClir(int32_t action, const AppExecFwk::InnerEvent::Pointer &result);
     int32_t GetClir(const AppExecFwk::InnerEvent::Pointer &result);
     int32_t GetLinkBandwidthInfo(const int32_t cid, const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t SetDataProfileInfo(const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t UnLockPin(const std::string &pin, const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t UnLockPin2(const std::string &pin2, const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t UnLockPuk(const std::string &puk, const std::string &pin, const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t UnLockPuk2(const std::string &puk2, const std::string &pin2, const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t ChangeSimPassword(const std::string &fac, const std::string &oldPassword, const std::string &newPassword,
+        int32_t passwordLength, const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t SetSimLock(const std::string &fac, int32_t mode, const std::string &password,
+        const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t GetSimLockStatus(const std::string &fac, int32_t mode, const AppExecFwk::InnerEvent::Pointer &result);
     int32_t SetEmergencyCallList(const AppExecFwk::InnerEvent::Pointer &result);
     int32_t SetBarringPassword(const std::string &fac, const std::string &oldPwd, const std::string &newPwd,
         const AppExecFwk::InnerEvent::Pointer &result);

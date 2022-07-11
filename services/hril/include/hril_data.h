@@ -50,7 +50,9 @@ public:
     int32_t SetLinkBandwidthReportingRule(struct HdfSBuf *data);
     int32_t SetLinkBandwidthReportingRuleResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
-
+    int32_t SetDataProfileInfo(struct HdfSBuf *data);
+    int32_t SetDataProfileInfoResponse(
+        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     bool IsDataRespOrNotify(uint32_t code);
 
     bool IsDataResponse(uint32_t code);
@@ -65,6 +67,7 @@ private:
         const void *response, size_t responseLen, std::vector<SetupDataCallResultInfo> &dcResultList);
     void SwitchRilDataToHal(const HRilDataCallResponse *response, SetupDataCallResultInfo &result);
     static void RilDataCallCharToString(const char *src, std::string dst);
+    HRilDataInfo BuildDataInfo(const DataProfileDataInfo &dataProfileInfo);
 
     const HRilDataReq *dataFuncs_ = nullptr;
 };

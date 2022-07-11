@@ -140,6 +140,7 @@ typedef struct {
     void (*GetPdpContextList)(const ReqDataInfo *requestInfo);
     void (*GetLinkBandwidthInfo)(const ReqDataInfo *requestInfo, int32_t cid);
     void (*SetLinkBandwidthReportingRule)(const ReqDataInfo *requestInfo, const HRilLinkBandwidthReportingRule *data);
+    void (*SetDataProfileInfo)(const ReqDataInfo *requestInfo, const HRilDataInfo *data, int32_t len);
 } HRilDataReq;
 #ifdef __cplusplus
 }

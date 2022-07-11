@@ -87,6 +87,9 @@ int32_t RilRadioResponseTest::OnRemoteRequest(
         case HREQ_CALL_SET_MUTE:
             OnResponseNullPara("Set Mute Result", data);
             break;
+        case HREQ_DATA_SET_DATA_PROFILE_INFO:
+            OnResponseNullPara("Set Data Profile Info Result", data);
+            break;
         case HREQ_CALL_GET_MUTE:
             OnResponseGetMute(data);
             break;
