@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -52,7 +52,6 @@ void HRilCall::AddCallNotificationToMap()
 {
     // Notification
     notiMemberFuncMap_[HNOTI_CALL_STATE_UPDATED] = &HRilCall::CallStateUpdated;
-    notiMemberFuncMap_[HNOTI_CALL_IMS_SERVICE_STATUS_REPORT] = &HRilCall::CallImsServiceStatusNotice;
     notiMemberFuncMap_[HNOTI_CALL_USSD_REPORT] = &HRilCall::CallUssdNotice;
     notiMemberFuncMap_[HNOTI_CALL_SRVCC_STATUS_REPORT] = &HRilCall::CallSrvccStatusNotice;
     notiMemberFuncMap_[HNOTI_CALL_RINGBACK_VOICE_REPORT] = &HRilCall::CallRingbackVoiceNotice;
@@ -87,11 +86,8 @@ void HRilCall::AddCallResponseToMap()
     respMemberFuncMap_[HREQ_CALL_START_DTMF] = &HRilCall::StartDtmfResponse;
     respMemberFuncMap_[HREQ_CALL_SEND_DTMF] = &HRilCall::SendDtmfResponse;
     respMemberFuncMap_[HREQ_CALL_STOP_DTMF] = &HRilCall::StopDtmfResponse;
-    respMemberFuncMap_[HREQ_CALL_GET_IMS_CALL_LIST] = &HRilCall::GetImsCallListResponse;
     respMemberFuncMap_[HREQ_CALL_GET_CALL_PREFERENCE] = &HRilCall::GetCallPreferenceModeResponse;
     respMemberFuncMap_[HREQ_CALL_SET_CALL_PREFERENCE] = &HRilCall::SetCallPreferenceModeResponse;
-    respMemberFuncMap_[HREQ_CALL_GET_LTEIMSSWITCH_STATUS] = &HRilCall::GetLteImsSwitchStatusResponse;
-    respMemberFuncMap_[HREQ_CALL_SET_LTEIMSSWITCH_STATUS] = &HRilCall::SetLteImsSwitchStatusResponse;
     respMemberFuncMap_[HREQ_CALL_SET_USSD] = &HRilCall::SetUssdResponse;
     respMemberFuncMap_[HREQ_CALL_GET_USSD] = &HRilCall::GetUssdResponse;
     respMemberFuncMap_[HREQ_CALL_SET_MUTE] = &HRilCall::SetMuteResponse;
@@ -129,11 +125,8 @@ void HRilCall::AddCallRequestToMap()
     reqMemberFuncMap_[HREQ_CALL_START_DTMF] = &HRilCall::StartDtmf;
     reqMemberFuncMap_[HREQ_CALL_SEND_DTMF] = &HRilCall::SendDtmf;
     reqMemberFuncMap_[HREQ_CALL_STOP_DTMF] = &HRilCall::StopDtmf;
-    reqMemberFuncMap_[HREQ_CALL_GET_IMS_CALL_LIST] = &HRilCall::GetImsCallList;
     reqMemberFuncMap_[HREQ_CALL_GET_CALL_PREFERENCE] = &HRilCall::GetCallPreferenceMode;
     reqMemberFuncMap_[HREQ_CALL_SET_CALL_PREFERENCE] = &HRilCall::SetCallPreferenceMode;
-    reqMemberFuncMap_[HREQ_CALL_GET_LTEIMSSWITCH_STATUS] = &HRilCall::GetLteImsSwitchStatus;
-    reqMemberFuncMap_[HREQ_CALL_SET_LTEIMSSWITCH_STATUS] = &HRilCall::SetLteImsSwitchStatus;
     reqMemberFuncMap_[HREQ_CALL_SET_USSD] = &HRilCall::SetUssd;
     reqMemberFuncMap_[HREQ_CALL_GET_USSD] = &HRilCall::GetUssd;
     reqMemberFuncMap_[HREQ_CALL_SET_MUTE] = &HRilCall::SetMute;
@@ -822,27 +815,6 @@ int32_t HRilCall::SetCallTransferInfo(struct HdfSBuf *data)
     return HRIL_ERR_SUCCESS;
 }
 
-int32_t HRilCall::GetImsCallList(struct HdfSBuf *data)
-{
-    if (callFuncs_ == nullptr || callFuncs_->GetImsCallList == nullptr || data == nullptr) {
-        TELEPHONY_LOGE(
-            "callFuncs_:%{public}p or callFuncs_->GetImsCallList or data:%{public}p is nullptr!", callFuncs_, data);
-        return HRIL_ERR_NULL_POINT;
-    }
-    int32_t serial = 0;
-    if (!HdfSbufReadInt32(data, &serial)) {
-        TELEPHONY_LOGE("miss serial parameter");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_CALL_GET_IMS_CALL_LIST);
-    if (requestInfo == nullptr) {
-        TELEPHONY_LOGE("RilAdapter failed to do Create GetCallList HRilRequest!");
-        return HRIL_ERR_NULL_POINT;
-    }
-    callFuncs_->GetImsCallList(requestInfo);
-    return HRIL_ERR_SUCCESS;
-}
-
 int32_t HRilCall::GetCallPreferenceMode(struct HdfSBuf *data)
 {
     if (callFuncs_ == nullptr || callFuncs_->GetCallPreferenceMode == nullptr || data == nullptr) {
@@ -887,53 +859,6 @@ int32_t HRilCall::SetCallPreferenceMode(struct HdfSBuf *data)
         return HRIL_ERR_NULL_POINT;
     }
     callFuncs_->SetCallPreferenceMode(requestInfo, mode);
-    return HRIL_ERR_SUCCESS;
-}
-
-int32_t HRilCall::GetLteImsSwitchStatus(struct HdfSBuf *data)
-{
-    if (callFuncs_ == nullptr || callFuncs_->GetLteImsSwitchStatus == nullptr || data == nullptr) {
-        TELEPHONY_LOGE("callFuncs_:%{public}p or callFuncs_->GetLteImsSwitchStatus or data:%{public}p is nullptr!",
-            callFuncs_, data);
-        return HRIL_ERR_NULL_POINT;
-    }
-    int32_t serial = 0;
-    if (!HdfSbufReadInt32(data, &serial)) {
-        TELEPHONY_LOGE("miss serial parameter");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_CALL_GET_LTEIMSSWITCH_STATUS);
-    if (requestInfo == nullptr) {
-        TELEPHONY_LOGE("RilAdapter failed to do Create HRilRequest!");
-        return HRIL_ERR_NULL_POINT;
-    }
-    callFuncs_->GetLteImsSwitchStatus(requestInfo);
-    return HRIL_ERR_SUCCESS;
-}
-
-int32_t HRilCall::SetLteImsSwitchStatus(struct HdfSBuf *data)
-{
-    if (callFuncs_ == nullptr || callFuncs_->SetLteImsSwitchStatus == nullptr || data == nullptr) {
-        TELEPHONY_LOGE("callFuncs_:%{public}p or callFuncs_->SetLteImsSwitchStatus or data:%{public}p is nullptr!",
-            callFuncs_, data);
-        return HRIL_ERR_NULL_POINT;
-    }
-    int32_t active = 0;
-    int32_t serial = 0;
-    if (!HdfSbufReadInt32(data, &serial)) {
-        TELEPHONY_LOGE("miss serial parameter");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    if (!HdfSbufReadInt32(data, &active)) {
-        TELEPHONY_LOGE("miss mode parameter");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_CALL_SET_LTEIMSSWITCH_STATUS);
-    if (requestInfo == nullptr) {
-        TELEPHONY_LOGE("RilAdapter failed to do Create HRilRequest!");
-        return HRIL_ERR_NULL_POINT;
-    }
-    callFuncs_->SetLteImsSwitchStatus(requestInfo, active);
     return HRIL_ERR_SUCCESS;
 }
 
@@ -1200,20 +1125,6 @@ int32_t HRilCall::StopDtmfResponse(
     return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));
 }
 
-int32_t HRilCall::GetImsCallListResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
-{
-    if ((response == nullptr && responseLen != 0) || (responseLen % sizeof(HRilCallInfo)) != 0) {
-        TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    CallInfoList callList = {};
-    if (response != nullptr) {
-        BuildCallList(callList, responseInfo, response, responseLen);
-    }
-    return ResponseMessageParcel(responseInfo, callList, requestNum);
-}
-
 int32_t HRilCall::GetCallPreferenceModeResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
@@ -1229,26 +1140,6 @@ int32_t HRilCall::GetCallPreferenceModeResponse(
 }
 
 int32_t HRilCall::SetCallPreferenceModeResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
-{
-    return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));
-}
-
-int32_t HRilCall::GetLteImsSwitchStatusResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
-{
-    if ((response == nullptr && responseLen != 0) || (responseLen % sizeof(int32_t)) != 0) {
-        TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    int32_t active = 0;
-    if (response != nullptr) {
-        active = *((int32_t *)response);
-    }
-    return ResponseInt32(requestNum, &responseInfo, sizeof(responseInfo), active);
-}
-
-int32_t HRilCall::SetLteImsSwitchStatusResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));
@@ -1581,26 +1472,6 @@ int32_t HRilCall::CallStateUpdated(int32_t notifyType, const HRilErrNumber e, co
     }
     HdfSbufRecycle(dataSbuf);
     return HRIL_ERR_SUCCESS;
-}
-
-int32_t HRilCall::CallImsServiceStatusNotice(
-    int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen)
-{
-    if ((response == nullptr) || (responseLen % sizeof(HRilImsServiceStatus)) != 0) {
-        TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    CallImsServiceStatus imsServiceStatusInfo = {};
-    const HRilImsServiceStatus *hImsServiceStatusInfo = reinterpret_cast<const HRilImsServiceStatus *>(response);
-    imsServiceStatusInfo.smsSrvStatus = hImsServiceStatusInfo->smsSrvStatus;
-    imsServiceStatusInfo.smsSrvRat = hImsServiceStatusInfo->smsSrvRat;
-    imsServiceStatusInfo.voipSrvStatus = hImsServiceStatusInfo->voipSrvStatus;
-    imsServiceStatusInfo.voipSrvRat = hImsServiceStatusInfo->voipSrvRat;
-    imsServiceStatusInfo.vtSrvStatus = hImsServiceStatusInfo->vtSrvStatus;
-    imsServiceStatusInfo.vtSrvRat = hImsServiceStatusInfo->vtSrvRat;
-    imsServiceStatusInfo.vsSrvStatus = hImsServiceStatusInfo->vsSrvStatus;
-    imsServiceStatusInfo.vsSrvRat = hImsServiceStatusInfo->vsSrvRat;
-    return NotifyMessageParcel(notifyType, imsServiceStatusInfo, HNOTI_CALL_IMS_SERVICE_STATUS_REPORT);
 }
 
 int32_t HRilCall::CallUssdNotice(int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -143,12 +143,6 @@ typedef struct {
 } HRilChannelConfigList;
 
 typedef struct {
-    int32_t notifyType;
-    int32_t regInfo;
-    int32_t extInfo;
-} HRilImsRegStatusInfo;
-
-typedef struct {
     char *longName;
     char *shortName;
     char *numeric;
@@ -289,7 +283,6 @@ typedef struct {
 } HRilRadioCapability;
 
 typedef struct {
-    void (*GetImsRegStatus)(const ReqDataInfo *requestInfo);
     void (*GetSignalStrength)(const ReqDataInfo *requestInfo);
     void (*GetCsRegStatus)(const ReqDataInfo *requestInfo);
     void (*GetPsRegStatus)(const ReqDataInfo *requestInfo);

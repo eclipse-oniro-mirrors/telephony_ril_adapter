@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -48,7 +48,6 @@ public:
     void UpdatedSimFile(OHOS::MessageParcel &data);
     void SimStateChanged(OHOS::MessageParcel &data);
     void ConnectedReturnRilVersion(OHOS::MessageParcel &data);
-    void ChangedImsNetworkState(OHOS::MessageParcel &data);
     void CallSsReport(OHOS::MessageParcel &data);
     void SimRefreshNotify(OHOS::MessageParcel &data);
 
