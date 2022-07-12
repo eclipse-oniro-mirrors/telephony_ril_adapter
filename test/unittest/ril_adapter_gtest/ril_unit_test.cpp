@@ -953,58 +953,72 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetRilCmRadioPowerTest_0100, Function
 
 HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetUssdTest_0100, Function | MediumTest | Level3)
 {
+#ifdef TEL_TEST_PIN_PUK
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_SET_USSD);
     event->SetOwner(GetHandler());
     OnProcessTest(HREQ_CALL_SET_USSD, event);
+#endif
 }
 
 HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetUssdTest_0100, Function | MediumTest | Level3)
 {
+#ifdef TEL_TEST_PIN_PUK
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_GET_USSD);
     event->SetOwner(GetHandler());
     OnProcessTest(HREQ_CALL_GET_USSD, event);
+#endif
 }
 
 HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetClipTest_0100, Function | MediumTest | Level3)
 {
+#ifdef TEL_TEST_PIN_PUK
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_SET_CLIP);
     event->SetOwner(GetHandler());
     OnProcessTest(HREQ_CALL_SET_CLIP, event);
+#endif
 }
 
 HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetClipTest_0100, Function | MediumTest | Level3)
 {
+#ifdef TEL_TEST_PIN_PUK
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_GET_CLIP);
     event->SetOwner(GetHandler());
     OnProcessTest(HREQ_CALL_GET_CLIP, event);
+#endif
 }
 
 HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetCallWaitingTest_0100, Function | MediumTest | Level3)
 {
+#ifdef TEL_TEST_PIN_PUK
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_SET_CALL_WAITING);
     event->SetOwner(GetHandler());
     OnProcessTest(HREQ_CALL_SET_CALL_WAITING, event);
+#endif
 }
 
 HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetCallWaitingTest_0100, Function | MediumTest | Level3)
 {
+#ifdef TEL_TEST_PIN_PUK
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_GET_CALL_WAITING);
     event->SetOwner(GetHandler());
     OnProcessTest(HREQ_CALL_GET_CALL_WAITING, event);
+#endif
 }
 
 HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetCallRestrictionTest_0100, Function | MediumTest | Level3)
 {
+#ifdef TEL_TEST_PIN_PUK
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_SET_CALL_RESTRICTION);
     event->SetOwner(GetHandler());
     OnProcessTest(HREQ_CALL_SET_CALL_RESTRICTION, event);
+#endif
 }
 
 HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetCallRestrictionTest_0100, Function | MediumTest | Level3)
