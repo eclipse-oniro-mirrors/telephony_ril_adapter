@@ -2081,50 +2081,14 @@ void ReqSetNotificationFilter(const ReqDataInfo *requestInfo, const int32_t *new
         TELEPHONY_LOGE("ReqSetNotificationFilter requestInfo is NULL");
         return;
     }
-    struct ReportInfo reportInfo = {};
     if (newFilter == NULL) {
-        reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_PARAMETER, HRIL_RESPONSE, 0);
+        struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_PARAMETER, HRIL_RESPONSE, 0);
         OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 0);
-        return;
-    }
-    int32_t filter = *(int32_t *)newFilter;
-    // Currently only support the control for network state
-    bool setNotificationOn = (filter & NOTIFICATION_FILTER_NETWORK_STATE) == NOTIFICATION_FILTER_NETWORK_STATE;
-    char *csCommand = setNotificationOn ? "AT+CREG=2" : "AT+CREG=0";
-    char *psCommand = setNotificationOn ? "AT+CGREG=2" : "AT+CGREG=0";
-    int32_t err = SendNotificationFilterCommand(requestInfo, reportInfo, csCommand);
-    if (err != HRIL_ERR_SUCCESS) {
-        TELEPHONY_LOGE("ReqSetCsNotificationFilter fail!!!");
-        return;
-    }
-    err = SendNotificationFilterCommand(requestInfo, reportInfo, psCommand);
-    if (err != HRIL_ERR_SUCCESS) {
-        TELEPHONY_LOGE("ReqSetPsNotificationFilter fail!!!");
         return;
     }
     TELEPHONY_LOGI("ReqSetNotificationFilter success");
-    reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
     OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 0);
-}
-
-int32_t SendNotificationFilterCommand(const ReqDataInfo *requestInfo, struct ReportInfo reportInfo, const char *command)
-{
-    ResponseInfo *responseInfo = NULL;
-    int32_t err = SendCommandLock(command, NULL, 0, &responseInfo);
-    if (responseInfo == NULL) {
-        reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
-        OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 0);
-        TELEPHONY_LOGE("SendNotificationFilterCommand(%{public}s) responseInfo == NULL", command);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    if (err != 0 || responseInfo->success == 0) {
-        err = GetResponseErrorCode(responseInfo);
-        TELEPHONY_LOGE("SendNotificationFilterCommand(%{public}s) errcode = %{public}d", command, err);
-        reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-        OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 0);
-    }
-    FreeResponseInfo(responseInfo);
-    return err;
 }
 
 void ReqSetDeviceState(const ReqDataInfo *requestInfo, const int32_t *deviceStateType, const int32_t *deviceStateOn)
