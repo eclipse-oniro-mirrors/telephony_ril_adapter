@@ -413,7 +413,7 @@ int32_t HRilData::SetLinkBandwidthReportingRuleResponse(
 int32_t HRilData::PdpContextListUpdated(
     int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen)
 {
-    if ((response == nullptr) || (responseLen % sizeof(HRilEmergencyInfo)) != 0) {
+    if ((response == nullptr) || (responseLen % sizeof(HRilDataCallResponse)) != 0) {
         TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
         return HRIL_ERR_INVALID_PARAMETER;
     }

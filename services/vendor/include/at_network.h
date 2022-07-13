@@ -84,6 +84,4 @@ int32_t ParseOperListInfo(
     const char *lineInfo, int32_t count, AvailableOperInfo *pOperInfo, AvailableOperInfo **ppOperInfo);
 void NotifyNetWorkTime(int32_t slotId);
 void GetNetworkSearchInformationPause(void);
-int32_t SendNotificationFilterCommand(
-    const ReqDataInfo *requestInfo, struct ReportInfo reportInfo, const char *command);
 #endif
