@@ -42,7 +42,7 @@ ohos_shared_library("hril") {
 
   defines += [
     "TELEPHONY_LOG_TAG = \"Hril\"",
-    "LOG_DOMAIN = 0xD002B01",
+    "LOG_DOMAIN = 0xD001F08",
   ]
 
   deps = [

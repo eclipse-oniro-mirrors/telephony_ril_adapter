@@ -51,8 +51,8 @@ ohos_shared_library("hril_innerkits") {
   ]
 
   defines = [
-    "TELEPHONY_LOG_TAG = \"Hril\"",
-    "LOG_DOMAIN = 0xD002B01",
+    "TELEPHONY_LOG_TAG = \"HrilInnerkits\"",
+    "LOG_DOMAIN = 0xD001F08",
   ]
 
   external_deps = [ "utils_base:utils" ]

@@ -33,8 +33,8 @@ ohos_shared_library("ril_vendor") {
   include_dirs = [ "$RIL_ADAPTER/services/vendor/include" ]
   configs = [ "$RIL_ADAPTER/utils:utils_config" ]
   defines += [
-    "LOG_TAG = \"RilVendor\"",
-    "LOG_DOMAIN = 0xD002B01",
+    "TELEPHONY_LOG_TAG = \"RilVendor\"",
+    "LOG_DOMAIN = 0xD001F08",
   ]
   deps = [
     "//base/telephony/ril_adapter/interfaces/innerkits:hril_innerkits",
