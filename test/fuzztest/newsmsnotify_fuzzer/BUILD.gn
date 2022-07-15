@@ -40,7 +40,10 @@ ohos_fuzztest("NewSmsNotifyFuzzTest") {
     "power_manager_native:powermgr_client",
     "samgr_standard:samgr_proxy",
   ]
-
+  defines += [
+    "TELEPHONY_LOG_TAG = \"RilAdapterFuzzTest\"",
+    "LOG_DOMAIN = 0xD000F00",
+  ]
   cflags = [
     "-g",
     "-O0",

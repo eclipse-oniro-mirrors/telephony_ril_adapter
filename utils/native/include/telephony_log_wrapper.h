@@ -23,7 +23,7 @@
 namespace OHOS {
 namespace Telephony {
 #ifndef LOG_DOMAIN
-#define LOG_DOMAIN 0xD002B01
+#define LOG_DOMAIN 0xD001F00
 #endif
 #ifndef TELEPHONY_LOG_TAG
 #define TELEPHONY_LOG_TAG "TelephonySubsystem"
