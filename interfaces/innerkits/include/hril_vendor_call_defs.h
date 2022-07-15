@@ -260,8 +260,11 @@ typedef struct {
     void (*StartDtmf)(const ReqDataInfo *requestInfo, CallDtmfInfo info);
     void (*SendDtmf)(const ReqDataInfo *requestInfo, CallDtmfInfo info);
     void (*StopDtmf)(const ReqDataInfo *requestInfo, CallDtmfInfo info);
+    void (*GetImsCallList)(const ReqDataInfo *requestInfo);
     void (*GetCallPreferenceMode)(const ReqDataInfo *requestInfo);
     void (*SetCallPreferenceMode)(const ReqDataInfo *requestInfo, int32_t mode);
+    void (*GetLteImsSwitchStatus)(const ReqDataInfo *requestInfo);
+    void (*SetLteImsSwitchStatus)(const ReqDataInfo *requestInfo, int32_t active);
     void (*SetUssd)(const ReqDataInfo *requestInfo, const char *str);
     void (*GetUssd)(const ReqDataInfo *requestInfo);
     void (*SetMute)(const ReqDataInfo *requestInfo, int32_t mute);

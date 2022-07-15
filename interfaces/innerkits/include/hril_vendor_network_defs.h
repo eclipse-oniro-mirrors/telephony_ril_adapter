@@ -143,6 +143,12 @@ typedef struct {
 } HRilChannelConfigList;
 
 typedef struct {
+    int32_t notifyType;
+    int32_t regInfo;
+    int32_t extInfo;
+} HRilImsRegStatusInfo;
+
+typedef struct {
     char *longName;
     char *shortName;
     char *numeric;
@@ -283,6 +289,7 @@ typedef struct {
 } HRilRadioCapability;
 
 typedef struct {
+    void (*GetImsRegStatus)(const ReqDataInfo *requestInfo);
     void (*GetSignalStrength)(const ReqDataInfo *requestInfo);
     void (*GetCsRegStatus)(const ReqDataInfo *requestInfo);
     void (*GetPsRegStatus)(const ReqDataInfo *requestInfo);
