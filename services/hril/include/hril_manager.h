@@ -27,7 +27,7 @@
 #include "hril_sim.h"
 #include "hril_sms.h"
 #include "hril_timer_callback.h"
-#include "power_mgr_client.h"
+#include "v1_0/ipower_interface.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -40,10 +40,9 @@ class HRilManager : public IHRilReporter {
 public:
     HRilManager();
     virtual ~HRilManager();
-
+    sptr<OHOS::HDI::Power::V1_0::IPowerInterface> powerInterface_ { nullptr };
     std::unique_ptr<HRilTimerCallback> timerCallback_ = nullptr;
     std::unique_ptr<std::thread> eventLoop_ = nullptr;
-    std::shared_ptr<PowerMgr::RunningLock> runningLock_ = nullptr;
     static const uint32_t RUNNING_LOCK_DEFAULT_TIMEOUT_S = 60; // 60s
     std::mutex mutexRunningLock_;
     std::atomic_uint runningLockCount_ = 0;
