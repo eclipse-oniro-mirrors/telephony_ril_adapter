@@ -16,8 +16,6 @@
 #ifndef OHOS_RIL_RADIO_RESPONSE_test_H
 #define OHOS_RIL_RADIO_RESPONSE_test_H
 
-#include <iservice_registry.h>
-
 #include "ril_manager_test.h"
 
 namespace OHOS {

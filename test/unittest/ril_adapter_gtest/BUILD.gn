@@ -32,7 +32,6 @@ ohos_unittest("tel_ril_adapter_gtest") {
 
   include_dirs = [
     "//base/telephony/ril_adapter/services/hril/include",
-    "//base/telephony/core_service/utils/common/include",
     "//utils/native/base/include",
     "//third_party/json/include",
     "//drivers/hdf_core/adapter/uhdf2/include/hdi",
@@ -43,7 +42,6 @@ ohos_unittest("tel_ril_adapter_gtest") {
     "$RIL_ADAPTER/services/hril:hril",
     "$RIL_ADAPTER/services/vendor:ril_vendor",
     "$hdf_uhdf_path/hdi:libhdi",
-    "//base/telephony/core_service:tel_core_service",
     "//drivers/hdf_core/adapter/uhdf2/host:libhdf_host",
     "//drivers/hdf_core/adapter/uhdf2/ipc:libhdf_ipc_adapter",
     "//drivers/hdf_core/adapter/uhdf2/utils:libhdf_utils",
@@ -52,12 +50,9 @@ ohos_unittest("tel_ril_adapter_gtest") {
   ]
 
   external_deps = [
-    "common_event_service:cesfwk_innerkits",
     "eventhandler:libeventhandler",
     "ipc:ipc_core",
     "ril_adapter:hril_innerkits",
-    "safwk:system_ability_fwk",
-    "samgr_standard:samgr_proxy",
   ]
 
   defines = [
