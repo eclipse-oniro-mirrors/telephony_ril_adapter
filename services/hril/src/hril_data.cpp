@@ -252,7 +252,7 @@ int32_t HRilData::SetDataProfileInfo(struct HdfSBuf *data)
         return HRIL_ERR_INVALID_PARAMETER;
     }
     int32_t size = dataProfilesInfo.profilesSize;
-    if (size <= 0 || size != dataProfilesInfo.profiles.size()) {
+    if (size <= 0 || size != static_cast<int32_t>(dataProfilesInfo.profiles.size())) {
         TELEPHONY_LOGE("RilAdapter failed to do ReadFromParcel!");
         return HRIL_ERR_INVALID_PARAMETER;
     }
