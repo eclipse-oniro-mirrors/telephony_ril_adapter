@@ -51,7 +51,7 @@ ohos_executable("ril_adapter_test") {
     "ril_adapter:hril_innerkits",
   ]
 
-  public_deps = [ "//utils/native/base:utils" ]
+  public_deps = [ "//commonlibrary/c_utils/base:utils" ]
 
   if (is_standard_system) {
     external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
