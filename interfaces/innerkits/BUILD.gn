@@ -63,6 +63,6 @@ ohos_shared_library("hril_innerkits") {
     external_deps += [ "hilog:libhilog" ]
   }
 
-  part_name = "ril_adapter"
+  part_name = "drivers_interface_ril"
   subsystem_name = "telephony"
 }
