@@ -84,7 +84,7 @@ int32_t NextBool(char **s, char *out);
 
 int32_t ParseReportError(char *str);
 
-uint64_t NextULongFromHex(char **s, uint64_t *out);
+int32_t NextULongFromHex(char **s, uint64_t *out);
 
 ModemReportErrorInfo GetReportErrorInfo(const ResponseInfo *response);
 
