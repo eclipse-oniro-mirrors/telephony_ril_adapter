@@ -30,6 +30,7 @@
 #define G_RESP_SUCCESS 2
 #define G_RESP_SMS_NOTIFY 3
 const int32_t G_CHAR_TO_INT = 10;
+static const int32_t ERR = -1;
 static const char *g_respErrors[G_RESP_ERRORS] = {
     "ERROR", "NO ANSWER", "+CME ERROR:", "NO CARRIER", "NO DIALTONE", "+CMS ERROR:", "COMMAND NOT SUPPORT"};
 
@@ -137,12 +138,12 @@ int32_t SkipATPrefix(char **s)
 {
     if (s == NULL || *s == NULL) {
         TELEPHONY_LOGE("str parameter is null.");
-        return -1;
+        return ERR;
     }
     *s = strchr(*s, ':');
     if (*s == NULL) {
         TELEPHONY_LOGE("str parameter is null.");
-        return -1;
+        return ERR;
     }
     (*s)++;
     return 0;
@@ -165,12 +166,12 @@ int32_t NextInt(char **s, int32_t *out)
     char *end = NULL;
     if (s == NULL || *s == NULL || out == NULL) {
         TELEPHONY_LOGE("str parameter is null.");
-        return -1;
+        return ERR;
     }
     SkipSpace(s);
     if (*s == NULL) {
         TELEPHONY_LOGE("str parameter is null, after skip space.");
-        return -1;
+        return ERR;
     }
     ret = strsep(s, ",");
     while (*s != NULL && **s == ',') {
@@ -179,7 +180,7 @@ int32_t NextInt(char **s, int32_t *out)
     *out = (int32_t)strtol(ret, &end, HRIL_DEC);
     if (ret == end) {
         TELEPHONY_LOGE("strtol is fail, err:%{public}d", *out);
-        return -1;
+        return ERR;
     }
     return 0;
 }
@@ -190,12 +191,12 @@ int64_t NextInt64(char **s, int64_t *out)
     char *end = NULL;
     if (s == NULL || *s == NULL || out == NULL) {
         TELEPHONY_LOGE("str parameter is null.");
-        return -1;
+        return ERR;
     }
     SkipSpace(s);
     if (*s == NULL) {
         TELEPHONY_LOGE("str parameter is null, after skip space.");
-        return -1;
+        return ERR;
     }
     ret = strsep(s, ",");
     while (*s != NULL && **s == ',') {
@@ -204,7 +205,7 @@ int64_t NextInt64(char **s, int64_t *out)
     *out = (int64_t)strtoll(ret, &end, HRIL_DEC);
     if (ret == end) {
         TELEPHONY_LOGE("NextInt64 strtoll is fail");
-        return -1;
+        return ERR;
     }
     return 0;
 }
@@ -215,18 +216,18 @@ int32_t NextIntNotSkipNextComma(char **s, int32_t *out)
     char *end = NULL;
     if (s == NULL || *s == NULL || out == NULL) {
         TELEPHONY_LOGE("str parameter is null.");
-        return -1;
+        return ERR;
     }
     SkipSpace(s);
     if (*s == NULL) {
         TELEPHONY_LOGE("str parameter is null, after skip space.");
-        return -1;
+        return ERR;
     }
     ret = strsep(s, ",");
     *out = (int32_t)strtol(ret, &end, HRIL_DEC);
     if (ret == end) {
         TELEPHONY_LOGE("strtol is fail, err:%{public}d", *out);
-        return -1;
+        return ERR;
     }
     return 0;
 }
@@ -237,12 +238,12 @@ int32_t NextIntByRightBracket(char **s, int32_t *out)
     char *end = NULL;
     if (s == NULL || *s == NULL || out == NULL) {
         TELEPHONY_LOGE("str parameter is null.");
-        return -1;
+        return ERR;
     }
     SkipSpace(s);
     if (*s == NULL) {
         TELEPHONY_LOGE("str parameter is null, after skip space.");
-        return -1;
+        return ERR;
     }
     ret = strsep(s, ")");
     while (*s != NULL && **s == ')') {
@@ -251,7 +252,7 @@ int32_t NextIntByRightBracket(char **s, int32_t *out)
     *out = (int32_t)strtol(ret, &end, HRIL_DEC);
     if (ret == end) {
         TELEPHONY_LOGE("strtol is fail, err:%{public}d", *out);
-        return -1;
+        return ERR;
     }
     return 0;
 }
@@ -276,12 +277,12 @@ int32_t NextIntFromHex(char **s, int32_t *out)
     char *end = NULL;
     if (s == NULL || *s == NULL || out == NULL) {
         TELEPHONY_LOGE("str parameter is null.");
-        return -1;
+        return ERR;
     }
     SkipSpace(s);
     if (*s == NULL) {
         TELEPHONY_LOGE("str parameter is null, after skip space.");
-        return -1;
+        return ERR;
     } else if (**s == '"') {
         (*s)++;
         ret = strsep(s, "\"");
@@ -292,23 +293,23 @@ int32_t NextIntFromHex(char **s, int32_t *out)
     *out = (int32_t)strtol(ret, &end, HRIL_HEX);
     if (ret == end) {
         TELEPHONY_LOGE("strtol is fail, err:%{public}d", *out);
-        return -1;
+        return ERR;
     }
     return 0;
 }
 
-uint64_t NextULongFromHex(char **s, uint64_t *out)
+int32_t NextULongFromHex(char **s, uint64_t *out)
 {
     char *ret = NULL;
     char *end = NULL;
     if (s == NULL || *s == NULL || out == NULL) {
         TELEPHONY_LOGE("str parameter is null.");
-        return -1;
+        return ERR;
     }
     SkipSpace(s);
     if (*s == NULL) {
         TELEPHONY_LOGE("str parameter is null, after skip space.");
-        return -1;
+        return ERR;
     } else if (**s == '"') {
         (*s)++;
         ret = strsep(s, "\"");
@@ -319,7 +320,7 @@ uint64_t NextULongFromHex(char **s, uint64_t *out)
     *out = (uint64_t)strtoul(ret, &end, HRIL_HEX);
     if (ret == end) {
         TELEPHONY_LOGE("strtoul is fail");
-        return -1;
+        return ERR;
     }
     return 0;
 }
@@ -328,12 +329,12 @@ int32_t NextStr(char **s, char **out)
 {
     if (s == NULL || *s == NULL || out == NULL) {
         TELEPHONY_LOGE("str parameter is null.");
-        return -1;
+        return ERR;
     }
     SkipSpace(s);
     if (*s == NULL) {
         TELEPHONY_LOGE("str parameter is null, after skip space.");
-        return -1;
+        return ERR;
     } else if (**s == '"') {
         (*s)++;
         *out = strsep(s, "\"");
@@ -351,12 +352,12 @@ int32_t NextTxtStr(char **s, char **out)
 {
     if (s == NULL || *s == NULL || out == NULL) {
         TELEPHONY_LOGE("str parameter is null.");
-        return -1;
+        return ERR;
     }
     SkipSpace(s);
     if (*s == NULL) {
         TELEPHONY_LOGE("str parameter is null, after skip space.");
-        return -1;
+        return ERR;
     } else {
         *out = strsep(s, " ");
     }
@@ -366,24 +367,23 @@ int32_t NextTxtStr(char **s, char **out)
 int32_t NextBool(char **s, char *out)
 {
     int32_t ret;
-    int32_t result;
+    int32_t value;
 
     if (*s == NULL) {
         TELEPHONY_LOGE("str parameter is null.");
-        return -1;
+        return ERR;
     }
-    ret = NextInt(s, &result);
+    ret = NextInt(s, &value);
     if (ret < 0) {
         TELEPHONY_LOGE("NextInt is fail, ret:%{public}d", ret);
-        return -1;
+        return ERR;
     }
-    // booleans should be 0 or 1
-    if (!(result == 0 || result == 1)) {
-        TELEPHONY_LOGE("booleans should be 0 or 1, result:%{public}d", result);
-        return -1;
+    if (!(value == 0 || value == 1)) {
+        TELEPHONY_LOGE("Bool should be 0 or 1, value:%{public}d", value);
+        return ERR;
     }
     if (out != NULL) {
-        *out = (char)result;
+        *out = (char)value;
     }
     return ret;
 }
@@ -471,10 +471,10 @@ int32_t FindCommaCharNum(const char *srcStr)
     char *str = (char *)srcStr;
     if (str == NULL) {
         TELEPHONY_LOGE("srcStr parameter is null.");
-        return -1;
+        return ERR;
     }
     if (*str == '\0') {
-        return -1;
+        return ERR;
     }
     int32_t charNum = 0;
     while (*str != '\0') {

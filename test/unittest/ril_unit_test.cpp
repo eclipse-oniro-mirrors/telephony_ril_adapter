@@ -1018,7 +1018,7 @@ void RilUnitTest::OnInitStressInterface()
     stressMemberFuncMap_[HREQ_MODEM_SET_RADIO_STATUS] = &RilUnitTest::SetRilCmRadioPowerStressTest;
 }
 
-void RilUnitTest::OnInitProcessInterface()
+void RilUnitTest::OnInitCallProcessInterface()
 {
     // call
     memberFuncMap_[HREQ_CALL_GET_CALL_LIST] = &RilUnitTest::GetCallListTest;
@@ -1047,14 +1047,20 @@ void RilUnitTest::OnInitProcessInterface()
     memberFuncMap_[HREQ_CALL_SET_EMERGENCY_LIST] = &RilUnitTest::SetEmergencyCallListTest;
     memberFuncMap_[HREQ_CALL_GET_FAIL_REASON] = &RilUnitTest::GetFailReasonTest;
     memberFuncMap_[HREQ_CALL_SET_BARRING_PASSWORD] = &RilUnitTest::SetBarringPasswordTest;
+}
 
+void RilUnitTest::OnInitSmsProcessInterface()
+{
     // sms
     memberFuncMap_[HREQ_SMS_SEND_GSM_SMS] = &RilUnitTest::SendRilCmSmsTest;
     memberFuncMap_[HREQ_SMS_SEND_SMS_MORE_MODE] = &RilUnitTest::SendRilCmSmsMoreModeTest;
     memberFuncMap_[HREQ_SMS_SEND_SMS_ACK] = &RilUnitTest::SendSmsAckTest;
     memberFuncMap_[HREQ_SMS_SET_SMSC_ADDR] = &RilUnitTest::SetSmscAddrTest;
     memberFuncMap_[HREQ_SMS_GET_SMSC_ADDR] = &RilUnitTest::GetSmscAddrTest;
+}
 
+void RilUnitTest::OnInitSimProcessInterface()
+{
     // sim
     memberFuncMap_[HREQ_SIM_GET_SIM_STATUS] = &RilUnitTest::GetRilCmIccCardStatusTest;
     memberFuncMap_[HREQ_SIM_GET_IMSI] = &RilUnitTest::GetRilCmImsiForAppTest;
@@ -1073,7 +1079,10 @@ void RilUnitTest::OnInitProcessInterface()
     memberFuncMap_[HREQ_SIM_CHANGE_SIM_PASSWORD] = &RilUnitTest::ChangeSimPasswordTest;
     memberFuncMap_[HREQ_SIM_SET_SIM_LOCK] = &RilUnitTest::SetSimLockTest;
     memberFuncMap_[HREQ_SIM_GET_SIM_LOCK_STATUS] = &RilUnitTest::GetSimLockStatusTest;
+}
 
+void RilUnitTest::OnInitDataProcessInterface()
+{
     // data
     memberFuncMap_[HREQ_DATA_ACTIVATE_PDP_CONTEXT] = &RilUnitTest::SetupRilCmDataCallTest;
     memberFuncMap_[HREQ_DATA_DEACTIVATE_PDP_CONTEXT] = &RilUnitTest::DeactivateRilCmDataCallTest;
@@ -1081,7 +1090,10 @@ void RilUnitTest::OnInitProcessInterface()
     memberFuncMap_[HREQ_DATA_SET_DATA_PROFILE_INFO] = &RilUnitTest::SetDataProfileInfoTest;
     memberFuncMap_[HREQ_DATA_GET_PDP_CONTEXT_LIST] = &RilUnitTest::GetRilCmDataCallListTest;
     memberFuncMap_[HREQ_DATA_SET_INIT_APN_INFO] = &RilUnitTest::SetInitialApnTest;
+}
 
+void RilUnitTest::OnInitNetworkProcessInterface()
+{
     // network
     memberFuncMap_[HREQ_NETWORK_GET_SIGNAL_STRENGTH] = &RilUnitTest::GetRilCmSignalIntensityTest;
     memberFuncMap_[HREQ_NETWORK_GET_CS_REG_STATUS] = &RilUnitTest::GetRilCmCsRegStatusTest;
@@ -1098,7 +1110,10 @@ void RilUnitTest::OnInitProcessInterface()
     memberFuncMap_[HREQ_NETWORK_SET_LOCATE_UPDATES] = &RilUnitTest::SetRilLocationUpdateTest;
     memberFuncMap_[HREQ_NETWORK_SET_NOTIFICATION_FILTER] = &RilUnitTest::SetRilNotificationFilterTest;
     memberFuncMap_[HREQ_NETWORK_SET_DEVICE_STATE] = &RilUnitTest::SetRilDeviceStateTest;
+}
 
+void RilUnitTest::OnInitModemProcessInterface()
+{
     // modem
     memberFuncMap_[HREQ_MODEM_SHUT_DOWN] = &RilUnitTest::ShutDownTest;
     memberFuncMap_[HREQ_MODEM_SET_RADIO_STATUS] = &RilUnitTest::SetRilCmRadioPowerTest;
@@ -1109,12 +1124,21 @@ void RilUnitTest::OnInitProcessInterface()
     memberFuncMap_[HREQ_MODEM_GET_BASEBAND_VERSION] = &RilUnitTest::GetBasebandVersionTest;
 }
 
+void RilUnitTest::OnInitProcessInterface()
+{
+    OnInitCallProcessInterface();
+    OnInitSmsProcessInterface();
+    OnInitSimProcessInterface();
+    OnInitDataProcessInterface();
+    OnInitNetworkProcessInterface();
+    OnInitModemProcessInterface();
+}
+
 void RilUnitTest::OnInitInterface()
 {
     OnInitStressInterface();
     OnInitProcessInterface();
 }
-
 } // namespace
 } // namespace Telephony
 } // namespace OHOS

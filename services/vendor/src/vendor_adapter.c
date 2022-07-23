@@ -186,12 +186,16 @@ int32_t SetRadioState(HRilRadioState newState, int32_t rst)
         pthread_cond_signal(&g_statusCond);
         return -1;
     }
+
     pthread_mutex_lock(&g_statusMutex);
     oldState = g_radioState;
-    if (oldState != newState || g_atStatus > 0) {
-        g_radioState = newState;
-        pthread_cond_broadcast(&g_statusCond);
+    if (oldState == newState) {
+        TELEPHONY_LOGE("now then is same state");
+        pthread_mutex_unlock(&g_statusMutex);
+        return HRIL_ERR_REPEAT_STATUS;
     }
+    g_radioState = newState;
+    pthread_cond_broadcast(&g_statusCond);
     pthread_mutex_unlock(&g_statusMutex);
 
     if (oldState != g_radioState) {
@@ -202,9 +206,6 @@ int32_t SetRadioState(HRilRadioState newState, int32_t rst)
             FreeResponseInfo(pResponse);
             return -1;
         }
-    } else {
-        TELEPHONY_LOGE("now then is same state");
-        return HRIL_ERR_REPEAT_STATUS;
     }
 
     FreeResponseInfo(pResponse);
@@ -322,20 +323,19 @@ static void EventListeners(void)
 
     TELEPHONY_LOGI("opening AT interface %{public}s", devicePath);
     AtSetOnUnusual(AtOnUnusual);
-    for (;;) {
+    while (TRUE) {
         while (g_fd < 0) {
             if (devicePath != NULL) {
                 g_fd = open(devicePath, O_RDWR);
             }
-            if (g_fd >= 0 && !memcmp(devicePath, DEVICE_PATH_DEFAULT, sizeof(DEVICE_PATH_DEFAULT) - 1)) {
+            if (g_fd < 0) {
+                TELEPHONY_LOGE("ril vendorlib,opening AT interface. retrying...");
+                sleep(waitNextTryTime);
+            } else if (!memcmp(devicePath, DEVICE_PATH_DEFAULT, sizeof(DEVICE_PATH_DEFAULT) - 1)) {
                 struct termios ios;
                 tcgetattr(g_fd, &ios);
                 ios.c_lflag = 0;
                 tcsetattr(g_fd, TCSANOW, &ios);
-            }
-            if (g_fd < 0) {
-                TELEPHONY_LOGE("ril vendorlib,opening AT interface. retrying...");
-                sleep(waitNextTryTime);
             }
         }
         g_atStatus = 0;
