@@ -112,6 +112,12 @@ public:
     void GetSimLockStatusTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void OnInitInterface();
     void OnInitStressInterface();
+    void OnInitCallProcessInterface();
+    void OnInitSmsProcessInterface();
+    void OnInitSimProcessInterface();
+    void OnInitDataProcessInterface();
+    void OnInitNetworkProcessInterface();
+    void OnInitModemProcessInterface();
     void OnInitProcessInterface();
     void GetTransmitApduChannelParam(
         int32_t &channelId, int32_t &type, int32_t &instruction, int32_t &p1, int32_t &p2, int32_t &p3);
