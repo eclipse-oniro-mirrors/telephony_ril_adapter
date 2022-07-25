@@ -39,7 +39,7 @@ ohos_shared_library("hril_hdf") {
 
   external_deps = [ "init:libbegetutil" ]
   defines = [
-    "TELEPHONY_LOG_TAG = \"HrilHdf\"",
+    "LOG_TAG = \"HrilHdf\"",
     "LOG_DOMAIN = 0xD001F08",
   ]
   if (is_standard_system) {

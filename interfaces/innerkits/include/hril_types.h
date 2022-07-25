@@ -243,8 +243,8 @@ static constexpr uint32_t HRIL_IMS_REG_FLAG = 1;
 static constexpr uint32_t HRIL_NETWORKS_SELECT_MODE = 0;
 // Get the number of SIM cards in the system configuration
 inline const int32_t HRIL_SYSPARA_SIZE = 128;
-inline const std::string HRIL_DEFAULT_SLOT_COUNT = "1";
-inline const std::string HRIL_TEL_SIM_SLOT_COUNT = "const.telephony.slotCount";
+inline constexpr const char *HRIL_DEFAULT_SLOT_COUNT = "1";
+inline constexpr const char *HRIL_TEL_SIM_SLOT_COUNT = "const.telephony.slotCount";
 // interface token
 inline const std::u16string HRIL_INTERFACE_TOKEN = u"ohos.telephony.hril";
 } // namespace Telephony

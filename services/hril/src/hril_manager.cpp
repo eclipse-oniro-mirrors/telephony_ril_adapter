@@ -382,7 +382,7 @@ extern "C" {
 int32_t GetSimSlotCount()
 {
     char simSlotCount[HRIL_SYSPARA_SIZE] = { 0 };
-    GetParameter(HRIL_TEL_SIM_SLOT_COUNT.c_str(), HRIL_DEFAULT_SLOT_COUNT.c_str(), simSlotCount, HRIL_SYSPARA_SIZE);
+    GetParameter(HRIL_TEL_SIM_SLOT_COUNT, HRIL_DEFAULT_SLOT_COUNT, simSlotCount, HRIL_SYSPARA_SIZE);
     return std::atoi(simSlotCount);
 }
 
