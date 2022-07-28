@@ -523,7 +523,7 @@ std::shared_ptr<DataPerformanceInfo> DataPerformanceInfo::UnMarshalling(Parcel &
         param = nullptr;
     }
     return param;
-} 
+}
 
 bool DataSleepInfo::ReadFromParcel(Parcel &parcel)
 {

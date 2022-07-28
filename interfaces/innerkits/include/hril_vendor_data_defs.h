@@ -135,7 +135,7 @@ typedef struct {
 
 typedef struct {
     int32_t performanceEnable; /* Performance Enable. eg: 1-enable, 0-disable */
-    int32_t enforce; /* Whether Enforce Data Performance. eg: 1-enable, 0-disable */ 
+    int32_t enforce; /* Whether Enforce Data Performance. eg: 1-enable, 0-disable */
 } HRilDataPerformanceInfo;
 
 typedef struct {
