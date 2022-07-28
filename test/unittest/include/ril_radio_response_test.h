@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -62,7 +62,6 @@ public:
     void OnResponseGetPdpContextList(OHOS::MessageParcel &data);
     void OnResponseSendNewMessageAckCdma(OHOS::MessageParcel &data);
     void OnResponseSetInitialApn(OHOS::MessageParcel &data);
-    void OnResponseGetImsRegistrationState(OHOS::MessageParcel &data);
     void OnResponseSendImsSms(OHOS::MessageParcel &data);
     void OnResponseSetDataCallAllowed(OHOS::MessageParcel &data);
     void OnResponseSetModemDataProfile(OHOS::MessageParcel &data);
@@ -87,6 +86,7 @@ public:
     void OnResponseSetSmscAddr(OHOS::MessageParcel &data);
     void OnResponseLockStatus(OHOS::MessageParcel &data);
     void OnResponseOpenLogicalChannel(OHOS::MessageParcel &data);
+    void OnResponseSimTransmitApduChannelTest(OHOS::MessageParcel &data);
     void OnResponseGetSimLockStatus(OHOS::MessageParcel &data);
 
 private:

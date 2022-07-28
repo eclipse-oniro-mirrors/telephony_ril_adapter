@@ -42,7 +42,7 @@ ohos_shared_library("hril") {
 
   defines += [
     "TELEPHONY_LOG_TAG = \"Hril\"",
-    "LOG_DOMAIN = 0xD002B01",
+    "LOG_DOMAIN = 0xD001F08",
   ]
 
   deps = [
@@ -53,12 +53,12 @@ ohos_shared_library("hril") {
   ]
 
   external_deps = [
+    "drivers_interface_power:libpower_proxy_1.0",
+    "init:libbegetutil",
     "ipc:ipc_core",
-    "power_manager_native:powermgr_client",
-    "startup_l2:syspara",
   ]
 
-  public_deps = [ "//utils/native/base:utils" ]
+  public_deps = [ "//commonlibrary/c_utils/base:utils" ]
 
   if (is_standard_system) {
     external_deps += [ "hiviewdfx_hilog_native:libhilog" ]

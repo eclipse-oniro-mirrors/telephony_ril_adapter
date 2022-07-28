@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -82,9 +82,6 @@ int32_t RilRadioIndicationTest::OnRemoteRequest(
         case HNOTI_NETWORK_SIGNAL_STRENGTH_UPDATED:
             GetSignalStrength(data);
             break;
-        case HNOTI_NETWORK_IMS_REG_STATUS_UPDATED:
-            ChangedImsNetworkState(data);
-            break;
         case HNOTI_SMS_NEW_SMS:
             NewSmsNotify(data);
             break;
@@ -155,14 +152,18 @@ void RilRadioIndicationTest::CallSrvccStatusReport(OHOS::MessageParcel &data)
 void RilRadioIndicationTest::CallEmergencyNumberReport(OHOS::MessageParcel &data)
 {
     cout << endl << "---->[NTF] CallEmergencyNumberReport: " << endl;
-    std::shared_ptr<EmergencyInfo> emcInfo = std::make_shared<EmergencyInfo>();
-    if (emcInfo == nullptr) {
-        TELEPHONY_LOGE("ERROR : emcInfo == nullptr !!!");
+    std::shared_ptr<EmergencyInfoList> emergencyCallList = std::make_shared<EmergencyInfoList>();
+    if (emergencyCallList == nullptr) {
+        TELEPHONY_LOGE("ERROR : callInfo == nullptr !!!");
         return;
     }
-    emcInfo->ReadFromParcel(data);
-    cout << "====> [index]: " << emcInfo->index << "/" << emcInfo->total << "\tcategory: " << emcInfo->category
-         << "\tmcc: " << emcInfo->mcc << "\teccNum: " << emcInfo->eccNum << endl;
+    emergencyCallList->ReadFromParcel(data);
+    cout << endl << "====>Emergency List Num: " << emergencyCallList->callSize << endl;
+    for (int32_t i = 0; i < emergencyCallList->callSize; i++) {
+        cout << "====> [index]: " << emergencyCallList->calls[i].index
+             << "\tcategory: " << emergencyCallList->calls[i].category << "\tmcc: " << emergencyCallList->calls[i].mcc
+             << "\teccNum: " << emergencyCallList->calls[i].eccNum << endl;
+    }
 }
 
 void RilRadioIndicationTest::NetworkStateNotify(OHOS::MessageParcel &data)
@@ -174,7 +175,6 @@ void RilRadioIndicationTest::NetworkStateNotify(OHOS::MessageParcel &data)
 
 void RilRadioIndicationTest::NetworkPhyChnlCfgUpdated(OHOS::MessageParcel &data)
 {
-    int32_t indicationType = data.ReadInt32();
     std::shared_ptr<ChannelConfigInfoList> phyChnlCfgList = std::make_shared<ChannelConfigInfoList>();
     if (phyChnlCfgList == nullptr) {
         TELEPHONY_LOGE("RilRadioIndicationTest::NetworkPhyChnlCfgUpdated phyChnlCfgList == nullptr");
@@ -186,13 +186,16 @@ void RilRadioIndicationTest::NetworkPhyChnlCfgUpdated(OHOS::MessageParcel &data)
     std::vector<PhysicalChannelConfig> &configs = phyChnlCfgList->channelConfigInfos;
     for (int32_t i = 0; i < static_cast<int32_t>(configs.size()); i++) {
         cout << "====> [cellConnStatus]: " << configs[i].cellConnStatus << endl;
-        cout << "====> [cellBandwidth]: " << configs[i].cellBandwidth << endl;
+        cout << "====> [cellBandwidthDownlinkKhz]: " << configs[i].cellBandwidthDownlinkKhz << endl;
+        cout << "====> [cellBandwidthUplinkKhz]: " << configs[i].cellBandwidthUplinkKhz << endl;
         cout << "====> [ratType]: " << configs[i].ratType << endl;
         cout << "====> [freqRange]: " << configs[i].freqRange << endl;
-        cout << "====> [channelNum]: " << configs[i].channelNum << endl;
+        cout << "====> [downlinkChannelNum]: " << configs[i].downlinkChannelNum << endl;
+        cout << "====> [uplinkChannelNum]: " << configs[i].uplinkChannelNum << endl;
         cout << "====> [physicalCellId]: " << configs[i].physicalCellId << endl;
         cout << "====> [contextIdNum]: " << configs[i].contextIdNum << endl;
     }
+    int32_t indicationType = data.ReadInt32();
     TELEPHONY_LOGI("func :%{public}s indicationType:%{public}d size:%{public}d", __func__, indicationType, size);
 }
 
@@ -373,22 +376,10 @@ void RilRadioIndicationTest::ConnectedReturnRilVersion(OHOS::MessageParcel &data
     auto mResult_ = AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
 }
 
-void RilRadioIndicationTest::ChangedImsNetworkState(OHOS::MessageParcel &data)
-{
-    cout << endl << "---->[NTF] ImsNetworkState: " << endl;
-    std::shared_ptr<ImsRegStatusInfo> imsState = std::make_shared<ImsRegStatusInfo>();
-    if (imsState == nullptr) {
-        TELEPHONY_LOGE("ERROR : imsState == nullptr !!!");
-        return;
-    }
-    imsState->ReadFromParcel(data);
-    cout << "====>ims reg status: " << imsState->regInfo << endl;
-}
-
 void RilRadioIndicationTest::SimRefreshNotify(OHOS::MessageParcel &data)
 {
     TELEPHONY_LOGI("RilRadioIndicationTest::SimRefreshNotify --> ");
-    cout << "---->[NTF] ICC Refresh Changed" << endl;
+    cout << "---->[NTF] SimRefreshNotify" << endl;
     int32_t indicationType = data.ReadInt32();
     if (mRilManager_ == nullptr) {
         TELEPHONY_LOGE("mRilManager_ is null!");

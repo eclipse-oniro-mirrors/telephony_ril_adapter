@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -87,6 +87,9 @@ int32_t RilRadioResponseTest::OnRemoteRequest(
         case HREQ_CALL_SET_MUTE:
             OnResponseNullPara("Set Mute Result", data);
             break;
+        case HREQ_DATA_SET_DATA_PROFILE_INFO:
+            OnResponseNullPara("Set Data Profile Info Result", data);
+            break;
         case HREQ_CALL_GET_MUTE:
             OnResponseGetMute(data);
             break;
@@ -97,13 +100,16 @@ int32_t RilRadioResponseTest::OnRemoteRequest(
             OnResponseOpenLogicalChannel(data);
             break;
         case HREQ_SIM_TRANSMIT_APDU_BASIC_CHANNEL:
-            OnResponseNullPara("Set Sim Transmit apdu basic channel Result", data);
+            OnResponseSimTransmitApduChannelTest(data);
             break;
         case HREQ_SIM_TRANSMIT_APDU_LOGICAL_CHANNEL:
-            OnResponseNullPara("Set sim transmit apdu logical channel Result", data);
+            OnResponseSimTransmitApduChannelTest(data);
             break;
         case HREQ_SIM_AUTHENTICATION:
             OnResponseNullPara("Set Sim Authentication Result", data);
+            break;
+        case HREQ_CALL_SET_EMERGENCY_LIST:
+            OnResponseNullPara("set emergency call Result", data);
             break;
         case HREQ_CALL_GET_EMERGENCY_LIST:
             OnResponseGetEmergencyList(data);
@@ -158,9 +164,6 @@ int32_t RilRadioResponseTest::OnRemoteRequest(
             break;
         case HREQ_NETWORK_SET_NETWORK_SELECTION_MODE:
             OnRequestSetNetworkSelectionModeTest(data);
-            break;
-        case HREQ_NETWORK_GET_IMS_REG_STATUS:
-            OnResponseGetImsRegistrationState(data);
             break;
         case HREQ_NETWORK_GET_NEIGHBORING_CELLINFO_LIST:
             OnResponseGetRilNeighboringCellInfoList(data);
@@ -308,8 +311,7 @@ void RilRadioResponseTest::OnResponseOpenLogicalChannel(MessageParcel &data)
         TELEPHONY_LOGE("OnResponseOpenLogicalChannel -->data.ReadBuffer(readSpSize) failed");
         return;
     }
-    const struct HRilRadioResponseInfo *responseInfo =
-        reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
+    const struct HRilRadioResponseInfo *responseInfo = reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
 
     std::shared_ptr<OpenLogicalChannelResponse> resp = std::make_shared<OpenLogicalChannelResponse>();
     resp.get()->ReadFromParcel(data);
@@ -913,26 +915,6 @@ void RilRadioResponseTest::OnResponseSetInitialApn(OHOS::MessageParcel &data)
     }
 }
 
-void RilRadioResponseTest::OnResponseGetImsRegistrationState(OHOS::MessageParcel &data)
-{
-    std::unique_ptr<ImsRegStatusInfo> imsRegStatus = std::make_unique<ImsRegStatusInfo>();
-    if (imsRegStatus == nullptr) {
-        return;
-    }
-    imsRegStatus.get()->ReadFromParcel(data);
-
-    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
-    const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
-    if (spBuffer == nullptr) {
-        TELEPHONY_LOGE("RilRadioResponseTest OnResponseGetImsRegistrationState read spBuffer failed");
-        return;
-    }
-
-    cout << "OnResponseGetImsRegistrationState: notifyType = " << imsRegStatus->notifyType << endl;
-    cout << "OnResponseGetImsRegistrationState: regInfo = " << imsRegStatus->regInfo << endl;
-    cout << "OnResponseGetImsRegistrationState: extInfo = " << imsRegStatus->extInfo << endl;
-}
-
 void RilRadioResponseTest::OnResponseSendImsSms(OHOS::MessageParcel &data)
 {
     TELEPHONY_LOGI("RilRadioResponseTest OnResponseSendImsSms ");
@@ -1079,6 +1061,26 @@ void RilRadioResponseTest::OnRequestGetMeidTest(OHOS::MessageParcel &data)
     }
     std::string meid = data.ReadString();
     cout << "---->OnRequestGetMeidTest Result:" << endl << "----> [imeid]: " << meid;
+    PrintResponseInfo((struct HRilRadioResponseInfo *)spBuffer);
+}
+
+void RilRadioResponseTest::OnResponseSimTransmitApduChannelTest(OHOS::MessageParcel &data)
+{
+    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
+    const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("OnRequesSimTransmitApduBasicChannelTest read spBuffer failed");
+        return;
+    }
+    std::unique_ptr<IccIoResultInfo> info = std::make_unique<IccIoResultInfo>();
+    if (info == nullptr) {
+        return;
+    }
+    info->ReadFromParcel(data);
+    cout << "---->OnRequesSimTransmitApduBasicChannelTest Result:" << endl
+         << "----> [sw1]: " << info->sw1 << endl
+         << "----> [sw2]: " << info->sw2 << endl
+         << "----> [response]: " << info->response << endl;
     PrintResponseInfo((struct HRilRadioResponseInfo *)spBuffer);
 }
 

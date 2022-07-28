@@ -27,8 +27,8 @@ class RilUnitTest : public testing::Test {
 public:
     class DemoHandler : public AppExecFwk::EventHandler {
     public:
-        explicit DemoHandler(
-            const std::shared_ptr<AppExecFwk::EventRunner> &runner) : AppExecFwk::EventHandler(runner) {}
+        explicit DemoHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner) : AppExecFwk::EventHandler(runner)
+        {}
         ~DemoHandler() {}
 
         void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
@@ -47,6 +47,12 @@ public:
 
 private:
     void AddRequestToMap();
+    void AddCallRequestToMap();
+    void AddSmsRequestToMap();
+    void AddSimRequestToMap();
+    void AddDataRequestToMap();
+    void AddNetworkRequestToMap();
+    void AddModermRequestToMap();
     void GetCallListTest(const AppExecFwk::InnerEvent::Pointer &result);
     void GetSimIOTest(const AppExecFwk::InnerEvent::Pointer &result);
     void GetImsiTest(const AppExecFwk::InnerEvent::Pointer &result);
@@ -74,8 +80,27 @@ private:
     void DeactivatePdpContextTest(const AppExecFwk::InnerEvent::Pointer &result);
     void SetUssdTest(const AppExecFwk::InnerEvent::Pointer &result);
     void GetUssdTest(const AppExecFwk::InnerEvent::Pointer &result);
+    void SetClipTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void GetClipTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void SetCallWaitingTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void GetCallWaitingTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void SetCallRestrictionTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void GetCallRestrictionTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void SetCallTransferInfoTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void GetCallTransferInfoTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void SetClirTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void GetClirTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void GetLinkBandwidthInfoTest(const AppExecFwk::InnerEvent::Pointer &result);
+    void SetDataProfileInfoTest(const AppExecFwk::InnerEvent::Pointer &result);
+    void UnLockPINTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void UnLockPIN2Test(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void UnLockPUKTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void UnLockPUK2Test(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void ChangeSimPasswordTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void SetSimLockTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void GetSimLockStatusTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void SetEmergencyCallListTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void SetBarringPasswordTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void SimOpenLogicalChannelTest(const AppExecFwk::InnerEvent::Pointer &result);
     void SimTransmitApduLogicalChannelTest(const AppExecFwk::InnerEvent::Pointer &result);
     void SimTransmitApduBasicChannelTest(const AppExecFwk::InnerEvent::Pointer &result);

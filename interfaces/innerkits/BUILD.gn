@@ -51,11 +51,11 @@ ohos_shared_library("hril_innerkits") {
   ]
 
   defines = [
-    "TELEPHONY_LOG_TAG = \"Hril\"",
-    "LOG_DOMAIN = 0xD002B01",
+    "TELEPHONY_LOG_TAG = \"HrilInnerkits\"",
+    "LOG_DOMAIN = 0xD001F08",
   ]
 
-  external_deps = [ "utils_base:utils" ]
+  external_deps = [ "c_utils:utils" ]
 
   if (is_standard_system) {
     external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
@@ -63,6 +63,7 @@ ohos_shared_library("hril_innerkits") {
     external_deps += [ "hilog:libhilog" ]
   }
   relative_install_dir = "chipset-pub-sdk"
-  part_name = "ril_adapter"
+
+  part_name = "drivers_interface_ril"
   subsystem_name = "telephony"
 }

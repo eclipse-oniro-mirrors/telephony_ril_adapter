@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,10 +17,9 @@
 
 #include <signal.h>
 
+#include "hril_notification.h"
 #include "vendor_report.h"
 #include "vendor_util.h"
-
-#include "hril_notification.h"
 
 #define numCount 3
 #define TIME_VALUE_LEN 30
@@ -444,133 +443,6 @@ int32_t ProcessParamSignalStrengthNotify(const char *result, HRilRssi *hrilRssi)
     return HRIL_ERR_SUCCESS;
 }
 
-static int32_t CheckImsStatusValid(
-    const int32_t *imsStatusArray, HRilImsRegStatusInfo *imsRegStatusInfo, int32_t realInfoNum, int32_t expectInfoNum)
-{
-    if ((imsStatusArray == NULL) || (imsRegStatusInfo == NULL)) {
-        TELEPHONY_LOGE("imsStatusArray or imsRegStatusInfo is invalid");
-        return HRIL_ERR_INVALID_RESPONSE;
-    }
-    const int32_t IMS_NOTIFY_NUM = 2;
-    const int32_t IMS_EXT_INFO_NOTIFY_TYPE = 2;
-    const int32_t REG_INFO_MAX_VALUE = 1;
-    const int32_t IMS_STATUS_INDEX = 2;
-    if (expectInfoNum == IMS_NOTIFY_NUM) {
-        if ((realInfoNum == IMS_NOTIFY_NUM) && (imsStatusArray[0] <= REG_INFO_MAX_VALUE)) {
-            imsRegStatusInfo->notifyType = IMS_EXT_INFO_NOTIFY_TYPE;
-            imsRegStatusInfo->regInfo = imsStatusArray[0];
-            imsRegStatusInfo->extInfo = imsStatusArray[1];
-        } else if ((realInfoNum == 1) && (imsStatusArray[0] == 0)) {
-            imsRegStatusInfo->notifyType = IMS_EXT_INFO_NOTIFY_TYPE;
-            imsRegStatusInfo->regInfo = 0;
-            imsRegStatusInfo->extInfo = 0;
-        } else {
-            TELEPHONY_LOGE("CheckImsStatusValid: Invalid response");
-            return HRIL_ERR_INVALID_RESPONSE;
-        }
-    } else if (expectInfoNum == MAX_IMS_INFO_ITEM) {
-        if (realInfoNum == IMS_NOTIFY_NUM) {
-            if ((imsStatusArray[0] != IMS_EXT_INFO_NOTIFY_TYPE) || (imsStatusArray[1] != 0)) {
-                TELEPHONY_LOGE("CheckImsStatusValid: Invalid response");
-                return HRIL_ERR_INVALID_RESPONSE;
-            } else {
-                imsRegStatusInfo->notifyType = IMS_EXT_INFO_NOTIFY_TYPE;
-                imsRegStatusInfo->regInfo = 0;
-                imsRegStatusInfo->extInfo = 0;
-            }
-        } else {
-            imsRegStatusInfo->notifyType = imsStatusArray[0];
-            imsRegStatusInfo->regInfo = imsStatusArray[1];
-            imsRegStatusInfo->extInfo = imsStatusArray[IMS_STATUS_INDEX];
-        }
-    }
-    if (imsRegStatusInfo->notifyType != IMS_EXT_INFO_NOTIFY_TYPE) {
-        TELEPHONY_LOGE("Ims Status n Value is invalid");
-        return HRIL_ERR_INVALID_RESPONSE;
-    }
-    if ((imsRegStatusInfo->regInfo < 0) || (imsRegStatusInfo->regInfo > REG_INFO_MAX_VALUE)) {
-        TELEPHONY_LOGE("Ims Status regInfo Value is invalid");
-        return HRIL_ERR_INVALID_RESPONSE;
-    }
-    return HRIL_ERR_SUCCESS;
-}
-
-int32_t ProcessImsRegStatus(const char *s, const HRilImsRegStatusInfo *imsRegStatusInfo, int32_t expectInfoNum)
-{
-    char *str = (char *)s;
-    if ((str == NULL) || (imsRegStatusInfo == NULL)) {
-        TELEPHONY_LOGE("ProcessIMSRegStatus s or imsRegStatusInfo param is null");
-        return HRIL_ERR_NULL_POINT;
-    } else {
-        TELEPHONY_LOGI("result: %{public}s", str);
-        int32_t err = SkipATPrefix(&str);
-        if (err < 0) {
-            TELEPHONY_LOGE("skip failed: [%{public}s]", str);
-            return HRIL_ERR_INVALID_RESPONSE;
-        }
-        int32_t commaNum = FindCommaCharNum(str);
-        if ((commaNum < 0) || (commaNum >= MAX_IMS_INFO_ITEM)) {
-            TELEPHONY_LOGE("check failed commaNum: [%{public}d]", commaNum);
-            return HRIL_ERR_INVALID_RESPONSE;
-        }
-        int32_t info[MAX_IMS_INFO_ITEM] = {0, 0, 0};
-        for (int32_t i = 0; i <= commaNum; i++) {
-            err = NextInt(&str, &(info[i]));
-            if (err == -1) {
-                info[i] = -1;
-                return HRIL_ERR_INVALID_RESPONSE;
-            }
-        }
-        if (CheckImsStatusValid(info, (HRilImsRegStatusInfo *)imsRegStatusInfo, commaNum + 1, expectInfoNum) !=
-            HRIL_ERR_SUCCESS) {
-            TELEPHONY_LOGE("ProcessImsRegStatus: Invalid response");
-            return HRIL_ERR_INVALID_RESPONSE;
-        }
-        return HRIL_ERR_SUCCESS;
-    }
-}
-
-void ReqGetImsRegStatus(const ReqDataInfo *requestInfo)
-{
-    if (requestInfo == NULL) {
-        return;
-    }
-    int32_t err = HRIL_ERR_SUCCESS;
-    char *result = NULL;
-    struct ReportInfo reportInfo;
-    const long TIME_OUT = DEFAULT_TIMEOUT;
-    ResponseInfo *responseInfo = NULL;
-
-    TELEPHONY_LOGI("enter to [%{public}s]:%{public}d", __func__, __LINE__);
-    int32_t ret = SendCommandLock("AT+CIREG?", "+CIREG:", TIME_OUT, &responseInfo);
-    if (responseInfo == NULL) {
-        reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_NULL_POINT, HRIL_RESPONSE, 0);
-        OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 0);
-        return;
-    }
-
-    if (ret != 0 || !responseInfo->success) {
-        err = GetResponseErrorCode(responseInfo);
-        TELEPHONY_LOGE("AT+CIREG send failed");
-    }
-    if (responseInfo->head != NULL) {
-        result = responseInfo->head->data;
-    }
-    HRilImsRegStatusInfo imsRegStatusInfo = {0};
-    ret = ProcessImsRegStatus(result, &imsRegStatusInfo, MAX_IMS_INFO_ITEM);
-    if (ret != 0) {
-        TELEPHONY_LOGE("GetImsRegStatusResponse CIREGU format  unexpected: %{public}s", result);
-        reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_RESPONSE, HRIL_RESPONSE, 0);
-        OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 0);
-        FreeResponseInfo(responseInfo);
-        return;
-    }
-
-    reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-    OnNetworkReport(requestInfo->slotId, reportInfo, (const uint8_t *)&imsRegStatusInfo, sizeof(HRilImsRegStatusInfo));
-    FreeResponseInfo(responseInfo);
-}
-
 void ReqGetSignalStrength(const ReqDataInfo *requestInfo)
 {
     if (requestInfo == NULL) {
@@ -771,8 +643,7 @@ void GetNetworkSearchInformationPause(void)
     pthread_mutex_lock(&g_networkSearchInformationMutex);
     g_reportInfoForOperListToUse.error = HRIL_ERR_NETWORK_SEARCHING_INTERRUPTED;
     if (g_reportInfoForOperListToUse.requestInfo != NULL) {
-        OnNetworkReport(g_reportInfoForOperListToUse.requestInfo->slotId,
-            g_reportInfoForOperListToUse, NULL, 0);
+        OnNetworkReport(g_reportInfoForOperListToUse.requestInfo->slotId, g_reportInfoForOperListToUse, NULL, 0);
     }
     SetAtPauseFlag(false);
     if (g_reportInfoForOperListToUse.requestInfo != NULL) {
@@ -1556,8 +1427,7 @@ int32_t ProcessCurrentCellList(struct ReportInfo reportInfo, const char *s)
         reportInfo.error = HRIL_ERR_SUCCESS;
         reportInfo.type = HRIL_NOTIFICATION;
         reportInfo.notifyId = HNOTI_NETWORK_CURRENT_CELL_UPDATED;
-        OnNetworkReport(GetSlotId(NULL), reportInfo, (const uint8_t *)&cellList,
-            sizeof(CurrentCellInfoList));
+        OnNetworkReport(GetSlotId(NULL), reportInfo, (const uint8_t *)&cellList, sizeof(CurrentCellInfoList));
         if (cellList.currentCellInfo != NULL) {
             free(cellList.currentCellInfo);
         }
@@ -1647,7 +1517,7 @@ int32_t ProcessOperListToUse(const char *list)
     }
 
     item = item - UNUSED_ITEM_COUNT;
-    ppOperInfo = (AvailableOperInfo **)malloc(item * sizeof(size_t));
+    ppOperInfo = (AvailableOperInfo **)malloc(item * sizeof(AvailableOperInfo));
     if (!ppOperInfo) {
         TELEPHONY_LOGE("ppOperInfo malloc fail");
         return OperListErrorHandler(ppOperInfo, pOperInfo);
@@ -1984,6 +1854,15 @@ void ReqGetRadioCapability(const ReqDataInfo *requestInfo)
         requestInfo->slotId, reportInfo, (const uint8_t *)GetRadioCapability(), sizeof(HRilRadioCapability));
 }
 
+static HRilCellConnectionStatus ConvertIntToHRilCellConnectionStatus(int32_t cellConnStatus)
+{
+    if ((cellConnStatus == HRIL_SERVING_CELL_PRIMARY) || (cellConnStatus == HRIL_SERVING_CELL_SECONDARY)) {
+        return (HRilCellConnectionStatus)cellConnStatus;
+    } else {
+        return HRIL_SERVING_CELL_UNKNOWN;
+    }
+}
+
 static int32_t ExtractConfigInfo(const char *str, const HRilPhyChannelConfig *config)
 {
     HRilPhyChannelConfig *cfg = (HRilPhyChannelConfig *)config;
@@ -1992,10 +1871,15 @@ static int32_t ExtractConfigInfo(const char *str, const HRilPhyChannelConfig *co
         TELEPHONY_LOGE("pStr or cfg is null.");
         return HRIL_ERR_GENERIC_FAILURE;
     }
-    if (NextInt(&pStr, &cfg->cellConnStatus) < 0) {
+    int32_t cellConnStatusValue = 0;
+    if (NextInt(&pStr, &cellConnStatusValue) < 0) {
         return HRIL_ERR_INVALID_RESPONSE;
     }
-    if (NextInt(&pStr, &cfg->cellBandwidth) < 0) {
+    cfg->cellConnStatus = ConvertIntToHRilCellConnectionStatus(cellConnStatusValue);
+    if (NextInt(&pStr, &cfg->cellBandwidthDownlinkKhz) < 0) {
+        return HRIL_ERR_INVALID_RESPONSE;
+    }
+    if (NextInt(&pStr, &cfg->cellBandwidthUplinkKhz) < 0) {
         return HRIL_ERR_INVALID_RESPONSE;
     }
     if (NextInt(&pStr, &cfg->ratType) < 0) {
@@ -2004,7 +1888,10 @@ static int32_t ExtractConfigInfo(const char *str, const HRilPhyChannelConfig *co
     if (NextInt(&pStr, &cfg->freqRange) < 0) {
         return HRIL_ERR_INVALID_RESPONSE;
     }
-    if (NextInt(&pStr, &cfg->channelNum) < 0) {
+    if (NextInt(&pStr, &cfg->downlinkChannelNum) < 0) {
+        return HRIL_ERR_INVALID_RESPONSE;
+    }
+    if (NextInt(&pStr, &cfg->uplinkChannelNum) < 0) {
         return HRIL_ERR_INVALID_RESPONSE;
     }
     if (NextInt(&pStr, &cfg->physicalCellId) < 0) {
@@ -2066,8 +1953,7 @@ void ProcessPhyChnlCfgNotify(struct ReportInfo reportInfo, char *srcStr)
         reportInfo.error = HRIL_ERR_SUCCESS;
         reportInfo.type = HRIL_NOTIFICATION;
         reportInfo.notifyId = HNOTI_NETWORK_PHY_CHNL_CFG_UPDATED;
-        OnNetworkReport(GetSlotId(NULL), reportInfo, (const uint8_t *)&configInfoList,
-            sizeof(HRilChannelConfigList));
+        OnNetworkReport(GetSlotId(NULL), reportInfo, (const uint8_t *)&configInfoList, sizeof(HRilChannelConfigList));
         for (int32_t i = 0; i < configInfoList.itemNum; i++) {
             if (configInfoList.channelConfigs[i].contextIds != NULL) {
                 free(configInfoList.channelConfigs[i].contextIds);
@@ -2121,6 +2007,7 @@ void ReqGetPhysicalChannelConfig(const ReqDataInfo *requestInfo)
         err = (responseInfo->success == 0) ? HRIL_ERR_CMD_SEND_FAILURE : HRIL_ERR_GENERIC_FAILURE;
         ResponseNetworkReport(requestInfo->slotId, requestInfo, err, &respDataAck);
         TELEPHONY_LOGE("send AT CMD failed!");
+        return;
     }
     for (configCount = 0, pLine = responseInfo->head; pLine != NULL; pLine = pLine->next) {
         configCount++;
@@ -2151,7 +2038,6 @@ void ReqGetPhysicalChannelConfig(const ReqDataInfo *requestInfo)
     if (configInfoList.channelConfigs != NULL) {
         free(configInfoList.channelConfigs);
     }
-    return;
 }
 
 void ReqSetLocateUpdates(const ReqDataInfo *requestInfo, HRilRegNotifyMode mode)
@@ -2161,21 +2047,20 @@ void ReqSetLocateUpdates(const ReqDataInfo *requestInfo, HRilRegNotifyMode mode)
     }
     const long TIME_OUT = DEFAULT_TIMEOUT;
     ResponseInfo *responseInfo = NULL;
-    struct ReportInfo reportInfo = {};
     char *cmd = NULL;
     if (mode == REG_NOTIFY_STAT_LAC_CELLID) {
         cmd = "AT+CREG=2";
     } else if (mode == REG_NOTIFY_STAT_ONLY) {
         cmd = "AT+CREG=1";
     } else {
-        reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_PARAMETER, HRIL_RESPONSE, 0);
+        struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_PARAMETER, HRIL_RESPONSE, 0);
         OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 0);
         TELEPHONY_LOGE("ReqSetLocateUpdates:  locateUpdateMode > 1");
         return;
     }
     int32_t err = SendCommandLock(cmd, NULL, TIME_OUT, &responseInfo);
     if (responseInfo == NULL) {
-        reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
+        struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
         OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 0);
         TELEPHONY_LOGE("ReqSetLocateUpdates responseInfo == NULL");
         return;
@@ -2185,7 +2070,7 @@ void ReqSetLocateUpdates(const ReqDataInfo *requestInfo, HRilRegNotifyMode mode)
         err = GetResponseErrorCode(responseInfo);
         TELEPHONY_LOGE("ReqSetLocateUpdates errcode = %{public}d", err);
     }
-    reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
     OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 0);
     FreeResponseInfo(responseInfo);
 }
@@ -2196,67 +2081,30 @@ void ReqSetNotificationFilter(const ReqDataInfo *requestInfo, const int32_t *new
         TELEPHONY_LOGE("ReqSetNotificationFilter requestInfo is NULL");
         return;
     }
-    struct ReportInfo reportInfo = {};
     if (newFilter == NULL) {
-        reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_PARAMETER, HRIL_RESPONSE, 0);
+        struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_PARAMETER, HRIL_RESPONSE, 0);
         OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 0);
-        return;
-    }
-    int32_t filter = *(int32_t *)newFilter;
-    // Currently only support the control for network state
-    bool setNotificationOn = (filter & NOTIFICATION_FILTER_NETWORK_STATE) == NOTIFICATION_FILTER_NETWORK_STATE;
-    char *csCommand = setNotificationOn ? "AT+CREG=2" : "AT+CREG=0";
-    char *psCommand = setNotificationOn ? "AT+CGREG=2" : "AT+CGREG=0";
-    int32_t err = SendNotificationFilterCommand(requestInfo, reportInfo, csCommand);
-    if (err != HRIL_ERR_SUCCESS) {
-        TELEPHONY_LOGE("ReqSetCsNotificationFilter fail!!!");
-        return;
-    }
-    err = SendNotificationFilterCommand(requestInfo, reportInfo, psCommand);
-    if (err != HRIL_ERR_SUCCESS) {
-        TELEPHONY_LOGE("ReqSetPsNotificationFilter fail!!!");
         return;
     }
     TELEPHONY_LOGI("ReqSetNotificationFilter success");
-    reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
     OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 0);
 }
 
-int32_t SendNotificationFilterCommand(const ReqDataInfo *requestInfo, struct ReportInfo reportInfo, const char *command)
-{
-    ResponseInfo *responseInfo = NULL;
-    int32_t err = SendCommandLock(command, NULL, 0, &responseInfo);
-    if (responseInfo == NULL) {
-        reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
-        OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 0);
-        TELEPHONY_LOGE("SendNotificationFilterCommand(%{public}s) responseInfo == NULL", command);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    if (err != 0 || responseInfo->success == 0) {
-        err = GetResponseErrorCode(responseInfo);
-        TELEPHONY_LOGE("SendNotificationFilterCommand(%{public}s) errcode = %{public}d", command, err);
-        reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-        OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 0);
-    }
-    FreeResponseInfo(responseInfo);
-    return err;
-}
-
-void ReqSetDeviceState(const ReqDataInfo *requestInfo, const int32_t *deviceStateType,
-    const int32_t *deviceStateOn)
+void ReqSetDeviceState(const ReqDataInfo *requestInfo, const int32_t *deviceStateType, const int32_t *deviceStateOn)
 {
     if (requestInfo == NULL) {
         TELEPHONY_LOGE("ReqSetDeviceState requestInfo is NULL");
         return;
     }
-    struct ReportInfo reportInfo;
+
     if (deviceStateType == NULL || deviceStateOn == NULL) {
-        reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_PARAMETER, HRIL_RESPONSE, 0);
+        struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_PARAMETER, HRIL_RESPONSE, 0);
         OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 0);
         return;
     }
     TELEPHONY_LOGI("ReqSetDeviceState success");
-    reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
     OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 0);
 }
 

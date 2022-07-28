@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -52,41 +52,6 @@ typedef struct {
                   * used character set should be the one selected with command select TE character set +CSCS */
 } HRilCallInfo;
 
-typedef struct {
-    int32_t smsSrvStatus; /* Service status of IMS SMS.
-                           * 0: IMS SMS service is not available.
-                           * 1: IMS SMS is in limited service.
-                           * 2: IMS SMS is in full service. */
-    int32_t smsSrvRat; /* IMS SMS service domain.
-                        * 0: IMS service is registered on LTE.
-                        * 1: IMS service is registered on WIFI.
-                        * 2: Reserve. */
-    int32_t voipSrvStatus; /* Service status of IMS VoIP.
-                            * 0: IMS VoIP service is not available.
-                            * 1: IMS VoIP is in limited service.
-                            * 2: IMS VoIP is in full service. */
-    int32_t voipSrvRat; /* IMS VoIP service domain.
-                         * 0: IMS service is registered on LTE.
-                         * 1: IMS service is registered on WIFI.
-                         * 2: Reserve. */
-    int32_t vtSrvStatus; /* Service status of IMS VT.
-                          * 0: IMS VT service is not available.
-                          * 1: IMS VT is in limited service.
-                          * 2: IMS VT is in full service. */
-    int32_t vtSrvRat; /* IMS VT service domain.
-                       * 0: IMS service is registered on LTE.
-                       * 1: IMS service is registered on WIFI.
-                       * 2: Reserve. */
-    int32_t vsSrvStatus; /* Service status of IMS VS.
-                          * 0: IMS VS service is not available.
-                          * 1: IMS VS is in limited service.
-                          * 2: IMS VS is in full service. */
-    int32_t vsSrvRat; /* IMS VS service domain.
-                       * 0: IMS service is registered on LTE.
-                       * 1: IMS service is registered on WIFI.
-                       * 2: Reserve. */
-} HRilImsServiceStatus;
-
 /* From 3GPP TS 27.007 V4.3.0 (2001-12) ATD%s%s */
 typedef struct {
     char *address; /* Type of address octet in integer format (refer TS 24.008 [8] subclauses 10.5.4.7);
@@ -135,6 +100,12 @@ typedef struct {
     int32_t mode;
     const char *password;
 } CallRestrictionInfo;
+
+typedef struct {
+    const char *fac;
+    const char *oldPassword;
+    const char *newPassword;
+} HRilSetBarringInfo;
 
 typedef struct {
     int32_t reason; /* call forwarding type <0-5> */
@@ -199,10 +170,6 @@ typedef struct {
                             4: The operation is not supported;
                             5: The network timed out. */
     char *str; /* USSD string, the maximum length is 160 characters. */
-    int32_t dcs; /* Integer value, encoding method.
-                                15: Not specified (default 7bit encoding);
-                                68: 8bit encoding (not supported temporarily);
-                                72: UCS2 encoding (not supported temporarily). */
 } HRilUssdNoticeInfo;
 
 typedef struct {
@@ -305,6 +272,7 @@ typedef struct {
     void (*GetEmergencyCallList)(const ReqDataInfo *requestInfo);
     void (*GetCallFailReason)(const ReqDataInfo *requestInfo);
     void (*SetEmergencyCallList)(const ReqDataInfo *requestInfo, HRilEmergencyInfo *emergencyInfo, const int len);
+    void (*SetBarringPassword)(const ReqDataInfo *requestInfo, HRilSetBarringInfo info);
 } HRilCallReq;
 #ifdef __cplusplus
 }

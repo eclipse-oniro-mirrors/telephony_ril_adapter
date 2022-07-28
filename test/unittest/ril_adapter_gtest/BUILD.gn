@@ -32,8 +32,7 @@ ohos_unittest("tel_ril_adapter_gtest") {
 
   include_dirs = [
     "//base/telephony/ril_adapter/services/hril/include",
-    "//base/telephony/core_service/utils/common/include",
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "//third_party/json/include",
     "//drivers/hdf_core/adapter/uhdf2/include/hdi",
     "include",
@@ -43,26 +42,26 @@ ohos_unittest("tel_ril_adapter_gtest") {
     "$RIL_ADAPTER/services/hril:hril",
     "$RIL_ADAPTER/services/vendor:ril_vendor",
     "$hdf_uhdf_path/hdi:libhdi",
-    "//base/telephony/core_service:tel_core_service",
     "//drivers/hdf_core/adapter/uhdf2/host:libhdf_host",
     "//drivers/hdf_core/adapter/uhdf2/ipc:libhdf_ipc_adapter",
     "//drivers/hdf_core/adapter/uhdf2/utils:libhdf_utils",
     "//third_party/googletest:gtest_main",
-    "//utils/native/base:utils",
   ]
 
   external_deps = [
-    "common_event_service:cesfwk_innerkits",
+    "c_utils:utils",
     "eventhandler:libeventhandler",
     "ipc:ipc_core",
     "ril_adapter:hril_innerkits",
-    "safwk:system_ability_fwk",
-    "samgr_standard:samgr_proxy",
   ]
 
-  defines = [ "TELEPHONY_LOG_TAG = \"RilAdapterGtest\"" ]
+  defines = [
+    "TELEPHONY_LOG_TAG = \"RilAdapterGtest\"",
+    "LOG_DOMAIN = 0xD000F00",
+  ]
   if ("${product_name}" == "rk3568" || "${product_name}" == "DAYU") {
     defines += [ "TEL_TEST_UNSUPPORT" ]
+    #   defines += [ "TEL_TEST_PIN_PUK" ]
   }
 
   if (is_standard_system) {

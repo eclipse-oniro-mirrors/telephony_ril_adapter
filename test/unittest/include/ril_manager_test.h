@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -91,7 +91,10 @@ public:
     void SetMute(int32_t mute, const AppExecFwk::InnerEvent::Pointer &result);
     void GetMute(const AppExecFwk::InnerEvent::Pointer &result);
     void GetEmergencyList(const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t SetEmergencyCallList(const AppExecFwk::InnerEvent::Pointer &result);
     void GetFailReason(const AppExecFwk::InnerEvent::Pointer &result);
+    void SetBarringPassword(const std::string &fac, const std::string &oldPwd, const std::string &newPwd,
+        const AppExecFwk::InnerEvent::Pointer &result);
 
     void GetImsi(std::string aid, const AppExecFwk::InnerEvent::Pointer &response);
 
@@ -105,7 +108,6 @@ public:
     void GetNetworkSearchInfo(const AppExecFwk::InnerEvent::Pointer &response);
     void GetNetworkSelectionMode(const AppExecFwk::InnerEvent::Pointer &response);
     void GetPreferredNetwork(const AppExecFwk::InnerEvent::Pointer &response);
-    void GetImsRegStatus(const AppExecFwk::InnerEvent::Pointer &response);
     void SetPreferredNetwrok(int32_t preferredNetwork, const AppExecFwk::InnerEvent::Pointer &result);
     void SetLocationUpdate(int32_t enableFlg, const AppExecFwk::InnerEvent::Pointer &result);
     void SetNotificationFilter(int32_t filter, const AppExecFwk::InnerEvent::Pointer &result);

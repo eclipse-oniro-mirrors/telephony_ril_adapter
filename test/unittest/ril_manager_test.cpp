@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -528,6 +528,67 @@ void RilManagerTest::GetEmergencyList(const AppExecFwk::InnerEvent::Pointer &res
     } else {
         TELEPHONY_LOGE("GetEmergencyList  cellularRadio_ == nullptr");
     }
+}
+
+int32_t RilManagerTest::SetEmergencyCallList(const AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("SetEmergencyInfoList");
+    if (cellularRadio_ != nullptr) {
+        std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_CALL_SET_EMERGENCY_LIST, result);
+        if (request == nullptr) {
+            return HRIL_ERR_NULL_POINT;
+        }
+        int32_t total = 1;
+        int32_t category = 2;
+        int32_t serviceType = 0;
+        EmergencyInfoList emergencyInfoList;
+        emergencyInfoList.callSize = total;
+        emergencyInfoList.flag = request->serialId_;
+        EmergencyInfo emergencyInfo = {};
+        emergencyInfo.index = 1;
+        emergencyInfo.total = total;
+        emergencyInfo.eccNum = "131";
+        emergencyInfo.category = category;
+        emergencyInfo.simpresent = serviceType;
+        emergencyInfo.mcc = "460";
+        emergencyInfo.abnormalService = 0;
+        emergencyInfoList.calls.push_back(emergencyInfo);
+        MessageParcel wData;
+        wData.WriteInt32(slotId_);
+        if (!emergencyInfoList.Marshalling(wData)) {
+            TELEPHONY_LOGE("ERROR : ActivatePdpContext --> emergencyInfoList.Marshalling(wData) failed !!!");
+            return HRIL_ERR_NULL_POINT;
+        }
+        int32_t ret = SendBufferEvent(HREQ_CALL_SET_EMERGENCY_LIST, wData);
+        TELEPHONY_LOGI("SendRequest(ID:%{public}d) return: %{public}d", HREQ_CALL_SET_EMERGENCY_LIST, ret);
+        return ret;
+    } else {
+        TELEPHONY_LOGE("RilCmJoin  cellularRadio_ == nullptr");
+        return HRIL_ERR_NULL_POINT;
+    }
+}
+
+void RilManagerTest::SetBarringPassword(const std::string &fac, const std::string &oldPwd, const std::string &newPwd,
+    const AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilManagerTest::SetBarringPassword -->");
+    if (cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("SetBarringPassword cellularRadio_ is nullptr");
+        return;
+    }
+    std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_CALL_SET_BARRING_PASSWORD, result);
+    if (request == nullptr) {
+        TELEPHONY_LOGE("SetBarringPassword request is nullptr");
+        return;
+    }
+    MessageParcel data;
+    MessageParcel reply;
+    data.WriteInt32(request->serialId_);
+    data.WriteCString(fac.c_str());
+    data.WriteCString(oldPwd.c_str());
+    data.WriteCString(newPwd.c_str());
+    MessageOption option;
+    cellularRadio_->SendRequest(HREQ_CALL_SET_BARRING_PASSWORD, data, reply, option);
 }
 
 void RilManagerTest::GetFailReason(const AppExecFwk::InnerEvent::Pointer &result)
@@ -1068,6 +1129,27 @@ void RilManagerTest::ActivatePdpContext(int32_t radioTechnology, RilDataProfileT
     }
 }
 
+void RilManagerTest::SetDataProfileInfo(
+    DataProfilesInfo dataProfilesInfo, const AppExecFwk::InnerEvent::Pointer &response)
+{
+    if (cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("ERROR: SetDataProfileInfo --> cellularRadio_ is nullptr");
+        return;
+    }
+    std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_DATA_SET_DATA_PROFILE_INFO, response);
+    if (request == nullptr) {
+        return;
+    }
+    dataProfilesInfo.serial = request->serialId_;
+    OHOS::MessageParcel wData;
+    wData.WriteInt32(slotId_);
+    if (!dataProfilesInfo.Marshalling(wData)) {
+        TELEPHONY_LOGE("ERROR: SetDataProfileInfo --> dataInfo.Marshalling(wData) failed!!!");
+        return;
+    }
+    SendBufferEvent(HREQ_DATA_SET_DATA_PROFILE_INFO, wData);
+}
+
 void RilManagerTest::DeactivatePdpContext(int32_t ci, int32_t reason, const AppExecFwk::InnerEvent::Pointer &response)
 {
     TELEPHONY_LOGI("RilBaseCommands::DeactivatePdpContext -->");
@@ -1247,6 +1329,7 @@ void RilManagerTest::SimTransmitApduBasicChannel(
 
         MessageParcel data;
         ApduSimIORequestInfo ApduRequestInfo;
+        ApduRequestInfo.channelId = reqInfo.channelId;
         ApduRequestInfo.serial = request->serialId_;
         ApduRequestInfo.type = reqInfo.type;
         ApduRequestInfo.instruction = reqInfo.instruction;
@@ -1366,42 +1449,40 @@ void RilManagerTest::GetLinkBandwidthInfo(const int32_t cid, const AppExecFwk::I
 void RilManagerTest::UnLockPin(const std::string &pin, const AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("RilManagerTest::UnLockPin -->");
-    if (cellularRadio_ != nullptr) {
-        std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_SIM_UNLOCK_PIN, result);
-        if (request == nullptr) {
-            return;
-        }
-        MessageParcel data;
-        data.WriteInt32(slotId_);
-        data.WriteInt32(request->serialId_);
-        data.WriteCString(pin.c_str());
-
-        if (SendBufferEvent(HREQ_SIM_UNLOCK_PIN, data) < 0) {
-            TELEPHONY_LOGE("cellularRadio_->SendRequest fail");
-        }
-    } else {
-        TELEPHONY_LOGE("ERROR : UnLockPin --> cellularRadio_ == nullptr !!!");
+    if (cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("ERROR: UnLockPin --> cellularRadio_ is nullptr!!!");
+        return;
+    }
+    std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_SIM_UNLOCK_PIN, result);
+    if (request == nullptr) {
+        return;
+    }
+    MessageParcel data;
+    data.WriteInt32(slotId_);
+    data.WriteInt32(request->serialId_);
+    data.WriteCString(pin.c_str());
+    if (SendBufferEvent(HREQ_SIM_UNLOCK_PIN, data) < 0) {
+        TELEPHONY_LOGE("cellularRadio_->SendRequest fail");
     }
 }
 
 void RilManagerTest::UnLockPin2(const std::string &pin2, const AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("RilManagerTest::UnLockPin2 -->");
-    if (cellularRadio_ != nullptr) {
-        std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_SIM_UNLOCK_PIN2, result);
-        if (request == nullptr) {
-            return;
-        }
-        MessageParcel data;
-        data.WriteInt32(slotId_);
-        data.WriteInt32(request->serialId_);
-        data.WriteCString(pin2.c_str());
-
-        if (SendBufferEvent(HREQ_SIM_UNLOCK_PIN2, data) < 0) {
-            TELEPHONY_LOGE("cellularRadio_->SendRequest fail");
-        }
-    } else {
-        TELEPHONY_LOGE("ERROR : UnLockPin2 --> cellularRadio_ == nullptr !!!");
+    if (cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("ERROR: UnLockPin2 --> cellularRadio_ is nullptr!!!");
+        return;
+    }
+    std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_SIM_UNLOCK_PIN2, result);
+    if (request == nullptr) {
+        return;
+    }
+    MessageParcel data;
+    data.WriteInt32(slotId_);
+    data.WriteInt32(request->serialId_);
+    data.WriteCString(pin2.c_str());
+    if (SendBufferEvent(HREQ_SIM_UNLOCK_PIN2, data) < 0) {
+        TELEPHONY_LOGE("cellularRadio_->SendRequest fail");
     }
 }
 
@@ -1409,22 +1490,21 @@ void RilManagerTest::UnLockPuk(
     const std::string &puk, const std::string &pin, const AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("RilManagerTest::UnLockPuk -->");
-    if (cellularRadio_ != nullptr) {
-        std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_SIM_UNLOCK_PUK, result);
-        if (request == nullptr) {
-            return;
-        }
-        MessageParcel data;
-        data.WriteInt32(slotId_);
-        data.WriteInt32(request->serialId_);
-        data.WriteCString(puk.c_str());
-        data.WriteCString(pin.c_str());
-
-        if (SendBufferEvent(HREQ_SIM_UNLOCK_PUK, data) < 0) {
-            TELEPHONY_LOGE("cellularRadio_->SendRequest fail");
-        }
-    } else {
-        TELEPHONY_LOGE("ERROR : UnLockPuk --> cellularRadio_ == nullptr !!!");
+    if (cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("ERROR: UnLockPuk --> cellularRadio_ is nullptr!!!");
+        return;
+    }
+    std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_SIM_UNLOCK_PUK, result);
+    if (request == nullptr) {
+        return;
+    }
+    MessageParcel data;
+    data.WriteInt32(slotId_);
+    data.WriteInt32(request->serialId_);
+    data.WriteCString(puk.c_str());
+    data.WriteCString(pin.c_str());
+    if (SendBufferEvent(HREQ_SIM_UNLOCK_PUK, data) < 0) {
+        TELEPHONY_LOGE("cellularRadio_->SendRequest fail");
     }
 }
 
@@ -1432,22 +1512,21 @@ void RilManagerTest::UnLockPuk2(
     const std::string &puk2, const std::string &pin2, const AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("RilManagerTest::UnLockPuk2 -->");
-    if (cellularRadio_ != nullptr) {
-        std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_SIM_UNLOCK_PUK2, result);
-        if (request == nullptr) {
-            return;
-        }
-        MessageParcel data;
-        data.WriteInt32(slotId_);
-        data.WriteInt32(request->serialId_);
-        data.WriteCString(puk2.c_str());
-        data.WriteCString(pin2.c_str());
-
-        if (SendBufferEvent(HREQ_SIM_UNLOCK_PUK2, data) < 0) {
-            TELEPHONY_LOGE("cellularRadio_->SendRequest fail");
-        }
-    } else {
-        TELEPHONY_LOGE("ERROR : UnLockPuk2 --> cellularRadio_ == nullptr !!!");
+    if (cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("ERROR: UnLockPuk2 --> cellularRadio_ is nullptr!!!");
+        return;
+    }
+    std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_SIM_UNLOCK_PUK2, result);
+    if (request == nullptr) {
+        return;
+    }
+    MessageParcel data;
+    data.WriteInt32(slotId_);
+    data.WriteInt32(request->serialId_);
+    data.WriteCString(puk2.c_str());
+    data.WriteCString(pin2.c_str());
+    if (SendBufferEvent(HREQ_SIM_UNLOCK_PUK2, data) < 0) {
+        TELEPHONY_LOGE("cellularRadio_->SendRequest fail");
     }
 }
 
@@ -1455,29 +1534,28 @@ void RilManagerTest::ChangeSimPassword(const std::string &fac, const std::string
     const std::string &newPassword, int32_t passwordLength, const AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("RilManagerTest::ChangeSimPassword -->");
-    if (cellularRadio_ != nullptr) {
-        std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_SIM_CHANGE_SIM_PASSWORD, result);
-        if (request == nullptr) {
-            return;
-        }
-        MessageParcel data;
-        data.WriteInt32(slotId_);
-        SimPasswordInfo simPwdInfo;
-        simPwdInfo.serial = request->serialId_;
-        simPwdInfo.fac = fac;
-        simPwdInfo.oldPassword = oldPassword;
-        simPwdInfo.newPassword = newPassword;
-        simPwdInfo.passwordLength = passwordLength;
-
-        if (!simPwdInfo.Marshalling(data)) {
-            TELEPHONY_LOGE("RilManagerTest simlockinfo Marshalling failed!!!");
-            return;
-        }
-        if (SendBufferEvent(HREQ_SIM_CHANGE_SIM_PASSWORD, data) < 0) {
-            TELEPHONY_LOGE("cellularRadio_->SendRequest fail");
-        }
-    } else {
-        TELEPHONY_LOGE("ERROR : ChangeSimPassword --> cellularRadio_ == nullptr !!!");
+    if (cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("ERROR: ChangeSimPassword --> cellularRadio_ is nullptr!!!");
+        return;
+    }
+    std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_SIM_CHANGE_SIM_PASSWORD, result);
+    if (request == nullptr) {
+        return;
+    }
+    MessageParcel data;
+    data.WriteInt32(slotId_);
+    SimPasswordInfo simPwdInfo;
+    simPwdInfo.serial = request->serialId_;
+    simPwdInfo.fac = fac;
+    simPwdInfo.oldPassword = oldPassword;
+    simPwdInfo.newPassword = newPassword;
+    simPwdInfo.passwordLength = passwordLength;
+    if (!simPwdInfo.Marshalling(data)) {
+        TELEPHONY_LOGE("RilManagerTest simlockinfo Marshalling failed!!!");
+        return;
+    }
+    if (SendBufferEvent(HREQ_SIM_CHANGE_SIM_PASSWORD, data) < 0) {
+        TELEPHONY_LOGE("cellularRadio_->SendRequest fail");
     }
 }
 
@@ -1485,29 +1563,28 @@ void RilManagerTest::SetSimLock(
     const std::string &fac, int32_t mode, const std::string &password, const AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("RilManagerTest::SetSimLock -->");
-    if (cellularRadio_ != nullptr) {
-        std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_SIM_SET_SIM_LOCK, result);
-        if (request == nullptr) {
-            return;
-        }
-        MessageParcel data;
-        data.WriteInt32(slotId_);
-        SimLockInfo simlockinfo;
-        simlockinfo.serial = request->serialId_;
-        simlockinfo.fac = fac;
-        simlockinfo.mode = mode;
-        simlockinfo.passwd = password;
-        simlockinfo.classx = 0;
-
-        if (!simlockinfo.Marshalling(data)) {
-            TELEPHONY_LOGE("RilManagerTest simlockinfo Marshalling failed!!!");
-            return;
-        }
-        if (SendBufferEvent(HREQ_SIM_SET_SIM_LOCK, data) < 0) {
-            TELEPHONY_LOGE("cellularRadio_->SendRequest fail");
-        }
-    } else {
-        TELEPHONY_LOGE("ERROR : SetSimLock --> cellularRadio_ == nullptr !!!");
+    if (cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("ERROR: SetSimLock --> cellularRadio_ is nullptr!!!");
+        return;
+    }
+    std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_SIM_SET_SIM_LOCK, result);
+    if (request == nullptr) {
+        return;
+    }
+    MessageParcel data;
+    data.WriteInt32(slotId_);
+    SimLockInfo simlockinfo;
+    simlockinfo.serial = request->serialId_;
+    simlockinfo.fac = fac;
+    simlockinfo.mode = mode;
+    simlockinfo.passwd = password;
+    simlockinfo.classx = 0;
+    if (!simlockinfo.Marshalling(data)) {
+        TELEPHONY_LOGE("RilManagerTest simlockinfo Marshalling failed!!!");
+        return;
+    }
+    if (SendBufferEvent(HREQ_SIM_SET_SIM_LOCK, data) < 0) {
+        TELEPHONY_LOGE("cellularRadio_->SendRequest fail");
     }
 }
 
@@ -1515,28 +1592,27 @@ void RilManagerTest::GetSimLockStatus(
     const std::string &fac, int32_t mode, const AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("RilManagerTest::GetSimLockStatus -->");
-    if (cellularRadio_ != nullptr) {
-        std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_SIM_GET_SIM_LOCK_STATUS, result);
-        if (request == nullptr) {
-            return;
-        }
-        MessageParcel data;
-        data.WriteInt32(slotId_);
-        SimLockInfo simlockinfo;
-        simlockinfo.serial = request->serialId_;
-        simlockinfo.fac = fac;
-        simlockinfo.mode = mode;
-        simlockinfo.classx = 0;
-
-        if (!simlockinfo.Marshalling(data)) {
-            TELEPHONY_LOGE("RilManagerTest simlockinfo Marshalling failed!!!");
-            return;
-        }
-        if (SendBufferEvent(HREQ_SIM_GET_SIM_LOCK_STATUS, data) < 0) {
-            TELEPHONY_LOGE("cellularRadio_->SendRequest fail");
-        }
-    } else {
-        TELEPHONY_LOGE("ERROR : GetSimLockStatus --> cellularRadio_ == nullptr !!!");
+    if (cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("ERROR: GetSimLockStatus --> cellularRadio_ is nullptr!!!");
+        return;
+    }
+    std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_SIM_GET_SIM_LOCK_STATUS, result);
+    if (request == nullptr) {
+        return;
+    }
+    MessageParcel data;
+    data.WriteInt32(slotId_);
+    SimLockInfo simlockinfo;
+    simlockinfo.serial = request->serialId_;
+    simlockinfo.fac = fac;
+    simlockinfo.mode = mode;
+    simlockinfo.classx = 0;
+    if (!simlockinfo.Marshalling(data)) {
+        TELEPHONY_LOGE("RilManagerTest simlockinfo Marshalling failed!!!");
+        return;
+    }
+    if (SendBufferEvent(HREQ_SIM_GET_SIM_LOCK_STATUS, data) < 0) {
+        TELEPHONY_LOGE("cellularRadio_->SendRequest fail");
     }
 }
 } // namespace Telephony

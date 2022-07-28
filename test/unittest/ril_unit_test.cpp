@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -50,8 +50,6 @@ RilUnitTest::RilUnitTest(int32_t opt) : slotId_(opt) {}
 RilUnitTest::~RilUnitTest() {}
 
 const int32_t REASON = 2;
-const int32_t REQ_INFO_P2 = 2;
-const int32_t REQ_INFO_P3 = 3;
 
 const int32_t STRESS_TEST_NUM = 10000;
 const int32_t MAX_CALL_ID = 7;
@@ -252,6 +250,31 @@ void RilUnitTest::GetEmergencyListTest(const OHOS::AppExecFwk::InnerEvent::Point
     TELEPHONY_LOGI("RilUnitTest::GetEmergencyListTest --> finished");
 }
 
+void RilUnitTest::SetEmergencyCallListTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::SetEmergencyCallListTest -->");
+    int32_t ret = mRilManager_->SetEmergencyCallList(result);
+    TELEPHONY_LOGI("RilUnitTest::SetEmergencyCallListTest return: %{public}d", ret);
+}
+
+void RilUnitTest::SetBarringPasswordTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::SetBarringPasswordTest -->");
+    string fac = "AB";
+    cout << "Please input old password:";
+    string oldPassword;
+    cin >> oldPassword;
+    cout << "Your input old password is : " << oldPassword << endl;
+
+    cout << "Please input new password:";
+    string newPassword;
+    cin >> newPassword;
+    cout << "Your input new password is : " << newPassword << endl;
+
+    mRilManager_->SetBarringPassword(fac, oldPassword, newPassword, result);
+    TELEPHONY_LOGI("RilUnitTest::SetBarringPasswordTest --> finished");
+}
+
 void RilUnitTest::GetFailReasonTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("RilUnitTest::GetFailReasonTest -->");
@@ -385,13 +408,6 @@ void RilUnitTest::GetRilPreferredNetwrokTest(const OHOS::AppExecFwk::InnerEvent:
     TELEPHONY_LOGI("RilUnitTest::GetRilPreferredNetwrokTest -->");
     mRilManager_->GetPreferredNetwork(result);
     TELEPHONY_LOGI("RilUnitTest::GetRilPreferredNetwrokTest --> GetRilPreferredNetwrokTest finished");
-}
-
-void RilUnitTest::GetRilImsRegStatusTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
-{
-    TELEPHONY_LOGI("RilUnitTest::GetRilImsRegStatusTest -->");
-    mRilManager_->GetImsRegStatus(result);
-    TELEPHONY_LOGI("RilUnitTest::GetRilImsRegStatusTest --> GetRilImsRegStatusTest finished");
 }
 
 void RilUnitTest::GetMeidTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
@@ -617,9 +633,7 @@ void RilUnitTest::AcknowledgeRilCmLastIncomingGsmSmsTest(const OHOS::AppExecFwk:
     TELEPHONY_LOGI("RilUnitTest::AcknowledgeRilCmLastIncomingGsmSmsTest -->");
     int32_t cause = 2;
     mRilManager_->SendSmsAck(true, cause, result);
-    TELEPHONY_LOGI(
-        "RilUnitTest::AcknowledgeRilCmLastIncomingGsmSmsTest --> AcknowledgeRilCmLastIncomingGsmSmsTest "
-        "finished");
+    TELEPHONY_LOGI("RilUnitTest::AcknowledgeRilCmLastIncomingGsmSmsTest --> finished");
 }
 
 void RilUnitTest::SetupRilCmDataCallTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
@@ -643,6 +657,45 @@ void RilUnitTest::SetupRilCmDataCallTest(const OHOS::AppExecFwk::InnerEvent::Poi
     RilDataProfileTest dataProfile(0, apn, protocol, 1, username, key, protocol);
     mRilManager_->ActivatePdpContext(1, dataProfile, true, true, result);
     TELEPHONY_LOGI("RilUnitTest::SetupRilCmDataCallTest --> SetupRilCmDataCallTest finished");
+}
+
+void RilUnitTest::SetDataProfileInfoTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::SetDataProfileInfoTest -->");
+    int32_t size = 0;
+    cout << "please enter the profile size:";
+    cin >> size;
+    DataProfilesInfo dataProfilesInfo;
+    dataProfilesInfo.profilesSize = size;
+    for (int32_t i = 0; i < size; i++) {
+        string apn;
+        cout << "please enter the apn:";
+        cin >> apn;
+        string username;
+
+        cout << "please enter the username:";
+        cin >> username;
+
+        string dataInfoPwd;
+        cout << "please enter the password:";
+        cin >> dataInfoPwd;
+
+        string protocol;
+        cout << "please enter the protocol:";
+        cin >> protocol;
+        DataProfileDataInfo dataInfo;
+        dataInfo.serial = i;
+        dataInfo.profileId = i;
+        dataInfo.apn = apn;
+        dataInfo.protocol = protocol;
+        dataInfo.roamingProtocol = "0";
+        dataInfo.verType = 0;
+        dataInfo.userName = username;
+        dataInfo.password = dataInfoPwd;
+        dataProfilesInfo.profiles.push_back(dataInfo);
+    }
+    mRilManager_->SetDataProfileInfo(dataProfilesInfo, result);
+    TELEPHONY_LOGI("RilUnitTest::SetInitialApnTest --> SetInitialApnTest finished");
 }
 
 void RilUnitTest::DeactivateRilCmDataCallTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
@@ -724,29 +777,64 @@ void RilUnitTest::OnStressInput(int32_t what, const OHOS::AppExecFwk::InnerEvent
 void RilUnitTest::SimOpenLogicalChannel(const AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("RilUnitTest::SimOpenLogicalChannel -->");
-    mRilManager_->SimOpenLogicalChannel("appID", 0, result);
+    std::string appId;
+    int32_t p2;
+    cout << "----> input appId:" << endl;
+    cin >> appId;
+    cout << "----> input p2:" << endl;
+    cin >> p2;
+    mRilManager_->SimOpenLogicalChannel(appId, p2, result);
     TELEPHONY_LOGI("RilUnitTest::SimOpenLogicalChannel --> SimOpenLogicalChannel finished");
 }
 
 void RilUnitTest::SimCloseLogicalChannel(const AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("RilUnitTest::SimCloseLogicalChannel -->");
-    mRilManager_->SimCloseLogicalChannel(0, result);
+    int32_t channelId;
+    cout << "----> input channelId:" << endl;
+    cin >> channelId;
+    mRilManager_->SimCloseLogicalChannel(channelId, result);
     TELEPHONY_LOGI("RilUnitTest::SimCloseLogicalChannel --> SimCloseLogicalChannel finished");
+}
+
+void RilUnitTest::GetTransmitApduChannelParam(
+    int32_t &channelId, int32_t &type, int32_t &instruction, int32_t &p1, int32_t &p2, int32_t &p3)
+{
+    cout << "----> input channelId:" << endl;
+    cin >> channelId;
+
+    cout << "----> input type:" << endl;
+    cin >> type;
+
+    cout << "----> input instruction:" << endl;
+    cin >> instruction;
+
+    cout << "----> input p1:" << endl;
+    cin >> p1;
+
+    cout << "----> input p2:" << endl;
+    cin >> p2;
+
+    cout << "----> input p3:" << endl;
+    cin >> p3;
 }
 
 void RilUnitTest::SimTransmitApduLogicalChannel(const AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("RilUnitTest::SimTransmitApduLogicalChannel -->");
     ApduSimIORequestInfo reqInfo = ApduSimIORequestInfo();
+
+    int32_t channelId, type, instruction, p1, p2, p3;
+    GetTransmitApduChannelParam(channelId, type, instruction, p1, p2, p3);
+
     reqInfo.serial = 0;
-    reqInfo.channelId = 1;
-    reqInfo.type = 0;
-    reqInfo.instruction = 1;
-    reqInfo.p1 = 1;
-    reqInfo.p2 = REQ_INFO_P2;
-    reqInfo.p3 = REQ_INFO_P3;
-    reqInfo.data = "apdu";
+    reqInfo.channelId = channelId;
+    reqInfo.type = type;
+    reqInfo.instruction = instruction;
+    reqInfo.p1 = p1;
+    reqInfo.p2 = p2;
+    reqInfo.p3 = p3;
+    reqInfo.data = "";
     mRilManager_->SimTransmitApduLogicalChannel(reqInfo, result);
     TELEPHONY_LOGI("RilUnitTest::SimTransmitApduLogicalChannel --> SimTransmitApduLogicalChannel finished");
 }
@@ -755,13 +843,18 @@ void RilUnitTest::SimTransmitApduBasicChannel(const AppExecFwk::InnerEvent::Poin
 {
     TELEPHONY_LOGI("RilUnitTest::SimTransmitApduBasicChannel -->");
     ApduSimIORequestInfo reqInfo = ApduSimIORequestInfo();
+
+    int32_t channelId, type, instruction, p1, p2, p3;
+    GetTransmitApduChannelParam(channelId, type, instruction, p1, p2, p3);
+
+    reqInfo.channelId = channelId;
     reqInfo.serial = 0;
-    reqInfo.type = 0;
-    reqInfo.instruction = 1;
-    reqInfo.p1 = 1;
-    reqInfo.p2 = REQ_INFO_P2;
-    reqInfo.p3 = REQ_INFO_P3;
-    reqInfo.data = "apdu";
+    reqInfo.type = type;
+    reqInfo.instruction = instruction;
+    reqInfo.p1 = p1;
+    reqInfo.p2 = p2;
+    reqInfo.p3 = p3;
+    reqInfo.data = "";
     mRilManager_->SimTransmitApduBasicChannel(reqInfo, result);
     TELEPHONY_LOGI("RilUnitTest::SimTransmitApduBasicChannel --> SimTransmitApduBasicChannel finished");
 }
@@ -831,28 +924,28 @@ void RilUnitTest::UnLockPIN2Test(const OHOS::AppExecFwk::InnerEvent::Pointer &re
 void RilUnitTest::UnLockPUKTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("RilUnitTest::UnLockPUKTest -->");
-    std::string pin;
-    cout << "please enter the pin:";
-    cin >> pin;
-
     std::string puk;
     cout << "please enter the puk:";
     cin >> puk;
-    mRilManager_->UnLockPuk(pin, puk, result);
+
+    std::string pin;
+    cout << "please enter the pin:";
+    cin >> pin;
+    mRilManager_->UnLockPuk(puk, pin, result);
     TELEPHONY_LOGI("RilUnitTest::UnLockPUKTest --> UnLockPUKTest finished");
 }
 
 void RilUnitTest::UnLockPUK2Test(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("RilUnitTest::UnLockPUK2Test -->");
-    std::string pin2;
-    cout << "please enter the pin2:";
-    cin >> pin2;
-
     std::string puk2;
     cout << "please enter the puk2:";
     cin >> puk2;
-    mRilManager_->UnLockPuk2(pin2, puk2, result);
+
+    std::string pin2;
+    cout << "please enter the pin2:";
+    cin >> pin2;
+    mRilManager_->UnLockPuk2(puk2, pin2, result);
     TELEPHONY_LOGI("RilUnitTest::UnLockPUK2Test --> UnLockPUK2Test finished");
 }
 
@@ -918,7 +1011,7 @@ void RilUnitTest::OnInitStressInterface()
     stressMemberFuncMap_[HREQ_MODEM_SET_RADIO_STATUS] = &RilUnitTest::SetRilCmRadioPowerStressTest;
 }
 
-void RilUnitTest::OnInitProcessInterface()
+void RilUnitTest::OnInitCallProcessInterface()
 {
     // call
     memberFuncMap_[HREQ_CALL_GET_CALL_LIST] = &RilUnitTest::GetCallListTest;
@@ -944,15 +1037,23 @@ void RilUnitTest::OnInitProcessInterface()
     memberFuncMap_[HREQ_CALL_SET_MUTE] = &RilUnitTest::SetMuteTest;
     memberFuncMap_[HREQ_CALL_GET_MUTE] = &RilUnitTest::GetMuteTest;
     memberFuncMap_[HREQ_CALL_GET_EMERGENCY_LIST] = &RilUnitTest::GetEmergencyListTest;
+    memberFuncMap_[HREQ_CALL_SET_EMERGENCY_LIST] = &RilUnitTest::SetEmergencyCallListTest;
     memberFuncMap_[HREQ_CALL_GET_FAIL_REASON] = &RilUnitTest::GetFailReasonTest;
+    memberFuncMap_[HREQ_CALL_SET_BARRING_PASSWORD] = &RilUnitTest::SetBarringPasswordTest;
+}
 
+void RilUnitTest::OnInitSmsProcessInterface()
+{
     // sms
     memberFuncMap_[HREQ_SMS_SEND_GSM_SMS] = &RilUnitTest::SendRilCmSmsTest;
     memberFuncMap_[HREQ_SMS_SEND_SMS_MORE_MODE] = &RilUnitTest::SendRilCmSmsMoreModeTest;
     memberFuncMap_[HREQ_SMS_SEND_SMS_ACK] = &RilUnitTest::SendSmsAckTest;
     memberFuncMap_[HREQ_SMS_SET_SMSC_ADDR] = &RilUnitTest::SetSmscAddrTest;
     memberFuncMap_[HREQ_SMS_GET_SMSC_ADDR] = &RilUnitTest::GetSmscAddrTest;
+}
 
+void RilUnitTest::OnInitSimProcessInterface()
+{
     // sim
     memberFuncMap_[HREQ_SIM_GET_SIM_STATUS] = &RilUnitTest::GetRilCmIccCardStatusTest;
     memberFuncMap_[HREQ_SIM_GET_IMSI] = &RilUnitTest::GetRilCmImsiForAppTest;
@@ -971,14 +1072,21 @@ void RilUnitTest::OnInitProcessInterface()
     memberFuncMap_[HREQ_SIM_CHANGE_SIM_PASSWORD] = &RilUnitTest::ChangeSimPasswordTest;
     memberFuncMap_[HREQ_SIM_SET_SIM_LOCK] = &RilUnitTest::SetSimLockTest;
     memberFuncMap_[HREQ_SIM_GET_SIM_LOCK_STATUS] = &RilUnitTest::GetSimLockStatusTest;
+}
 
+void RilUnitTest::OnInitDataProcessInterface()
+{
     // data
     memberFuncMap_[HREQ_DATA_ACTIVATE_PDP_CONTEXT] = &RilUnitTest::SetupRilCmDataCallTest;
     memberFuncMap_[HREQ_DATA_DEACTIVATE_PDP_CONTEXT] = &RilUnitTest::DeactivateRilCmDataCallTest;
     memberFuncMap_[HREQ_DATA_GET_LINK_BANDWIDTH_INFO] = &RilUnitTest::GetLinkBandwidthInfoTest;
+    memberFuncMap_[HREQ_DATA_SET_DATA_PROFILE_INFO] = &RilUnitTest::SetDataProfileInfoTest;
     memberFuncMap_[HREQ_DATA_GET_PDP_CONTEXT_LIST] = &RilUnitTest::GetRilCmDataCallListTest;
     memberFuncMap_[HREQ_DATA_SET_INIT_APN_INFO] = &RilUnitTest::SetInitialApnTest;
+}
 
+void RilUnitTest::OnInitNetworkProcessInterface()
+{
     // network
     memberFuncMap_[HREQ_NETWORK_GET_SIGNAL_STRENGTH] = &RilUnitTest::GetRilCmSignalIntensityTest;
     memberFuncMap_[HREQ_NETWORK_GET_CS_REG_STATUS] = &RilUnitTest::GetRilCmCsRegStatusTest;
@@ -991,11 +1099,13 @@ void RilUnitTest::OnInitProcessInterface()
     memberFuncMap_[HREQ_NETWORK_GET_CURRENT_CELL_INFO] = &RilUnitTest::GetRilCurrentCellInfoTest;
     memberFuncMap_[HREQ_NETWORK_GET_PREFERRED_NETWORK] = &RilUnitTest::GetRilPreferredNetwrokTest;
     memberFuncMap_[HREQ_NETWORK_SET_PREFERRED_NETWORK] = &RilUnitTest::SetRilPreferredNetwrokTest;
-    memberFuncMap_[HREQ_NETWORK_GET_IMS_REG_STATUS] = &RilUnitTest::GetRilImsRegStatusTest;
     memberFuncMap_[HREQ_NETWORK_SET_LOCATE_UPDATES] = &RilUnitTest::SetRilLocationUpdateTest;
     memberFuncMap_[HREQ_NETWORK_SET_NOTIFICATION_FILTER] = &RilUnitTest::SetRilNotificationFilterTest;
     memberFuncMap_[HREQ_NETWORK_SET_DEVICE_STATE] = &RilUnitTest::SetRilDeviceStateTest;
+}
 
+void RilUnitTest::OnInitModemProcessInterface()
+{
     // modem
     memberFuncMap_[HREQ_MODEM_SHUT_DOWN] = &RilUnitTest::ShutDownTest;
     memberFuncMap_[HREQ_MODEM_SET_RADIO_STATUS] = &RilUnitTest::SetRilCmRadioPowerTest;
@@ -1006,12 +1116,21 @@ void RilUnitTest::OnInitProcessInterface()
     memberFuncMap_[HREQ_MODEM_GET_BASEBAND_VERSION] = &RilUnitTest::GetBasebandVersionTest;
 }
 
+void RilUnitTest::OnInitProcessInterface()
+{
+    OnInitCallProcessInterface();
+    OnInitSmsProcessInterface();
+    OnInitSimProcessInterface();
+    OnInitDataProcessInterface();
+    OnInitNetworkProcessInterface();
+    OnInitModemProcessInterface();
+}
+
 void RilUnitTest::OnInitInterface()
 {
     OnInitStressInterface();
     OnInitProcessInterface();
 }
-
 } // namespace
 } // namespace Telephony
 } // namespace OHOS
@@ -1063,7 +1182,9 @@ static int32_t PrintCallMenu()
     cout << "----> [" << HREQ_CALL_SET_MUTE << "] ---->[ HREQ_CALL_SET_MUTE ]" << endl;
     cout << "----> [" << HREQ_CALL_GET_MUTE << "] ---->[ HREQ_CALL_GET_MUTE ]" << endl;
     cout << "----> [" << HREQ_CALL_GET_EMERGENCY_LIST << "] ---->[ HREQ_CALL_GET_EMERGENCY_LIST ]" << endl;
+    cout << "----> [" << HREQ_CALL_SET_EMERGENCY_LIST << "] ---->[ HREQ_CALL_SET_EMERGENCY_LIST ]" << endl;
     cout << "----> [" << HREQ_CALL_GET_FAIL_REASON << "] ---->[ HREQ_CALL_GET_FAIL_REASON ]" << endl;
+    cout << "----> [" << HREQ_CALL_SET_BARRING_PASSWORD << "] ---->[ HREQ_CALL_SET_BARRING_PASSWORD ]" << endl;
 
     int32_t choice = InputInt32(HREQ_CALL_BASE, HREQ_SMS_BASE - 1, "Command");
     cout << "---->You choose: " << choice << endl;
@@ -1125,6 +1246,7 @@ static int32_t PrintDataMenu()
     cout << "----> [" << HREQ_DATA_GET_LINK_BANDWIDTH_INFO << "] ---->[ HREQ_DATA_GET_LINK_BANDWIDTH_INFO ]" << endl;
     cout << "----> [" << HREQ_DATA_GET_PDP_CONTEXT_LIST << "] ---->[ HREQ_DATA_GET_PDP_CONTEXT_LIST ]" << endl;
     cout << "----> [" << HREQ_DATA_SET_INIT_APN_INFO << "] ---->[ HREQ_DATA_SET_INIT_APN_INFO ]" << endl;
+    cout << "----> [" << HREQ_DATA_SET_DATA_PROFILE_INFO << "] ---->[ HREQ_DATA_SET_DATA_PROFILE_INFO ]" << endl;
 
     int32_t choice = InputInt32(HREQ_DATA_BASE, HREQ_NETWORK_BASE - 1, "Command");
     cout << "---->You choose: " << choice << endl;
@@ -1156,7 +1278,6 @@ static int32_t PrintNetworkMenu()
     cout << "----> [" << HREQ_NETWORK_GET_CURRENT_CELL_INFO << "] ---->[ HREQ_NETWORK_GET_CURRENT_CELL_INFO ]" << endl;
     cout << "----> [" << HREQ_NETWORK_GET_PREFERRED_NETWORK << "] ---->[ HREQ_NETWORK_GET_PREFERRED_NETWORK ]" << endl;
     cout << "----> [" << HREQ_NETWORK_SET_PREFERRED_NETWORK << "] ---->[ HREQ_NETWORK_SET_PREFERRED_NETWORK ]" << endl;
-    cout << "----> [" << HREQ_NETWORK_GET_IMS_REG_STATUS << "] ---->[ HREQ_NETWORK_GET_IMS_REG_STATUS ]" << endl;
     cout << "----> [" << HREQ_NETWORK_SET_LOCATE_UPDATES << "] ---->[ HREQ_NETWORK_SET_LOCATE_UPDATES ]" << endl;
     cout << "----> [" << HREQ_NETWORK_SET_NOTIFICATION_FILTER
          << "] ---->[ HREQ_NETWORK_SET_NOTIFICATION_FILTER ]" << endl;

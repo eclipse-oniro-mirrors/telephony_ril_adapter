@@ -425,7 +425,7 @@ int32_t HRilSms::SetCdmaCBConfig(struct HdfSBuf *data)
         return HRIL_ERR_INVALID_PARAMETER;
     }
     HRilCdmaCBConfigInfo list[cellBroadcastInfoList.size];
-    for (size_t i = 0; i < cellBroadcastInfoList.size; i++) {
+    for (int32_t i = 0; i < cellBroadcastInfoList.size; i++) {
         list[i].service = cellBroadcastInfoList.list[i].service;
         list[i].language = cellBroadcastInfoList.list[i].language;
         list[i].checked = cellBroadcastInfoList.list[i].checked;
@@ -1164,7 +1164,7 @@ int32_t HRilSms::RequestWithStrings(int32_t serial, int32_t request, int32_t cou
     if (count <= 0) {
         return HRIL_ERR_NULL_POINT;
     }
-    pBuff = (char **)malloc(count * sizeof(int32_t));
+    pBuff = (char **)malloc(count * sizeof(int8_t));
     if (pBuff == nullptr) {
         TELEPHONY_LOGE("req: [%{public}d,%{public}d], malloc fail", serial, request);
         return HRIL_ERR_NULL_POINT;

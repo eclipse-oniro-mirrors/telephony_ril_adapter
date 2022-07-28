@@ -34,14 +34,14 @@ ohos_shared_library("ril_vendor") {
   configs = [ "$RIL_ADAPTER/utils:utils_config" ]
   defines += [
     "LOG_TAG = \"RilVendor\"",
-    "LOG_DOMAIN = 0xD002B01",
+    "LOG_DOMAIN = 0xD001F08",
   ]
-  deps = [
-    "//base/telephony/ril_adapter/interfaces/innerkits:hril_innerkits",
-    "//utils/native/base:utils",
-  ]
+  deps = [ "//base/telephony/ril_adapter/interfaces/innerkits:hril_innerkits" ]
 
-  external_deps = [ "startup_l2:syspara" ]
+  external_deps = [
+    "c_utils:utils",
+    "init:libbegetutil",
+  ]
 
   if (is_standard_system) {
     external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
@@ -49,6 +49,7 @@ ohos_shared_library("ril_vendor") {
     external_deps += [ "hilog:libhilog" ]
   }
 
+  install_images = [ chipset_base_dir ]
   part_name = "ril_adapter"
   subsystem_name = "telephony"
 }

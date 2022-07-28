@@ -16,8 +16,6 @@
 #ifndef OHOS_RIL_RADIO_RESPONSE_test_H
 #define OHOS_RIL_RADIO_RESPONSE_test_H
 
-#include <iservice_registry.h>
-
 #include "ril_manager_test.h"
 
 namespace OHOS {
@@ -72,6 +70,16 @@ public:
     void OnRequestSetUssdTest(MessageParcel &data);
     void OnRequestGetUssdTest(MessageParcel &data);
     void OnRequestGetLinkBandwidthInfoTest(MessageParcel &data);
+    void OnRequestSetClipTest(MessageParcel &data);
+    void OnRequestGetClipTest(MessageParcel &data);
+    void OnRequestSetCallWaitingTest(MessageParcel &data);
+    void OnRequestGetCallWaitingTest(MessageParcel &data);
+    void OnRequestSetCallRestrictionTest(MessageParcel &data);
+    void OnRequestGetCallRestrictionTest(MessageParcel &data);
+    void OnRequestSetCallTransferInfoTest(MessageParcel &data);
+    void OnRequestGetCallTransferInfoTest(MessageParcel &data);
+    void OnRequestSetClirTest(MessageParcel &data);
+    void OnRequestGetClirTest(MessageParcel &data);
 
 private:
     RilManagerTest *mRilManager_;

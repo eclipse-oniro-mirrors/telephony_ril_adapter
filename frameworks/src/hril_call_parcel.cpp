@@ -738,9 +738,6 @@ bool UssdNoticeInfo::ReadFromParcel(Parcel &parcel)
     if (!Read(parcel, str)) {
         return false;
     }
-    if (!Read(parcel, dcs)) {
-        return false;
-    }
     return true;
 }
 
@@ -750,9 +747,6 @@ bool UssdNoticeInfo::Marshalling(Parcel &parcel) const
         return false;
     }
     if (!Write(parcel, str)) {
-        return false;
-    }
-    if (!Write(parcel, dcs)) {
         return false;
     }
     return true;

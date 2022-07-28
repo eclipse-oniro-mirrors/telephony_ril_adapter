@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,8 +18,6 @@
 #include <fcntl.h>
 #include <termios.h>
 
-#include "parameter.h"
-
 #include "at_call.h"
 #include "at_data.h"
 #include "at_modem.h"
@@ -27,9 +25,9 @@
 #include "at_sim.h"
 #include "at_sms.h"
 #include "at_support.h"
-#include "vendor_report.h"
-
 #include "hril_notification.h"
+#include "parameter.h"
+#include "vendor_report.h"
 
 #define DEVICE_PATH "/dev/ttyUSB0"
 #define DEVICE_PATH_DEFAULT "/dev/ttyUSB"
@@ -68,11 +66,8 @@ static const HRilCallReq g_callReqOps = {
     .StartDtmf = ReqStartDtmf,
     .SendDtmf = ReqSendDtmf,
     .StopDtmf = ReqStopDtmf,
-    .GetImsCallList = ReqGetImsCallList,
     .GetCallPreferenceMode = ReqGetCallPreferenceMode,
     .SetCallPreferenceMode = ReqSetCallPreferenceMode,
-    .GetLteImsSwitchStatus = ReqGetLteImsSwitchStatus,
-    .SetLteImsSwitchStatus = ReqSetLteImsSwitchStatus,
     .SetUssd = ReqSetUssd,
     .GetUssd = ReqGetUssd,
     .GetMute = ReqGetMute,
@@ -80,6 +75,7 @@ static const HRilCallReq g_callReqOps = {
     .GetEmergencyCallList = ReqGetEmergencyCallList,
     .GetCallFailReason = ReqGetCallFailReason,
     .SetEmergencyCallList = ReqSetEmergencyCallList,
+    .SetBarringPassword = ReqSetBarringPassword,
 };
 
 static const HRilSimReq g_simReqOps = {
@@ -125,7 +121,6 @@ static const HRilSmsReq g_smsReqOps = {
 
 static const HRilNetworkReq g_networkReqOps = {
     .GetSignalStrength = ReqGetSignalStrength,
-    .GetImsRegStatus = ReqGetImsRegStatus,
     .GetCsRegStatus = ReqGetCsRegStatus,
     .GetPsRegStatus = ReqGetPsRegStatus,
     .GetOperatorInfo = ReqGetOperatorInfo,
@@ -184,16 +179,19 @@ int32_t SetRadioState(HRilRadioState newState, int32_t rst)
     struct ReportInfo reportInfo;
     (void)memset_s(&reportInfo, sizeof(struct ReportInfo), 0, sizeof(struct ReportInfo));
     if (g_atStatus > 0) {
-        newState = HRIL_RADIO_POWER_STATE_UNAVAILABLE;
         pthread_cond_signal(&g_statusCond);
         return -1;
     }
+
     pthread_mutex_lock(&g_statusMutex);
     oldState = g_radioState;
-    if (oldState != newState || g_atStatus > 0) {
-        g_radioState = newState;
-        pthread_cond_broadcast(&g_statusCond);
+    if (oldState == newState) {
+        TELEPHONY_LOGE("now then is same state");
+        pthread_mutex_unlock(&g_statusMutex);
+        return HRIL_ERR_REPEAT_STATUS;
     }
+    g_radioState = newState;
+    pthread_cond_broadcast(&g_statusCond);
     pthread_mutex_unlock(&g_statusMutex);
 
     if (oldState != g_radioState) {
@@ -204,9 +202,6 @@ int32_t SetRadioState(HRilRadioState newState, int32_t rst)
             FreeResponseInfo(pResponse);
             return -1;
         }
-    } else {
-        TELEPHONY_LOGE("now then is same state");
-        return HRIL_ERR_REPEAT_STATUS;
     }
 
     FreeResponseInfo(pResponse);
@@ -324,20 +319,19 @@ static void EventListeners(void)
 
     TELEPHONY_LOGI("opening AT interface %{public}s", devicePath);
     AtSetOnUnusual(AtOnUnusual);
-    for (;;) {
+    while (TRUE) {
         while (g_fd < 0) {
             if (devicePath != NULL) {
                 g_fd = open(devicePath, O_RDWR);
             }
-            if (g_fd >= 0 && !memcmp(devicePath, DEVICE_PATH_DEFAULT, sizeof(DEVICE_PATH_DEFAULT) - 1)) {
+            if (g_fd < 0) {
+                TELEPHONY_LOGE("ril vendorlib,opening AT interface. retrying...");
+                sleep(waitNextTryTime);
+            } else if (!memcmp(devicePath, DEVICE_PATH_DEFAULT, sizeof(DEVICE_PATH_DEFAULT) - 1)) {
                 struct termios ios;
                 tcgetattr(g_fd, &ios);
                 ios.c_lflag = 0;
                 tcsetattr(g_fd, TCSANOW, &ios);
-            }
-            if (g_fd < 0) {
-                TELEPHONY_LOGE("ril vendorlib,opening AT interface. retrying...");
-                sleep(waitNextTryTime);
             }
         }
         g_atStatus = 0;

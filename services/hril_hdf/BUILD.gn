@@ -18,10 +18,6 @@ RIL_ADAPTER = "//base/telephony/ril_adapter"
 HRIL_HDF_ROOT = "$RIL_ADAPTER/services/hril_hdf"
 
 ohos_shared_library("hril_hdf") {
-  defines = [
-    "LOG_TAG = \"RilAdapterInit\"",
-    "LOG_DOMAIN = 0xD002B01",
-  ]
   sources = [ "$HRIL_HDF_ROOT/src/hril_hdf.c" ]
 
   include_dirs = [ "$HRIL_HDF_ROOT/include" ]
@@ -38,11 +34,16 @@ ohos_shared_library("hril_hdf") {
     "${hdf_uhdf_path}/ipc:libhdf_ipc_adapter",
     "${hdf_uhdf_path}/utils:libhdf_utils",
     "//base/hiviewdfx/faultloggerd/interfaces/innerkits/signal_handler:dfx_signalhandler",
-    "//utils/native/base:utils",
   ]
 
-  external_deps = [ "startup_l2:syspara" ]
-
+  external_deps = [
+    "c_utils:utils",
+    "init:libbegetutil",
+  ]
+  defines = [
+    "LOG_TAG = \"HrilHdf\"",
+    "LOG_DOMAIN = 0xD001F08",
+  ]
   if (is_standard_system) {
     external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
   } else {

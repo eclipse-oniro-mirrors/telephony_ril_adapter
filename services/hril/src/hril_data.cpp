@@ -51,6 +51,7 @@ void HRilData::AddHandlerToMap()
     notiMemberFuncMap_[HNOTI_DATA_PDP_CONTEXT_LIST_UPDATED] = &HRilData::PdpContextListUpdated;
     // response
     respMemberFuncMap_[HREQ_DATA_SET_INIT_APN_INFO] = &HRilData::SetInitApnInfoResponse;
+    respMemberFuncMap_[HREQ_DATA_SET_DATA_PROFILE_INFO] = &HRilData::SetDataProfileInfoResponse;
     respMemberFuncMap_[HREQ_DATA_ACTIVATE_PDP_CONTEXT] = &HRilData::ActivatePdpContextResponse;
     respMemberFuncMap_[HREQ_DATA_DEACTIVATE_PDP_CONTEXT] = &HRilData::DeactivatePdpContextResponse;
     respMemberFuncMap_[HREQ_DATA_GET_PDP_CONTEXT_LIST] = &HRilData::GetPdpContextListResponse;
@@ -59,6 +60,7 @@ void HRilData::AddHandlerToMap()
 
     // ReqFunc
     reqMemberFuncMap_[HREQ_DATA_SET_INIT_APN_INFO] = &HRilData::SetInitApnInfo;
+    reqMemberFuncMap_[HREQ_DATA_SET_DATA_PROFILE_INFO] = &HRilData::SetDataProfileInfo;
     reqMemberFuncMap_[HREQ_DATA_ACTIVATE_PDP_CONTEXT] = &HRilData::ActivatePdpContext;
     reqMemberFuncMap_[HREQ_DATA_DEACTIVATE_PDP_CONTEXT] = &HRilData::DeactivatePdpContext;
     reqMemberFuncMap_[HREQ_DATA_GET_PDP_CONTEXT_LIST] = &HRilData::GetPdpContextList;
@@ -223,18 +225,59 @@ int32_t HRilData::SetInitApnInfo(struct HdfSBuf *data)
         TELEPHONY_LOGE("RilAdapter failed to do ReadFromParcel!");
         return HRIL_ERR_INVALID_PARAMETER;
     }
-    dataInfo.apn = StringToCString(dataProfileInfo.apn);
-    dataInfo.type = StringToCString(dataProfileInfo.protocol);
-    dataInfo.roamingType = StringToCString(dataProfileInfo.roamingProtocol);
-    dataInfo.userName = StringToCString(dataProfileInfo.userName);
-    dataInfo.password = StringToCString(dataProfileInfo.password);
-    dataInfo.verType = dataProfileInfo.verType;
+    dataInfo = BuildDataInfo(dataProfileInfo);
     ReqDataInfo *requestInfo = CreateHRilRequest(dataProfileInfo.serial, HREQ_DATA_SET_INIT_APN_INFO);
     if (requestInfo == nullptr) {
         return HRIL_ERR_NULL_POINT;
     }
     dataFuncs_->SetInitApnInfo(requestInfo, &dataInfo);
     return HRIL_ERR_SUCCESS;
+}
+
+int32_t HRilData::SetDataProfileInfo(struct HdfSBuf *data)
+{
+    if (dataFuncs_ == nullptr || dataFuncs_->SetDataProfileInfo == nullptr || data == nullptr) {
+        TELEPHONY_LOGE(
+            "dataFuncs_:%{public}p or dataFuncs_->SetDataProfileInfo or data:%{public}p is nullptr!", dataFuncs_, data);
+        return HRIL_ERR_NULL_POINT;
+    }
+    MessageParcel *parcel = nullptr;
+    if (SbufToParcel(data, &parcel) || parcel == nullptr) {
+        TELEPHONY_LOGE("RilAdapter failed to do SbufToParcel:");
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    DataProfilesInfo dataProfilesInfo;
+    if (!dataProfilesInfo.ReadFromParcel(*parcel)) {
+        TELEPHONY_LOGE("RilAdapter failed to do ReadFromParcel!");
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    int32_t size = dataProfilesInfo.profilesSize;
+    if (size <= 0 || size != static_cast<int32_t>(dataProfilesInfo.profiles.size())) {
+        TELEPHONY_LOGE("RilAdapter failed to do ReadFromParcel!");
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    ReqDataInfo *requestInfo = CreateHRilRequest(dataProfilesInfo.serial, HREQ_DATA_SET_DATA_PROFILE_INFO);
+    if (requestInfo == nullptr) {
+        return HRIL_ERR_NULL_POINT;
+    }
+    std::unique_ptr<HRilDataInfo[]> dataInfos = std::make_unique<HRilDataInfo[]>(size);
+    for (int32_t i = 0; i < size; i++) {
+        dataInfos[i] = BuildDataInfo(dataProfilesInfo.profiles[i]);
+    }
+    dataFuncs_->SetDataProfileInfo(requestInfo, dataInfos.get(), size);
+    return HRIL_ERR_SUCCESS;
+}
+
+HRilDataInfo HRilData::BuildDataInfo(const DataProfileDataInfo &dataProfileInfo)
+{
+    HRilDataInfo dataInfo;
+    dataInfo.apn = StringToCString(dataProfileInfo.apn);
+    dataInfo.type = StringToCString(dataProfileInfo.protocol);
+    dataInfo.roamingType = StringToCString(dataProfileInfo.roamingProtocol);
+    dataInfo.userName = StringToCString(dataProfileInfo.userName);
+    dataInfo.password = StringToCString(dataProfileInfo.password);
+    dataInfo.verType = dataProfileInfo.verType;
+    return dataInfo;
 }
 
 int32_t HRilData::GetLinkBandwidthInfo(struct HdfSBuf *data)
@@ -355,6 +398,12 @@ int32_t HRilData::SetInitApnInfoResponse(
     return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));
 }
 
+int32_t HRilData::SetDataProfileInfoResponse(
+    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+{
+    return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));
+}
+
 int32_t HRilData::SetLinkBandwidthReportingRuleResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
@@ -364,7 +413,7 @@ int32_t HRilData::SetLinkBandwidthReportingRuleResponse(
 int32_t HRilData::PdpContextListUpdated(
     int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen)
 {
-    if ((response == nullptr) || (responseLen % sizeof(HRilEmergencyInfo)) != 0) {
+    if ((response == nullptr) || (responseLen % sizeof(HRilDataCallResponse)) != 0) {
         TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
         return HRIL_ERR_INVALID_PARAMETER;
     }

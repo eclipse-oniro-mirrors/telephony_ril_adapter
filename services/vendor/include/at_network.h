@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -34,7 +34,29 @@
 #define WCDMA_GSM_TYPE "0201"
 #define LTE_WCDMA_TYPE "0302"
 
-void ReqGetImsRegStatus(const ReqDataInfo *requestInfo);
+typedef enum {
+    HRIL_RADIO_GSM = 0,
+    HRIL_RADIO_GSM_COMPACT = 1,
+    HRIL_RADIO_UTRAN = 2,
+    HRIL_RADIO_EGPRS = 3,
+    HRIL_RADIO_HSDPA = 4,
+    HRIL_RADIO_HSUPA = 5,
+    HRIL_RADIO_HSDPA_HSUPA = 6,
+    HRIL_RADIO_EUTRAN = 7,
+    HRIL_RADIO_CDMA = 8,
+    HRIL_RADIO_CDMA_IS95A = 9,
+    HRIL_RADIO_CDMA_IS95B = 10,
+    HRIL_RADIO_CDMA_EVDO_0 = 11,
+    HRIL_RADIO_CDMA_EVDO_A = 12,
+    HRIL_RADIO_CDMA_EVDO_B = 13,
+    HRIL_RADIO_CDMA_EHRPD = 14,
+    HRIL_RADIO_TDSCDMA = 15,
+    HRIL_RADIO_HSPAP = 16,
+    HRIL_RADIO_LTE = 17,
+    HRIL_RADIO_LTE_CA = 18,
+    HRIL_RADIO_NR = 19,
+} HRilActTech;
+
 void ReqGetSignalStrength(const ReqDataInfo *requestInfo);
 void ReqGetCsRegStatus(const ReqDataInfo *requestInfo);
 void ReqGetPsRegStatus(const ReqDataInfo *requestInfo);
@@ -54,7 +76,6 @@ void ReqSetDeviceState(const ReqDataInfo *requestInfo, const int32_t *deviceStat
 void ProcessPhyChnlCfgNotify(struct ReportInfo reportInfo, char *srcStr);
 int32_t ProcessCurrentCellList(struct ReportInfo reportInfo, const char *s);
 int32_t ProcessRegStatus(const char *s, const HRilRegStatusInfo *hrilRegStateInfo);
-int32_t ProcessImsRegStatus(const char *s, const HRilImsRegStatusInfo *imsRegStatusInfo, int32_t expectInfoNum);
 int32_t ProcessParamSignalStrength(const char *result, HRilRssi *hrilRssi);
 int32_t ProcessParamSignalStrengthNotify(const char *result, HRilRssi *hrilRssi);
 int32_t ProcessOperListToUse(const char *list);
@@ -63,6 +84,4 @@ int32_t ParseOperListInfo(
     const char *lineInfo, int32_t count, AvailableOperInfo *pOperInfo, AvailableOperInfo **ppOperInfo);
 void NotifyNetWorkTime(int32_t slotId);
 void GetNetworkSearchInformationPause(void);
-int32_t SendNotificationFilterCommand(
-    const ReqDataInfo *requestInfo, struct ReportInfo reportInfo, const char *command);
 #endif

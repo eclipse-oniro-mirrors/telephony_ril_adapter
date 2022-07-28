@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,9 +18,8 @@
 
 #include <stdlib.h>
 
-#include "securec.h"
-
 #include "hril_vendor_call_defs.h"
+#include "securec.h"
 
 typedef enum {
     GET_CALL_WAITING,
@@ -62,11 +61,8 @@ void ReqSetClir(const ReqDataInfo *requestInfo, int32_t action);
 void ReqStartDtmf(const ReqDataInfo *requestInfo, CallDtmfInfo info);
 void ReqSendDtmf(const ReqDataInfo *requestInfo, CallDtmfInfo info);
 void ReqStopDtmf(const ReqDataInfo *requestInfo, CallDtmfInfo info);
-void ReqGetImsCallList(const ReqDataInfo *requestInfo);
 void ReqGetCallPreferenceMode(const ReqDataInfo *requestInfo);
 void ReqSetCallPreferenceMode(const ReqDataInfo *requestInfo, int32_t mode);
-void ReqGetLteImsSwitchStatus(const ReqDataInfo *requestInfo);
-void ReqSetLteImsSwitchStatus(const ReqDataInfo *requestInfo, int32_t active);
 void ReqSetUssd(const ReqDataInfo *requestInfo, const char *str);
 void ReqGetUssd(const ReqDataInfo *requestInfo);
 void ReqGetMute(const ReqDataInfo *requestInfo);
@@ -74,8 +70,8 @@ void ReqSetMute(const ReqDataInfo *requestInfo, int32_t mute);
 void ReqGetEmergencyCallList(const ReqDataInfo *requestInfo);
 void ReqSetEmergencyCallList(const ReqDataInfo *requestInfo, HRilEmergencyInfo *emergencyInfo, const int len);
 void ReqGetCallFailReason(const ReqDataInfo *requestInfo);
+void ReqSetBarringPassword(const ReqDataInfo *requestInfo, HRilSetBarringInfo info);
 
-void ReportImsServiceStatusInfo(const char *str);
 void ReportCallStateUpdated(const char *str);
 void ReportSrvccStatusUpdate(const char *str);
 void ReportCsChannelInfo(const char *str);

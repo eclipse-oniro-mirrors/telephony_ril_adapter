@@ -33,8 +33,8 @@ ohos_executable("ril_adapter_test") {
   ]
   configs = [ "$RIL_ADAPTER/utils:utils_config" ]
   defines = [
-    "TELEPHONY_LOG_TAG = \"HrilTest\"",
-    "LOG_DOMAIN = 0xD002B01",
+    "TELEPHONY_LOG_TAG = \"RilAdapterUTest\"",
+    "LOG_DOMAIN = 0xD000F00",
   ]
   deps = [
     "$RIL_ADAPTER/interfaces/innerkits:hril_innerkits",
@@ -51,7 +51,7 @@ ohos_executable("ril_adapter_test") {
     "ril_adapter:hril_innerkits",
   ]
 
-  public_deps = [ "//utils/native/base:utils" ]
+  public_deps = [ "//commonlibrary/c_utils/base:utils" ]
 
   if (is_standard_system) {
     external_deps += [ "hiviewdfx_hilog_native:libhilog" ]

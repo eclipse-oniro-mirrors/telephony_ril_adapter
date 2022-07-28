@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -54,7 +54,9 @@ public:
     void SetMuteTest(const AppExecFwk::InnerEvent::Pointer &result);
     void GetMuteTest(const AppExecFwk::InnerEvent::Pointer &result);
     void GetEmergencyListTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void SetEmergencyCallListTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void GetFailReasonTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void SetBarringPasswordTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
 
     void IccRilSimIoForAppTest(const AppExecFwk::InnerEvent::Pointer &result);
     void GetRilCmImsiForAppTest(const AppExecFwk::InnerEvent::Pointer &result);
@@ -77,7 +79,6 @@ public:
     void GetRilNetworkSearchInfoTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void GetRilNetworkSelectionModeTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void GetRilPreferredNetwrokTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
-    void GetRilImsRegStatusTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void GetRilImeiTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void ShutDownTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void GetMeidTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
@@ -111,7 +112,15 @@ public:
     void GetSimLockStatusTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void OnInitInterface();
     void OnInitStressInterface();
+    void OnInitCallProcessInterface();
+    void OnInitSmsProcessInterface();
+    void OnInitSimProcessInterface();
+    void OnInitDataProcessInterface();
+    void OnInitNetworkProcessInterface();
+    void OnInitModemProcessInterface();
     void OnInitProcessInterface();
+    void GetTransmitApduChannelParam(
+        int32_t &channelId, int32_t &type, int32_t &instruction, int32_t &p1, int32_t &p2, int32_t &p3);
 
     class DemoHandler : public AppExecFwk::EventHandler {
     public:

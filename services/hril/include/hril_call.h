@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -62,11 +62,8 @@ private:
     int32_t StopDtmf(struct HdfSBuf *data);
     bool IsCallResponse(uint32_t code);
     bool IsCallNotification(uint32_t code);
-    int32_t GetImsCallList(struct HdfSBuf *data);
     int32_t GetCallPreferenceMode(struct HdfSBuf *data);
     int32_t SetCallPreferenceMode(struct HdfSBuf *data);
-    int32_t GetLteImsSwitchStatus(struct HdfSBuf *data);
-    int32_t SetLteImsSwitchStatus(struct HdfSBuf *data);
     int32_t SetUssd(struct HdfSBuf *data);
     int32_t GetUssd(struct HdfSBuf *data);
     int32_t SetMute(struct HdfSBuf *data);
@@ -74,6 +71,7 @@ private:
     int32_t GetEmergencyCallList(struct HdfSBuf *data);
     int32_t GetCallFailReason(struct HdfSBuf *data);
     int32_t SetEmergencyCallList(struct HdfSBuf *data);
+    int32_t SetBarringPassword(struct HdfSBuf *data);
 
     int32_t GetCallListResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
@@ -125,15 +123,9 @@ private:
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t StopDtmfResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
-    int32_t GetImsCallListResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t GetCallPreferenceModeResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t SetCallPreferenceModeResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
-    int32_t GetLteImsSwitchStatusResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
-    int32_t SetLteImsSwitchStatusResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t SetUssdResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
@@ -151,7 +143,6 @@ private:
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
 
     int32_t CallStateUpdated(int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
-    int32_t CallImsServiceStatusNotice(int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
     int32_t CallUssdNotice(int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
     int32_t CallRingbackVoiceNotice(int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
     int32_t CallSrvccStatusNotice(int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
@@ -160,10 +151,11 @@ private:
 
     void BuildCallList(
         CallInfoList &callInfoList, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
-    void BuildEmergencyCallList(EmergencyInfoList &EmergencyCallInfoList,
-        const void *response, size_t responseLen);
+    void BuildEmergencyCallList(EmergencyInfoList &EmergencyCallInfoList, const void *response, size_t responseLen);
     void BuildCallForwardQueryInfoList(CallForwardQueryInfoList &callForwardQueryInfoList,
         HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t SetBarringPasswordResponse(
+        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
 
 private:
     const HRilCallReq *callFuncs_ = nullptr;

@@ -15,11 +15,10 @@
 
 #include "hril_manager.h"
 
-#include "parameter.h"
-
 #include "hril_base.h"
-#include "hril_request.h"
 #include "hril_notification.h"
+#include "hril_request.h"
+#include "parameter.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -29,6 +28,7 @@ std::unordered_map<int32_t, int32_t> HRilManager::notificationMap_ = {
 #include "hril_notification_map.h"
 };
 
+using namespace OHOS::HDI::Power::V1_0;
 // Distribute the request event to a specific card slot processing flow
 static int32_t DispatchModule(int32_t slotId, int32_t cmd, struct HdfSBuf *data)
 {
@@ -228,13 +228,13 @@ static void RunningLockCallback(uint8_t *param)
     delete param;
     param = nullptr;
     std::lock_guard<std::mutex> lockRequest(g_manager->mutexRunningLock_);
-    TELEPHONY_LOGI("RunningLockCallback, serialNum:%{public}d, runningSerialNum_:%{public}d",
-        serialNum, (int)g_manager->runningSerialNum_);
-    if (g_manager->runningLock_ == nullptr || serialNum != (int)g_manager->runningSerialNum_) {
+    TELEPHONY_LOGI("RunningLockCallback, serialNum:%{public}d, runningSerialNum_:%{public}d", serialNum,
+        (int)g_manager->runningSerialNum_);
+    if (g_manager->powerInterface_ == nullptr || serialNum != (int)g_manager->runningSerialNum_) {
         return;
     }
     g_manager->runningLockCount_ = 0;
-    g_manager->runningLock_->UnLock();
+    g_manager->powerInterface_->SuspendUnblock("HRilRunningLock");
     TELEPHONY_LOGI("RunningLockCallback, UnLock");
 }
 
@@ -244,10 +244,11 @@ void HRilManager::ApplyRunningLock(void)
         TELEPHONY_LOGE("check nullptr fail.");
         return;
     }
+
     std::lock_guard<std::mutex> lockRequest(mutexRunningLock_);
-    if (runningLock_ != nullptr) {
-        runningLock_->Lock();
-        struct timeval tv = {RUNNING_LOCK_DEFAULT_TIMEOUT_S, 0};
+    if (powerInterface_ != nullptr) {
+        powerInterface_->SuspendBlock("HRilRunningLock");
+        struct timeval tv = { RUNNING_LOCK_DEFAULT_TIMEOUT_S, 0 };
         runningLockCount_++;
         runningSerialNum_++;
         int *serialNum = new int((int)runningSerialNum_);
@@ -258,10 +259,11 @@ void HRilManager::ApplyRunningLock(void)
         /* Since the power management subsystem starts slower than the RilAdapter,
          * the wakelock needs to be recreated.
          */
-        TELEPHONY_LOGW("The runningLock is nullptr, needs to be recreated.");
-        auto &powerMgrClient = PowerMgr::PowerMgrClient::GetInstance();
-        g_manager->runningLock_ =
-            powerMgrClient.CreateRunningLock("HRilRunningLock", PowerMgr::RunningLockType::RUNNINGLOCK_BACKGROUND);
+        TELEPHONY_LOGW("The powerInterface_ is nullptr, needs to be recreated.");
+        powerInterface_ = IPowerInterface::Get();
+        if (powerInterface_ == nullptr) {
+            TELEPHONY_LOGE("failed to get power hdi interface");
+        }
     }
 }
 
@@ -269,15 +271,15 @@ void HRilManager::ReleaseRunningLock(void)
 {
     std::lock_guard<std::mutex> lockRequest(mutexRunningLock_);
     TELEPHONY_LOGI("ReleaseRunningLock, runningLockCount_:%{public}d", (int)runningLockCount_);
-    if (runningLock_ == nullptr) {
-        TELEPHONY_LOGE("runningLock_ is nullptr");
+    if (powerInterface_ == nullptr) {
+        TELEPHONY_LOGE("powerInterface_ is nullptr");
         return;
     }
     if (runningLockCount_ > 1) {
         runningLockCount_--;
     } else {
         runningLockCount_ = 0;
-        runningLock_->UnLock();
+        powerInterface_->SuspendUnblock("HRilRunningLock");
         TELEPHONY_LOGI("ReleaseRunningLock UnLock");
     }
 }
@@ -348,20 +350,17 @@ void HRilManager::OnNetworkReport(
     OnReport(hrilNetwork_, slotId, reportInfo, response, responseLen);
 }
 
-void HRilManager::OnSimReport(
-    int32_t slotId, const ReportInfo *reportInfo, const uint8_t *response, size_t responseLen)
+void HRilManager::OnSimReport(int32_t slotId, const ReportInfo *reportInfo, const uint8_t *response, size_t responseLen)
 {
     OnReport(hrilSim_, slotId, reportInfo, response, responseLen);
 }
 
-void HRilManager::OnSmsReport(
-    int32_t slotId, const ReportInfo *reportInfo, const uint8_t *response, size_t responseLen)
+void HRilManager::OnSmsReport(int32_t slotId, const ReportInfo *reportInfo, const uint8_t *response, size_t responseLen)
 {
     OnReport(hrilSms_, slotId, reportInfo, response, responseLen);
 }
 
-HRilManager::HRilManager()
-    : hrilSimSlotCount_(GetSimSlotCount())
+HRilManager::HRilManager() : hrilSimSlotCount_(GetSimSlotCount())
 {
     for (int32_t slotId = HRIL_SIM_SLOT_0; slotId < hrilSimSlotCount_; slotId++) {
         hrilCall_.push_back(std::make_unique<HRilCall>(slotId, *this));
@@ -382,9 +381,8 @@ extern "C" {
 
 int32_t GetSimSlotCount()
 {
-    char simSlotCount[HRIL_SYSPARA_SIZE] = {0};
-    GetParameter(HRIL_TEL_SIM_SLOT_COUNT.c_str(),
-        HRIL_DEFAULT_SLOT_COUNT.c_str(), simSlotCount, HRIL_SYSPARA_SIZE);
+    char simSlotCount[HRIL_SYSPARA_SIZE] = { 0 };
+    GetParameter(HRIL_TEL_SIM_SLOT_COUNT, HRIL_DEFAULT_SLOT_COUNT, simSlotCount, HRIL_SYSPARA_SIZE);
     return std::atoi(simSlotCount);
 }
 
@@ -439,9 +437,24 @@ static void HRilBootUpEventLoop()
     g_manager->timerCallback_->EventLoop();
 }
 
+void HRilInit(void)
+{
+    if (g_manager == nullptr) {
+        TELEPHONY_LOGE("HRilInit: g_manager is nullptr");
+        return;
+    }
+    if (g_manager->powerInterface_ == nullptr) {
+        g_manager->powerInterface_ = IPowerInterface::Get();
+        if (g_manager->powerInterface_ == nullptr) {
+            TELEPHONY_LOGE("failed to get power hdi interface");
+        }
+    }
+    g_manager->eventLoop_ = std::make_unique<std::thread>(HRilBootUpEventLoop);
+}
+
 void HRilRegOps(const HRilOps *hrilOps)
 {
-    static HRilOps callBacks = {0};
+    static HRilOps callBacks = { 0 };
     static RegisterState rilRegisterStatus = RIL_REGISTER_IS_NONE;
 
     if (hrilOps == nullptr || g_manager == nullptr) {
@@ -453,10 +466,6 @@ void HRilRegOps(const HRilOps *hrilOps)
         return;
     }
     rilRegisterStatus = RIL_REGISTER_IS_RUNNING;
-    auto &powerMgrClient = PowerMgr::PowerMgrClient::GetInstance();
-    g_manager->runningLock_ =
-        powerMgrClient.CreateRunningLock("HRilRunningLock", PowerMgr::RunningLockType::RUNNINGLOCK_BACKGROUND);
-    g_manager->eventLoop_ = std::make_unique<std::thread>(HRilBootUpEventLoop);
     (void)memcpy_s(&callBacks, sizeof(HRilOps), hrilOps, sizeof(HRilOps));
     for (int32_t slotId = HRIL_SIM_SLOT_0; slotId < g_manager->GetMaxSimSlotCount(); slotId++) {
         if (callBacks.smsOps != nullptr) {
