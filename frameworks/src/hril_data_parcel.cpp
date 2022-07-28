@@ -493,5 +493,61 @@ std::shared_ptr<DataLinkBandwidthReportingRule> DataLinkBandwidthReportingRule::
     }
     return param;
 }
+
+bool DataPerformanceInfo::ReadFromParcel(Parcel &parcel)
+{
+    if (!Read(parcel, performanceEnable)) {
+        return false;
+    }
+    if (!Read(parcel, enforce)) {
+        return false;
+    }
+    return true;
+}
+
+bool DataPerformanceInfo::Marshalling(Parcel &parcel) const
+{
+    if (!Write(parcel, performanceEnable)) {
+        return false;
+    }
+    if (!Write(parcel, enforce)) {
+        return false;
+    }
+    return true;
+}
+
+std::shared_ptr<DataPerformanceInfo> DataPerformanceInfo::UnMarshalling(Parcel &parcel)
+{
+    std::shared_ptr<DataPerformanceInfo> param = std::make_shared<DataPerformanceInfo>();
+    if (param == nullptr || !param->ReadFromParcel(parcel)) {
+        param = nullptr;
+    }
+    return param;
+} 
+
+bool DataSleepInfo::ReadFromParcel(Parcel &parcel)
+{
+    if (!Read(parcel, sleepEnable)) {
+        return false;
+    }
+    return true;
+}
+
+bool DataSleepInfo::Marshalling(Parcel &parcel) const
+{
+    if (!Write(parcel, sleepEnable)) {
+        return false;
+    }
+    return true;
+}
+
+std::shared_ptr<DataSleepInfo> DataSleepInfo::UnMarshalling(Parcel &parcel)
+{
+    std::shared_ptr<DataSleepInfo> param = std::make_shared<DataSleepInfo>();
+    if (param == nullptr || !param->ReadFromParcel(parcel)) {
+        param = nullptr;
+    }
+    return param;
+}
 } // namespace Telephony
 } // namespace OHOS

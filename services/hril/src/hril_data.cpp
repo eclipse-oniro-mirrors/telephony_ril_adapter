@@ -66,6 +66,8 @@ void HRilData::AddHandlerToMap()
     reqMemberFuncMap_[HREQ_DATA_GET_PDP_CONTEXT_LIST] = &HRilData::GetPdpContextList;
     reqMemberFuncMap_[HREQ_DATA_GET_LINK_BANDWIDTH_INFO] = &HRilData::GetLinkBandwidthInfo;
     reqMemberFuncMap_[HREQ_DATA_SET_LINK_BANDWIDTH_REPORTING_RULE] = &HRilData::SetLinkBandwidthReportingRule;
+    reqMemberFuncMap_[HREQ_DATA_SEND_DATA_PERFORMANCE_MODE] = &HRilData::SendDataPerformanceMode;
+    reqMemberFuncMap_[HREQ_DATA_SEND_DATA_SLEEP_MODE] = &HRilData::SendDataSleepMode;
 }
 
 void HRilData::SwitchRilDataToHal(const HRilDataCallResponse *response, SetupDataCallResultInfo &result)
@@ -231,6 +233,75 @@ int32_t HRilData::SetInitApnInfo(struct HdfSBuf *data)
         return HRIL_ERR_NULL_POINT;
     }
     dataFuncs_->SetInitApnInfo(requestInfo, &dataInfo);
+    return HRIL_ERR_SUCCESS;
+}
+
+int32_t HRilData::SendDataPerformanceMode(struct HdfSBuf *data)
+{
+    TELEPHONY_LOGE("SendDataPerformanceMode");
+    if (dataFuncs_ == nullptr || dataFuncs_->SendDataPerformanceMode == nullptr || data == nullptr) {
+        TELEPHONY_LOGE(
+            "dataFuncs_:%{public}p or dataFuncs_->SendDataPerformanceMode or data:%{public}p is nullptr!", dataFuncs_, data);
+        return HRIL_ERR_NULL_POINT;
+    }
+    int32_t serial = 0;
+    if (!HdfSbufReadInt32(data, &serial)) {
+        TELEPHONY_LOGE("SendDataPerformanceMode miss serial parameter");
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    DataPerformanceInfo dataPerformanceInfo;
+    HRilDataPerformanceInfo hrilDataPerformanceInfo;
+    MessageParcel *parcel = nullptr;
+    if (SbufToParcel(data, &parcel) || parcel == nullptr) {
+        TELEPHONY_LOGE("RilAdapter failed to do SbufToParcel:");
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    if (!dataPerformanceInfo.ReadFromParcel(*parcel)) {
+        TELEPHONY_LOGE("RilAdapter failed to do ReadFromParcel!");
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    hrilDataPerformanceInfo.performanceEnable = dataPerformanceInfo.performanceEnable;
+    hrilDataPerformanceInfo.enforce = dataPerformanceInfo.enforce;
+    TELEPHONY_LOGE("SendDataPerformanceMode: performanceEnable=%{public}d enforce=%{public}d", hrilDataPerformanceInfo.performanceEnable, hrilDataPerformanceInfo.enforce);
+    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_DATA_SEND_DATA_PERFORMANCE_MODE);
+    if (requestInfo == nullptr) {
+        return HRIL_ERR_NULL_POINT;
+    }
+    dataFuncs_->SendDataPerformanceMode(requestInfo, &hrilDataPerformanceInfo);
+    return HRIL_ERR_SUCCESS;
+}
+
+int32_t HRilData::SendDataSleepMode(struct HdfSBuf *data)
+{
+    TELEPHONY_LOGE("SendDataSleepMode");
+    if (dataFuncs_ == nullptr || dataFuncs_->SendDataSleepMode == nullptr || data == nullptr) {
+        TELEPHONY_LOGE(
+            "dataFuncs_:%{public}p or dataFuncs_->SendDataSleepMode or data:%{public}p is nullptr!", dataFuncs_, data);
+        return HRIL_ERR_NULL_POINT;
+    }
+    int32_t serial = 0;
+    if (!HdfSbufReadInt32(data, &serial)) {
+        TELEPHONY_LOGE("SendDataSleepMode miss serial parameter");
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    DataSleepInfo dataSleepInfo;
+    HRilDataSleepInfo hrilDataSleepInfo;
+    MessageParcel *parcel = nullptr;
+    if (SbufToParcel(data, &parcel) || parcel == nullptr) {
+        TELEPHONY_LOGE("RilAdapter failed to do SbufToParcel:");
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    if (!dataSleepInfo.ReadFromParcel(*parcel)) {
+        TELEPHONY_LOGE("RilAdapter failed to do ReadFromParcel!");
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    hrilDataSleepInfo.sleepEnable = dataSleepInfo.sleepEnable;
+    TELEPHONY_LOGE("SendDataSleepMode: sleepEnable=%{public}d", hrilDataSleepInfo.sleepEnable);
+    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_DATA_SEND_DATA_SLEEP_MODE);
+    if (requestInfo == nullptr) {
+        return HRIL_ERR_NULL_POINT;
+    }
+    dataFuncs_->SendDataSleepMode(requestInfo, &hrilDataSleepInfo);
     return HRIL_ERR_SUCCESS;
 }
 

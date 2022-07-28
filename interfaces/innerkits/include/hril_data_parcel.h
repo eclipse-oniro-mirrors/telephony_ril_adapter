@@ -183,6 +183,25 @@ struct DataLinkBandwidthReportingRule : public HrilBaseParcel {
     std::shared_ptr<DataLinkBandwidthReportingRule> UnMarshalling(Parcel &parcel);
     void Dump(std::string, int32_t);
 };
+
+struct DataPerformanceInfo : public HrilBaseParcel {
+    int32_t performanceEnable; /* Performance Enable. eg: 1-enable, 0-disable */
+    int32_t enforce; /* Whether Enforce Data Performance. eg: 1-enable, 0-disable */ 
+
+    bool ReadFromParcel(Parcel &parcel);
+    virtual bool Marshalling(Parcel &parcel) const override;
+    std::shared_ptr<DataPerformanceInfo> UnMarshalling(Parcel &parcel);
+    void Dump(std::string, int32_t);
+};
+
+struct DataSleepInfo : public HrilBaseParcel {
+    int32_t sleepEnable; /* Sleep Mode Enable. eg: 1-enable, 0-disable */
+
+    bool ReadFromParcel(Parcel &parcel);
+    virtual bool Marshalling(Parcel &parcel) const override;
+    std::shared_ptr<DataSleepInfo> UnMarshalling(Parcel &parcel);
+    void Dump(std::string, int32_t);
+};
 } // namespace Telephony
 } // namespace OHOS
 #endif // OHOS_RIL_DATA_PARCEL_H
