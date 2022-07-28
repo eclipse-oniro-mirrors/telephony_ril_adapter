@@ -86,12 +86,22 @@ public:
     int32_t GetPsRegStatus(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetOperatorInfo(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int32_t what);
     int32_t SetNotificationFilter(int32_t filter, const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t GetNetworkSearchInfo(const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t GetNetworkSelectionMode(const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t SetNetworkSelectionMode(int32_t mode, std::string plmn, const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t GetPhysicalChannelConfig(const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t GetRadioCapability(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t SetDeviceState(int32_t deviceStateType, bool deviceStateOn, const AppExecFwk::InnerEvent::Pointer &result);
     int32_t SendSms(std::string smscPdu, std::string pdu, const std::shared_ptr<AppExecFwk::EventHandler> &handler,
         const AppExecFwk::InnerEvent::Pointer &response);
     int32_t SendSmsMoreMode(std::string smscPdu, std::string pdu,
         const std::shared_ptr<AppExecFwk::EventHandler> &handler, const AppExecFwk::InnerEvent::Pointer &response);
     int32_t SetRadioState(int32_t fan, int32_t rst, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t ShutDown(const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t GetRadioState(const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t GetImei(const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t GetMeid(const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t GetVoiceRadioTechnology(const AppExecFwk::InnerEvent::Pointer &result);
     int32_t SendSmsAck(bool success, int32_t cause, const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetSimIO(SimIoRequestInfo data, const AppExecFwk::InnerEvent::Pointer &response);
     int32_t ActivatePdpContext(int32_t radioTechnology, RilDataProfileTest dataProfile, bool isRoaming,

@@ -154,11 +154,21 @@ void RilUnitTest::AddNetworkRequestToMap()
     memberFuncMap_[HREQ_NETWORK_SET_DEVICE_STATE] = &RilUnitTest::SetRilDeviceStateTest;
     memberFuncMap_[HREQ_NETWORK_GET_CS_REG_STATUS] = &RilUnitTest::GetRilCmCsRegStatusTest;
     memberFuncMap_[HREQ_NETWORK_GET_PS_REG_STATUS] = &RilUnitTest::GetRilCmPsRegStatusTest;
+    memberFuncMap_[HREQ_NETWORK_GET_NETWORK_SEARCH_INFORMATION] = &RilUnitTest::GetRilNetworkSearchInfoTest;
+    memberFuncMap_[HREQ_NETWORK_GET_NETWORK_SELECTION_MODE] = &RilUnitTest::GetRilNetworkSelectionModeTest;
+    memberFuncMap_[HREQ_NETWORK_SET_NETWORK_SELECTION_MODE] = &RilUnitTest::SetRilNetworkSelectionModeTest;
+    memberFuncMap_[HREQ_NETWORK_GET_RADIO_CAPABILITY] = &RilUnitTest::GetRilRadioCapabilityTest;
+    memberFuncMap_[HREQ_NETWORK_GET_PHYSICAL_CHANNEL_CONFIG] = &RilUnitTest::GetPhysicalChannelConfigTest;
 }
 
 void RilUnitTest::AddModermRequestToMap()
 {
     memberFuncMap_[HREQ_MODEM_SET_RADIO_STATUS] = &RilUnitTest::SetRilCmRadioPowerTest;
+    memberFuncMap_[HREQ_MODEM_SHUT_DOWN] = &RilUnitTest::ShutDownTest;
+    memberFuncMap_[HREQ_MODEM_GET_RADIO_STATUS] = &RilUnitTest::GetRilRadioPowerTest;
+    memberFuncMap_[HREQ_MODEM_GET_IMEI] = &RilUnitTest::GetImeiTest;
+    memberFuncMap_[HREQ_MODEM_GET_MEID] = &RilUnitTest::GetMeidTest;
+    memberFuncMap_[HREQ_MODEM_GET_VOICE_RADIO] = &RilUnitTest::GetVoiceRadioTechnologyTest;
 }
 
 void RilUnitTest::GetCallListTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
@@ -373,6 +383,48 @@ void RilUnitTest::SetRilDeviceStateTest(const OHOS::AppExecFwk::InnerEvent::Poin
     ASSERT_EQ(0, ret);
 }
 
+void RilUnitTest::GetRilNetworkSearchInfoTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::GetRilNetworkSearchInfoTest -->");
+    int32_t ret = mRilManager_->GetNetworkSearchInfo(result);
+    TELEPHONY_LOGI("RilUnitTest::GetRilNetworkSearchInfoTest --> finished, return: %{public}d", ret);
+    ASSERT_EQ(0, ret);
+}
+
+void RilUnitTest::GetRilNetworkSelectionModeTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::GetRilNetworkSelectionModeTest -->");
+    int32_t ret = mRilManager_->GetNetworkSelectionMode(result);
+    TELEPHONY_LOGI("RilUnitTest::GetRilNetworkSelectionModeTest --> finished, return: %{public}d", ret);
+    ASSERT_EQ(0, ret);
+}
+
+void RilUnitTest::SetRilNetworkSelectionModeTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::SetRilNetworkSelectionModeTest -->");
+    int32_t mode = 1;
+    string plmn = "46000";
+    int32_t ret = mRilManager_->SetNetworkSelectionMode(mode, plmn, result);
+    TELEPHONY_LOGI("RilUnitTest::SetRilNetworkSelectionModeTest --> finished, return: %{public}d", ret);
+    ASSERT_EQ(0, ret);
+}
+
+void RilUnitTest::GetRilRadioCapabilityTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::GetRilRadioCapabilityTest -->");
+    int32_t ret = mRilManager_->GetRadioCapability(result);
+    TELEPHONY_LOGI("RilUnitTest::GetRilRadioCapabilityTest --> finished, return: %{public}d", ret);
+    ASSERT_EQ(0, ret);
+}
+
+void RilUnitTest::GetPhysicalChannelConfigTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::GetPhysicalChannelConfigTest -->");
+    int32_t ret = mRilManager_->GetPhysicalChannelConfig(result);
+    TELEPHONY_LOGI("RilUnitTest::GetPhysicalChannelConfigTest --> finished, return: %{public}d", ret);
+    ASSERT_EQ(0, ret);
+}
+
 void RilUnitTest::SendRilCmSmsTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("RilUnitTest::SendRilCmSmsTest -->");
@@ -394,6 +446,46 @@ void RilUnitTest::SetRilCmRadioPowerTest(const OHOS::AppExecFwk::InnerEvent::Poi
     TELEPHONY_LOGI("RilUnitTest::SetRilCmRadioPowerTest -->");
     int32_t ret = mRilManager_->SetRadioState(1, 0, result);
     TELEPHONY_LOGI("RilUnitTest::SetRilCmRadioPowerTest return: %{public}d", ret);
+    ASSERT_EQ(0, ret);
+}
+
+void RilUnitTest::ShutDownTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::ShutDownTest -->");
+    int32_t ret = mRilManager_->ShutDown(result);
+    TELEPHONY_LOGI("RilUnitTest::ShutDownTest --> finished, return: %{public}d", ret);
+    ASSERT_EQ(0, ret);
+}
+
+void RilUnitTest::GetRilRadioPowerTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::GetRilRadioPowerTest -->");
+    int32_t ret = mRilManager_->GetRadioState(result);
+    TELEPHONY_LOGI("RilUnitTest::GetRilRadioPowerTest --> finished, return: %{public}d", ret);
+    ASSERT_EQ(0, ret);
+}
+
+void RilUnitTest::GetImeiTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::GetImeiTest -->");
+    int32_t ret = mRilManager_->GetImei(result);
+    TELEPHONY_LOGI("RilUnitTest::GetImeiTest --> finished, return: %{public}d", ret);
+    ASSERT_EQ(0, ret);
+}
+
+void RilUnitTest::GetMeidTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::GetMeidTest -->");
+    int32_t ret = mRilManager_->GetMeid(result);
+    TELEPHONY_LOGI("RilUnitTest::GetMeidTest --> finished, return: %{public}d", ret);
+    ASSERT_EQ(0, ret);
+}
+
+void RilUnitTest::GetVoiceRadioTechnologyTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::GetVoiceRadioTechnologyTest -->");
+    int32_t ret = mRilManager_->GetVoiceRadioTechnology(result);
+    TELEPHONY_LOGI("RilUnitTest::GetVoiceRadioTechnologyTest --> finished, return: %{public}d", ret);
     ASSERT_EQ(0, ret);
 }
 
@@ -839,6 +931,46 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetRilDeviceStateTest_0100, Function 
     OnProcessTest(HREQ_NETWORK_SET_DEVICE_STATE, event);
 }
 
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetRilNetworkSearchInfoTest_0100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_NETWORK_GET_NETWORK_SEARCH_INFORMATION);
+    event->SetOwner(GetHandler());
+    OnProcessTest(HREQ_NETWORK_GET_NETWORK_SEARCH_INFORMATION, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetRilNetworkSelectionModeTest_0100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_NETWORK_GET_NETWORK_SELECTION_MODE);
+    event->SetOwner(GetHandler());
+    OnProcessTest(HREQ_NETWORK_GET_NETWORK_SELECTION_MODE, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetRilNetworkSelectionModeTest_0100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_NETWORK_SET_NETWORK_SELECTION_MODE);
+    event->SetOwner(GetHandler());
+    OnProcessTest(HREQ_NETWORK_SET_NETWORK_SELECTION_MODE, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetRilRadioCapabilityTest_0100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_NETWORK_GET_RADIO_CAPABILITY);
+    event->SetOwner(GetHandler());
+    OnProcessTest(HREQ_NETWORK_GET_RADIO_CAPABILITY, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetPhysicalChannelConfigTest_0100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_NETWORK_GET_PHYSICAL_CHANNEL_CONFIG);
+    event->SetOwner(GetHandler());
+    OnProcessTest(HREQ_NETWORK_GET_PHYSICAL_CHANNEL_CONFIG, event);
+}
+
 HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetSimIOTest_0100, Function | MediumTest | Level3)
 {
     OnInit();
@@ -949,6 +1081,46 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetRilCmRadioPowerTest_0100, Function
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_MODEM_SET_RADIO_STATUS);
     event->SetOwner(GetHandler());
     OnProcessTest(HREQ_MODEM_SET_RADIO_STATUS, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_ShutDownTest_0100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_MODEM_SHUT_DOWN);
+    event->SetOwner(GetHandler());
+    OnProcessTest(HREQ_MODEM_SHUT_DOWN, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetRilRadioPowerTest_0100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_MODEM_GET_RADIO_STATUS);
+    event->SetOwner(GetHandler());
+    OnProcessTest(HREQ_MODEM_GET_RADIO_STATUS, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetImeiTest_0100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_MODEM_GET_IMEI);
+    event->SetOwner(GetHandler());
+    OnProcessTest(HREQ_MODEM_GET_IMEI, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetMeidTest_0100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_MODEM_GET_MEID);
+    event->SetOwner(GetHandler());
+    OnProcessTest(HREQ_MODEM_GET_MEID, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetVoiceRadioTest_0100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_MODEM_GET_VOICE_RADIO);
+    event->SetOwner(GetHandler());
+    OnProcessTest(HREQ_MODEM_GET_VOICE_RADIO, event);
 }
 
 HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetUssdTest_0100, Function | MediumTest | Level3)

@@ -74,6 +74,8 @@ public:
     void OnRequestSetNotificationFilterTest(OHOS::MessageParcel &data);
     void OnRequestSetDeviceStateTest(OHOS::MessageParcel &data);
     void OnRequestGetPreferredNetworkTypeInfoTest(OHOS::MessageParcel &data);
+    void OnResponseGetPhysicalChannelConfig(OHOS::MessageParcel &data);
+    void OnResponseGetRadioCapability(OHOS::MessageParcel &data);
     void OnRequestGetMeidTest(OHOS::MessageParcel &data);
     void OnRequestGetModemVoiceRadioTest(OHOS::MessageParcel &data);
     void OnRequestGetBasebandVersionTest(OHOS::MessageParcel &data);

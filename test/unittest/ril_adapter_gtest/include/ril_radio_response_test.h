@@ -48,7 +48,13 @@ public:
     void OnResponseGetCsRegStatus(MessageParcel &data);
     void OnResponseGetNetworkRegistrationState(MessageParcel &data);
     void OnResponseGetCurrentOperator(MessageParcel &data);
-    void SetRadioStateResponse(MessageParcel &data);
+    void OnRequestSetRadioStateTest(MessageParcel &data);
+    void OnResponseGetRadioCapability(MessageParcel &data);
+    void OnRequestShutDownTest(MessageParcel &data);
+    void OnRequestGetRadioStateTest(MessageParcel &data);
+    void OnRequestGetImeiTest(MessageParcel &data);
+    void OnRequestGetMeidTest(MessageParcel &data);
+    void OnRequestGetVoiceRadioTechnologyTest(MessageParcel &data);
     void SendSmsResponse(MessageParcel &data);
     void SendSmsMoreModeResponse(MessageParcel &data);
     void ActivatePdpContextResponse(MessageParcel &data);
@@ -62,9 +68,10 @@ public:
     void OnResponseSetDataCallAllowed(MessageParcel &data);
     void OnResponseSetModemDataProfile(MessageParcel &data);
     void OnResponsePullRadioLceData(MessageParcel &data);
-    void OnRequestGetNetworkSelectionModeTest(MessageParcel &data);
-    void OnRequestGetNetworkSearchInformationTest(MessageParcel &data);
-    void OnRequestSetNetworkSelectionModeTest(MessageParcel &data);
+    void OnResponseGetNetworkSearchInformationTest(MessageParcel &data);
+    void OnResponseGetNetworkSelectionModeTest(MessageParcel &data);
+    void OnResponseSetNetworkSelectionModeTest(MessageParcel &data);
+    void OnResponseGetPhysicalChannelConfig(OHOS::MessageParcel &data);
     void OnRequestSetNotificationFilterTest(MessageParcel &data);
     void OnRequestSetDeviceStateTest(MessageParcel &data);
     void OnRequestSetUssdTest(MessageParcel &data);

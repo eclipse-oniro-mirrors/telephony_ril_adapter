@@ -183,6 +183,12 @@ int32_t RilRadioResponseTest::OnRemoteRequest(
         case HREQ_NETWORK_SET_DEVICE_STATE:
             OnRequestSetDeviceStateTest(data);
             break;
+        case HREQ_NETWORK_GET_PHYSICAL_CHANNEL_CONFIG:
+            OnResponseGetPhysicalChannelConfig(data);
+            break;
+        case HREQ_NETWORK_GET_RADIO_CAPABILITY:
+            OnResponseGetRadioCapability(data);
+            break;
         case HREQ_MODEM_GET_MEID:
             OnRequestGetMeidTest(data);
             break;
@@ -533,60 +539,91 @@ void RilRadioResponseTest::OnResponseGetSimIo(OHOS::MessageParcel &data)
 
 void RilRadioResponseTest::OnResponseGetRilCurrentCellInfo(OHOS::MessageParcel &data)
 {
-    TELEPHONY_LOGI("RilRadioResponseTest::OnResponseGetRilCurrentCellInfo --> ");
-    std::unique_ptr<CurrentCellInfo> curCellInfo = std::make_unique<CurrentCellInfo>();
-    if (curCellInfo == nullptr) {
-        return;
-    }
-    if (!curCellInfo.get()->ReadFromParcel(data)) {
-        TELEPHONY_LOGE("ERROR : OnResponseGetRilCurrentCellInfo --> CurrentCellInfo.ReadFromParcel(data) failed !!!");
-        return;
-    }
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
-    const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
+    const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
     if (spBuffer == nullptr) {
-        TELEPHONY_LOGE("ERROR : OnResponseGetRilCurrentCellInfo --> data.ReadBuffer(readSpSize) failed !!!");
+        TELEPHONY_LOGE("OnResponseGetRilCurrentCellInfo read spBuffer failed");
         return;
     }
-
-    cout << "OnResponseGetRilCurrentCellInfo: mcc = " << curCellInfo->mcc << endl;
-    cout << "OnResponseGetRilCurrentCellInfo: mnc = " << curCellInfo->mnc << endl;
-    cout << "OnResponseGetRilCurrentCellInfo: ratType = " << curCellInfo->ratType << endl;
-
-    if (curCellInfo->ratType == NETWORK_TYPE_WCDMA) {
-        cout << "OnResponseGetRilCurrentCellInfo: arfcn = " << curCellInfo->ServiceCellParas.wcdma.arfcn << endl;
-        cout << "OnResponseGetRilCurrentCellInfo: psc = " << curCellInfo->ServiceCellParas.wcdma.psc << endl;
-        cout << "OnResponseGetRilCurrentCellInfo: cellId = " << curCellInfo->ServiceCellParas.wcdma.cellId << endl;
-        cout << "OnResponseGetRilCurrentCellInfo: lac = " << curCellInfo->ServiceCellParas.wcdma.lac << endl;
-        cout << "OnResponseGetRilCurrentCellInfo: rscp = " << curCellInfo->ServiceCellParas.wcdma.rscp << endl;
-        cout << "OnResponseGetRilCurrentCellInfo: rxlev = " << curCellInfo->ServiceCellParas.wcdma.rxlev << endl;
-        cout << "OnResponseGetRilCurrentCellInfo: ecno = " << curCellInfo->ServiceCellParas.wcdma.ecno << endl;
-        cout << "OnResponseGetRilCurrentCellInfo: drx = " << curCellInfo->ServiceCellParas.wcdma.drx << endl;
-        cout << "OnResponseGetRilCurrentCellInfo: ura = " << curCellInfo->ServiceCellParas.wcdma.ura << endl;
-    } else if (curCellInfo->ratType == NETWORK_TYPE_LTE) {
-        cout << "OnResponseGetRilCurrentCellInfo: arfcn = " << curCellInfo->ServiceCellParas.lte.arfcn << endl;
-        cout << "OnResponseGetRilCurrentCellInfo: cellId = " << curCellInfo->ServiceCellParas.lte.cellId << endl;
-        cout << "OnResponseGetRilCurrentCellInfo: pci = " << curCellInfo->ServiceCellParas.lte.pci << endl;
-        cout << "OnResponseGetRilCurrentCellInfo: tac = " << curCellInfo->ServiceCellParas.lte.tac << endl;
-        cout << "OnResponseGetRilCurrentCellInfo: rsrp = " << curCellInfo->ServiceCellParas.lte.rsrp << endl;
-        cout << "OnResponseGetRilCurrentCellInfo: rsrq = " << curCellInfo->ServiceCellParas.lte.rsrq << endl;
-        cout << "OnResponseGetRilCurrentCellInfo: rssi = " << curCellInfo->ServiceCellParas.lte.rssi << endl;
-    } else if (curCellInfo->ratType == NETWORK_TYPE_GSM) {
-        cout << "OnResponseGetRilCurrentCellInfo: band = " << curCellInfo->ServiceCellParas.gsm.band << endl;
-        cout << "OnResponseGetRilCurrentCellInfo: arfcn = " << curCellInfo->ServiceCellParas.gsm.arfcn << endl;
-        cout << "OnResponseGetRilCurrentCellInfo: bsic = " << curCellInfo->ServiceCellParas.gsm.bsic << endl;
-        cout << "OnResponseGetRilCurrentCellInfo: cellId = " << curCellInfo->ServiceCellParas.gsm.cellId << endl;
-        cout << "OnResponseGetRilCurrentCellInfo: lac = " << curCellInfo->ServiceCellParas.gsm.lac << endl;
-        cout << "OnResponseGetRilCurrentCellInfo: rxlev = " << curCellInfo->ServiceCellParas.gsm.rxlev << endl;
-        cout << "OnResponseGetRilCurrentCellInfo: rxQuality = " << curCellInfo->ServiceCellParas.gsm.rxQuality << endl;
-        cout << "OnResponseGetRilCurrentCellInfo: ta = " << curCellInfo->ServiceCellParas.gsm.ta << endl;
-    } else if (curCellInfo->ratType == NETWORK_TYPE_NR) {
-        cout << "OnResponseGetRilCurrentCellInfo: nrArfcn = " << curCellInfo->ServiceCellParas.nr.nrArfcn << endl;
-        cout << "OnResponseGetRilCurrentCellInfo: pci = " << curCellInfo->ServiceCellParas.nr.pci << endl;
-        cout << "OnResponseGetRilCurrentCellInfo: tac = " << curCellInfo->ServiceCellParas.nr.tac << endl;
-        cout << "OnResponseGetRilCurrentCellInfo: nci = " << curCellInfo->ServiceCellParas.nr.nci << endl;
-    } else {
-        cout << "OnResponseGetRilCurrentCellInfo: invalid rat " << endl;
+    std::shared_ptr<CellListCurrentInfo> currentCellList = std::make_shared<CellListCurrentInfo>();
+    if (currentCellList == nullptr) {
+        TELEPHONY_LOGE("OnResponseGetRilCurrentCellInfo currentCellList is nullptr");
+        return;
+    }
+    currentCellList->ReadFromParcel(data);
+    int32_t cellSize = currentCellList->itemNum;
+    if (cellSize <= 0) {
+        TELEPHONY_LOGE("OnResponseGetRilCurrentCellInfo no cell info");
+        return;
+    }
+    std::vector<CurrentCellInfo> cellInfos = currentCellList->cellCurrentInfo;
+    for (CurrentCellInfo cell : cellInfos) {
+        cout << "OnResponseGetRilCurrentCellInfo: mcc = " << cell.mcc << endl;
+        cout << "OnResponseGetRilCurrentCellInfo: mnc = " << cell.mnc << endl;
+        cout << "OnResponseGetRilCurrentCellInfo: ratType = " << cell.ratType << endl;
+        switch (static_cast<int>(cell.ratType)) {
+            case NETWORK_TYPE_WCDMA:
+                cout << "OnResponseGetRilCurrentCellInfo: arfcn = " << cell.ServiceCellParas.wcdma.arfcn << endl;
+                cout << "OnResponseGetRilCurrentCellInfo: psc = " << cell.ServiceCellParas.wcdma.psc << endl;
+                cout << "OnResponseGetRilCurrentCellInfo: cellId = " << cell.ServiceCellParas.wcdma.cellId << endl;
+                cout << "OnResponseGetRilCurrentCellInfo: lac = " << cell.ServiceCellParas.wcdma.lac << endl;
+                cout << "OnResponseGetRilCurrentCellInfo: rscp = " << cell.ServiceCellParas.wcdma.rscp << endl;
+                cout << "OnResponseGetRilCurrentCellInfo: rxlev = " << cell.ServiceCellParas.wcdma.rxlev << endl;
+                cout << "OnResponseGetRilCurrentCellInfo: ecno = " << cell.ServiceCellParas.wcdma.ecno << endl;
+                cout << "OnResponseGetRilCurrentCellInfo: drx = " << cell.ServiceCellParas.wcdma.drx << endl;
+                cout << "OnResponseGetRilCurrentCellInfo: ura = " << cell.ServiceCellParas.wcdma.ura << endl;
+                break;
+            case NETWORK_TYPE_TDSCDMA:
+                cout << "OnResponseGetRilCurrentCellInfo: arfcn = " << cell.ServiceCellParas.tdscdma.arfcn << endl;
+                cout << "OnResponseGetRilCurrentCellInfo: syncId = " << cell.ServiceCellParas.tdscdma.syncId << endl;
+                cout << "OnResponseGetRilCurrentCellInfo: sc = " << cell.ServiceCellParas.tdscdma.sc << endl;
+                cout << "OnResponseGetRilCurrentCellInfo: cellId = " << cell.ServiceCellParas.tdscdma.cellId << endl;
+                cout << "OnResponseGetRilCurrentCellInfo: lac = " << cell.ServiceCellParas.tdscdma.lac << endl;
+                cout << "OnResponseGetRilCurrentCellInfo: rscp = " << cell.ServiceCellParas.tdscdma.rscp << endl;
+                cout << "OnResponseGetRilCurrentCellInfo: rac = " << cell.ServiceCellParas.tdscdma.rac << endl;
+                cout << "OnResponseGetRilCurrentCellInfo: drx = " << cell.ServiceCellParas.tdscdma.drx << endl;
+                cout << "OnResponseGetRilCurrentCellInfo: cpid = " << cell.ServiceCellParas.tdscdma.cpid << endl;
+                break;
+            case NETWORK_TYPE_CDMA:
+                cout << "OnResponseGetRilCurrentCellInfo: systemId = " << cell.ServiceCellParas.cdma.systemId << endl;
+                cout << "OnResponseGetRilCurrentCellInfo: baseId = " << cell.ServiceCellParas.cdma.baseId << endl;
+                cout << "OnResponseGetRilCurrentCellInfo: zoneId = " << cell.ServiceCellParas.cdma.zoneId << endl;
+                cout << "OnResponseGetRilCurrentCellInfo: pilotPn = " << cell.ServiceCellParas.cdma.pilotPn << endl;
+                cout << "OnResponseGetRilCurrentCellInfo: pilotStrength = "
+                     << cell.ServiceCellParas.cdma.pilotStrength << endl;
+                cout << "OnResponseGetRilCurrentCellInfo: channel = " << cell.ServiceCellParas.cdma.channel << endl;
+                cout << "OnResponseGetRilCurrentCellInfo: longitude = " << cell.ServiceCellParas.cdma.longitude << endl;
+                cout << "OnResponseGetRilCurrentCellInfo: latitude = " << cell.ServiceCellParas.cdma.latitude << endl;
+                break;
+            case NETWORK_TYPE_LTE:
+                cout << "OnResponseGetRilCurrentCellInfo: arfcn = " << cell.ServiceCellParas.lte.arfcn << endl;
+                cout << "OnResponseGetRilCurrentCellInfo: cellId = " << cell.ServiceCellParas.lte.cellId << endl;
+                cout << "OnResponseGetRilCurrentCellInfo: pci = " << cell.ServiceCellParas.lte.pci << endl;
+                cout << "OnResponseGetRilCurrentCellInfo: tac = " << cell.ServiceCellParas.lte.tac << endl;
+                cout << "OnResponseGetRilCurrentCellInfo: rsrp = " << cell.ServiceCellParas.lte.rsrp << endl;
+                cout << "OnResponseGetRilCurrentCellInfo: rsrq = " << cell.ServiceCellParas.lte.rsrq << endl;
+                cout << "OnResponseGetRilCurrentCellInfo: rssi = " << cell.ServiceCellParas.lte.rssi << endl;
+                break;
+            case NETWORK_TYPE_GSM:
+                cout << "OnResponseGetRilCurrentCellInfo: band = " << cell.ServiceCellParas.gsm.band << endl;
+                cout << "OnResponseGetRilCurrentCellInfo: arfcn = " << cell.ServiceCellParas.gsm.arfcn << endl;
+                cout << "OnResponseGetRilCurrentCellInfo: bsic = " << cell.ServiceCellParas.gsm.bsic << endl;
+                cout << "OnResponseGetRilCurrentCellInfo: cellId = " << cell.ServiceCellParas.gsm.cellId << endl;
+                cout << "OnResponseGetRilCurrentCellInfo: lac = " << cell.ServiceCellParas.gsm.lac << endl;
+                cout << "OnResponseGetRilCurrentCellInfo: rxlev = " << cell.ServiceCellParas.gsm.rxlev << endl;
+                cout << "OnResponseGetRilCurrentCellInfo: rxQuality = " << cell.ServiceCellParas.gsm.rxQuality << endl;
+                cout << "OnResponseGetRilCurrentCellInfo: ta = " << cell.ServiceCellParas.gsm.ta << endl;
+                break;
+            case NETWORK_TYPE_NR:
+                cout << "OnResponseGetRilCurrentCellInfo: nrArfcn = " << cell.ServiceCellParas.nr.nrArfcn << endl;
+                cout << "OnResponseGetRilCurrentCellInfo: pci = " << cell.ServiceCellParas.nr.pci << endl;
+                cout << "OnResponseGetRilCurrentCellInfo: tac = " << cell.ServiceCellParas.nr.tac << endl;
+                cout << "OnResponseGetRilCurrentCellInfo: nci = " << cell.ServiceCellParas.nr.nci << endl;
+                break;
+            default:
+                cout << "OnResponseGetRilCurrentCellInfo: invalid rat " << endl;
+                break;
+        }
     }
 }
 
@@ -965,22 +1002,18 @@ void RilRadioResponseTest::OnResponsePullRadioLceData(OHOS::MessageParcel &data)
 
 void RilRadioResponseTest::OnRequestGetNetworkSelectionModeTest(OHOS::MessageParcel &data)
 {
-    std::unique_ptr<SetNetworkModeInfo> networkMode = std::make_unique<SetNetworkModeInfo>();
-    if (networkMode == nullptr) {
-        return;
-    }
-
-    if (!networkMode.get()->ReadFromParcel(data)) {
-        TELEPHONY_LOGE("ERROR : OnRequestGetNetworkSelectionModeTest --> ReadFromParcel(data) failed !!!");
-        return;
-    }
-
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
     if (spBuffer == nullptr) {
-        TELEPHONY_LOGE("ERROR : OnResponsePullRadioLceData --> data.ReadBuffer(readSpSize) failed !!!");
+        TELEPHONY_LOGE("OnRequestGetNetworkSelectionModeTest data.ReadBuffer failed");
         return;
     }
+    std::unique_ptr<SetNetworkModeInfo> networkMode = std::make_unique<SetNetworkModeInfo>();
+    if (networkMode == nullptr || networkMode.get() == nullptr) {
+        TELEPHONY_LOGE("OnRequestGetNetworkSelectionModeTest networkMode is nullptr");
+        return;
+    }
+    networkMode->ReadFromParcel(data);
     cout << "OnRequestGetNetworkSelectionModeTest: selectMode = " << networkMode->selectMode << endl;
 }
 void RilRadioResponseTest::OnRequestGetNetworkSearchInformationTest(OHOS::MessageParcel &data)
@@ -1035,20 +1068,19 @@ void RilRadioResponseTest::OnRequestSetNetworkPreferredNetworkModeTest(OHOS::Mes
 
 void RilRadioResponseTest::OnRequestGetNetworkPreferredNetworkModeTest(OHOS::MessageParcel &data)
 {
-    std::unique_ptr<PreferredNetworkTypeInfo> preferNetworkType = std::make_unique<PreferredNetworkTypeInfo>();
-    if (preferNetworkType == nullptr) {
-        return;
-    }
-    preferNetworkType.get()->ReadFromParcel(data);
-
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
     if (spBuffer == nullptr) {
-        TELEPHONY_LOGE("ERROR : OnResponsePullRadioLceData --> data.ReadBuffer(readSpSize) failed !!!");
+        TELEPHONY_LOGE("OnRequestGetPreferredNetworkTypeInfoTest data.ReadBuffer(readSpSize) failed !!!");
         return;
     }
-    cout << "OnRequestGetNetworkPreferredNetworkModeTest: preferredNetworkType = "
-         << preferNetworkType->preferredNetworkType << endl;
+    std::unique_ptr<PreferredNetworkTypeInfo> networkType = std::make_unique<PreferredNetworkTypeInfo>();
+    if (networkType == nullptr) {
+        TELEPHONY_LOGE("OnRequestGetPreferredNetworkTypeInfoTest networkType is nullptr");
+        return;
+    }
+    networkType->ReadFromParcel(data);
+    cout << "OnRequestGetPreferredNetworkTypeInfoTest: type = " << networkType->preferredNetworkType << endl;
 }
 
 void RilRadioResponseTest::OnRequestGetMeidTest(OHOS::MessageParcel &data)
@@ -1168,22 +1200,49 @@ void RilRadioResponseTest::OnRequestSetDeviceStateTest(OHOS::MessageParcel &data
     PrintResponseInfo((struct HRilRadioResponseInfo *)spBuffer);
 }
 
-void RilRadioResponseTest::OnRequestGetPreferredNetworkTypeInfoTest(OHOS::MessageParcel &data)
+void RilRadioResponseTest::OnResponseGetPhysicalChannelConfig(OHOS::MessageParcel &data)
 {
-    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
-    const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
+    const uint8_t *spBuffer = data.ReadUnpadBuffer(sizeof(HRilRadioResponseInfo));
     if (spBuffer == nullptr) {
-        TELEPHONY_LOGE("ERROR : OnResponsePullRadioLceData --> data.ReadBuffer(readSpSize) failed !!!");
+        TELEPHONY_LOGE("RilRadioResponseTest::OnResponseGetPhysicalChannelConfig read spBuffer failed");
         return;
     }
+    std::shared_ptr<ChannelConfigInfoList> channelConfigInfoList = std::make_shared<ChannelConfigInfoList>();
+    if (channelConfigInfoList == nullptr) {
+        TELEPHONY_LOGE("RilRadioResponseTest::OnResponseGetPhysicalChannelConfig channelConfigInfoList == nullptr");
+        return;
+    }
+    channelConfigInfoList->ReadFromParcel(data);
+    int32_t size = channelConfigInfoList->itemNum;
+    cout << "RilRadioResponseTest::OnResponseGetPhysicalChannelConfig:" << endl << "====> [size]: " << size << endl;
+    std::vector<PhysicalChannelConfig> &configs = channelConfigInfoList->channelConfigInfos;
+    for (int32_t i = 0; i < static_cast<int32_t>(configs.size()); i++) {
+        cout << "====> [cellConnStatus]: " << configs[i].cellConnStatus << endl;
+        cout << "====> [cellBandwidthDownlinkKhz]: " << configs[i].cellBandwidthDownlinkKhz << endl;
+        cout << "====> [cellBandwidthUplinkKhz]: " << configs[i].cellBandwidthUplinkKhz << endl;
+        cout << "====> [ratType]: " << configs[i].ratType << endl;
+        cout << "====> [freqRange]: " << configs[i].freqRange << endl;
+        cout << "====> [downlinkChannelNum]: " << configs[i].downlinkChannelNum << endl;
+        cout << "====> [uplinkChannelNum]: " << configs[i].uplinkChannelNum << endl;
+        cout << "====> [physicalCellId]: " << configs[i].physicalCellId << endl;
+        cout << "====> [contextIdNum]: " << configs[i].contextIdNum << endl;
+    }
+}
 
-    std::unique_ptr<PreferredNetworkTypeInfo> networkType = std::make_unique<PreferredNetworkTypeInfo>();
-    if (networkType == nullptr) {
+void RilRadioResponseTest::OnResponseGetRadioCapability(OHOS::MessageParcel &data)
+{
+    const uint8_t *spBuffer = data.ReadUnpadBuffer(sizeof(HRilRadioResponseInfo));
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("RilRadioResponseTest::OnResponseGetRadioCapability read spBuffer failed");
         return;
     }
-    networkType.get()->ReadFromParcel(data);
-    cout << "OnRequestGetPreferredNetworkTypeInfoTest: preferredNetworkType = " << networkType->preferredNetworkType
-         << endl;
+    std::shared_ptr<RadioCapabilityInfo> radioCapabilityInfo = std::make_shared<RadioCapabilityInfo>();
+    if (radioCapabilityInfo == nullptr) {
+        TELEPHONY_LOGE("RilRadioResponseTest::OnResponseGetRadioCapability radioCapabilityInfo  == nullptr");
+        return;
+    }
+    radioCapabilityInfo->ReadFromParcel(data);
+    cout << "OnResponseGetRadioCapability: ratFamily = " << radioCapabilityInfo->ratFamily << endl;
 }
 
 void RilRadioResponseTest::OnRequestGetLinkBandwidthInfoTest(OHOS::MessageParcel &data)

@@ -113,9 +113,11 @@ public:
     void SetNotificationFilter(int32_t filter, const AppExecFwk::InnerEvent::Pointer &result);
     void SetDeviceState(int32_t deviceStateType, bool deviceStateOn, const AppExecFwk::InnerEvent::Pointer &result);
     void SetNetworkSelectionMode(int32_t mode, std::string plmn, const AppExecFwk::InnerEvent::Pointer &result);
+    void GetPhysicalChannelConfig(const AppExecFwk::InnerEvent::Pointer &response);
+    void GetRadioCapability(const AppExecFwk::InnerEvent::Pointer &response);
     void ShutDown(const AppExecFwk::InnerEvent::Pointer &result);
     void GetMeid(const AppExecFwk::InnerEvent::Pointer &response);
-    void GetVoiceRadio(const AppExecFwk::InnerEvent::Pointer &response);
+    void GetVoiceRadioTechnology(const AppExecFwk::InnerEvent::Pointer &response);
     void GetBasebandVersion(const AppExecFwk::InnerEvent::Pointer &response);
     void SendSms(std::string smscPdu, std::string pdu, const std::shared_ptr<AppExecFwk::EventHandler> &handler,
         const AppExecFwk::InnerEvent::Pointer &response);

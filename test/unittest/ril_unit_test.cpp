@@ -15,8 +15,8 @@
 
 #include "ril_unit_test.h"
 
-#include <iostream>
 #include <unistd.h>
+#include <iostream>
 
 #include "hril_request.h"
 #include "telephony_log_wrapper.h"
@@ -417,11 +417,11 @@ void RilUnitTest::GetMeidTest(const OHOS::AppExecFwk::InnerEvent::Pointer &resul
     TELEPHONY_LOGI("RilUnitTest::GetMeidTest --> GetMeidTest finished");
 }
 
-void RilUnitTest::GetVoiceRadioTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+void RilUnitTest::GetVoiceRadioTechnologyTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
 {
-    TELEPHONY_LOGI("RilUnitTest::GetVoiceRadioTest -->");
-    mRilManager_->GetVoiceRadio(result);
-    TELEPHONY_LOGI("RilUnitTest::GetVoiceRadioTest --> GetVoiceRadioTest finished");
+    TELEPHONY_LOGI("RilUnitTest::GetVoiceRadioTechnologyTest -->");
+    mRilManager_->GetVoiceRadioTechnology(result);
+    TELEPHONY_LOGI("RilUnitTest::GetVoiceRadioTechnologyTest --> GetVoiceRadioTechnologyTest finished");
 }
 
 void RilUnitTest::GetBasebandVersionTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
@@ -501,6 +501,20 @@ void RilUnitTest::SetRilNetworkSelectionModeTest(const OHOS::AppExecFwk::InnerEv
 
     mRilManager_->SetNetworkSelectionMode(mode, plmn, result);
     TELEPHONY_LOGI("RilUnitTest::SetRilNetworkSelectionModeTest --> SetRilNetworkSelectionModeTest finished");
+}
+
+void RilUnitTest::GetPhysicalChannelConfigTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::GetPhysicalChannelConfigTest -->");
+    mRilManager_->GetPhysicalChannelConfig(result);
+    TELEPHONY_LOGI("RilUnitTest::GetPhysicalChannelConfigTest --> finished");
+}
+
+void RilUnitTest::GetRilRadioCapabilityTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::GetRilRadioCapabilityTest -->");
+    mRilManager_->GetRadioCapability(result);
+    TELEPHONY_LOGI("RilUnitTest::GetRilRadioCapabilityTest --> finished");
 }
 
 void RilUnitTest::SendRilCmSmsTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
@@ -1102,6 +1116,8 @@ void RilUnitTest::OnInitNetworkProcessInterface()
     memberFuncMap_[HREQ_NETWORK_SET_LOCATE_UPDATES] = &RilUnitTest::SetRilLocationUpdateTest;
     memberFuncMap_[HREQ_NETWORK_SET_NOTIFICATION_FILTER] = &RilUnitTest::SetRilNotificationFilterTest;
     memberFuncMap_[HREQ_NETWORK_SET_DEVICE_STATE] = &RilUnitTest::SetRilDeviceStateTest;
+    memberFuncMap_[HREQ_NETWORK_GET_RADIO_CAPABILITY] = &RilUnitTest::GetRilRadioCapabilityTest;
+    memberFuncMap_[HREQ_NETWORK_GET_PHYSICAL_CHANNEL_CONFIG] = &RilUnitTest::GetPhysicalChannelConfigTest;
 }
 
 void RilUnitTest::OnInitModemProcessInterface()
@@ -1112,7 +1128,7 @@ void RilUnitTest::OnInitModemProcessInterface()
     memberFuncMap_[HREQ_MODEM_GET_RADIO_STATUS] = &RilUnitTest::GetRilRadioPowerTest;
     memberFuncMap_[HREQ_MODEM_GET_IMEI] = &RilUnitTest::GetImeiTest;
     memberFuncMap_[HREQ_MODEM_GET_MEID] = &RilUnitTest::GetMeidTest;
-    memberFuncMap_[HREQ_MODEM_GET_VOICE_RADIO] = &RilUnitTest::GetVoiceRadioTest;
+    memberFuncMap_[HREQ_MODEM_GET_VOICE_RADIO] = &RilUnitTest::GetVoiceRadioTechnologyTest;
     memberFuncMap_[HREQ_MODEM_GET_BASEBAND_VERSION] = &RilUnitTest::GetBasebandVersionTest;
 }
 
@@ -1282,6 +1298,9 @@ static int32_t PrintNetworkMenu()
     cout << "----> [" << HREQ_NETWORK_SET_NOTIFICATION_FILTER
          << "] ---->[ HREQ_NETWORK_SET_NOTIFICATION_FILTER ]" << endl;
     cout << "----> [" << HREQ_NETWORK_SET_DEVICE_STATE << "] ---->[ HREQ_NETWORK_SET_DEVICE_STATE ]" << endl;
+    cout << "----> [" << HREQ_NETWORK_GET_RADIO_CAPABILITY << "] ---->[ HREQ_NETWORK_GET_RADIO_CAPABILITY ]" << endl;
+    cout << "----> [" << HREQ_NETWORK_GET_PHYSICAL_CHANNEL_CONFIG
+         << "] ---->[ HREQ_NETWORK_GET_PHYSICAL_CHANNEL_CONFIG ]" << endl;
     int32_t choice = InputInt32(HREQ_NETWORK_BASE, HREQ_COMMON_BASE - 1, "Command");
     cout << "---->You choose: " << choice << endl;
     choice = (choice == HREQ_NETWORK_BASE) ? -1 : choice;

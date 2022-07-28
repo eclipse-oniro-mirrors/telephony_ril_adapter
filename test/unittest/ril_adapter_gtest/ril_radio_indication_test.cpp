@@ -15,10 +15,9 @@
 
 #include "ril_radio_indication_test.h"
 
+#include "hril_notification.h"
 #include "ril_manager_test.h"
 #include "telephony_log_wrapper.h"
-
-#include "hril_notification.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -57,6 +56,12 @@ int32_t RilRadioIndicationTest::OnRemoteRequest(
             return 0;
         case HNOTI_NETWORK_SIGNAL_STRENGTH_UPDATED:
             SignalStrengthUpdated(data);
+            return 0;
+        case HNOTI_NETWORK_PS_REG_STATUS_UPDATED:
+            NetworkPsRegStatusNotify(data);
+            return 0;
+        case HNOTI_NETWORK_PHY_CHNL_CFG_UPDATED:
+            NetworkPhyChnlCfgUpdated(data);
             return 0;
         default:
             return DEFAULT_VALUE;
@@ -145,6 +150,37 @@ void RilRadioIndicationTest::SignalStrengthUpdated(MessageParcel &data)
         TELEPHONY_LOGE("SignalStrengthUpdated memcpy_s failed");
         return;
     }
+}
+
+void RilRadioIndicationTest::NetworkPsRegStatusNotify(OHOS::MessageParcel &data)
+{
+    TELEPHONY_LOGI("RilRadioIndicationTest::NetworkPsRegStatusNotify --> ");
+    int32_t indicationType = data.ReadInt32();
+    TELEPHONY_LOGI("func :%{public}s indicationType: %{public}d", __func__, indicationType);
+}
+
+void RilRadioIndicationTest::NetworkPhyChnlCfgUpdated(OHOS::MessageParcel &data)
+{
+    std::shared_ptr<ChannelConfigInfoList> phyChnlCfgList = std::make_shared<ChannelConfigInfoList>();
+    if (phyChnlCfgList == nullptr) {
+        TELEPHONY_LOGE("RilRadioIndicationTest::NetworkPhyChnlCfgUpdated phyChnlCfgList == nullptr");
+        return;
+    }
+    phyChnlCfgList->ReadFromParcel(data);
+    std::vector<PhysicalChannelConfig> &configs = phyChnlCfgList->channelConfigInfos;
+    for (int32_t i = 0; i < static_cast<int32_t>(configs.size()); i++) {
+        TELEPHONY_LOGI(
+            "func :%{public}s cellConnStatus:%{public}d cellBandwidthDownlinkKhz:%{public}d"
+            "cellBandwidthUplinkKhz:%{public}d ratType:%{public}d freqRange:%{public}d downlinkChannelNum:%{public}d"
+            "uplinkChannelNum:%{public}d physicalCellId:%{public}d contextIdNum:%{public}d",
+            __func__, configs[i].cellConnStatus, configs[i].cellBandwidthDownlinkKhz,
+            configs[i].cellBandwidthUplinkKhz, configs[i].ratType, configs[i].freqRange,
+            configs[i].downlinkChannelNum, configs[i].uplinkChannelNum,
+            configs[i].physicalCellId, configs[i].contextIdNum);
+    }
+    int32_t indicationType = data.ReadInt32();
+    TELEPHONY_LOGI("func :%{public}s indicationType:%{public}d size:%{public}d",
+        __func__, indicationType, phyChnlCfgList->itemNum);
 }
 } // namespace Telephony
 } // namespace OHOS
