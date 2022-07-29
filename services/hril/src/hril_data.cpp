@@ -238,7 +238,6 @@ int32_t HRilData::SetInitApnInfo(struct HdfSBuf *data)
 
 int32_t HRilData::SendDataPerformanceMode(struct HdfSBuf *data)
 {
-    TELEPHONY_LOGE("SendDataPerformanceMode");
     if (dataFuncs_ == nullptr || dataFuncs_->SendDataPerformanceMode == nullptr || data == nullptr) {
         TELEPHONY_LOGE(
             "dataFuncs_:%{public}p or dataFuncs_->SendDataPerformanceMode or data:%{public}p is nullptr!",
@@ -263,7 +262,7 @@ int32_t HRilData::SendDataPerformanceMode(struct HdfSBuf *data)
     }
     hrilDataPerformanceInfo.performanceEnable = dataPerformanceInfo.performanceEnable;
     hrilDataPerformanceInfo.enforce = dataPerformanceInfo.enforce;
-    TELEPHONY_LOGE("SendDataPerformanceMode: performanceEnable=%{public}d enforce=%{public}d",
+    TELEPHONY_LOGI("SendDataPerformanceMode: performanceEnable=%{public}d enforce=%{public}d",
         hrilDataPerformanceInfo.performanceEnable, hrilDataPerformanceInfo.enforce);
     ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_DATA_SEND_DATA_PERFORMANCE_MODE);
     if (requestInfo == nullptr) {
@@ -275,7 +274,6 @@ int32_t HRilData::SendDataPerformanceMode(struct HdfSBuf *data)
 
 int32_t HRilData::SendDataSleepMode(struct HdfSBuf *data)
 {
-    TELEPHONY_LOGE("SendDataSleepMode");
     if (dataFuncs_ == nullptr || dataFuncs_->SendDataSleepMode == nullptr || data == nullptr) {
         TELEPHONY_LOGE(
             "dataFuncs_:%{public}p or dataFuncs_->SendDataSleepMode or data:%{public}p is nullptr!",
@@ -299,7 +297,7 @@ int32_t HRilData::SendDataSleepMode(struct HdfSBuf *data)
         return HRIL_ERR_INVALID_PARAMETER;
     }
     hrilDataSleepInfo.sleepEnable = dataSleepInfo.sleepEnable;
-    TELEPHONY_LOGE("SendDataSleepMode: sleepEnable=%{public}d", hrilDataSleepInfo.sleepEnable);
+    TELEPHONY_LOGI("SendDataSleepMode: sleepEnable=%{public}d", hrilDataSleepInfo.sleepEnable);
     ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_DATA_SEND_DATA_SLEEP_MODE);
     if (requestInfo == nullptr) {
         return HRIL_ERR_NULL_POINT;
