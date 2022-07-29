@@ -39,6 +39,8 @@ private:
     void SmsStatusReportNotify(MessageParcel &data);
     void NewSmsStoredOnSimNotify(MessageParcel &data);
     void SignalStrengthUpdated(MessageParcel &data);
+    void NetworkPsRegStatusNotify(MessageParcel &data);
+    void NetworkPhyChnlCfgUpdated(MessageParcel &data);
 
 private:
     RilManagerTest *mRilManager_;

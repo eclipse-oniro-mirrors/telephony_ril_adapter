@@ -35,14 +35,44 @@ int32_t RilRadioResponseTest::OnRemoteRequest(
         case HREQ_SIM_GET_SIM_STATUS:
             OnResponseGetSimState(data);
             break;
+        case HREQ_NETWORK_GET_NETWORK_SEARCH_INFORMATION:
+            OnResponseGetNetworkSearchInformationTest(data);
+            break;
+        case HREQ_NETWORK_GET_NETWORK_SELECTION_MODE:
+            OnResponseGetNetworkSelectionModeTest(data);
+            break;
+        case HREQ_NETWORK_SET_NETWORK_SELECTION_MODE:
+            OnResponseSetNetworkSelectionModeTest(data);
+            break;
         case HREQ_NETWORK_GET_CURRENT_CELL_INFO:
             OnResponseGetRilCurrentCellInfo(data);
+            break;
+        case HREQ_NETWORK_GET_PHYSICAL_CHANNEL_CONFIG:
+            OnResponseGetPhysicalChannelConfig(data);
             break;
         case HREQ_NETWORK_SET_NOTIFICATION_FILTER:
             OnRequestSetNotificationFilterTest(data);
             break;
         case HREQ_NETWORK_SET_DEVICE_STATE:
             OnRequestSetDeviceStateTest(data);
+            break;
+        case HREQ_MODEM_SHUT_DOWN:
+            OnRequestShutDownTest(data);
+            break;
+        case HREQ_MODEM_SET_RADIO_STATUS:
+            OnRequestSetRadioStateTest(data);
+            break;
+        case HREQ_MODEM_GET_RADIO_STATUS:
+            OnRequestGetRadioStateTest(data);
+            break;
+        case HREQ_MODEM_GET_IMEI:
+            OnRequestGetImeiTest(data);
+            break;
+        case HREQ_MODEM_GET_MEID:
+            OnRequestGetMeidTest(data);
+            break;
+        case HREQ_MODEM_GET_VOICE_RADIO:
+            OnRequestGetVoiceRadioTechnologyTest(data);
             break;
         default:
             break;
@@ -69,6 +99,66 @@ void RilRadioResponseTest::OnResponseGetSimState(MessageParcel &data)
     }
 }
 
+void RilRadioResponseTest::OnResponseGetNetworkSearchInformationTest(MessageParcel &data)
+{
+    TELEPHONY_LOGI("RilRadioResponseTest::OnResponseGetNetworkSearchInformationTest -->");
+    std::unique_ptr<AvailableNetworkList> availableNetwork = std::make_unique<AvailableNetworkList>();
+    if (availableNetwork == nullptr) {
+        TELEPHONY_LOGE("RilRadioResponseTest::OnResponseGetNetworkSearchInformationTest availableNetwork == nullptr");
+        return;
+    }
+    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
+    const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("RilRadioResponseTest::OnResponseGetNetworkSearchInformationTest --> spBuffer == nullptr");
+        return;
+    }
+    if (!availableNetwork.get()->ReadFromParcel(data)) {
+        TELEPHONY_LOGE("RilRadioResponseTest::OnResponseGetNetworkSearchInformationTest --> readFromParcel failed");
+        return;
+    }
+    for (auto &netInfo : availableNetwork->availableNetworkInfo) {
+        TELEPHONY_LOGI(
+            "RilRadioResponseTest OnResponseGetNetworkSearchInformationTest --> longName = %{public}s,"
+            "shortName = %{public}s, numeric = %{public}s, status = %{public}d, rat = %{public}d",
+            netInfo.longName.c_str(), netInfo.shortName.c_str(), netInfo.numeric.c_str(), netInfo.status, netInfo.rat);
+    }
+}
+
+void RilRadioResponseTest::OnResponseGetNetworkSelectionModeTest(OHOS::MessageParcel &data)
+{
+    TELEPHONY_LOGI("RilRadioResponseTest::OnResponseGetNetworkSelectionModeTest -->");
+    std::unique_ptr<SetNetworkModeInfo> networkMode = std::make_unique<SetNetworkModeInfo>();
+    if (networkMode == nullptr) {
+        TELEPHONY_LOGE("RilRadioResponseTest::OnResponseGetNetworkSelectionModeTest networkMode == nullptr");
+        return;
+    }
+    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
+    const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("RilRadioResponseTest::OnResponseGetNetworkSelectionModeTest --> spBuffer == nullptr");
+        return;
+    }
+    if (!networkMode.get()->ReadFromParcel(data)) {
+        TELEPHONY_LOGE("RilRadioResponseTest::OnResponseGetNetworkSelectionModeTest --> readFromParcel failed");
+        return;
+    }
+    TELEPHONY_LOGI("RilRadioResponseTest OnResponseGetNetworkSelectionModeTest --> selectMode = %{public}d",
+        networkMode->selectMode);
+}
+
+void RilRadioResponseTest::OnResponseSetNetworkSelectionModeTest(OHOS::MessageParcel &data)
+{
+    TELEPHONY_LOGI("RilRadioResponseTest::OnResponseSetNetworkSelectionModeTest -->");
+    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
+    const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("RilRadioResponseTest OnResponseSetNetworkSelectionModeTest read spBuffer failed");
+        return;
+    }
+    TELEPHONY_LOGI("RilRadioResponseTest::OnResponseSetNetworkSelectionModeTest --> finished");
+}
+
 void RilRadioResponseTest::OnResponseGetRilCurrentCellInfo(MessageParcel &data)
 {
     TELEPHONY_LOGI("RilRadioResponseTest::OnResponseGetRilCurrentCellInfo --> ");
@@ -85,6 +175,33 @@ void RilRadioResponseTest::OnResponseGetRilCurrentCellInfo(MessageParcel &data)
     if (spBuffer == nullptr) {
         TELEPHONY_LOGE("ERROR : OnResponseGetRilCurrentCellInfo --> data.ReadBuffer(readSpSize) failed !!!");
         return;
+    }
+}
+
+void RilRadioResponseTest::OnResponseGetPhysicalChannelConfig(OHOS::MessageParcel &data)
+{
+    TELEPHONY_LOGI("RilRadioResponseTest OnResponseGetPhysicalChannelConfig -->");
+    const uint8_t *spBuffer = data.ReadUnpadBuffer(sizeof(HRilRadioResponseInfo));
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("RilRadioResponseTest::OnResponseGetPhysicalChannelConfig read spBuffer failed");
+        return;
+    }
+    std::shared_ptr<ChannelConfigInfoList> channelConfigInfoList = std::make_shared<ChannelConfigInfoList>();
+    if (channelConfigInfoList == nullptr) {
+        TELEPHONY_LOGE("RilRadioResponseTest::OnResponseGetPhysicalChannelConfig channelConfigInfoList == nullptr");
+        return;
+    }
+    channelConfigInfoList->ReadFromParcel(data);
+    std::vector<PhysicalChannelConfig> &configs = channelConfigInfoList->channelConfigInfos;
+    for (int32_t i = 0; i < static_cast<int32_t>(configs.size()); i++) {
+        TELEPHONY_LOGI(
+            "func :%{public}s cellConnStatus:%{public}d cellBandwidthDownlinkKhz:%{public}d"
+            "cellBandwidthUplinkKhz:%{public}d ratType:%{public}d freqRange:%{public}d downlinkChannelNum:%{public}d"
+            "uplinkChannelNum:%{public}d physicalCellId:%{public}d contextIdNum:%{public}d",
+            __func__, configs[i].cellConnStatus, configs[i].cellBandwidthDownlinkKhz,
+            configs[i].cellBandwidthUplinkKhz, configs[i].ratType, configs[i].freqRange,
+            configs[i].downlinkChannelNum, configs[i].uplinkChannelNum,
+            configs[i].physicalCellId, configs[i].contextIdNum);
     }
 }
 
@@ -291,15 +408,114 @@ void RilRadioResponseTest::OnResponseGetCurrentOperator(MessageParcel &data)
     }
 }
 
-void RilRadioResponseTest::SetRadioStateResponse(MessageParcel &data)
+void RilRadioResponseTest::OnResponseGetRadioCapability(MessageParcel &data)
 {
+    TELEPHONY_LOGI("RilRadioResponseTest::OnResponseGetRadioCapability --> ");
+    const uint8_t *spBuffer = data.ReadUnpadBuffer(sizeof(HRilRadioResponseInfo));
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("RilRadioResponseTest::OnResponseGetRadioCapability read spBuffer failed");
+        return;
+    }
+    std::shared_ptr<RadioCapabilityInfo> radioCapabilityInfo = std::make_shared<RadioCapabilityInfo>();
+    if (radioCapabilityInfo == nullptr) {
+        TELEPHONY_LOGE("RilRadioResponseTest::OnResponseGetRadioCapability radioCapabilityInfo  == nullptr");
+        return;
+    }
+    radioCapabilityInfo->ReadFromParcel(data);
+    TELEPHONY_LOGI("RilRadioResponseTest::OnResponseGetRadioCapability --> finished: ratFamily=%{public}d",
+        radioCapabilityInfo->ratFamily);
+}
+
+void RilRadioResponseTest::OnRequestShutDownTest(MessageParcel &data)
+{
+    TELEPHONY_LOGI("RilRadioResponseTest::OnRequestShutDownTest -->");
     const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
     const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
     if (spBuffer == nullptr) {
-        TELEPHONY_LOGE("RilRadioResponseTest SetRadioStateResponse read spBuffer failed");
+        TELEPHONY_LOGE("RilRadioResponseTest::OnRequestShutDownTest --> data.ReadBuffer(readSpSize) failed !!!");
         return;
     }
-    TELEPHONY_LOGI("SetRadioStateResponse");
+    TELEPHONY_LOGI("RilRadioResponseTest::OnRequestShutDownTest --> finished");
+}
+
+void RilRadioResponseTest::OnRequestSetRadioStateTest(MessageParcel &data)
+{
+    TELEPHONY_LOGI("RilRadioResponseTest::OnRequestSetRadioStateTest -->");
+    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
+    const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("RilRadioResponseTest::OnRequestSetRadioStateTest read spBuffer failed");
+        return;
+    }
+    TELEPHONY_LOGI("RilRadioResponseTest::OnRequestSetRadioStateTest --> finished");
+}
+
+void RilRadioResponseTest::OnRequestGetRadioStateTest(MessageParcel &data)
+{
+    TELEPHONY_LOGI("RilRadioResponseTest::OnRequestGetRadioStateTest -->");
+    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
+    const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("RilRadioResponseTest::OnRequestGetRadioStateTest read spBuffer failed");
+        return;
+    }
+    int32_t radioState = data.ReadInt32();
+    TELEPHONY_LOGI("RilRadioResponseTest::OnRequestGetRadioStateTest --> finished radioState=%{public}d", radioState);
+}
+
+void RilRadioResponseTest::OnRequestGetImeiTest(MessageParcel &data)
+{
+    TELEPHONY_LOGI("RilRadioResponseTest::OnRequestGetImeiTest -->");
+    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
+    const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("RilRadioResponseTest::OnRequestGetImeiTest read spBuffer failed");
+        return;
+    }
+    std::string imei = data.ReadString();
+    TELEPHONY_LOGI("RilRadioResponseTest::OnRequestGetImeiTest --> finished imei=%{public}s", imei.c_str());
+}
+
+void RilRadioResponseTest::OnRequestGetMeidTest(MessageParcel &data)
+{
+    TELEPHONY_LOGI("RilRadioResponseTest::OnRequestGetMeidTest -->");
+    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
+    const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("RilRadioResponseTest::OnRequestGetMeidTest read spBuffer failed");
+        return;
+    }
+    std::string meid = data.ReadString();
+    TELEPHONY_LOGI("RilRadioResponseTest::OnRequestGetMeidTest --> finished meid=%{public}s", meid.c_str());
+}
+
+void RilRadioResponseTest::OnRequestGetVoiceRadioTechnologyTest(MessageParcel &data)
+{
+    TELEPHONY_LOGI("RilRadioResponseTest::OnRequestGetVoiceRadioTechnologyTest -->");
+    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
+    const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("RilRadioResponseTest::OnRequestGetVoiceRadioTechnologyTest spBuffer nullptr");
+        return;
+    }
+    const struct HRilRadioResponseInfo *responseInfo = reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
+    if (responseInfo->error != HRilErrType::NONE) {
+        TELEPHONY_LOGE("RilRadioResponseTest::OnRequestGetVoiceRadioTechnologyTest --> error");
+        return;
+    }
+    std::shared_ptr<VoiceRadioTechnology> voiceRadioTech = std::make_shared<VoiceRadioTechnology>();
+    if (voiceRadioTech == nullptr) {
+        TELEPHONY_LOGE("RilRadioResponseTest::OnRequestGetVoiceRadioTechnologyTest --> voiceRadioTech == nullptr");
+        return;
+    }
+    voiceRadioTech.get()->ReadFromParcel(data);
+    TELEPHONY_LOGI(
+        "RilRadioResponseTest::OnRequestGetVoiceRadioTechnologyTest --> finished:"
+        "srvStatus:%{public}d, srvDomain:%{public}d, roamStatus:%{public}d, simStatus:%{public}d,"
+        "sysMode:%{public}d, sysModeName:%{public}s, actType:%{public}d, actName:%{public}s",
+        voiceRadioTech->srvStatus, voiceRadioTech->srvDomain, voiceRadioTech->roamStatus, voiceRadioTech->simStatus,
+        voiceRadioTech->sysMode, voiceRadioTech->sysModeName.c_str(), voiceRadioTech->actType,
+        voiceRadioTech->actName.c_str());
 }
 
 void RilRadioResponseTest::SendSmsResponse(MessageParcel &data)
@@ -454,35 +670,6 @@ void RilRadioResponseTest::OnResponsePullRadioLceData(MessageParcel &data)
     const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
     if (spBuffer == nullptr) {
         TELEPHONY_LOGE("ERROR : OnResponsePullRadioLceData --> data.ReadBuffer(readSpSize) failed !!!");
-        return;
-    }
-}
-
-void RilRadioResponseTest::OnRequestGetNetworkSelectionModeTest(MessageParcel &data)
-{
-    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
-    const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
-    if (spBuffer == nullptr) {
-        TELEPHONY_LOGE("ERROR : OnRequestGetNetworkSelectionModeTest --> data.ReadBuffer(readSpSize) failed !!!");
-        return;
-    }
-}
-void RilRadioResponseTest::OnRequestGetNetworkSearchInformationTest(MessageParcel &data)
-{
-    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
-    const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
-    if (spBuffer == nullptr) {
-        TELEPHONY_LOGE("ERROR : OnRequestGetNetworkSearchInformationTest --> data.ReadBuffer(readSpSize) failed !!!");
-        return;
-    }
-}
-
-void RilRadioResponseTest::OnRequestSetNetworkSelectionModeTest(MessageParcel &data)
-{
-    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
-    const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
-    if (spBuffer == nullptr) {
-        TELEPHONY_LOGE("ERROR : OnRequestSetNetworkSelectionModeTest --> data.ReadBuffer(readSpSize) failed !!!");
         return;
     }
 }

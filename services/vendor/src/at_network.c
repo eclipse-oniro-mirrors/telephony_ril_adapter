@@ -1854,190 +1854,30 @@ void ReqGetRadioCapability(const ReqDataInfo *requestInfo)
         requestInfo->slotId, reportInfo, (const uint8_t *)GetRadioCapability(), sizeof(HRilRadioCapability));
 }
 
-static HRilCellConnectionStatus ConvertIntToHRilCellConnectionStatus(int32_t cellConnStatus)
-{
-    if ((cellConnStatus == HRIL_SERVING_CELL_PRIMARY) || (cellConnStatus == HRIL_SERVING_CELL_SECONDARY)) {
-        return (HRilCellConnectionStatus)cellConnStatus;
-    } else {
-        return HRIL_SERVING_CELL_UNKNOWN;
-    }
-}
-
-static int32_t ExtractConfigInfo(const char *str, const HRilPhyChannelConfig *config)
-{
-    HRilPhyChannelConfig *cfg = (HRilPhyChannelConfig *)config;
-    char *pStr = (char *)str;
-    if (pStr == NULL || cfg == NULL) {
-        TELEPHONY_LOGE("pStr or cfg is null.");
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    int32_t cellConnStatusValue = 0;
-    if (NextInt(&pStr, &cellConnStatusValue) < 0) {
-        return HRIL_ERR_INVALID_RESPONSE;
-    }
-    cfg->cellConnStatus = ConvertIntToHRilCellConnectionStatus(cellConnStatusValue);
-    if (NextInt(&pStr, &cfg->cellBandwidthDownlinkKhz) < 0) {
-        return HRIL_ERR_INVALID_RESPONSE;
-    }
-    if (NextInt(&pStr, &cfg->cellBandwidthUplinkKhz) < 0) {
-        return HRIL_ERR_INVALID_RESPONSE;
-    }
-    if (NextInt(&pStr, &cfg->ratType) < 0) {
-        return HRIL_ERR_INVALID_RESPONSE;
-    }
-    if (NextInt(&pStr, &cfg->freqRange) < 0) {
-        return HRIL_ERR_INVALID_RESPONSE;
-    }
-    if (NextInt(&pStr, &cfg->downlinkChannelNum) < 0) {
-        return HRIL_ERR_INVALID_RESPONSE;
-    }
-    if (NextInt(&pStr, &cfg->uplinkChannelNum) < 0) {
-        return HRIL_ERR_INVALID_RESPONSE;
-    }
-    if (NextInt(&pStr, &cfg->physicalCellId) < 0) {
-        return HRIL_ERR_INVALID_RESPONSE;
-    }
-    if (NextInt(&pStr, &cfg->contextIdNum) < 0) {
-        return HRIL_ERR_INVALID_RESPONSE;
-    }
-    int32_t *contextIds = NULL;
-    if (cfg->contextIdNum > 0) {
-        contextIds = (int32_t *)calloc(cfg->contextIdNum, sizeof(int32_t));
-        if (contextIds == NULL) {
-            TELEPHONY_LOGE("contextIds alloc failed!");
-            return HRIL_ERR_MEMORY_FULL;
-        }
-        for (int32_t i = 0; i < cfg->contextIdNum; i++) {
-            if (NextInt(&pStr, &(contextIds[i])) < 0) {
-                free(contextIds);
-                return HRIL_ERR_INVALID_RESPONSE;
-            }
-        }
-    } else {
-        cfg->contextIdNum = 0;
-    }
-    cfg->contextIds = contextIds;
-    return HRIL_ERR_SUCCESS;
-}
-
 void ProcessPhyChnlCfgNotify(struct ReportInfo reportInfo, char *srcStr)
 {
-    char *str = (char *)srcStr;
-    if (str == NULL) {
-        TELEPHONY_LOGE("ProcessPhyChnlCfgNotify Str  is null.");
-        return;
-    }
-    int32_t err = SkipATPrefix(&str);
-    if (err < 0) {
-        TELEPHONY_LOGE("ProcessPhyChnlCfgNotify skip failed: [%{public}s]", str);
-        return;
-    }
-    int32_t semicolonNum = FindSemicolonCharNum(str);
-    if (semicolonNum > 0) {
-        HRilPhyChannelConfig *configInfo = NULL;
-        HRilChannelConfigList configInfoList = {0, NULL};
-        configInfo = (HRilPhyChannelConfig *)calloc(semicolonNum, sizeof(HRilPhyChannelConfig));
-        if (configInfo == NULL) {
-            TELEPHONY_LOGE("^PHYCHLCFG: notify configInfo alloc failed!");
-            return;
-        }
-        for (int32_t i = 0; i < semicolonNum; i++) {
-            char *pStr = strsep(&str, ";");
-            int32_t ret = ExtractConfigInfo(pStr, &configInfo[configInfoList.itemNum]);
-            if (ret != 0) {
-                continue;
-            }
-            configInfoList.itemNum++;
-        }
-        configInfoList.channelConfigs = configInfo;
-        reportInfo.error = HRIL_ERR_SUCCESS;
-        reportInfo.type = HRIL_NOTIFICATION;
-        reportInfo.notifyId = HNOTI_NETWORK_PHY_CHNL_CFG_UPDATED;
-        OnNetworkReport(GetSlotId(NULL), reportInfo, (const uint8_t *)&configInfoList, sizeof(HRilChannelConfigList));
-        for (int32_t i = 0; i < configInfoList.itemNum; i++) {
-            if (configInfoList.channelConfigs[i].contextIds != NULL) {
-                free(configInfoList.channelConfigs[i].contextIds);
-            }
-        }
-        if (configInfoList.channelConfigs != NULL) {
-            free(configInfoList.channelConfigs);
-        }
-    } else {
-        TELEPHONY_LOGW("^PHYCHLCFG: notify str format  unexpected: %{public}s", str);
-    }
-}
-
-static int32_t ParseConfigInfo(const char *str, const HRilPhyChannelConfig *config)
-{
-    HRilPhyChannelConfig *cfg = (HRilPhyChannelConfig *)config;
-    char *pStr = (char *)str;
-    if (pStr == NULL || cfg == NULL) {
-        TELEPHONY_LOGE("pStr or cfg is null.");
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    if (ReportStrWith(pStr, "^PHYCHLCFG:") == 0) {
-        TELEPHONY_LOGE("skip failed: [%{public}s]", str);
-        return HRIL_ERR_INVALID_RESPONSE;
-    }
-    int32_t err = SkipATPrefix(&pStr);
-    if (err < 0) {
-        TELEPHONY_LOGE("skip failed: [%{public}s]", str);
-        return HRIL_ERR_INVALID_RESPONSE;
-    }
-    return ExtractConfigInfo(pStr, config);
+    int32_t contextIds[] = { 7, 8, 9 };
+    HRilPhyChannelConfig configInfo = { 1, 2, 3, 4, 5, 6, 3 };
+    configInfo.contextIds = contextIds;
+    HRilChannelConfigList configInfoList = { 1, &configInfo };
+    reportInfo.error = HRIL_ERR_SUCCESS;
+    reportInfo.type = HRIL_NOTIFICATION;
+    reportInfo.notifyId = HNOTI_NETWORK_PHY_CHNL_CFG_UPDATED;
+    OnNetworkReport(GetSlotId(NULL), reportInfo, (const uint8_t *)&configInfoList, sizeof(HRilChannelConfigList));
 }
 
 void ReqGetPhysicalChannelConfig(const ReqDataInfo *requestInfo)
 {
     if (requestInfo == NULL) {
+        TELEPHONY_LOGE("ReqGetPhysicalChannelConfig requestInfo is NULL");
         return;
     }
-    const long TIME_OUT = DEFAULT_TIMEOUT;
-    int32_t err = HRIL_ERR_SUCCESS;
-    int32_t configCount = 0;
-    ResponseInfo *responseInfo = NULL;
-    Line *pLine = NULL;
-    HRilPhyChannelConfig *configInfo = NULL;
-    HRilChannelConfigList configInfoList = {0, NULL};
-    int32_t ret = SendCommandLock("AT^PHYCHLCFG", "^PHYCHLCFG:", TIME_OUT, &responseInfo);
-    struct ResponseAck respDataAck = {responseInfo, NULL, 0};
-    respDataAck.respDataPointer = (uint8_t *)&configInfoList;
-    respDataAck.respDataLen = sizeof(HRilChannelConfigList);
-    if (ret != 0 || !responseInfo->success) {
-        err = (responseInfo->success == 0) ? HRIL_ERR_CMD_SEND_FAILURE : HRIL_ERR_GENERIC_FAILURE;
-        ResponseNetworkReport(requestInfo->slotId, requestInfo, err, &respDataAck);
-        TELEPHONY_LOGE("send AT CMD failed!");
-        return;
-    }
-    for (configCount = 0, pLine = responseInfo->head; pLine != NULL; pLine = pLine->next) {
-        configCount++;
-    }
-    TELEPHONY_LOGI("configCount:%{public}d", configCount);
-    if (configCount > 0) {
-        configInfo = (HRilPhyChannelConfig *)calloc(configCount, sizeof(HRilPhyChannelConfig));
-        if (configInfo == NULL) {
-            TELEPHONY_LOGE("configInfo alloc failed!");
-            ResponseNetworkReport(requestInfo->slotId, requestInfo, HRIL_ERR_MEMORY_FULL, &respDataAck);
-            return;
-        }
-        for (pLine = responseInfo->head; pLine != NULL; pLine = pLine->next) {
-            ret = ParseConfigInfo(pLine->data, &configInfo[configInfoList.itemNum]);
-            if (ret != 0) {
-                continue;
-            }
-            configInfoList.itemNum++;
-        }
-        configInfoList.channelConfigs = configInfo;
-    }
-    ResponseNetworkReport(requestInfo->slotId, requestInfo, err, &respDataAck);
-    for (int32_t i = 0; i < configInfoList.itemNum; i++) {
-        if (configInfoList.channelConfigs[i].contextIds != NULL) {
-            free(configInfoList.channelConfigs[i].contextIds);
-        }
-    }
-    if (configInfoList.channelConfigs != NULL) {
-        free(configInfoList.channelConfigs);
-    }
+    int32_t contextIds[] = { 7, 8, 9 };
+    HRilPhyChannelConfig configInfo = { HRIL_SERVING_CELL_PRIMARY, RADIO_TECHNOLOGY_GSM, 1, 2, 3, 4, 5, 6, 1 };
+    configInfo.contextIds = contextIds;
+    HRilChannelConfigList configInfoList = { 1, &configInfo };
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
+    OnNetworkReport(requestInfo->slotId, reportInfo, (const uint8_t *)&configInfoList, sizeof(HRilChannelConfigList));
 }
 
 void ReqSetLocateUpdates(const ReqDataInfo *requestInfo, HRilRegNotifyMode mode)
