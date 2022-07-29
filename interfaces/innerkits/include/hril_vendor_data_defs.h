@@ -134,6 +134,15 @@ typedef struct {
 } HRilLinkBandwidthReportingRule;
 
 typedef struct {
+    int32_t performanceEnable; /* Performance Enable. eg: 1-enable, 0-disable */
+    int32_t enforce; /* Whether Enforce Data Performance. eg: 1-enable, 0-disable */
+} HRilDataPerformanceInfo;
+
+typedef struct {
+    int32_t sleepEnable; /* Sleep Mode Enable. eg: 1-enable, 0-disable */
+} HRilDataSleepInfo;
+
+typedef struct {
     void (*SetInitApnInfo)(const ReqDataInfo *requestInfo, const HRilDataInfo *data);
     void (*ActivatePdpContext)(const ReqDataInfo *requestInfo, const HRilDataInfo *data);
     void (*DeactivatePdpContext)(const ReqDataInfo *requestInfo, const HRilDataInfo *data);
@@ -141,6 +150,8 @@ typedef struct {
     void (*GetLinkBandwidthInfo)(const ReqDataInfo *requestInfo, int32_t cid);
     void (*SetLinkBandwidthReportingRule)(const ReqDataInfo *requestInfo, const HRilLinkBandwidthReportingRule *data);
     void (*SetDataProfileInfo)(const ReqDataInfo *requestInfo, const HRilDataInfo *data, int32_t len);
+    void (*SendDataPerformanceMode)(const ReqDataInfo *requestInfo, const HRilDataPerformanceInfo *data);
+    void (*SendDataSleepMode)(const ReqDataInfo *requestInfo, const HRilDataSleepInfo *data);
 } HRilDataReq;
 #ifdef __cplusplus
 }

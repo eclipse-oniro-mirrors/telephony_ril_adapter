@@ -31,6 +31,8 @@ public:
     int32_t ActivatePdpContext(struct HdfSBuf *data);
     int32_t GetPdpContextList(struct HdfSBuf *data);
     int32_t SetInitApnInfo(struct HdfSBuf *data);
+    int32_t SendDataPerformanceMode(struct HdfSBuf *data);
+    int32_t SendDataSleepMode(struct HdfSBuf *data);
     int32_t ActivatePdpContextResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t DeactivatePdpContextResponse(
