@@ -186,7 +186,7 @@ struct DataLinkBandwidthReportingRule : public HrilBaseParcel {
 
 struct DataPerformanceInfo : public HrilBaseParcel {
     int32_t performanceEnable; /* Data Performance Enable. eg: 1-enable, 0-disable */
-    int32_t enforce; /* Whether Enforce Data Performance. eg: 1-enable, 0-disable */ 
+    int32_t enforce; /* Whether Enforce Data Performance. eg: 1-enable, 0-disable */
 
     bool ReadFromParcel(Parcel &parcel);
     virtual bool Marshalling(Parcel &parcel) const override;

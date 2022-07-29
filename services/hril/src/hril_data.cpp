@@ -264,7 +264,7 @@ int32_t HRilData::SendDataPerformanceMode(struct HdfSBuf *data)
     hrilDataPerformanceInfo.performanceEnable = dataPerformanceInfo.performanceEnable;
     hrilDataPerformanceInfo.enforce = dataPerformanceInfo.enforce;
     TELEPHONY_LOGE("SendDataPerformanceMode: performanceEnable=%{public}d enforce=%{public}d",
-	    hrilDataPerformanceInfo.performanceEnable, hrilDataPerformanceInfo.enforce);
+        hrilDataPerformanceInfo.performanceEnable, hrilDataPerformanceInfo.enforce);
     ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_DATA_SEND_DATA_PERFORMANCE_MODE);
     if (requestInfo == nullptr) {
         return HRIL_ERR_NULL_POINT;
