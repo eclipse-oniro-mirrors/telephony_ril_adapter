@@ -271,6 +271,7 @@ int32_t HRilData::SetDataProfileInfo(struct HdfSBuf *data)
 HRilDataInfo HRilData::BuildDataInfo(const DataProfileDataInfo &dataProfileInfo)
 {
     HRilDataInfo dataInfo;
+    dataInfo.cid = dataProfileInfo.profileId;
     dataInfo.apn = StringToCString(dataProfileInfo.apn);
     dataInfo.type = StringToCString(dataProfileInfo.protocol);
     dataInfo.roamingType = StringToCString(dataProfileInfo.roamingProtocol);
