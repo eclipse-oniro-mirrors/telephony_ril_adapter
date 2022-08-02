@@ -715,6 +715,22 @@ void RilUnitTest::SetDataProfileInfoTest(const OHOS::AppExecFwk::InnerEvent::Poi
     ASSERT_EQ(0, ret);
 }
 
+void RilUnitTest::SendDataPerformanceModeTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::SendDataPerformanceModeTest -->");
+    int32_t ret = mRilManager_->SendDataPerformanceMode(result);
+    TELEPHONY_LOGI("RilUnitTest::SendDataPerformanceModeTest return: %{public}d", ret);
+    ASSERT_EQ(0, ret);
+}
+
+void RilUnitTest::SendDataSleepModeTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::SendDataSleepModeTest -->");
+    int32_t ret = mRilManager_->SendDataSleepMode(result);
+    TELEPHONY_LOGI("RilUnitTest::SendDataSleepModeTest return: %{public}d", ret);
+    ASSERT_EQ(0, ret);
+}
+
 void RilUnitTest::UnLockPINTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("RilUnitTest::UnLockPINTest -->");
@@ -1247,6 +1263,22 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetDataProfileInfoTest_0100, Function
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_DATA_SET_DATA_PROFILE_INFO);
     event->SetOwner(GetHandler());
     OnProcessTest(HREQ_DATA_SET_DATA_PROFILE_INFO, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_SendDataPerformanceModeTest_0100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_DATA_SEND_DATA_PERFORMANCE_MODE);
+    event->SetOwner(GetHandler());
+    OnProcessTest(HREQ_DATA_SEND_DATA_PERFORMANCE_MODE, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_SendDataSleepModeTest_0100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_DATA_SEND_DATA_SLEEP_MODE);
+    event->SetOwner(GetHandler());
+    OnProcessTest(HREQ_DATA_SEND_DATA_SLEEP_MODE, event);
 }
 
 HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetSimLockStatusTest_0100, Function | MediumTest | Level3)

@@ -86,6 +86,8 @@ public:
     void GetMeidTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void GetVoiceRadioTechnologyTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void GetBasebandVersionTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void SendDataPerformanceModeTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void SendDataSleepModeTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void SetRilPreferredNetwrokTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void SetRilNetworkSelectionModeTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void SetRilLocationUpdateTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);

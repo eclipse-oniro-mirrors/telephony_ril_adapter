@@ -102,6 +102,8 @@ private:
     void GetClirTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void GetLinkBandwidthInfoTest(const AppExecFwk::InnerEvent::Pointer &result);
     void SetDataProfileInfoTest(const AppExecFwk::InnerEvent::Pointer &result);
+    void SendDataPerformanceModeTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void SendDataSleepModeTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void UnLockPINTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void UnLockPIN2Test(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void UnLockPUKTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);

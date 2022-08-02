@@ -124,6 +124,8 @@ public:
     int32_t GetClir(const AppExecFwk::InnerEvent::Pointer &result);
     int32_t GetLinkBandwidthInfo(const int32_t cid, const AppExecFwk::InnerEvent::Pointer &result);
     int32_t SetDataProfileInfo(const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t SendDataPerformanceMode(const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t SendDataSleepMode(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t UnLockPin(const std::string &pin, const AppExecFwk::InnerEvent::Pointer &result);
     int32_t UnLockPin2(const std::string &pin2, const AppExecFwk::InnerEvent::Pointer &result);
     int32_t UnLockPuk(const std::string &puk, const std::string &pin, const AppExecFwk::InnerEvent::Pointer &result);

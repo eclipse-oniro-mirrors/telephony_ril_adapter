@@ -431,6 +431,20 @@ void RilUnitTest::GetBasebandVersionTest(const OHOS::AppExecFwk::InnerEvent::Poi
     TELEPHONY_LOGI("RilUnitTest::GetBasebandVersionTest --> GetBasebandVersionTest finished");
 }
 
+void RilUnitTest::SendDataPerformanceModeTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::SendDataPerformanceModeTest -->");
+    mRilManager_->SendDataPerformanceMode(result);
+    TELEPHONY_LOGI("RilUnitTest::SendDataPerformanceModeTest --> SendDataPerformanceModeTest finished");
+}
+
+void RilUnitTest::SendDataSleepModeTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::SendDataSleepModeTest -->");
+    mRilManager_->SendDataSleepMode(result);
+    TELEPHONY_LOGI("RilUnitTest::SendDataSleepModeTest --> SendDataSleepModeTest finished");
+}
+
 void RilUnitTest::SetRilPreferredNetwrokTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
 {
     int32_t preferredNetwork;
