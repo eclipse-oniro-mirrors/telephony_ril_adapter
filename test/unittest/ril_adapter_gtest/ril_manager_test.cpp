@@ -654,6 +654,51 @@ int32_t RilManagerTest::SetDataProfileInfo(const AppExecFwk::InnerEvent::Pointer
     return ret;
 }
 
+int32_t RilManagerTest::SendDataPerformanceMode(const AppExecFwk::InnerEvent::Pointer &response)
+{
+    if (cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("ERROR : SendDataPerformanceMode --> cellularRadio_ is nullptr");
+        return HRIL_ERR_NULL_POINT;
+    }
+    std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_DATA_SEND_DATA_PERFORMANCE_MODE, response);
+    if (request == nullptr) {
+        return HRIL_ERR_NULL_POINT;
+    }
+    DataPerformanceInfo dataPerformanceInfo;
+    dataPerformanceInfo.performanceEnable = 1;
+    dataPerformanceInfo.enforce = 1;
+    OHOS::MessageParcel wData;
+    if (!dataPerformanceInfo.Marshalling(wData)) {
+        TELEPHONY_LOGE("ERROR: SendDataPerformanceMode --> dataInfo.Marshalling(wData) failed!!!");
+        return HRIL_ERR_NULL_POINT;
+    }
+    int32_t ret = SendBufferEvent(HREQ_DATA_SEND_DATA_PERFORMANCE_MODE, wData);
+    TELEPHONY_LOGI("SendRequest(ID:%{public}d) return: %{public}d", HREQ_DATA_SEND_DATA_PERFORMANCE_MODE, ret);
+    return ret;
+}
+
+int32_t RilManagerTest::SendDataSleepMode(const AppExecFwk::InnerEvent::Pointer &response)
+{
+    if (cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("ERROR : SendDataSleepMode --> cellularRadio_ is nullptr");
+        return HRIL_ERR_NULL_POINT;
+    }
+    std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_DATA_SEND_DATA_SLEEP_MODE, response);
+    if (request == nullptr) {
+        return HRIL_ERR_NULL_POINT;
+    }
+    DataSleepInfo dataSleepInfo;
+    dataSleepInfo.sleepEnable = 1;
+    OHOS::MessageParcel wData;
+    if (!dataSleepInfo.Marshalling(wData)) {
+        TELEPHONY_LOGE("ERROR: SendDataSleepMode --> dataInfo.Marshalling(wData) failed!!!");
+        return HRIL_ERR_NULL_POINT;
+    }
+    int32_t ret = SendBufferEvent(HREQ_DATA_SEND_DATA_SLEEP_MODE, wData);
+    TELEPHONY_LOGI("SendRequest(ID:%{public}d) return: %{public}d", HREQ_DATA_SEND_DATA_SLEEP_MODE, ret);
+    return ret;
+}
+
 int32_t RilManagerTest::SetBarringPassword(const std::string &fac, const std::string &oldPwd, const std::string &newPwd,
     const AppExecFwk::InnerEvent::Pointer &result)
 {

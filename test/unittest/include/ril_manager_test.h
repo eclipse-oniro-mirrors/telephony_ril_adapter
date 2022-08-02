@@ -117,6 +117,8 @@ public:
     void GetMeid(const AppExecFwk::InnerEvent::Pointer &response);
     void GetVoiceRadio(const AppExecFwk::InnerEvent::Pointer &response);
     void GetBasebandVersion(const AppExecFwk::InnerEvent::Pointer &response);
+    void SendDataPerformanceMode(const AppExecFwk::InnerEvent::Pointer &response);
+    void SendDataSleepMode(const AppExecFwk::InnerEvent::Pointer &response);
     void SendSms(std::string smscPdu, std::string pdu, const std::shared_ptr<AppExecFwk::EventHandler> &handler,
         const AppExecFwk::InnerEvent::Pointer &response);
     void SendSmsMoreMode(std::string smscPdu, std::string pdu, const std::shared_ptr<AppExecFwk::EventHandler> &handler,

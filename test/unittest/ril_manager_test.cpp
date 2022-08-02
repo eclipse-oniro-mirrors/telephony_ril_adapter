@@ -790,6 +790,28 @@ void RilManagerTest::GetBasebandVersion(const AppExecFwk::InnerEvent::Pointer &r
     }
 }
 
+void RilManagerTest::SendDataPerformanceMode(const AppExecFwk::InnerEvent::Pointer &response)
+{
+    if (cellularRadio_ != nullptr) {
+        std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_DATA_SEND_DATA_PERFORMANCE_MODE, response);
+        if (request == nullptr) {
+            return;
+        }
+        SendInt32Event(HREQ_DATA_SEND_DATA_PERFORMANCE_MODE, request->serialId_);
+    }
+}
+
+void RilManagerTest::SendDataSleepMode(const AppExecFwk::InnerEvent::Pointer &response)
+{
+    if (cellularRadio_ != nullptr) {
+        std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_DATA_SEND_DATA_SLEEP_MODE, response);
+        if (request == nullptr) {
+            return;
+        }
+        SendInt32Event(HREQ_DATA_SEND_DATA_SLEEP_MODE, request->serialId_);
+    }
+}
+
 void RilManagerTest::SetPreferredNetwrok(int32_t preferredNetwork, const AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("SetRilPreferredNetwrok  Request ");
