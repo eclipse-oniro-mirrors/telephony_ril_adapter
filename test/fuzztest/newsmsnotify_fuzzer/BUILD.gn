@@ -38,7 +38,7 @@ ohos_fuzztest("NewSmsNotifyFuzzTest") {
   external_deps = [
     "drivers_interface_power:libpower_proxy_1.0",
     "ipc:ipc_core",
-    "samgr_standard:samgr_proxy",
+    "samgr:samgr_proxy",
   ]
   defines += [
     "TELEPHONY_LOG_TAG = \"RilAdapterFuzzTest\"",
