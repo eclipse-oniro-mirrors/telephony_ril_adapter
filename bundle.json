@@ -41,12 +41,18 @@
             ]
         },
         "build": {
-            "sub_component": [
-                "//base/telephony/ril_adapter/interfaces/innerkits:hril_innerkits",
-                "//base/telephony/ril_adapter/services/hril:hril",
-                "//base/telephony/ril_adapter/services/hril_hdf:hril_hdf",
-                "//base/telephony/ril_adapter/services/vendor:ril_vendor"
-            ],
+            "group_type": {
+                "base_group": [
+                ],
+                "fwk_group": [
+                    "//base/telephony/ril_adapter/interfaces/innerkits:hril_innerkits"
+                ],
+                "service_group": [
+                    "//base/telephony/ril_adapter/services/hril:hril",
+                    "//base/telephony/ril_adapter/services/hril_hdf:hril_hdf",
+                    "//base/telephony/ril_adapter/services/vendor:ril_vendor"
+                ]
+            },
             "inner_kits": [
                 {
                     "type": "so",
