@@ -33,7 +33,6 @@ ohos_shared_library("hril_hdf") {
     "${hdf_uhdf_path}/host:libhdf_host",
     "${hdf_uhdf_path}/ipc:libhdf_ipc_adapter",
     "${hdf_uhdf_path}/utils:libhdf_utils",
-    "//base/hiviewdfx/faultloggerd/interfaces/innerkits/signal_handler:dfx_signalhandler",
   ]
 
   external_deps = [

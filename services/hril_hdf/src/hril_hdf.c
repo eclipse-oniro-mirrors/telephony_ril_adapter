@@ -19,7 +19,6 @@
 #include <libudev.h>
 #include <pthread.h>
 
-#include "dfx_signal_handler.h"
 #include "parameter.h"
 
 #include "modem_adapter.h"
@@ -189,7 +188,6 @@ static int32_t RilAdapterInit(struct HdfDeviceObject *device)
     if (device == NULL) {
         return HDF_ERR_INVALID_OBJECT;
     }
-    DFX_InstallSignalHandler();
     struct HdfSBuf *sbuf = HdfSbufTypedObtain(SBUF_IPC);
     if (sbuf == NULL) {
         TELEPHONY_LOGE("HdfSampleDriverBind, failed to obtain ipc sbuf");
