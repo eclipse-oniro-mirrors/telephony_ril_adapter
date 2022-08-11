@@ -254,7 +254,7 @@ static void BuildDataInfoList(
 
 static int32_t AddressFormat(uint64_t addr, char *outBuf, size_t bufLen)
 {
-    int32_t data[IVP4_INDEX_MAX] = {0};
+    int32_t data[IPV4_INDEX_MAX] = { 0 };
     const int32_t index1st = 0;
     const int32_t index2nd = 1;
     const int32_t index3rd = 2;
@@ -275,6 +275,32 @@ static int32_t AddressFormat(uint64_t addr, char *outBuf, size_t bufLen)
     data[index4th] = (int32_t)((addr >> ADDR_OFFSET_24BIT) & ADDR_MASK);
     GenerateCommand(
         outBuf, MAX_CMD_LENGTH, "%d.%d.%d.%d", data[index1st], data[index2nd], data[index3rd], data[index4th]);
+    return HRIL_ERR_SUCCESS;
+}
+
+static int32_t NetMaskFormat(uint64_t addr, char *outBuf, size_t bufLen)
+{
+    if (addr < IPV4_MASK_MIN || addr > IPV4_MASK_MAX) {
+        return HRIL_ERR_NULL_POINT;
+    }
+    if ((outBuf == NULL) || !bufLen) {
+        TELEPHONY_LOGE("outBuf is Null or bufLen is zero!");
+        return HRIL_ERR_NULL_POINT;
+    }
+    int32_t ret = memset_s(outBuf, bufLen, 0, bufLen);
+    if (ret != EOK) {
+        TELEPHONY_LOGE("memset_s outBuf is failed!");
+        return HRIL_ERR_NULL_POINT;
+    }
+    int32_t prefixLen = IPV4_MASK_LEN_MIN;
+    for (int32_t i = ADDR_OFFSET_8BIT; i <= ADDR_OFFSET_24BIT; i += ADDR_OFFSET_8BIT) {
+        uint32_t maskValue = (addr >> i) & ADDR_MASK;
+        while ((maskValue & IPV4_BIT_MASK) != 0) {
+            prefixLen++;
+            maskValue = (maskValue << 1);
+        }
+    }
+    GenerateCommand(outBuf, MAX_CMD_LENGTH, "/%d", prefixLen);
     return HRIL_ERR_SUCCESS;
 }
 
@@ -308,11 +334,9 @@ static ModemReportErrorInfo GetLinkInformation(int32_t activeIndex, HRilDataCall
     SkipATPrefix(&lineStr);
     NextULongFromHex(&lineStr, &addr); // ip
     AddressFormat(addr, readBuf, MAX_CMD_LENGTH);
-    ret = strlen(readBuf);
-    readBuf[ret] = '.';
     NextULongFromHex(&lineStr, &addr); // subnet mask
     ret = strlen(readBuf);
-    AddressFormat(addr, &readBuf[ret], MAX_CMD_LENGTH - ret);
+    NetMaskFormat(addr, &readBuf[ret], MAX_CMD_LENGTH - ret);
     (*ppDcr)[activeIndex].address = strdup(readBuf);
     NextULongFromHex(&lineStr, &addr); // default gateway
     AddressFormat(addr, readBuf, MAX_CMD_LENGTH);
