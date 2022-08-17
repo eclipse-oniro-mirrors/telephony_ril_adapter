@@ -57,6 +57,7 @@ void HRilData::AddHandlerToMap()
     respMemberFuncMap_[HREQ_DATA_GET_PDP_CONTEXT_LIST] = &HRilData::GetPdpContextListResponse;
     respMemberFuncMap_[HREQ_DATA_GET_LINK_BANDWIDTH_INFO] = &HRilData::GetLinkBandwidthInfoResponse;
     respMemberFuncMap_[HREQ_DATA_SET_LINK_BANDWIDTH_REPORTING_RULE] = &HRilData::SetLinkBandwidthReportingRuleResponse;
+    respMemberFuncMap_[HREQ_DATA_SET_DATA_PERMITTED] = &HRilData::SetDataPermittedResponse;
 
     // ReqFunc
     reqMemberFuncMap_[HREQ_DATA_SET_INIT_APN_INFO] = &HRilData::SetInitApnInfo;
@@ -68,6 +69,7 @@ void HRilData::AddHandlerToMap()
     reqMemberFuncMap_[HREQ_DATA_SET_LINK_BANDWIDTH_REPORTING_RULE] = &HRilData::SetLinkBandwidthReportingRule;
     reqMemberFuncMap_[HREQ_DATA_SEND_DATA_PERFORMANCE_MODE] = &HRilData::SendDataPerformanceMode;
     reqMemberFuncMap_[HREQ_DATA_SEND_DATA_SLEEP_MODE] = &HRilData::SendDataSleepMode;
+    reqMemberFuncMap_[HREQ_DATA_SET_DATA_PERMITTED] = &HRilData::SetDataPermitted;
 }
 
 void HRilData::SwitchRilDataToHal(const HRilDataCallResponse *response, SetupDataCallResultInfo &result)
@@ -428,6 +430,32 @@ int32_t HRilData::SetLinkBandwidthReportingRule(struct HdfSBuf *data)
     return HRIL_ERR_SUCCESS;
 }
 
+int32_t HRilData::SetDataPermitted(struct HdfSBuf *data)
+{
+    if (dataFuncs_ == nullptr || dataFuncs_->SetDataPermitted == nullptr || data == nullptr) {
+        TELEPHONY_LOGE(
+            "dataFuncs_:%{public}p or dataFuncs_->SetDataPermitted or data:%{public}p is nullptr!", dataFuncs_, data);
+        return HRIL_ERR_NULL_POINT;
+    }
+    int32_t serial = 0;
+    int32_t enabled;
+    if (!HdfSbufReadInt32(data, &serial)) {
+        TELEPHONY_LOGE("miss serial parameter");
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    if (!HdfSbufReadInt32(data, &enabled)) {
+        TELEPHONY_LOGE("miss enabled parameter");
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_DATA_SET_DATA_PERMITTED);
+    if (requestInfo == nullptr) {
+        TELEPHONY_LOGE("RilAdapter failed to do Create HRilRequest!");
+        return HRIL_ERR_NULL_POINT;
+    }
+    dataFuncs_->SetDataPermitted(requestInfo, enabled);
+    return HRIL_ERR_SUCCESS;
+}
+
 int32_t HRilData::DeactivatePdpContextResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
@@ -518,6 +546,12 @@ int32_t HRilData::GetLinkBandwidthInfoResponse(
         uplinkAndDownlinkBandwidthInfo.averagingWindow = result->averagingWindow;
     }
     return ResponseMessageParcel(responseInfo, uplinkAndDownlinkBandwidthInfo, requestNum);
+}
+
+int32_t HRilData::SetDataPermittedResponse(
+    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+{
+    return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));
 }
 
 void HRilData::RegisterDataFuncs(const HRilDataReq *dataFuncs)

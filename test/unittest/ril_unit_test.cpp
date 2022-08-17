@@ -726,6 +726,16 @@ void RilUnitTest::SetDataProfileInfoTest(const OHOS::AppExecFwk::InnerEvent::Poi
     TELEPHONY_LOGI("RilUnitTest::SetInitialApnTest --> SetInitialApnTest finished");
 }
 
+void RilUnitTest::SetDataPermittedTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::SetDataPermittedTestTest -->");
+    int32_t enabled = 0;
+    cout << "please enter the enabled 0 not 1 yes:";
+    cin >> enabled;
+    mRilManager_->SetDataPermitted(enabled, result);
+    TELEPHONY_LOGI("RilUnitTest::SetDataPermittedTest --> SetDataPermittedTest finished");
+}
+
 void RilUnitTest::DeactivateRilCmDataCallTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
 {
     int32_t cid;
@@ -1111,6 +1121,7 @@ void RilUnitTest::OnInitDataProcessInterface()
     memberFuncMap_[HREQ_DATA_SET_DATA_PROFILE_INFO] = &RilUnitTest::SetDataProfileInfoTest;
     memberFuncMap_[HREQ_DATA_GET_PDP_CONTEXT_LIST] = &RilUnitTest::GetRilCmDataCallListTest;
     memberFuncMap_[HREQ_DATA_SET_INIT_APN_INFO] = &RilUnitTest::SetInitialApnTest;
+    memberFuncMap_[HREQ_DATA_SET_DATA_PERMITTED] = &RilUnitTest::SetDataPermittedTest;
 }
 
 void RilUnitTest::OnInitNetworkProcessInterface()
@@ -1277,7 +1288,7 @@ static int32_t PrintDataMenu()
     cout << "----> [" << HREQ_DATA_GET_PDP_CONTEXT_LIST << "] ---->[ HREQ_DATA_GET_PDP_CONTEXT_LIST ]" << endl;
     cout << "----> [" << HREQ_DATA_SET_INIT_APN_INFO << "] ---->[ HREQ_DATA_SET_INIT_APN_INFO ]" << endl;
     cout << "----> [" << HREQ_DATA_SET_DATA_PROFILE_INFO << "] ---->[ HREQ_DATA_SET_DATA_PROFILE_INFO ]" << endl;
-
+    cout << "----> [" << HREQ_DATA_SET_DATA_PERMITTED << "] ---->[ HREQ_DATA_SET_DATA_PERMITTED ]" << endl;
     int32_t choice = InputInt32(HREQ_DATA_BASE, HREQ_NETWORK_BASE - 1, "Command");
     cout << "---->You choose: " << choice << endl;
     choice = (choice == HREQ_DATA_BASE) ? -1 : choice;

@@ -144,6 +144,7 @@ void RilUnitTest::AddDataRequestToMap()
     memberFuncMap_[HREQ_DATA_DEACTIVATE_PDP_CONTEXT] = &RilUnitTest::DeactivatePdpContextTest;
     memberFuncMap_[HREQ_DATA_GET_LINK_BANDWIDTH_INFO] = &RilUnitTest::GetLinkBandwidthInfoTest;
     memberFuncMap_[HREQ_DATA_SET_DATA_PROFILE_INFO] = &RilUnitTest::SetDataProfileInfoTest;
+    memberFuncMap_[HREQ_DATA_SET_DATA_PERMITTED] = &RilUnitTest::SetDataPermittedTest;
 }
 
 void RilUnitTest::AddNetworkRequestToMap()
@@ -715,6 +716,15 @@ void RilUnitTest::SetDataProfileInfoTest(const OHOS::AppExecFwk::InnerEvent::Poi
     ASSERT_EQ(0, ret);
 }
 
+void RilUnitTest::SetDataPermittedTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::SetDataPermittedTest -->");
+    int32_t enabled = 1;
+    int32_t ret = mRilManager_->SetDataPermitted(enabled, result);
+    TELEPHONY_LOGI("RilUnitTest::SetDataPermittedTest return: %{public}d", ret);
+    ASSERT_EQ(0, ret);
+}
+
 void RilUnitTest::SendDataPerformanceModeTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("RilUnitTest::SendDataPerformanceModeTest -->");
@@ -1255,6 +1265,14 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetLinkBandwidthInfoTest_0100, Functi
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_DATA_GET_LINK_BANDWIDTH_INFO);
     event->SetOwner(GetHandler());
     OnProcessTest(HREQ_DATA_GET_LINK_BANDWIDTH_INFO, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetDataPermittedTest_0100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_DATA_SET_DATA_PERMITTED);
+    event->SetOwner(GetHandler());
+    OnProcessTest(HREQ_DATA_SET_DATA_PERMITTED, event);
 }
 
 HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetDataProfileInfoTest_0100, Function | MediumTest | Level3)

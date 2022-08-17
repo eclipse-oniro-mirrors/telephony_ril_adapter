@@ -97,6 +97,8 @@ public:
     void DeactivateRilCmDataCallTest(const AppExecFwk::InnerEvent::Pointer &result);
     void GetRilCmDataCallListTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void SetInitialApnTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void SetDataProfileInfoTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void SetDataPermittedTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void OnProcessInput(int32_t what, const OHOS::AppExecFwk::InnerEvent::Pointer &event);
     void OnStressInput(int32_t what, const OHOS::AppExecFwk::InnerEvent::Pointer &event);
     void SimOpenLogicalChannel(const AppExecFwk::InnerEvent::Pointer &result);

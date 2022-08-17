@@ -152,6 +152,7 @@ typedef struct {
     void (*SetDataProfileInfo)(const ReqDataInfo *requestInfo, const HRilDataInfo *data, int32_t len);
     void (*SendDataPerformanceMode)(const ReqDataInfo *requestInfo, const HRilDataPerformanceInfo *data);
     void (*SendDataSleepMode)(const ReqDataInfo *requestInfo, const HRilDataSleepInfo *data);
+    void (*SetDataPermitted)(const ReqDataInfo *requestInfo, int32_t enabled);
 } HRilDataReq;
 #ifdef __cplusplus
 }
