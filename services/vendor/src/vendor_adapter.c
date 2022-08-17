@@ -145,6 +145,7 @@ static const HRilDataReq g_dataReqOps = {
     .GetPdpContextList = ReqGetPdpContextList,
     .GetLinkBandwidthInfo = ReqGetLinkBandwidthInfo,
     .SetLinkBandwidthReportingRule = ReqSetLinkBandwidthReportingRule,
+    .SetDataPermitted = ReqSetDataPermitted,
 };
 
 static const HRilModemReq g_modemReqOps = {

@@ -1200,6 +1200,25 @@ void RilManagerTest::SetDataProfileInfo(
     SendBufferEvent(HREQ_DATA_SET_DATA_PROFILE_INFO, wData);
 }
 
+void RilManagerTest::SetDataPermitted(int32_t enabled, const AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilManagerTest::SetDataPermitted -->");
+    if (cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("ERROR : SetDataPermitted --> cellularRadio_ == nullptr !!!");
+    }
+    std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_DATA_SET_DATA_PERMITTED, result);
+    if (request == nullptr) {
+        return;
+    }
+    MessageParcel data;
+    MessageParcel reply;
+    data.WriteInt32(slotId_);
+    data.WriteInt32(request->serialId_);
+    data.WriteInt32(enabled);
+    MessageOption option = { MessageOption::TF_ASYNC };
+    cellularRadio_->SendRequest(HREQ_DATA_SET_DATA_PERMITTED, data, reply, option);
+}
+
 void RilManagerTest::DeactivatePdpContext(int32_t ci, int32_t reason, const AppExecFwk::InnerEvent::Pointer &response)
 {
     TELEPHONY_LOGI("RilBaseCommands::DeactivatePdpContext -->");

@@ -55,6 +55,9 @@ public:
     int32_t SetDataProfileInfo(struct HdfSBuf *data);
     int32_t SetDataProfileInfoResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t SetDataPermitted(struct HdfSBuf *data);
+    int32_t SetDataPermittedResponse(
+        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     bool IsDataRespOrNotify(uint32_t code);
 
     bool IsDataResponse(uint32_t code);

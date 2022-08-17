@@ -922,3 +922,12 @@ void ReqGetLinkBandwidthInfo(const ReqDataInfo *requestInfo, const int32_t cid)
         sizeof(HRilLinkBandwidthInfo));
     FreeResponseInfo(pResponse);
 }
+
+void ReqSetDataPermitted(const ReqDataInfo *requestInfo, const int32_t dataPermitted)
+{
+    TELEPHONY_LOGI("dataPermitted:%{public}d", dataPermitted);
+    ModemReportErrorInfo errInfo = {};
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, errInfo.errorNo, HRIL_RESPONSE, 0);
+    reportInfo.modemErrInfo = errInfo;
+    OnDataReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
+}

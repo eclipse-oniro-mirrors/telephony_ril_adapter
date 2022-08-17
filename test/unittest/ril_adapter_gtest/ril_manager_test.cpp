@@ -1502,6 +1502,27 @@ int32_t RilManagerTest::GetLinkBandwidthInfo(const int32_t cid, const AppExecFwk
     }
 }
 
+int32_t RilManagerTest::SetDataPermitted(int32_t enabled, const AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilManagerTest::SetDataPermitted -->");
+    if (cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("ERROR : SetDataPermitted --> cellularRadio_ == nullptr !!!");
+        return HRIL_ERR_NULL_POINT;
+    }
+    std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_DATA_SET_DATA_PERMITTED, result);
+    if (request == nullptr) {
+        return HRIL_ERR_NULL_POINT;
+    }
+    MessageParcel data;
+    MessageParcel reply;
+    data.WriteInt32(request->serialId_);
+    data.WriteInt32(enabled);
+    MessageOption option = { MessageOption::TF_ASYNC };
+    int32_t ret = cellularRadio_->SendRequest(HREQ_DATA_SET_DATA_PERMITTED, data, reply, option);
+    TELEPHONY_LOGI("SendRequest(ID:%{public}d) return: %{public}d", HREQ_DATA_SET_DATA_PERMITTED, ret);
+    return ret;
+}
+
 int32_t RilManagerTest::UnLockPin(const std::string &pin, const AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("RilManagerTest::UnLockPin -->");

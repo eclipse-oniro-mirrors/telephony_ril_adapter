@@ -137,6 +137,8 @@ public:
         const AppExecFwk::InnerEvent::Pointer &response);
     void DeactivatePdpContext(int32_t ci, int32_t reason, const AppExecFwk::InnerEvent::Pointer &response);
     void SetInitApnInfo(RilDataProfileTest dataProfile, const AppExecFwk::InnerEvent::Pointer &response);
+    void SetDataProfileInfo(DataProfilesInfo dataProfilesInfo, const AppExecFwk::InnerEvent::Pointer &response);
+    void SetDataPermitted(int32_t enabled, const AppExecFwk::InnerEvent::Pointer &response);
     void GetPdpContext(const AppExecFwk::InnerEvent::Pointer &response);
     void GetSimStatus(const AppExecFwk::InnerEvent::Pointer &result);
     void SimOpenLogicalChannel(std::string appID, int32_t p2, const AppExecFwk::InnerEvent::Pointer &response);
