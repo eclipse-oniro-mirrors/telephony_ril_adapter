@@ -165,6 +165,7 @@ public:
 
     static std::atomic_int nextSerialId_;
     static std::unordered_map<int32_t, std::shared_ptr<HRilRequestTest>> requestMap_;
+    static int32_t slotId;
 
 private:
     std::shared_ptr<HRilRequestTest> CreateRequest(int32_t request, const AppExecFwk::InnerEvent::Pointer &result);

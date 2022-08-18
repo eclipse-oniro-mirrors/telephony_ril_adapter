@@ -30,7 +30,7 @@ using OHOS::sptr;
 struct EventPackage {
     uint32_t serial;
 };
-
+int32_t RilManagerTest::slotId = HRIL_SIM_SLOT_0;
 std::atomic_int32_t RilManagerTest::nextSerialId_(1);
 std::unordered_map<int32_t, std::shared_ptr<HRilRequestTest>> RilManagerTest::requestMap_;
 
@@ -40,6 +40,7 @@ int32_t RilManagerTest::SendInt32Event(int32_t dispatchId, int32_t value)
     if (cellularRadio_ != nullptr) {
         MessageParcel data;
         MessageParcel reply;
+        data.WriteInt32(RilManagerTest::slotId);
         data.WriteInt32(value);
         MessageOption option = {MessageOption::TF_ASYNC};
         status = cellularRadio_->SendRequest(dispatchId, data, reply, option);
@@ -56,6 +57,7 @@ int32_t RilManagerTest::SendInt32sEvent(int32_t dispatchId, int32_t argCount, ..
 
     MessageParcel data;
     MessageParcel reply;
+    data.WriteInt32(RilManagerTest::slotId);
     va_list list;
     va_start(list, argCount);
     int32_t i = 0;
@@ -81,6 +83,7 @@ int32_t RilManagerTest::SendStringEvent(int32_t dispatchId, const char *value)
     if (cellularRadio_ != nullptr) {
         MessageParcel data;
         MessageParcel reply;
+        data.WriteInt32(RilManagerTest::slotId);
         data.WriteCString(value);
         MessageOption option = {MessageOption::TF_ASYNC};
         status = cellularRadio_->SendRequest(dispatchId, data, reply, option);
@@ -106,6 +109,7 @@ int32_t RilManagerTest::SendCommonBufferEvent(int32_t dispatchId, const void *ev
     if (cellularRadio_ != nullptr) {
         MessageParcel data;
         MessageParcel reply;
+        data.WriteInt32(RilManagerTest::slotId);
         data.WriteBuffer(eventData, (dataLength + INCREMENT_VALUE));
         MessageOption option = {MessageOption::TF_ASYNC};
         status = cellularRadio_->SendRequest(dispatchId, data, reply, option);
@@ -234,6 +238,7 @@ int32_t RilManagerTest::GetSimIO(SimIoRequestInfo data, const AppExecFwk::InnerE
             return HRIL_ERR_NULL_POINT;
         }
         MessageParcel wData;
+        wData.WriteInt32(RilManagerTest::slotId);
         SimIoRequestInfo iccIoRequestInfo;
         iccIoRequestInfo.serial = request->serialId_;
         iccIoRequestInfo.command = data.command;
@@ -269,6 +274,7 @@ int32_t RilManagerTest::GetImsi(std::string aid, const AppExecFwk::InnerEvent::P
         imsi.serial = request->serialId_;
         imsi.strTmp = ConvertNullToEmptyString(aid);
         MessageParcel wData;
+        wData.WriteInt32(RilManagerTest::slotId);
         if (!imsi.Marshalling(wData)) {
             TELEPHONY_LOGE("ERROR : GetImsi --> imsi.Marshalling(wData) failed !!!");
             return HRIL_ERR_NULL_POINT;
@@ -326,6 +332,7 @@ int32_t RilManagerTest::RilCmDial(std::string address, int32_t clirMode, const A
             return HRIL_ERR_NULL_POINT;
         }
         MessageParcel wData;
+        wData.WriteInt32(RilManagerTest::slotId);
         DialInfo dialInfo;
         dialInfo.address = ConvertNullToEmptyString(address);
         dialInfo.clir = clirMode;
@@ -485,6 +492,7 @@ int32_t RilManagerTest::SetEmergencyCallList(const AppExecFwk::InnerEvent::Point
         emergencyInfo.abnormalService = 0;
         emergencyInfoList.calls.push_back(emergencyInfo);
         MessageParcel wData;
+        wData.WriteInt32(RilManagerTest::slotId);
         if (!emergencyInfoList.Marshalling(wData)) {
             TELEPHONY_LOGE("ERROR : ActivatePdpContext --> emergencyInfoList.Marshalling(wData) failed !!!");
             return HRIL_ERR_NULL_POINT;
@@ -585,8 +593,7 @@ int32_t RilManagerTest::SetNotificationFilter(int32_t filter, const AppExecFwk::
     }
     MessageParcel data;
     MessageParcel reply;
-    int slotId = 0;
-    data.WriteInt32(slotId);
+    data.WriteInt32(RilManagerTest::slotId);
     data.WriteInt32(request->serialId_);
     data.WriteInt32(filter);
     MessageOption option;
@@ -610,8 +617,7 @@ int32_t RilManagerTest::SetDeviceState(int32_t deviceStateType, bool deviceState
     }
     MessageParcel data;
     MessageParcel reply;
-    int slotId = 0;
-    data.WriteInt32(slotId);
+    data.WriteInt32(RilManagerTest::slotId);
     data.WriteInt32(request->serialId_);
     data.WriteInt32(deviceStateType);
     data.WriteInt32(deviceStateOn);
@@ -673,8 +679,7 @@ int32_t RilManagerTest::SetNetworkSelectionMode(
     networkMode.serial = request->serialId_;
     networkMode.selectMode = mode;
     networkMode.oper = ConvertNullToEmptyString(plmn);
-    int slotId = 0;
-    data.WriteInt32(slotId);
+    data.WriteInt32(RilManagerTest::slotId);
     if (!networkMode.Marshalling(data)) {
         TELEPHONY_LOGE("RilManagerTest::SetNetworkSelectionMode --> Marshalling (data) failed !!!");
         return HRIL_ERR_INVALID_PARAMETER;
@@ -742,6 +747,7 @@ int32_t RilManagerTest::SetDataProfileInfo(const AppExecFwk::InnerEvent::Pointer
     dataInfo.password = "3333";
     dataProfilesInfo.profiles.push_back(dataInfo);
     OHOS::MessageParcel wData;
+    wData.WriteInt32(RilManagerTest::slotId);
     if (!dataProfilesInfo.Marshalling(wData)) {
         TELEPHONY_LOGE("ERROR: SetDataProfileInfo --> dataInfo.Marshalling(wData) failed!!!");
         return HRIL_ERR_NULL_POINT;
@@ -810,6 +816,7 @@ int32_t RilManagerTest::SetBarringPassword(const std::string &fac, const std::st
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     MessageParcel data;
+    data.WriteInt32(RilManagerTest::slotId);
     data.WriteInt32(telRilRequest->serialId_);
     data.WriteCString(fac.c_str());
     data.WriteCString(oldPwd.c_str());
@@ -829,6 +836,7 @@ int32_t RilManagerTest::SendSms(std::string smscPdu, std::string pdu,
             return HRIL_ERR_NULL_POINT;
         }
         MessageParcel data;
+        data.WriteInt32(RilManagerTest::slotId);
         GsmSmsMessageInfo mGsmSmsMessageInfo = ConstructGsmSendSmsRilRequest(smscPdu, pdu);
         mGsmSmsMessageInfo.serial = request->serialId_;
         if (!mGsmSmsMessageInfo.Marshalling(data)) {
@@ -852,6 +860,7 @@ int32_t RilManagerTest::SendSmsMoreMode(std::string smscPdu, std::string pdu,
         }
         /* Do not log function arg for privacy */
         MessageParcel data;
+        data.WriteInt32(RilManagerTest::slotId);
         GsmSmsMessageInfo mGsmSmsMessageInfo = ConstructGsmSendSmsRilRequest(smscPdu, pdu);
         mGsmSmsMessageInfo.serial = request->serialId_;
         if (!mGsmSmsMessageInfo.Marshalling(data)) {
@@ -908,8 +917,7 @@ int32_t RilManagerTest::ShutDown(const AppExecFwk::InnerEvent::Pointer &result)
     }
     MessageParcel data;
     MessageParcel reply;
-    int slotId = 0;
-    data.WriteInt32(slotId);
+    data.WriteInt32(RilManagerTest::slotId);
     data.WriteInt32(request->serialId_);
     MessageOption option;
     int32_t ret = cellularRadio_->SendRequest(HREQ_MODEM_SHUT_DOWN, data, reply, option);
@@ -930,8 +938,7 @@ int32_t RilManagerTest::GetRadioState(const AppExecFwk::InnerEvent::Pointer &res
     }
     MessageParcel data;
     MessageParcel reply;
-    int slotId = 0;
-    data.WriteInt32(slotId);
+    data.WriteInt32(RilManagerTest::slotId);
     data.WriteInt32(request->serialId_);
     MessageOption option;
     int32_t ret = cellularRadio_->SendRequest(HREQ_MODEM_GET_RADIO_STATUS, data, reply, option);
@@ -952,8 +959,7 @@ int32_t RilManagerTest::GetImei(const AppExecFwk::InnerEvent::Pointer &result)
     }
     MessageParcel data;
     MessageParcel reply;
-    int slotId = 0;
-    data.WriteInt32(slotId);
+    data.WriteInt32(RilManagerTest::slotId);
     data.WriteInt32(request->serialId_);
     MessageOption option;
     int32_t ret = cellularRadio_->SendRequest(HREQ_MODEM_GET_IMEI, data, reply, option);
@@ -974,8 +980,7 @@ int32_t RilManagerTest::GetMeid(const AppExecFwk::InnerEvent::Pointer &result)
     }
     MessageParcel data;
     MessageParcel reply;
-    int slotId = 0;
-    data.WriteInt32(slotId);
+    data.WriteInt32(RilManagerTest::slotId);
     data.WriteInt32(request->serialId_);
     MessageOption option;
     int32_t ret = cellularRadio_->SendRequest(HREQ_MODEM_GET_MEID, data, reply, option);
@@ -996,6 +1001,7 @@ int32_t RilManagerTest::GetVoiceRadioTechnology(const AppExecFwk::InnerEvent::Po
     }
     MessageParcel data;
     MessageParcel reply;
+    data.WriteInt32(RilManagerTest::slotId);
     data.WriteInt32(request->serialId_);
     MessageOption option;
     int32_t ret = cellularRadio_->SendRequest(HREQ_MODEM_GET_VOICE_RADIO, data, reply, option);
@@ -1037,7 +1043,7 @@ int32_t RilManagerTest::SimOpenLogicalChannel(
             return HRIL_ERR_NULL_POINT;
         }
         MessageParcel data;
-        data.WriteInt32(0);
+        data.WriteInt32(RilManagerTest::slotId);
         data.WriteInt32(request->serialId_);
         data.WriteCString(appID.c_str());
         data.WriteInt32(p2);
@@ -1058,7 +1064,7 @@ int32_t RilManagerTest::SimCloseLogicalChannel(int32_t channelId, const AppExecF
             return HRIL_ERR_NULL_POINT;
         }
         MessageParcel data;
-        data.WriteInt32(0);
+        data.WriteInt32(RilManagerTest::slotId);
         data.WriteInt32(request->serialId_);
         data.WriteInt32(channelId);
         int32_t ret = SendBufferEvent(HREQ_SIM_CLOSE_LOGICAL_CHANNEL, data);
@@ -1080,6 +1086,7 @@ int32_t RilManagerTest::SimTransmitApduLogicalChannel(
         }
 
         MessageParcel data;
+        data.WriteInt32(RilManagerTest::slotId);
         ApduSimIORequestInfo ApduRequestInfo;
         ApduRequestInfo.serial = request->serialId_;
         ApduRequestInfo.channelId = reqInfo.channelId;
@@ -1089,8 +1096,6 @@ int32_t RilManagerTest::SimTransmitApduLogicalChannel(
         ApduRequestInfo.p2 = reqInfo.p2;
         ApduRequestInfo.p3 = reqInfo.p3;
         ApduRequestInfo.data = reqInfo.data;
-
-        data.WriteInt32(0);
         ApduRequestInfo.Marshalling(data);
         int32_t ret = SendBufferEvent(HREQ_SIM_TRANSMIT_APDU_LOGICAL_CHANNEL, data);
         TELEPHONY_LOGI("SendBufferEvent(ID:%{public}d) return: %{public}d",
@@ -1112,6 +1117,7 @@ int32_t RilManagerTest::SimTransmitApduBasicChannel(
         }
 
         MessageParcel data;
+        data.WriteInt32(RilManagerTest::slotId);
         ApduSimIORequestInfo ApduRequestInfo;
         ApduRequestInfo.serial = request->serialId_;
         ApduRequestInfo.type = reqInfo.type;
@@ -1120,8 +1126,6 @@ int32_t RilManagerTest::SimTransmitApduBasicChannel(
         ApduRequestInfo.p2 = reqInfo.p2;
         ApduRequestInfo.p3 = reqInfo.p3;
         ApduRequestInfo.data = reqInfo.data;
-
-        data.WriteInt32(0);
         ApduRequestInfo.Marshalling(data);
         int32_t ret = SendBufferEvent(HREQ_SIM_TRANSMIT_APDU_BASIC_CHANNEL, data);
         TELEPHONY_LOGI("SendBufferEvent(ID:%{public}d) return: %{public}d",
@@ -1142,9 +1146,8 @@ int32_t RilManagerTest::SetActiveSim(
             return HRIL_ERR_NULL_POINT;
         }
 
-        int32_t slotId = 0;
         MessageParcel data;
-        data.WriteInt32(slotId);
+        data.WriteInt32(RilManagerTest::slotId);
         data.WriteInt32(request->serialId_);
         data.WriteInt32(index);
         data.WriteInt32(enable);
@@ -1244,6 +1247,7 @@ int32_t RilManagerTest::SetUssd(std::string str, const AppExecFwk::InnerEvent::P
         }
         MessageParcel data;
         MessageParcel reply;
+        data.WriteInt32(RilManagerTest::slotId);
         data.WriteInt32(request->serialId_);
         data.WriteCString(str.c_str());
         MessageOption option = {MessageOption::TF_ASYNC};
@@ -1359,6 +1363,7 @@ int32_t RilManagerTest::SetCallRestriction(
 
     MessageParcel data = {};
     MessageParcel reply = {};
+    data.WriteInt32(RilManagerTest::slotId);
     data.WriteInt32(telRilRequest->serialId_);
     data.WriteInt32(mode);
     data.WriteCString(fac.c_str());
@@ -1386,6 +1391,7 @@ int32_t RilManagerTest::GetCallRestriction(std::string fac, const AppExecFwk::In
 
     MessageParcel data = {};
     MessageParcel reply = {};
+    data.WriteInt32(RilManagerTest::slotId);
     data.WriteInt32(telRilRequest->serialId_);
     data.WriteCString(fac.c_str());
     OHOS::MessageOption option = {OHOS::MessageOption::TF_ASYNC};
@@ -1418,6 +1424,7 @@ int32_t RilManagerTest::SetCallTransferInfo(
     callForwardSetInfo.serial = telRilRequest->serialId_;
 
     MessageParcel data = {};
+    data.WriteInt32(RilManagerTest::slotId);
     callForwardSetInfo.Marshalling(data);
     int32_t ret = SendBufferEvent(HREQ_CALL_SET_CALL_TRANSFER_INFO, data);
     TELEPHONY_LOGI("Send (ID:%{public}d) return: %{public}d", HREQ_CALL_SET_CALL_TRANSFER_INFO, ret);
@@ -1490,6 +1497,7 @@ int32_t RilManagerTest::GetLinkBandwidthInfo(const int32_t cid, const AppExecFwk
         }
         MessageParcel data;
         MessageParcel reply;
+        data.WriteInt32(RilManagerTest::slotId);
         data.WriteInt32(request->serialId_);
         data.WriteInt32(cid);
         MessageOption option = {MessageOption::TF_ASYNC};
@@ -1535,8 +1543,7 @@ int32_t RilManagerTest::UnLockPin(const std::string &pin, const AppExecFwk::Inne
         return HRIL_ERR_NULL_POINT;
     }
     MessageParcel data;
-    int slotId = 0;
-    data.WriteInt32(slotId);
+    data.WriteInt32(RilManagerTest::slotId);
     data.WriteInt32(request->serialId_);
     data.WriteCString(pin.c_str());
     int32_t ret = SendBufferEvent(HREQ_SIM_UNLOCK_PIN, data);
@@ -1556,8 +1563,7 @@ int32_t RilManagerTest::UnLockPin2(const std::string &pin2, const AppExecFwk::In
         return HRIL_ERR_NULL_POINT;
     }
     MessageParcel data;
-    int slotId = 0;
-    data.WriteInt32(slotId);
+    data.WriteInt32(RilManagerTest::slotId);
     data.WriteInt32(request->serialId_);
     data.WriteCString(pin2.c_str());
     int32_t ret = SendBufferEvent(HREQ_SIM_UNLOCK_PIN2, data);
@@ -1578,8 +1584,7 @@ int32_t RilManagerTest::UnLockPuk(
         return HRIL_ERR_NULL_POINT;
     }
     MessageParcel data;
-    int slotId = 0;
-    data.WriteInt32(slotId);
+    data.WriteInt32(RilManagerTest::slotId);
     data.WriteInt32(request->serialId_);
     data.WriteCString(puk.c_str());
     data.WriteCString(pin.c_str());
@@ -1601,8 +1606,7 @@ int32_t RilManagerTest::UnLockPuk2(
         return HRIL_ERR_NULL_POINT;
     }
     MessageParcel data;
-    int slotId = 0;
-    data.WriteInt32(slotId);
+    data.WriteInt32(RilManagerTest::slotId);
     data.WriteInt32(request->serialId_);
     data.WriteCString(puk2.c_str());
     data.WriteCString(pin2.c_str());
@@ -1624,8 +1628,7 @@ int32_t RilManagerTest::ChangeSimPassword(const std::string &fac, const std::str
         return HRIL_ERR_NULL_POINT;
     }
     MessageParcel data;
-    int slotId = 0;
-    data.WriteInt32(slotId);
+    data.WriteInt32(RilManagerTest::slotId);
     SimPasswordInfo simPwdInfo;
     simPwdInfo.serial = request->serialId_;
     simPwdInfo.fac = fac;
@@ -1654,8 +1657,7 @@ int32_t RilManagerTest::SetSimLock(
         return HRIL_ERR_NULL_POINT;
     }
     MessageParcel data;
-    int slotId = 0;
-    data.WriteInt32(slotId);
+    data.WriteInt32(RilManagerTest::slotId);
     SimLockInfo simlockinfo;
     simlockinfo.serial = request->serialId_;
     simlockinfo.fac = fac;
@@ -1683,8 +1685,7 @@ int32_t RilManagerTest::GetSimLockStatus(
         return HRIL_ERR_NULL_POINT;
     }
     MessageParcel data;
-    int slotId = 0;
-    data.WriteInt32(slotId);
+    data.WriteInt32(RilManagerTest::slotId);
     SimLockInfo simlockinfo;
     simlockinfo.serial = request->serialId_;
     simlockinfo.fac = fac;

@@ -17,9 +17,8 @@
 
 #include <iostream>
 
-#include "telephony_log_wrapper.h"
-
 #include "hril_request.h"
+#include "telephony_log_wrapper.h"
 
 using namespace testing::ext;
 namespace OHOS {
@@ -490,6 +489,15 @@ void RilUnitTest::GetVoiceRadioTechnologyTest(const OHOS::AppExecFwk::InnerEvent
     ASSERT_EQ(0, ret);
 }
 
+
+void RilUnitTest::SendDataSleepModeTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::SendDataSleepModeTest -->");
+    int32_t ret = mRilManager_->SendDataSleepMode(result);
+    TELEPHONY_LOGI("RilUnitTest::SendDataSleepModeTest return: %{public}d", ret);
+    ASSERT_EQ(0, ret);
+}
+
 void RilUnitTest::SendSmsAckTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("RilUnitTest::SendSmsAckTest -->");
@@ -716,31 +724,6 @@ void RilUnitTest::SetDataProfileInfoTest(const OHOS::AppExecFwk::InnerEvent::Poi
     ASSERT_EQ(0, ret);
 }
 
-void RilUnitTest::SetDataPermittedTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
-{
-    TELEPHONY_LOGI("RilUnitTest::SetDataPermittedTest -->");
-    int32_t enabled = 1;
-    int32_t ret = mRilManager_->SetDataPermitted(enabled, result);
-    TELEPHONY_LOGI("RilUnitTest::SetDataPermittedTest return: %{public}d", ret);
-    ASSERT_EQ(0, ret);
-}
-
-void RilUnitTest::SendDataPerformanceModeTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
-{
-    TELEPHONY_LOGI("RilUnitTest::SendDataPerformanceModeTest -->");
-    int32_t ret = mRilManager_->SendDataPerformanceMode(result);
-    TELEPHONY_LOGI("RilUnitTest::SendDataPerformanceModeTest return: %{public}d", ret);
-    ASSERT_EQ(0, ret);
-}
-
-void RilUnitTest::SendDataSleepModeTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
-{
-    TELEPHONY_LOGI("RilUnitTest::SendDataSleepModeTest -->");
-    int32_t ret = mRilManager_->SendDataSleepMode(result);
-    TELEPHONY_LOGI("RilUnitTest::SendDataSleepModeTest return: %{public}d", ret);
-    ASSERT_EQ(0, ret);
-}
-
 void RilUnitTest::UnLockPINTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
 {
     TELEPHONY_LOGI("RilUnitTest::UnLockPINTest -->");
@@ -818,6 +801,16 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetCallListTest_0100, Function | Medi
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_GET_CALL_LIST);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_CALL_GET_CALL_LIST, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetCallListTest_1100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_GET_CALL_LIST);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_CALL_GET_CALL_LIST, event);
 }
 
@@ -826,6 +819,16 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetEmergencyCallListTest_0100, Functi
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_SET_EMERGENCY_LIST);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_CALL_SET_EMERGENCY_LIST, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetEmergencyCallListTest_1100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_SET_EMERGENCY_LIST);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_CALL_SET_EMERGENCY_LIST, event);
 }
 
@@ -834,6 +837,16 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetBarringPasswordTest_0100, Function
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_SET_BARRING_PASSWORD);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_CALL_SET_BARRING_PASSWORD, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetBarringPasswordTest_1100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_SET_BARRING_PASSWORD);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_CALL_SET_BARRING_PASSWORD, event);
 }
 
@@ -842,6 +855,16 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_RilCmDialTest_0100, Function | Medium
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_DIAL);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_CALL_DIAL, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_RilCmDialTest_1100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_DIAL);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_CALL_DIAL, event);
 }
 
@@ -850,6 +873,16 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_RejectCallTest_0100, Function | Mediu
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_REJECT);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_CALL_REJECT, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_RejectCallTest_1100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_REJECT);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_CALL_REJECT, event);
 }
 
@@ -858,6 +891,16 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_HangupRilCmConnectionTest_0100, Funct
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_HANGUP);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_CALL_HANGUP, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_HangupRilCmConnectionTest_1100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_HANGUP);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_CALL_HANGUP, event);
 }
 
@@ -866,6 +909,16 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_AcceptRilCmCallTest_0100, Function | 
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_ANSWER);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_CALL_ANSWER, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_AcceptRilCmCallTest_1100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_ANSWER);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_CALL_ANSWER, event);
 }
 
@@ -874,6 +927,16 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_HoldCallTest_0100, Function | MediumT
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_HOLD_CALL);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_CALL_HOLD_CALL, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_HoldCallTest_1100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_HOLD_CALL);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_CALL_HOLD_CALL, event);
 }
 
@@ -882,6 +945,16 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_UnHoldCallTest_0100, Function | Mediu
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_UNHOLD_CALL);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_CALL_UNHOLD_CALL, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_UnHoldCallTest_1100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_UNHOLD_CALL);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_CALL_UNHOLD_CALL, event);
 }
 
@@ -890,6 +963,16 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_SwitchCallTest_0100, Function | Mediu
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_SWITCH_CALL);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_CALL_SWITCH_CALL, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_SwitchCallTest_1100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_SWITCH_CALL);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_CALL_SWITCH_CALL, event);
 }
 
@@ -898,6 +981,16 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_RilCmJoinCallTest_0100, Function | Me
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_COMBINE_CONFERENCE);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_CALL_COMBINE_CONFERENCE, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_RilCmJoinCallTest_1100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_COMBINE_CONFERENCE);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_CALL_COMBINE_CONFERENCE, event);
 }
 
@@ -906,6 +999,16 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_RilCmSplitCallTest_0100, Function | M
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_SEPARATE_CONFERENCE);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_CALL_SEPARATE_CONFERENCE, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_RilCmSplitCallTest_1100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_SEPARATE_CONFERENCE);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_CALL_SEPARATE_CONFERENCE, event);
 }
 
@@ -914,6 +1017,16 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetRilCmSignalStrengthTest_0100, Func
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_NETWORK_GET_SIGNAL_STRENGTH);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_NETWORK_GET_SIGNAL_STRENGTH, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetRilCmSignalStrengthTest_1100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_NETWORK_GET_SIGNAL_STRENGTH);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_NETWORK_GET_SIGNAL_STRENGTH, event);
 }
 
@@ -922,6 +1035,16 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetRilCmOperatorTest_0100, Function |
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_NETWORK_GET_OPERATOR_INFO);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_NETWORK_GET_OPERATOR_INFO, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetRilCmOperatorTest_1100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_NETWORK_GET_OPERATOR_INFO);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_NETWORK_GET_OPERATOR_INFO, event);
 }
 
@@ -930,6 +1053,16 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetRilCmCsRegStatusTest_0100, Functio
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_NETWORK_GET_CS_REG_STATUS);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_NETWORK_GET_CS_REG_STATUS, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetRilCmCsRegStatusTest_1100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_NETWORK_GET_CS_REG_STATUS);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_NETWORK_GET_CS_REG_STATUS, event);
 }
 
@@ -938,6 +1071,16 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetRilCmPsRegStatusTest_0100, Functio
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_NETWORK_GET_PS_REG_STATUS);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_NETWORK_GET_PS_REG_STATUS, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetRilCmPsRegStatusTest_1100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_NETWORK_GET_PS_REG_STATUS);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_NETWORK_GET_PS_REG_STATUS, event);
 }
 
@@ -946,6 +1089,16 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetRilNotificationFilterTest_0100, Fu
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_NETWORK_SET_NOTIFICATION_FILTER);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_NETWORK_SET_NOTIFICATION_FILTER, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetRilNotificationFilterTest_1100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_NETWORK_SET_NOTIFICATION_FILTER);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_NETWORK_SET_NOTIFICATION_FILTER, event);
 }
 
@@ -954,6 +1107,16 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetRilDeviceStateTest_0100, Function 
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_NETWORK_SET_DEVICE_STATE);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_NETWORK_SET_DEVICE_STATE, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetRilDeviceStateTest_1100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_NETWORK_SET_DEVICE_STATE);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_NETWORK_SET_DEVICE_STATE, event);
 }
 
@@ -962,6 +1125,16 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetRilNetworkSearchInfoTest_0100, Fun
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_NETWORK_GET_NETWORK_SEARCH_INFORMATION);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_NETWORK_GET_NETWORK_SEARCH_INFORMATION, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetRilNetworkSearchInfoTest_1100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_NETWORK_GET_NETWORK_SEARCH_INFORMATION);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_NETWORK_GET_NETWORK_SEARCH_INFORMATION, event);
 }
 
@@ -970,6 +1143,16 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetRilNetworkSelectionModeTest_0100, 
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_NETWORK_GET_NETWORK_SELECTION_MODE);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_NETWORK_GET_NETWORK_SELECTION_MODE, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetRilNetworkSelectionModeTest_1100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_NETWORK_GET_NETWORK_SELECTION_MODE);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_NETWORK_GET_NETWORK_SELECTION_MODE, event);
 }
 
@@ -978,6 +1161,16 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetRilNetworkSelectionModeTest_0100, 
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_NETWORK_SET_NETWORK_SELECTION_MODE);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_NETWORK_SET_NETWORK_SELECTION_MODE, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetRilNetworkSelectionModeTest_1100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_NETWORK_SET_NETWORK_SELECTION_MODE);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_NETWORK_SET_NETWORK_SELECTION_MODE, event);
 }
 
@@ -986,6 +1179,16 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetRilRadioCapabilityTest_0100, Funct
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_NETWORK_GET_RADIO_CAPABILITY);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_NETWORK_GET_RADIO_CAPABILITY, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetRilRadioCapabilityTest_1100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_NETWORK_GET_RADIO_CAPABILITY);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_NETWORK_GET_RADIO_CAPABILITY, event);
 }
 
@@ -994,6 +1197,16 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetPhysicalChannelConfigTest_0100, Fu
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_NETWORK_GET_PHYSICAL_CHANNEL_CONFIG);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_NETWORK_GET_PHYSICAL_CHANNEL_CONFIG, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetPhysicalChannelConfigTest_1100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_NETWORK_GET_PHYSICAL_CHANNEL_CONFIG);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_NETWORK_GET_PHYSICAL_CHANNEL_CONFIG, event);
 }
 
@@ -1002,6 +1215,16 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetSimIOTest_0100, Function | MediumT
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_SIM_GET_SIM_IO);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_SIM_GET_SIM_IO, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetSimIOTest_1100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_SIM_GET_SIM_IO);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_SIM_GET_SIM_IO, event);
 }
 
@@ -1010,6 +1233,16 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetImsiTest_0100, Function | MediumTe
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_SIM_GET_IMSI);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_SIM_GET_IMSI, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetImsiTest_1100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_SIM_GET_IMSI);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_SIM_GET_IMSI, event);
 }
 
@@ -1018,6 +1251,16 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetSimStatusTest_0100, Function | Med
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_SIM_GET_SIM_STATUS);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_SIM_GET_SIM_STATUS, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetSimStatusTest_1100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_SIM_GET_SIM_STATUS);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_SIM_GET_SIM_STATUS, event);
 }
 
@@ -1026,6 +1269,16 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_SendSmsAckTest_0100, Function | Mediu
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_SMS_SEND_SMS_ACK);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_SMS_SEND_SMS_ACK, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_SendSmsAckTest_1100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_SMS_SEND_SMS_ACK);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_SMS_SEND_SMS_ACK, event);
 }
 
@@ -1034,6 +1287,16 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_SimOpenLogicalChannelTest_0100, Funct
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_SIM_OPEN_LOGICAL_CHANNEL);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_SIM_OPEN_LOGICAL_CHANNEL, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_SimOpenLogicalChannelTest_1100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_SIM_OPEN_LOGICAL_CHANNEL);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_SIM_OPEN_LOGICAL_CHANNEL, event);
 }
 
@@ -1042,6 +1305,16 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_SimTransmitApduLogicalChannelTest_010
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_SIM_TRANSMIT_APDU_LOGICAL_CHANNEL);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_SIM_TRANSMIT_APDU_LOGICAL_CHANNEL, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_SimTransmitApduLogicalChannelTest_1100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_SIM_TRANSMIT_APDU_LOGICAL_CHANNEL);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_SIM_TRANSMIT_APDU_LOGICAL_CHANNEL, event);
 }
 
@@ -1050,6 +1323,16 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_SimTransmitApduBasicChannelTest_0100,
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_SIM_TRANSMIT_APDU_BASIC_CHANNEL);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_SIM_TRANSMIT_APDU_BASIC_CHANNEL, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_SimTransmitApduBasicChannelTest_1100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_SIM_TRANSMIT_APDU_BASIC_CHANNEL);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_SIM_TRANSMIT_APDU_BASIC_CHANNEL, event);
 }
 
@@ -1058,6 +1341,16 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_SimCloseLogicalChannelTest_0100, Func
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_SIM_CLOSE_LOGICAL_CHANNEL);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_SIM_CLOSE_LOGICAL_CHANNEL, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_SimCloseLogicalChannelTest_1100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_SIM_CLOSE_LOGICAL_CHANNEL);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_SIM_CLOSE_LOGICAL_CHANNEL, event);
 }
 
@@ -1066,6 +1359,16 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetActiveSimTest_0100, Function | Med
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_SIM_SET_ACTIVE_SIM);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_SIM_SET_ACTIVE_SIM, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetActiveSimTest_1100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_SIM_SET_ACTIVE_SIM);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_SIM_SET_ACTIVE_SIM, event);
 }
 
@@ -1074,6 +1377,16 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_ActivatePdpContextTest_0100, Function
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_DATA_ACTIVATE_PDP_CONTEXT);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_DATA_ACTIVATE_PDP_CONTEXT, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_ActivatePdpContextTest_1100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_DATA_ACTIVATE_PDP_CONTEXT);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_DATA_ACTIVATE_PDP_CONTEXT, event);
 }
 
@@ -1082,6 +1395,16 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_DeactivatePdpContextTest_0100, Functi
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_DATA_DEACTIVATE_PDP_CONTEXT);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_DATA_DEACTIVATE_PDP_CONTEXT, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_DeactivatePdpContextTest_1100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_DATA_DEACTIVATE_PDP_CONTEXT);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_DATA_DEACTIVATE_PDP_CONTEXT, event);
 }
 
@@ -1090,6 +1413,16 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_SendRilCmSmsTest_0100, Function | Med
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_SMS_SEND_GSM_SMS);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_SMS_SEND_GSM_SMS, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_SendRilCmSmsTest_1100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_SMS_SEND_GSM_SMS);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_SMS_SEND_GSM_SMS, event);
 }
 
@@ -1098,6 +1431,16 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_SendRilCmSmsMoreModeTest_0100, Functi
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_SMS_SEND_SMS_MORE_MODE);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_SMS_SEND_SMS_MORE_MODE, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_SendRilCmSmsMoreModeTest_1100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_SMS_SEND_SMS_MORE_MODE);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_SMS_SEND_SMS_MORE_MODE, event);
 }
 
@@ -1106,6 +1449,16 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetRilCmRadioPowerTest_0100, Function
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_MODEM_SET_RADIO_STATUS);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_MODEM_SET_RADIO_STATUS, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetRilCmRadioPowerTest_1100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_MODEM_SET_RADIO_STATUS);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_MODEM_SET_RADIO_STATUS, event);
 }
 
@@ -1114,6 +1467,16 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_ShutDownTest_0100, Function | MediumT
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_MODEM_SHUT_DOWN);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_MODEM_SHUT_DOWN, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_ShutDownTest_1100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_MODEM_SHUT_DOWN);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_MODEM_SHUT_DOWN, event);
 }
 
@@ -1122,6 +1485,16 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetRilRadioPowerTest_0100, Function |
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_MODEM_GET_RADIO_STATUS);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_MODEM_GET_RADIO_STATUS, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetRilRadioPowerTest_1100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_MODEM_GET_RADIO_STATUS);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_MODEM_GET_RADIO_STATUS, event);
 }
 
@@ -1130,6 +1503,16 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetImeiTest_0100, Function | MediumTe
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_MODEM_GET_IMEI);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_MODEM_GET_IMEI, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetImeiTest_1100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_MODEM_GET_IMEI);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_MODEM_GET_IMEI, event);
 }
 
@@ -1138,14 +1521,34 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetMeidTest_0100, Function | MediumTe
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_MODEM_GET_MEID);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
     OnProcessTest(HREQ_MODEM_GET_MEID, event);
 }
 
-HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetVoiceRadioTest_0100, Function | MediumTest | Level3)
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetMeidTest_1100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_MODEM_GET_MEID);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
+    OnProcessTest(HREQ_MODEM_GET_MEID, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetVoiceRadioTechnologyTest_0100, Function | MediumTest | Level3)
 {
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_MODEM_GET_VOICE_RADIO);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_MODEM_GET_VOICE_RADIO, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetVoiceRadioTechnologyTest_1100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_MODEM_GET_VOICE_RADIO);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_MODEM_GET_VOICE_RADIO, event);
 }
 
@@ -1155,6 +1558,18 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetUssdTest_0100, Function | MediumTe
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_SET_USSD);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_CALL_SET_USSD, event);
+#endif
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetUssdTest_1100, Function | MediumTest | Level3)
+{
+#ifdef TEL_TEST_PIN_PUK
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_SET_USSD);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_CALL_SET_USSD, event);
 #endif
 }
@@ -1165,6 +1580,18 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetUssdTest_0100, Function | MediumTe
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_GET_USSD);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_CALL_GET_USSD, event);
+#endif
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetUssdTest_1100, Function | MediumTest | Level3)
+{
+#ifdef TEL_TEST_PIN_PUK
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_GET_USSD);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_CALL_GET_USSD, event);
 #endif
 }
@@ -1175,6 +1602,18 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetClipTest_0100, Function | MediumTe
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_SET_CLIP);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_CALL_SET_CLIP, event);
+#endif
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetClipTest_1100, Function | MediumTest | Level3)
+{
+#ifdef TEL_TEST_PIN_PUK
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_SET_CLIP);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_CALL_SET_CLIP, event);
 #endif
 }
@@ -1185,6 +1624,18 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetClipTest_0100, Function | MediumTe
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_GET_CLIP);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_CALL_GET_CLIP, event);
+#endif
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetClipTest_1100, Function | MediumTest | Level3)
+{
+#ifdef TEL_TEST_PIN_PUK
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_GET_CLIP);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_CALL_GET_CLIP, event);
 #endif
 }
@@ -1195,6 +1646,18 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetCallWaitingTest_0100, Function | M
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_SET_CALL_WAITING);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_CALL_SET_CALL_WAITING, event);
+#endif
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetCallWaitingTest_1100, Function | MediumTest | Level3)
+{
+#ifdef TEL_TEST_PIN_PUK
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_SET_CALL_WAITING);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_CALL_SET_CALL_WAITING, event);
 #endif
 }
@@ -1205,6 +1668,18 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetCallWaitingTest_0100, Function | M
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_GET_CALL_WAITING);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_CALL_GET_CALL_WAITING, event);
+#endif
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetCallWaitingTest_1100, Function | MediumTest | Level3)
+{
+#ifdef TEL_TEST_PIN_PUK
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_GET_CALL_WAITING);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_CALL_GET_CALL_WAITING, event);
 #endif
 }
@@ -1215,6 +1690,18 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetCallRestrictionTest_0100, Function
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_SET_CALL_RESTRICTION);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_CALL_SET_CALL_RESTRICTION, event);
+#endif
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetCallRestrictionTest_1100, Function | MediumTest | Level3)
+{
+#ifdef TEL_TEST_PIN_PUK
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_SET_CALL_RESTRICTION);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_CALL_SET_CALL_RESTRICTION, event);
 #endif
 }
@@ -1224,6 +1711,16 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetCallRestrictionTest_0100, Function
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_GET_CALL_RESTRICTION);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_CALL_GET_CALL_RESTRICTION, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetCallRestrictionTest_1100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_GET_CALL_RESTRICTION);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_CALL_GET_CALL_RESTRICTION, event);
 }
 
@@ -1232,6 +1729,16 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetCallTransferInfoTest_0100, Functio
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_SET_CALL_TRANSFER_INFO);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_CALL_SET_CALL_TRANSFER_INFO, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetCallTransferInfoTest_1100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_SET_CALL_TRANSFER_INFO);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_CALL_SET_CALL_TRANSFER_INFO, event);
 }
 
@@ -1240,6 +1747,16 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetCallTransferInfoTest_0100, Functio
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_GET_CALL_TRANSFER_INFO);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_CALL_GET_CALL_TRANSFER_INFO, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetCallTransferInfoTest_1100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_GET_CALL_TRANSFER_INFO);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_CALL_GET_CALL_TRANSFER_INFO, event);
 }
 
@@ -1248,6 +1765,16 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetClirTest_0100, Function | MediumTe
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_SET_CLIR);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_CALL_SET_CLIR, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetClirTest_1100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_SET_CLIR);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_CALL_SET_CLIR, event);
 }
 
@@ -1256,6 +1783,16 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetClirTest_0100, Function | MediumTe
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_GET_CLIR);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_CALL_GET_CLIR, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetClirTest_1100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_CALL_GET_CLIR);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_CALL_GET_CLIR, event);
 }
 
@@ -1264,6 +1801,16 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetLinkBandwidthInfoTest_0100, Functi
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_DATA_GET_LINK_BANDWIDTH_INFO);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
+    OnProcessTest(HREQ_DATA_GET_LINK_BANDWIDTH_INFO, event);
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetLinkBandwidthInfoTest_1100, Function | MediumTest | Level3)
+{
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_DATA_GET_LINK_BANDWIDTH_INFO);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_DATA_GET_LINK_BANDWIDTH_INFO, event);
 }
 
@@ -1280,79 +1827,171 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetDataProfileInfoTest_0100, Function
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_DATA_SET_DATA_PROFILE_INFO);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
     OnProcessTest(HREQ_DATA_SET_DATA_PROFILE_INFO, event);
 }
 
-HWTEST_F(RilUnitTest, Telephony_RilAdapter_SendDataPerformanceModeTest_0100, Function | MediumTest | Level3)
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetDataProfileInfoTest_1100, Function | MediumTest | Level3)
 {
     OnInit();
-    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_DATA_SEND_DATA_PERFORMANCE_MODE);
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_DATA_SET_DATA_PROFILE_INFO);
     event->SetOwner(GetHandler());
-    OnProcessTest(HREQ_DATA_SEND_DATA_PERFORMANCE_MODE, event);
-}
-
-HWTEST_F(RilUnitTest, Telephony_RilAdapter_SendDataSleepModeTest_0100, Function | MediumTest | Level3)
-{
-    OnInit();
-    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_DATA_SEND_DATA_SLEEP_MODE);
-    event->SetOwner(GetHandler());
-    OnProcessTest(HREQ_DATA_SEND_DATA_SLEEP_MODE, event);
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
+    OnProcessTest(HREQ_DATA_SET_DATA_PROFILE_INFO, event);
 }
 
 HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetSimLockStatusTest_0100, Function | MediumTest | Level3)
 {
+#ifdef TEL_TEST_PIN_PUK
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_SIM_GET_SIM_LOCK_STATUS);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
     OnProcessTest(HREQ_SIM_GET_SIM_LOCK_STATUS, event);
+#endif
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetSimLockStatusTest_1100, Function | MediumTest | Level3)
+{
+#ifdef TEL_TEST_PIN_PUK
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_SIM_GET_SIM_LOCK_STATUS);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
+    OnProcessTest(HREQ_SIM_GET_SIM_LOCK_STATUS, event);
+#endif
 }
 
 HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetSimLockTest_0100, Function | MediumTest | Level3)
 {
+#ifdef TEL_TEST_PIN_PUK
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_SIM_SET_SIM_LOCK);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
     OnProcessTest(HREQ_SIM_SET_SIM_LOCK, event);
+#endif
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetSimLockTest_1100, Function | MediumTest | Level3)
+{
+#ifdef TEL_TEST_PIN_PUK
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_SIM_SET_SIM_LOCK);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
+    OnProcessTest(HREQ_SIM_SET_SIM_LOCK, event);
+#endif
 }
 
 HWTEST_F(RilUnitTest, Telephony_RilAdapter_ChangeSimPasswordTest_0100, Function | MediumTest | Level3)
 {
+#ifdef TEL_TEST_PIN_PUK
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_SIM_CHANGE_SIM_PASSWORD);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
     OnProcessTest(HREQ_SIM_CHANGE_SIM_PASSWORD, event);
+#endif
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_ChangeSimPasswordTest_1100, Function | MediumTest | Level3)
+{
+#ifdef TEL_TEST_PIN_PUK
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_SIM_CHANGE_SIM_PASSWORD);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
+    OnProcessTest(HREQ_SIM_CHANGE_SIM_PASSWORD, event);
+#endif
 }
 
 HWTEST_F(RilUnitTest, Telephony_RilAdapter_UnLockPinTest_0100, Function | MediumTest | Level3)
 {
+#ifdef TEL_TEST_PIN_PUK
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_SIM_UNLOCK_PIN);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
     OnProcessTest(HREQ_SIM_UNLOCK_PIN, event);
+#endif
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_UnLockPinTest_1100, Function | MediumTest | Level3)
+{
+#ifdef TEL_TEST_PIN_PUK
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_SIM_UNLOCK_PIN);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
+    OnProcessTest(HREQ_SIM_UNLOCK_PIN, event);
+#endif
 }
 
 HWTEST_F(RilUnitTest, Telephony_RilAdapter_UnLockPukTest_0100, Function | MediumTest | Level3)
 {
+#ifdef TEL_TEST_PIN_PUK
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_SIM_UNLOCK_PUK);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
     OnProcessTest(HREQ_SIM_UNLOCK_PUK, event);
+#endif
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_UnLockPukTest_1100, Function | MediumTest | Level3)
+{
+#ifdef TEL_TEST_PIN_PUK
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_SIM_UNLOCK_PUK);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
+    OnProcessTest(HREQ_SIM_UNLOCK_PUK, event);
+#endif
 }
 
 HWTEST_F(RilUnitTest, Telephony_RilAdapter_UnLockPin2Test_0100, Function | MediumTest | Level3)
 {
+#ifdef TEL_TEST_PIN_PUK
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_SIM_UNLOCK_PIN2);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
     OnProcessTest(HREQ_SIM_UNLOCK_PIN2, event);
+#endif
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_UnLockPin2Test_1100, Function | MediumTest | Level3)
+{
+#ifdef TEL_TEST_PIN_PUK
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_SIM_UNLOCK_PIN2);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
+    OnProcessTest(HREQ_SIM_UNLOCK_PIN2, event);
+#endif
 }
 
 HWTEST_F(RilUnitTest, Telephony_RilAdapter_UnLockPuk2Test_0100, Function | MediumTest | Level3)
 {
+#ifdef TEL_TEST_PIN_PUK
     OnInit();
     auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_SIM_UNLOCK_PUK2);
     event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
     OnProcessTest(HREQ_SIM_UNLOCK_PUK2, event);
+#endif
+}
+
+HWTEST_F(RilUnitTest, Telephony_RilAdapter_UnLockPuk2Test_1100, Function | MediumTest | Level3)
+{
+#ifdef TEL_TEST_PIN_PUK
+    OnInit();
+    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_SIM_UNLOCK_PUK2);
+    event->SetOwner(GetHandler());
+    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
+    OnProcessTest(HREQ_SIM_UNLOCK_PUK2, event);
+#endif
 }
 
 #else // TEL_TEST_UNSUPPORT
@@ -1364,3 +2003,4 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetLinkBandwidthInfoTest_0100, Functi
 #endif // TEL_TEST_UNSUPPORT
 } // namespace Telephony
 } // namespace OHOS
+
