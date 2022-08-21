@@ -30,11 +30,6 @@ public:
 
     void RegisterCallFuncs(const HRilCallReq *callFuncs);
 
-private:
-    void AddCallNotificationToMap();
-    void AddCallResponseToMap();
-    void AddCallRequestToMap();
-
     int32_t Dial(struct HdfSBuf *data);
     int32_t GetClip(struct HdfSBuf *data);
     int32_t SetClip(struct HdfSBuf *data);
@@ -68,9 +63,9 @@ private:
     int32_t GetUssd(struct HdfSBuf *data);
     int32_t SetMute(struct HdfSBuf *data);
     int32_t GetMute(struct HdfSBuf *data);
-    int32_t GetEmergencyCallList(struct HdfSBuf *data);
+    int32_t GetEmergencyCallList(int32_t serialId);
     int32_t GetCallFailReason(struct HdfSBuf *data);
-    int32_t SetEmergencyCallList(struct HdfSBuf *data);
+    int32_t SetEmergencyCallList(int32_t serialId, const OHOS::HDI::Ril::V1_0::IEmergencyInfoList &emergencyInfoList);
     int32_t SetBarringPassword(struct HdfSBuf *data);
 
     int32_t GetCallListResponse(
@@ -151,15 +146,22 @@ private:
 
     void BuildCallList(
         CallInfoList &callInfoList, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
-    void BuildEmergencyCallList(EmergencyInfoList &EmergencyCallInfoList, const void *response, size_t responseLen);
+    void BuildIEmergencyCallList(
+        HDI::Ril::V1_0::IEmergencyInfoList &emergencyCallInfoList, const void *response, size_t responseLen);
     void BuildCallForwardQueryInfoList(CallForwardQueryInfoList &callForwardQueryInfoList,
         HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t SetBarringPasswordResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
 
 private:
+    void CopyToHRilEmergencyInfoArray(
+        HRilEmergencyInfo *emergencyInfoCalls, std::vector<OHOS::HDI::Ril::V1_0::IEmergencyCall> calls);
+    void AddCallNotificationToMap();
+    void AddCallResponseToMap();
+    void AddCallRequestToMap();
+
+private:
     const HRilCallReq *callFuncs_ = nullptr;
-    void CopyToHRilEmergencyInfoArray(HRilEmergencyInfo *emergencyInfoCalls, std::vector<EmergencyInfo> calls);
 };
 } // namespace Telephony
 } // namespace OHOS

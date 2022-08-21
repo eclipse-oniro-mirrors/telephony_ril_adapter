@@ -27,6 +27,8 @@
 #define RIL_VENDOR_LIB_PATH "persist.sys.radio.vendorlib.path"
 #define BASE_HEX 16
 
+struct HdfSBuf;
+static void *g_dlHandle = NULL;
 static struct HRilReport g_reportOps = {
     OnCallReport,
     OnDataReport,
@@ -156,15 +158,17 @@ static void LoadVendor(void)
     TELEPHONY_LOGI("HRilRegOps completed");
 }
 
+void InitRilAdapter(void)
+{
+    LoadVendor();
+}
+
 static int32_t RilAdapterDispatch(
     struct HdfDeviceIoClient *client, int32_t cmd, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     int32_t ret;
-    static pthread_mutex_t dispatchMutex = PTHREAD_MUTEX_INITIALIZER;
-    pthread_mutex_lock(&dispatchMutex);
     TELEPHONY_LOGI("RilAdapterDispatch cmd:%{public}d", cmd);
     ret = DispatchRequest(cmd, data);
-    pthread_mutex_unlock(&dispatchMutex);
     return ret;
 }
 
@@ -202,7 +206,6 @@ static int32_t RilAdapterInit(struct HdfDeviceObject *device)
         HdfSbufRecycle(sbuf);
     }
     TELEPHONY_LOGI("sbuf IPC obtain success!");
-    LoadVendor();
     return HDF_SUCCESS;
 }
 

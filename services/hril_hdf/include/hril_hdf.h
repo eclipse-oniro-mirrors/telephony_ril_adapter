@@ -26,13 +26,18 @@
 #include "hdf_remote_service.h"
 
 #include "hril.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-static void *g_dlHandle = NULL;
+struct HdfSBuf;
+struct ReportInfo;
+struct timeval;
 
 extern int32_t DispatchRequest(int32_t cmd, struct HdfSBuf *data);
 extern void HRilInit(void);
 extern void HRilRegOps(const HRilOps *g_hrilOps);
-
+void InitRilAdapter(void);
 extern void OnCallReport(
     int32_t slotId, const struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen);
 extern void OnDataReport(
@@ -46,4 +51,7 @@ extern void OnSimReport(
 extern void OnSmsReport(
     int32_t slotId, const struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen);
 extern void OnTimerCallback(HRilCallbackFun func, uint8_t *param, const struct timeval *tv);
+#ifdef __cplusplus
+}
+#endif
 #endif // OHOS_RIL_ADAPTER_RIL_INIT_H
