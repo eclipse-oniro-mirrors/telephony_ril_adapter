@@ -32,6 +32,10 @@ public:
 
     int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
     void OnResponseGetSimState(MessageParcel &data);
+    void OnResponseSendTerminalResponseCmd(OHOS::MessageParcel &data);
+    void OnResponseSendEnvelopeCmd(OHOS::MessageParcel &data);
+    void OnResponseSendCallSetupRequestResult(OHOS::MessageParcel &data);
+    void OnResponseSimStkIsReady(OHOS::MessageParcel &data);
     void OnResponseGetCurrentCalls(MessageParcel &data);
     void OnResponseGetRilCurrentCellInfo(MessageParcel &data);
     void DialResponse(MessageParcel &data);

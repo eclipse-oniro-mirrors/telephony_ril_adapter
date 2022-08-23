@@ -50,6 +50,7 @@ private:
     int32_t SetActiveSim(struct HdfSBuf *data);
     int32_t SimStkSendTerminalResponse(struct HdfSBuf *data);
     int32_t SimStkSendEnvelope(struct HdfSBuf *data);
+    int32_t SimStkSendCallSetupRequestResult(struct HdfSBuf *data);
     int32_t SimStkIsReady(struct HdfSBuf *data);
     int32_t SetRadioProtocol(struct HdfSBuf *data);
     int32_t SimOpenLogicalChannel(struct HdfSBuf *data);
@@ -85,6 +86,8 @@ private:
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t SimStkSendEnvelopeResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t SimStkSendCallSetupRequestResultResponse(
+        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t SimStkIsReadyResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t SetRadioProtocolResponse(
@@ -109,6 +112,8 @@ private:
         int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen);
     int32_t SimStkProactiveNotify(int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen);
     int32_t SimStkAlphaNotify(int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen);
+    int32_t SimStkEventNotify(int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen);
+    int32_t SimStkCallSetupNotify(int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen);
     int32_t SimRefreshNotify(int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen);
 
 private:

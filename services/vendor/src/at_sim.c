@@ -997,6 +997,12 @@ void ReqSimStkSendEnvelope(const ReqDataInfo *requestInfo, const char *strCmd)
     FreeResponseInfo(pResponse);
 }
 
+void ReqSimStkSendCallSetupRequestResult(const ReqDataInfo *requestInfo, int32_t accept)
+{
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
+    OnSimReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
+}
+
 void ReqSimStkIsReady(const ReqDataInfo *requestInfo)
 {
     char *pLine = NULL;

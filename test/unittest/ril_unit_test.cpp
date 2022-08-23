@@ -1037,6 +1037,46 @@ void RilUnitTest::GetSimLockStatusTest(const OHOS::AppExecFwk::InnerEvent::Point
     TELEPHONY_LOGI("RilUnitTest::GetSimLockStatusTest --> GetSimLockStatusTest finished");
 }
 
+void RilUnitTest::SendTerminalResponseCmdTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::SendTerminalResponseCmdTest -->");
+    std::string cmd;
+    cout << "please enter terminal response command:";
+    cin >> cmd;
+
+    mRilManager_->SendTerminalResponseCmd(cmd, result);
+    TELEPHONY_LOGI("RilUnitTest::SendTerminalResponseCmdTest --> finished");
+}
+
+void RilUnitTest::SendEnvelopeCmdTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::SendEnvelopeCmdTest -->");
+    std::string cmd;
+    cout << "please enter envelope command:";
+    cin >> cmd;
+
+    mRilManager_->SendEnvelopeCmd(cmd, result);
+    TELEPHONY_LOGI("RilUnitTest::SendEnvelopeCmdTest --> finished");
+}
+
+void RilUnitTest::SendCallSetupRequestResultTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::SendCallSetupRequestResultTest -->");
+    int32_t accept;
+    cout << "please enter call setup request result:";
+    cin >> accept;
+
+    mRilManager_->SendCallSetupRequestResult(accept, result);
+    TELEPHONY_LOGI("RilUnitTest::SendCallSetupRequestResultTest --> finished");
+}
+
+void RilUnitTest::SimStkIsReadyTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilUnitTest::SimStkIsReadyTest -->");
+    mRilManager_->SimStkIsReady(result);
+    TELEPHONY_LOGI("RilUnitTest::SimStkIsReadyTest --> finished");
+}
+
 void RilUnitTest::OnInitStressInterface()
 {
     // set
@@ -1110,6 +1150,10 @@ void RilUnitTest::OnInitSimProcessInterface()
     memberFuncMap_[HREQ_SIM_CHANGE_SIM_PASSWORD] = &RilUnitTest::ChangeSimPasswordTest;
     memberFuncMap_[HREQ_SIM_SET_SIM_LOCK] = &RilUnitTest::SetSimLockTest;
     memberFuncMap_[HREQ_SIM_GET_SIM_LOCK_STATUS] = &RilUnitTest::GetSimLockStatusTest;
+    memberFuncMap_[HREQ_SIM_STK_SEND_TERMINAL_RESPONSE] = &RilUnitTest::SendTerminalResponseCmdTest;
+    memberFuncMap_[HREQ_SIM_STK_SEND_ENVELOPE] = &RilUnitTest::SendEnvelopeCmdTest;
+    memberFuncMap_[HREQ_SIM_STK_SEND_CALL_SETUP_REQUEST_RESULT] = &RilUnitTest::SendCallSetupRequestResultTest;
+    memberFuncMap_[HREQ_SIM_STK_IS_READY] = &RilUnitTest::SimStkIsReadyTest;
 }
 
 void RilUnitTest::OnInitDataProcessInterface()
@@ -1272,6 +1316,12 @@ static int32_t PrintSimMenu()
     cout << "----> [" << HREQ_SIM_CHANGE_SIM_PASSWORD << "] ---->[ HREQ_SIM_CHANGE_SIM_PASSWORD ]" << endl;
     cout << "----> [" << HREQ_SIM_SET_SIM_LOCK << "] ---->[ HREQ_SIM_SET_SIM_LOCK ]" << endl;
     cout << "----> [" << HREQ_SIM_GET_SIM_LOCK_STATUS << "] ---->[ HREQ_SIM_GET_SIM_LOCK_STATUS ]" << endl;
+    cout << "----> [" << HREQ_SIM_STK_SEND_TERMINAL_RESPONSE << "] ---->[ HREQ_SIM_STK_SEND_TERMINAL_RESPONSE ]"
+         << endl;
+    cout << "----> [" << HREQ_SIM_STK_SEND_ENVELOPE << "] ---->[ HREQ_SIM_STK_SEND_ENVELOPE ]" << endl;
+    cout << "----> [" << HREQ_SIM_STK_SEND_CALL_SETUP_REQUEST_RESULT
+         << "] ---->[ HREQ_SIM_STK_SEND_CALL_SETUP_REQUEST_RESULT ]" << endl;
+    cout << "----> [" << HREQ_SIM_STK_IS_READY << "] ---->[ HREQ_SIM_STK_IS_READY ]" << endl;
     int32_t choice = InputInt32(HREQ_SIM_BASE, HREQ_DATA_BASE - 1, "Command");
     cout << "---->You choose: " << choice << endl;
     choice = (choice == HREQ_SIM_BASE) ? -1 : choice;

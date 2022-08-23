@@ -112,6 +112,10 @@ private:
     void ChangeSimPasswordTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void SetSimLockTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void GetSimLockStatusTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
+    void SendTerminalResponseCmdTest(const AppExecFwk::InnerEvent::Pointer &result);
+    void SendEnvelopeCmdTest(const AppExecFwk::InnerEvent::Pointer &result);
+    void SendCallSetupRequestResultTest(const AppExecFwk::InnerEvent::Pointer &result);
+    void SimStkIsReadyTest(const AppExecFwk::InnerEvent::Pointer &result);
     void SetEmergencyCallListTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void SetBarringPasswordTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void SimOpenLogicalChannelTest(const AppExecFwk::InnerEvent::Pointer &result);

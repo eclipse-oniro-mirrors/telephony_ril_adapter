@@ -31,58 +31,65 @@ RilRadioIndicationTest::~RilRadioIndicationTest() {}
 int32_t RilRadioIndicationTest::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    const int32_t DEFAULT_VALUE = 1;
     switch (code) {
         case HNOTI_MODEM_RADIO_STATE_UPDATED:
             RadioStateUpdated(data);
-            return 0;
+            break;
         case HNOTI_CALL_STATE_UPDATED:
             CallStateChgInd(data);
-            return 0;
-        case HNOTI_NETWORK_CS_REG_STATUS_UPDATED:
-            NetworkStateNotify(data);
-            return 0;
+            break;
         case HNOTI_SMS_NEW_SMS:
             NewSmsNotify(data);
-            return 0;
+            break;
         case HNOTI_SMS_NEW_CDMA_SMS:
             NewCdmaSmsNotify(data);
-            return 0;
+            break;
         case HNOTI_SMS_STATUS_REPORT:
             SmsStatusReportNotify(data);
-            return 0;
+            break;
         case HNOTI_SMS_NEW_SMS_STORED_ON_SIM:
             NewSmsStoredOnSimNotify(data);
-            return 0;
+            break;
+        case HNOTI_SIM_STATUS_CHANGED:
+            SimStateChanged(data);
+            break;
+        case HNOTI_SIM_STK_SESSION_END_NOTIFY:
+            SimStkSessionEndNotify(data);
+            break;
+        case HNOTI_SIM_STK_PROACTIVE_NOTIFY:
+            SimStkProactiveNotify(data);
+            break;
+        case HNOTI_SIM_STK_ALPHA_NOTIFY:
+            SimStkAlphaNotify(data);
+            break;
+        case HNOTI_SIM_STK_EVENT_NOTIFY:
+            SimStkEventNotify(data);
+            break;
+        case HNOTI_SIM_STK_CALL_SETUP_NOTIFY:
+            SimStkCallSetupNotify(data);
+            break;
+        case HNOTI_SIM_REFRESH_NOTIFY:
+            SimRefreshNotify(data);
+            break;
+        case HNOTI_NETWORK_CS_REG_STATUS_UPDATED:
+            NetworkStateNotify(data);
+            break;
         case HNOTI_NETWORK_SIGNAL_STRENGTH_UPDATED:
             SignalStrengthUpdated(data);
-            return 0;
+            break;
         case HNOTI_NETWORK_PS_REG_STATUS_UPDATED:
             NetworkPsRegStatusNotify(data);
-            return 0;
+            break;
         case HNOTI_NETWORK_PHY_CHNL_CFG_UPDATED:
             NetworkPhyChnlCfgUpdated(data);
-            return 0;
+            break;
         default:
-            return DEFAULT_VALUE;
+            return HRIL_ERR_GENERIC_FAILURE;
     }
-}
-
-void RilRadioIndicationTest::RadioStateUpdated(MessageParcel &data)
-{
-    int32_t radioState = data.ReadInt32();
-    int32_t indicationType = data.ReadInt32();
-    TELEPHONY_LOGI(
-        "func :%{public}s indicationType: %{public}d state:%{public}d", __func__, indicationType, radioState);
+    return HRIL_ERR_SUCCESS;
 }
 
 void RilRadioIndicationTest::CallStateChgInd(MessageParcel &data)
-{
-    int32_t indicationType = data.ReadInt32();
-    TELEPHONY_LOGI("func :%{public}s indicationType: %{public}d", __func__, indicationType);
-}
-
-void RilRadioIndicationTest::NetworkStateNotify(MessageParcel &data)
 {
     int32_t indicationType = data.ReadInt32();
     TELEPHONY_LOGI("func :%{public}s indicationType: %{public}d", __func__, indicationType);
@@ -127,6 +134,74 @@ void RilRadioIndicationTest::NewSmsStoredOnSimNotify(MessageParcel &data)
 {
     TELEPHONY_LOGI("RilRadioIndicationTest::NewSmsStoredOnSimNotify --> ");
     data.ReadInt32();
+    int32_t indicationType = data.ReadInt32();
+    TELEPHONY_LOGI("func :%{public}s indicationType: %{public}d", __func__, indicationType);
+}
+
+void RilRadioIndicationTest::SimStateChanged(OHOS::MessageParcel &data)
+{
+    TELEPHONY_LOGI("RilRadioIndicationTest::SimStateChanged --> ");
+    int32_t indicationType = data.ReadInt32();
+    if (mRilManager_ == nullptr) {
+        TELEPHONY_LOGE("mRilManager_ is null!");
+        return;
+    }
+    TELEPHONY_LOGI("func :%{public}s indicationType: %{public}d", __func__, indicationType);
+}
+
+void RilRadioIndicationTest::SimStkSessionEndNotify(OHOS::MessageParcel &data)
+{
+    TELEPHONY_LOGI("RilRadioIndicationTest::SimStkSessionEndNotify --> ");
+    int32_t indicationType = data.ReadInt32();
+    TELEPHONY_LOGI("func :%{public}s indicationType:%{public}d", __func__, indicationType);
+}
+
+void RilRadioIndicationTest::SimStkProactiveNotify(OHOS::MessageParcel &data)
+{
+    TELEPHONY_LOGI("RilRadioIndicationTest::SimStkProactiveNotify --> ");
+    int32_t indicationType = data.ReadInt32();
+    const char *buffer = data.ReadCString();
+    std::shared_ptr<std::string> stkMessage = std::make_shared<std::string>(buffer);
+    TELEPHONY_LOGI("func :%{public}s indicationType:%{public}d stkMessage:%{public}s",
+        __func__, indicationType, stkMessage->c_str());
+}
+
+void RilRadioIndicationTest::SimStkAlphaNotify(OHOS::MessageParcel &data)
+{
+    TELEPHONY_LOGI("RilRadioIndicationTest::SimStkAlphaNotify --> ");
+    int32_t indicationType = data.ReadInt32();
+    const char *buffer = data.ReadCString();
+    std::shared_ptr<std::string> alphaMessage = std::make_shared<std::string>(buffer);
+    TELEPHONY_LOGI("func :%{public}s indicationType:%{public}d alphaMessage:%{public}s",
+        __func__, indicationType, alphaMessage->c_str());
+}
+
+void RilRadioIndicationTest::SimStkEventNotify(OHOS::MessageParcel &data)
+{
+    TELEPHONY_LOGI("RilRadioIndicationTest::SimStkEventNotify --> ");
+    int32_t indicationType = data.ReadInt32();
+    const char *buffer = data.ReadCString();
+    std::shared_ptr<std::string> eventMessage = std::make_shared<std::string>(buffer);
+    TELEPHONY_LOGI("func :%{public}s indicationType:%{public}d eventMessage:%{public}s",
+        __func__, indicationType, eventMessage->c_str());
+}
+
+void RilRadioIndicationTest::SimStkCallSetupNotify(OHOS::MessageParcel &data)
+{
+    TELEPHONY_LOGI("RilRadioIndicationTest::SimStkCallSetupNotify --> ");
+    int32_t indicationType = data.ReadInt32();
+    TELEPHONY_LOGI("func :%{public}s indicationType:%{public}d", __func__, indicationType);
+}
+
+void RilRadioIndicationTest::SimRefreshNotify(OHOS::MessageParcel &data)
+{
+    TELEPHONY_LOGI("RilRadioIndicationTest::SimRefreshNotify --> ");
+    int32_t indicationType = data.ReadInt32();
+    TELEPHONY_LOGI("func :%{public}s indicationType: %{public}d", __func__, indicationType);
+}
+
+void RilRadioIndicationTest::NetworkStateNotify(MessageParcel &data)
+{
     int32_t indicationType = data.ReadInt32();
     TELEPHONY_LOGI("func :%{public}s indicationType: %{public}d", __func__, indicationType);
 }
@@ -181,6 +256,14 @@ void RilRadioIndicationTest::NetworkPhyChnlCfgUpdated(OHOS::MessageParcel &data)
     int32_t indicationType = data.ReadInt32();
     TELEPHONY_LOGI("func :%{public}s indicationType:%{public}d size:%{public}d",
         __func__, indicationType, phyChnlCfgList->itemNum);
+}
+
+void RilRadioIndicationTest::RadioStateUpdated(MessageParcel &data)
+{
+    int32_t radioState = data.ReadInt32();
+    int32_t indicationType = data.ReadInt32();
+    TELEPHONY_LOGI(
+        "func :%{public}s indicationType: %{public}d state:%{public}d", __func__, indicationType, radioState);
 }
 } // namespace Telephony
 } // namespace OHOS

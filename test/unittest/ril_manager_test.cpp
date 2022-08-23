@@ -1684,5 +1684,88 @@ void RilManagerTest::GetSimLockStatus(
         TELEPHONY_LOGE("cellularRadio_->SendRequest fail");
     }
 }
+
+void RilManagerTest::SendTerminalResponseCmd(const std::string &cmd, const AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilManagerTest::SendTerminalResponseCmd -->");
+    if (cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("RilManagerTest::SendTerminalResponseCmd --> cellularRadio_ == nullptr !!!");
+        return;
+    }
+    std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_SIM_STK_SEND_TERMINAL_RESPONSE, result);
+    if (request == nullptr) {
+        TELEPHONY_LOGE("RilManagerTest::SendTerminalResponseCmd --> request == nullptr !!!");
+        return;
+    }
+    MessageParcel data;
+    data.WriteInt32(slotId_);
+    data.WriteInt32(request->serialId_);
+    data.WriteCString(cmd.c_str());
+    if (SendBufferEvent(HREQ_SIM_STK_SEND_TERMINAL_RESPONSE, data) < 0) {
+        TELEPHONY_LOGE("RilManagerTest::SendTerminalResponseCmd --> SendBufferEvent fail");
+    }
+}
+
+void RilManagerTest::SendEnvelopeCmd(const std::string &cmd, const AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilManagerTest::SendEnvelopeCmd -->");
+    if (cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("RilManagerTest::SendEnvelopeCmd --> cellularRadio_ == nullptr !!!");
+        return;
+    }
+    std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_SIM_STK_SEND_ENVELOPE, result);
+    if (request == nullptr) {
+        TELEPHONY_LOGE("RilManagerTest::SendEnvelopeCmd --> request == nullptr !!!");
+        return;
+    }
+    MessageParcel data;
+    data.WriteInt32(slotId_);
+    data.WriteInt32(request->serialId_);
+    data.WriteCString(cmd.c_str());
+    if (SendBufferEvent(HREQ_SIM_STK_SEND_ENVELOPE, data) < 0) {
+        TELEPHONY_LOGE("RilManagerTest::SendEnvelopeCmd --> SendBufferEvent fail");
+    }
+}
+
+void RilManagerTest::SendCallSetupRequestResult(bool accept, const AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilManagerTest::SendCallSetupRequestResult -->");
+    if (cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("RilManagerTest::SendCallSetupRequestResult --> cellularRadio_ == nullptr !!!");
+        return;
+    }
+    std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_SIM_STK_SEND_CALL_SETUP_REQUEST_RESULT, result);
+    if (request == nullptr) {
+        TELEPHONY_LOGE("RilManagerTest::SendCallSetupRequestResult --> request == nullptr !!!");
+        return;
+    }
+    MessageParcel data;
+    data.WriteInt32(slotId_);
+    data.WriteInt32(request->serialId_);
+    data.WriteInt32(accept);
+    if (SendBufferEvent(HREQ_SIM_STK_SEND_CALL_SETUP_REQUEST_RESULT, data) < 0) {
+        TELEPHONY_LOGE("RilManagerTest::SendCallSetupRequestResult --> SendBufferEvent fail");
+    }
+}
+
+void RilManagerTest::SimStkIsReady(const AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilManagerTest::SimStkIsReady -->");
+    if (cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("RilManagerTest::SimStkIsReady --> cellularRadio_ == nullptr !!!");
+        return;
+    }
+    std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_SIM_STK_IS_READY, result);
+    if (request == nullptr) {
+        TELEPHONY_LOGE("RilManagerTest::SimStkIsReady --> request == nullptr !!!");
+        return;
+    }
+    MessageParcel data;
+    data.WriteInt32(slotId_);
+    data.WriteInt32(request->serialId_);
+    if (SendBufferEvent(HREQ_SIM_STK_IS_READY, data) < 0) {
+        TELEPHONY_LOGE("RilManagerTest::SimStkIsReady --> SendBufferEvent fail");
+    }
+}
 } // namespace Telephony
 } // namespace OHOS
