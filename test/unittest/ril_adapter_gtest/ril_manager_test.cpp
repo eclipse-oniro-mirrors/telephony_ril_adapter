@@ -1698,5 +1698,89 @@ int32_t RilManagerTest::GetSimLockStatus(
     TELEPHONY_LOGI("SendBufferEvent(ID:%{public}d) return: %{public}d", HREQ_SIM_GET_SIM_LOCK_STATUS, ret);
     return ret;
 }
+
+int32_t RilManagerTest::SendTerminalResponseCmd(const std::string &cmd, const AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilManagerTest::SendTerminalResponseCmd -->");
+    if (cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("RilManagerTest::SendTerminalResponseCmd --> cellularRadio_ is nullptr !!!");
+        return HRIL_ERR_NULL_POINT;
+    }
+    std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_SIM_STK_SEND_TERMINAL_RESPONSE, result);
+    if (request == nullptr) {
+        TELEPHONY_LOGE("RilManagerTest::SendTerminalResponseCmd --> request is nullptr !!!");
+        return HRIL_ERR_NULL_POINT;
+    }
+    MessageParcel data;
+    data.WriteInt32(RilManagerTest::slotId);
+    data.WriteInt32(request->serialId_);
+    data.WriteCString(cmd.c_str());
+    int32_t ret = SendBufferEvent(HREQ_SIM_STK_SEND_TERMINAL_RESPONSE, data);
+    TELEPHONY_LOGI("SendBufferEvent(ID:%{public}d) return: %{public}d", HREQ_SIM_STK_SEND_TERMINAL_RESPONSE, ret);
+    return ret;
+}
+
+int32_t RilManagerTest::SendEnvelopeCmd(const std::string &cmd, const AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilManagerTest::SendEnvelopeCmd -->");
+    if (cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("RilManagerTest::SendEnvelopeCmd --> cellularRadio_ is nullptr !!!");
+        return HRIL_ERR_NULL_POINT;
+    }
+    std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_SIM_STK_SEND_ENVELOPE, result);
+    if (request == nullptr) {
+        TELEPHONY_LOGE("RilManagerTest::SendEnvelopeCmd --> request is nullptr !!!");
+        return HRIL_ERR_NULL_POINT;
+    }
+    MessageParcel data;
+    data.WriteInt32(RilManagerTest::slotId);
+    data.WriteInt32(request->serialId_);
+    data.WriteCString(cmd.c_str());
+    int32_t ret = SendBufferEvent(HREQ_SIM_STK_SEND_ENVELOPE, data);
+    TELEPHONY_LOGI("SendBufferEvent(ID:%{public}d) return: %{public}d", HREQ_SIM_STK_SEND_ENVELOPE, ret);
+    return ret;
+}
+
+int32_t RilManagerTest::SendCallSetupRequestResult(bool accept, const AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilManagerTest::SendCallSetupRequestResult -->");
+    if (cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("RilManagerTest::SendCallSetupRequestResult --> cellularRadio_ is nullptr !!!");
+        return HRIL_ERR_NULL_POINT;
+    }
+    std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_SIM_STK_SEND_CALL_SETUP_REQUEST_RESULT, result);
+    if (request == nullptr) {
+        TELEPHONY_LOGE("RilManagerTest::SendCallSetupRequestResult --> request is nullptr !!!");
+        return HRIL_ERR_NULL_POINT;
+    }
+    MessageParcel data;
+    data.WriteInt32(RilManagerTest::slotId);
+    data.WriteInt32(request->serialId_);
+    data.WriteInt32(accept);
+    int32_t ret = SendBufferEvent(HREQ_SIM_STK_SEND_CALL_SETUP_REQUEST_RESULT, data);
+    TELEPHONY_LOGI(
+        "SendBufferEvent(ID:%{public}d) return: %{public}d", HREQ_SIM_STK_SEND_CALL_SETUP_REQUEST_RESULT, ret);
+    return ret;
+}
+
+int32_t RilManagerTest::SimStkIsReady(const AppExecFwk::InnerEvent::Pointer &result)
+{
+    TELEPHONY_LOGI("RilManagerTest::SimStkIsReady -->");
+    if (cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("RilManagerTest::SimStkIsReady --> cellularRadio_ is nullptr !!!");
+        return HRIL_ERR_NULL_POINT;
+    }
+    std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_SIM_STK_IS_READY, result);
+    if (request == nullptr) {
+        TELEPHONY_LOGE("RilManagerTest::SimStkIsReady --> request is nullptr !!!");
+        return HRIL_ERR_NULL_POINT;
+    }
+    MessageParcel data;
+    data.WriteInt32(RilManagerTest::slotId);
+    data.WriteInt32(request->serialId_);
+    int32_t ret = SendBufferEvent(HREQ_SIM_STK_IS_READY, data);
+    TELEPHONY_LOGI("SendBufferEvent(ID:%{public}d) return: %{public}d", HREQ_SIM_STK_IS_READY, ret);
+    return ret;
+}
 } // namespace Telephony
 } // namespace OHOS

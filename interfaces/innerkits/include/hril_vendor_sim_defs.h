@@ -172,6 +172,7 @@ typedef struct {
     void (*SetActiveSim)(const ReqDataInfo *requestInfo, int32_t index, int32_t enable);
     void (*SimStkSendTerminalResponse)(const ReqDataInfo *requestInfo, const char *strCmd);
     void (*SimStkSendEnvelope)(const ReqDataInfo *requestInfo, const char *strCmd);
+    void (*SimStkSendCallSetupRequestResult)(const ReqDataInfo *requestInfo, int32_t accept);
     void (*SimStkIsReady)(const ReqDataInfo *requestInfo);
     void (*SetRadioProtocol)(const ReqDataInfo *requestInfo, const HRilSimProtocolRequest *data, size_t dataLen);
     void (*SimOpenLogicalChannel)(const ReqDataInfo *requestInfo, const char *appID, int32_t p2);

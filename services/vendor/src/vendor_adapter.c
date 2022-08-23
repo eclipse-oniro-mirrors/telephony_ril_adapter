@@ -92,6 +92,7 @@ static const HRilSimReq g_simReqOps = {
     .SetActiveSim = ReqSetActiveSim,
     .SimStkSendTerminalResponse = ReqSimStkSendTerminalResponse,
     .SimStkSendEnvelope = ReqSimStkSendEnvelope,
+    .SimStkSendCallSetupRequestResult = ReqSimStkSendCallSetupRequestResult,
     .SimStkIsReady = ReqSimStkIsReady,
     .SetRadioProtocol = ReqSetRadioProtocol,
     .SimOpenLogicalChannel = ReqSimOpenLogicalChannel,

@@ -252,6 +252,18 @@ int32_t RilRadioResponseTest::OnRemoteRequest(
         case HREQ_SIM_UNLOCK_PUK2:
             OnResponseLockStatus(data);
             break;
+        case HREQ_SIM_STK_SEND_TERMINAL_RESPONSE:
+            OnResponseSendTerminalResponseCmd(data);
+            break;
+        case HREQ_SIM_STK_SEND_ENVELOPE:
+            OnResponseSendEnvelopeCmd(data);
+            break;
+        case HREQ_SIM_STK_SEND_CALL_SETUP_REQUEST_RESULT:
+            OnResponseSendCallSetupRequestResult(data);
+            break;
+        case HREQ_SIM_STK_IS_READY:
+            OnResponseSimStkIsReady(data);
+            break;
         default:
             break;
     }
@@ -327,6 +339,82 @@ void RilRadioResponseTest::OnResponseOpenLogicalChannel(MessageParcel &data)
     cout << endl << "====>channelId: " << resp->channelId << endl;
     cout << endl << "---->OnResponseOpenLogicalChannel";
     PrintResponseInfo(responseInfo);
+}
+
+void RilRadioResponseTest::OnResponseSendTerminalResponseCmd(MessageParcel &data)
+{
+    TELEPHONY_LOGI("RilRadioResponseTest::OnResponseSendTerminalResponseCmd -->");
+    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
+    const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("RilRadioResponseTest::OnResponseSendTerminalResponseCmd --> spBuffer == nullptr");
+        return;
+    }
+    const struct HRilRadioResponseInfo *radioResponseInfo =
+        reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
+    if (radioResponseInfo == nullptr) {
+        TELEPHONY_LOGE("RilRadioResponseTest::OnResponseSendTerminalResponseCmd --> radioResponseInfo == nullptr");
+        return;
+    }
+    cout << "----> OnResponseSendTerminalResponseCmd Result:" << (radioResponseInfo->error == HRilErrType::NONE);
+    PrintResponseInfo((struct HRilRadioResponseInfo *)spBuffer);
+}
+
+void RilRadioResponseTest::OnResponseSendEnvelopeCmd(MessageParcel &data)
+{
+    TELEPHONY_LOGI("RilRadioResponseTest::OnResponseSendEnvelopeCmd -->");
+    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
+    const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("RilRadioResponseTest::OnResponseSendEnvelopeCmd --> spBuffer == nullptr");
+        return;
+    }
+    const struct HRilRadioResponseInfo *radioResponseInfo =
+        reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
+    if (radioResponseInfo == nullptr) {
+        TELEPHONY_LOGE("RilRadioResponseTest::OnResponseSendEnvelopeCmd --> radioResponseInfo == nullptr");
+        return;
+    }
+    cout << "----> OnResponseSendEnvelopeCmd Result:" << (radioResponseInfo->error == HRilErrType::NONE);
+    PrintResponseInfo((struct HRilRadioResponseInfo *)spBuffer);
+}
+
+void RilRadioResponseTest::OnResponseSendCallSetupRequestResult(MessageParcel &data)
+{
+    TELEPHONY_LOGI("RilRadioResponseTest::OnResponseSendCallSetupRequestResult -->");
+    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
+    const uint8_t *spBuffer = data.ReadUnpadBuffer(readSpSize);
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("RilRadioResponseTest::OnResponseSendCallSetupRequestResult --> spBuffer == nullptr");
+        return;
+    }
+    const struct HRilRadioResponseInfo *radioResponseInfo =
+        reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
+    if (radioResponseInfo == nullptr) {
+        TELEPHONY_LOGE("RilRadioResponseTest::OnResponseSendCallSetupRequestResult --> radioResponseInfo == nullptr");
+        return;
+    }
+    cout << "----> OnResponseSendCallSetupRequestResult Result:" << (radioResponseInfo->error == HRilErrType::NONE);
+    PrintResponseInfo((struct HRilRadioResponseInfo *)spBuffer);
+}
+
+void RilRadioResponseTest::OnResponseSimStkIsReady(MessageParcel &data)
+{
+    TELEPHONY_LOGI("RilRadioResponseTest::OnResponseSimStkIsReady -->");
+    const size_t readSpSize = sizeof(struct HRilRadioResponseInfo);
+    const uint8_t *spBuffer = data.ReadBuffer(readSpSize);
+    if (spBuffer == nullptr) {
+        TELEPHONY_LOGE("RilRadioResponseTest::OnResponseSimStkIsReady --> spBuffer == nullptr");
+        return;
+    }
+    const struct HRilRadioResponseInfo *radioResponseInfo =
+        reinterpret_cast<const struct HRilRadioResponseInfo *>(spBuffer);
+    if (radioResponseInfo == nullptr) {
+        TELEPHONY_LOGE("RilRadioResponseTest::OnResponseSimStkIsReady --> radioResponseInfo == nullptr");
+        return;
+    }
+    cout << "----> OnResponseSimStkIsReady Result:" << (radioResponseInfo->error == HRilErrType::NONE);
+    PrintResponseInfo((struct HRilRadioResponseInfo *)spBuffer);
 }
 
 void RilRadioResponseTest::OnResponseGetCallList(OHOS::MessageParcel &data)

@@ -41,6 +41,7 @@ void ReqGetSimPin2InputTimes(const ReqDataInfo *requestInfo);
 void ReqSetActiveSim(const ReqDataInfo *requestInfo, int32_t index, int32_t enable);
 void ReqSimStkSendTerminalResponse(const ReqDataInfo *requestInfo, const char *strCmd);
 void ReqSimStkSendEnvelope(const ReqDataInfo *requestInfo, const char *strCmd);
+void ReqSimStkSendCallSetupRequestResult(const ReqDataInfo *requestInfo, int32_t accept);
 void ReqSimStkIsReady(const ReqDataInfo *requestInfo);
 void ReqSetRadioProtocol(const ReqDataInfo *requestInfo, const HRilSimProtocolRequest *data, size_t dataLen);
 void ReqSimOpenLogicalChannel(const ReqDataInfo *requestInfo, const char *appID, int32_t p2);

@@ -136,6 +136,10 @@ public:
     int32_t SetSimLock(const std::string &fac, int32_t mode, const std::string &password,
         const AppExecFwk::InnerEvent::Pointer &result);
     int32_t GetSimLockStatus(const std::string &fac, int32_t mode, const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t SendTerminalResponseCmd(const std::string &cmd, const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t SendEnvelopeCmd(const std::string &cmd, const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t SendCallSetupRequestResult(bool accept, const AppExecFwk::InnerEvent::Pointer &result);
+    int32_t SimStkIsReady(const AppExecFwk::InnerEvent::Pointer &result);
     int32_t SetEmergencyCallList(const AppExecFwk::InnerEvent::Pointer &result);
     int32_t SetBarringPassword(const std::string &fac, const std::string &oldPwd, const std::string &newPwd,
         const AppExecFwk::InnerEvent::Pointer &result);

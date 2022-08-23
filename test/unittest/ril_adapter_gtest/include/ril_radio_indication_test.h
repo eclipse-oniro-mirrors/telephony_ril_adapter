@@ -25,22 +25,29 @@ namespace OHOS {
 namespace Telephony {
 class RilRadioIndicationTest : public IPCObjectStub {
 public:
-    RilRadioIndicationTest(RilManagerTest *mRilManager);
+    explicit RilRadioIndicationTest(RilManagerTest *mRilManager);
     ~RilRadioIndicationTest();
 
     int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
 private:
-    void RadioStateUpdated(MessageParcel &data);
     void CallStateChgInd(MessageParcel &data);
-    void NetworkStateNotify(MessageParcel &data);
     void NewSmsNotify(MessageParcel &data);
     void NewCdmaSmsNotify(MessageParcel &data);
     void SmsStatusReportNotify(MessageParcel &data);
     void NewSmsStoredOnSimNotify(MessageParcel &data);
+    void SimStateChanged(OHOS::MessageParcel &data);
+    void SimStkSessionEndNotify(OHOS::MessageParcel &data);
+    void SimStkProactiveNotify(OHOS::MessageParcel &data);
+    void SimStkAlphaNotify(OHOS::MessageParcel &data);
+    void SimStkEventNotify(OHOS::MessageParcel &data);
+    void SimStkCallSetupNotify(OHOS::MessageParcel &data);
+    void SimRefreshNotify(OHOS::MessageParcel &data);
+    void NetworkStateNotify(MessageParcel &data);
     void SignalStrengthUpdated(MessageParcel &data);
     void NetworkPsRegStatusNotify(MessageParcel &data);
     void NetworkPhyChnlCfgUpdated(MessageParcel &data);
+    void RadioStateUpdated(MessageParcel &data);
 
 private:
     RilManagerTest *mRilManager_;

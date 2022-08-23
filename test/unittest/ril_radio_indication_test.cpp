@@ -34,27 +34,8 @@ RilRadioIndicationTest::~RilRadioIndicationTest() {}
 int32_t RilRadioIndicationTest::OnRemoteRequest(
     uint32_t code, OHOS::MessageParcel &data, OHOS::MessageParcel &reply, OHOS::MessageOption &option)
 {
-    auto reqToken = data.ReadInterfaceToken();
-    HRilResponseTypes responseType = HRIL_RESPONSE_NOTICE;
-    int32_t slotId = 0;
-    const uint8_t *spBuffer = data.ReadUnpadBuffer(sizeof(HRilResponseHeadInfo));
-    const HRilResponseHeadInfo *headInfo = reinterpret_cast<const HRilResponseHeadInfo *>(spBuffer);
-    if (headInfo != nullptr) {
-        slotId = headInfo->slotId;
-        responseType = headInfo->type;
-    } else {
-        TELEPHONY_LOGW("code:%{public}d, headInfo parsed is failed.", code);
-    }
-    TELEPHONY_LOGI("TOnRemoteRequest code:%{public}d, slotId:%{public}d, type:%{public}d", code, slotId, responseType);
-    if (slotId != HRIL_SIM_SLOT_0) {
-        TELEPHONY_LOGE("RilAdapterTest rsp slotid abnormal");
-    }
-
     const int32_t DEFAULT_VALUE = HRIL_ERR_SUCCESS;
     switch (code) {
-        case HNOTI_MODEM_RADIO_STATE_UPDATED:
-            RadioStateChange(data);
-            break;
         case HNOTI_CALL_STATE_UPDATED:
             CallStateUpdated(data);
             break;
@@ -67,20 +48,8 @@ int32_t RilRadioIndicationTest::OnRemoteRequest(
         case HNOTI_CALL_EMERGENCY_NUMBER_REPORT:
             CallEmergencyNumberReport(data);
             break;
-        case HNOTI_NETWORK_CS_REG_STATUS_UPDATED:
-            NetworkStateNotify(data);
-            break;
-        case HNOTI_NETWORK_PHY_CHNL_CFG_UPDATED:
-            NetworkPhyChnlCfgUpdated(data);
-            break;
-        case HNOTI_NETWORK_CURRENT_CELL_UPDATED:
-            NetworkCurrentCellUpdated(data);
-            break;
-        case HNOTI_MODEM_VOICE_TECH_UPDATED:
-            VoiceRadioTechUpdated(data);
-            break;
-        case HNOTI_NETWORK_SIGNAL_STRENGTH_UPDATED:
-            GetSignalStrength(data);
+        case HNOTI_CALL_SS_REPORT:
+            CallSsReport(data);
             break;
         case HNOTI_SMS_NEW_SMS:
             NewSmsNotify(data);
@@ -94,28 +63,49 @@ int32_t RilRadioIndicationTest::OnRemoteRequest(
         case HNOTI_SIM_STATUS_CHANGED:
             SimStateChanged(data);
             break;
-        case HNOTI_DATA_PDP_CONTEXT_LIST_UPDATED:
-            PdpContextListChangedNotify(data);
+        case HNOTI_SIM_STK_SESSION_END_NOTIFY:
+            SimStkSessionEndNotify(data);
+            break;
+        case HNOTI_SIM_STK_PROACTIVE_NOTIFY:
+            SimStkProactiveNotify(data);
+            break;
+        case HNOTI_SIM_STK_ALPHA_NOTIFY:
+            SimStkAlphaNotify(data);
+            break;
+        case HNOTI_SIM_STK_EVENT_NOTIFY:
+            SimStkEventNotify(data);
+            break;
+        case HNOTI_SIM_STK_CALL_SETUP_NOTIFY:
+            SimStkCallSetupNotify(data);
             break;
         case HNOTI_SIM_REFRESH_NOTIFY:
             SimRefreshNotify(data);
             break;
-        case HNOTI_CALL_SS_REPORT:
-            CallSsReport(data);
+        case HNOTI_DATA_PDP_CONTEXT_LIST_UPDATED:
+            PdpContextListChangedNotify(data);
+            break;
+        case HNOTI_NETWORK_CS_REG_STATUS_UPDATED:
+            NetworkStateNotify(data);
+            break;
+        case HNOTI_NETWORK_SIGNAL_STRENGTH_UPDATED:
+            GetSignalStrength(data);
+            break;
+        case HNOTI_NETWORK_PHY_CHNL_CFG_UPDATED:
+            NetworkPhyChnlCfgUpdated(data);
+            break;
+        case HNOTI_NETWORK_CURRENT_CELL_UPDATED:
+            NetworkCurrentCellUpdated(data);
+            break;
+        case HNOTI_MODEM_RADIO_STATE_UPDATED:
+            RadioStateChange(data);
+            break;
+        case HNOTI_MODEM_VOICE_TECH_UPDATED:
+            VoiceRadioTechUpdated(data);
             break;
         default:
             break;
     }
     return DEFAULT_VALUE;
-}
-
-void RilRadioIndicationTest::RadioStateChange(OHOS::MessageParcel &data)
-{
-    int32_t radioState = data.ReadInt32();
-    int32_t indicationType = data.ReadInt32();
-    std::cout << "---->[NTF] RadioStateChange:" << endl << "====> [radioState]: " << radioState << endl;
-    TELEPHONY_LOGI(
-        "func :%{public}s indicationType: %{public}d state:%{public}d", __func__, indicationType, radioState);
 }
 
 void RilRadioIndicationTest::CallStateUpdated(OHOS::MessageParcel &data)
@@ -166,72 +156,17 @@ void RilRadioIndicationTest::CallEmergencyNumberReport(OHOS::MessageParcel &data
     }
 }
 
-void RilRadioIndicationTest::NetworkStateNotify(OHOS::MessageParcel &data)
+void RilRadioIndicationTest::CallSsReport(OHOS::MessageParcel &data)
 {
-    cout << endl << "---->[NTF] NetworkStateNotify" << endl;
-    int32_t indicationType = data.ReadInt32();
-    TELEPHONY_LOGI("func :%{public}s indicationType: %{public}d", __func__, indicationType);
-}
-
-void RilRadioIndicationTest::NetworkPhyChnlCfgUpdated(OHOS::MessageParcel &data)
-{
-    std::shared_ptr<ChannelConfigInfoList> phyChnlCfgList = std::make_shared<ChannelConfigInfoList>();
-    if (phyChnlCfgList == nullptr) {
-        TELEPHONY_LOGE("RilRadioIndicationTest::NetworkPhyChnlCfgUpdated phyChnlCfgList == nullptr");
+    cout << endl << "---->[NTF] CallSsReport: " << endl;
+    std::shared_ptr<SsNoticeInfo> ssInfo = std::make_shared<SsNoticeInfo>();
+    if (ssInfo == nullptr) {
+        TELEPHONY_LOGE("ERROR : ssInfo == nullptr !!!");
         return;
     }
-    phyChnlCfgList->ReadFromParcel(data);
-    int32_t size = phyChnlCfgList->itemNum;
-    cout << endl << "---->[NTF] NetworkPhyChnlCfgUpdated:" << endl << "====> [size]: " << size << endl;
-    std::vector<PhysicalChannelConfig> &configs = phyChnlCfgList->channelConfigInfos;
-    for (int32_t i = 0; i < static_cast<int32_t>(configs.size()); i++) {
-        cout << "====> [cellConnStatus]: " << configs[i].cellConnStatus << endl;
-        cout << "====> [cellBandwidthDownlinkKhz]: " << configs[i].cellBandwidthDownlinkKhz << endl;
-        cout << "====> [cellBandwidthUplinkKhz]: " << configs[i].cellBandwidthUplinkKhz << endl;
-        cout << "====> [ratType]: " << configs[i].ratType << endl;
-        cout << "====> [freqRange]: " << configs[i].freqRange << endl;
-        cout << "====> [downlinkChannelNum]: " << configs[i].downlinkChannelNum << endl;
-        cout << "====> [uplinkChannelNum]: " << configs[i].uplinkChannelNum << endl;
-        cout << "====> [physicalCellId]: " << configs[i].physicalCellId << endl;
-        cout << "====> [contextIdNum]: " << configs[i].contextIdNum << endl;
-    }
-    int32_t indicationType = data.ReadInt32();
-    TELEPHONY_LOGI("func :%{public}s indicationType:%{public}d size:%{public}d", __func__, indicationType, size);
-}
-
-void RilRadioIndicationTest::NetworkCurrentCellUpdated(OHOS::MessageParcel &data)
-{
-    int32_t indicationType = data.ReadInt32();
-    std::shared_ptr<CellListCurrentInfo> currentCellList = std::make_shared<CellListCurrentInfo>();
-    if (currentCellList == nullptr) {
-        TELEPHONY_LOGE("RilRadioIndicationTest::NetworkCurrentCellUpdated currentCellList == nullptr");
-        return;
-    }
-    currentCellList->ReadFromParcel(data);
-    int32_t size = currentCellList->itemNum;
-    cout << endl << "---->[NTF] NetworkCurrentCellUpdated:" << endl << "====> [size]: " << size << endl;
-    std::vector<CurrentCellInfo> &cellInfos = currentCellList->cellCurrentInfo;
-    for (int32_t i = 0; i < static_cast<int32_t>(cellInfos.size()); i++) {
-        cout << "====> [ratType]: " << cellInfos[i].ratType << endl;
-        cout << "====> [mcc]: " << cellInfos[i].mcc << endl;
-        cout << "====> [mnc]: " << cellInfos[i].mnc << endl;
-    }
-    TELEPHONY_LOGI("func :%{public}s indicationType:%{public}d size:%{public}d", __func__, indicationType, size);
-}
-
-void RilRadioIndicationTest::VoiceRadioTechUpdated(OHOS::MessageParcel &data)
-{
-    int32_t indicationType = data.ReadInt32();
-    std::shared_ptr<VoiceRadioTechnology> radioTech = std::make_shared<VoiceRadioTechnology>();
-    if (radioTech == nullptr) {
-        TELEPHONY_LOGE("RilRadioIndicationTest::VoiceRadioTechUpdated radioTech is nullptr");
-        return;
-    }
-    radioTech->ReadFromParcel(data);
-    int32_t radioTechType = radioTech->actType;
-    std::cout << "---->[NTF] VoiceRadioTechUpdated:" << endl << "====> [radioTechType]: " << radioTechType << endl;
-    TELEPHONY_LOGI(
-        "func :%{public}s indicationType:%{public}d radioTechType:%{public}d", __func__, indicationType, radioTechType);
+    ssInfo->ReadFromParcel(data);
+    cout << "====> serviceType: " << ssInfo->serviceType << "\trequestType: " << ssInfo->requestType
+         << "\tserviceClass: " << ssInfo->serviceClass << "\tresult: " << ssInfo->result << endl;
 }
 
 void RilRadioIndicationTest::NewSmsNotify(OHOS::MessageParcel &data)
@@ -286,10 +221,84 @@ void RilRadioIndicationTest::SmsStatusReportNotify(OHOS::MessageParcel &data)
     TELEPHONY_LOGI("func :%{public}s indicationType: %{public}d", __func__, indicationType);
 }
 
-void RilRadioIndicationTest::NewSmsStoredOnSimNotify(OHOS::MessageParcel &data)
+void RilRadioIndicationTest::SimStateChanged(OHOS::MessageParcel &data)
 {
-    TELEPHONY_LOGI("RilRadioIndicationTest::NewSmsStoredOnSimNotify --> ");
-    data.ReadInt32();
+    TELEPHONY_LOGI("RilRadioIndicationTest::SimStateChanged --> ");
+    int32_t indicationType = data.ReadInt32();
+    cout << "---->[NTF] Sim State Changed" << endl
+         << "====> [indicationType]: " << indicationType << endl;
+    TELEPHONY_LOGI("func :%{public}s indicationType: %{public}d", __func__, indicationType);
+}
+
+void RilRadioIndicationTest::SimStkSessionEndNotify(OHOS::MessageParcel &data)
+{
+    TELEPHONY_LOGI("RilRadioIndicationTest::SimStkSessionEndNotify --> ");
+    int32_t indicationType = data.ReadInt32();
+    cout << "---->[NTF] Sim Stk Session End Notify" << endl
+         << "====> [indicationType]: " << indicationType << endl;
+    TELEPHONY_LOGI("func :%{public}s indicationType:%{public}d", __func__, indicationType);
+}
+
+void RilRadioIndicationTest::SimStkProactiveNotify(OHOS::MessageParcel &data)
+{
+    TELEPHONY_LOGI("RilRadioIndicationTest::SimStkProactiveNotify --> ");
+    int32_t indicationType = data.ReadInt32();
+    const char *buffer = data.ReadCString();
+    std::shared_ptr<std::string> stkMessage = std::make_shared<std::string>(buffer);
+    cout << "---->[NTF] Sim Stk Proactive Notify" << endl
+         << "====> [indicationType]: " << indicationType << endl
+         << "====> [stkMessage]: " << stkMessage << endl;
+    TELEPHONY_LOGI("func :%{public}s indicationType:%{public}d stkMessage:%{public}s",
+        __func__, indicationType, stkMessage->c_str());
+}
+
+void RilRadioIndicationTest::SimStkAlphaNotify(OHOS::MessageParcel &data)
+{
+    TELEPHONY_LOGI("RilRadioIndicationTest::SimStkAlphaNotify --> ");
+    int32_t indicationType = data.ReadInt32();
+    const char *buffer = data.ReadCString();
+    std::shared_ptr<std::string> alphaMessage = std::make_shared<std::string>(buffer);
+    cout << "---->[NTF] Sim Stk Alpha Notify" << endl
+         << "====> [indicationType]: " << indicationType << endl
+         << "====> [alphaMessage]: " << alphaMessage << endl;
+    TELEPHONY_LOGI("func :%{public}s indicationType:%{public}d alphaMessage:%{public}s",
+        __func__, indicationType, alphaMessage->c_str());
+}
+
+void RilRadioIndicationTest::SimStkEventNotify(OHOS::MessageParcel &data)
+{
+    TELEPHONY_LOGI("RilRadioIndicationTest::SimStkEventNotify --> ");
+    int32_t indicationType = data.ReadInt32();
+    const char *buffer = data.ReadCString();
+    std::shared_ptr<std::string> eventMessage = std::make_shared<std::string>(buffer);
+    cout << "---->[NTF] Sim Stk Event Notify" << endl
+         << "====> [indicationType]: " << indicationType << endl
+         << "====> [eventMessage]: " << eventMessage << endl;
+    TELEPHONY_LOGI("func :%{public}s indicationType:%{public}d eventMessage:%{public}s",
+        __func__, indicationType, eventMessage->c_str());
+}
+
+void RilRadioIndicationTest::SimStkCallSetupNotify(OHOS::MessageParcel &data)
+{
+    TELEPHONY_LOGI("RilRadioIndicationTest::SimStkCallSetupNotify --> ");
+    int32_t indicationType = data.ReadInt32();
+    cout << "---->[NTF] Sim Stk Call Setup Notify" << endl
+         << "====> [indicationType]: " << indicationType << endl;
+    TELEPHONY_LOGI("func :%{public}s indicationType:%{public}d", __func__, indicationType);
+}
+
+void RilRadioIndicationTest::SimRefreshNotify(OHOS::MessageParcel &data)
+{
+    TELEPHONY_LOGI("RilRadioIndicationTest::SimRefreshNotify --> ");
+    int32_t indicationType = data.ReadInt32();
+    cout << "---->[NTF] ICC Refresh Changed" << endl
+         << "====> [indicationType]: " << indicationType << endl;
+    TELEPHONY_LOGI("func :%{public}s indicationType: %{public}d", __func__, indicationType);
+}
+
+void RilRadioIndicationTest::NetworkStateNotify(OHOS::MessageParcel &data)
+{
+    cout << endl << "---->[NTF] NetworkStateNotify" << endl;
     int32_t indicationType = data.ReadInt32();
     TELEPHONY_LOGI("func :%{public}s indicationType: %{public}d", __func__, indicationType);
 }
@@ -314,6 +323,50 @@ void RilRadioIndicationTest::GetSignalStrength(OHOS::MessageParcel &data)
         return;
     }
     TELEPHONY_LOGI("Network Signal Strength updated [lte.rsrp]: %{public}d", mSignalStrength->lte.rsrp);
+}
+
+void RilRadioIndicationTest::NetworkPhyChnlCfgUpdated(OHOS::MessageParcel &data)
+{
+    int32_t indicationType = data.ReadInt32();
+    std::shared_ptr<ChannelConfigInfoList> phyChnlCfgList = std::make_shared<ChannelConfigInfoList>();
+    if (phyChnlCfgList == nullptr) {
+        TELEPHONY_LOGE("RilRadioIndicationTest::NetworkPhyChnlCfgUpdated phyChnlCfgList == nullptr");
+        return;
+    }
+    phyChnlCfgList->ReadFromParcel(data);
+    int32_t size = phyChnlCfgList->itemNum;
+    cout << endl << "---->[NTF] NetworkPhyChnlCfgUpdated:" << endl << "====> [size]: " << size << endl;
+    std::vector<PhysicalChannelConfig> &configs = phyChnlCfgList->channelConfigInfos;
+    for (int32_t i = 0; i < static_cast<int32_t>(configs.size()); i++) {
+        cout << "====> [cellConnStatus]: " << configs[i].cellConnStatus << endl;
+        cout << "====> [cellBandwidth]: " << configs[i].cellBandwidth << endl;
+        cout << "====> [ratType]: " << configs[i].ratType << endl;
+        cout << "====> [freqRange]: " << configs[i].freqRange << endl;
+        cout << "====> [channelNum]: " << configs[i].channelNum << endl;
+        cout << "====> [physicalCellId]: " << configs[i].physicalCellId << endl;
+        cout << "====> [contextIdNum]: " << configs[i].contextIdNum << endl;
+    }
+    TELEPHONY_LOGI("func :%{public}s indicationType:%{public}d size:%{public}d", __func__, indicationType, size);
+}
+
+void RilRadioIndicationTest::NetworkCurrentCellUpdated(OHOS::MessageParcel &data)
+{
+    int32_t indicationType = data.ReadInt32();
+    std::shared_ptr<CellListCurrentInfo> currentCellList = std::make_shared<CellListCurrentInfo>();
+    if (currentCellList == nullptr) {
+        TELEPHONY_LOGE("RilRadioIndicationTest::NetworkCurrentCellUpdated currentCellList == nullptr");
+        return;
+    }
+    currentCellList->ReadFromParcel(data);
+    int32_t size = currentCellList->itemNum;
+    cout << endl << "---->[NTF] NetworkCurrentCellUpdated:" << endl << "====> [size]: " << size << endl;
+    std::vector<CurrentCellInfo> &cellInfos = currentCellList->cellCurrentInfo;
+    for (int32_t i = 0; i < static_cast<int32_t>(cellInfos.size()); i++) {
+        cout << "====> [ratType]: " << cellInfos[i].ratType << endl;
+        cout << "====> [mcc]: " << cellInfos[i].mcc << endl;
+        cout << "====> [mnc]: " << cellInfos[i].mnc << endl;
+    }
+    TELEPHONY_LOGI("func :%{public}s indicationType:%{public}d size:%{public}d", __func__, indicationType, size);
 }
 
 void RilRadioIndicationTest::PdpContextListChangedNotify(OHOS::MessageParcel &data)
@@ -357,46 +410,27 @@ void RilRadioIndicationTest::PdpContextListChangedNotify(OHOS::MessageParcel &da
     TELEPHONY_LOGI("func :%{public}s indicationType: %{public}d", __func__, indicationType);
 }
 
-void RilRadioIndicationTest::SimStateChanged(OHOS::MessageParcel &data)
+void RilRadioIndicationTest::RadioStateChange(OHOS::MessageParcel &data)
 {
-    TELEPHONY_LOGI("RilRadioIndicationTest::SimStateChanged --> ");
-    cout << "---->[NTF] Sim State Changed" << endl;
+    int32_t radioState = data.ReadInt32();
     int32_t indicationType = data.ReadInt32();
-    if (mRilManager_ == nullptr) {
-        TELEPHONY_LOGE("mRilManager_ is null!");
-        return;
-    }
-    TELEPHONY_LOGI("func :%{public}s indicationType: %{public}d", __func__, indicationType);
+    std::cout << "---->[NTF] RadioStateChange:" << endl << "====> [radioState]: " << radioState << endl;
+    TELEPHONY_LOGI(
+        "func :%{public}s indicationType: %{public}d state:%{public}d", __func__, indicationType, radioState);
 }
 
-void RilRadioIndicationTest::ConnectedReturnRilVersion(OHOS::MessageParcel &data)
+void RilRadioIndicationTest::VoiceRadioTechUpdated(OHOS::MessageParcel &data)
 {
     int32_t indicationType = data.ReadInt32();
-    TELEPHONY_LOGI("func :%{public}s indicationType: %{public}d", __func__, indicationType);
-    auto mResult_ = AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
-}
-
-void RilRadioIndicationTest::SimRefreshNotify(OHOS::MessageParcel &data)
-{
-    TELEPHONY_LOGI("RilRadioIndicationTest::SimRefreshNotify --> ");
-    cout << "---->[NTF] SimRefreshNotify" << endl;
-    int32_t indicationType = data.ReadInt32();
-    if (mRilManager_ == nullptr) {
-        TELEPHONY_LOGE("mRilManager_ is null!");
+    std::shared_ptr<VoiceRadioTechnology> radioTech = std::make_shared<VoiceRadioTechnology>();
+    if (radioTech == nullptr) {
+        TELEPHONY_LOGE("RilRadioIndicationTest::VoiceRadioTechUpdated radioTech is nullptr");
         return;
     }
-    TELEPHONY_LOGI("func :%{public}s indicationType: %{public}d", __func__, indicationType);
+    radioTech->ReadFromParcel(data);
+    int32_t radioTechType = radioTech->actType;
+    std::cout << "---->[NTF] VoiceRadioTechUpdated:" << endl << "====> [radioTechType]: " << radioTechType << endl;
+    TELEPHONY_LOGI(
+        "func :%{public}s indicationType:%{public}d radioTechType:%{public}d", __func__, indicationType, radioTechType);
 }
 
-void RilRadioIndicationTest::CallSsReport(OHOS::MessageParcel &data)
-{
-    cout << endl << "---->[NTF] CallSsReport: " << endl;
-    std::shared_ptr<SsNoticeInfo> ssInfo = std::make_shared<SsNoticeInfo>();
-    if (ssInfo == nullptr) {
-        TELEPHONY_LOGE("ERROR : ssInfo == nullptr !!!");
-        return;
-    }
-    ssInfo->ReadFromParcel(data);
-    cout << "====> serviceType: " << ssInfo->serviceType << "\trequestType: " << ssInfo->requestType
-         << "\tserviceClass: " << ssInfo->serviceClass << "\tresult: " << ssInfo->result << endl;
-}

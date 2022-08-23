@@ -28,7 +28,7 @@ struct Tmp1 {
 
 class RilRadioResponseTest : public OHOS::IPCObjectStub {
 public:
-    RilRadioResponseTest(RilManagerTest *mRilManager);
+    explicit RilRadioResponseTest(RilManagerTest *mRilManager);
     ~RilRadioResponseTest();
 
     int32_t OnRemoteRequest(
@@ -90,6 +90,10 @@ public:
     void OnResponseOpenLogicalChannel(OHOS::MessageParcel &data);
     void OnResponseSimTransmitApduChannelTest(OHOS::MessageParcel &data);
     void OnResponseGetSimLockStatus(OHOS::MessageParcel &data);
+    void OnResponseSendTerminalResponseCmd(OHOS::MessageParcel &data);
+    void OnResponseSendEnvelopeCmd(OHOS::MessageParcel &data);
+    void OnResponseSendCallSetupRequestResult(OHOS::MessageParcel &data);
+    void OnResponseSimStkIsReady(OHOS::MessageParcel &data);
 
 private:
     RilManagerTest *mRilManager_;

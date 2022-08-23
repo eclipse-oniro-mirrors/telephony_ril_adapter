@@ -158,6 +158,10 @@ public:
     void SetSimLock(const std::string &fac, int32_t mode, const std::string &password,
         const AppExecFwk::InnerEvent::Pointer &result);
     void GetSimLockStatus(const std::string &fac, int32_t mode, const AppExecFwk::InnerEvent::Pointer &result);
+    void SendTerminalResponseCmd(const std::string &cmd, const AppExecFwk::InnerEvent::Pointer &result);
+    void SendEnvelopeCmd(const std::string &cmd, const AppExecFwk::InnerEvent::Pointer &result);
+    void SendCallSetupRequestResult(bool accept, const AppExecFwk::InnerEvent::Pointer &result);
+    void SimStkIsReady(const AppExecFwk::InnerEvent::Pointer &result);
 
     static const int32_t INVALID_WAKELOCK = -1;
     static const int32_t FOR_WAKELOCK = 0;
