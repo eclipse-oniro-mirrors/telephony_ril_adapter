@@ -931,6 +931,12 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetRilCmPsRegStatusTest_0100, Functio
     OnProcessTest(HREQ_NETWORK_GET_PS_REG_STATUS, event);
 }
 
+/**
+ * @tc.number Telephony_RilAdapter_SetRilNotificationFilterTest_0100 to do ...
+ * @tc.name Set notification filter of the card 1
+ * @tc.desc Function test
+ * @tc.require: issueI5BFY5
+ */
 HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetRilNotificationFilterTest_0100, Function | MediumTest | Level3)
 {
     OnInit();
@@ -939,6 +945,12 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetRilNotificationFilterTest_0100, Fu
     OnProcessTest(HREQ_NETWORK_SET_NOTIFICATION_FILTER, event);
 }
 
+/**
+ * @tc.number Telephony_RilAdapter_SetRilNotificationFilterTest_1100 to do ...
+ * @tc.name Set notification filter of the card 2
+ * @tc.desc Function test
+ * @tc.require: issueI5BFY5
+ */
 HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetRilDeviceStateTest_0100, Function | MediumTest | Level3)
 {
     OnInit();
@@ -947,6 +959,12 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetRilDeviceStateTest_0100, Function 
     OnProcessTest(HREQ_NETWORK_SET_DEVICE_STATE, event);
 }
 
+/**
+ * @tc.number Telephony_RilAdapter_SetRilDeviceStateTest_0100 to do ...
+ * @tc.name Set device state of the card 1
+ * @tc.desc Function test
+ * @tc.require: issueI5BFY5
+ */
 HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetRilNetworkSearchInfoTest_0100, Function | MediumTest | Level3)
 {
     OnInit();
@@ -955,6 +973,12 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetRilNetworkSearchInfoTest_0100, Fun
     OnProcessTest(HREQ_NETWORK_GET_NETWORK_SEARCH_INFORMATION, event);
 }
 
+/**
+ * @tc.number Telephony_RilAdapter_SetRilDeviceStateTest_1100 to do ...
+ * @tc.name Set device state of the card 2
+ * @tc.desc Function test
+ * @tc.require: issueI5BFY5
+ */
 HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetRilNetworkSelectionModeTest_0100, Function | MediumTest | Level3)
 {
     OnInit();
