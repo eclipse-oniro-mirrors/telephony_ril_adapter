@@ -131,8 +131,6 @@ void HRilCall::AddCallRequestToMap()
     reqMemberFuncMap_[HREQ_CALL_GET_USSD] = &HRilCall::GetUssd;
     reqMemberFuncMap_[HREQ_CALL_SET_MUTE] = &HRilCall::SetMute;
     reqMemberFuncMap_[HREQ_CALL_GET_MUTE] = &HRilCall::GetMute;
-    reqMemberFuncMap_[HREQ_CALL_GET_EMERGENCY_LIST] = &HRilCall::GetEmergencyCallList;
-    reqMemberFuncMap_[HREQ_CALL_SET_EMERGENCY_LIST] = &HRilCall::SetEmergencyCallList;
     reqMemberFuncMap_[HREQ_CALL_GET_FAIL_REASON] = &HRilCall::GetCallFailReason;
     reqMemberFuncMap_[HREQ_CALL_SET_BARRING_PASSWORD] = &HRilCall::SetBarringPassword;
 }
@@ -1312,33 +1310,16 @@ int32_t HRilCall::GetCallFailReasonResponse(
     return ResponseInt32(requestNum, &responseInfo, sizeof(responseInfo), callFail);
 }
 
-int32_t HRilCall::GetEmergencyCallList(struct HdfSBuf *data)
+int32_t HRilCall::GetEmergencyCallList(int32_t serialId)
 {
-    if (callFuncs_ == nullptr || callFuncs_->GetEmergencyCallList == nullptr || data == nullptr) {
-        TELEPHONY_LOGE("callFuncs_:%{public}p or callFuncs_->GetEmergencyCallList or data:%{public}p is nullptr!",
-            callFuncs_, data);
-        return HRIL_ERR_NULL_POINT;
-    }
-    int32_t serial = 0;
-    if (!HdfSbufReadInt32(data, &serial)) {
-        TELEPHONY_LOGE("miss serial parameter");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_CALL_GET_EMERGENCY_LIST);
-    if (requestInfo == nullptr) {
-        TELEPHONY_LOGE("RilAdapter failed to do Create HRilRequest!");
-        SafeFrees(requestInfo);
-        return HRIL_ERR_NULL_POINT;
-    }
-    callFuncs_->GetEmergencyCallList(requestInfo);
-    return HRIL_ERR_SUCCESS;
+    return RequestVendor(serialId, HREQ_CALL_GET_EMERGENCY_LIST, callFuncs_, &HRilCallReq::GetEmergencyCallList);
 }
 
-void HRilCall::BuildEmergencyCallList(
-    EmergencyInfoList &emergencyCallInfoList, const void *response, size_t responseLen)
+void HRilCall::BuildIEmergencyCallList(
+    HDI::Ril::V1_0::IEmergencyInfoList &emergencyCallInfoList, const void *response, size_t responseLen)
 {
     size_t num = responseLen / sizeof(HRilEmergencyInfo);
-    EmergencyInfo callInfo;
+    HDI::Ril::V1_0::IEmergencyCall callInfo;
     emergencyCallInfoList.callSize = num;
     for (size_t i = 0; i < num; i++) {
         HRilEmergencyInfo *curPtr = ((HRilEmergencyInfo *)response + i);
@@ -1346,10 +1327,10 @@ void HRilCall::BuildEmergencyCallList(
             callInfo.index = curPtr->index;
             callInfo.total = curPtr->total;
             callInfo.eccNum = curPtr->eccNum;
-            callInfo.category = curPtr->category;
-            callInfo.simpresent = curPtr->simpresent;
+            callInfo.eccType = static_cast<OHOS::HDI::Ril::V1_0::IEccType>(curPtr->category);
+            callInfo.simpresent = static_cast<OHOS::HDI::Ril::V1_0::ISimpresentType>(curPtr->simpresent);
             callInfo.mcc = curPtr->mcc;
-            callInfo.abnormalService = curPtr->abnormalService;
+            callInfo.abnormalService = static_cast<OHOS::HDI::Ril::V1_0::IAbnormalServiceType>(curPtr->abnormalService);
             emergencyCallInfoList.calls.push_back(callInfo);
         } else {
             TELEPHONY_LOGE("BuildEmergencyCallList: Invalid curPtr");
@@ -1365,53 +1346,28 @@ int32_t HRilCall::GetEmergencyCallListResponse(
         TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
         return HRIL_ERR_INVALID_PARAMETER;
     }
-    EmergencyInfoList callList = {};
-    if (response != nullptr) {
-        BuildEmergencyCallList(callList, response, responseLen);
-    }
-
-    return ResponseMessageParcel(responseInfo, callList, requestNum);
-}
-
-int32_t HRilCall::SetEmergencyCallList(struct HdfSBuf *data)
-{
-    if (callFuncs_ == nullptr || callFuncs_->SetEmergencyCallList == nullptr || data == nullptr) {
-        TELEPHONY_LOGE(
-            "SetEmergencyCallList callFuncs %{public}p or SetFunc or data:%{public}p null", callFuncs_, data);
+    if (response == nullptr || callback_ == nullptr) {
+        TELEPHONY_LOGE("GetEmergencyCallListResponse callback_ or response is null");
         return HRIL_ERR_NULL_POINT;
     }
-    MessageParcel *parcel = nullptr;
-    if (SbufToParcel(data, &parcel)) {
-        TELEPHONY_LOGE("SetEmergencyCallList RilAdapter failed to do SbufToParcel");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    if (parcel == nullptr) {
-        TELEPHONY_LOGE(":SetEmergencyCallList parcel in SetEmergencyCallList is nullptr!");
-        return HRIL_ERR_NULL_POINT;
-    }
-    EmergencyInfoList emergencyInfoList;
-    if (!emergencyInfoList.ReadFromParcel(*parcel)) {
-        TELEPHONY_LOGE(":SetEmergencyCallList RilAdapter failed to do ReadFromParcel!");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    int size = emergencyInfoList.calls.size();
-    if (size <= 0) {
-        TELEPHONY_LOGE("SetEmergencyCallList RilAdapter failed to do ReadFromParcel! calls len 0");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    HRilEmergencyInfo emergencyInfoCalls[size];
-    int32_t serial = emergencyInfoList.flag;
-    CopyToHRilEmergencyInfoArray(emergencyInfoCalls, emergencyInfoList.calls);
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_CALL_SET_EMERGENCY_LIST);
-    if (requestInfo == nullptr) {
-        TELEPHONY_LOGE("SetEmergencyCallList RilAdapter failed to do Create HRilRequest!");
-        return HRIL_ERR_NULL_POINT;
-    }
-    callFuncs_->SetEmergencyCallList(requestInfo, emergencyInfoCalls, size);
+    HDI::Ril::V1_0::IEmergencyInfoList callList = {};
+    BuildIEmergencyCallList(callList, response, responseLen);
+    callback_->GetEmergencyCallListResponse(BuildIHRilRadioResponseInfo(responseInfo), callList);
     return HRIL_ERR_SUCCESS;
 }
 
-void HRilCall::CopyToHRilEmergencyInfoArray(HRilEmergencyInfo *emergencyInfoCalls, std::vector<EmergencyInfo> calls)
+int32_t HRilCall::SetEmergencyCallList(
+    int32_t serialId, const OHOS::HDI::Ril::V1_0::IEmergencyInfoList &emergencyInfoList)
+{
+    auto size = emergencyInfoList.calls.size();
+    std::unique_ptr<HRilEmergencyInfo[]> emergencyInfoCalls = std::make_unique<HRilEmergencyInfo[]>(size);
+    CopyToHRilEmergencyInfoArray(emergencyInfoCalls.get(), emergencyInfoList.calls);
+    return RequestVendor(serialId, HREQ_CALL_SET_EMERGENCY_LIST, callFuncs_, &HRilCallReq::SetEmergencyCallList,
+        emergencyInfoCalls.get(), size);
+}
+
+void HRilCall::CopyToHRilEmergencyInfoArray(
+    HRilEmergencyInfo *emergencyInfoCalls, std::vector<OHOS::HDI::Ril::V1_0::IEmergencyCall> calls)
 {
     for (unsigned int i = 0; i < calls.size(); i++) {
         auto call = calls.at(i);
@@ -1423,7 +1379,7 @@ void HRilCall::CopyToHRilEmergencyInfoArray(HRilEmergencyInfo *emergencyInfoCall
         } else {
             delete[] eccNum;
         }
-        emergencyInfoCalls[i].category = call.category;
+        emergencyInfoCalls[i].category = static_cast<int32_t>(call.eccType);
         emergencyInfoCalls[i].simpresent = call.simpresent;
         char *mcc = new char[call.mcc.size() + 1];
         if (strcpy_s(mcc, call.mcc.size() + 1, call.mcc.c_str()) == EOK) {
@@ -1438,7 +1394,11 @@ void HRilCall::CopyToHRilEmergencyInfoArray(HRilEmergencyInfo *emergencyInfoCall
 int32_t HRilCall::SetEmergencyCallListResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));
+    if (callback_ == nullptr) {
+        TELEPHONY_LOGE("SetEmergencyCallListResponse start callback_ is null");
+        return HRIL_ERR_NULL_POINT;
+    }
+    return callback_->SetEmergencyCallListResponse(BuildIHRilRadioResponseInfo(responseInfo));
 }
 
 int32_t HRilCall::CallStateUpdated(int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen)
@@ -1529,16 +1489,18 @@ int32_t HRilCall::CallRingbackVoiceNotice(int32_t notifyType, HRilErrNumber e, c
 int32_t HRilCall::CallEmergencyNotice(
     int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen)
 {
-    TELEPHONY_LOGI("CallEmergencyNotice");
     if ((response == nullptr && responseLen != 0) || (responseLen % sizeof(HRilEmergencyInfo)) != 0) {
         TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
         return HRIL_ERR_INVALID_PARAMETER;
     }
-    EmergencyInfoList callList = {};
-    if (response != nullptr) {
-        BuildEmergencyCallList(callList, response, responseLen);
+    if (callback_ == nullptr || response == nullptr) {
+        TELEPHONY_LOGE("CallEmergencyNotice callback_ or response is null");
+        return HRIL_ERR_NULL_POINT;
     }
-    return NotifyMessageParcel(notifyType, callList, HNOTI_CALL_EMERGENCY_NUMBER_REPORT);
+    HDI::Ril::V1_0::IEmergencyInfoList callList = {};
+    BuildIEmergencyCallList(callList, response, responseLen);
+    callback_->CallEmergencyNotice(GetSlotId(), callList);
+    return HRIL_ERR_SUCCESS;
 }
 
 void HRilCall::RegisterCallFuncs(const HRilCallReq *callFuncs)

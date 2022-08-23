@@ -22,8 +22,11 @@
 
 namespace OHOS {
 namespace Telephony {
-static std::unique_ptr<HRilManager> g_manager = std::make_unique<HRilManager>();
-
+constexpr const char *MODULE_HRIL_CALL = "hrilCall";
+constexpr const char *MODULE_HRIL_DATA = "hrilData";
+static std::shared_ptr<HRilManager> g_manager = std::make_shared<HRilManager>();
+static pthread_mutex_t dispatchMutex = PTHREAD_MUTEX_INITIALIZER;
+std::shared_ptr<HRilManager> HRilManager::manager_ = g_manager;
 std::unordered_map<int32_t, int32_t> HRilManager::notificationMap_ = {
 #include "hril_notification_map.h"
 };
@@ -36,7 +39,9 @@ static int32_t DispatchModule(int32_t slotId, int32_t cmd, struct HdfSBuf *data)
         TELEPHONY_LOGE("Manager is nullptr, id:%{public}d!", slotId);
         return HDF_FAILURE;
     }
+    pthread_mutex_lock(&dispatchMutex);
     int32_t ret = g_manager->Dispatch(slotId, cmd, data);
+    pthread_mutex_unlock(&dispatchMutex);
     if (ret != HRIL_ERR_SUCCESS) {
         TELEPHONY_LOGE("HRilManager::Dispatch is failed!");
         return ret;
@@ -138,6 +143,20 @@ void HRilManager::ReleaseHRilRequest(int32_t request, ReqDataInfo *requestInfo)
             reqDataSet.erase(it);
         }
     }
+}
+
+template<typename ClassTypePtr, typename FuncType, typename... ParamTypes>
+inline int32_t HRilManager::TaskSchedule(
+    const std::string _module, ClassTypePtr &_obj, FuncType &&_func, ParamTypes &&... _args)
+{
+    if (_func == nullptr || _obj == nullptr) {
+        TELEPHONY_LOGE("%{public}s func or obj is null pointer", _module.c_str());
+        return HDF_FAILURE;
+    }
+    pthread_mutex_lock(&dispatchMutex);
+    int32_t ret = (_obj.get()->*(_func))(std::forward<ParamTypes>(_args)...);
+    pthread_mutex_unlock(&dispatchMutex);
+    return ret;
 }
 
 int32_t HRilManager::ReportToParent(int32_t requestNum, const HdfSBuf *dataSbuf)
@@ -288,6 +307,7 @@ template<typename T>
 void HRilManager::OnReport(std::vector<std::unique_ptr<T>> &subModules, int32_t slotId, const ReportInfo *reportInfo,
     const uint8_t *response, size_t responseLen)
 {
+    TELEPHONY_LOGI("OnReport notifyId:%{public}d", reportInfo->notifyId);
     if (reportInfo == nullptr) {
         TELEPHONY_LOGE("OnReport reportInfo is null!!!");
         return;
@@ -373,6 +393,77 @@ HRilManager::HRilManager() : hrilSimSlotCount_(GetSimSlotCount())
     timerCallback_ = std::make_unique<HRilTimerCallback>();
 }
 
+void HRilManager::SetRilCallback(sptr<OHOS::HDI::Ril::V1_0::IRilCallback> callback)
+{
+    TELEPHONY_LOGI("SetRilCallback");
+    for (int32_t slotId = HRIL_SIM_SLOT_0; slotId < hrilSimSlotCount_; slotId++) {
+        hrilCall_[slotId]->SetRilCallback(callback);
+        hrilModem_[slotId]->SetRilCallback(callback);
+        hrilNetwork_[slotId]->SetRilCallback(callback);
+        hrilSim_[slotId]->SetRilCallback(callback);
+        hrilSms_[slotId]->SetRilCallback(callback);
+        hrilData_[slotId]->SetRilCallback(callback);
+    }
+}
+
+int32_t HRilManager::SetEmergencyCallList(
+    int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::IEmergencyInfoList &emergencyInfoList)
+{
+    return TaskSchedule(
+        MODULE_HRIL_CALL, hrilCall_[slotId], &HRilCall::SetEmergencyCallList, serialId, emergencyInfoList);
+}
+
+int32_t HRilManager::GetEmergencyCallList(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(MODULE_HRIL_CALL, hrilCall_[slotId], &HRilCall::GetEmergencyCallList, serialId);
+}
+
+int32_t HRilManager::ActivatePdpContext(
+    int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::IDataCallInfo &dataCallInfo)
+{
+    return TaskSchedule(MODULE_HRIL_DATA, hrilData_[slotId], &HRilData::ActivatePdpContext, serialId, dataCallInfo);
+}
+
+int32_t HRilManager::DeactivatePdpContext(
+    int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::IUniInfo &uniInfo)
+{
+    return TaskSchedule(MODULE_HRIL_DATA, hrilData_[slotId], &HRilData::DeactivatePdpContext, serialId, uniInfo);
+}
+
+int32_t HRilManager::GetPdpContextList(int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::IUniInfo &uniInfo)
+{
+    return TaskSchedule(MODULE_HRIL_DATA, hrilData_[slotId], &HRilData::GetPdpContextList, serialId, uniInfo);
+}
+
+int32_t HRilManager::SetInitApnInfo(
+    int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::IDataProfileDataInfo &dataProfileDataInfo)
+{
+    return TaskSchedule(MODULE_HRIL_DATA, hrilData_[slotId], &HRilData::SetInitApnInfo, serialId, dataProfileDataInfo);
+}
+
+int32_t HRilManager::GetLinkBandwidthInfo(int32_t slotId, int32_t serialId, int32_t cid)
+{
+    return TaskSchedule(MODULE_HRIL_DATA, hrilData_[slotId], &HRilData::GetLinkBandwidthInfo, serialId, cid);
+}
+
+int32_t HRilManager::SetLinkBandwidthReportingRule(int32_t slotId, int32_t serialId,
+    const OHOS::HDI::Ril::V1_0::IDataLinkBandwidthReportingRule &dataLinkBandwidthReportingRule)
+{
+    return TaskSchedule(MODULE_HRIL_DATA, hrilData_[slotId], &HRilData::SetLinkBandwidthReportingRule, serialId,
+        dataLinkBandwidthReportingRule);
+}
+
+int32_t HRilManager::SetDataPermitted(int32_t slotId, int32_t serialId, int32_t dataPermitted)
+{
+    return TaskSchedule(MODULE_HRIL_DATA, hrilData_[slotId], &HRilData::SetDataPermitted, serialId, dataPermitted);
+}
+
+int32_t HRilManager::SetDataProfileInfo(
+    int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::IDataProfilesInfo &dataProfilesInfo)
+{
+    return TaskSchedule(MODULE_HRIL_DATA, hrilData_[slotId], &HRilData::SetDataProfileInfo, serialId, dataProfilesInfo);
+}
+
 HRilManager::~HRilManager() {}
 
 #ifdef __cplusplus
@@ -448,6 +539,10 @@ void HRilInit(void)
         if (g_manager->powerInterface_ == nullptr) {
             TELEPHONY_LOGE("failed to get power hdi interface");
         }
+    }
+    if (g_manager->eventLoop_ != nullptr) {
+        TELEPHONY_LOGI("eventLoop_ has exit");
+        return;
     }
     g_manager->eventLoop_ = std::make_unique<std::thread>(HRilBootUpEventLoop);
 }

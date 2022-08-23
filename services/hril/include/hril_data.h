@@ -26,11 +26,10 @@ class HRilData : public HRilBase {
 public:
     HRilData(int32_t slotId, IHRilReporter &hrilReporter);
     virtual ~HRilData();
-
-    int32_t DeactivatePdpContext(struct HdfSBuf *data);
-    int32_t ActivatePdpContext(struct HdfSBuf *data);
-    int32_t GetPdpContextList(struct HdfSBuf *data);
-    int32_t SetInitApnInfo(struct HdfSBuf *data);
+    int32_t DeactivatePdpContext(int32_t serialId, const OHOS::HDI::Ril::V1_0::IUniInfo &uniInfo);
+    int32_t ActivatePdpContext(int32_t serialId, const OHOS::HDI::Ril::V1_0::IDataCallInfo &dataCallInfo);
+    int32_t GetPdpContextList(int32_t serialId, const OHOS::HDI::Ril::V1_0::IUniInfo &uniInfo);
+    int32_t SetInitApnInfo(int32_t serialId, const OHOS::HDI::Ril::V1_0::IDataProfileDataInfo &dataProfileDataInfo);
     int32_t SendDataPerformanceMode(struct HdfSBuf *data);
     int32_t SendDataSleepMode(struct HdfSBuf *data);
     int32_t ActivatePdpContextResponse(
@@ -46,16 +45,17 @@ public:
         int32_t code, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t ProcessDataRequest(int32_t code, struct HdfSBuf *data);
     int32_t ProcessDataNotify(const struct ReportInfo *reportInfo, const void *response, size_t responseLen);
-    int32_t GetLinkBandwidthInfo(struct HdfSBuf *data);
+    int32_t GetLinkBandwidthInfo(int32_t serialId, int32_t cid);
     int32_t GetLinkBandwidthInfoResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
-    int32_t SetLinkBandwidthReportingRule(struct HdfSBuf *data);
+    int32_t SetLinkBandwidthReportingRule(
+        int32_t serialId, const OHOS::HDI::Ril::V1_0::IDataLinkBandwidthReportingRule &linkBandwidthRule);
     int32_t SetLinkBandwidthReportingRuleResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
-    int32_t SetDataProfileInfo(struct HdfSBuf *data);
+    int32_t SetDataProfileInfo(int32_t serialId, const OHOS::HDI::Ril::V1_0::IDataProfilesInfo &dataProfilesInfo);
     int32_t SetDataProfileInfoResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
-    int32_t SetDataPermitted(struct HdfSBuf *data);
+    int32_t SetDataPermitted(int32_t serialId, int32_t dataPermitted);
     int32_t SetDataPermittedResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     bool IsDataRespOrNotify(uint32_t code);
@@ -67,13 +67,14 @@ public:
     void RegisterDataFuncs(const HRilDataReq *dataFuncs);
 
 private:
-    static constexpr uint32_t HRIL_ERROR_UNSPECIFIED_RSN = 0xffff;
     void SwitchHRilDataListToHal(
-        const void *response, size_t responseLen, std::vector<SetupDataCallResultInfo> &dcResultList);
-    void SwitchRilDataToHal(const HRilDataCallResponse *response, SetupDataCallResultInfo &result);
+        const void *response, size_t responseLen, std::vector<HDI::Ril::V1_0::ISetupDataCallResultInfo> &dcResultList);
+    void SwitchRilDataToHal(const HRilDataCallResponse *response, HDI::Ril::V1_0::ISetupDataCallResultInfo &result);
     static void RilDataCallCharToString(const char *src, std::string dst);
-    HRilDataInfo BuildDataInfo(const DataProfileDataInfo &dataProfileInfo);
+    HRilDataInfo BuildDataInfo(const OHOS::HDI::Ril::V1_0::IDataProfileDataInfo &dataProfileInfo);
 
+private:
+    static constexpr uint32_t HRIL_ERROR_UNSPECIFIED_RSN = 0xffff;
     const HRilDataReq *dataFuncs_ = nullptr;
 };
 } // namespace Telephony

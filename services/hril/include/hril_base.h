@@ -23,9 +23,9 @@
 
 #include "hdf_remote_service.h"
 #include "hdf_sbuf_ipc.h"
-
 #include "hril_types.h"
 #include "telephony_log_wrapper.h"
+#include "v1_0/iril_callback.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -50,6 +50,7 @@ public:
     // The "request" event processing entry.
     template<typename T>
     int32_t ProcessRequest(int32_t code, struct HdfSBuf *data);
+    void SetRilCallback(const sptr<HDI::Ril::V1_0::IRilCallback> &callback);
 
 protected:
     HRilBase(int32_t slotId, IHRilReporter &hrilReporter) : hrilReporter_(hrilReporter), slotId_(slotId) {}
@@ -65,10 +66,8 @@ protected:
     uint8_t ConvertHexCharToInt(uint8_t c);
     uint8_t *ConvertHexStringToBytes(const void *response, size_t responseLen);
     bool ConvertToString(char **dest, const std::string &src);
-
-    // Safety release memorys
+    HDI::Ril::V1_0::IHRilRadioResponseInfo BuildIHRilRadioResponseInfo(const HRilRadioResponseInfo &responseInfo);
     inline void SafeFrees() {}
-    // Safety release memorys
     template<typename M, typename... Ms>
     inline void SafeFrees(M &m, Ms &...ms)
     {
@@ -79,16 +78,8 @@ protected:
         SafeFrees(ms...);
     }
 
-    /**
-     * @brief Receive the reply event from vendorlib, encapsulate the C-style data structure into
-     *         a C++-style data structure, and pass the encapsulated data into the HDF service.
-     */
     template<typename T>
     int32_t Response(const HRilRadioResponseInfo &responseInfo, T &&data, int32_t requestNum);
-    /**
-     * @brief Receive active reporting events from vendorlib, encapsulate C-style data structures into
-     *  C++-style data structures, and transfer the encapsulated data into HDF services.
-     */
     template<typename SourceType, typename ToType>
     int32_t Notify(int32_t indType, const SourceType *notifyData, size_t notifyDataLen, int32_t notifyId);
     template<typename T>
@@ -117,11 +108,15 @@ protected:
     template<typename ReqFuncSet, typename FuncPointer, typename... ValueTypes>
     int32_t RequestVendor(
         struct HdfSBuf *data, int32_t requestId, ReqFuncSet reqFuncSet, FuncPointer func, ValueTypes &&...vals);
+    template<typename ReqFuncSet, typename FuncPointer, typename... ValueTypes>
+    int32_t RequestVendor(
+        int32_t serial, int32_t requestId, ReqFuncSet reqFuncSet, FuncPointer func, ValueTypes &&... vals);
 
 protected:
     std::map<uint32_t, std::any> respMemberFuncMap_;
     std::map<uint32_t, std::any> notiMemberFuncMap_;
     std::map<uint32_t, std::any> reqMemberFuncMap_;
+    sptr<HDI::Ril::V1_0::IRilCallback> callback_ = nullptr;
 
 private:
     // Read data from HDF buffer
@@ -163,6 +158,25 @@ int32_t HRilBase::RequestVendor(
     if (!ReadFromHdf(data, serial, std::forward<ValueTypes>(vals)...)) {
         TELEPHONY_LOGE("read fail from hdf, data=%{public}p, serial=%{public}d", data, serial);
         return HRIL_ERR_GENERIC_FAILURE;
+    }
+
+    ReqDataInfo *requestInfo = CreateHRilRequest(serial, requestId);
+    if (requestInfo == nullptr) {
+        TELEPHONY_LOGE("requestInfo == nullptr: serial=%{public}d, request=%{public}d", serial, requestId);
+        return HRIL_ERR_MEMORY_FULL;
+    }
+
+    (reqFuncSet->*func)(requestInfo, std::forward<ValueTypes>(vals)...);
+    return HRIL_ERR_SUCCESS;
+}
+
+template<typename ReqFuncSet, typename FuncPointer, typename... ValueTypes>
+int32_t HRilBase::RequestVendor(
+    int32_t serial, int32_t requestId, ReqFuncSet reqFuncSet, FuncPointer func, ValueTypes &&... vals)
+{
+    if (reqFuncSet == nullptr || (reqFuncSet->*func) == nullptr) {
+        TELEPHONY_LOGE("it is null: func set=%{public}p", reqFuncSet);
+        return HRIL_ERR_NULL_POINT;
     }
 
     ReqDataInfo *requestInfo = CreateHRilRequest(serial, requestId);

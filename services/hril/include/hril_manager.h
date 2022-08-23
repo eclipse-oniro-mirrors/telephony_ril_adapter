@@ -75,12 +75,36 @@ public:
     void OnNetworkReport(int32_t slotId, const ReportInfo *reportInfo, const uint8_t *response, size_t responseLen);
     void OnSimReport(int32_t slotId, const ReportInfo *reportInfo, const uint8_t *response, size_t responseLen);
     void OnSmsReport(int32_t slotId, const ReportInfo *reportInfo, const uint8_t *response, size_t responseLen);
+    void SetRilCallback(const sptr<OHOS::HDI::Ril::V1_0::IRilCallback> callback);
+
+    int32_t SetEmergencyCallList(
+        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::IEmergencyInfoList &emergencyInfoList);
+    int32_t GetEmergencyCallList(int32_t slotId, int32_t serialId);
+
+    int32_t ActivatePdpContext(
+        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::IDataCallInfo &dataCallInfo);
+    int32_t DeactivatePdpContext(int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::IUniInfo &uniInfo);
+    int32_t GetPdpContextList(int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::IUniInfo &uniInfo);
+    int32_t SetInitApnInfo(
+        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::IDataProfileDataInfo &dataProfileDataInfo);
+    int32_t GetLinkBandwidthInfo(int32_t slotId, int32_t serialId, int32_t cid);
+    int32_t SetLinkBandwidthReportingRule(int32_t slotId, int32_t serialId,
+        const OHOS::HDI::Ril::V1_0::IDataLinkBandwidthReportingRule &dataLinkBandwidthReportingRule);
+    int32_t SetDataPermitted(int32_t slotId, int32_t serialId, int32_t dataPermitted);
+    int32_t SetDataProfileInfo(
+        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::IDataProfilesInfo &dataProfilesInfo);
+
+    static std::shared_ptr<HRilManager> manager_;
+    template<typename ClassTypePtr, typename FuncType, typename... ParamTypes>
+    inline int32_t TaskSchedule(
+        const std::string _module, ClassTypePtr &_obj, FuncType &&_func, ParamTypes &&... _args);
 
 private:
     template<typename T>
     void OnReport(std::vector<std::unique_ptr<T>> &subModules, int32_t slotId, const ReportInfo *reportInfo,
         const uint8_t *response, size_t responseLen);
 
+private:
     const int32_t hrilSimSlotCount_;
     std::vector<std::unique_ptr<HRilCall>> hrilCall_;
     std::vector<std::unique_ptr<HRilModem>> hrilModem_;
@@ -88,7 +112,6 @@ private:
     std::vector<std::unique_ptr<HRilSim>> hrilSim_;
     std::vector<std::unique_ptr<HRilSms>> hrilSms_;
     std::vector<std::unique_ptr<HRilData>> hrilData_;
-
     const struct HdfRemoteService *serviceCallback_ = nullptr;
     const struct HdfRemoteService *serviceCallbackNotify_ = nullptr;
     std::unordered_map<int32_t, std::list<ReqDataInfo *>> requestList_;

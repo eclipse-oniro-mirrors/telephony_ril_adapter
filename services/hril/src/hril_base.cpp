@@ -287,5 +287,21 @@ ReqDataInfo *HRilBase::CreateHRilRequest(int32_t serial, int32_t request)
 {
     return hrilReporter_.CreateHRilRequest(serial, slotId_, request);
 }
+
+HDI::Ril::V1_0::IHRilRadioResponseInfo HRilBase::BuildIHRilRadioResponseInfo(const HRilRadioResponseInfo &responseInfo)
+{
+    HDI::Ril::V1_0::IHRilRadioResponseInfo iResponseInfo = { 0 };
+    iResponseInfo.slotId = GetSlotId();
+    iResponseInfo.flag = responseInfo.flag;
+    iResponseInfo.serial = responseInfo.serial;
+    iResponseInfo.error = (HDI::Ril::V1_0::IHRilErrType)responseInfo.error;
+    iResponseInfo.type = (HDI::Ril::V1_0::IHRilResponseTypes)responseInfo.type;
+    return iResponseInfo;
+}
+
+void HRilBase::SetRilCallback(const sptr<HDI::Ril::V1_0::IRilCallback> &callback)
+{
+    callback_ = callback;
+}
 } // namespace Telephony
 } // namespace OHOS

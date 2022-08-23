@@ -50,6 +50,7 @@ ohos_unittest("tel_ril_adapter_gtest") {
 
   external_deps = [
     "c_utils:utils",
+    "drivers_interface_ril:ril_idl_headers",
     "eventhandler:libeventhandler",
     "ipc:ipc_core",
     "ril_adapter:hril_innerkits",
