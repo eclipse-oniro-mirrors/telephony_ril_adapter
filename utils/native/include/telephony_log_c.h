@@ -40,7 +40,7 @@ extern "C" {
 #else
 // Gets the raw file name of the file.
 // Its advantage is that it is executed only once __builtin_strrchr() function
-inline const char *GetRawFileName(const char *path)
+__attribute__((always_inline)) inline const char *GetRawFileName(const char *path)
 {
     const char *last = __builtin_strrchr(path, '/');
     return (last != NULL) ? (last + 1) : path;
