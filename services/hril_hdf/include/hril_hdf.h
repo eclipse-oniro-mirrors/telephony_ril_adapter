@@ -16,14 +16,8 @@
 #ifndef OHOS_HRIL_HDF_H
 #define OHOS_HRIL_HDF_H
 
-#include <dlfcn.h>
-#include <memory.h>
+#include <stdint.h>
 #include <string.h>
-#include <unistd.h>
-
-#include "hdf_base.h"
-#include "hdf_device_desc.h"
-#include "hdf_remote_service.h"
 
 #include "hril.h"
 #ifdef __cplusplus

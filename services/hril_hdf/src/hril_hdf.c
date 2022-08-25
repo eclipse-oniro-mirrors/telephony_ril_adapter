@@ -15,19 +15,24 @@
 
 #include "hril_hdf.h"
 
-#include <stdlib.h>
 #include <libudev.h>
 #include <pthread.h>
 
-#include "parameter.h"
-
+#include "dlfcn.h"
+#include "hdf_base.h"
+#include "hdf_device_desc.h"
+#include "hdf_sbuf.h"
+#include "hril_enum.h"
 #include "modem_adapter.h"
+#include "parameter.h"
+#include "stdlib.h"
 #include "telephony_log_c.h"
 
 #define RIL_VENDOR_LIB_PATH "persist.sys.radio.vendorlib.path"
 #define BASE_HEX 16
 
 struct HdfSBuf;
+
 static void *g_dlHandle = NULL;
 static struct HRilReport g_reportOps = {
     OnCallReport,
