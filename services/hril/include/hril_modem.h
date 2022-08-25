@@ -26,13 +26,13 @@ public:
     HRilModem(int32_t slotId, IHRilReporter &hrilReporter);
     virtual ~HRilModem() = default;
 
-    int32_t ShutDown(struct HdfSBuf *data);
-    int32_t SetRadioState(struct HdfSBuf *data);
-    int32_t GetRadioState(struct HdfSBuf *data);
-    int32_t GetImei(struct HdfSBuf *data);
-    int32_t GetMeid(struct HdfSBuf *data);
-    int32_t GetVoiceRadioTechnology(struct HdfSBuf *data);
-    int32_t GetBasebandVersion(struct HdfSBuf *data);
+    int32_t ShutDown(int32_t serialId);
+    int32_t SetRadioState(int32_t serialId, int32_t fun, int32_t rst);
+    int32_t GetRadioState(int32_t serialId);
+    int32_t GetImei(int32_t serialId);
+    int32_t GetMeid(int32_t serialId);
+    int32_t GetVoiceRadioTechnology(int32_t serialId);
+    int32_t GetBasebandVersion(int32_t serialId);
     int32_t ShutDownResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t SetRadioStateResponse(
@@ -56,7 +56,8 @@ public:
 private:
     bool IsModemResponse(uint32_t code);
     bool IsModemNotification(uint32_t code);
-
+    void BuildIVoiceRadioTechnology(
+        HDI::Ril::V1_0::IVoiceRadioTechnology &voiceRadioTech, const HRilVoiceRadioInfo &hRiadioInfo);
     const HRilModemReq *modemFuncs_ = nullptr;
 };
 } // namespace Telephony

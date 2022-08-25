@@ -80,13 +80,16 @@ protected:
 
     template<typename T>
     int32_t Response(const HRilRadioResponseInfo &responseInfo, T &&data, int32_t requestNum);
+    template<typename FuncType, typename... ParamTypes>
+    inline int32_t Response(HRilRadioResponseInfo &responseInfo, FuncType &&_func, ParamTypes &&... _args);
     template<typename SourceType, typename ToType>
     int32_t Notify(int32_t indType, const SourceType *notifyData, size_t notifyDataLen, int32_t notifyId);
+    template<typename FuncType, typename... ParamTypes>
+    inline int32_t Notify(FuncType &&_func, ParamTypes &&... _args);
     template<typename T>
     int32_t ResponseMessageParcel(const HRilRadioResponseInfo &responseInfo, const T &data, int32_t requestNum);
     template<typename T>
     int32_t NotifyMessageParcel(int32_t notifyType, T &data, int32_t requestNum);
-
     int32_t ConvertHexStringToInt(char **response, int32_t index, int32_t length);
     inline char *StringToCString(const std::string &src)
     {
@@ -261,6 +264,17 @@ int32_t HRilBase::Response(const HRilRadioResponseInfo &responseInfo, T &&data, 
     return ret;
 }
 
+template<typename FuncType, typename... ParamTypes>
+inline int32_t HRilBase::Response(HRilRadioResponseInfo &responseInfo, FuncType &&_func, ParamTypes &&... _args)
+{
+    if (callback_ == nullptr) {
+        TELEPHONY_LOGE("Invalid parameter, callback_ is null");
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    (callback_->*(_func))(BuildIHRilRadioResponseInfo(responseInfo), std::forward<ParamTypes>(_args)...);
+    return HRIL_ERR_SUCCESS;
+}
+
 template<typename SourceType, typename ToType>
 int32_t HRilBase::Notify(int32_t indType, const SourceType *notifyData, size_t notifyDataLen, int32_t notifyId)
 {
@@ -284,6 +298,17 @@ int32_t HRilBase::Notify(int32_t indType, const SourceType *notifyData, size_t n
     }
     TELEPHONY_LOGE("write failed for report header, event id=%{public}d", notifyId);
     return ret;
+}
+
+template<typename FuncType, typename... ParamTypes>
+inline int32_t HRilBase::Notify(FuncType &&_func, ParamTypes &&... _args)
+{
+    if (callback_ == nullptr) {
+        TELEPHONY_LOGE("Invalid parameter, callback_ is null");
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    (callback_->*(_func))(GetSlotId(), std::forward<ParamTypes>(_args)...);
+    return HRIL_ERR_SUCCESS;
 }
 
 template<typename T>

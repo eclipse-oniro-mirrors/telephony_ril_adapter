@@ -24,6 +24,8 @@ namespace OHOS {
 namespace Telephony {
 constexpr const char *MODULE_HRIL_CALL = "hrilCall";
 constexpr const char *MODULE_HRIL_DATA = "hrilData";
+constexpr const char *MODULE_HRIL_MODEM = "hrilModem";
+constexpr const char *MODULE_HRIL_SIM = "hrilSim";
 static std::shared_ptr<HRilManager> g_manager = std::make_shared<HRilManager>();
 static pthread_mutex_t dispatchMutex = PTHREAD_MUTEX_INITIALIZER;
 std::shared_ptr<HRilManager> HRilManager::manager_ = g_manager;
@@ -147,10 +149,11 @@ void HRilManager::ReleaseHRilRequest(int32_t request, ReqDataInfo *requestInfo)
 
 template<typename ClassTypePtr, typename FuncType, typename... ParamTypes>
 inline int32_t HRilManager::TaskSchedule(
-    const std::string _module, ClassTypePtr &_obj, FuncType &&_func, ParamTypes &&... _args)
+    const std::string module, ClassTypePtr &_obj, FuncType &&_func, ParamTypes &&... _args)
 {
+    TELEPHONY_LOGI("%{public}s enter", module.c_str());
     if (_func == nullptr || _obj == nullptr) {
-        TELEPHONY_LOGE("%{public}s func or obj is null pointer", _module.c_str());
+        TELEPHONY_LOGE("%{public}s func or obj is null pointer", module.c_str());
         return HDF_FAILURE;
     }
     pthread_mutex_lock(&dispatchMutex);
@@ -406,6 +409,7 @@ void HRilManager::SetRilCallback(sptr<OHOS::HDI::Ril::V1_0::IRilCallback> callba
     }
 }
 
+// Call
 int32_t HRilManager::SetEmergencyCallList(
     int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::IEmergencyInfoList &emergencyInfoList)
 {
@@ -418,6 +422,180 @@ int32_t HRilManager::GetEmergencyCallList(int32_t slotId, int32_t serialId)
     return TaskSchedule(MODULE_HRIL_CALL, hrilCall_[slotId], &HRilCall::GetEmergencyCallList, serialId);
 }
 
+int32_t HRilManager::GetCallList(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(MODULE_HRIL_CALL, hrilCall_[slotId], &HRilCall::GetCallList, serialId);
+}
+
+int32_t HRilManager::Dial(
+    int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::IDialInfo &dialInfo)
+{
+    return TaskSchedule(
+        MODULE_HRIL_CALL, hrilCall_[slotId], &HRilCall::Dial, serialId, dialInfo);
+}
+
+int32_t HRilManager::Reject(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(MODULE_HRIL_CALL, hrilCall_[slotId], &HRilCall::Reject, serialId);
+}
+
+int32_t HRilManager::Hangup(int32_t slotId, int32_t serialId, int32_t gsmIndex)
+{
+    return TaskSchedule(MODULE_HRIL_CALL, hrilCall_[slotId], &HRilCall::Hangup, serialId, gsmIndex);
+}
+
+int32_t HRilManager::Answer(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(MODULE_HRIL_CALL, hrilCall_[slotId], &HRilCall::Answer, serialId);
+}
+
+int32_t HRilManager::HoldCall(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(MODULE_HRIL_CALL, hrilCall_[slotId], &HRilCall::HoldCall, serialId);
+}
+
+int32_t HRilManager::UnHoldCall(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(MODULE_HRIL_CALL, hrilCall_[slotId], &HRilCall::UnHoldCall, serialId);
+}
+
+int32_t HRilManager::SwitchCall(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(MODULE_HRIL_CALL, hrilCall_[slotId], &HRilCall::SwitchCall, serialId);
+}
+
+int32_t HRilManager::CombineConference(int32_t slotId, int32_t serialId, int32_t callType)
+{
+    return TaskSchedule(MODULE_HRIL_CALL, hrilCall_[slotId], &HRilCall::CombineConference, serialId, callType);
+}
+
+int32_t HRilManager::SeparateConference(
+    int32_t slotId, int32_t serialId, int32_t callIndex, int32_t callType)
+{
+    return TaskSchedule(
+        MODULE_HRIL_CALL, hrilCall_[slotId], &HRilCall::SeparateConference, serialId, callIndex, callType);
+}
+
+int32_t HRilManager::GetCallWaiting(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(MODULE_HRIL_CALL, hrilCall_[slotId], &HRilCall::GetCallWaiting, serialId);
+}
+
+int32_t HRilManager::SetCallWaiting(int32_t slotId, int32_t serialId, int32_t activate)
+{
+    return TaskSchedule(MODULE_HRIL_CALL, hrilCall_[slotId], &HRilCall::SetCallWaiting, serialId, activate);
+}
+
+int32_t HRilManager::GetCallTransferInfo(int32_t slotId, int32_t serialId, int32_t reason)
+{
+    return TaskSchedule(MODULE_HRIL_CALL, hrilCall_[slotId], &HRilCall::GetCallTransferInfo, serialId, reason);
+}
+
+int32_t HRilManager::SetCallTransferInfo(
+    int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::ICallForwardSetInfo &callForwardSetInfo)
+{
+    return TaskSchedule(
+        MODULE_HRIL_CALL, hrilCall_[slotId], &HRilCall::SetCallTransferInfo, serialId, callForwardSetInfo);
+}
+
+int32_t HRilManager::GetCallRestriction(int32_t slotId, int32_t serialId, const std::string &fac)
+{
+    return TaskSchedule(MODULE_HRIL_CALL, hrilCall_[slotId], &HRilCall::GetCallRestriction, serialId, fac);
+}
+
+int32_t HRilManager::SetCallRestriction(
+    int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::ICallRestrictionInfo &callRestrictionInfo)
+{
+    return TaskSchedule(
+        MODULE_HRIL_CALL, hrilCall_[slotId], &HRilCall::SetCallRestriction, serialId, callRestrictionInfo);
+}
+
+int32_t HRilManager::GetClip(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(MODULE_HRIL_CALL, hrilCall_[slotId], &HRilCall::GetClip, serialId);
+}
+
+int32_t HRilManager::SetClip(int32_t slotId, int32_t serialId, int32_t action)
+{
+    return TaskSchedule(MODULE_HRIL_CALL, hrilCall_[slotId], &HRilCall::SetClip, serialId, action);
+}
+
+int32_t HRilManager::GetClir(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(MODULE_HRIL_CALL, hrilCall_[slotId], &HRilCall::GetClir, serialId);
+}
+
+int32_t HRilManager::SetClir(int32_t slotId, int32_t serialId, int32_t action)
+{
+    return TaskSchedule(MODULE_HRIL_CALL, hrilCall_[slotId], &HRilCall::SetClir, serialId, action);
+}
+
+int32_t HRilManager::SetCallPreferenceMode(int32_t slotId, int32_t serialId, int32_t mode)
+{
+    return TaskSchedule(MODULE_HRIL_CALL, hrilCall_[slotId], &HRilCall::SetCallPreferenceMode, serialId, mode);
+}
+
+int32_t HRilManager::GetCallPreferenceMode(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(MODULE_HRIL_CALL, hrilCall_[slotId], &HRilCall::GetCallPreferenceMode, serialId);
+}
+
+int32_t HRilManager::SetUssd(int32_t slotId, int32_t serialId, const std::string &str)
+{
+    return TaskSchedule(MODULE_HRIL_CALL, hrilCall_[slotId], &HRilCall::SetUssd, serialId, str);
+}
+
+int32_t HRilManager::GetUssd(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(MODULE_HRIL_CALL, hrilCall_[slotId], &HRilCall::GetUssd, serialId);
+}
+
+int32_t HRilManager::SetMute(int32_t slotId, int32_t serialId, int32_t mute)
+{
+    return TaskSchedule(MODULE_HRIL_CALL, hrilCall_[slotId], &HRilCall::SetMute, serialId, mute);
+}
+
+int32_t HRilManager::GetMute(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(MODULE_HRIL_CALL, hrilCall_[slotId], &HRilCall::GetMute, serialId);
+}
+
+int32_t HRilManager::GetCallFailReason(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(MODULE_HRIL_CALL, hrilCall_[slotId], &HRilCall::GetCallFailReason, serialId);
+}
+
+int32_t HRilManager::CallSupplement(int32_t slotId, int32_t serialId, int32_t type)
+{
+    return TaskSchedule(MODULE_HRIL_CALL, hrilCall_[slotId], &HRilCall::CallSupplement, serialId, type);
+}
+
+int32_t HRilManager::SendDtmf(
+    int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::IDtmfInfo &dtmfInfo)
+{
+    return TaskSchedule(MODULE_HRIL_CALL, hrilCall_[slotId], &HRilCall::SendDtmf, serialId, dtmfInfo);
+}
+
+int32_t HRilManager::StartDtmf(
+    int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::IDtmfInfo &dtmfInfo)
+{
+    return TaskSchedule(MODULE_HRIL_CALL, hrilCall_[slotId], &HRilCall::StartDtmf, serialId, dtmfInfo);
+}
+
+int32_t HRilManager::StopDtmf(
+    int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::IDtmfInfo &dtmfInfo)
+{
+    return TaskSchedule(MODULE_HRIL_CALL, hrilCall_[slotId], &HRilCall::StopDtmf, serialId, dtmfInfo);
+}
+
+int32_t HRilManager::SetBarringPassword(
+    int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::ISetBarringInfo &setBarringInfo)
+{
+    return TaskSchedule(
+        MODULE_HRIL_CALL, hrilCall_[slotId], &HRilCall::SetBarringPassword, serialId, setBarringInfo);
+}
+
+// Data
 int32_t HRilManager::ActivatePdpContext(
     int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::IDataCallInfo &dataCallInfo)
 {
@@ -462,6 +640,160 @@ int32_t HRilManager::SetDataProfileInfo(
     int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::IDataProfilesInfo &dataProfilesInfo)
 {
     return TaskSchedule(MODULE_HRIL_DATA, hrilData_[slotId], &HRilData::SetDataProfileInfo, serialId, dataProfilesInfo);
+}
+
+// Modem
+int32_t HRilManager::SetRadioState(int32_t slotId, int32_t serialId, int32_t fun, int32_t rst)
+{
+    return TaskSchedule(MODULE_HRIL_MODEM, hrilModem_[slotId], &HRilModem::SetRadioState, serialId, fun, rst);
+}
+
+int32_t HRilManager::GetRadioState(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(MODULE_HRIL_MODEM, hrilModem_[slotId], &HRilModem::GetRadioState, serialId);
+}
+
+int32_t HRilManager::GetImei(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(MODULE_HRIL_MODEM, hrilModem_[slotId], &HRilModem::GetImei, serialId);
+}
+
+int32_t HRilManager::GetMeid(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(MODULE_HRIL_MODEM, hrilModem_[slotId], &HRilModem::GetMeid, serialId);
+}
+
+int32_t HRilManager::GetVoiceRadioTechnology(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(MODULE_HRIL_MODEM, hrilModem_[slotId], &HRilModem::GetVoiceRadioTechnology, serialId);
+}
+
+int32_t HRilManager::GetBasebandVersion(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(MODULE_HRIL_MODEM, hrilModem_[slotId], &HRilModem::GetBasebandVersion, serialId);
+}
+
+int32_t HRilManager::ShutDown(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(MODULE_HRIL_MODEM, hrilModem_[slotId], &HRilModem::ShutDown, serialId);
+}
+
+int32_t HRilManager::GetSimIO(int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::ISimIoRequestInfo &simIO)
+{
+    return TaskSchedule(MODULE_HRIL_SIM, hrilSim_[slotId], &HRilSim::GetSimIO, serialId, simIO);
+}
+
+int32_t HRilManager::GetSimStatus(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(MODULE_HRIL_SIM, hrilSim_[slotId], &HRilSim::GetSimStatus, serialId);
+}
+
+int32_t HRilManager::GetImsi(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(MODULE_HRIL_SIM, hrilSim_[slotId], &HRilSim::GetImsi, serialId);
+}
+
+int32_t HRilManager::GetSimLockStatus(
+    int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::ISimLockInfo &simLockInfo)
+{
+    return TaskSchedule(MODULE_HRIL_SIM, hrilSim_[slotId], &HRilSim::GetSimLockStatus, serialId, simLockInfo);
+}
+
+int32_t HRilManager::SetSimLock(int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::ISimLockInfo &simLockInfo)
+{
+    return TaskSchedule(MODULE_HRIL_SIM, hrilSim_[slotId], &HRilSim::SetSimLock, serialId, simLockInfo);
+}
+
+int32_t HRilManager::ChangeSimPassword(
+    int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::ISimPasswordInfo &simPassword)
+{
+    return TaskSchedule(MODULE_HRIL_SIM, hrilSim_[slotId], &HRilSim::ChangeSimPassword, serialId, simPassword);
+}
+
+int32_t HRilManager::UnlockPin(int32_t slotId, int32_t serialId, const std::string &pin)
+{
+    return TaskSchedule(MODULE_HRIL_SIM, hrilSim_[slotId], &HRilSim::UnlockPin, serialId, pin);
+}
+
+int32_t HRilManager::UnlockPuk(int32_t slotId, int32_t serialId, const std::string &puk, const std::string &pin)
+{
+    return TaskSchedule(MODULE_HRIL_SIM, hrilSim_[slotId], &HRilSim::UnlockPuk, serialId, puk, pin);
+}
+
+int32_t HRilManager::UnlockPin2(int32_t slotId, int32_t serialId, const std::string &pin2)
+{
+    return TaskSchedule(MODULE_HRIL_SIM, hrilSim_[slotId], &HRilSim::UnlockPin2, serialId, pin2);
+}
+
+int32_t HRilManager::UnlockPuk2(int32_t slotId, int32_t serialId, const std::string &puk2, const std::string &pin2)
+{
+    return TaskSchedule(MODULE_HRIL_SIM, hrilSim_[slotId], &HRilSim::UnlockPuk2, serialId, puk2, pin2);
+}
+
+int32_t HRilManager::SetActiveSim(int32_t slotId, int32_t serialId, int32_t index, int32_t enable)
+{
+    return TaskSchedule(MODULE_HRIL_SIM, hrilSim_[slotId], &HRilSim::SetActiveSim, serialId, index, enable);
+}
+
+int32_t HRilManager::SimStkSendTerminalResponse(int32_t slotId, int32_t serialId, const std::string &strCmd)
+{
+    return TaskSchedule(MODULE_HRIL_SIM, hrilSim_[slotId], &HRilSim::SimStkSendTerminalResponse, serialId, strCmd);
+}
+
+int32_t HRilManager::SimStkSendEnvelope(int32_t slotId, int32_t serialId, const std::string &strCmd)
+{
+    return TaskSchedule(MODULE_HRIL_SIM, hrilSim_[slotId], &HRilSim::SimStkSendEnvelope, serialId, strCmd);
+}
+
+int32_t HRilManager::SimStkSendCallSetupRequestResult(int32_t slotId, int32_t serialId, int32_t accept)
+{
+    return TaskSchedule(
+        MODULE_HRIL_SIM, hrilSim_[slotId], &HRilSim::SimStkSendCallSetupRequestResult, serialId, accept);
+}
+
+int32_t HRilManager::SimStkIsReady(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(MODULE_HRIL_SIM, hrilSim_[slotId], &HRilSim::SimStkIsReady, serialId);
+}
+
+int32_t HRilManager::SetRadioProtocol(
+    int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::ISimProtocolRequest &protocol)
+{
+    return TaskSchedule(MODULE_HRIL_SIM, hrilSim_[slotId], &HRilSim::SetRadioProtocol, serialId, protocol);
+}
+
+int32_t HRilManager::SimOpenLogicalChannel(int32_t slotId, int32_t serialId, const std::string &appID, int32_t p2)
+{
+    return TaskSchedule(MODULE_HRIL_SIM, hrilSim_[slotId], &HRilSim::SimOpenLogicalChannel, serialId, appID, p2);
+}
+
+int32_t HRilManager::SimCloseLogicalChannel(int32_t slotId, int32_t serialId, int32_t channelId)
+{
+    return TaskSchedule(MODULE_HRIL_SIM, hrilSim_[slotId], &HRilSim::SimCloseLogicalChannel, serialId, channelId);
+}
+
+int32_t HRilManager::SimTransmitApduLogicalChannel(
+    int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::IApduSimIORequestInfo &apduSimIO)
+{
+    return TaskSchedule(
+        MODULE_HRIL_SIM, hrilSim_[slotId], &HRilSim::SimTransmitApduLogicalChannel, serialId, apduSimIO);
+}
+
+int32_t HRilManager::SimTransmitApduBasicChannel(
+    int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::IApduSimIORequestInfo &apduSimIO)
+{
+    return TaskSchedule(MODULE_HRIL_SIM, hrilSim_[slotId], &HRilSim::SimTransmitApduBasicChannel, serialId, apduSimIO);
+}
+
+int32_t HRilManager::SimAuthentication(
+    int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::ISimAuthenticationRequestInfo &simAuthInfo)
+{
+    return TaskSchedule(MODULE_HRIL_SIM, hrilSim_[slotId], &HRilSim::SimAuthentication, serialId, simAuthInfo);
+}
+
+int32_t HRilManager::UnlockSimLock(int32_t slotId, int32_t serialId, int32_t lockType, const std::string &key)
+{
+    return TaskSchedule(MODULE_HRIL_SIM, hrilSim_[slotId], &HRilSim::UnlockSimLock, serialId, lockType, key);
 }
 
 HRilManager::~HRilManager() {}

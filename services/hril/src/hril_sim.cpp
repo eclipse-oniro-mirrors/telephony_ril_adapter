@@ -99,1345 +99,471 @@ void HRilSim::AddNotificationHandlerToMap()
     notiMemberFuncMap_[HNOTI_SIM_REFRESH_NOTIFY] = &HRilSim::SimRefreshNotify;
 }
 
-int32_t HRilSim::GetSimIO(struct HdfSBuf *data)
+int32_t HRilSim::GetSimIO(int32_t serialId, const OHOS::HDI::Ril::V1_0::ISimIoRequestInfo &simIO)
 {
-    if ((simFuncs_ == nullptr) || (simFuncs_->GetSimIO == nullptr)) {
-        TELEPHONY_LOGE("GetSimIO::simFuncs_:%{public}p", simFuncs_);
-        return HRIL_ERR_NULL_POINT;
-    }
-    SimIoRequestInfo SimIO = SimIoRequestInfo();
-    MessageParcel *parcel = nullptr;
-    if (SbufToParcel(data, &parcel)) {
-        TELEPHONY_LOGE("RilAdapter failed to do SbufToParcel");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    if (parcel == nullptr) {
-        TELEPHONY_LOGE("parcel in GetSimIO is nullptr!");
-        return HRIL_ERR_NULL_POINT;
-    }
-    if (!SimIO.ReadFromParcel(*parcel)) {
-        TELEPHONY_LOGE("RilAdapter failed to do ReadFromParcel!");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    int32_t serial = SimIO.serial;
-    HRilSimIO rilSimIO = {};
-    rilSimIO.command = SimIO.command;
-    rilSimIO.fileid = SimIO.fileId;
-    rilSimIO.p1 = SimIO.p1;
-    rilSimIO.p2 = SimIO.p2;
-    rilSimIO.p3 = SimIO.p3;
-    rilSimIO.data = static_cast<char *>(const_cast<char *>(SimIO.data.c_str()));
-    rilSimIO.pathid = static_cast<char *>(const_cast<char *>(SimIO.path.c_str()));
-    rilSimIO.pin2 = static_cast<char *>(const_cast<char *>(SimIO.pin2.c_str()));
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_SIM_GET_SIM_IO);
-    if (requestInfo == nullptr) {
-        TELEPHONY_LOGE("RilAdapter failed to do Create GetSimIO HRilRequest!");
-        return HRIL_ERR_NULL_POINT;
-    }
-    simFuncs_->GetSimIO(requestInfo, &rilSimIO, sizeof(rilSimIO));
-    return HRIL_ERR_SUCCESS;
+    std::unique_ptr<HRilSimIO> rilSimIO = std::make_unique<HRilSimIO>();
+    CopyToHRilSimIO(rilSimIO, simIO);
+    int32_t ret = RequestVendor(
+        serialId, HREQ_SIM_GET_SIM_IO, simFuncs_, &HRilSimReq::GetSimIO, rilSimIO.get(), sizeof(*rilSimIO));
+    SafeFrees(rilSimIO->data, rilSimIO->pathid, rilSimIO->pin2);
+    return ret;
 }
 
-int32_t HRilSim::GetSimStatus(struct HdfSBuf *data)
+int32_t HRilSim::GetSimStatus(int32_t serialId)
 {
-    if ((simFuncs_ == nullptr) || (simFuncs_->GetSimStatus == nullptr)) {
-        TELEPHONY_LOGE("GetSimStatus::simFuncs_:%{public}p", simFuncs_);
-        return HRIL_ERR_NULL_POINT;
-    }
-    int32_t serial = 0;
-    if (!HdfSbufReadInt32(data, &serial)) {
-        TELEPHONY_LOGE("miss serial parameter");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_SIM_GET_SIM_STATUS);
-    if (requestInfo == nullptr) {
-        TELEPHONY_LOGE("RilAdapter failed to do Create GetSimStatus HRilRequest!");
-        return HRIL_ERR_NULL_POINT;
-    }
-    simFuncs_->GetSimStatus(requestInfo);
-    return HRIL_ERR_SUCCESS;
+    return RequestVendor(serialId, HREQ_SIM_GET_SIM_STATUS, simFuncs_, &HRilSimReq::GetSimStatus);
 }
 
-int32_t HRilSim::GetImsi(struct HdfSBuf *data)
+int32_t HRilSim::GetImsi(int32_t serialId)
 {
-    if ((simFuncs_ == nullptr) || (simFuncs_->GetSimImsi == nullptr)) {
-        TELEPHONY_LOGE("GetSimImsi::simFuncs_:%{public}p", simFuncs_);
-        return HRIL_ERR_NULL_POINT;
-    }
-    int32_t serial = 0;
-    if (!HdfSbufReadInt32(data, &serial)) {
-        TELEPHONY_LOGE("miss serial parameter");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_SIM_GET_IMSI);
-    if (requestInfo == nullptr) {
-        TELEPHONY_LOGE("RilAdapter failed to do Create GetImsi HRilRequest!");
-        return HRIL_ERR_NULL_POINT;
-    }
-    simFuncs_->GetSimImsi(requestInfo);
-    return HRIL_ERR_SUCCESS;
+    return RequestVendor(serialId, HREQ_SIM_GET_IMSI, simFuncs_, &HRilSimReq::GetSimImsi);
 }
 
-int32_t HRilSim::GetSimLockStatus(struct HdfSBuf *data)
+int32_t HRilSim::GetSimLockStatus(int32_t serialId, const OHOS::HDI::Ril::V1_0::ISimLockInfo &simLockInfo)
 {
-    if ((simFuncs_ == nullptr) || (simFuncs_->GetSimLockStatus == nullptr)) {
-        TELEPHONY_LOGE("GetSimLockStatus::simFuncs_:%{public}p", simFuncs_);
-        return HRIL_ERR_NULL_POINT;
-    }
-    SimLockInfo simClock = SimLockInfo();
-    MessageParcel *parcel = nullptr;
-    if (SbufToParcel(data, &parcel)) {
-        TELEPHONY_LOGE("RilAdapter failed to do SbufToParcel");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    if (parcel == nullptr) {
-        TELEPHONY_LOGE("parcel in GetSimLockStatus is nullptr!");
-        return HRIL_ERR_NULL_POINT;
-    }
-    if (!simClock.ReadFromParcel(*parcel)) {
-        TELEPHONY_LOGE("RilAdapter failed to do ReadFromParcel!");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    HRilSimClock rilSimClock = {};
-    rilSimClock.mode = simClock.mode;
-    rilSimClock.status = simClock.status;
-    rilSimClock.classx = simClock.classx;
-    rilSimClock.fac = static_cast<char *>(const_cast<char *>(simClock.fac.c_str()));
-    rilSimClock.passwd = static_cast<char *>(const_cast<char *>(simClock.passwd.c_str()));
-    int32_t serial = simClock.serial;
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_SIM_GET_SIM_LOCK_STATUS);
-    if (requestInfo == nullptr) {
-        TELEPHONY_LOGE("RilAdapter failed to do Create GetSimLockStatus HRilRequest!");
-        return HRIL_ERR_NULL_POINT;
-    }
-    simFuncs_->GetSimLockStatus(requestInfo, &rilSimClock, sizeof(rilSimClock));
-    return HRIL_ERR_SUCCESS;
+    std::unique_ptr<HRilSimClock> rilSimLock = std::make_unique<HRilSimClock>();
+    CopyToHRilSimLock(rilSimLock, simLockInfo);
+    int32_t ret = RequestVendor(serialId, HREQ_SIM_GET_SIM_LOCK_STATUS, simFuncs_, &HRilSimReq::GetSimLockStatus,
+        rilSimLock.get(), sizeof(*rilSimLock));
+    SafeFrees(rilSimLock->fac, rilSimLock->passwd);
+    return ret;
 }
 
-int32_t HRilSim::SetSimLock(struct HdfSBuf *data)
+int32_t HRilSim::SetSimLock(int32_t serialId, const OHOS::HDI::Ril::V1_0::ISimLockInfo &simLockInfo)
 {
-    if ((simFuncs_ == nullptr) || (simFuncs_->SetSimLock == nullptr)) {
-        TELEPHONY_LOGE("SetSimLock::simFuncs_:%{public}p", simFuncs_);
-        return HRIL_ERR_NULL_POINT;
-    }
-    SimLockInfo simClock = SimLockInfo();
-    MessageParcel *parcel = nullptr;
-    if (SbufToParcel(data, &parcel)) {
-        TELEPHONY_LOGE("RilAdapter failed to do SbufToParcel");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    if (parcel == nullptr) {
-        TELEPHONY_LOGE("parcel in SetSimLock is nullptr!");
-        return HRIL_ERR_NULL_POINT;
-    }
-    if (!simClock.ReadFromParcel(*parcel)) {
-        TELEPHONY_LOGE("RilAdapter failed to do ReadFromParcel!");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    HRilSimClock rilSimClock = {};
-    rilSimClock.fac = static_cast<char *>(const_cast<char *>(simClock.fac.c_str()));
-    rilSimClock.mode = simClock.mode;
-    rilSimClock.status = simClock.status;
-    rilSimClock.passwd = static_cast<char *>(const_cast<char *>(simClock.passwd.c_str()));
-    rilSimClock.classx = simClock.classx;
-    int32_t serial = simClock.serial;
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_SIM_SET_SIM_LOCK);
-    if (requestInfo == nullptr) {
-        TELEPHONY_LOGE("RilAdapter failed to do Create SetSimLock HRilRequest!");
-        return HRIL_ERR_NULL_POINT;
-    }
-    simFuncs_->SetSimLock(requestInfo, &rilSimClock, sizeof(rilSimClock));
-    return HRIL_ERR_SUCCESS;
+    std::unique_ptr<HRilSimClock> rilSimLock = std::make_unique<HRilSimClock>();
+    CopyToHRilSimLock(rilSimLock, simLockInfo);
+    int32_t ret = RequestVendor(
+        serialId, HREQ_SIM_SET_SIM_LOCK, simFuncs_, &HRilSimReq::SetSimLock, rilSimLock.get(), sizeof(*rilSimLock));
+    SafeFrees(rilSimLock->fac, rilSimLock->passwd);
+    return ret;
 }
 
-int32_t HRilSim::ChangeSimPassword(struct HdfSBuf *data)
+int32_t HRilSim::ChangeSimPassword(int32_t serialId, const OHOS::HDI::Ril::V1_0::ISimPasswordInfo &simPassword)
 {
-    if ((simFuncs_ == nullptr) || (simFuncs_->ChangeSimPassword == nullptr)) {
-        TELEPHONY_LOGE("ChangeSimPassword::simFuncs_:%{public}p", simFuncs_);
-        return HRIL_ERR_NULL_POINT;
-    }
-    SimPasswordInfo simPassword = SimPasswordInfo();
-    MessageParcel *parcel = nullptr;
-    if (SbufToParcel(data, &parcel)) {
-        TELEPHONY_LOGE("RilAdapter failed to do SbufToParcel");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    if (parcel == nullptr || simFuncs_ == nullptr) {
-        TELEPHONY_LOGE("ChangeSimPassword failed : nullptr!");
-        return HRIL_ERR_NULL_POINT;
-    }
-    if (!simPassword.ReadFromParcel(*parcel)) {
-        TELEPHONY_LOGE("RilAdapter failed to do ReadFromParcel!");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    HRilSimPassword rilSimPassword = {};
-    rilSimPassword.fac = static_cast<char *>(const_cast<char *>(simPassword.fac.c_str()));
-    rilSimPassword.oldPassword = static_cast<char *>(const_cast<char *>(simPassword.oldPassword.c_str()));
-    rilSimPassword.newPassword = static_cast<char *>(const_cast<char *>(simPassword.newPassword.c_str()));
-    rilSimPassword.passwordLength = simPassword.passwordLength;
-    int32_t serial = simPassword.serial;
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_SIM_CHANGE_SIM_PASSWORD);
-    if (requestInfo == nullptr) {
-        TELEPHONY_LOGE("RilAdapter failed to do Create ChangeSimPassword HRilRequest!");
-        return HRIL_ERR_NULL_POINT;
-    }
-    simFuncs_->ChangeSimPassword(requestInfo, &rilSimPassword, sizeof(rilSimPassword));
-    return HRIL_ERR_SUCCESS;
+    std::unique_ptr<HRilSimPassword> rilSimPassword = std::make_unique<HRilSimPassword>();
+    CopyToHRilSimPassword(rilSimPassword, simPassword);
+    int32_t ret = RequestVendor(serialId, HREQ_SIM_CHANGE_SIM_PASSWORD, simFuncs_, &HRilSimReq::ChangeSimPassword,
+        rilSimPassword.get(), sizeof(*rilSimPassword));
+    SafeFrees(rilSimPassword->fac, rilSimPassword->oldPassword, rilSimPassword->newPassword);
+    return ret;
 }
 
-int32_t HRilSim::UnlockPin(struct HdfSBuf *data)
+int32_t HRilSim::UnlockPin(int32_t serialId, const std::string &pin)
 {
-    if ((simFuncs_ == nullptr) || (simFuncs_->UnlockPin == nullptr)) {
-        TELEPHONY_LOGE("UnlockPin::simFuncs_:%{public}p", simFuncs_);
-        return HRIL_ERR_NULL_POINT;
-    }
-    int32_t serial = 0;
-    const char *pin = nullptr;
-    if (!HdfSbufReadInt32(data, &serial)) {
-        TELEPHONY_LOGE("miss serial parameter");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    MessageParcel *parcel = nullptr;
-    if (SbufToParcel(data, &parcel)) {
-        TELEPHONY_LOGE("RilAdapter failed to do SbufToParcel");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    if (parcel == nullptr) {
-        TELEPHONY_LOGE("parcel in EnterSimPin is nullptr!");
-        return HRIL_ERR_NULL_POINT;
-    }
-    pin = parcel->ReadCString();
-    if (pin == nullptr) {
-        TELEPHONY_LOGE("miss pin parameter");
-        return HRIL_ERR_NULL_POINT;
-    }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_SIM_UNLOCK_PIN);
-    if (requestInfo == nullptr) {
-        TELEPHONY_LOGE("RilAdapter failed to do Create EnterSimPin HRilRequest!");
-        return HRIL_ERR_NULL_POINT;
-    }
-    simFuncs_->UnlockPin(requestInfo, pin);
-    return HRIL_ERR_SUCCESS;
+    char *pinPoint = nullptr;
+    CopyToCharPoint(&pinPoint, pin);
+    int32_t ret = RequestVendor(serialId, HREQ_SIM_UNLOCK_PIN, simFuncs_, &HRilSimReq::UnlockPin, pinPoint);
+    SafeFrees(pinPoint);
+    return ret;
 }
 
-int32_t HRilSim::UnlockPuk(struct HdfSBuf *data)
+int32_t HRilSim::UnlockPuk(int32_t serialId, const std::string &puk, const std::string &pin)
 {
-    if ((simFuncs_ == nullptr) || (simFuncs_->UnlockPuk == nullptr)) {
-        TELEPHONY_LOGE("UnlockPuk::simFuncs_:%{public}p", simFuncs_);
-        return HRIL_ERR_NULL_POINT;
-    }
-    int32_t serial = 0;
-    const char *puk = nullptr;
-    const char *pin = nullptr;
-    if (!HdfSbufReadInt32(data, &serial)) {
-        TELEPHONY_LOGE("miss serial parameter");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    puk = HdfSbufReadString(data);
-    if (puk == nullptr) {
-        TELEPHONY_LOGE("miss puk parameter");
-        return HRIL_ERR_NULL_POINT;
-    }
-    pin = HdfSbufReadString(data);
-    if (pin == nullptr) {
-        TELEPHONY_LOGE("miss pin parameter");
-        return HRIL_ERR_NULL_POINT;
-    }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_SIM_UNLOCK_PUK);
-    if (requestInfo == nullptr) {
-        TELEPHONY_LOGE("RilAdapter failed to do Create UnlockSimPin HRilRequest!");
-        return HRIL_ERR_NULL_POINT;
-    }
-    simFuncs_->UnlockPuk(requestInfo, puk, pin);
-    return HRIL_ERR_SUCCESS;
+    char *pukPoint = nullptr;
+    CopyToCharPoint(&pukPoint, puk);
+    char *pinPoint = nullptr;
+    CopyToCharPoint(&pinPoint, pin);
+    int32_t ret = RequestVendor(serialId, HREQ_SIM_UNLOCK_PUK, simFuncs_, &HRilSimReq::UnlockPuk, pukPoint, pinPoint);
+    SafeFrees(pukPoint, pinPoint);
+    return ret;
 }
 
-int32_t HRilSim::UnlockPin2(struct HdfSBuf *data)
+int32_t HRilSim::UnlockPin2(int32_t serialId, const std::string &pin2)
 {
-    if ((simFuncs_ == nullptr) || (simFuncs_->UnlockPin2 == nullptr)) {
-        TELEPHONY_LOGE("UnlockPin2::simFuncs_:%{public}p", simFuncs_);
-        return HRIL_ERR_NULL_POINT;
-    }
-    int32_t serial = 0;
-    const char *pin2 = nullptr;
-    if (!HdfSbufReadInt32(data, &serial)) {
-        TELEPHONY_LOGE("miss serial parameter");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    MessageParcel *parcel = nullptr;
-    if (SbufToParcel(data, &parcel)) {
-        TELEPHONY_LOGE("RilAdapter failed to do SbufToParcel");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    pin2 = parcel->ReadCString();
-    if (pin2 == nullptr) {
-        TELEPHONY_LOGE("miss pin parameter");
-        return HRIL_ERR_NULL_POINT;
-    }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_SIM_UNLOCK_PIN2);
-    if (requestInfo == nullptr) {
-        TELEPHONY_LOGE("RilAdapter failed to do Create EnterSimPin HRilRequest!");
-        return HRIL_ERR_NULL_POINT;
-    }
-    simFuncs_->UnlockPin2(requestInfo, pin2);
-    return HRIL_ERR_SUCCESS;
+    char *pin2Point = nullptr;
+    CopyToCharPoint(&pin2Point, pin2);
+    int32_t ret = RequestVendor(serialId, HREQ_SIM_UNLOCK_PIN2, simFuncs_, &HRilSimReq::UnlockPin2, pin2Point);
+    SafeFrees(pin2Point);
+    return ret;
 }
 
-int32_t HRilSim::UnlockPuk2(struct HdfSBuf *data)
+int32_t HRilSim::UnlockPuk2(int32_t serialId, const std::string &puk2, const std::string &pin2)
 {
-    if ((simFuncs_ == nullptr) || (simFuncs_->UnlockPuk2 == nullptr)) {
-        TELEPHONY_LOGE("UnlockPuk2::simFuncs_:%{public}p", simFuncs_);
-        return HRIL_ERR_NULL_POINT;
-    }
-    int32_t serial = 0;
-    const char *puk2 = nullptr;
-    const char *pin2 = nullptr;
-    if (!HdfSbufReadInt32(data, &serial)) {
-        TELEPHONY_LOGE("miss serial parameter");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    puk2 = HdfSbufReadString(data);
-    if (puk2 == nullptr) {
-        TELEPHONY_LOGE("miss puk2 parameter");
-        return HRIL_ERR_NULL_POINT;
-    }
-    pin2 = HdfSbufReadString(data);
-    if (pin2 == nullptr) {
-        TELEPHONY_LOGE("miss pin2 parameter");
-        return HRIL_ERR_NULL_POINT;
-    }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_SIM_UNLOCK_PUK2);
-    if (requestInfo == nullptr) {
-        TELEPHONY_LOGE("RilAdapter failed to do Create UnlockSimPin2 HRilRequest!");
-        return HRIL_ERR_NULL_POINT;
-    }
-    simFuncs_->UnlockPuk2(requestInfo, puk2, pin2);
-    return HRIL_ERR_SUCCESS;
+    char *puk2Point = nullptr;
+    CopyToCharPoint(&puk2Point, puk2);
+    char *pin2Point = nullptr;
+    CopyToCharPoint(&pin2Point, pin2);
+    int32_t ret =
+        RequestVendor(serialId, HREQ_SIM_UNLOCK_PUK2, simFuncs_, &HRilSimReq::UnlockPuk2, puk2Point, pin2Point);
+    SafeFrees(puk2Point, pin2Point);
+    return ret;
 }
 
-int32_t HRilSim::SetActiveSim(struct HdfSBuf *data)
+int32_t HRilSim::SetActiveSim(int32_t serialId, int32_t index, int32_t enable)
 {
-    if ((simFuncs_ == nullptr) || (simFuncs_->SetActiveSim == nullptr)) {
-        TELEPHONY_LOGE("SetActiveSim::simFuncs_:%{public}p", simFuncs_);
-        return HRIL_ERR_NULL_POINT;
-    }
-    int32_t serial = 0;
-    int32_t index = 0;
-    int32_t enable = 0;
-    if (!HdfSbufReadInt32(data, &serial)) {
-        TELEPHONY_LOGE("miss serial parameter");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    if (!HdfSbufReadInt32(data, &index)) {
-        TELEPHONY_LOGE("miss index parameter");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    if (!HdfSbufReadInt32(data, &enable)) {
-        TELEPHONY_LOGE("miss enable parameter");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_SIM_SET_ACTIVE_SIM);
-    if (requestInfo == nullptr) {
-        TELEPHONY_LOGE("RilAdapter failed to do Create EnterSimPin HRilRequest!");
-        return HRIL_ERR_NULL_POINT;
-    }
-    simFuncs_->SetActiveSim(requestInfo, index, enable);
-    return HRIL_ERR_SUCCESS;
+    return RequestVendor(serialId, HREQ_SIM_SET_ACTIVE_SIM, simFuncs_, &HRilSimReq::SetActiveSim, index, enable);
 }
 
-int32_t HRilSim::SimStkSendTerminalResponse(struct HdfSBuf *data)
+int32_t HRilSim::SimStkSendTerminalResponse(int32_t serialId, const std::string &strCmd)
 {
-    if ((simFuncs_ == nullptr) || (simFuncs_->SimStkSendTerminalResponse == nullptr)) {
-        TELEPHONY_LOGE("SimStkSendTerminalResponse::simFuncs_:%{public}p", simFuncs_);
-        return HRIL_ERR_NULL_POINT;
-    }
-    int32_t serial = 0;
-    if (!HdfSbufReadInt32(data, &serial)) {
-        TELEPHONY_LOGE("miss serial parameter");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    MessageParcel *parcel = nullptr;
-    if (SbufToParcel(data, &parcel)) {
-        TELEPHONY_LOGE("RilAdapter failed to do SbufToParcel");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    const char *strCmd = parcel->ReadCString();
-    if (strCmd == nullptr) {
-        TELEPHONY_LOGE("miss command parameter");
-        return HRIL_ERR_NULL_POINT;
-    }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_SIM_STK_SEND_TERMINAL_RESPONSE);
-    if (requestInfo == nullptr) {
-        TELEPHONY_LOGE("RilAdapter failed to do Create SimStkSendTerminalResponse HRilRequest!");
-        return HRIL_ERR_NULL_POINT;
-    }
-    simFuncs_->SimStkSendTerminalResponse(requestInfo, strCmd);
-    return HRIL_ERR_SUCCESS;
+    char *strCmdPoint = nullptr;
+    CopyToCharPoint(&strCmdPoint, strCmd);
+    int32_t ret = RequestVendor(
+        serialId, HREQ_SIM_STK_SEND_TERMINAL_RESPONSE, simFuncs_, &HRilSimReq::SimStkSendTerminalResponse, strCmdPoint);
+    SafeFrees(strCmdPoint);
+    return ret;
 }
 
-int32_t HRilSim::SimStkSendEnvelope(struct HdfSBuf *data)
+int32_t HRilSim::SimStkSendEnvelope(int32_t serialId, const std::string &strCmd)
 {
-    if ((simFuncs_ == nullptr) || (simFuncs_->SimStkSendEnvelope == nullptr)) {
-        TELEPHONY_LOGE("SimStkSendEnvelope::simFuncs_:%{public}p", simFuncs_);
-        return HRIL_ERR_NULL_POINT;
-    }
-    int32_t serial = 0;
-    if (!HdfSbufReadInt32(data, &serial)) {
-        TELEPHONY_LOGE("miss serial parameter");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    MessageParcel *parcel = nullptr;
-    if (SbufToParcel(data, &parcel)) {
-        TELEPHONY_LOGE("RilAdapter failed to do SbufToParcel");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    const char *strCmd = parcel->ReadCString();
-    if (strCmd == nullptr) {
-        TELEPHONY_LOGE("miss command parameter");
-        return HRIL_ERR_NULL_POINT;
-    }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_SIM_STK_SEND_ENVELOPE);
-    if (requestInfo == nullptr) {
-        TELEPHONY_LOGE("RilAdapter failed to do Create SimStkSendEnvelope HRilRequest!");
-        return HRIL_ERR_NULL_POINT;
-    }
-    simFuncs_->SimStkSendEnvelope(requestInfo, strCmd);
-    return HRIL_ERR_SUCCESS;
+    char *strCmdPoint = nullptr;
+    CopyToCharPoint(&strCmdPoint, strCmd);
+    int32_t ret =
+        RequestVendor(serialId, HREQ_SIM_STK_SEND_ENVELOPE, simFuncs_, &HRilSimReq::SimStkSendEnvelope, strCmdPoint);
+    SafeFrees(strCmdPoint);
+    return ret;
 }
 
-int32_t HRilSim::SimStkSendCallSetupRequestResult(struct HdfSBuf *data)
+int32_t HRilSim::SimStkSendCallSetupRequestResult(int32_t serialId, int32_t accept)
 {
-    if ((simFuncs_ == nullptr) || (simFuncs_->SimStkSendCallSetupRequestResult == nullptr)) {
-        TELEPHONY_LOGE("SimStkSendCallSetupRequestResult::simFuncs_:%{public}p", simFuncs_);
-        return HRIL_ERR_NULL_POINT;
-    }
-    int32_t serial = 0;
-    if (!HdfSbufReadInt32(data, &serial)) {
-        TELEPHONY_LOGE("miss serial parameter");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    int32_t accept = 0;
-    if (!HdfSbufReadInt32(data, &accept)) {
-        TELEPHONY_LOGE("miss accept parameter");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_SIM_STK_SEND_CALL_SETUP_REQUEST_RESULT);
-    if (requestInfo == nullptr) {
-        TELEPHONY_LOGE("RilAdapter failed to do Create SimStkSendCallSetupRequestResult HRilRequest!");
-        return HRIL_ERR_NULL_POINT;
-    }
-    simFuncs_->SimStkSendCallSetupRequestResult(requestInfo, accept);
-    return HRIL_ERR_SUCCESS;
+    return RequestVendor(serialId, HREQ_SIM_STK_SEND_CALL_SETUP_REQUEST_RESULT, simFuncs_,
+        &HRilSimReq::SimStkSendCallSetupRequestResult, accept);
 }
 
-int32_t HRilSim::SimStkIsReady(struct HdfSBuf *data)
+int32_t HRilSim::SimStkIsReady(int32_t serialId)
 {
-    if ((simFuncs_ == nullptr) || (simFuncs_->SimStkIsReady == nullptr)) {
-        TELEPHONY_LOGE("SimStkIsReady::simFuncs_:%{public}p", simFuncs_);
-        return HRIL_ERR_NULL_POINT;
-    }
-    int32_t serial = 0;
-    if (!HdfSbufReadInt32(data, &serial)) {
-        TELEPHONY_LOGE("miss serial parameter");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_SIM_STK_IS_READY);
-    if (requestInfo == nullptr) {
-        TELEPHONY_LOGE("RilAdapter failed to do Create SimStkIsReady HRilRequest!");
-        return HRIL_ERR_NULL_POINT;
-    }
-    simFuncs_->SimStkIsReady(requestInfo);
-    return HRIL_ERR_SUCCESS;
+    return RequestVendor(serialId, HREQ_SIM_STK_IS_READY, simFuncs_, &HRilSimReq::SimStkIsReady);
 }
 
-int32_t HRilSim::SetRadioProtocol(struct HdfSBuf *data)
+int32_t HRilSim::SetRadioProtocol(int32_t serialId, const OHOS::HDI::Ril::V1_0::ISimProtocolRequest &protocol)
 {
-    if ((simFuncs_ == nullptr) || (simFuncs_->SetRadioProtocol == nullptr)) {
-        TELEPHONY_LOGE("SetRadioProtocol::simFuncs_:%{public}p", simFuncs_);
-        return HRIL_ERR_NULL_POINT;
-    }
-    SimProtocolRequest protocol = SimProtocolRequest();
-    MessageParcel *parcel = nullptr;
-    if (SbufToParcel(data, &parcel)) {
-        TELEPHONY_LOGE("RilAdapter failed to do SbufToParcel");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    if (parcel == nullptr) {
-        TELEPHONY_LOGE("parcel in GetSimIO is nullptr!");
-        return HRIL_ERR_NULL_POINT;
-    }
-    if (!protocol.ReadFromParcel(*parcel)) {
-        TELEPHONY_LOGE("RilAdapter failed to do ReadFromParcel!");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    int32_t serial = protocol.serial;
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_SIM_RADIO_PROTOCOL);
-    if (requestInfo == nullptr) {
-        TELEPHONY_LOGE("RilAdapter failed to do Create SetRadioProtocol HRilRequest!");
-        return HRIL_ERR_NULL_POINT;
-    }
-    HRilSimProtocolRequest hRilSimProtocolRequest;
-    hRilSimProtocolRequest.phase = protocol.phase;
-    hRilSimProtocolRequest.protocol = protocol.protocol;
-    hRilSimProtocolRequest.slotId = protocol.slotId;
-    simFuncs_->SetRadioProtocol(requestInfo, &hRilSimProtocolRequest, sizeof(hRilSimProtocolRequest));
-    return HRIL_ERR_SUCCESS;
+    std::unique_ptr<HRilSimProtocolRequest> hRilSimProtocolRequest = std::make_unique<HRilSimProtocolRequest>();
+    CopyToHRilSimProtocolRequest(hRilSimProtocolRequest, protocol);
+    return RequestVendor(serialId, HREQ_SIM_RADIO_PROTOCOL, simFuncs_, &HRilSimReq::SetRadioProtocol,
+        hRilSimProtocolRequest.get(), sizeof(*hRilSimProtocolRequest));
 }
 
-int32_t HRilSim::SimOpenLogicalChannel(struct HdfSBuf *data)
+int32_t HRilSim::SimOpenLogicalChannel(int32_t serialId, const std::string &appID, int32_t p2)
 {
-    if ((simFuncs_ == nullptr) || (simFuncs_->SimOpenLogicalChannel == nullptr)) {
-        TELEPHONY_LOGE("SimOpenLogicalChannel::simFuncs_:%{public}p", simFuncs_);
-        return HRIL_ERR_NULL_POINT;
-    }
-    int32_t serial = 0;
-    const char *appID = nullptr;
-    int32_t p2 = 0;
-    if (!HdfSbufReadInt32(data, &serial)) {
-        TELEPHONY_LOGE("miss serial parameter");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    appID = HdfSbufReadString(data);
-    if (appID == nullptr) {
-        TELEPHONY_LOGE("miss appID parameter");
-        return HRIL_ERR_NULL_POINT;
-    }
-    if (!HdfSbufReadInt32(data, &p2)) {
-        TELEPHONY_LOGE("miss p2 parameter");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_SIM_OPEN_LOGICAL_CHANNEL);
-    if (requestInfo == nullptr) {
-        TELEPHONY_LOGE("RilAdapter failed to do Create SimOpenLogicalChannel HRilRequest!");
-        return HRIL_ERR_NULL_POINT;
-    }
-
-    simFuncs_->SimOpenLogicalChannel(requestInfo, appID, p2);
-    return HRIL_ERR_SUCCESS;
+    char *appIDPoint = nullptr;
+    CopyToCharPoint(&appIDPoint, appID);
+    int32_t ret = RequestVendor(
+        serialId, HREQ_SIM_OPEN_LOGICAL_CHANNEL, simFuncs_, &HRilSimReq::SimOpenLogicalChannel, appIDPoint, p2);
+    SafeFrees(appIDPoint);
+    return ret;
 }
 
-int32_t HRilSim::SimCloseLogicalChannel(struct HdfSBuf *data)
+int32_t HRilSim::SimCloseLogicalChannel(int32_t serialId, int32_t channelId)
 {
-    if ((simFuncs_ == nullptr) || (simFuncs_->SimCloseLogicalChannel == nullptr)) {
-        TELEPHONY_LOGE("SimCloseLogicalChannel::simFuncs_:%{public}p", simFuncs_);
-        return HRIL_ERR_NULL_POINT;
-    }
-    int32_t serial = 0;
-    int32_t channelId = 0;
-    if (!HdfSbufReadInt32(data, &serial)) {
-        TELEPHONY_LOGE("miss serial parameter");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    if (!HdfSbufReadInt32(data, &channelId)) {
-        TELEPHONY_LOGE("miss channelId parameter");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_SIM_CLOSE_LOGICAL_CHANNEL);
-    if (requestInfo == nullptr) {
-        TELEPHONY_LOGE("RilAdapter failed to do Create SimCloseLogicalChannel HRilRequest!");
-        return HRIL_ERR_NULL_POINT;
-    }
-
-    simFuncs_->SimCloseLogicalChannel(requestInfo, channelId);
-    return HRIL_ERR_SUCCESS;
+    return RequestVendor(
+        serialId, HREQ_SIM_CLOSE_LOGICAL_CHANNEL, simFuncs_, &HRilSimReq::SimCloseLogicalChannel, channelId);
 }
 
-int32_t HRilSim::SimTransmitApduLogicalChannel(struct HdfSBuf *data)
+int32_t HRilSim::SimTransmitApduLogicalChannel(
+    int32_t serialId, const OHOS::HDI::Ril::V1_0::IApduSimIORequestInfo &apduSimIO)
 {
-    if ((simFuncs_ == nullptr) || (simFuncs_->SimTransmitApduLogicalChannel == nullptr)) {
-        TELEPHONY_LOGE("SimTransmitApduLogicalChannel::simFuncs_:%{public}p", simFuncs_);
-        return HRIL_ERR_NULL_POINT;
-    }
-    ApduSimIORequestInfo apduSimIO = ApduSimIORequestInfo();
-    MessageParcel *parcel = nullptr;
-    if (SbufToParcel(data, &parcel)) {
-        TELEPHONY_LOGE("RilAdapter failed to do SbufToParcel");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    if (parcel == nullptr) {
-        TELEPHONY_LOGE("parcel in SimTransmitApduLogicalChannel is nullptr!");
-        return HRIL_ERR_NULL_POINT;
-    }
-    if (!apduSimIO.ReadFromParcel(*parcel)) {
-        TELEPHONY_LOGE("RilAdapter failed to do ReadFromParcel!");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    HRilApduSimIO rilApduSimIO = {};
-    rilApduSimIO.channelId = apduSimIO.channelId;
-    rilApduSimIO.type = apduSimIO.type;
-    rilApduSimIO.instruction = apduSimIO.instruction;
-    rilApduSimIO.p1 = apduSimIO.p1;
-    rilApduSimIO.p2 = apduSimIO.p2;
-    rilApduSimIO.p3 = apduSimIO.p3;
-    rilApduSimIO.data = static_cast<char *>(const_cast<char *>(apduSimIO.data.c_str()));
-
-    int32_t serial = apduSimIO.serial;
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_SIM_TRANSMIT_APDU_LOGICAL_CHANNEL);
-    if (requestInfo == nullptr) {
-        TELEPHONY_LOGE("RilAdapter failed to do Create SimTransmitApduLogicalChannel HRilRequest!");
-        return HRIL_ERR_NULL_POINT;
-    }
-    simFuncs_->SimTransmitApduLogicalChannel(requestInfo, &rilApduSimIO, sizeof(rilApduSimIO));
-    return HRIL_ERR_SUCCESS;
+    std::unique_ptr<HRilApduSimIO> rilApduSimIO = std::make_unique<HRilApduSimIO>();
+    CopyToHRilApduSimIO(rilApduSimIO, apduSimIO);
+    int32_t ret = RequestVendor(serialId, HREQ_SIM_TRANSMIT_APDU_LOGICAL_CHANNEL, simFuncs_,
+        &HRilSimReq::SimTransmitApduLogicalChannel, rilApduSimIO.get(), sizeof(*rilApduSimIO));
+    SafeFrees(rilApduSimIO->data);
+    return ret;
 }
 
-int32_t HRilSim::SimTransmitApduBasicChannel(struct HdfSBuf *data)
+int32_t HRilSim::SimTransmitApduBasicChannel(
+    int32_t serialId, const OHOS::HDI::Ril::V1_0::IApduSimIORequestInfo &apduSimIO)
 {
-    if ((simFuncs_ == nullptr) || (simFuncs_->SimTransmitApduBasicChannel == nullptr)) {
-        TELEPHONY_LOGE("SimTransmitApduBasicChannel::simFuncs_:%{public}p", simFuncs_);
-        return HRIL_ERR_NULL_POINT;
-    }
-    ApduSimIORequestInfo apduSimIO = ApduSimIORequestInfo();
-    MessageParcel *parcel = nullptr;
-    if (SbufToParcel(data, &parcel)) {
-        TELEPHONY_LOGE("RilAdapter failed to do SbufToParcel");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    if (parcel == nullptr) {
-        TELEPHONY_LOGE("parcel in SimTransmitApduBasicChannel is nullptr!");
-        return HRIL_ERR_NULL_POINT;
-    }
-    if (!apduSimIO.ReadFromParcel(*parcel)) {
-        TELEPHONY_LOGE("RilAdapter failed to do ReadFromParcel!");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    HRilApduSimIO rilApduSimIO = {};
-    rilApduSimIO.channelId = apduSimIO.channelId;
-    rilApduSimIO.type = apduSimIO.type;
-    rilApduSimIO.instruction = apduSimIO.instruction;
-    rilApduSimIO.p1 = apduSimIO.p1;
-    rilApduSimIO.p2 = apduSimIO.p2;
-    rilApduSimIO.p3 = apduSimIO.p3;
-    rilApduSimIO.data = static_cast<char *>(const_cast<char *>(apduSimIO.data.c_str()));
-
-    int32_t serial = apduSimIO.serial;
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_SIM_TRANSMIT_APDU_BASIC_CHANNEL);
-    if (requestInfo == nullptr) {
-        TELEPHONY_LOGE("RilAdapter failed to do Create SimTransmitApduBasicChannel HRilRequest!");
-        return HRIL_ERR_NULL_POINT;
-    }
-    simFuncs_->SimTransmitApduBasicChannel(requestInfo, &rilApduSimIO, sizeof(rilApduSimIO));
-    return HRIL_ERR_SUCCESS;
+    std::unique_ptr<HRilApduSimIO> rilApduSimIO = std::make_unique<HRilApduSimIO>();
+    CopyToHRilApduSimIO(rilApduSimIO, apduSimIO);
+    int32_t ret = RequestVendor(serialId, HREQ_SIM_TRANSMIT_APDU_BASIC_CHANNEL, simFuncs_,
+        &HRilSimReq::SimTransmitApduBasicChannel, rilApduSimIO.get(), sizeof(*rilApduSimIO));
+    SafeFrees(rilApduSimIO->data);
+    return ret;
 }
 
-int32_t HRilSim::SimAuthentication(struct HdfSBuf *data)
+int32_t HRilSim::SimAuthentication(
+    int32_t serialId, const OHOS::HDI::Ril::V1_0::ISimAuthenticationRequestInfo &simAuthInfo)
 {
-    if ((simFuncs_ == nullptr) || (simFuncs_->SimAuthentication == nullptr)) {
-        TELEPHONY_LOGE("SimAuthentication::simFuncs_:%{public}p", simFuncs_);
-        return HRIL_ERR_NULL_POINT;
-    }
-    SimAuthenticationRequestInfo simAuthInfo = SimAuthenticationRequestInfo();
-    MessageParcel *parcel = nullptr;
-    if (SbufToParcel(data, &parcel)) {
-        TELEPHONY_LOGE("RilAdapter failed to do SbufToParcel");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    if (parcel == nullptr) {
-        TELEPHONY_LOGE("parcel in SimAuthentication is nullptr!");
-        return HRIL_ERR_NULL_POINT;
-    }
-    if (!simAuthInfo.ReadFromParcel(*parcel)) {
-        TELEPHONY_LOGE("RilAdapter failed to do ReadFromParcel!");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    HRilSimAuthenticationRequestInfo rilSimAuthInfo = {};
-    rilSimAuthInfo.serial = simAuthInfo.serial;
-    rilSimAuthInfo.aid = static_cast<char *>(const_cast<char *>(simAuthInfo.aid.c_str()));
-    rilSimAuthInfo.data = static_cast<char *>(const_cast<char *>(simAuthInfo.authData.c_str()));
-
-    int32_t serial = simAuthInfo.serial;
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_SIM_AUTHENTICATION);
-    if (requestInfo == nullptr) {
-        TELEPHONY_LOGE("RilAdapter failed to do Create SimAuthentication HRilRequest!");
-        return HRIL_ERR_NULL_POINT;
-    }
-    simFuncs_->SimAuthentication(requestInfo, &rilSimAuthInfo, sizeof(rilSimAuthInfo));
-    return HRIL_ERR_SUCCESS;
+    std::unique_ptr<HRilSimAuthenticationRequestInfo> rilSimAuthInfo =
+        std::make_unique<HRilSimAuthenticationRequestInfo>();
+    CopyToHRilSimAuthentication(rilSimAuthInfo, simAuthInfo);
+    int32_t ret = RequestVendor(serialId, HREQ_SIM_AUTHENTICATION, simFuncs_, &HRilSimReq::SimAuthentication,
+        rilSimAuthInfo.get(), sizeof(*rilSimAuthInfo));
+    SafeFrees(rilSimAuthInfo->aid, rilSimAuthInfo->data);
+    return ret;
 }
 
-
-int32_t HRilSim::UnlockSimLock(struct HdfSBuf *data)
+int32_t HRilSim::UnlockSimLock(int32_t serialId, int32_t lockType, const std::string &key)
 {
-    if ((simFuncs_ == nullptr) || (simFuncs_->UnlockSimLock == nullptr)) {
-        TELEPHONY_LOGE("UnlockSimLock::simFuncs_:%{public}p", simFuncs_);
-        return HRIL_ERR_NULL_POINT;
-    }
-    int32_t serial = 0;
-    int32_t lockType = 0;
-    const char *key = nullptr;
-    if (!HdfSbufReadInt32(data, &serial)) {
-        TELEPHONY_LOGE("miss serial parameter");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    if (!HdfSbufReadInt32(data, &lockType)) {
-        TELEPHONY_LOGE("miss lockType parameter");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    key = HdfSbufReadString(data);
-    if (key == nullptr) {
-        TELEPHONY_LOGE("miss key parameter");
-        return HRIL_ERR_NULL_POINT;
-    }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_SIM_UNLOCK_SIM_LOCK);
-    if (requestInfo == nullptr) {
-        TELEPHONY_LOGE("RilAdapter failed to do Create UnlockSimLock HRilRequest!");
-        return HRIL_ERR_NULL_POINT;
-    }
-    simFuncs_->UnlockSimLock(requestInfo, lockType, key);
-    return HRIL_ERR_SUCCESS;
+    char *keyPoint = nullptr;
+    CopyToCharPoint(&keyPoint, key);
+    int32_t ret =
+        RequestVendor(serialId, HREQ_SIM_UNLOCK_SIM_LOCK, simFuncs_, &HRilSimReq::UnlockSimLock, lockType, keyPoint);
+    SafeFrees(keyPoint);
+    return ret;
 }
 
 int32_t HRilSim::GetSimIOResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    if ((response == nullptr && responseLen != 0) ||
-        (response != nullptr && responseLen != sizeof(HRilSimIOResponse))) {
-        TELEPHONY_LOGE("Invalid response: Vendor exception!");
-        return HRIL_ERR_GENERIC_FAILURE;
-    } else if (response == nullptr && responseLen == 0) {
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
-        }
+    HDI::Ril::V1_0::IIccIoResultInfo result = {};
+    int32_t ret = BuildSimIOResp(result, responseInfo, response, responseLen);
+    if (ret != HRIL_ERR_SUCCESS) {
+        return ret;
     }
-    IccIoResultInfo result = ProcessIccIoResponse(responseInfo, response, responseLen);
-    return ResponseMessageParcel(responseInfo, result, requestNum);
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::GetSimIOResponse, result);
 }
 
 int32_t HRilSim::GetSimStatusResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    CardStatusInfo rilCardStatus = {};
+    HDI::Ril::V1_0::ICardStatusInfo rilCardStatus = {};
     if ((response == nullptr && responseLen != 0) ||
         (response != nullptr && responseLen != sizeof(HRilCardState))) {
         TELEPHONY_LOGE("Invalid response: Vendor exception!");
-        return HRIL_ERR_GENERIC_FAILURE;
-    } else if (response == nullptr && responseLen == 0) {
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
-        }
-    } else {
-        const HRilCardState *curPtr = static_cast<const HRilCardState *>(response);
-        rilCardStatus.index = curPtr->index;
-        rilCardStatus.simType = curPtr->simType;
-        rilCardStatus.simState = curPtr->simState;
+        return HRIL_ERR_INVALID_PARAMETER;
     }
-
-    return ResponseMessageParcel(responseInfo, rilCardStatus, requestNum);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null");
+        return HRIL_ERR_NULL_POINT;
+    }
+    const HRilCardState *curPtr = static_cast<const HRilCardState *>(response);
+    rilCardStatus.index = curPtr->index;
+    rilCardStatus.simType = curPtr->simType;
+    rilCardStatus.simState = curPtr->simState;
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::GetSimStatusResponse, rilCardStatus);
 }
 
 int32_t HRilSim::GetImsiResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    if (response == nullptr) {
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
-        }
-    }
-    std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
-    if (parcel == nullptr) {
-        TELEPHONY_LOGE("parcel is nullptr");
-        return HRIL_ERR_NULL_POINT;
-    }
-    if (!parcel->WriteInterfaceToken(HRIL_INTERFACE_TOKEN)) {
-        TELEPHONY_LOGE("write interface token failed.");
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    struct HdfSBuf *dataSbuf = ParcelToSbuf(parcel.get());
-    if (dataSbuf == nullptr) {
-        TELEPHONY_LOGE("Error : dataSbuf in GetImsiResponse is nullptr!");
-        return HRIL_ERR_NULL_POINT;
-    }
-    HRilResponseHeadInfo headInfo = {0};
-    headInfo.slotId = GetSlotId();
-    headInfo.type = responseInfo.type;
-    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&headInfo, sizeof(HRilResponseHeadInfo))) {
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&responseInfo, sizeof(responseInfo))) {
-        TELEPHONY_LOGE("HdfSbufWriteUnpadBuffer in GetImsiResponse is failed!");
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    if (!HdfSbufWriteString(dataSbuf, (const char *)response)) {
-        TELEPHONY_LOGE("HdfSbufWriteString in GetImsiResponse is failed!");
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    int32_t ret = ServiceDispatcher(requestNum, dataSbuf);
-    if (ret != HRIL_ERR_SUCCESS) {
-        TELEPHONY_LOGE("ret in GetImsiResponse is not equal to HRIL_ERR_SUCCESS!");
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    HdfSbufRecycle(dataSbuf);
-
-    return HRIL_ERR_SUCCESS;
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::GetImsiResponse, (const char *)response);
 }
 
 int32_t HRilSim::GetSimLockStatusResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    int32_t simLockStatus = 0;
     if (response == nullptr || responseLen != sizeof(int32_t)) {
         TELEPHONY_LOGE("GetSimStatusResponse: Invalid response");
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
-        }
-    } else {
-        simLockStatus = *(static_cast<const int32_t *>(response));
+        return HRIL_ERR_INVALID_PARAMETER;
     }
-    std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
-    if (parcel == nullptr) {
-        TELEPHONY_LOGE("parcel is nullptr");
-        return HRIL_ERR_NULL_POINT;
-    }
-    if (!parcel->WriteInterfaceToken(HRIL_INTERFACE_TOKEN)) {
-        TELEPHONY_LOGE("write interface token failed.");
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    struct HdfSBuf *dataSbuf = ParcelToSbuf(parcel.get());
-    if (dataSbuf == nullptr) {
-        TELEPHONY_LOGE("GetSimLockStatusResponse dataSbuf is NULL.");
-        return HRIL_ERR_NULL_POINT;
-    }
-    HRilResponseHeadInfo headInfo = {0};
-    headInfo.slotId = GetSlotId();
-    headInfo.type = responseInfo.type;
-    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&headInfo, sizeof(HRilResponseHeadInfo))) {
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&responseInfo, sizeof(responseInfo))) {
-        TELEPHONY_LOGE("HdfSbufWriteUnpadBuffer in GetSimLockStatusResponse is failed!");
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    if (!HdfSbufWriteInt32(dataSbuf, simLockStatus)) {
-        TELEPHONY_LOGE("HdfSbufWriteInt32 in GetSimLockStatusResponse is failed!");
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    int32_t ret = ServiceDispatcher(requestNum, dataSbuf);
-    if (ret != HRIL_ERR_SUCCESS) {
-        TELEPHONY_LOGE("ret in GetSimLockStatusResponse is not equal to HRIL_ERR_SUCCESS!");
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    HdfSbufRecycle(dataSbuf);
-    return HRIL_ERR_SUCCESS;
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::GetSimLockStatusResponse,
+        *(static_cast<const int32_t *>(response)));
 }
 
 int32_t HRilSim::SetSimLockResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    LockStatusResp lockStatus = {};
-
-    if (response == nullptr || responseLen != sizeof(HRilLockStatus)) {
-        TELEPHONY_LOGE("Invalid response: response is nullptr");
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
-        }
-    } else {
-        const HRilLockStatus *resp = static_cast<const HRilLockStatus *>(response);
-        lockStatus.result = resp->result;
-        lockStatus.remain = resp->remain;
-        TELEPHONY_LOGE("lockStatus.result: %{public}d, remain: %{public}d", lockStatus.result, lockStatus.remain);
+    HDI::Ril::V1_0::ILockStatusResp result = {};
+    if (ResponseLockStatus(result, responseInfo, response, responseLen) == HRIL_ERR_INVALID_PARAMETER) {
+        return HRIL_ERR_INVALID_PARAMETER;
     }
-    return ResponseMessageParcel(responseInfo, lockStatus, requestNum);
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::SetSimLockResponse, result);
 }
 
 int32_t HRilSim::ChangeSimPasswordResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    LockStatusResp lockStatus = {};
-
-    if (response == nullptr || responseLen != sizeof(HRilLockStatus)) {
-        TELEPHONY_LOGE("Invalid response: response is nullptr");
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
-        }
-    } else {
-        const HRilLockStatus *resp = static_cast<const HRilLockStatus *>(response);
-        lockStatus.result = resp->result;
-        lockStatus.remain = resp->remain;
-        TELEPHONY_LOGE("lockStatus.result: %{public}d, remain: %{public}d", lockStatus.result, lockStatus.remain);
+    HDI::Ril::V1_0::ILockStatusResp result = {};
+    if (ResponseLockStatus(result, responseInfo, response, responseLen) == HRIL_ERR_INVALID_PARAMETER) {
+        return HRIL_ERR_INVALID_PARAMETER;
     }
-    return ResponseMessageParcel(responseInfo, lockStatus, requestNum);
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::ChangeSimPasswordResponse, result);
 }
 
 int32_t HRilSim::UnlockPinResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    LockStatusResp lockStatus = {};
-
-    if (response == nullptr || responseLen != sizeof(HRilLockStatus)) {
-        TELEPHONY_LOGE("Invalid response: response is nullptr");
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
-        }
-    } else {
-        const HRilLockStatus *resp = static_cast<const HRilLockStatus *>(response);
-        lockStatus.result = resp->result;
-        lockStatus.remain = resp->remain;
-        TELEPHONY_LOGE("lockStatus.result: %{public}d, remain: %{public}d", lockStatus.result, lockStatus.remain);
+    HDI::Ril::V1_0::ILockStatusResp result = {};
+    if (ResponseLockStatus(result, responseInfo, response, responseLen) == HRIL_ERR_INVALID_PARAMETER) {
+        return HRIL_ERR_INVALID_PARAMETER;
     }
-    return ResponseMessageParcel(responseInfo, lockStatus, requestNum);
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::UnlockPinResponse, result);
 }
 
 int32_t HRilSim::UnlockPukResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    LockStatusResp lockStatus = {};
-
-    if (response == nullptr || responseLen != sizeof(HRilLockStatus)) {
-        TELEPHONY_LOGE("Invalid response: response is nullptr");
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
-        }
-    } else {
-        const HRilLockStatus *resp = static_cast<const HRilLockStatus *>(response);
-        lockStatus.result = resp->result;
-        lockStatus.remain = resp->remain;
-        TELEPHONY_LOGE("lockStatus.result: %{public}d, remain: %{public}d", lockStatus.result, lockStatus.remain);
+    HDI::Ril::V1_0::ILockStatusResp result = {};
+    if (ResponseLockStatus(result, responseInfo, response, responseLen) == HRIL_ERR_INVALID_PARAMETER) {
+        return HRIL_ERR_INVALID_PARAMETER;
     }
-    return ResponseMessageParcel(responseInfo, lockStatus, requestNum);
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::UnlockPukResponse, result);
 }
 
 int32_t HRilSim::UnlockPin2Response(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    LockStatusResp lockStatus = {};
-
-    if (response == nullptr || responseLen != sizeof(HRilLockStatus)) {
-        TELEPHONY_LOGE("Invalid response: response is nullptr");
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
-        }
-    } else {
-        const HRilLockStatus *resp = static_cast<const HRilLockStatus *>(response);
-        lockStatus.result = resp->result;
-        lockStatus.remain = resp->remain;
-        TELEPHONY_LOGE("lockStatus.result: %{public}d, remain: %{public}d", lockStatus.result, lockStatus.remain);
+    HDI::Ril::V1_0::ILockStatusResp result = {};
+    if (ResponseLockStatus(result, responseInfo, response, responseLen) == HRIL_ERR_INVALID_PARAMETER) {
+        return HRIL_ERR_INVALID_PARAMETER;
     }
-    return ResponseMessageParcel(responseInfo, lockStatus, requestNum);
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::UnlockPin2Response, result);
 }
 
 int32_t HRilSim::UnlockPuk2Response(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    LockStatusResp lockStatus = {};
-
-    if (response == nullptr || responseLen != sizeof(HRilLockStatus)) {
-        TELEPHONY_LOGE("Invalid response: response is nullptr");
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
-        }
-    } else {
-        const HRilLockStatus *resp = static_cast<const HRilLockStatus *>(response);
-        lockStatus.result = resp->result;
-        lockStatus.remain = resp->remain;
-        TELEPHONY_LOGE("lockStatus.result: %{public}d, remain: %{public}d", lockStatus.result, lockStatus.remain);
+    HDI::Ril::V1_0::ILockStatusResp result = {};
+    if (ResponseLockStatus(result, responseInfo, response, responseLen) == HRIL_ERR_INVALID_PARAMETER) {
+        return HRIL_ERR_INVALID_PARAMETER;
     }
-    return ResponseMessageParcel(responseInfo, lockStatus, requestNum);
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::UnlockPuk2Response, result);
 }
 
 int32_t HRilSim::SetActiveSimResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::SetActiveSimResponse);
 }
 
 int32_t HRilSim::SimStkSendTerminalResponseResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::SimStkSendTerminalResponseResponse);
 }
 
 int32_t HRilSim::SimStkSendEnvelopeResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::SimStkSendEnvelopeResponse);
 }
 
 int32_t HRilSim::SimStkSendCallSetupRequestResultResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::SimStkSendCallSetupRequestResultResponse);
 }
 
 int32_t HRilSim::SimStkIsReadyResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::SimStkIsReadyResponse);
 }
 
 int32_t HRilSim::SetRadioProtocolResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    SimProtocolResponse pSimProtocol = {};
-    if (response == nullptr) {
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
-        }
-    } else {
-        const HRilSimProtocolResponse *pSimProtocolResponse = static_cast<const HRilSimProtocolResponse *>(response);
-        pSimProtocol.phase = pSimProtocolResponse->phase;
-        pSimProtocol.result = pSimProtocolResponse->result;
-        pSimProtocol.slotId = pSimProtocolResponse->slotId;
+    HDI::Ril::V1_0::ISimProtocolResponse pSimProtocol = {};
+    if (response == nullptr || responseLen != sizeof(HRilSimProtocolResponse)) {
+        TELEPHONY_LOGE("Invalid response: response is nullptr");
+        return HRIL_ERR_INVALID_PARAMETER;
     }
-
-    return ResponseMessageParcel(responseInfo, pSimProtocol, requestNum);
+    const HRilSimProtocolResponse *pSimProtocolResponse = static_cast<const HRilSimProtocolResponse *>(response);
+    pSimProtocol.phase = pSimProtocolResponse->phase;
+    pSimProtocol.result = pSimProtocolResponse->result;
+    pSimProtocol.slotId = pSimProtocolResponse->slotId;
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::SetRadioProtocolResponse, pSimProtocol);
 }
 
 int32_t HRilSim::SimOpenLogicalChannelResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    OpenLogicalChannelResponse pOpenLogicalChannelResponse = {};
-    if (response == nullptr) {
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
-        }
-    } else {
-        const HRilOpenLogicalChannelResponse *pRilResponse =
-            static_cast<const HRilOpenLogicalChannelResponse *>(response);
-        pOpenLogicalChannelResponse.sw1 = pRilResponse->sw1;
-        pOpenLogicalChannelResponse.sw2 = pRilResponse->sw2;
-        pOpenLogicalChannelResponse.channelId = pRilResponse->channelId;
-        pOpenLogicalChannelResponse.response = pRilResponse->response;
+    HDI::Ril::V1_0::IOpenLogicalChannelResponse pOpenLogicalChannelResponse = {};
+    if (response == nullptr || responseLen != sizeof(HRilOpenLogicalChannelResponse)) {
+        TELEPHONY_LOGE("Invalid response: response is nullptr");
+        return HRIL_ERR_INVALID_PARAMETER;
     }
-
-    return ResponseMessageParcel(responseInfo, pOpenLogicalChannelResponse, requestNum);
+    const HRilOpenLogicalChannelResponse *pRilResponse = static_cast<const HRilOpenLogicalChannelResponse *>(response);
+    pOpenLogicalChannelResponse.sw1 = pRilResponse->sw1;
+    pOpenLogicalChannelResponse.sw2 = pRilResponse->sw2;
+    pOpenLogicalChannelResponse.channelId = pRilResponse->channelId;
+    pOpenLogicalChannelResponse.response = pRilResponse->response;
+    return Response(
+        responseInfo, &HDI::Ril::V1_0::IRilCallback::SimOpenLogicalChannelResponse, pOpenLogicalChannelResponse);
 }
 
 int32_t HRilSim::SimCloseLogicalChannelResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::SimCloseLogicalChannelResponse);
 }
 
 int32_t HRilSim::SimTransmitApduLogicalChannelResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    IccIoResultInfo result = ProcessIccIoResponse(responseInfo, response, responseLen);
-    return ResponseMessageParcel(responseInfo, result, requestNum);
+    HDI::Ril::V1_0::IIccIoResultInfo result = {};
+    int32_t ret = BuildSimIOResp(result, responseInfo, response, responseLen);
+    if (ret != HRIL_ERR_SUCCESS) {
+        return ret;
+    }
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::SimTransmitApduLogicalChannelResponse, result);
 }
 
 int32_t HRilSim::SimTransmitApduBasicChannelResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    IccIoResultInfo result = ProcessIccIoResponse(responseInfo, response, responseLen);
-    return ResponseMessageParcel(responseInfo, result, requestNum);
+    HDI::Ril::V1_0::IIccIoResultInfo result = {};
+    int32_t ret = BuildSimIOResp(result, responseInfo, response, responseLen);
+    if (ret != HRIL_ERR_SUCCESS) {
+        return ret;
+    }
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::SimTransmitApduBasicChannelResponse, result);
 }
 
 int32_t HRilSim::SimAuthenticationResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    IccIoResultInfo result = ProcessIccIoResponse(responseInfo, response, responseLen);
-    return ResponseMessageParcel(responseInfo, result, requestNum);
+    HDI::Ril::V1_0::IIccIoResultInfo result = {};
+    int32_t ret = BuildSimIOResp(result, responseInfo, response, responseLen);
+    if (ret != HRIL_ERR_SUCCESS) {
+        return ret;
+    }
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::SimAuthenticationResponse, result);
 }
 
 int32_t HRilSim::UnlockSimLockResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    LockStatusResp lockStatus = {};
-
-    if (response == nullptr || responseLen != sizeof(HRilLockStatus)) {
-        TELEPHONY_LOGE("Invalid response: response is nullptr");
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
-        }
-    } else {
-        const HRilLockStatus *resp = static_cast<const HRilLockStatus *>(response);
-        lockStatus.result = resp->result;
-        lockStatus.remain = resp->remain;
+    HDI::Ril::V1_0::ILockStatusResp result = {};
+    if (ResponseLockStatus(result, responseInfo, response, responseLen) == HRIL_ERR_INVALID_PARAMETER) {
+        return HRIL_ERR_INVALID_PARAMETER;
     }
-    return ResponseMessageParcel(responseInfo, lockStatus, requestNum);
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::UnlockSimLockResponse, result);
 }
 
-IccIoResultInfo HRilSim::ProcessIccIoResponse(
+HDI::Ril::V1_0::IIccIoResultInfo HRilSim::ProcessIccIoResponse(
     HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    IccIoResultInfo result = {};
-    if (response == nullptr || responseLen != sizeof(HRilSimIOResponse)) {
-        TELEPHONY_LOGE("Invalid response: response is nullptr");
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
-        }
-        result.response = std::string("");
-    } else {
-        const HRilSimIOResponse *resp = static_cast<const HRilSimIOResponse *>(response);
-        result.sw1 = resp->sw1;
-        result.sw2 = resp->sw2;
-        if (resp->response == nullptr) {
-            result.response = "";
-        } else {
-            result.response = std::string(resp->response);
-        }
+    HDI::Ril::V1_0::IIccIoResultInfo result = {};
+    const HRilSimIOResponse *resp = static_cast<const HRilSimIOResponse *>(response);
+    result.sw1 = resp->sw1;
+    result.sw2 = resp->sw2;
+    result.response = "";
+    if (resp->response != nullptr) {
+        result.response = std::string(resp->response);
     }
     return result;
 }
 
 int32_t HRilSim::SimStateUpdated(int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen)
 {
-    std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
-    if (parcel == nullptr) {
-        TELEPHONY_LOGE("parcel is nullptr");
-        return HRIL_ERR_NULL_POINT;
-    }
-    if (!parcel->WriteInterfaceToken(HRIL_INTERFACE_TOKEN)) {
-        TELEPHONY_LOGE("write interface token failed.");
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    struct HdfSBuf *dataSbuf = ParcelToSbuf(parcel.get());
-    if (dataSbuf == nullptr) {
-        TELEPHONY_LOGE("GetSimLockStatusResponse dataSbuf is NULL.");
-        return HRIL_ERR_NULL_POINT;
-    }
-    HRilResponseHeadInfo headInfo = {0};
-    headInfo.slotId = GetSlotId();
-    headInfo.type = (HRilResponseTypes)notifyType;
-    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&headInfo, sizeof(HRilResponseHeadInfo))) {
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    int32_t ret = ServiceNotifyDispatcher(HNOTI_SIM_STATUS_CHANGED, dataSbuf);
-    if (ret != HRIL_ERR_SUCCESS) {
-        TELEPHONY_LOGE("ret in SimStateUpdated is not equal to HRIL_ERR_SUCCESS!");
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    if (dataSbuf != nullptr) {
-        HdfSbufRecycle(dataSbuf);
-    }
-
-    return HRIL_ERR_SUCCESS;
+    return Notify(&HDI::Ril::V1_0::IRilCallback::SimStateUpdated);
 }
 
 int32_t HRilSim::SimStkSessionEndNotify(
     int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen)
 {
-    std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
-    if (parcel == nullptr) {
-        TELEPHONY_LOGE("parcel is nullptr");
-        return HRIL_ERR_NULL_POINT;
-    }
-    if (!parcel->WriteInterfaceToken(HRIL_INTERFACE_TOKEN)) {
-        TELEPHONY_LOGE("write interface token failed.");
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    struct HdfSBuf *dataSbuf = ParcelToSbuf(parcel.get());
-    if (dataSbuf == nullptr) {
-        TELEPHONY_LOGE("Error : dataSbuf in SimStkSessionEndNotify is nullptr!");
-        return HRIL_ERR_NULL_POINT;
-    }
-    HRilResponseHeadInfo headInfo = {0};
-    headInfo.slotId = GetSlotId();
-    headInfo.type = (HRilResponseTypes)notifyType;
-    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&headInfo, sizeof(HRilResponseHeadInfo))) {
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    int32_t ret = ServiceNotifyDispatcher(HNOTI_SIM_STK_SESSION_END_NOTIFY, dataSbuf);
-    if (ret != HRIL_ERR_SUCCESS) {
-        TELEPHONY_LOGE("ret in SimStkSessionEndNotify is not equal to HRIL_ERR_SUCCESS!");
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    if (dataSbuf != nullptr) {
-        HdfSbufRecycle(dataSbuf);
-    }
-    return HRIL_ERR_SUCCESS;
+    return Notify(&HDI::Ril::V1_0::IRilCallback::SimStkSessionEndNotify);
 }
 
 int32_t HRilSim::SimStkProactiveNotify(
     int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen)
 {
-    std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
-    if (parcel == nullptr) {
-        TELEPHONY_LOGE("parcel in is nullptr");
-        return HRIL_ERR_NULL_POINT;
-    }
-    if (!parcel->WriteInterfaceToken(HRIL_INTERFACE_TOKEN)) {
-        TELEPHONY_LOGE("write interface token failed.");
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    struct HdfSBuf *dataSbuf = ParcelToSbuf(parcel.get());
-    if (dataSbuf == nullptr) {
-        TELEPHONY_LOGE("Error : dataSbuf in SimStkProactiveNotify is nullptr!");
-        return HRIL_ERR_NULL_POINT;
-    }
-    HRilResponseHeadInfo headInfo = {0};
-    headInfo.slotId = GetSlotId();
-    headInfo.type = (HRilResponseTypes)notifyType;
-    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&headInfo, sizeof(HRilResponseHeadInfo))) {
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    if (!HdfSbufWriteString(dataSbuf, (const char *)response)) {
-        TELEPHONY_LOGE("HdfSbufWriteString in SimStkProactiveNotify is failed!");
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    int32_t ret = ServiceNotifyDispatcher(HNOTI_SIM_STK_PROACTIVE_NOTIFY, dataSbuf);
-    if (ret != HRIL_ERR_SUCCESS) {
-        TELEPHONY_LOGE("ret in SimStkProactiveNotify is not equal to HRIL_ERR_SUCCESS!");
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    HdfSbufRecycle(dataSbuf);
-    return HRIL_ERR_SUCCESS;
+    return Notify(&HDI::Ril::V1_0::IRilCallback::SimStkProactiveNotify, (const char *)response);
 }
 
 int32_t HRilSim::SimStkAlphaNotify(int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen)
 {
-    std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
-    if (parcel == nullptr) {
-        TELEPHONY_LOGE("parcel in is nullptr");
-        return HRIL_ERR_NULL_POINT;
-    }
-    if (!parcel->WriteInterfaceToken(HRIL_INTERFACE_TOKEN)) {
-        TELEPHONY_LOGE("write interface token failed.");
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    struct HdfSBuf *dataSbuf = ParcelToSbuf(parcel.get());
-    if (dataSbuf == nullptr) {
-        TELEPHONY_LOGE("Error : dataSbuf in SimStkAlphaNotify is nullptr!");
-        return HRIL_ERR_NULL_POINT;
-    }
-    HRilResponseHeadInfo headInfo = {0};
-    headInfo.slotId = GetSlotId();
-    headInfo.type = (HRilResponseTypes)notifyType;
-    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&headInfo, sizeof(HRilResponseHeadInfo))) {
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    if (!HdfSbufWriteString(dataSbuf, (const char *)response)) {
-        TELEPHONY_LOGE("HdfSbufWriteString in SimStkAlphaNotify is failed!");
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    int32_t ret = ServiceNotifyDispatcher(HNOTI_SIM_STK_ALPHA_NOTIFY, dataSbuf);
-    if (ret != HRIL_ERR_SUCCESS) {
-        TELEPHONY_LOGE("ret in SimStkAlphaNotify is not equal to HRIL_ERR_SUCCESS!");
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    if (dataSbuf != nullptr) {
-        HdfSbufRecycle(dataSbuf);
-    }
-    return HRIL_ERR_SUCCESS;
+    return Notify(&HDI::Ril::V1_0::IRilCallback::SimStkAlphaNotify, (const char *)response);
 }
 
 int32_t HRilSim::SimStkEventNotify(
     int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen)
 {
-    std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
-    if (parcel == nullptr) {
-        TELEPHONY_LOGE("parcel in is nullptr");
-        return HRIL_ERR_NULL_POINT;
-    }
-    if (!parcel->WriteInterfaceToken(HRIL_INTERFACE_TOKEN)) {
-        TELEPHONY_LOGE("write interface token failed.");
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    struct HdfSBuf *dataSbuf = ParcelToSbuf(parcel.get());
-    if (dataSbuf == nullptr) {
-        TELEPHONY_LOGE("Error : dataSbuf in SimStkEventNotify is nullptr!");
-        return HRIL_ERR_NULL_POINT;
-    }
-    HRilResponseHeadInfo headInfo = {0};
-    headInfo.slotId = GetSlotId();
-    headInfo.type = (HRilResponseTypes)notifyType;
-    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&headInfo, sizeof(HRilResponseHeadInfo))) {
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    if (!HdfSbufWriteString(dataSbuf, (const char *)response)) {
-        TELEPHONY_LOGE("HdfSbufWriteString in SimStkEventNotify is failed!");
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    int32_t ret = ServiceNotifyDispatcher(HNOTI_SIM_STK_EVENT_NOTIFY, dataSbuf);
-    if (ret != HRIL_ERR_SUCCESS) {
-        TELEPHONY_LOGE("ret in SimStkEventNotify is not equal to HRIL_ERR_SUCCESS!");
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    HdfSbufRecycle(dataSbuf);
-    return HRIL_ERR_SUCCESS;
+    return Notify(&HDI::Ril::V1_0::IRilCallback::SimStkEventNotify, (const char *)response);
 }
 
 int32_t HRilSim::SimStkCallSetupNotify(
     int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen)
 {
-    std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
-    if (parcel == nullptr) {
-        TELEPHONY_LOGE("parcel in is nullptr");
-        return HRIL_ERR_NULL_POINT;
-    }
-    if (!parcel->WriteInterfaceToken(HRIL_INTERFACE_TOKEN)) {
-        TELEPHONY_LOGE("write interface token failed.");
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    struct HdfSBuf *dataSbuf = ParcelToSbuf(parcel.get());
-    if (dataSbuf == nullptr) {
-        TELEPHONY_LOGE("Error : dataSbuf in SimStkCallSetupNotify is nullptr!");
-        return HRIL_ERR_NULL_POINT;
-    }
-    HRilResponseHeadInfo headInfo = {0};
-    headInfo.slotId = GetSlotId();
-    headInfo.type = (HRilResponseTypes)notifyType;
-    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&headInfo, sizeof(HRilResponseHeadInfo))) {
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    int32_t ret = ServiceNotifyDispatcher(HNOTI_SIM_STK_CALL_SETUP_NOTIFY, dataSbuf);
-    if (ret != HRIL_ERR_SUCCESS) {
-        TELEPHONY_LOGE("ret in SimStkCallSetupNotify is not equal to HRIL_ERR_SUCCESS!");
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    HdfSbufRecycle(dataSbuf);
-    return HRIL_ERR_SUCCESS;
+    return Notify(&HDI::Ril::V1_0::IRilCallback::SimStkCallSetupNotify);
 }
 
 int32_t HRilSim::SimRefreshNotify(int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen)
 {
-    std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
-    if (parcel == nullptr) {
-        TELEPHONY_LOGE("parcel in is nullptr");
-        return HRIL_ERR_NULL_POINT;
-    }
-    if (!parcel->WriteInterfaceToken(HRIL_INTERFACE_TOKEN)) {
-        TELEPHONY_LOGE("write interface token failed.");
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    struct HdfSBuf *dataSbuf = ParcelToSbuf(parcel.get());
-    if (dataSbuf == nullptr) {
-        TELEPHONY_LOGE("Error : dataSbuf in SimRefreshNotify is nullptr!");
-        return HRIL_ERR_NULL_POINT;
-    }
-    HRilResponseHeadInfo headInfo = {0};
-    headInfo.slotId = GetSlotId();
-    headInfo.type = (HRilResponseTypes)notifyType;
-    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&headInfo, sizeof(HRilResponseHeadInfo))) {
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    int32_t ret = ServiceNotifyDispatcher(HNOTI_SIM_REFRESH_NOTIFY, dataSbuf);
-    if (ret != HRIL_ERR_SUCCESS) {
-        TELEPHONY_LOGE("ret in SimRefreshNotify is not equal to HRIL_ERR_SUCCESS!");
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    if (dataSbuf != nullptr) {
-        HdfSbufRecycle(dataSbuf);
-    }
-    return HRIL_ERR_SUCCESS;
+    return Notify(&HDI::Ril::V1_0::IRilCallback::SimRefreshNotify);
 }
 
 bool HRilSim::IsSimResponse(uint32_t code)
@@ -1448,6 +574,131 @@ bool HRilSim::IsSimResponse(uint32_t code)
 bool HRilSim::IsSimNotification(uint32_t code)
 {
     return ((code >= HNOTI_SIM_BASE) && (code < HNOTI_DATA_BASE));
+}
+
+void HRilSim::CopyToHRilSimIO(
+    std::unique_ptr<HRilSimIO> &rilSimIO, const OHOS::HDI::Ril::V1_0::ISimIoRequestInfo &simIO)
+{
+    rilSimIO->command = simIO.command;
+    rilSimIO->fileid = simIO.fileId;
+    rilSimIO->p1 = simIO.p1;
+    rilSimIO->p2 = simIO.p2;
+    rilSimIO->p3 = simIO.p3;
+    TELEPHONY_LOGI("CopyToHRilSimIO.data: %{public}s, path: %{public}s, pin2: %{public}s", simIO.data.c_str(),
+        simIO.path.c_str(), simIO.pin2.c_str());
+    CopyToCharPoint(&(rilSimIO->data), simIO.data);
+    CopyToCharPoint(&(rilSimIO->pathid), simIO.path);
+    CopyToCharPoint(&(rilSimIO->pin2), simIO.pin2);
+    TELEPHONY_LOGI("CopyToHRilSimIO.result: %{public}s, pathid: %{public}s, pin2: %{public}s", rilSimIO->data,
+        rilSimIO->pathid, rilSimIO->pin2);
+}
+
+void HRilSim::CopyToHRilSimLock(
+    std::unique_ptr<HRilSimClock> &rilSimLock, const OHOS::HDI::Ril::V1_0::ISimLockInfo &simLockInfo)
+{
+    rilSimLock->mode = simLockInfo.mode;
+    rilSimLock->status = simLockInfo.status;
+    rilSimLock->classx = simLockInfo.classx;
+    CopyToCharPoint(&(rilSimLock->fac), simLockInfo.fac);
+    CopyToCharPoint(&(rilSimLock->passwd), simLockInfo.passwd);
+}
+
+void HRilSim::CopyToHRilSimPassword(
+    std::unique_ptr<HRilSimPassword> &rilSimPassword, const OHOS::HDI::Ril::V1_0::ISimPasswordInfo &simPassword)
+{
+    CopyToCharPoint(&(rilSimPassword->fac), simPassword.fac);
+    CopyToCharPoint(&(rilSimPassword->oldPassword), simPassword.oldPassword);
+    CopyToCharPoint(&(rilSimPassword->newPassword), simPassword.newPassword);
+    rilSimPassword->passwordLength = simPassword.passwordLength;
+}
+
+void HRilSim::CopyToHRilSimProtocolRequest(std::unique_ptr<HRilSimProtocolRequest> &hRilSimProtocolRequest,
+    const OHOS::HDI::Ril::V1_0::ISimProtocolRequest &protocol)
+{
+    hRilSimProtocolRequest->phase = protocol.phase;
+    hRilSimProtocolRequest->protocol = protocol.protocol;
+    hRilSimProtocolRequest->slotId = protocol.slotId;
+}
+
+void HRilSim::CopyToHRilApduSimIO(
+    std::unique_ptr<HRilApduSimIO> &rilApduSimIO, const OHOS::HDI::Ril::V1_0::IApduSimIORequestInfo &apduSimIO)
+{
+    rilApduSimIO->channelId = apduSimIO.channelId;
+    rilApduSimIO->type = apduSimIO.type;
+    rilApduSimIO->instruction = apduSimIO.instruction;
+    rilApduSimIO->p1 = apduSimIO.p1;
+    rilApduSimIO->p2 = apduSimIO.p2;
+    rilApduSimIO->p3 = apduSimIO.p3;
+    CopyToCharPoint(&(rilApduSimIO->data), apduSimIO.data);
+}
+
+void HRilSim::CopyToHRilSimAuthentication(std::unique_ptr<HRilSimAuthenticationRequestInfo> &rilSimAuthInfo,
+    const OHOS::HDI::Ril::V1_0::ISimAuthenticationRequestInfo &simAuthInfo)
+{
+    rilSimAuthInfo->serial = simAuthInfo.serial;
+    CopyToCharPoint(&(rilSimAuthInfo->aid), simAuthInfo.aid);
+    CopyToCharPoint(&(rilSimAuthInfo->data), simAuthInfo.authData);
+}
+
+void HRilSim::CopyToCharPoint(char **dest, const std::string &src)
+{
+    size_t size = src.size();
+    if (size <= 0) {
+        TELEPHONY_LOGE("CopyToCharPoint  src is null");
+        return;
+    }
+    *dest = (char *)malloc((size + 1) * sizeof(char));
+    if (*dest == nullptr) {
+        TELEPHONY_LOGE("CopyToCharPoint malloc content fail!");
+        return;
+    }
+    if (memset_s(*dest, size + 1, 0, size + 1) != EOK) {
+        TELEPHONY_LOGE("CopyToCharPoint memset_s failed");
+        SafeFrees(*dest);
+        return;
+    }
+    if (strcpy_s(*dest, size + 1, src.c_str()) != EOK) {
+        TELEPHONY_LOGE("CopyToCharPoint strcpy_s error");
+        SafeFrees(*dest);
+    }
+}
+
+bool HRilSim::BuildILockStatusResp(
+    const void *response, size_t responseLen, HDI::Ril::V1_0::ILockStatusResp &lockStatus)
+{
+    if (response == nullptr || responseLen != sizeof(HRilLockStatus)) {
+        return false;
+    }
+    const HRilLockStatus *resp = static_cast<const HRilLockStatus *>(response);
+    lockStatus.result = resp->result;
+    lockStatus.remain = resp->remain;
+    return true;
+}
+
+int32_t HRilSim::ResponseLockStatus(HDI::Ril::V1_0::ILockStatusResp &lockStatus, HRilRadioResponseInfo &responseInfo,
+    const void *response, size_t responseLen)
+{
+    if (BuildILockStatusResp(response, responseLen, lockStatus)) {
+        TELEPHONY_LOGE("Invalid response: response is nullptr");
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    return HRIL_ERR_SUCCESS;
+}
+
+int32_t HRilSim::BuildSimIOResp(HDI::Ril::V1_0::IIccIoResultInfo &result, HRilRadioResponseInfo &responseInfo,
+    const void *response, size_t responseLen)
+{
+    if ((response == nullptr && responseLen != 0) ||
+        (response != nullptr && responseLen != sizeof(HRilSimIOResponse))) {
+        TELEPHONY_LOGE("Invalid response: Vendor exception!");
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null");
+        return HRIL_ERR_NULL_POINT;
+    }
+    result = ProcessIccIoResponse(responseInfo, response, responseLen);
+    return HRIL_ERR_SUCCESS;
 }
 } // namespace Telephony
 } // namespace OHOS

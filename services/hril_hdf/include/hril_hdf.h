@@ -49,3 +49,4 @@ extern void OnTimerCallback(HRilCallbackFun func, uint8_t *param, const struct t
 }
 #endif
 #endif // OHOS_RIL_ADAPTER_RIL_INIT_H
+
