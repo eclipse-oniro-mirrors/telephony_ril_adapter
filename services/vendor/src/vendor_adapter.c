@@ -16,6 +16,7 @@
 #include "vendor_adapter.h"
 
 #include <fcntl.h>
+#include <stddef.h>
 #include <termios.h>
 
 #include "at_call.h"
@@ -25,9 +26,23 @@
 #include "at_sim.h"
 #include "at_sms.h"
 #include "at_support.h"
+#include "hril.h"
 #include "hril_notification.h"
+#include "hril_public_struct.h"
+#include "hril_vendor_call_defs.h"
+#include "hril_vendor_data_defs.h"
+#include "hril_vendor_modem_defs.h"
+#include "hril_vendor_network_defs.h"
+#include "hril_vendor_sim_defs.h"
+#include "hril_vendor_sms_defs.h"
 #include "parameter.h"
+#include "pthread.h"
+#include "sched.h"
+#include "securec.h"
+#include "telephony_log_c.h"
+#include "unistd.h"
 #include "vendor_report.h"
+#include "vendor_util.h"
 
 #define DEVICE_PATH "/dev/ttyUSB0"
 #define DEVICE_PATH_DEFAULT "/dev/ttyUSB"

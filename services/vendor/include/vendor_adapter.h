@@ -16,7 +16,10 @@
 #ifndef OHOS_VENDOR_ADAPTER_H
 #define OHOS_VENDOR_ADAPTER_H
 
+#include <stdint.h>
+
 #include "hril.h"
+#include "hril_enum.h"
 
 #define SLEEP_TIME 10
 

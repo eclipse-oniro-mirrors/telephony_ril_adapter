@@ -15,6 +15,15 @@
 
 #include "vendor_channel.h"
 
+#include <stddef.h>
+#include <sys/types.h>
+
+#include "bits/errno.h"
+#include "errno.h"
+#include "securec.h"
+#include "string.h"
+#include "telephony_log_c.h"
+#include "unistd.h"
 #include "vendor_util.h"
 
 static char g_buffer[MAX_RESPONSE_LEN + 1];
