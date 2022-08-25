@@ -1421,7 +1421,20 @@ int32_t HRilCall::GetEmergencyCallListResponse(
 
 int32_t HRilCall::CallStateUpdated(int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen)
 {
-    struct HdfSBuf *dataSbuf = HdfSbufTypedObtain(SBUF_IPC);
+    std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
+    if (parcel == nullptr) {
+        TELEPHONY_LOGE("parcel is nullptr");
+        return HRIL_ERR_NULL_POINT;
+    }
+    if (!parcel->WriteInterfaceToken(HRIL_INTERFACE_TOKEN)) {
+        TELEPHONY_LOGE("write interface token failed.");
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
+    struct HdfSBuf *dataSbuf = ParcelToSbuf(parcel.get());
+    if (dataSbuf == nullptr) {
+        TELEPHONY_LOGE("dataSbuf is null.");
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
 
     if (!HdfSbufWriteInt32(dataSbuf, GetSlotId())) {
         HdfSbufRecycle(dataSbuf);
