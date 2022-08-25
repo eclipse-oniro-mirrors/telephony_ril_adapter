@@ -25,106 +25,167 @@ HRilModem::HRilModem(int32_t slotId, IHRilReporter &hrilReporter) : HRilBase(slo
     AddHandlerToMap();
 }
 
-int32_t HRilModem::ShutDown(struct HdfSBuf *data)
+int32_t HRilModem::ShutDown(int32_t serialId)
 {
-    return RequestVendor(data, HREQ_MODEM_SHUT_DOWN, modemFuncs_, &HRilModemReq::ShutDown);
+    return RequestVendor(serialId, HREQ_MODEM_SHUT_DOWN, modemFuncs_, &HRilModemReq::ShutDown);
 }
 
-int32_t HRilModem::SetRadioState(struct HdfSBuf *data)
+int32_t HRilModem::SetRadioState(int32_t serialId, int32_t fun, int32_t rst)
 {
-    int32_t fun = -1;
-    int32_t rst = -1;
-    return RequestVendor(data, HREQ_MODEM_SET_RADIO_STATUS, modemFuncs_, &HRilModemReq::SetRadioState, fun, rst);
+    return RequestVendor(serialId, HREQ_MODEM_SET_RADIO_STATUS, modemFuncs_, &HRilModemReq::SetRadioState, fun, rst);
 }
 
-int32_t HRilModem::GetRadioState(struct HdfSBuf *data)
+int32_t HRilModem::GetRadioState(int32_t serialId)
 {
-    return RequestVendor(data, HREQ_MODEM_GET_RADIO_STATUS, modemFuncs_, &HRilModemReq::GetRadioState);
+    return RequestVendor(serialId, HREQ_MODEM_GET_RADIO_STATUS, modemFuncs_, &HRilModemReq::GetRadioState);
 }
 
-int32_t HRilModem::GetImei(struct HdfSBuf *data)
+int32_t HRilModem::GetImei(int32_t serialId)
 {
-    return RequestVendor(data, HREQ_MODEM_GET_IMEI, modemFuncs_, &HRilModemReq::GetImei);
+    return RequestVendor(serialId, HREQ_MODEM_GET_IMEI, modemFuncs_, &HRilModemReq::GetImei);
 }
 
-int32_t HRilModem::GetMeid(struct HdfSBuf *data)
+int32_t HRilModem::GetMeid(int32_t serialId)
 {
-    return RequestVendor(data, HREQ_MODEM_GET_MEID, modemFuncs_, &HRilModemReq::GetMeid);
+    return RequestVendor(serialId, HREQ_MODEM_GET_MEID, modemFuncs_, &HRilModemReq::GetMeid);
 }
 
-int32_t HRilModem::GetVoiceRadioTechnology(struct HdfSBuf *data)
+int32_t HRilModem::GetVoiceRadioTechnology(int32_t serialId)
 {
-    return RequestVendor(data, HREQ_MODEM_GET_VOICE_RADIO, modemFuncs_, &HRilModemReq::GetVoiceRadioTechnology);
+    return RequestVendor(serialId, HREQ_MODEM_GET_VOICE_RADIO, modemFuncs_, &HRilModemReq::GetVoiceRadioTechnology);
 }
 
-int32_t HRilModem::GetBasebandVersion(struct HdfSBuf *data)
+int32_t HRilModem::GetBasebandVersion(int32_t serialId)
 {
-    return RequestVendor(data, HREQ_MODEM_GET_BASEBAND_VERSION, modemFuncs_, &HRilModemReq::GetBasebandVersion);
+    return RequestVendor(serialId, HREQ_MODEM_GET_BASEBAND_VERSION, modemFuncs_, &HRilModemReq::GetBasebandVersion);
 }
 
 int32_t HRilModem::RadioStateUpdated(
-    const int32_t indType, const HRilErrNumber e, const void *response, size_t responselen)
+    const int32_t indType, const HRilErrNumber e, const void *response, size_t responseLen)
 {
-    return Notify<int32_t, HRilInt32Parcel>(
-        indType, (const int32_t *)response, responselen, HNOTI_MODEM_RADIO_STATE_UPDATED);
+    if ((response == nullptr && responseLen != 0) || (responseLen % sizeof(int32_t)) != 0) {
+        TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null");
+        return HRIL_ERR_NULL_POINT;
+    }
+    return Notify(&HDI::Ril::V1_0::IRilCallback::RadioStateUpdated, *(const int32_t *)response);
 }
 
 int32_t HRilModem::VoiceRadioTechUpdated(
-    const int32_t indType, const HRilErrNumber e, const void *response, size_t responselen)
+    const int32_t indType, const HRilErrNumber e, const void *response, size_t responseLen)
 {
-    return Notify<HRilVoiceRadioInfo, VoiceRadioTechnology>(
-        indType, (const HRilVoiceRadioInfo *)response, responselen, HNOTI_MODEM_VOICE_TECH_UPDATED);
+    if ((response == nullptr && responseLen != 0) || (responseLen % sizeof(HRilVoiceRadioInfo)) != 0) {
+        TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null");
+        return HRIL_ERR_NULL_POINT;
+    }
+    HDI::Ril::V1_0::IVoiceRadioTechnology voiceRadioTech = {};
+    BuildIVoiceRadioTechnology(voiceRadioTech, *(const HRilVoiceRadioInfo *)response);
+    return Notify(&HDI::Ril::V1_0::IRilCallback::VoiceRadioTechUpdated, voiceRadioTech);
 }
 
 int32_t HRilModem::ShutDownResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    return Response(responseInfo, HrilEmptyParcel(), requestNum);
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::ShutDownResponse);
 }
 
 int32_t HRilModem::SetRadioStateResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    return Response(responseInfo, HrilEmptyParcel(), requestNum);
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::SetRadioStateResponse);
 }
 
 int32_t HRilModem::GetRadioStateResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    return Response(responseInfo, HRilInt32Parcel((const uint8_t *)response, responseLen), requestNum);
+    if ((response == nullptr && responseLen != 0) || (responseLen % sizeof(int32_t)) != 0) {
+        TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null");
+        return HRIL_ERR_NULL_POINT;
+    }
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::GetRadioStateResponse, *(const int32_t *)response);
 }
 
 int32_t HRilModem::GetImeiResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    return Response(responseInfo, HRilStringParcel((const char *)response), requestNum);
+    if ((response == nullptr && responseLen != 0) || (responseLen % sizeof(char)) != 0) {
+        TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null");
+        return HRIL_ERR_NULL_POINT;
+    }
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::GetImeiResponse, std::string((const char *)response));
 }
 
 int32_t HRilModem::GetMeidResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    return Response(responseInfo, HRilStringParcel((const char *)response), requestNum);
+    if ((response == nullptr && responseLen != 0) || (responseLen % sizeof(char)) != 0) {
+        TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null");
+        return HRIL_ERR_NULL_POINT;
+    }
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::GetMeidResponse, std::string((const char *)response));
 }
 
 int32_t HRilModem::GetVoiceRadioTechnologyResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    VoiceRadioTechnology voiceRadioTech = {};
+    HDI::Ril::V1_0::IVoiceRadioTechnology voiceRadioTech = {};
     if (response == nullptr) {
         TELEPHONY_LOGE("GetVoiceRadioTechnologyResponse Invalid response: nullptr");
         if (responseInfo.error == HRilErrType::NONE) {
             responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
         }
     } else {
-        voiceRadioTech = *static_cast<const HRilVoiceRadioInfo *>(response);
+        BuildIVoiceRadioTechnology(voiceRadioTech, *(const HRilVoiceRadioInfo *)response);
     }
-    return Response(responseInfo, voiceRadioTech, requestNum);
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::GetVoiceRadioTechnologyResponse, voiceRadioTech);
+}
+
+void HRilModem::BuildIVoiceRadioTechnology(
+    HDI::Ril::V1_0::IVoiceRadioTechnology &voiceRadioTech, const HRilVoiceRadioInfo &hRiadioInfo)
+{
+    voiceRadioTech.srvStatus = static_cast<OHOS::HDI::Ril::V1_0::IHRilSrvStatus>(hRiadioInfo.srvStatus);
+    voiceRadioTech.srvDomain = static_cast<OHOS::HDI::Ril::V1_0::IHRilSrvDomain>(hRiadioInfo.srvDomain);
+    voiceRadioTech.roamStatus = static_cast<OHOS::HDI::Ril::V1_0::IHRilRoamStatus>(hRiadioInfo.roamStatus);
+    voiceRadioTech.simStatus = static_cast<OHOS::HDI::Ril::V1_0::IHRilSimStatus>(hRiadioInfo.simStatus);
+    voiceRadioTech.lockStatus = static_cast<OHOS::HDI::Ril::V1_0::IHRilSimLockStatus>(hRiadioInfo.lockStatus);
+    voiceRadioTech.sysMode = static_cast<OHOS::HDI::Ril::V1_0::IHRilSysMode>(hRiadioInfo.sysMode);
+    voiceRadioTech.sysModeName = hRiadioInfo.sysModeName;
+    voiceRadioTech.actType = static_cast<OHOS::HDI::Ril::V1_0::IHRilRadioTech>(hRiadioInfo.actType);
+    voiceRadioTech.actName = hRiadioInfo.actName;
 }
 
 int32_t HRilModem::GetBasebandVersionResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    return Response(responseInfo, HRilStringParcel((const char *)response), requestNum);
+    if ((response == nullptr && responseLen != 0) || (responseLen % sizeof(char)) != 0) {
+        TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null");
+        return HRIL_ERR_NULL_POINT;
+    }
+    return Response(
+        responseInfo, &HDI::Ril::V1_0::IRilCallback::GetBasebandVersionResponse, std::string((const char *)response));
 }
 
 bool HRilModem::IsModemResponse(uint32_t code)
@@ -155,14 +216,6 @@ void HRilModem::AddHandlerToMap()
     respMemberFuncMap_[HREQ_MODEM_GET_MEID] = &HRilModem::GetMeidResponse;
     respMemberFuncMap_[HREQ_MODEM_GET_VOICE_RADIO] = &HRilModem::GetVoiceRadioTechnologyResponse;
     respMemberFuncMap_[HREQ_MODEM_GET_BASEBAND_VERSION] = &HRilModem::GetBasebandVersionResponse;
-    // request
-    reqMemberFuncMap_[HREQ_MODEM_SHUT_DOWN] = &HRilModem::ShutDown;
-    reqMemberFuncMap_[HREQ_MODEM_SET_RADIO_STATUS] = &HRilModem::SetRadioState;
-    reqMemberFuncMap_[HREQ_MODEM_GET_RADIO_STATUS] = &HRilModem::GetRadioState;
-    reqMemberFuncMap_[HREQ_MODEM_GET_IMEI] = &HRilModem::GetImei;
-    reqMemberFuncMap_[HREQ_MODEM_GET_MEID] = &HRilModem::GetMeid;
-    reqMemberFuncMap_[HREQ_MODEM_GET_VOICE_RADIO] = &HRilModem::GetVoiceRadioTechnology;
-    reqMemberFuncMap_[HREQ_MODEM_GET_BASEBAND_VERSION] = &HRilModem::GetBasebandVersion;
 }
 
 void HRilModem::RegisterModemFuncs(const HRilModemReq *modemFuncs)

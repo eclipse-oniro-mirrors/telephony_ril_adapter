@@ -30,43 +30,42 @@ public:
 
     void RegisterCallFuncs(const HRilCallReq *callFuncs);
 
-    int32_t Dial(struct HdfSBuf *data);
-    int32_t GetClip(struct HdfSBuf *data);
-    int32_t SetClip(struct HdfSBuf *data);
-    int32_t GetCallList(struct HdfSBuf *data);
-    int32_t Hangup(struct HdfSBuf *data);
-    int32_t Reject(struct HdfSBuf *data);
-    int32_t HoldCall(struct HdfSBuf *data);
-    int32_t UnHoldCall(struct HdfSBuf *data);
-    int32_t SwitchCall(struct HdfSBuf *data);
-    int32_t Answer(struct HdfSBuf *data);
-    int32_t CombineConference(struct HdfSBuf *data);
-    int32_t SeparateConference(struct HdfSBuf *data);
-    int32_t CallSupplement(struct HdfSBuf *data);
-    int32_t GetCallWaiting(struct HdfSBuf *data);
-    int32_t SetCallWaiting(struct HdfSBuf *data);
-    int32_t GetCallTransferInfo(struct HdfSBuf *data);
-    int32_t SetCallTransferInfo(struct HdfSBuf *data);
-    int32_t GetCallRestriction(struct HdfSBuf *data);
-    int32_t SetCallRestriction(struct HdfSBuf *data);
-    int32_t GetClir(struct HdfSBuf *data);
-    int32_t SetClir(struct HdfSBuf *data);
-    int32_t StartDtmf(struct HdfSBuf *data);
-    int32_t SendDtmf(struct HdfSBuf *data);
-    int32_t ProcessSendDtmf(int32_t serial, CallDtmfInfo &info);
-    int32_t StopDtmf(struct HdfSBuf *data);
+    int32_t GetCallList(int32_t serialId);
+    int32_t Dial(int32_t serialId, const OHOS::HDI::Ril::V1_0::IDialInfo &dialInfo);
+    int32_t Reject(int32_t serialId);
+    int32_t Hangup(int32_t serialId, int32_t gsmIndex);
+    int32_t Answer(int32_t serialId);
+    int32_t HoldCall(int32_t serialId);
+    int32_t UnHoldCall(int32_t serialId);
+    int32_t SwitchCall(int32_t serialId);
+    int32_t CombineConference(int32_t serialId, int32_t callType);
+    int32_t SeparateConference(int32_t serialId, int32_t callIndex, int32_t callType);
+    int32_t GetCallWaiting(int32_t serialId);
+    int32_t SetCallWaiting(int32_t serialId, int32_t activate);
+    int32_t GetCallTransferInfo(int32_t serialId, int32_t reason);
+    int32_t SetCallTransferInfo(int32_t serialId, const OHOS::HDI::Ril::V1_0::ICallForwardSetInfo &callForwardSetInfo);
+    int32_t GetCallRestriction(int32_t serialId, const std::string &fac);
+    int32_t SetCallRestriction(int32_t serialId, const OHOS::HDI::Ril::V1_0::ICallRestrictionInfo &callRestrictionInfo);
+    int32_t GetClip(int32_t serialId);
+    int32_t SetClip(int32_t serialId, int32_t action);
+    int32_t GetClir(int32_t serialId);
+    int32_t SetClir(int32_t serialId, int32_t action);
+    int32_t GetCallPreferenceMode(int32_t serialId);
+    int32_t SetCallPreferenceMode(int32_t serialId, int32_t mode);
+    int32_t SetUssd(int32_t serialId, const std::string &str);
+    int32_t GetUssd(int32_t serialId);
+    int32_t SetMute(int32_t serialId, int32_t mute);
+    int32_t GetMute(int32_t serialId);
+    int32_t GetCallFailReason(int32_t serialId);
+    int32_t CallSupplement(int32_t serialId, int32_t type);
+    int32_t SetBarringPassword(int32_t serialId, const OHOS::HDI::Ril::V1_0::ISetBarringInfo &setBarringInfo);
+    int32_t StartDtmf(int32_t serialId, const OHOS::HDI::Ril::V1_0::IDtmfInfo &dtmfInfo);
+    int32_t SendDtmf(int32_t serialId, const OHOS::HDI::Ril::V1_0::IDtmfInfo &dtmfInfo);
+    int32_t StopDtmf(int32_t serialId, const OHOS::HDI::Ril::V1_0::IDtmfInfo &dtmfInfo);
+    int32_t GetEmergencyCallList(int32_t serialId);
+    int32_t SetEmergencyCallList(int32_t serialId, const OHOS::HDI::Ril::V1_0::IEmergencyInfoList &emergencyInfoList);
     bool IsCallResponse(uint32_t code);
     bool IsCallNotification(uint32_t code);
-    int32_t GetCallPreferenceMode(struct HdfSBuf *data);
-    int32_t SetCallPreferenceMode(struct HdfSBuf *data);
-    int32_t SetUssd(struct HdfSBuf *data);
-    int32_t GetUssd(struct HdfSBuf *data);
-    int32_t SetMute(struct HdfSBuf *data);
-    int32_t GetMute(struct HdfSBuf *data);
-    int32_t GetEmergencyCallList(int32_t serialId);
-    int32_t GetCallFailReason(struct HdfSBuf *data);
-    int32_t SetEmergencyCallList(int32_t serialId, const OHOS::HDI::Ril::V1_0::IEmergencyInfoList &emergencyInfoList);
-    int32_t SetBarringPassword(struct HdfSBuf *data);
 
     int32_t GetCallListResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
@@ -136,6 +135,8 @@ public:
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t SetEmergencyCallListResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t SetBarringPasswordResponse(
+        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
 
     int32_t CallStateUpdated(int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
     int32_t CallUssdNotice(int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
@@ -144,21 +145,18 @@ public:
     int32_t CallEmergencyNotice(int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
     int32_t CallSsNotice(int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
 
-    void BuildCallList(
-        CallInfoList &callInfoList, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    void BuildICallList(
+        HDI::Ril::V1_0::ICallInfoList &callInfoList, const void *response, size_t responseLen);
     void BuildIEmergencyCallList(
         HDI::Ril::V1_0::IEmergencyInfoList &emergencyCallInfoList, const void *response, size_t responseLen);
-    void BuildCallForwardQueryInfoList(CallForwardQueryInfoList &callForwardQueryInfoList,
+    void BuildICallForwardQueryInfoList(HDI::Ril::V1_0::ICallForwardQueryInfoList &cFQueryList,
         HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
-    int32_t SetBarringPasswordResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
 
 private:
     void CopyToHRilEmergencyInfoArray(
         HRilEmergencyInfo *emergencyInfoCalls, std::vector<OHOS::HDI::Ril::V1_0::IEmergencyCall> calls);
     void AddCallNotificationToMap();
     void AddCallResponseToMap();
-    void AddCallRequestToMap();
 
 private:
     const HRilCallReq *callFuncs_ = nullptr;

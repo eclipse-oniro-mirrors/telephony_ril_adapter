@@ -32,34 +32,33 @@ public:
     void ProcessSimNotify(const struct ReportInfo *reportInfo, const void *response, size_t responseLen);
     bool IsSimRespOrNotify(uint32_t code);
     void RegisterSimFuncs(const HRilSimReq *simFuncs);
+    int32_t GetSimIO(int32_t serialId, const OHOS::HDI::Ril::V1_0::ISimIoRequestInfo &simIO);
+    int32_t GetSimStatus(int32_t serialId);
+    int32_t GetImsi(int32_t serialId);
+    int32_t GetSimLockStatus(int32_t serialId, const OHOS::HDI::Ril::V1_0::ISimLockInfo &simLockInfo);
+    int32_t SetSimLock(int32_t serialId, const OHOS::HDI::Ril::V1_0::ISimLockInfo &simLockInfo);
+    int32_t ChangeSimPassword(int32_t serialId, const OHOS::HDI::Ril::V1_0::ISimPasswordInfo &simPassword);
+    int32_t UnlockPin(int32_t serialId, const std::string &pin);
+    int32_t UnlockPuk(int32_t serialId, const std::string &puk, const std::string &pin);
+    int32_t UnlockPin2(int32_t serialId, const std::string &pin2);
+    int32_t UnlockPuk2(int32_t serialId, const std::string &puk2, const std::string &pin2);
+    int32_t SetActiveSim(int32_t serialId, int32_t index, int32_t enable);
+    int32_t SimStkSendTerminalResponse(int32_t serialId, const std::string &strCmd);
+    int32_t SimStkSendEnvelope(int32_t serialId, const std::string &strCmd);
+    int32_t SimStkSendCallSetupRequestResult(int32_t serialId, int32_t accept);
+    int32_t SimStkIsReady(int32_t serialId);
+    int32_t SetRadioProtocol(int32_t serialId, const OHOS::HDI::Ril::V1_0::ISimProtocolRequest &protocol);
+    int32_t SimOpenLogicalChannel(int32_t serialId, const std::string &appID, int32_t p2);
+    int32_t SimCloseLogicalChannel(int32_t serialId, int32_t channelId);
+    int32_t SimTransmitApduLogicalChannel(
+        int32_t serialId, const OHOS::HDI::Ril::V1_0::IApduSimIORequestInfo &apduSimIO);
+    int32_t SimTransmitApduBasicChannel(int32_t serialId, const OHOS::HDI::Ril::V1_0::IApduSimIORequestInfo &apduSimIO);
+    int32_t SimAuthentication(int32_t serialId, const OHOS::HDI::Ril::V1_0::ISimAuthenticationRequestInfo &simAuthInfo);
+    int32_t UnlockSimLock(int32_t serialId, int32_t lockType, const std::string &key);
 
 private:
     void AddHandlerToMap();
     void AddNotificationHandlerToMap();
-
-    int32_t GetSimIO(struct HdfSBuf *data);
-    int32_t GetSimStatus(struct HdfSBuf *data);
-    int32_t GetImsi(struct HdfSBuf *data);
-    int32_t GetSimLockStatus(struct HdfSBuf *data);
-    int32_t SetSimLock(struct HdfSBuf *data);
-    int32_t ChangeSimPassword(struct HdfSBuf *data);
-    int32_t UnlockPin(struct HdfSBuf *data);
-    int32_t UnlockPuk(struct HdfSBuf *data);
-    int32_t UnlockPin2(struct HdfSBuf *data);
-    int32_t UnlockPuk2(struct HdfSBuf *data);
-    int32_t SetActiveSim(struct HdfSBuf *data);
-    int32_t SimStkSendTerminalResponse(struct HdfSBuf *data);
-    int32_t SimStkSendEnvelope(struct HdfSBuf *data);
-    int32_t SimStkSendCallSetupRequestResult(struct HdfSBuf *data);
-    int32_t SimStkIsReady(struct HdfSBuf *data);
-    int32_t SetRadioProtocol(struct HdfSBuf *data);
-    int32_t SimOpenLogicalChannel(struct HdfSBuf *data);
-    int32_t SimCloseLogicalChannel(struct HdfSBuf *data);
-    int32_t SimTransmitApduLogicalChannel(struct HdfSBuf *data);
-    int32_t SimTransmitApduBasicChannel(struct HdfSBuf *data);
-    int32_t SimAuthentication(struct HdfSBuf *data);
-    int32_t UnlockSimLock(struct HdfSBuf *data);
-
     int32_t GetSimIOResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t GetSimStatusResponse(
@@ -104,7 +103,7 @@ private:
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t UnlockSimLockResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
-    IccIoResultInfo ProcessIccIoResponse(
+    HDI::Ril::V1_0::IIccIoResultInfo ProcessIccIoResponse(
         HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
 
     int32_t SimStateUpdated(int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen);
@@ -119,6 +118,23 @@ private:
 private:
     bool IsSimResponse(uint32_t code);
     bool IsSimNotification(uint32_t code);
+    void CopyToHRilSimIO(std::unique_ptr<HRilSimIO> &rilSimIO, const OHOS::HDI::Ril::V1_0::ISimIoRequestInfo &simIO);
+    void CopyToHRilSimLock(
+        std::unique_ptr<HRilSimClock> &rilSimLock, const OHOS::HDI::Ril::V1_0::ISimLockInfo &simLockInfo);
+    void CopyToHRilSimPassword(
+        std::unique_ptr<HRilSimPassword> &rilSimPassword, const OHOS::HDI::Ril::V1_0::ISimPasswordInfo &simPassword);
+    void CopyToHRilSimProtocolRequest(std::unique_ptr<HRilSimProtocolRequest> &hRilSimProtocolRequest,
+        const OHOS::HDI::Ril::V1_0::ISimProtocolRequest &protocol);
+    void CopyToHRilApduSimIO(
+        std::unique_ptr<HRilApduSimIO> &rilApduSimIO, const OHOS::HDI::Ril::V1_0::IApduSimIORequestInfo &apduSimIO);
+    void CopyToHRilSimAuthentication(std::unique_ptr<HRilSimAuthenticationRequestInfo> &rilSimAuthInfo,
+        const OHOS::HDI::Ril::V1_0::ISimAuthenticationRequestInfo &simAuthInfo);
+    void CopyToCharPoint(char **a, const std::string &temp);
+    bool BuildILockStatusResp(const void *response, size_t responseLen, HDI::Ril::V1_0::ILockStatusResp &lockStatus);
+    int32_t ResponseLockStatus(HDI::Ril::V1_0::ILockStatusResp &lockStatus, HRilRadioResponseInfo &responseInfo,
+        const void *response, size_t responseLen);
+    int32_t BuildSimIOResp(HDI::Ril::V1_0::IIccIoResultInfo &result, HRilRadioResponseInfo &responseInfo,
+        const void *response, size_t responseLen);
 
     const HRilSimReq *simFuncs_ = nullptr;
 };
