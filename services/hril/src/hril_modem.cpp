@@ -168,9 +168,9 @@ void HRilModem::BuildIVoiceRadioTechnology(
     voiceRadioTech.simStatus = static_cast<OHOS::HDI::Ril::V1_0::IHRilSimStatus>(hRiadioInfo.simStatus);
     voiceRadioTech.lockStatus = static_cast<OHOS::HDI::Ril::V1_0::IHRilSimLockStatus>(hRiadioInfo.lockStatus);
     voiceRadioTech.sysMode = static_cast<OHOS::HDI::Ril::V1_0::IHRilSysMode>(hRiadioInfo.sysMode);
-    voiceRadioTech.sysModeName = hRiadioInfo.sysModeName;
+    voiceRadioTech.sysModeName = (hRiadioInfo.sysModeName == nullptr) ? "" : hRiadioInfo.sysModeName;
     voiceRadioTech.actType = static_cast<OHOS::HDI::Ril::V1_0::IHRilRadioTech>(hRiadioInfo.actType);
-    voiceRadioTech.actName = hRiadioInfo.actName;
+    voiceRadioTech.actName = (hRiadioInfo.actName == nullptr) ? "" : hRiadioInfo.actName;
 }
 
 int32_t HRilModem::GetBasebandVersionResponse(
