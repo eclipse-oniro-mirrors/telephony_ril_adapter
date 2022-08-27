@@ -1289,6 +1289,12 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetDataProfileInfoTest_0100, Function
     OnProcessTest(HREQ_DATA_SET_DATA_PROFILE_INFO, event);
 }
 
+/**
+ * @tc.number Telephony_RilAdapter_SendDataPerformanceModeTest_0100 to do ...
+ * @tc.name Set notification filter of the card 1
+ * @tc.desc Function test
+ * @tc.require: issueI5NWRD
+ */
 HWTEST_F(RilUnitTest, Telephony_RilAdapter_SendDataPerformanceModeTest_0100, Function | MediumTest | Level3)
 {
     OnInit();
@@ -1297,6 +1303,12 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_SendDataPerformanceModeTest_0100, Fun
     OnProcessTest(HREQ_DATA_SEND_DATA_PERFORMANCE_MODE, event);
 }
 
+/**
+ * @tc.number Telephony_RilAdapter_SendDataSleepModeTest_0100 to do ...
+ * @tc.name Set notification filter of the card 1
+ * @tc.desc Function test
+ * @tc.require: issueI5NWRD
+ */
 HWTEST_F(RilUnitTest, Telephony_RilAdapter_SendDataSleepModeTest_0100, Function | MediumTest | Level3)
 {
     OnInit();
