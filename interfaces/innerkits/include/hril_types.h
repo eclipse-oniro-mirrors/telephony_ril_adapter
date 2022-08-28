@@ -124,7 +124,6 @@ struct NrRssi {
 };
 
 struct Rssi {
-    int32_t slotId;
     GsmRssi gw;
     CdmaRssi cdma;
     WCdmaRssi wcdma;
@@ -135,8 +134,8 @@ struct Rssi {
 
 /* from 3GPP TS 27.007 V4.3.0 (2001-12) */
 struct GetCallWaitingInfo {
-    int32_t status; /* 0	not active
-                      * 1	active */
+    int32_t status; /* 0 not active
+                     * 1 active */
     int32_t typeClass; /* <classx> default, SLM790 is 255 */
 };
 

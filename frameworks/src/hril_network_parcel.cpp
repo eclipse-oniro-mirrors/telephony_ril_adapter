@@ -383,9 +383,6 @@ std::shared_ptr<AvailableNetworkInfo> AvailableNetworkInfo::UnMarshalling(Parcel
 
 bool SetNetworkModeInfo::ReadFromParcel(Parcel &parcel)
 {
-    if (!ReadBaseInt32(parcel, serial)) {
-        return false;
-    }
     if (!ReadBaseInt32(parcel, selectMode)) {
         return false;
     }
@@ -400,9 +397,6 @@ bool SetNetworkModeInfo::ReadFromParcel(Parcel &parcel)
 
 bool SetNetworkModeInfo::Marshalling(Parcel &parcel) const
 {
-    if (!WriteBaseInt32(parcel, serial)) {
-        return false;
-    }
     if (!WriteBaseInt32(parcel, selectMode)) {
         return false;
     }

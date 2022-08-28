@@ -676,10 +676,10 @@ int32_t RilManagerTest::SetNetworkSelectionMode(
     }
     OHOS::MessageParcel data;
     SetNetworkModeInfo networkMode;
-    networkMode.serial = request->serialId_;
     networkMode.selectMode = mode;
     networkMode.oper = ConvertNullToEmptyString(plmn);
     data.WriteInt32(RilManagerTest::slotId);
+    data.WriteInt32(request->serialId_);
     if (!networkMode.Marshalling(data)) {
         TELEPHONY_LOGE("RilManagerTest::SetNetworkSelectionMode --> Marshalling (data) failed !!!");
         return HRIL_ERR_INVALID_PARAMETER;

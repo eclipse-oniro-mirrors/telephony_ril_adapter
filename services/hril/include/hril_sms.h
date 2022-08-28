@@ -29,24 +29,22 @@ public:
     bool IsSmsRespOrNotify(uint32_t code);
     void RegisterSmsFuncs(const HRilSmsReq *smsFuncs);
 
-private:
-    void AddHandlerToMap();
-    int32_t SendGsmSms(struct HdfSBuf *data);
-    int32_t SendCdmaSms(struct HdfSBuf *data);
-    int32_t AddSimMessage(struct HdfSBuf *data);
-    int32_t DelSimMessage(struct HdfSBuf *data);
-    int32_t UpdateSimMessage(struct HdfSBuf *data);
-    int32_t SetSmscAddr(struct HdfSBuf *data);
-    int32_t GetSmscAddr(struct HdfSBuf *data);
-    int32_t SetCBConfig(struct HdfSBuf *data);
-    int32_t GetCBConfig(struct HdfSBuf *data);
-    int32_t SetCdmaCBConfig(struct HdfSBuf *data);
-    int32_t GetCdmaCBConfig(struct HdfSBuf *data);
-    int32_t SendSmsMoreMode(struct HdfSBuf *data);
-    int32_t SendSmsAck(struct HdfSBuf *data);
-    int32_t AddCdmaSimMessage(struct HdfSBuf *data);
-    int32_t DelCdmaSimMessage(struct HdfSBuf *data);
-    int32_t UpdateCdmaSimMessage(struct HdfSBuf *data);
+    int32_t SendGsmSms(int32_t serialId, const OHOS::HDI::Ril::V1_0::IGsmSmsMessageInfo &gsmSmsMessageInfo);
+    int32_t SendCdmaSms(int32_t serialId, const OHOS::HDI::Ril::V1_0::ISendCdmaSmsMessageInfo &cdmaSmsMessageInfo);
+    int32_t AddSimMessage(int32_t serialId, const OHOS::HDI::Ril::V1_0::ISmsMessageIOInfo &smsMessageIOInfo);
+    int32_t DelSimMessage(int32_t serialId, int32_t index);
+    int32_t UpdateSimMessage(int32_t serialId, const OHOS::HDI::Ril::V1_0::ISmsMessageIOInfo &smsMessageIOInfo);
+    int32_t SetSmscAddr(int32_t serialId, const OHOS::HDI::Ril::V1_0::IServiceCenterAddress &serviceCenterAddress);
+    int32_t GetSmscAddr(int32_t serialId);
+    int32_t SetCBConfig(int32_t serialId, const OHOS::HDI::Ril::V1_0::ICBConfigInfo &cellBroadcastInfo);
+    int32_t GetCBConfig(int32_t serialId);
+    int32_t SetCdmaCBConfig(int32_t serialId, const OHOS::HDI::Ril::V1_0::ICdmaCBConfigInfoList &cdmaCBConfigInfoList);
+    int32_t GetCdmaCBConfig(int32_t serialId);
+    int32_t SendSmsMoreMode(int32_t serialId, const OHOS::HDI::Ril::V1_0::IGsmSmsMessageInfo &gsmSmsMessageInfo);
+    int32_t SendSmsAck(int32_t serialId, const OHOS::HDI::Ril::V1_0::IModeData &modeData);
+    int32_t AddCdmaSimMessage(int32_t serialId, const OHOS::HDI::Ril::V1_0::ISmsMessageIOInfo &smsMessageIOInfo);
+    int32_t DelCdmaSimMessage(int32_t serialId, int32_t index);
+    int32_t UpdateCdmaSimMessage(int32_t serialId, const OHOS::HDI::Ril::V1_0::ISmsMessageIOInfo &smsMessageIOInfo);
 
     int32_t SendGsmSmsResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
@@ -87,14 +85,17 @@ private:
     int32_t NewCdmaSmsNotify(int32_t indType, HRilErrNumber e, const void *response, size_t responseLen);
     int32_t CBConfigNotify(int32_t indType, HRilErrNumber e, const void *response, size_t responseLen);
 
+private:
+    void AddHandlerToMap();
     bool IsSmsResponse(uint32_t code);
     bool IsSmsNotification(uint32_t code);
-    int32_t DataSbuf(HdfSBuf *dataSbuf, int32_t indType);
     int32_t RequestWithInts(int32_t **p, ReqDataInfo *requestInfo, int32_t argCount, ...);
     int32_t RequestWithStrings(int32_t serial, int32_t request, int32_t count, ...);
-    CBConfigReportInfo MakeCBConfigResult(const void *response, const size_t responseLen);
-    SendSmsResultInfo MakeSendSmsResult(
+    HDI::Ril::V1_0::ICBConfigReportInfo MakeCBConfigResult(const void *response, const size_t responseLen);
+    HDI::Ril::V1_0::ISendSmsResultInfo MakeSendSmsResult(
         HRilRadioResponseInfo &responseInfo, int32_t serial, const void *response, const size_t responseLen);
+    void CopyToHRilCdmaCBConfigInfo(
+        HRilCdmaCBConfigInfo *list, OHOS::HDI::Ril::V1_0::ICdmaCBConfigInfoList cellBroadcastInfoList);
 
     const HRilSmsReq *smsFuncs_ = nullptr;
 };

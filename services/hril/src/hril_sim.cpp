@@ -459,7 +459,7 @@ int32_t HRilSim::SimOpenLogicalChannelResponse(
     pOpenLogicalChannelResponse.sw1 = pRilResponse->sw1;
     pOpenLogicalChannelResponse.sw2 = pRilResponse->sw2;
     pOpenLogicalChannelResponse.channelId = pRilResponse->channelId;
-    pOpenLogicalChannelResponse.response = pRilResponse->response;
+    pOpenLogicalChannelResponse.response = (pRilResponse->response == nullptr) ? "" :  pRilResponse->response;
     return Response(
         responseInfo, &HDI::Ril::V1_0::IRilCallback::SimOpenLogicalChannelResponse, pOpenLogicalChannelResponse);
 }
@@ -520,10 +520,7 @@ HDI::Ril::V1_0::IIccIoResultInfo HRilSim::ProcessIccIoResponse(
     const HRilSimIOResponse *resp = static_cast<const HRilSimIOResponse *>(response);
     result.sw1 = resp->sw1;
     result.sw2 = resp->sw2;
-    result.response = "";
-    if (resp->response != nullptr) {
-        result.response = std::string(resp->response);
-    }
+    result.response = (resp->response == nullptr) ? "" : std::string(resp->response);
     return result;
 }
 
@@ -638,29 +635,6 @@ void HRilSim::CopyToHRilSimAuthentication(std::unique_ptr<HRilSimAuthenticationR
     rilSimAuthInfo->serial = simAuthInfo.serial;
     CopyToCharPoint(&(rilSimAuthInfo->aid), simAuthInfo.aid);
     CopyToCharPoint(&(rilSimAuthInfo->data), simAuthInfo.authData);
-}
-
-void HRilSim::CopyToCharPoint(char **dest, const std::string &src)
-{
-    size_t size = src.size();
-    if (size <= 0) {
-        TELEPHONY_LOGE("CopyToCharPoint  src is null");
-        return;
-    }
-    *dest = (char *)malloc((size + 1) * sizeof(char));
-    if (*dest == nullptr) {
-        TELEPHONY_LOGE("CopyToCharPoint malloc content fail!");
-        return;
-    }
-    if (memset_s(*dest, size + 1, 0, size + 1) != EOK) {
-        TELEPHONY_LOGE("CopyToCharPoint memset_s failed");
-        SafeFrees(*dest);
-        return;
-    }
-    if (strcpy_s(*dest, size + 1, src.c_str()) != EOK) {
-        TELEPHONY_LOGE("CopyToCharPoint strcpy_s error");
-        SafeFrees(*dest);
-    }
 }
 
 bool HRilSim::BuildILockStatusResp(

@@ -167,6 +167,53 @@ public:
     int32_t SimAuthentication(
         int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::ISimAuthenticationRequestInfo &simAuthInfo);
     int32_t UnlockSimLock(int32_t slotId, int32_t serialId, int32_t lockType, const std::string &key);
+
+    // Network
+    int32_t GetSignalStrength(int32_t slotId, int32_t serialId);
+    int32_t GetCsRegStatus(int32_t slotId, int32_t serialId);
+    int32_t GetPsRegStatus(int32_t slotId, int32_t serialId);
+    int32_t GetOperatorInfo(int32_t slotId, int32_t serialId);
+    int32_t GetNetworkSearchInformation(int32_t slotId, int32_t serialId);
+    int32_t GetNetworkSelectionMode(int32_t slotId, int32_t serialId);
+    int32_t SetNetworkSelectionMode(
+        int32_t slotId, int32_t serialId, const HDI::Ril::V1_0::ISetNetworkModeInfo &networkModeInfo);
+    int32_t GetNeighboringCellInfoList(int32_t slotId, int32_t serialId);
+    int32_t GetCurrentCellInfo(int32_t slotId, int32_t serialId);
+    int32_t SetPreferredNetwork(int32_t slotId, int32_t serialId, int32_t preferredNetworkType);
+    int32_t GetPreferredNetwork(int32_t slotId, int32_t serialId);
+    int32_t GetRadioCapability(int32_t slotId, int32_t serialId);
+    int32_t GetPhysicalChannelConfig(int32_t slotId, int32_t serialId);
+    int32_t SetLocateUpdates(int32_t slotId, int32_t serialId, const HDI::Ril::V1_0::IHRilRegNotifyMode mode);
+    int32_t SetNotificationFilter(int32_t slotId, int32_t serialId, int32_t newFilter);
+    int32_t SetDeviceState(int32_t slotId, int32_t serialId, int32_t deviceStateType, int32_t deviceStateOn);
+
+    // Sms
+    int32_t SendGsmSms(
+        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::IGsmSmsMessageInfo &gsmSmsMessageInfo);
+    int32_t SendCdmaSms(
+        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::ISendCdmaSmsMessageInfo &cdmaSmsMessageInfo);
+    int32_t AddSimMessage(
+        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::ISmsMessageIOInfo &smsMessageIOInfo);
+    int32_t DelSimMessage(int32_t slotId, int32_t serialId, int32_t index);
+    int32_t UpdateSimMessage(
+        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::ISmsMessageIOInfo &smsMessageIOInfo);
+    int32_t AddCdmaSimMessage(
+        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::ISmsMessageIOInfo &smsMessageIOInfo);
+    int32_t DelCdmaSimMessage(int32_t slotId, int32_t serialId, int32_t index);
+    int32_t UpdateCdmaSimMessage(
+        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::ISmsMessageIOInfo &smsMessageIOInfo);
+    int32_t SetSmscAddr(
+        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::IServiceCenterAddress &serviceCenterAddress);
+    int32_t GetSmscAddr(int32_t slotId, int32_t serialId);
+    int32_t SetCBConfig(int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::ICBConfigInfo &cellBroadcastInfo);
+    int32_t GetCBConfig(int32_t slotId, int32_t serialId);
+    int32_t SetCdmaCBConfig(
+        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::ICdmaCBConfigInfoList &cdmaCBConfigInfoList);
+    int32_t GetCdmaCBConfig(int32_t slotId, int32_t serialId);
+    int32_t SendSmsMoreMode(
+        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::IGsmSmsMessageInfo &gsmSmsMessageInfo);
+    int32_t SendSmsAck(int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::IModeData &modeData);
+
     static std::shared_ptr<HRilManager> manager_;
     template<typename ClassTypePtr, typename FuncType, typename... ParamTypes>
     inline int32_t TaskSchedule(

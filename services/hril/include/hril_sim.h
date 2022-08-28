@@ -129,7 +129,6 @@ private:
         std::unique_ptr<HRilApduSimIO> &rilApduSimIO, const OHOS::HDI::Ril::V1_0::IApduSimIORequestInfo &apduSimIO);
     void CopyToHRilSimAuthentication(std::unique_ptr<HRilSimAuthenticationRequestInfo> &rilSimAuthInfo,
         const OHOS::HDI::Ril::V1_0::ISimAuthenticationRequestInfo &simAuthInfo);
-    void CopyToCharPoint(char **a, const std::string &temp);
     bool BuildILockStatusResp(const void *response, size_t responseLen, HDI::Ril::V1_0::ILockStatusResp &lockStatus);
     int32_t ResponseLockStatus(HDI::Ril::V1_0::ILockStatusResp &lockStatus, HRilRadioResponseInfo &responseInfo,
         const void *response, size_t responseLen);

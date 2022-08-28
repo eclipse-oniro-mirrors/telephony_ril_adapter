@@ -54,7 +54,6 @@ struct AvailableNetworkList : public HrilBaseParcel {
 };
 
 struct SetNetworkModeInfo : public HrilBaseParcel {
-    int32_t serial;
     int32_t selectMode;
     std::string oper; /* Operator information */
     int64_t flag;
