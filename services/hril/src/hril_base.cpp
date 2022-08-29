@@ -273,6 +273,29 @@ bool HRilBase::ConvertToString(char **dest, const std::string &srcStr)
     return true;
 }
 
+void HRilBase::CopyToCharPoint(char **dest, const std::string &src)
+{
+    size_t size = src.size();
+    if (size <= 0) {
+        TELEPHONY_LOGE("CopyToCharPoint  src is null");
+        return;
+    }
+    *dest = (char *)malloc((size + 1) * sizeof(char));
+    if (*dest == nullptr) {
+        TELEPHONY_LOGE("CopyToCharPoint malloc content fail!");
+        return;
+    }
+    if (memset_s(*dest, size + 1, 0, size + 1) != EOK) {
+        TELEPHONY_LOGE("CopyToCharPoint memset_s failed");
+        SafeFrees(*dest);
+        return;
+    }
+    if (strcpy_s(*dest, size + 1, src.c_str()) != EOK) {
+        TELEPHONY_LOGE("CopyToCharPoint strcpy_s error");
+        SafeFrees(*dest);
+    }
+}
+
 int32_t HRilBase::ServiceDispatcher(int32_t requestNum, const HdfSBuf *dataSbuf)
 {
     return hrilReporter_.ReportToParent(requestNum, dataSbuf);

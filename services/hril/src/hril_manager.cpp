@@ -26,6 +26,8 @@ constexpr const char *MODULE_HRIL_CALL = "hrilCall";
 constexpr const char *MODULE_HRIL_DATA = "hrilData";
 constexpr const char *MODULE_HRIL_MODEM = "hrilModem";
 constexpr const char *MODULE_HRIL_SIM = "hrilSim";
+constexpr const char *MODULE_HRIL_NETWORK = "hrilNetwork";
+constexpr const char *MODULE_HRIL_SMS = "hrilSms";
 static std::shared_ptr<HRilManager> g_manager = std::make_shared<HRilManager>();
 static pthread_mutex_t dispatchMutex = PTHREAD_MUTEX_INITIALIZER;
 std::shared_ptr<HRilManager> HRilManager::manager_ = g_manager;
@@ -794,6 +796,184 @@ int32_t HRilManager::SimAuthentication(
 int32_t HRilManager::UnlockSimLock(int32_t slotId, int32_t serialId, int32_t lockType, const std::string &key)
 {
     return TaskSchedule(MODULE_HRIL_SIM, hrilSim_[slotId], &HRilSim::UnlockSimLock, serialId, lockType, key);
+}
+
+// Network
+int32_t HRilManager::GetSignalStrength(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(MODULE_HRIL_NETWORK, hrilNetwork_[slotId], &HRilNetwork::GetSignalStrength, serialId);
+}
+
+int32_t HRilManager::GetCsRegStatus(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(MODULE_HRIL_NETWORK, hrilNetwork_[slotId], &HRilNetwork::GetCsRegStatus, serialId);
+}
+
+int32_t HRilManager::GetPsRegStatus(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(MODULE_HRIL_NETWORK, hrilNetwork_[slotId], &HRilNetwork::GetPsRegStatus, serialId);
+}
+
+int32_t HRilManager::GetOperatorInfo(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(MODULE_HRIL_NETWORK, hrilNetwork_[slotId], &HRilNetwork::GetOperatorInfo, serialId);
+}
+
+int32_t HRilManager::GetNetworkSearchInformation(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(MODULE_HRIL_NETWORK, hrilNetwork_[slotId], &HRilNetwork::GetNetworkSearchInformation, serialId);
+}
+
+int32_t HRilManager::GetNetworkSelectionMode(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(MODULE_HRIL_NETWORK, hrilNetwork_[slotId], &HRilNetwork::GetNetworkSelectionMode, serialId);
+}
+
+int32_t HRilManager::SetNetworkSelectionMode(
+    int32_t slotId, int32_t serialId, const HDI::Ril::V1_0::ISetNetworkModeInfo &networkModeInfo)
+{
+    return TaskSchedule(
+        MODULE_HRIL_NETWORK, hrilNetwork_[slotId], &HRilNetwork::SetNetworkSelectionMode, serialId, networkModeInfo);
+}
+
+int32_t HRilManager::GetNeighboringCellInfoList(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(MODULE_HRIL_NETWORK, hrilNetwork_[slotId], &HRilNetwork::GetNeighboringCellInfoList, serialId);
+}
+
+int32_t HRilManager::GetCurrentCellInfo(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(MODULE_HRIL_NETWORK, hrilNetwork_[slotId], &HRilNetwork::GetCurrentCellInfo, serialId);
+}
+
+int32_t HRilManager::SetPreferredNetwork(int32_t slotId, int32_t serialId, int32_t preferredNetworkType)
+{
+    return TaskSchedule(
+        MODULE_HRIL_NETWORK, hrilNetwork_[slotId], &HRilNetwork::SetPreferredNetwork, serialId, preferredNetworkType);
+}
+
+int32_t HRilManager::GetPreferredNetwork(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(MODULE_HRIL_NETWORK, hrilNetwork_[slotId], &HRilNetwork::GetPreferredNetwork, serialId);
+}
+
+int32_t HRilManager::GetRadioCapability(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(MODULE_HRIL_NETWORK, hrilNetwork_[slotId], &HRilNetwork::GetRadioCapability, serialId);
+}
+
+int32_t HRilManager::GetPhysicalChannelConfig(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(MODULE_HRIL_NETWORK, hrilNetwork_[slotId], &HRilNetwork::GetPhysicalChannelConfig, serialId);
+}
+
+int32_t HRilManager::SetLocateUpdates(int32_t slotId, int32_t serialId, const HDI::Ril::V1_0::IHRilRegNotifyMode mode)
+{
+    return TaskSchedule(MODULE_HRIL_NETWORK, hrilNetwork_[slotId], &HRilNetwork::SetLocateUpdates, serialId, mode);
+}
+
+int32_t HRilManager::SetNotificationFilter(int32_t slotId, int32_t serialId, int32_t newFilter)
+{
+    return TaskSchedule(
+        MODULE_HRIL_NETWORK, hrilNetwork_[slotId], &HRilNetwork::SetNotificationFilter, serialId, newFilter);
+}
+
+int32_t HRilManager::SetDeviceState(int32_t slotId, int32_t serialId, int32_t deviceStateType, int32_t deviceStateOn)
+{
+    return TaskSchedule(MODULE_HRIL_NETWORK, hrilNetwork_[slotId], &HRilNetwork::SetDeviceState, serialId,
+        deviceStateType, deviceStateOn);
+}
+
+// Sms
+int32_t HRilManager::SendGsmSms(
+    int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::IGsmSmsMessageInfo &gsmSmsMessageInfo)
+{
+    return TaskSchedule(MODULE_HRIL_SMS, hrilSms_[slotId], &HRilSms::SendGsmSms, serialId, gsmSmsMessageInfo);
+}
+
+int32_t HRilManager::SendCdmaSms(
+    int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::ISendCdmaSmsMessageInfo &cdmaSmsMessageInfo)
+{
+    return TaskSchedule(MODULE_HRIL_SMS, hrilSms_[slotId], &HRilSms::SendCdmaSms, serialId, cdmaSmsMessageInfo);
+}
+
+int32_t HRilManager::AddSimMessage(
+    int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::ISmsMessageIOInfo &smsMessageIOInfo)
+{
+    return TaskSchedule(MODULE_HRIL_SMS, hrilSms_[slotId], &HRilSms::AddSimMessage, serialId, smsMessageIOInfo);
+}
+
+int32_t HRilManager::DelSimMessage(int32_t slotId, int32_t serialId, int32_t index)
+{
+    return TaskSchedule(MODULE_HRIL_SMS, hrilSms_[slotId], &HRilSms::DelSimMessage, serialId, index);
+}
+
+int32_t HRilManager::UpdateSimMessage(
+    int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::ISmsMessageIOInfo &smsMessageIOInfo)
+{
+    return TaskSchedule(MODULE_HRIL_SMS, hrilSms_[slotId], &HRilSms::UpdateSimMessage, serialId, smsMessageIOInfo);
+}
+
+int32_t HRilManager::AddCdmaSimMessage(
+    int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::ISmsMessageIOInfo &smsMessageIOInfo)
+{
+    return TaskSchedule(MODULE_HRIL_SMS, hrilSms_[slotId], &HRilSms::AddCdmaSimMessage, serialId, smsMessageIOInfo);
+}
+
+int32_t HRilManager::DelCdmaSimMessage(int32_t slotId, int32_t serialId, int32_t index)
+{
+    return TaskSchedule(MODULE_HRIL_SMS, hrilSms_[slotId], &HRilSms::DelCdmaSimMessage, serialId, index);
+}
+
+int32_t HRilManager::UpdateCdmaSimMessage(
+    int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::ISmsMessageIOInfo &smsMessageIOInfo)
+{
+    return TaskSchedule(MODULE_HRIL_SMS, hrilSms_[slotId], &HRilSms::UpdateCdmaSimMessage, serialId, smsMessageIOInfo);
+}
+
+int32_t HRilManager::SetSmscAddr(
+    int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::IServiceCenterAddress &serviceCenterAddress)
+{
+    return TaskSchedule(MODULE_HRIL_SMS, hrilSms_[slotId], &HRilSms::SetSmscAddr, serialId, serviceCenterAddress);
+}
+
+int32_t HRilManager::GetSmscAddr(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(MODULE_HRIL_SMS, hrilSms_[slotId], &HRilSms::GetSmscAddr, serialId);
+}
+
+int32_t HRilManager::SetCBConfig(
+    int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::ICBConfigInfo &cellBroadcastInfo)
+{
+    return HRilManager::TaskSchedule(
+        MODULE_HRIL_SMS, hrilSms_[slotId], &HRilSms::SetCBConfig, serialId, cellBroadcastInfo);
+}
+
+int32_t HRilManager::GetCBConfig(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(MODULE_HRIL_SMS, hrilSms_[slotId], &HRilSms::GetCBConfig, serialId);
+}
+
+int32_t HRilManager::SetCdmaCBConfig(
+    int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::ICdmaCBConfigInfoList &cdmaCBConfigInfoList)
+{
+    return TaskSchedule(MODULE_HRIL_SMS, hrilSms_[slotId], &HRilSms::SetCdmaCBConfig, serialId, cdmaCBConfigInfoList);
+}
+
+int32_t HRilManager::GetCdmaCBConfig(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(MODULE_HRIL_SMS, hrilSms_[slotId], &HRilSms::GetCdmaCBConfig, serialId);
+}
+
+int32_t HRilManager::SendSmsMoreMode(
+    int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::IGsmSmsMessageInfo &gsmSmsMessageInfo)
+{
+    return TaskSchedule(MODULE_HRIL_SMS, hrilSms_[slotId], &HRilSms::SendSmsMoreMode, serialId, gsmSmsMessageInfo);
+}
+
+int32_t HRilManager::SendSmsAck(int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::IModeData &modeData)
+{
+    return TaskSchedule(MODULE_HRIL_SMS, hrilSms_[slotId], &HRilSms::SendSmsAck, serialId, modeData);
 }
 
 HRilManager::~HRilManager() {}

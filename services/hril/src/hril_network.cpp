@@ -41,24 +41,6 @@ void HRilNetwork::AddHandlerToMap()
     notiMemberFuncMap_[HNOTI_NETWORK_PHY_CHNL_CFG_UPDATED] = &HRilNetwork::NetworkPhyChnlCfgUpdated;
     notiMemberFuncMap_[HNOTI_NETWORK_CURRENT_CELL_UPDATED] = &HRilNetwork::NetworkCurrentCellUpdated;
 
-    // request
-    reqMemberFuncMap_[HREQ_NETWORK_GET_SIGNAL_STRENGTH] = &HRilNetwork::GetSignalStrength;
-    reqMemberFuncMap_[HREQ_NETWORK_GET_CS_REG_STATUS] = &HRilNetwork::GetCsRegStatus;
-    reqMemberFuncMap_[HREQ_NETWORK_GET_PS_REG_STATUS] = &HRilNetwork::GetPsRegStatus;
-    reqMemberFuncMap_[HREQ_NETWORK_GET_OPERATOR_INFO] = &HRilNetwork::GetOperatorInfo;
-    reqMemberFuncMap_[HREQ_NETWORK_GET_NETWORK_SEARCH_INFORMATION] = &HRilNetwork::GetNetworkSearchInformation;
-    reqMemberFuncMap_[HREQ_NETWORK_GET_NETWORK_SELECTION_MODE] = &HRilNetwork::GetNetworkSelectionMode;
-    reqMemberFuncMap_[HREQ_NETWORK_SET_NETWORK_SELECTION_MODE] = &HRilNetwork::SetNetworkSelectionMode;
-    reqMemberFuncMap_[HREQ_NETWORK_SET_PREFERRED_NETWORK] = &HRilNetwork::SetPreferredNetwork;
-    reqMemberFuncMap_[HREQ_NETWORK_GET_PREFERRED_NETWORK] = &HRilNetwork::GetPreferredNetwork;
-    reqMemberFuncMap_[HREQ_NETWORK_GET_NEIGHBORING_CELLINFO_LIST] = &HRilNetwork::GetNeighboringCellInfoList;
-    reqMemberFuncMap_[HREQ_NETWORK_GET_CURRENT_CELL_INFO] = &HRilNetwork::GetCurrentCellInfo;
-    reqMemberFuncMap_[HREQ_NETWORK_GET_RADIO_CAPABILITY] = &HRilNetwork::GetRadioCapability;
-    reqMemberFuncMap_[HREQ_NETWORK_GET_PHYSICAL_CHANNEL_CONFIG] = &HRilNetwork::GetPhysicalChannelConfig;
-    reqMemberFuncMap_[HREQ_NETWORK_SET_LOCATE_UPDATES] = &HRilNetwork::SetLocateUpdates;
-    reqMemberFuncMap_[HREQ_NETWORK_SET_NOTIFICATION_FILTER] = &HRilNetwork::SetNotificationFilter;
-    reqMemberFuncMap_[HREQ_NETWORK_SET_DEVICE_STATE] = &HRilNetwork::SetDeviceState;
-
     // Response
     respMemberFuncMap_[HREQ_NETWORK_GET_SIGNAL_STRENGTH] = &HRilNetwork::GetSignalStrengthResponse;
     respMemberFuncMap_[HREQ_NETWORK_GET_CS_REG_STATUS] = &HRilNetwork::GetCsRegStatusResponse;
@@ -78,980 +60,548 @@ void HRilNetwork::AddHandlerToMap()
     respMemberFuncMap_[HREQ_NETWORK_SET_DEVICE_STATE] = &HRilNetwork::SetDeviceStateResponse;
 }
 
-int32_t HRilNetwork::GetSignalStrength(struct HdfSBuf *data)
+int32_t HRilNetwork::GetSignalStrength(int32_t serialId)
 {
-    if ((networkFuncs_ == nullptr) || (networkFuncs_->GetSignalStrength == nullptr)) {
-        TELEPHONY_LOGE("GetSignalStrength::networkFuncs_:%{public}p", networkFuncs_);
-        return HRIL_ERR_NULL_POINT;
-    }
-    int32_t serial = 0;
-    if (!HdfSbufReadInt32(data, &serial)) {
-        TELEPHONY_LOGE("miss serial parameter");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_NETWORK_GET_SIGNAL_STRENGTH);
-    if (requestInfo == nullptr) {
-        TELEPHONY_LOGE("Create Request is fail");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    networkFuncs_->GetSignalStrength(requestInfo);
-    return HRIL_ERR_SUCCESS;
+    return RequestVendor(serialId, HREQ_NETWORK_GET_SIGNAL_STRENGTH, networkFuncs_, &HRilNetworkReq::GetSignalStrength);
 }
 
-int32_t HRilNetwork::GetRadioCapability(struct HdfSBuf *data)
+int32_t HRilNetwork::GetCsRegStatus(int32_t serialId)
 {
-    if ((networkFuncs_ == nullptr) || (networkFuncs_->GetRadioCapability == nullptr)) {
-        TELEPHONY_LOGE("GetRadioCapability::networkFuncs_:%{public}p", networkFuncs_);
-        return HRIL_ERR_NULL_POINT;
-    }
-    int32_t serial = 0;
-    if (!HdfSbufReadInt32(data, &serial)) {
-        TELEPHONY_LOGE("miss serial parameter");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_NETWORK_GET_RADIO_CAPABILITY);
-    if (requestInfo == nullptr) {
-        TELEPHONY_LOGE("Create Request is fail");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    networkFuncs_->GetRadioCapability(requestInfo);
-    return HRIL_ERR_SUCCESS;
+    return RequestVendor(serialId, HREQ_NETWORK_GET_CS_REG_STATUS, networkFuncs_, &HRilNetworkReq::GetCsRegStatus);
 }
 
-void HRilNetwork::ExchangeRilRssiToHdf(const void *response, size_t responseLen, Rssi &rssi)
+int32_t HRilNetwork::GetPsRegStatus(int32_t serialId)
 {
-    if (response == nullptr) {
-        TELEPHONY_LOGE("response is nullptr");
-        return;
+    return RequestVendor(serialId, HREQ_NETWORK_GET_PS_REG_STATUS, networkFuncs_, &HRilNetworkReq::GetPsRegStatus);
+}
+
+int32_t HRilNetwork::GetOperatorInfo(int32_t serialId)
+{
+    return RequestVendor(serialId, HREQ_NETWORK_GET_OPERATOR_INFO, networkFuncs_, &HRilNetworkReq::GetOperatorInfo);
+}
+
+int32_t HRilNetwork::GetNeighboringCellInfoList(int32_t serialId)
+{
+    return RequestVendor(serialId, HREQ_NETWORK_GET_NEIGHBORING_CELLINFO_LIST, networkFuncs_,
+        &HRilNetworkReq::GetNeighboringCellInfoList);
+}
+
+int32_t HRilNetwork::GetCurrentCellInfo(int32_t serialId)
+{
+    return RequestVendor(
+        serialId, HREQ_NETWORK_GET_CURRENT_CELL_INFO, networkFuncs_, &HRilNetworkReq::GetCurrentCellInfo);
+}
+
+int32_t HRilNetwork::GetNetworkSearchInformation(int32_t serialId)
+{
+    return RequestVendor(serialId, HREQ_NETWORK_GET_NETWORK_SEARCH_INFORMATION, networkFuncs_,
+        &HRilNetworkReq::GetNetworkSearchInformation);
+}
+
+int32_t HRilNetwork::GetNetworkSelectionMode(int32_t serialId)
+{
+    return RequestVendor(serialId, HREQ_NETWORK_GET_NETWORK_SELECTION_MODE, networkFuncs_,
+        &HRilNetworkReq::GetNetworkSelectionMode);
+}
+
+int32_t HRilNetwork::SetNetworkSelectionMode(
+    int32_t serialId, const HDI::Ril::V1_0::ISetNetworkModeInfo &networkModeInfo)
+{
+    HRilSetNetworkModeInfo setNetworkModeInfo = {};
+    setNetworkModeInfo.selectMode = networkModeInfo.selectMode;
+    ConvertToString(&setNetworkModeInfo.oper, networkModeInfo.oper);
+    TELEPHONY_LOGI("HRilNetwork::SetNetworkSelectionMode selectMode = %{public}d", setNetworkModeInfo.selectMode);
+    return RequestVendor(serialId, HREQ_NETWORK_SET_NETWORK_SELECTION_MODE, networkFuncs_,
+        &HRilNetworkReq::SetNetworkSelectionMode, &setNetworkModeInfo);
+}
+
+int32_t HRilNetwork::SetPreferredNetwork(int32_t serialId, int32_t preferredNetworkType)
+{
+    return RequestVendor(serialId, HREQ_NETWORK_SET_PREFERRED_NETWORK, networkFuncs_,
+        &HRilNetworkReq::SetPreferredNetwork, &preferredNetworkType);
+}
+
+int32_t HRilNetwork::GetPreferredNetwork(int32_t serialId)
+{
+    return RequestVendor(serialId, HREQ_NETWORK_GET_PREFERRED_NETWORK, networkFuncs_,
+        &HRilNetworkReq::GetPreferredNetwork);
+}
+
+int32_t HRilNetwork::GetRadioCapability(int32_t serialId)
+{
+    return RequestVendor(
+        serialId, HREQ_NETWORK_GET_RADIO_CAPABILITY, networkFuncs_, &HRilNetworkReq::GetRadioCapability);
+}
+
+int32_t HRilNetwork::GetPhysicalChannelConfig(int32_t serialId)
+{
+    return RequestVendor(serialId, HREQ_NETWORK_GET_PHYSICAL_CHANNEL_CONFIG, networkFuncs_,
+        &HRilNetworkReq::GetPhysicalChannelConfig);
+}
+
+int32_t HRilNetwork::SetLocateUpdates(int32_t serialId, const HDI::Ril::V1_0::IHRilRegNotifyMode mode)
+{
+    HRilRegNotifyMode regNotifyMode = static_cast<HRilRegNotifyMode>(mode);
+    if ((regNotifyMode < REG_NOT_NOTIFY) || (regNotifyMode > REG_NOTIFY_STAT_LAC_CELLID)) {
+        TELEPHONY_LOGE("SetLocateUpdates Invalid regNotifyMode parameter");
+        return HRIL_ERR_INVALID_PARAMETER;
     }
-    HRilRssi *rilRssi = (HRilRssi *)response;
+    return RequestVendor(serialId, HREQ_NETWORK_SET_LOCATE_UPDATES, networkFuncs_,
+        &HRilNetworkReq::SetLocateUpdates, static_cast<HRilRegNotifyMode>(mode));
+}
 
-    rssi.gw.rxlev = rilRssi->gsmRssi.rxlev;
-    rssi.gw.ber = rilRssi->gsmRssi.ber;
-    rssi.cdma.absoluteRssi = rilRssi->cdmaRssi.absoluteRssi;
-    rssi.cdma.ecno = rilRssi->cdmaRssi.ecno;
+int32_t HRilNetwork::SetNotificationFilter(int32_t serialId, int32_t newFilter)
+{
+    return RequestVendor(serialId, HREQ_NETWORK_SET_NOTIFICATION_FILTER, networkFuncs_,
+        &HRilNetworkReq::SetNotificationFilter, &newFilter);
+}
 
-    rssi.wcdma.rxlev = rilRssi->wcdmaRssi.rxlev;
-    rssi.wcdma.ber = rilRssi->wcdmaRssi.ber;
-    rssi.wcdma.ecio = rilRssi->wcdmaRssi.ecio;
-    rssi.wcdma.rscp = rilRssi->wcdmaRssi.rscp;
-
-    rssi.lte.rxlev = rilRssi->lteRssi.rxlev;
-    rssi.lte.rsrp = rilRssi->lteRssi.rsrp;
-    rssi.lte.rsrq = rilRssi->lteRssi.rsrq;
-    rssi.lte.snr = rilRssi->lteRssi.snr;
-
-    rssi.tdScdma.rscp = rilRssi->tdScdmaRssi.rscp;
-
-    rssi.nr.rsrp = rilRssi->nrRssi.rsrp;
-    rssi.nr.rsrq = rilRssi->nrRssi.rsrq;
-    rssi.nr.sinr = rilRssi->nrRssi.sinr;
-
-    TELEPHONY_LOGI("rxlev:%{public}d, rsrp:%{public}d", rssi.lte.rxlev, rssi.lte.rsrp);
+int32_t HRilNetwork::SetDeviceState(int32_t serialId, int32_t deviceStateType, int32_t deviceStateOn)
+{
+    return RequestVendor(serialId, HREQ_NETWORK_SET_DEVICE_STATE, networkFuncs_,
+        &HRilNetworkReq::SetDeviceState, &deviceStateType, &deviceStateOn);
 }
 
 int32_t HRilNetwork::GetSignalStrengthResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    Rssi event = {};
-    event.slotId = GetSlotId();
-    if (((response == nullptr) && (responseLen != 0)) || ((response != nullptr) && (responseLen != sizeof(HRilRssi)))) {
-        TELEPHONY_LOGE("GetSignalStrengthResponse check data: error");
-        return HRIL_ERR_GENERIC_FAILURE;
-    } else if (response == nullptr || responseLen != sizeof(HRilRssi)) {
-        TELEPHONY_LOGE("GetSignalStrengthResponse: Invalid response");
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
-        }
-    } else {
-        ExchangeRilRssiToHdf(response, responseLen, event);
-    }
-    return ResponseBuffer(requestNum, &responseInfo, sizeof(responseInfo), &event, sizeof(event));
-}
-
-int32_t HRilNetwork::GetCsRegStatus(struct HdfSBuf *data)
-{
-    if ((networkFuncs_ == nullptr) || (networkFuncs_->GetCsRegStatus == nullptr)) {
-        TELEPHONY_LOGE("GetCsRegStatus::networkFuncs_:%{public}p", networkFuncs_);
-        return HRIL_ERR_NULL_POINT;
-    }
-    int32_t serial = 0;
-    if (!HdfSbufReadInt32(data, &serial)) {
-        TELEPHONY_LOGE("miss serial parameter");
+    if (response == nullptr || responseLen != sizeof(HRilRssi)) {
+        TELEPHONY_LOGE("GetSignalStrengthResponse response is invalid");
         return HRIL_ERR_INVALID_PARAMETER;
     }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_NETWORK_GET_CS_REG_STATUS);
-    if (requestInfo == nullptr) {
-        TELEPHONY_LOGE("Create Request is fail");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    networkFuncs_->GetCsRegStatus(requestInfo);
-    return HRIL_ERR_SUCCESS;
+    HDI::Ril::V1_0::IRssi rssi = {};
+    ExchangeRilRssiToHdf(response, rssi);
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::GetSignalStrengthResponse, rssi);
 }
 
 int32_t HRilNetwork::GetCsRegStatusResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    CsRegStatusInfo csRegResponse = {};
-    csRegResponse.notifyType = REG_NOTIFY_STAT_LAC_CELLID;
-    csRegResponse.regStatus = NO_REG_MT_NO_SEARCH;
-    csRegResponse.lacCode = 0;
-    csRegResponse.cellId = 0;
-    csRegResponse.radioTechnology = RADIO_TECHNOLOGY_UNKNOWN;
-    if (((response == nullptr) && (responseLen != 0)) ||
-        ((response != nullptr) && (responseLen != sizeof(HRilRegStatusInfo)))) {
-        TELEPHONY_LOGE("GetCsRegStatusResponse check data: error");
-        return HRIL_ERR_GENERIC_FAILURE;
-    } else if ((response == nullptr) && (responseLen == 0)) {
-        TELEPHONY_LOGE("GetCsRegStatusResponse Invalid response: nullptr");
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
-        }
-    } else {
-        const HRilRegStatusInfo *hrilRegStatusInfo = static_cast<const HRilRegStatusInfo *>(response);
-        csRegResponse.notifyType = hrilRegStatusInfo->notifyMode;
-        csRegResponse.regStatus = hrilRegStatusInfo->regStatus;
-        csRegResponse.lacCode = hrilRegStatusInfo->lacCode;
-        csRegResponse.cellId = hrilRegStatusInfo->cellId;
-        csRegResponse.radioTechnology = hrilRegStatusInfo->actType;
-        TELEPHONY_LOGI("GetCsRegStatusResponse n:%{public}d, regStatus:%{public}d, "
-                       "lacCode:%{public}d, cellId:%{public}d, actType:%{public}d",
-            csRegResponse.notifyType, csRegResponse.regStatus, csRegResponse.lacCode, csRegResponse.cellId,
-            csRegResponse.radioTechnology);
-    }
-    return ResponseMessageParcel(responseInfo, csRegResponse, requestNum);
-}
-
-int32_t HRilNetwork::GetOperatorInfo(struct HdfSBuf *data)
-{
-    if ((networkFuncs_ == nullptr) || (networkFuncs_->GetOperatorInfo == nullptr)) {
-        TELEPHONY_LOGE("GetOperatorInfo::networkFuncs_:%{public}p", networkFuncs_);
-        return HRIL_ERR_NULL_POINT;
-    }
-    int32_t serial = 0;
-    if (!HdfSbufReadInt32(data, &serial)) {
-        TELEPHONY_LOGE("miss serial parameter");
+    if (response == nullptr || responseLen != sizeof(HRilRegStatusInfo)) {
+        TELEPHONY_LOGE("GetCsRegStatusResponse response is invalid");
         return HRIL_ERR_INVALID_PARAMETER;
     }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_NETWORK_GET_OPERATOR_INFO);
-    if (requestInfo == nullptr) {
-        TELEPHONY_LOGE("Create Request is fail");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    networkFuncs_->GetOperatorInfo(requestInfo);
-    return HRIL_ERR_SUCCESS;
-}
-
-int32_t HRilNetwork::GetNetworkSearchInformation(struct HdfSBuf *data)
-{
-    if ((networkFuncs_ == nullptr) || (networkFuncs_->GetNetworkSearchInformation == nullptr)) {
-        TELEPHONY_LOGE("GetNetworkSearchInformation::networkFuncs_:%{public}p", networkFuncs_);
-        return HRIL_ERR_NULL_POINT;
-    }
-    int32_t serial = 0;
-    if (!HdfSbufReadInt32(data, &serial)) {
-        TELEPHONY_LOGE("GetNetworkSearchInformation::miss serial parameter");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_NETWORK_GET_NETWORK_SEARCH_INFORMATION);
-    if (requestInfo == nullptr) {
-        TELEPHONY_LOGE("GetNetworkSearchInformation::Create Request is fail");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    networkFuncs_->GetNetworkSearchInformation(requestInfo);
-    return HRIL_ERR_SUCCESS;
-}
-
-int32_t HRilNetwork::GetNetworkSelectionMode(struct HdfSBuf *data)
-{
-    if ((networkFuncs_ == nullptr) || (networkFuncs_->GetNetworkSelectionMode == nullptr)) {
-        TELEPHONY_LOGE("GetNetworkSelectionMode::networkFuncs_:%{public}p", networkFuncs_);
-        return HRIL_ERR_NULL_POINT;
-    }
-    int32_t serial = 0;
-    if (!HdfSbufReadInt32(data, &serial)) {
-        TELEPHONY_LOGE("GetNetworkSelectionMode::miss serial parameter");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_NETWORK_GET_NETWORK_SELECTION_MODE);
-    if (requestInfo == nullptr) {
-        TELEPHONY_LOGE("GetNetworkSelectionMode::Create Request is fail");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    networkFuncs_->GetNetworkSelectionMode(requestInfo);
-    return HRIL_ERR_SUCCESS;
-}
-
-int32_t HRilNetwork::SetNetworkSelectionMode(struct HdfSBuf *data)
-{
-    if ((networkFuncs_ == nullptr) || (networkFuncs_->SetNetworkSelectionMode == nullptr)) {
-        TELEPHONY_LOGE("SetNetworkSelectionMode::networkFuncs_:%{public}p", networkFuncs_);
-        return HRIL_ERR_NULL_POINT;
-    }
-    struct SetNetworkModeInfo setNetworkModeInfo = {};
-    MessageParcel *parcel = nullptr;
-    if (SbufToParcel(data, &parcel)) {
-        TELEPHONY_LOGE("RilAdapter failed to do SbufToParcel");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    if (!setNetworkModeInfo.ReadFromParcel(*parcel)) {
-        TELEPHONY_LOGE("RilAdapter failed to do ReadFromParcel!");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    HRilSetNetworkModeInfo setModeInfo = {};
-    setModeInfo.selectMode = setNetworkModeInfo.selectMode;
-    TELEPHONY_LOGI("setModeInfo = %{public}d", setModeInfo.selectMode);
-    if (!ConvertToString(&setModeInfo.oper, setNetworkModeInfo.oper)) {
-        TELEPHONY_LOGE("SetNetworkSelectionMode::ConvertToString failed");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    ReqDataInfo *requestInfo = CreateHRilRequest(setNetworkModeInfo.serial, HREQ_NETWORK_SET_NETWORK_SELECTION_MODE);
-    if (requestInfo == nullptr) {
-        TELEPHONY_LOGE("SetNetworkSelectionMode::Create Request is fail");
-        SafeFrees(setModeInfo.oper);
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    TELEPHONY_LOGI("SetNetworkSelectionMode selectMode:%{public}s", setModeInfo.oper);
-    networkFuncs_->SetNetworkSelectionMode(requestInfo, &setModeInfo);
-    SafeFrees(setModeInfo.oper);
-    return HRIL_ERR_SUCCESS;
-}
-
-int32_t HRilNetwork::GetPreferredNetwork(struct HdfSBuf *data)
-{
-    if ((networkFuncs_ == nullptr) || (networkFuncs_->GetPreferredNetwork == nullptr)) {
-        TELEPHONY_LOGE("GetPreferredNetwork::networkFuncs_:%{public}p", networkFuncs_);
-        return HRIL_ERR_NULL_POINT;
-    }
-    int32_t serial = 0;
-    if (!HdfSbufReadInt32(data, &serial)) {
-        TELEPHONY_LOGE("miss serial parameter");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    TELEPHONY_LOGI("serial = %{public}d", serial);
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_NETWORK_GET_PREFERRED_NETWORK);
-    if (requestInfo == nullptr) {
-        TELEPHONY_LOGE("GetPreferredNetwork::Create Request is fail");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    networkFuncs_->GetPreferredNetwork(requestInfo);
-    return HRIL_ERR_SUCCESS;
-}
-
-int32_t HRilNetwork::SetPreferredNetwork(struct HdfSBuf *data)
-{
-    if ((networkFuncs_ == nullptr) || (networkFuncs_->SetPreferredNetwork == nullptr)) {
-        TELEPHONY_LOGE("SetPreferredNetwork::networkFuncs_:%{public}p", networkFuncs_);
-        return HRIL_ERR_NULL_POINT;
-    }
-    int32_t netType = 0;
-    int32_t serial = 0;
-    if (!HdfSbufReadInt32(data, &serial)) {
-        TELEPHONY_LOGE("miss serial parameter");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    if (!HdfSbufReadInt32(data, &netType)) {
-        TELEPHONY_LOGE("miss netType parameter");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_NETWORK_SET_PREFERRED_NETWORK);
-    if (requestInfo == nullptr) {
-        TELEPHONY_LOGE("SetPreferredNetwork::Create Request is fail");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    TELEPHONY_LOGI("SetPreferredNetwork netType:%{public}d", netType);
-    networkFuncs_->SetPreferredNetwork(requestInfo, &netType);
-    return HRIL_ERR_SUCCESS;
-}
-
-int32_t HRilNetwork::GetPhysicalChannelConfig(struct HdfSBuf *data)
-{
-    if ((networkFuncs_ == nullptr) || (networkFuncs_->GetPhysicalChannelConfig == nullptr)) {
-        TELEPHONY_LOGE("GetPhysicalChannelConfig::networkFuncs_:%{public}p", networkFuncs_);
-        return HRIL_ERR_NULL_POINT;
-    }
-    int32_t serial = 0;
-    if (!HdfSbufReadInt32(data, &serial)) {
-        TELEPHONY_LOGE("GetPhysicalChannelConfig::miss serial parameter");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_NETWORK_GET_PHYSICAL_CHANNEL_CONFIG);
-    if (requestInfo == nullptr) {
-        TELEPHONY_LOGE("GetPhysicalChannelConfig::Create Request is fail");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    networkFuncs_->GetPhysicalChannelConfig(requestInfo);
-    return HRIL_ERR_SUCCESS;
-}
-
-int32_t HRilNetwork::SetLocateUpdates(struct HdfSBuf *data)
-{
-    if ((networkFuncs_ == nullptr) || (networkFuncs_->SetLocateUpdates == nullptr)) {
-        TELEPHONY_LOGE("SetLocateUpdates::networkFuncs_:%{public}p", networkFuncs_);
-        return HRIL_ERR_NULL_POINT;
-    }
-    int32_t serial = 0;
-    if (!HdfSbufReadInt32(data, &serial)) {
-        TELEPHONY_LOGE("SetLocateUpdates::miss serial parameter");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    int32_t regNotifyMode = 0;
-    if (!HdfSbufReadInt32(data, &regNotifyMode)) {
-        TELEPHONY_LOGE("miss regNotifyMode parameter");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    HRilRegNotifyMode mode = REG_NOTIFY_STAT_LAC_CELLID;
-    if ((regNotifyMode >= REG_NOT_NOTIFY) && (regNotifyMode <= REG_NOTIFY_STAT_LAC_CELLID)) {
-        mode = static_cast<HRilRegNotifyMode>(regNotifyMode);
-    } else {
-        TELEPHONY_LOGE("Invalid regNotifyMode parameter");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_NETWORK_SET_LOCATE_UPDATES);
-    if (requestInfo == nullptr) {
-        TELEPHONY_LOGE("SetLocateUpdates::Create Request is fail");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    networkFuncs_->SetLocateUpdates(requestInfo, mode);
-    return HRIL_ERR_SUCCESS;
-}
-
-int32_t HRilNetwork::SetNotificationFilter(struct HdfSBuf *data)
-{
-    if ((networkFuncs_ == nullptr) || (networkFuncs_->SetNotificationFilter == nullptr)) {
-        TELEPHONY_LOGE("SetNotificationFilter::networkFuncs_:%{public}p", networkFuncs_);
-        return HRIL_ERR_NULL_POINT;
-    }
-    int32_t serial = 0;
-    if (!HdfSbufReadInt32(data, &serial)) {
-        TELEPHONY_LOGE("SetNotificationFilter::miss serial parameter");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    int32_t newFilter = 0;
-    if (!HdfSbufReadInt32(data, &newFilter)) {
-        TELEPHONY_LOGE("SetNotificationFilter::miss newFilter parameter");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_NETWORK_SET_NOTIFICATION_FILTER);
-    if (requestInfo == nullptr) {
-        TELEPHONY_LOGE("SetNotificationFilter::Create Request is fail");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    networkFuncs_->SetNotificationFilter(requestInfo, &newFilter);
-    return HRIL_ERR_SUCCESS;
-}
-
-int32_t HRilNetwork::SetDeviceState(struct HdfSBuf *data)
-{
-    if ((networkFuncs_ == nullptr) || (networkFuncs_->SetDeviceState == nullptr)) {
-        TELEPHONY_LOGE("SetDeviceState::networkFuncs_:%{public}p", networkFuncs_);
-        return HRIL_ERR_NULL_POINT;
-    }
-    int32_t serial = 0;
-    if (!HdfSbufReadInt32(data, &serial)) {
-        TELEPHONY_LOGE("SetDeviceState::miss serial parameter");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    int32_t deviceStateType = 0;
-    if (!HdfSbufReadInt32(data, &deviceStateType)) {
-        TELEPHONY_LOGE("SetDeviceState::miss deviceStateType parameter");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    int32_t deviceStateOn = 0;
-    if (!HdfSbufReadInt32(data, &deviceStateOn)) {
-        TELEPHONY_LOGE("SetDeviceState::miss deviceStateOn parameter");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_NETWORK_SET_DEVICE_STATE);
-    if (requestInfo == nullptr) {
-        TELEPHONY_LOGE("SetDeviceState::Create Request is fail");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    networkFuncs_->SetDeviceState(requestInfo, &deviceStateType, &deviceStateOn);
-    return HRIL_ERR_SUCCESS;
-}
-
-int32_t HRilNetwork::GetOperatorInfoResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
-{
-    struct OperatorInfoResult operatorInfoResult = {};
-    if (((response == nullptr) && (responseLen != 0)) || ((response != nullptr) && (responseLen == 0))) {
-        TELEPHONY_LOGE("GetOperatorInfoResponse check data: error");
-        return HRIL_ERR_GENERIC_FAILURE;
-    } else if ((response == nullptr) && (responseLen == 0)) {
-        TELEPHONY_LOGE("Create Request is fail");
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
-        }
-    } else {
-        char **resp = static_cast<char **>(const_cast<void *>(response));
-        operatorInfoResult.longName = resp[HRIL_LONE_NAME];
-        operatorInfoResult.shortName = resp[HRIL_SHORT_NAME];
-        operatorInfoResult.numeric = resp[HRIL_NUMERIC];
-        TELEPHONY_LOGI("GetOperatorInfoResponse longName:%{public}s, shortName:%{public}s, numeric:%{public}s",
-            operatorInfoResult.longName.c_str(), operatorInfoResult.shortName.c_str(),
-            operatorInfoResult.numeric.c_str());
-    }
-    return ResponseMessageParcel(responseInfo, operatorInfoResult, requestNum);
-}
-
-int32_t HRilNetwork::NetworkCsRegStatusUpdated(
-    int32_t indType, const HRilErrNumber e, const void *response, size_t responseLen)
-{
+    HDI::Ril::V1_0::ICsRegStatusInfo csRegStatusInfo = {};
     const HRilRegStatusInfo *hrilRegStatusInfo = static_cast<const HRilRegStatusInfo *>(response);
-    if (hrilRegStatusInfo == nullptr) {
-        TELEPHONY_LOGE("hrilRegStatusInfo is nullptr");
-        return HRIL_ERR_NULL_POINT;
-    }
-    CsRegStatusInfo regStatusInfoNotify = {};
-    regStatusInfoNotify.notifyType = hrilRegStatusInfo->notifyMode;
-    regStatusInfoNotify.regStatus = hrilRegStatusInfo->regStatus;
-    regStatusInfoNotify.lacCode = hrilRegStatusInfo->lacCode;
-    regStatusInfoNotify.cellId = hrilRegStatusInfo->cellId;
-    regStatusInfoNotify.radioTechnology = hrilRegStatusInfo->actType;
-    std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
-    if (parcel == nullptr) {
-        TELEPHONY_LOGE("parcel is nullptr");
-        return HRIL_ERR_NULL_POINT;
-    }
-    if (!parcel->WriteInterfaceToken(HRIL_INTERFACE_TOKEN)) {
-        TELEPHONY_LOGE("write interface token failed.");
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    struct HdfSBuf *dataSbuf = ParcelToSbuf(parcel.get());
-    if (dataSbuf == nullptr) {
-        TELEPHONY_LOGE("dataSbuf is nullptr");
-        return HRIL_ERR_NULL_POINT;
-    }
-    HRilResponseHeadInfo headInfo = { 0 };
-    headInfo.slotId = GetSlotId();
-    headInfo.type = (HRilResponseTypes)indType;
-    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&headInfo, sizeof(HRilResponseHeadInfo))) {
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    if (!regStatusInfoNotify.Marshalling(*parcel.get())) {
-        TELEPHONY_LOGE("Marshalling is fail");
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    indType = static_cast<int32_t>(ConvertIntToRadioNoticeType(indType));
-    if (!HdfSbufWriteInt32(dataSbuf, indType)) {
-        TELEPHONY_LOGE("HdfSbufWriteInt32 in NetworkCsRegStatusUpdated is failed!");
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    int32_t ret = ServiceNotifyDispatcher(HNOTI_NETWORK_CS_REG_STATUS_UPDATED, dataSbuf);
-    if (ret != HRIL_ERR_SUCCESS) {
-        TELEPHONY_LOGE("ret is not equal to HRIL_ERR_SUCCESS!");
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    if (dataSbuf != nullptr) {
-        HdfSbufRecycle(dataSbuf);
-    }
-    return HRIL_ERR_SUCCESS;
-}
-
-int32_t HRilNetwork::NetworkPhyChnlCfgUpdated(
-    int32_t indType, const HRilErrNumber e, const void *response, size_t responseLen)
-{
-    const HRilChannelConfigList *hrilChannelConfigList = static_cast<const HRilChannelConfigList *>(response);
-    if (hrilChannelConfigList == nullptr) {
-        return HRIL_ERR_NULL_POINT;
-    }
-    ChannelConfigInfoList phyChnlCfgList = {};
-    phyChnlCfgList.itemNum = hrilChannelConfigList->itemNum;
-    for (int32_t i = 0; i < phyChnlCfgList.itemNum; i++) {
-        PhysicalChannelConfig cfg;
-        cfg.cellConnStatus = hrilChannelConfigList->channelConfigs[i].cellConnStatus;
-        cfg.cellBandwidthDownlinkKhz = hrilChannelConfigList->channelConfigs[i].cellBandwidthDownlinkKhz;
-        cfg.cellBandwidthUplinkKhz = hrilChannelConfigList->channelConfigs[i].cellBandwidthUplinkKhz;
-        cfg.ratType = hrilChannelConfigList->channelConfigs[i].ratType;
-        cfg.freqRange = hrilChannelConfigList->channelConfigs[i].freqRange;
-        cfg.downlinkChannelNum = hrilChannelConfigList->channelConfigs[i].downlinkChannelNum;
-        cfg.uplinkChannelNum = hrilChannelConfigList->channelConfigs[i].uplinkChannelNum;
-        cfg.physicalCellId = hrilChannelConfigList->channelConfigs[i].physicalCellId;
-        cfg.contextIdNum = hrilChannelConfigList->channelConfigs[i].contextIdNum;
-        for (int32_t j = 0; j < cfg.contextIdNum; j++) {
-            cfg.contextIds.push_back(hrilChannelConfigList->channelConfigs[i].contextIds[j]);
-        }
-        phyChnlCfgList.channelConfigInfos.push_back(cfg);
-    }
-    std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
-    if (parcel == nullptr) {
-        return HRIL_ERR_NULL_POINT;
-    }
-    if (!parcel->WriteInterfaceToken(HRIL_INTERFACE_TOKEN)) {
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    struct HdfSBuf *dataSbuf = ParcelToSbuf(parcel.get());
-    if (dataSbuf == nullptr) {
-        return HRIL_ERR_NULL_POINT;
-    }
-    HRilResponseHeadInfo headInfo = { 0 };
-    headInfo.slotId = GetSlotId();
-    headInfo.type = (HRilResponseTypes)indType;
-    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&headInfo, sizeof(HRilResponseHeadInfo))) {
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    if (!phyChnlCfgList.Marshalling(*parcel.get())) {
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    indType = static_cast<int32_t>(ConvertIntToRadioNoticeType(indType));
-    if (!HdfSbufWriteInt32(dataSbuf, indType)) {
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    ServiceNotifyDispatcher(HNOTI_NETWORK_PHY_CHNL_CFG_UPDATED, dataSbuf);
-    if (dataSbuf != nullptr) {
-        HdfSbufRecycle(dataSbuf);
-    }
-    return HRIL_ERR_SUCCESS;
-}
-
-int32_t HRilNetwork::FixCurrentCellList(
-    CellListCurrentInfo &cellInfoList, const CurrentCellInfoList *hrilCurrentCellList)
-{
-    if (hrilCurrentCellList == nullptr) {
-        TELEPHONY_LOGE("BuildCurrentCellList: hrilCurrentCellList nullptr!");
-        return HRIL_ERR_GENERIC_FAILURE;
-    } else {
-        cellInfoList.itemNum = hrilCurrentCellList->itemNum;
-        TELEPHONY_LOGI("BuildCurrentCellList:  cellInfoList.itemNum = %{public}d", cellInfoList.itemNum);
-        for (int32_t i = 0; i < cellInfoList.itemNum; i++) {
-            CurrentCellInfo cellInfo;
-            CurrentCellInfoVendor *cellPtr = hrilCurrentCellList->currentCellInfo + i;
-            if (cellPtr == nullptr) {
-                TELEPHONY_LOGE("BuildNeighboringCellList: response item error!");
-                return HRIL_ERR_GENERIC_FAILURE;
-            }
-            FillCurrentCellInfo(cellInfo, cellPtr);
-            cellInfoList.cellCurrentInfo.push_back(cellInfo);
-        }
-        return HRIL_ERR_SUCCESS;
-    }
-}
-
-int32_t HRilNetwork::NetworkCurrentCellUpdated(
-    int32_t indType, const HRilErrNumber e, const void *response, size_t responseLen)
-{
-    const CurrentCellInfoList *hrilCurrentCellList = static_cast<const CurrentCellInfoList *>(response);
-    if (hrilCurrentCellList == nullptr) {
-        return HRIL_ERR_NULL_POINT;
-    }
-    CellListCurrentInfo cellListCurrentInfo;
-    cellListCurrentInfo.itemNum = 0;
-    cellListCurrentInfo.cellCurrentInfo.clear();
-    if (FixCurrentCellList(cellListCurrentInfo, hrilCurrentCellList) != 0) {
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
-    if (parcel == nullptr) {
-        TELEPHONY_LOGE("parcel is nullptr");
-        return HRIL_ERR_NULL_POINT;
-    }
-    if (!parcel->WriteInterfaceToken(HRIL_INTERFACE_TOKEN)) {
-        TELEPHONY_LOGE("write interface token failed.");
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    struct HdfSBuf *dataSbuf = ParcelToSbuf(parcel.get());
-    if (dataSbuf == nullptr) {
-        TELEPHONY_LOGE("dataSbuf is nullptr");
-        return HRIL_ERR_NULL_POINT;
-    }
-    HRilResponseHeadInfo headInfo = { 0 };
-    headInfo.slotId = GetSlotId();
-    headInfo.type = (HRilResponseTypes)indType;
-    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&headInfo, sizeof(HRilResponseHeadInfo))) {
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    if (!cellListCurrentInfo.Marshalling(*parcel.get())) {
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    indType = static_cast<int32_t>(ConvertIntToRadioNoticeType(indType));
-    if (!HdfSbufWriteInt32(dataSbuf, indType)) {
-        HdfSbufRecycle(dataSbuf);
-        TELEPHONY_LOGE("Marshalling is fail");
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    ServiceNotifyDispatcher(HNOTI_NETWORK_CURRENT_CELL_UPDATED, dataSbuf);
-    if (dataSbuf != nullptr) {
-        HdfSbufRecycle(dataSbuf);
-    }
-    return HRIL_ERR_SUCCESS;
-}
-
-int32_t HRilNetwork::NetworkPsRegStatusUpdated(
-    int32_t indType, const HRilErrNumber e, const void *response, size_t responseLen)
-{
-    const HRilRegStatusInfo *hrilRegStatusInfo = static_cast<const HRilRegStatusInfo *>(response);
-    if (hrilRegStatusInfo == nullptr) {
-        TELEPHONY_LOGE("hrilRegStatusInfo is nullptr");
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    CsRegStatusInfo regStatusInfoNotify = {};
-    regStatusInfoNotify.notifyType = hrilRegStatusInfo->notifyMode;
-    regStatusInfoNotify.regStatus = hrilRegStatusInfo->regStatus;
-    regStatusInfoNotify.lacCode = hrilRegStatusInfo->lacCode;
-    regStatusInfoNotify.cellId = hrilRegStatusInfo->cellId;
-    regStatusInfoNotify.radioTechnology = hrilRegStatusInfo->actType;
-    std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
-    if (parcel == nullptr) {
-        TELEPHONY_LOGE("parcel is nullptr");
-        return HRIL_ERR_NULL_POINT;
-    }
-    if (!parcel->WriteInterfaceToken(HRIL_INTERFACE_TOKEN)) {
-        TELEPHONY_LOGE("write interface token failed.");
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    struct HdfSBuf *dataSbuf = ParcelToSbuf(parcel.get());
-    if (dataSbuf == nullptr) {
-        TELEPHONY_LOGE("dataSbuf is nullptr");
-        return HRIL_ERR_NULL_POINT;
-    }
-    HRilResponseHeadInfo headInfo = { 0 };
-    headInfo.slotId = GetSlotId();
-    headInfo.type = (HRilResponseTypes)indType;
-    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&headInfo, sizeof(HRilResponseHeadInfo))) {
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    if (!regStatusInfoNotify.Marshalling(*parcel.get())) {
-        HdfSbufRecycle(dataSbuf);
-        TELEPHONY_LOGE("Marshalling is fail");
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    indType = static_cast<int32_t>(ConvertIntToRadioNoticeType(indType));
-    if (!HdfSbufWriteInt32(dataSbuf, indType)) {
-        TELEPHONY_LOGE("HdfSbufWriteInt32 in NetworkPsRegStatusUpdated is failed!");
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    int32_t ret = ServiceNotifyDispatcher(HNOTI_NETWORK_PS_REG_STATUS_UPDATED, dataSbuf);
-    if (ret != HRIL_ERR_SUCCESS) {
-        TELEPHONY_LOGE("ret is not equal to HRIL_ERR_SUCCESS!");
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    if (dataSbuf != nullptr) {
-        HdfSbufRecycle(dataSbuf);
-    }
-    return HRIL_ERR_SUCCESS;
-}
-
-int32_t HRilNetwork::SignalStrengthUpdated(
-    int32_t indType, const HRilErrNumber e, const void *response, size_t responseLen)
-{
-    Rssi rssi = { 0 };
-
-    if (response == nullptr || responseLen != sizeof(HRilRssi)) {
-        TELEPHONY_LOGE("SignalStrengthUpdated: Invalid response");
-    } else {
-        ExchangeRilRssiToHdf(response, responseLen, rssi);
-    }
-    std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
-    if (parcel == nullptr) {
-        TELEPHONY_LOGE("parcel is nullptr");
-        return HRIL_ERR_NULL_POINT;
-    }
-    if (!parcel->WriteInterfaceToken(HRIL_INTERFACE_TOKEN)) {
-        TELEPHONY_LOGE("write interface token failed.");
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    struct HdfSBuf *dataSbuf = ParcelToSbuf(parcel.get());
-    if (dataSbuf == nullptr) {
-        TELEPHONY_LOGE("dataSbuf is nullptr");
-        return HRIL_ERR_NULL_POINT;
-    }
-    HRilResponseHeadInfo headInfo = { 0 };
-    headInfo.slotId = GetSlotId();
-    headInfo.type = (HRilResponseTypes)indType;
-    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&headInfo, sizeof(HRilResponseHeadInfo))) {
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&rssi, sizeof(rssi))) {
-        TELEPHONY_LOGE("HdfSbufWriteUnpadBuffer in SignalStrengthUpdated is failed!");
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    indType = static_cast<int32_t>(ConvertIntToRadioNoticeType(indType));
-    if (!HdfSbufWriteInt32(dataSbuf, indType)) {
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    int32_t ret = ServiceNotifyDispatcher(HNOTI_NETWORK_SIGNAL_STRENGTH_UPDATED, dataSbuf);
-    if (ret != HRIL_ERR_SUCCESS) {
-        TELEPHONY_LOGE("ret is not equal to HRIL_ERR_SUCCESS!");
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    if (dataSbuf != nullptr) {
-        HdfSbufRecycle(dataSbuf);
-    }
-    return HRIL_ERR_SUCCESS;
-}
-
-int32_t HRilNetwork::NetworkTimeUpdated(
-    int32_t indType, const HRilErrNumber e, const void *response, size_t responseLen)
-{
-    std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
-    if (parcel == nullptr) {
-        TELEPHONY_LOGE("parcel is nullptr");
-        return HRIL_ERR_NULL_POINT;
-    }
-    if (!parcel->WriteInterfaceToken(HRIL_INTERFACE_TOKEN)) {
-        TELEPHONY_LOGE("write interface token failed.");
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    struct HdfSBuf *dataSbuf = ParcelToSbuf(parcel.get());
-    if (dataSbuf == nullptr) {
-        TELEPHONY_LOGE("dataSbuf is nullptr");
-        return HRIL_ERR_NULL_POINT;
-    }
-    HRilResponseHeadInfo headInfo = { 0 };
-    headInfo.slotId = GetSlotId();
-    headInfo.type = (HRilResponseTypes)indType;
-    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&headInfo, sizeof(HRilResponseHeadInfo))) {
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    if (!HdfSbufWriteString(dataSbuf, (const char *)response)) {
-        TELEPHONY_LOGE("HdfSbufWriteString in NetworkTimeUpdated is failed!");
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    indType = static_cast<int32_t>(ConvertIntToRadioNoticeType(indType));
-    if (!HdfSbufWriteInt32(dataSbuf, indType)) {
-        TELEPHONY_LOGE("HdfSbufWriteInt32 in NetworkTimeUpdated is failed!");
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    int32_t ret = ServiceNotifyDispatcher(HNOTI_NETWORK_TIME_UPDATED, dataSbuf);
-    if (ret != HRIL_ERR_SUCCESS) {
-        TELEPHONY_LOGE("ret is not equal to HRIL_ERR_SUCCESS!");
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    if (dataSbuf != nullptr) {
-        HdfSbufRecycle(dataSbuf);
-    }
-    return HRIL_ERR_SUCCESS;
-}
-
-int32_t HRilNetwork::NetworkTimeZoneUpdated(
-    int32_t indType, const HRilErrNumber e, const void *response, size_t responseLen)
-{
-    std::unique_ptr<MessageParcel> parcel = std::make_unique<MessageParcel>();
-    if (parcel == nullptr) {
-        TELEPHONY_LOGE("parcel is nullptr");
-        return HRIL_ERR_NULL_POINT;
-    }
-    if (!parcel->WriteInterfaceToken(HRIL_INTERFACE_TOKEN)) {
-        TELEPHONY_LOGE("write interface token failed.");
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    struct HdfSBuf *dataSbuf = ParcelToSbuf(parcel.get());
-    if (dataSbuf == nullptr) {
-        TELEPHONY_LOGE("dataSbuf is nullptr");
-        return HRIL_ERR_NULL_POINT;
-    }
-    HRilResponseHeadInfo headInfo = { 0 };
-    headInfo.slotId = GetSlotId();
-    headInfo.type = (HRilResponseTypes)indType;
-    if (!HdfSbufWriteUnpadBuffer(dataSbuf, (const uint8_t *)&headInfo, sizeof(HRilResponseHeadInfo))) {
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    if (!HdfSbufWriteString(dataSbuf, (const char *)response)) {
-        TELEPHONY_LOGE("HdfSbufWriteString in NetworkTimeZoneUpdated is failed!");
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-
-    indType = static_cast<int32_t>(ConvertIntToRadioNoticeType(indType));
-    if (!HdfSbufWriteInt32(dataSbuf, indType)) {
-        TELEPHONY_LOGE("HdfSbufWriteInt32 in NetworkTimeZoneUpdated is failed!");
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    int32_t ret = ServiceNotifyDispatcher(HNOTI_NETWORK_TIME_ZONE_UPDATED, dataSbuf);
-    if (ret != HRIL_ERR_SUCCESS) {
-        TELEPHONY_LOGE("ret is not equal to HRIL_ERR_SUCCESS!");
-        HdfSbufRecycle(dataSbuf);
-        return HRIL_ERR_GENERIC_FAILURE;
-    }
-    TELEPHONY_LOGI("serviceCallbackNotify_->dispatcher->Dispatch ret %{public}d", ret);
-    if (dataSbuf != nullptr) {
-        HdfSbufRecycle(dataSbuf);
-    }
-    return HRIL_ERR_SUCCESS;
-}
-
-int32_t HRilNetwork::GetPsRegStatus(struct HdfSBuf *data)
-{
-    if ((networkFuncs_ == nullptr) || (networkFuncs_->GetPsRegStatus == nullptr)) {
-        TELEPHONY_LOGE("GetPsRegStatus::networkFuncs_:%{public}p", networkFuncs_);
-        return HRIL_ERR_NULL_POINT;
-    }
-    int32_t serial = 0;
-    if (!HdfSbufReadInt32(data, &serial)) {
-        TELEPHONY_LOGE("miss serial parameter");
-        HdfSbufRecycle(data);
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_NETWORK_GET_PS_REG_STATUS);
-    if (requestInfo == nullptr) {
-        TELEPHONY_LOGE("Create Request is fail");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    networkFuncs_->GetPsRegStatus(requestInfo);
-    return HRIL_ERR_SUCCESS;
-}
-
-int32_t HRilNetwork::GetNeighboringCellInfoList(struct HdfSBuf *data)
-{
-    if ((networkFuncs_ == nullptr) || (networkFuncs_->GetNeighboringCellInfoList == nullptr)) {
-        TELEPHONY_LOGE("GetNeighboringCellInfoList::networkFuncs_:%{public}p", networkFuncs_);
-        return HRIL_ERR_NULL_POINT;
-    }
-    int32_t serial = 0;
-    if (!HdfSbufReadInt32(data, &serial)) {
-        TELEPHONY_LOGE("GetNeighboringCellInfoList miss serial parameter");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_NETWORK_GET_NEIGHBORING_CELLINFO_LIST);
-    if (requestInfo == nullptr) {
-        TELEPHONY_LOGE("GetNeighboringCellInfoList::Create Request is fail");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    networkFuncs_->GetNeighboringCellInfoList(requestInfo);
-    return HRIL_ERR_SUCCESS;
-}
-
-int32_t HRilNetwork::GetCurrentCellInfo(struct HdfSBuf *data)
-{
-    if ((networkFuncs_ == nullptr) || (networkFuncs_->GetCurrentCellInfo == nullptr)) {
-        TELEPHONY_LOGE("GetCurrentCellInfo::networkFuncs_:%{public}p", networkFuncs_);
-        return HRIL_ERR_NULL_POINT;
-    }
-    int32_t serial = 0;
-    if (!HdfSbufReadInt32(data, &serial)) {
-        TELEPHONY_LOGE("GetCurrentCellInfo miss serial parameter");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_NETWORK_GET_CURRENT_CELL_INFO);
-    if (requestInfo == nullptr) {
-        TELEPHONY_LOGE("GetCurrentCellInfo::Create Request is fail");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    networkFuncs_->GetCurrentCellInfo(requestInfo);
-    return HRIL_ERR_SUCCESS;
+    csRegStatusInfo.notifyType = hrilRegStatusInfo->notifyMode;
+    csRegStatusInfo.regStatus = static_cast<HDI::Ril::V1_0::IHRilRegStatus>(hrilRegStatusInfo->regStatus);
+    csRegStatusInfo.lacCode = hrilRegStatusInfo->lacCode;
+    csRegStatusInfo.cellId = hrilRegStatusInfo->cellId;
+    csRegStatusInfo.radioTechnology = static_cast<HDI::Ril::V1_0::IHRilRadioTech>(hrilRegStatusInfo->actType);
+    TELEPHONY_LOGI("GetCsRegStatusResponse notifyType:%{public}d, regStatus:%{public}d, "
+        "lacCode:%{public}d, cellId:%{public}d, radioTechnology:%{public}d",
+        csRegStatusInfo.notifyType, csRegStatusInfo.regStatus, csRegStatusInfo.lacCode, csRegStatusInfo.cellId,
+        csRegStatusInfo.radioTechnology);
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::GetCsRegStatusResponse, csRegStatusInfo);
 }
 
 int32_t HRilNetwork::GetPsRegStatusResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    PsRegStatusResultInfo psRegResponse = {};
-    psRegResponse.notifyType = REG_NOTIFY_STAT_LAC_CELLID;
-    psRegResponse.regStatus = REG_MT_UNKNOWN;
-    psRegResponse.lacCode = 0;
-    psRegResponse.cellId = 0;
-    psRegResponse.radioTechnology = RADIO_TECHNOLOGY_UNKNOWN;
-    psRegResponse.isDcNrRestricted = false;
-    psRegResponse.isNrAvailable = false;
-    psRegResponse.isEnDcAvailable = false;
-    if (((response == nullptr) && (responseLen != 0)) ||
-        ((response != nullptr) && (responseLen != sizeof(HRilRegStatusInfo)))) {
-        TELEPHONY_LOGE("GetPsRegStatusResponse check data: error");
+    if (response == nullptr || responseLen != sizeof(HRilRegStatusInfo)) {
+        TELEPHONY_LOGE("GetPsRegStatusResponse response is invalid");
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    HDI::Ril::V1_0::IPsRegStatusInfo psRegStatusInfo = {};
+    const HRilRegStatusInfo *hrilRegStatusInfo = static_cast<const HRilRegStatusInfo *>(response);
+    psRegStatusInfo.notifyType = hrilRegStatusInfo->notifyMode;
+    psRegStatusInfo.regStatus = static_cast<HDI::Ril::V1_0::IHRilRegStatus>(hrilRegStatusInfo->regStatus);
+    psRegStatusInfo.lacCode = hrilRegStatusInfo->lacCode;
+    psRegStatusInfo.cellId = hrilRegStatusInfo->cellId;
+    psRegStatusInfo.radioTechnology = static_cast<HDI::Ril::V1_0::IHRilRadioTech>(hrilRegStatusInfo->actType);
+    psRegStatusInfo.isDcNrRestricted = hrilRegStatusInfo->isDcNrRestricted;
+    psRegStatusInfo.isNrAvailable = hrilRegStatusInfo->isNrAvailable;
+    psRegStatusInfo.isEnDcAvailable = hrilRegStatusInfo->isEnDcAvailable;
+    TELEPHONY_LOGI(
+        "GetPsRegStatusResponse notifyType:%{public}d, regStatus:%{public}d, lacCode:%{public}d, cellId:%{public}d, "
+        "radioTechnology:%{public}d, isDcNrRestricted:%{public}d, isNrAvailable:%{public}d, isEnDcAvailable:%{public}d",
+        psRegStatusInfo.notifyType, psRegStatusInfo.regStatus, psRegStatusInfo.lacCode,
+        psRegStatusInfo.cellId, psRegStatusInfo.radioTechnology, psRegStatusInfo.isDcNrRestricted,
+        psRegStatusInfo.isNrAvailable, psRegStatusInfo.isEnDcAvailable);
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::GetPsRegStatusResponse, psRegStatusInfo);
+}
+
+int32_t HRilNetwork::GetOperatorInfoResponse(
+    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+{
+    if (response == nullptr || responseLen == 0) {
+        TELEPHONY_LOGE("GetOperatorInfoResponse response is invalid");
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    HDI::Ril::V1_0::IOperatorInfo operatorInfoResult = {};
+    char **resp = static_cast<char **>(const_cast<void *>(response));
+    operatorInfoResult.longName = (resp[HRIL_LONE_NAME] == nullptr) ? "" : resp[HRIL_LONE_NAME];
+    operatorInfoResult.shortName = (resp[HRIL_SHORT_NAME] == nullptr) ? "" : resp[HRIL_SHORT_NAME];
+    operatorInfoResult.numeric = (resp[HRIL_NUMERIC] == nullptr) ? "" : resp[HRIL_NUMERIC];
+    TELEPHONY_LOGI("GetOperatorInfoResponse longName:%{public}s, shortName:%{public}s, numeric:%{public}s",
+        operatorInfoResult.longName.c_str(), operatorInfoResult.shortName.c_str(), operatorInfoResult.numeric.c_str());
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::GetOperatorInfoResponse, operatorInfoResult);
+}
+
+int32_t HRilNetwork::GetNetworkSearchInformationResponse(
+    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+{
+    if (response == nullptr || responseLen == 0) {
+        TELEPHONY_LOGE("GetNetworkSearchInformationResponse response is invalid");
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    HDI::Ril::V1_0::IAvailableNetworkList availableNetworkList = {};
+    availableNetworkList.itemNum = 0;
+    BuildOperatorList(availableNetworkList, response, responseLen);
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::GetNetworkSearchInformationResponse,
+        availableNetworkList);
+}
+
+int32_t HRilNetwork::GetNetworkSelectionModeResponse(
+    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+{
+    if (response == nullptr || responseLen != sizeof(int32_t)) {
+        TELEPHONY_LOGE("GetNetworkSelectionModeResponse response is invalid");
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    HDI::Ril::V1_0::ISetNetworkModeInfo selectModeInfo = {};
+    int32_t *resp = static_cast<int32_t *>(const_cast<void *>(response));
+    selectModeInfo.selectMode = *resp;
+    TELEPHONY_LOGI("GetNetworkSelectionModeResponse selectMode: %{public}d", selectModeInfo.selectMode);
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::GetNetworkSelectionModeResponse, selectModeInfo);
+}
+
+int32_t HRilNetwork::SetNetworkSelectionModeResponse(
+    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+{
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::SetNetworkSelectionModeResponse);
+}
+
+int32_t HRilNetwork::SetPreferredNetworkResponse(
+    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+{
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::SetPreferredNetworkResponse);
+}
+
+int32_t HRilNetwork::GetPreferredNetworkResponse(
+    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+{
+    if (response == nullptr || responseLen != sizeof(int32_t)) {
+        TELEPHONY_LOGE("GetPreferredNetworkResponse response is invalid");
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    HDI::Ril::V1_0::IPreferredNetworkTypeInfo preferredNetworkTypeInfo = {};
+    int32_t *resp = static_cast<int32_t *>(const_cast<void *>(response));
+    preferredNetworkTypeInfo.preferredNetworkType = *resp;
+    TELEPHONY_LOGI("GetPreferredNetworkResponse preferredNetworkType: %{public}d", *resp);
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::GetPreferredNetworkResponse, preferredNetworkTypeInfo);
+}
+
+int32_t HRilNetwork::GetRadioCapabilityResponse(
+    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+{
+    if (response == nullptr || responseLen != sizeof(HRilRadioCapability)) {
+        TELEPHONY_LOGE("GetRadioCapabilityResponse response is invalid");
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    HDI::Ril::V1_0::IRadioCapabilityInfo radioCapabilityInfo = {};
+    const HRilRadioCapability *hRilRadioCapability = static_cast<const HRilRadioCapability *>(response);
+    radioCapabilityInfo.ratFamily = hRilRadioCapability->ratFamily;
+    radioCapabilityInfo.modemId = hRilRadioCapability->modemId;
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::GetRadioCapabilityResponse, radioCapabilityInfo);
+}
+
+int32_t HRilNetwork::GetNeighboringCellInfoListResponse(
+    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+{
+    if (response == nullptr || responseLen != sizeof(CellInfoList)) {
+        TELEPHONY_LOGE("GetNeighboringCellInfoListResponse response is invalid");
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    HDI::Ril::V1_0::ICellListNearbyInfo cellInfoList;
+    cellInfoList.itemNum = 0;
+    cellInfoList.cellNearbyInfo.clear();
+    if (BuildNeighboringCellList(cellInfoList, response, responseLen) != 0) {
+        TELEPHONY_LOGE("GetNeighboringCellInfoListResponse BuildNeighboringCellList failed");
         return HRIL_ERR_GENERIC_FAILURE;
-    } else if ((response == nullptr) && (responseLen == 0)) {
-        TELEPHONY_LOGE("GetPsRegStatusResponse Invalid response: nullptr");
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
+    }
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::GetNeighboringCellInfoListResponse, cellInfoList);
+}
+
+int32_t HRilNetwork::GetCurrentCellInfoResponse(
+    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+{
+    if (response == nullptr || responseLen != sizeof(CurrentCellInfoList)) {
+        TELEPHONY_LOGE("GetCurrentCellInfoResponse response is invalid");
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    HDI::Ril::V1_0::ICellListCurrentInfo cellList;
+    cellList.itemNum = 0;
+    cellList.cellCurrentInfo.clear();
+    if (BuildCurrentCellList(cellList, response, responseLen) != 0) {
+        TELEPHONY_LOGE("GetCurrentCellInfoResponse BuildCurrentCellList failed");
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::GetCurrentCellInfoResponse, cellList);
+}
+
+int32_t HRilNetwork::GetPhysicalChannelConfigResponse(
+    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+{
+    if (response == nullptr || responseLen != sizeof(HRilChannelConfigList)) {
+        TELEPHONY_LOGE("GetPhysicalChannelConfigResponse response is invalid");
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    HDI::Ril::V1_0::IChannelConfigInfoList phyChnlCfgList = {};
+    phyChnlCfgList.itemNum = 0;
+    phyChnlCfgList.channelConfigInfos.clear();
+    const HRilChannelConfigList *hrilChannelConfigList = static_cast<const HRilChannelConfigList *>(response);
+    phyChnlCfgList.itemNum = hrilChannelConfigList->itemNum;
+    for (int32_t i = 0; i < phyChnlCfgList.itemNum; i++) {
+        HDI::Ril::V1_0::IPhysicalChannelConfig phyChnlCfg;
+        phyChnlCfg.cellConnStatus = static_cast<HDI::Ril::V1_0::IHRilCellConnectionStatus>(
+            hrilChannelConfigList->channelConfigs[i].cellConnStatus);
+        phyChnlCfg.cellBandwidthDownlinkKhz = hrilChannelConfigList->channelConfigs[i].cellBandwidthDownlinkKhz;
+        phyChnlCfg.cellBandwidthUplinkKhz = hrilChannelConfigList->channelConfigs[i].cellBandwidthUplinkKhz;
+        phyChnlCfg.ratType = static_cast<HDI::Ril::V1_0::IHRilRadioTech>(
+            hrilChannelConfigList->channelConfigs[i].ratType);
+        phyChnlCfg.freqRange = hrilChannelConfigList->channelConfigs[i].freqRange;
+        phyChnlCfg.downlinkChannelNum = hrilChannelConfigList->channelConfigs[i].downlinkChannelNum;
+        phyChnlCfg.uplinkChannelNum = hrilChannelConfigList->channelConfigs[i].uplinkChannelNum;
+        phyChnlCfg.physicalCellId = hrilChannelConfigList->channelConfigs[i].physicalCellId;
+        phyChnlCfg.contextIdNum = hrilChannelConfigList->channelConfigs[i].contextIdNum;
+        TELEPHONY_LOGI(
+            "GetPhysicalChannelConfigResponse cellConnStatus:%{public}d, "
+            "cellBandwidthDownlinkKhz:%{public}d, cellBandwidthUplinkKhz:%{public}d, physicalCellId:%{public}d, "
+            "ratType:%{public}d, freqRange:%{public}d, downlinkChannelNum:%{public}d, "
+            "uplinkChannelNum:%{public}d, contextIdNum:%{public}d",
+            phyChnlCfg.cellConnStatus, phyChnlCfg.cellBandwidthDownlinkKhz, phyChnlCfg.cellBandwidthUplinkKhz,
+            phyChnlCfg.ratType, phyChnlCfg.freqRange, phyChnlCfg.downlinkChannelNum, phyChnlCfg.uplinkChannelNum,
+            phyChnlCfg.physicalCellId, phyChnlCfg.contextIdNum);
+        for (int32_t j = 0; j < phyChnlCfg.contextIdNum; j++) {
+            phyChnlCfg.contextIds.push_back(hrilChannelConfigList->channelConfigs[i].contextIds[j]);
+            TELEPHONY_LOGI("contextIds:%{public}d---contextId:%{public}d", j, phyChnlCfg.contextIds[j]);
         }
-    } else {
-        const HRilRegStatusInfo *hrilRegStatusInfo = static_cast<const HRilRegStatusInfo *>(response);
-        psRegResponse.notifyType = hrilRegStatusInfo->notifyMode;
-        psRegResponse.regStatus = hrilRegStatusInfo->regStatus;
-        psRegResponse.lacCode = hrilRegStatusInfo->lacCode;
-        psRegResponse.cellId = hrilRegStatusInfo->cellId;
-        psRegResponse.radioTechnology = hrilRegStatusInfo->actType;
-        psRegResponse.isDcNrRestricted = (hrilRegStatusInfo->isDcNrRestricted == 1) ? true : false;
-        psRegResponse.isNrAvailable = (hrilRegStatusInfo->isNrAvailable == 1) ? true : false;
-        psRegResponse.isEnDcAvailable = (hrilRegStatusInfo->isEnDcAvailable == 1) ? true : false;
-        TELEPHONY_LOGI("GetPsRegStatusResponse n:%{public}d, regStatus:%{public}d, "
-                       "lacCode:%{public}d, cellId:%{public}d, actType:%{public}d",
-            psRegResponse.notifyType, psRegResponse.regStatus, psRegResponse.lacCode, psRegResponse.cellId,
-            psRegResponse.radioTechnology);
+        phyChnlCfgList.channelConfigInfos.push_back(phyChnlCfg);
     }
-    return ResponseMessageParcel(responseInfo, psRegResponse, requestNum);
+    TELEPHONY_LOGI("GetPhysicalChannelConfigResponse itemNum:%{public}d", phyChnlCfgList.itemNum);
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::GetPhysicalChannelConfigResponse, phyChnlCfgList);
 }
 
-void HRilNetwork::FillCellNearbyInfoTdscdma(CellNearbyInfo &cellInfo, const CellInfo *hrilCellPtr)
+int32_t HRilNetwork::SetLocateUpdatesResponse(
+    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    CellInfo *cellPtr = (CellInfo *)hrilCellPtr;
-    if (cellPtr == NULL) {
-        TELEPHONY_LOGE("FillCellNearbyInfoTdscdma cellPtr param is null");
-        return;
-    }
-    cellInfo.ServiceCellParas.tdscdma.arfcn = cellPtr->ServiceCellParas.tdscdma.arfcn;
-    cellInfo.ServiceCellParas.tdscdma.syncId = cellPtr->ServiceCellParas.tdscdma.syncId;
-    cellInfo.ServiceCellParas.tdscdma.sc = cellPtr->ServiceCellParas.tdscdma.sc;
-    cellInfo.ServiceCellParas.tdscdma.cellId = cellPtr->ServiceCellParas.tdscdma.cellId;
-    cellInfo.ServiceCellParas.tdscdma.lac = cellPtr->ServiceCellParas.tdscdma.lac;
-    cellInfo.ServiceCellParas.tdscdma.rscp = cellPtr->ServiceCellParas.tdscdma.rscp;
-    cellInfo.ServiceCellParas.tdscdma.drx = cellPtr->ServiceCellParas.tdscdma.drx;
-    cellInfo.ServiceCellParas.tdscdma.rac = cellPtr->ServiceCellParas.tdscdma.rac;
-    cellInfo.ServiceCellParas.tdscdma.cpid = cellPtr->ServiceCellParas.tdscdma.cpid;
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::SetLocateUpdatesResponse);
 }
 
-void HRilNetwork::FillCellNearbyInfoCdma(CellNearbyInfo &cellInfo, const CellInfo *hrilCellPtr)
+int32_t HRilNetwork::SetNotificationFilterResponse(
+    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    CellInfo *cellPtr = (CellInfo *)hrilCellPtr;
-    if (cellPtr == NULL) {
-        TELEPHONY_LOGE("FillCellNearbyInfoTdscdma cellPtr param is null");
-        return;
-    }
-    cellInfo.ServiceCellParas.cdma.systemId = cellPtr->ServiceCellParas.cdma.systemId;
-    cellInfo.ServiceCellParas.cdma.networkId = cellPtr->ServiceCellParas.cdma.networkId;
-    cellInfo.ServiceCellParas.cdma.baseId = cellPtr->ServiceCellParas.cdma.baseId;
-    cellInfo.ServiceCellParas.cdma.zoneId = cellPtr->ServiceCellParas.cdma.zoneId;
-    cellInfo.ServiceCellParas.cdma.pilotPn = cellPtr->ServiceCellParas.cdma.pilotPn;
-    cellInfo.ServiceCellParas.cdma.pilotStrength = cellPtr->ServiceCellParas.cdma.pilotStrength;
-    cellInfo.ServiceCellParas.cdma.channel = cellPtr->ServiceCellParas.cdma.channel;
-    cellInfo.ServiceCellParas.cdma.longitude = cellPtr->ServiceCellParas.cdma.longitude;
-    cellInfo.ServiceCellParas.cdma.latitude = cellPtr->ServiceCellParas.cdma.latitude;
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::SetNotificationFilterResponse);
 }
 
-void HRilNetwork::FillCellNearbyInfo(CellNearbyInfo &cellInfo, const CellInfo *cellPtr)
+int32_t HRilNetwork::SetDeviceStateResponse(
+    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+{
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::SetDeviceStateResponse);
+}
+
+int32_t HRilNetwork::NetworkCsRegStatusUpdated(
+    int32_t indType, const HRilErrNumber e, const void *response, size_t responseLen)
+{
+    if (response == nullptr || responseLen != sizeof(HRilRegStatusInfo)) {
+        TELEPHONY_LOGE("NetworkCsRegStatusUpdated response is invalid");
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    HDI::Ril::V1_0::ICsRegStatusInfo regStatusInfoNotify = {};
+    const HRilRegStatusInfo *hrilRegStatusInfo = static_cast<const HRilRegStatusInfo *>(response);
+    regStatusInfoNotify.notifyType = hrilRegStatusInfo->notifyMode;
+    regStatusInfoNotify.regStatus = static_cast<HDI::Ril::V1_0::IHRilRegStatus>(hrilRegStatusInfo->regStatus);
+    regStatusInfoNotify.lacCode = hrilRegStatusInfo->lacCode;
+    regStatusInfoNotify.cellId = hrilRegStatusInfo->cellId;
+    regStatusInfoNotify.radioTechnology = static_cast<HDI::Ril::V1_0::IHRilRadioTech>(hrilRegStatusInfo->actType);
+    TELEPHONY_LOGI("NetworkCsRegStatusUpdated notifyType:%{public}d, regStatus:%{public}d, "
+        "lacCode:%{public}d, cellId:%{public}d, radioTechnology:%{public}d",
+        regStatusInfoNotify.notifyType, regStatusInfoNotify.regStatus, regStatusInfoNotify.lacCode,
+        regStatusInfoNotify.cellId, regStatusInfoNotify.radioTechnology);
+    return Notify(&HDI::Ril::V1_0::IRilCallback::NetworkCsRegStatusUpdated, regStatusInfoNotify);
+}
+
+int32_t HRilNetwork::NetworkPsRegStatusUpdated(
+    int32_t indType, const HRilErrNumber e, const void *response, size_t responseLen)
+{
+    if (response == nullptr || responseLen != sizeof(HRilRegStatusInfo)) {
+        TELEPHONY_LOGE("NetworkPsRegStatusUpdated response is invalid");
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    HDI::Ril::V1_0::IPsRegStatusInfo regStatusInfoNotify = {};
+    const HRilRegStatusInfo *hrilRegStatusInfo = static_cast<const HRilRegStatusInfo *>(response);
+    regStatusInfoNotify.notifyType = hrilRegStatusInfo->notifyMode;
+    regStatusInfoNotify.regStatus = static_cast<HDI::Ril::V1_0::IHRilRegStatus>(hrilRegStatusInfo->regStatus);
+    regStatusInfoNotify.lacCode = hrilRegStatusInfo->lacCode;
+    regStatusInfoNotify.cellId = hrilRegStatusInfo->cellId;
+    regStatusInfoNotify.radioTechnology = static_cast<HDI::Ril::V1_0::IHRilRadioTech>(hrilRegStatusInfo->actType);
+    regStatusInfoNotify.isDcNrRestricted = hrilRegStatusInfo->isDcNrRestricted;
+    regStatusInfoNotify.isNrAvailable = hrilRegStatusInfo->isNrAvailable;
+    regStatusInfoNotify.isEnDcAvailable = hrilRegStatusInfo->isEnDcAvailable;
+    TELEPHONY_LOGI(
+        "GetPsRegStatusResponse notifyType:%{public}d, regStatus:%{public}d, lacCode:%{public}d, cellId:%{public}d, "
+        "radioTechnology:%{public}d, isDcNrRestricted:%{public}d, isNrAvailable:%{public}d, isEnDcAvailable:%{public}d",
+        regStatusInfoNotify.notifyType, regStatusInfoNotify.regStatus, regStatusInfoNotify.lacCode,
+        regStatusInfoNotify.cellId, regStatusInfoNotify.radioTechnology, regStatusInfoNotify.isDcNrRestricted,
+        regStatusInfoNotify.isNrAvailable, regStatusInfoNotify.isEnDcAvailable);
+    return Notify(&HDI::Ril::V1_0::IRilCallback::NetworkPsRegStatusUpdated, regStatusInfoNotify);
+}
+
+int32_t HRilNetwork::SignalStrengthUpdated(
+    int32_t indType, const HRilErrNumber e, const void *response, size_t responseLen)
+{
+    if (response == nullptr || responseLen != sizeof(HRilRssi)) {
+        TELEPHONY_LOGE("SignalStrengthUpdated response is invalid");
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    HDI::Ril::V1_0::IRssi rssi = {};
+    ExchangeRilRssiToHdf(response, rssi);
+    return Notify(&HDI::Ril::V1_0::IRilCallback::SignalStrengthUpdated, rssi);
+}
+
+int32_t HRilNetwork::NetworkTimeUpdated(
+    int32_t indType, const HRilErrNumber e, const void *response, size_t responseLen)
+{
+    if (response == nullptr) {
+        TELEPHONY_LOGE("NetworkTimeUpdated response is invalid");
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    return Notify(&HDI::Ril::V1_0::IRilCallback::NetworkTimeUpdated, (const char *)response);
+}
+
+int32_t HRilNetwork::NetworkTimeZoneUpdated(
+    int32_t indType, const HRilErrNumber e, const void *response, size_t responseLen)
+{
+    if (response == nullptr) {
+        TELEPHONY_LOGE("NetworkTimeZoneUpdated response is invalid");
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    return Notify(&HDI::Ril::V1_0::IRilCallback::NetworkTimeZoneUpdated, (const char *)response);
+}
+
+int32_t HRilNetwork::NetworkPhyChnlCfgUpdated(
+    int32_t indType, const HRilErrNumber e, const void *response, size_t responseLen)
+{
+    if (response == nullptr || responseLen != sizeof(HRilRegStatusInfo)) {
+        TELEPHONY_LOGE("NetworkPhyChnlCfgUpdated response is invalid");
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    HDI::Ril::V1_0::IChannelConfigInfoList phyChnlCfgList = {};
+    phyChnlCfgList.itemNum = 0;
+    phyChnlCfgList.channelConfigInfos.clear();
+    const HRilChannelConfigList *hrilChannelConfigList = static_cast<const HRilChannelConfigList *>(response);
+    phyChnlCfgList.itemNum = hrilChannelConfigList->itemNum;
+    for (int32_t i = 0; i < phyChnlCfgList.itemNum; i++) {
+        HDI::Ril::V1_0::IPhysicalChannelConfig phyChnlCfg;
+        phyChnlCfg.cellConnStatus = static_cast<HDI::Ril::V1_0::IHRilCellConnectionStatus>(
+            hrilChannelConfigList->channelConfigs[i].cellConnStatus);
+        phyChnlCfg.cellBandwidthDownlinkKhz = hrilChannelConfigList->channelConfigs[i].cellBandwidthDownlinkKhz;
+        phyChnlCfg.cellBandwidthUplinkKhz = hrilChannelConfigList->channelConfigs[i].cellBandwidthUplinkKhz;
+        phyChnlCfg.ratType = static_cast<HDI::Ril::V1_0::IHRilRadioTech>(
+            hrilChannelConfigList->channelConfigs[i].ratType);
+        phyChnlCfg.freqRange = hrilChannelConfigList->channelConfigs[i].freqRange;
+        phyChnlCfg.downlinkChannelNum = hrilChannelConfigList->channelConfigs[i].downlinkChannelNum;
+        phyChnlCfg.uplinkChannelNum = hrilChannelConfigList->channelConfigs[i].uplinkChannelNum;
+        phyChnlCfg.physicalCellId = hrilChannelConfigList->channelConfigs[i].physicalCellId;
+        phyChnlCfg.contextIdNum = hrilChannelConfigList->channelConfigs[i].contextIdNum;
+        for (int32_t j = 0; j < phyChnlCfg.contextIdNum; j++) {
+            phyChnlCfg.contextIds.push_back(hrilChannelConfigList->channelConfigs[i].contextIds[j]);
+        }
+        phyChnlCfgList.channelConfigInfos.push_back(phyChnlCfg);
+    }
+    TELEPHONY_LOGI("NetworkPhyChnlCfgUpdated itemNum:%{public}d", phyChnlCfgList.itemNum);
+    return Notify(&HDI::Ril::V1_0::IRilCallback::NetworkPhyChnlCfgUpdated, phyChnlCfgList);
+}
+
+int32_t HRilNetwork::NetworkCurrentCellUpdated(
+    int32_t indType, const HRilErrNumber e, const void *response, size_t responseLen)
+{
+    if (response == nullptr || responseLen != sizeof(HRilRegStatusInfo)) {
+        TELEPHONY_LOGE("NetworkCurrentCellUpdated response is invalid");
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    HDI::Ril::V1_0::ICellListCurrentInfo cellList;
+    cellList.itemNum = 0;
+    cellList.cellCurrentInfo.clear();
+    if (BuildCurrentCellList(cellList, response, responseLen) != 0) {
+        TELEPHONY_LOGE("NetworkCurrentCellUpdated BuildCurrentCellList failed");
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
+    return Notify(&HDI::Ril::V1_0::IRilCallback::NetworkCurrentCellUpdated, cellList);
+}
+
+void HRilNetwork::ExchangeRilRssiToHdf(const void *response, HDI::Ril::V1_0::IRssi &rssi)
+{
+    HRilRssi *rilRssi = (HRilRssi *)response;
+    rssi.gw.rxlev = rilRssi->gsmRssi.rxlev;
+    rssi.gw.ber = rilRssi->gsmRssi.ber;
+    rssi.cdma.absoluteRssi = rilRssi->cdmaRssi.absoluteRssi;
+    rssi.cdma.ecno = rilRssi->cdmaRssi.ecno;
+    rssi.wcdma.rxlev = rilRssi->wcdmaRssi.rxlev;
+    rssi.wcdma.ber = rilRssi->wcdmaRssi.ber;
+    rssi.wcdma.ecio = rilRssi->wcdmaRssi.ecio;
+    rssi.wcdma.rscp = rilRssi->wcdmaRssi.rscp;
+    rssi.lte.rxlev = rilRssi->lteRssi.rxlev;
+    rssi.lte.rsrp = rilRssi->lteRssi.rsrp;
+    rssi.lte.rsrq = rilRssi->lteRssi.rsrq;
+    rssi.lte.snr = rilRssi->lteRssi.snr;
+    rssi.tdScdma.rscp = rilRssi->tdScdmaRssi.rscp;
+    rssi.nr.rsrp = rilRssi->nrRssi.rsrp;
+    rssi.nr.rsrq = rilRssi->nrRssi.rsrq;
+    rssi.nr.sinr = rilRssi->nrRssi.sinr;
+    TELEPHONY_LOGI("ExchangeRilRssiToHdf rxlev:%{public}d, rsrp:%{public}d", rssi.lte.rxlev, rssi.lte.rsrp);
+}
+
+void HRilNetwork::BuildOperatorList(
+    HDI::Ril::V1_0::IAvailableNetworkList &availableNetworkList, const void *response, size_t responseLen)
+{
+    size_t numStrings = responseLen / sizeof(AvailableOperInfo *);
+    HDI::Ril::V1_0::IAvailableNetworkInfo operInfo = {};
+    availableNetworkList.itemNum = numStrings;
+    TELEPHONY_LOGI("BuildOperatorList availableNetworkList.itemNum: %{public}lu", (unsigned long)numStrings);
+    for (size_t i = 0; i < numStrings; i++) {
+        AvailableOperInfo *curPtr = ((AvailableOperInfo **)response)[i];
+        if (curPtr != nullptr) {
+            operInfo.status = curPtr->status;
+            TELEPHONY_LOGI("operInfo.status:%{public}d", curPtr->status);
+            operInfo.longName = (curPtr->longName == nullptr) ? "" : curPtr->longName;
+            TELEPHONY_LOGI("operInfo.longName:%{public}s", curPtr->longName);
+            operInfo.numeric = (curPtr->numeric == nullptr) ? "" : curPtr->numeric;
+            TELEPHONY_LOGI("operInfo.numeric:%{public}s", curPtr->numeric);
+            operInfo.shortName = (curPtr->shortName == nullptr) ? "" : curPtr->shortName;
+            TELEPHONY_LOGI("operInfo.shortName:%{public}s", curPtr->shortName);
+            operInfo.rat = curPtr->rat;
+            TELEPHONY_LOGI("operInfo.rat:%{public}d", curPtr->rat);
+            availableNetworkList.availableNetworkInfo.push_back(operInfo);
+        }
+    }
+}
+
+void HRilNetwork::FillCellNearbyInfo(HDI::Ril::V1_0::ICellNearbyInfo &cellInfo, const CellInfo *cellPtr)
 {
     cellInfo.ratType = cellPtr->ratType;
     switch (cellPtr->ratType) {
         case NETWORK_TYPE_GSM:
-            cellInfo.ServiceCellParas.gsm.band = cellPtr->ServiceCellParas.gsm.band;
-            cellInfo.ServiceCellParas.gsm.arfcn = cellPtr->ServiceCellParas.gsm.arfcn;
-            cellInfo.ServiceCellParas.gsm.bsic = cellPtr->ServiceCellParas.gsm.bsic;
-            cellInfo.ServiceCellParas.gsm.cellId = cellPtr->ServiceCellParas.gsm.cellId;
-            cellInfo.ServiceCellParas.gsm.lac = cellPtr->ServiceCellParas.gsm.lac;
-            cellInfo.ServiceCellParas.gsm.rxlev = cellPtr->ServiceCellParas.gsm.rxlev;
+            cellInfo.serviceCells.gsm.band = cellPtr->ServiceCellParas.gsm.band;
+            cellInfo.serviceCells.gsm.arfcn = cellPtr->ServiceCellParas.gsm.arfcn;
+            cellInfo.serviceCells.gsm.bsic = cellPtr->ServiceCellParas.gsm.bsic;
+            cellInfo.serviceCells.gsm.cellId = cellPtr->ServiceCellParas.gsm.cellId;
+            cellInfo.serviceCells.gsm.lac = cellPtr->ServiceCellParas.gsm.lac;
+            cellInfo.serviceCells.gsm.rxlev = cellPtr->ServiceCellParas.gsm.rxlev;
             break;
         case NETWORK_TYPE_LTE:
-            cellInfo.ServiceCellParas.lte.arfcn = cellPtr->ServiceCellParas.lte.arfcn;
-            cellInfo.ServiceCellParas.lte.pci = cellPtr->ServiceCellParas.lte.pci;
-            cellInfo.ServiceCellParas.lte.rsrp = cellPtr->ServiceCellParas.lte.rsrp;
-            cellInfo.ServiceCellParas.lte.rsrq = cellPtr->ServiceCellParas.lte.rsrq;
-            cellInfo.ServiceCellParas.lte.rxlev = cellPtr->ServiceCellParas.lte.rxlev;
+            cellInfo.serviceCells.lte.arfcn = cellPtr->ServiceCellParas.lte.arfcn;
+            cellInfo.serviceCells.lte.pci = cellPtr->ServiceCellParas.lte.pci;
+            cellInfo.serviceCells.lte.rsrp = cellPtr->ServiceCellParas.lte.rsrp;
+            cellInfo.serviceCells.lte.rsrq = cellPtr->ServiceCellParas.lte.rsrq;
+            cellInfo.serviceCells.lte.rxlev = cellPtr->ServiceCellParas.lte.rxlev;
             break;
         case NETWORK_TYPE_WCDMA:
-            cellInfo.ServiceCellParas.wcdma.arfcn = cellPtr->ServiceCellParas.wcdma.arfcn;
-            cellInfo.ServiceCellParas.wcdma.psc = cellPtr->ServiceCellParas.wcdma.psc;
-            cellInfo.ServiceCellParas.wcdma.rscp = cellPtr->ServiceCellParas.wcdma.rscp;
-            cellInfo.ServiceCellParas.wcdma.ecno = cellPtr->ServiceCellParas.wcdma.ecno;
+            cellInfo.serviceCells.wcdma.arfcn = cellPtr->ServiceCellParas.wcdma.arfcn;
+            cellInfo.serviceCells.wcdma.psc = cellPtr->ServiceCellParas.wcdma.psc;
+            cellInfo.serviceCells.wcdma.rscp = cellPtr->ServiceCellParas.wcdma.rscp;
+            cellInfo.serviceCells.wcdma.ecno = cellPtr->ServiceCellParas.wcdma.ecno;
             break;
         case NETWORK_TYPE_CDMA:
             FillCellNearbyInfoCdma(cellInfo, cellPtr);
@@ -1060,136 +610,128 @@ void HRilNetwork::FillCellNearbyInfo(CellNearbyInfo &cellInfo, const CellInfo *c
             FillCellNearbyInfoTdscdma(cellInfo, cellPtr);
             break;
         case NETWORK_TYPE_NR:
-            cellInfo.ServiceCellParas.nr.nrArfcn = cellPtr->ServiceCellParas.nr.nrArfcn;
-            cellInfo.ServiceCellParas.nr.pci = cellPtr->ServiceCellParas.nr.pci;
-            cellInfo.ServiceCellParas.nr.tac = cellPtr->ServiceCellParas.nr.tac;
-            cellInfo.ServiceCellParas.nr.nci = cellPtr->ServiceCellParas.nr.nci;
+            cellInfo.serviceCells.nr.nrArfcn = cellPtr->ServiceCellParas.nr.nrArfcn;
+            cellInfo.serviceCells.nr.pci = cellPtr->ServiceCellParas.nr.pci;
+            cellInfo.serviceCells.nr.tac = cellPtr->ServiceCellParas.nr.tac;
+            cellInfo.serviceCells.nr.nci = cellPtr->ServiceCellParas.nr.nci;
             break;
         default:
-            cellInfo.ServiceCellParas.gsm.band = 0;
-            cellInfo.ServiceCellParas.gsm.arfcn = 0;
-            cellInfo.ServiceCellParas.gsm.bsic = 0;
-            cellInfo.ServiceCellParas.gsm.cellId = 0;
-            cellInfo.ServiceCellParas.gsm.lac = 0;
-            cellInfo.ServiceCellParas.gsm.rxlev = 0;
+            cellInfo.serviceCells.gsm.band = 0;
+            cellInfo.serviceCells.gsm.arfcn = 0;
+            cellInfo.serviceCells.gsm.bsic = 0;
+            cellInfo.serviceCells.gsm.cellId = 0;
+            cellInfo.serviceCells.gsm.lac = 0;
+            cellInfo.serviceCells.gsm.rxlev = 0;
             break;
     }
+}
+
+void HRilNetwork::FillCellNearbyInfoTdscdma(HDI::Ril::V1_0::ICellNearbyInfo &cellInfo, const CellInfo *hrilCellPtr)
+{
+    cellInfo.serviceCells.tdscdma.arfcn = hrilCellPtr->ServiceCellParas.tdscdma.arfcn;
+    cellInfo.serviceCells.tdscdma.syncId = hrilCellPtr->ServiceCellParas.tdscdma.syncId;
+    cellInfo.serviceCells.tdscdma.sc = hrilCellPtr->ServiceCellParas.tdscdma.sc;
+    cellInfo.serviceCells.tdscdma.cellId = hrilCellPtr->ServiceCellParas.tdscdma.cellId;
+    cellInfo.serviceCells.tdscdma.lac = hrilCellPtr->ServiceCellParas.tdscdma.lac;
+    cellInfo.serviceCells.tdscdma.rscp = hrilCellPtr->ServiceCellParas.tdscdma.rscp;
+    cellInfo.serviceCells.tdscdma.drx = hrilCellPtr->ServiceCellParas.tdscdma.drx;
+    cellInfo.serviceCells.tdscdma.rac = hrilCellPtr->ServiceCellParas.tdscdma.rac;
+    cellInfo.serviceCells.tdscdma.cpid = hrilCellPtr->ServiceCellParas.tdscdma.cpid;
+}
+
+void HRilNetwork::FillCellNearbyInfoCdma(HDI::Ril::V1_0::ICellNearbyInfo &cellInfo, const CellInfo *hrilCellPtr)
+{
+    cellInfo.serviceCells.cdma.systemId = hrilCellPtr->ServiceCellParas.cdma.systemId;
+    cellInfo.serviceCells.cdma.networkId = hrilCellPtr->ServiceCellParas.cdma.networkId;
+    cellInfo.serviceCells.cdma.baseId = hrilCellPtr->ServiceCellParas.cdma.baseId;
+    cellInfo.serviceCells.cdma.zoneId = hrilCellPtr->ServiceCellParas.cdma.zoneId;
+    cellInfo.serviceCells.cdma.pilotPn = hrilCellPtr->ServiceCellParas.cdma.pilotPn;
+    cellInfo.serviceCells.cdma.pilotStrength = hrilCellPtr->ServiceCellParas.cdma.pilotStrength;
+    cellInfo.serviceCells.cdma.channel = hrilCellPtr->ServiceCellParas.cdma.channel;
+    cellInfo.serviceCells.cdma.longitude = hrilCellPtr->ServiceCellParas.cdma.longitude;
+    cellInfo.serviceCells.cdma.latitude = hrilCellPtr->ServiceCellParas.cdma.latitude;
 }
 
 int32_t HRilNetwork::BuildNeighboringCellList(
-    CellListNearbyInfo &cellInfoList, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    HDI::Ril::V1_0::ICellListNearbyInfo &cellInfoList, const void *response, size_t responseLen)
 {
-    if (response == nullptr) {
-        TELEPHONY_LOGE("BuildCellList: Invalid response");
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
-        }
-        return HRIL_ERR_NULL_POINT;
-    } else {
-        const CellInfoList *temp = reinterpret_cast<const CellInfoList *>(response);
-        cellInfoList.itemNum = temp->itemNum;
-        TELEPHONY_LOGI("BuildNeighboringCellList:  cellInfoList.itemNum = %{public}d", cellInfoList.itemNum);
-        for (int32_t i = 0; i < temp->itemNum; i++) {
-            CellNearbyInfo cellInfo;
-            CellInfo *cellPtr = temp->cellNearbyInfo + i;
-            if (cellPtr == nullptr) {
-                TELEPHONY_LOGE("BuildNeighboringCellList: response item error!");
-                return HRIL_ERR_GENERIC_FAILURE;
-            }
-            FillCellNearbyInfo(cellInfo, cellPtr);
-            cellInfoList.cellNearbyInfo.push_back(cellInfo);
-        }
-        return HRIL_ERR_SUCCESS;
-    }
-}
-
-int32_t HRilNetwork::GetNeighboringCellInfoListResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
-{
-    CellListNearbyInfo cellList;
-    cellList.itemNum = 0;
-    cellList.cellNearbyInfo.clear();
-    if (((response == nullptr) && (responseLen != 0)) ||
-        ((response != nullptr) && (responseLen != sizeof(CellInfoList)))) {
-        TELEPHONY_LOGE("GetNeighboringCellInfoListResponse  check data: error");
-        return HRIL_ERR_GENERIC_FAILURE;
-    } else if ((response == nullptr) && (responseLen == 0)) {
-        TELEPHONY_LOGI("GetNeighboringCellInfoListResponse Invalid response: nullptr");
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
-        }
-    } else {
-        if (BuildNeighboringCellList(cellList, responseInfo, response, responseLen) != 0) {
+    const CellInfoList *temp = reinterpret_cast<const CellInfoList *>(response);
+    cellInfoList.itemNum = temp->itemNum;
+    TELEPHONY_LOGI("BuildNeighboringCellList cellInfoList.itemNum = %{public}d", cellInfoList.itemNum);
+    for (int32_t i = 0; i < temp->itemNum; i++) {
+        HDI::Ril::V1_0::ICellNearbyInfo cellInfo;
+        CellInfo *cell = temp->cellNearbyInfo + i;
+        if (cell == nullptr) {
+            TELEPHONY_LOGE("BuildNeighboringCellList cell is nullptr");
             return HRIL_ERR_GENERIC_FAILURE;
         }
+        FillCellNearbyInfo(cellInfo, cell);
+        cellInfoList.cellNearbyInfo.push_back(cellInfo);
     }
-    return ResponseMessageParcel(responseInfo, cellList, requestNum);
+    return HRIL_ERR_SUCCESS;
 }
 
-void HRilNetwork::FillCellInfoType(CurrentCellInfo &cellInfo, const CurrentCellInfoVendor *hrilCellInfoVendor)
+void HRilNetwork::FillCellInfoType(
+    HDI::Ril::V1_0::ICurrentCellInfo &cellInfo, const CurrentCellInfoVendor *hrilCellInfoVendor)
 {
-    CurrentCellInfoVendor *cellInfoVendor = (CurrentCellInfoVendor *)hrilCellInfoVendor;
-    if (cellInfoVendor == NULL) {
-        TELEPHONY_LOGE("FillCellInfoType cellInfoVendor param is null");
-        return;
-    }
-    if (cellInfoVendor->ratType == NETWORK_TYPE_WCDMA) {
-        cellInfo.ServiceCellParas.wcdma.arfcn = cellInfoVendor->ServiceCellParas.wcdma.arfcn;
-        cellInfo.ServiceCellParas.wcdma.cellId = cellInfoVendor->ServiceCellParas.wcdma.cellId;
-        cellInfo.ServiceCellParas.wcdma.psc = cellInfoVendor->ServiceCellParas.wcdma.psc;
-        cellInfo.ServiceCellParas.wcdma.lac = cellInfoVendor->ServiceCellParas.wcdma.lac;
-        cellInfo.ServiceCellParas.wcdma.rxlev = cellInfoVendor->ServiceCellParas.wcdma.rxlev;
-        cellInfo.ServiceCellParas.wcdma.rscp = cellInfoVendor->ServiceCellParas.wcdma.rscp;
-        cellInfo.ServiceCellParas.wcdma.ecno = cellInfoVendor->ServiceCellParas.wcdma.ecno;
-        cellInfo.ServiceCellParas.wcdma.ura = cellInfoVendor->ServiceCellParas.wcdma.ura;
-        cellInfo.ServiceCellParas.wcdma.drx = cellInfoVendor->ServiceCellParas.wcdma.drx;
-    } else if (cellInfoVendor->ratType == NETWORK_TYPE_CDMA) {
-        cellInfo.ServiceCellParas.cdma.systemId = cellInfoVendor->ServiceCellParas.cdma.systemId;
-        cellInfo.ServiceCellParas.cdma.networkId = cellInfoVendor->ServiceCellParas.cdma.networkId;
-        cellInfo.ServiceCellParas.cdma.baseId = cellInfoVendor->ServiceCellParas.cdma.baseId;
-        cellInfo.ServiceCellParas.cdma.zoneId = cellInfoVendor->ServiceCellParas.cdma.zoneId;
-        cellInfo.ServiceCellParas.cdma.pilotPn = cellInfoVendor->ServiceCellParas.cdma.pilotPn;
-        cellInfo.ServiceCellParas.cdma.pilotStrength = cellInfoVendor->ServiceCellParas.cdma.pilotStrength;
-        cellInfo.ServiceCellParas.cdma.channel = cellInfoVendor->ServiceCellParas.cdma.channel;
-        cellInfo.ServiceCellParas.cdma.longitude = cellInfoVendor->ServiceCellParas.cdma.longitude;
-        cellInfo.ServiceCellParas.cdma.latitude = cellInfoVendor->ServiceCellParas.cdma.latitude;
-    } else if (cellInfoVendor->ratType == NETWORK_TYPE_TDSCDMA) {
-        cellInfo.ServiceCellParas.tdscdma.arfcn = cellInfoVendor->ServiceCellParas.tdscdma.arfcn;
-        cellInfo.ServiceCellParas.tdscdma.syncId = cellInfoVendor->ServiceCellParas.tdscdma.syncId;
-        cellInfo.ServiceCellParas.tdscdma.sc = cellInfoVendor->ServiceCellParas.tdscdma.sc;
-        cellInfo.ServiceCellParas.tdscdma.cellId = cellInfoVendor->ServiceCellParas.tdscdma.cellId;
-        cellInfo.ServiceCellParas.tdscdma.lac = cellInfoVendor->ServiceCellParas.tdscdma.lac;
-        cellInfo.ServiceCellParas.tdscdma.rscp = cellInfoVendor->ServiceCellParas.tdscdma.rscp;
-        cellInfo.ServiceCellParas.tdscdma.drx = cellInfoVendor->ServiceCellParas.tdscdma.drx;
-        cellInfo.ServiceCellParas.tdscdma.rac = cellInfoVendor->ServiceCellParas.tdscdma.rac;
-        cellInfo.ServiceCellParas.tdscdma.cpid = cellInfoVendor->ServiceCellParas.tdscdma.cpid;
+    if (hrilCellInfoVendor->ratType == NETWORK_TYPE_WCDMA) {
+        cellInfo.serviceCells.wcdma.arfcn = hrilCellInfoVendor->ServiceCellParas.wcdma.arfcn;
+        cellInfo.serviceCells.wcdma.cellId = hrilCellInfoVendor->ServiceCellParas.wcdma.cellId;
+        cellInfo.serviceCells.wcdma.psc = hrilCellInfoVendor->ServiceCellParas.wcdma.psc;
+        cellInfo.serviceCells.wcdma.lac = hrilCellInfoVendor->ServiceCellParas.wcdma.lac;
+        cellInfo.serviceCells.wcdma.rxlev = hrilCellInfoVendor->ServiceCellParas.wcdma.rxlev;
+        cellInfo.serviceCells.wcdma.rscp = hrilCellInfoVendor->ServiceCellParas.wcdma.rscp;
+        cellInfo.serviceCells.wcdma.ecno = hrilCellInfoVendor->ServiceCellParas.wcdma.ecno;
+        cellInfo.serviceCells.wcdma.ura = hrilCellInfoVendor->ServiceCellParas.wcdma.ura;
+        cellInfo.serviceCells.wcdma.drx = hrilCellInfoVendor->ServiceCellParas.wcdma.drx;
+    } else if (hrilCellInfoVendor->ratType == NETWORK_TYPE_CDMA) {
+        cellInfo.serviceCells.cdma.systemId = hrilCellInfoVendor->ServiceCellParas.cdma.systemId;
+        cellInfo.serviceCells.cdma.networkId = hrilCellInfoVendor->ServiceCellParas.cdma.networkId;
+        cellInfo.serviceCells.cdma.baseId = hrilCellInfoVendor->ServiceCellParas.cdma.baseId;
+        cellInfo.serviceCells.cdma.zoneId = hrilCellInfoVendor->ServiceCellParas.cdma.zoneId;
+        cellInfo.serviceCells.cdma.pilotPn = hrilCellInfoVendor->ServiceCellParas.cdma.pilotPn;
+        cellInfo.serviceCells.cdma.pilotStrength = hrilCellInfoVendor->ServiceCellParas.cdma.pilotStrength;
+        cellInfo.serviceCells.cdma.channel = hrilCellInfoVendor->ServiceCellParas.cdma.channel;
+        cellInfo.serviceCells.cdma.longitude = hrilCellInfoVendor->ServiceCellParas.cdma.longitude;
+        cellInfo.serviceCells.cdma.latitude = hrilCellInfoVendor->ServiceCellParas.cdma.latitude;
+    } else if (hrilCellInfoVendor->ratType == NETWORK_TYPE_TDSCDMA) {
+        cellInfo.serviceCells.tdscdma.arfcn = hrilCellInfoVendor->ServiceCellParas.tdscdma.arfcn;
+        cellInfo.serviceCells.tdscdma.syncId = hrilCellInfoVendor->ServiceCellParas.tdscdma.syncId;
+        cellInfo.serviceCells.tdscdma.sc = hrilCellInfoVendor->ServiceCellParas.tdscdma.sc;
+        cellInfo.serviceCells.tdscdma.cellId = hrilCellInfoVendor->ServiceCellParas.tdscdma.cellId;
+        cellInfo.serviceCells.tdscdma.lac = hrilCellInfoVendor->ServiceCellParas.tdscdma.lac;
+        cellInfo.serviceCells.tdscdma.rscp = hrilCellInfoVendor->ServiceCellParas.tdscdma.rscp;
+        cellInfo.serviceCells.tdscdma.drx = hrilCellInfoVendor->ServiceCellParas.tdscdma.drx;
+        cellInfo.serviceCells.tdscdma.rac = hrilCellInfoVendor->ServiceCellParas.tdscdma.rac;
+        cellInfo.serviceCells.tdscdma.cpid = hrilCellInfoVendor->ServiceCellParas.tdscdma.cpid;
     }
 }
 
-void HRilNetwork::FillCurrentCellInfo(CurrentCellInfo &cellInfo, const CurrentCellInfoVendor *cellInfoVendor)
+void HRilNetwork::FillCurrentCellInfo(
+    HDI::Ril::V1_0::ICurrentCellInfo &cellInfo, const CurrentCellInfoVendor *cellInfoVendor)
 {
     cellInfo.ratType = cellInfoVendor->ratType;
     cellInfo.mcc = cellInfoVendor->mcc;
     cellInfo.mnc = cellInfoVendor->mnc;
     switch (cellInfoVendor->ratType) {
         case NETWORK_TYPE_GSM:
-            cellInfo.ServiceCellParas.gsm.band = cellInfoVendor->ServiceCellParas.gsm.band;
-            cellInfo.ServiceCellParas.gsm.arfcn = cellInfoVendor->ServiceCellParas.gsm.arfcn;
-            cellInfo.ServiceCellParas.gsm.bsic = cellInfoVendor->ServiceCellParas.gsm.bsic;
-            cellInfo.ServiceCellParas.gsm.cellId = cellInfoVendor->ServiceCellParas.gsm.cellId;
-            cellInfo.ServiceCellParas.gsm.lac = cellInfoVendor->ServiceCellParas.gsm.lac;
-            cellInfo.ServiceCellParas.gsm.rxlev = cellInfoVendor->ServiceCellParas.gsm.rxlev;
-            cellInfo.ServiceCellParas.gsm.rxQuality = cellInfoVendor->ServiceCellParas.gsm.rxQuality;
-            cellInfo.ServiceCellParas.gsm.ta = cellInfoVendor->ServiceCellParas.gsm.ta;
+            cellInfo.serviceCells.gsm.band = cellInfoVendor->ServiceCellParas.gsm.band;
+            cellInfo.serviceCells.gsm.arfcn = cellInfoVendor->ServiceCellParas.gsm.arfcn;
+            cellInfo.serviceCells.gsm.bsic = cellInfoVendor->ServiceCellParas.gsm.bsic;
+            cellInfo.serviceCells.gsm.cellId = cellInfoVendor->ServiceCellParas.gsm.cellId;
+            cellInfo.serviceCells.gsm.lac = cellInfoVendor->ServiceCellParas.gsm.lac;
+            cellInfo.serviceCells.gsm.rxlev = cellInfoVendor->ServiceCellParas.gsm.rxlev;
+            cellInfo.serviceCells.gsm.rxQuality = cellInfoVendor->ServiceCellParas.gsm.rxQuality;
+            cellInfo.serviceCells.gsm.ta = cellInfoVendor->ServiceCellParas.gsm.ta;
             break;
         case NETWORK_TYPE_LTE:
-            cellInfo.ServiceCellParas.lte.arfcn = cellInfoVendor->ServiceCellParas.lte.arfcn;
-            cellInfo.ServiceCellParas.lte.cellId = cellInfoVendor->ServiceCellParas.lte.cellId;
-            cellInfo.ServiceCellParas.lte.pci = cellInfoVendor->ServiceCellParas.lte.pci;
-            cellInfo.ServiceCellParas.lte.tac = cellInfoVendor->ServiceCellParas.lte.tac;
-            cellInfo.ServiceCellParas.lte.rsrp = cellInfoVendor->ServiceCellParas.lte.rsrp;
-            cellInfo.ServiceCellParas.lte.rsrq = cellInfoVendor->ServiceCellParas.lte.rsrq;
-            cellInfo.ServiceCellParas.lte.rssi = cellInfoVendor->ServiceCellParas.lte.rssi;
+            cellInfo.serviceCells.lte.arfcn = cellInfoVendor->ServiceCellParas.lte.arfcn;
+            cellInfo.serviceCells.lte.cellId = cellInfoVendor->ServiceCellParas.lte.cellId;
+            cellInfo.serviceCells.lte.pci = cellInfoVendor->ServiceCellParas.lte.pci;
+            cellInfo.serviceCells.lte.tac = cellInfoVendor->ServiceCellParas.lte.tac;
+            cellInfo.serviceCells.lte.rsrp = cellInfoVendor->ServiceCellParas.lte.rsrp;
+            cellInfo.serviceCells.lte.rsrq = cellInfoVendor->ServiceCellParas.lte.rsrq;
+            cellInfo.serviceCells.lte.rssi = cellInfoVendor->ServiceCellParas.lte.rssi;
             break;
         case NETWORK_TYPE_WCDMA:
         case NETWORK_TYPE_CDMA:
@@ -1197,255 +739,42 @@ void HRilNetwork::FillCurrentCellInfo(CurrentCellInfo &cellInfo, const CurrentCe
             FillCellInfoType(cellInfo, cellInfoVendor);
             break;
         case NETWORK_TYPE_NR:
-            cellInfo.ServiceCellParas.nr.nrArfcn = cellInfoVendor->ServiceCellParas.nr.nrArfcn;
-            cellInfo.ServiceCellParas.nr.pci = cellInfoVendor->ServiceCellParas.nr.pci;
-            cellInfo.ServiceCellParas.nr.tac = cellInfoVendor->ServiceCellParas.nr.tac;
-            cellInfo.ServiceCellParas.nr.nci = cellInfoVendor->ServiceCellParas.nr.nci;
+            cellInfo.serviceCells.nr.nrArfcn = cellInfoVendor->ServiceCellParas.nr.nrArfcn;
+            cellInfo.serviceCells.nr.pci = cellInfoVendor->ServiceCellParas.nr.pci;
+            cellInfo.serviceCells.nr.tac = cellInfoVendor->ServiceCellParas.nr.tac;
+            cellInfo.serviceCells.nr.nci = cellInfoVendor->ServiceCellParas.nr.nci;
             break;
         default:
-            cellInfo.ServiceCellParas.wcdma.arfcn = 0;
-            cellInfo.ServiceCellParas.wcdma.cellId = 0;
-            cellInfo.ServiceCellParas.wcdma.psc = 0;
-            cellInfo.ServiceCellParas.wcdma.lac = 0;
-            cellInfo.ServiceCellParas.wcdma.rxlev = 0;
-            cellInfo.ServiceCellParas.wcdma.rscp = 0;
-            cellInfo.ServiceCellParas.wcdma.ecno = 0;
-            cellInfo.ServiceCellParas.wcdma.drx = 0;
-            cellInfo.ServiceCellParas.wcdma.ura = 0;
+            cellInfo.serviceCells.wcdma.arfcn = 0;
+            cellInfo.serviceCells.wcdma.cellId = 0;
+            cellInfo.serviceCells.wcdma.psc = 0;
+            cellInfo.serviceCells.wcdma.lac = 0;
+            cellInfo.serviceCells.wcdma.rxlev = 0;
+            cellInfo.serviceCells.wcdma.rscp = 0;
+            cellInfo.serviceCells.wcdma.ecno = 0;
+            cellInfo.serviceCells.wcdma.drx = 0;
+            cellInfo.serviceCells.wcdma.ura = 0;
             break;
     }
 }
 
-int32_t HRilNetwork::BuildCurrentCellList(
-    CellListCurrentInfo &cellInfoList, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
-{
-    if (response == nullptr) {
-        TELEPHONY_LOGE("BuildCurrentCellList: Invalid response");
-        return HRIL_ERR_NULL_POINT;
-    } else {
-        const CurrentCellInfoList *temp = reinterpret_cast<const CurrentCellInfoList *>(response);
-        cellInfoList.itemNum = temp->itemNum;
-        TELEPHONY_LOGI("BuildCurrentCellList:  cellInfoList.itemNum = %{public}d", cellInfoList.itemNum);
-        for (int32_t i = 0; i < temp->itemNum; i++) {
-            CurrentCellInfo cellInfo;
-            CurrentCellInfoVendor *cellPtr = temp->currentCellInfo + i;
-            if (cellPtr == nullptr) {
-                TELEPHONY_LOGE("BuildCurrentCellList: response item error!");
-                return HRIL_ERR_GENERIC_FAILURE;
-            }
-            FillCurrentCellInfo(cellInfo, cellPtr);
-            cellInfoList.cellCurrentInfo.push_back(cellInfo);
-        }
-        return HRIL_ERR_SUCCESS;
-    }
-}
-
-int32_t HRilNetwork::GetCurrentCellInfoResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
-{
-    CellListCurrentInfo cellList;
-    cellList.itemNum = 0;
-    cellList.cellCurrentInfo.clear();
-    if (((response == nullptr) && (responseLen != 0)) ||
-        ((response != nullptr) && (responseLen != sizeof(CurrentCellInfoList)))) {
-        TELEPHONY_LOGE("GetCurrentCellInfoResponse check data: error");
-        return HRIL_ERR_GENERIC_FAILURE;
-    } else if ((response == nullptr) && (responseLen == 0)) {
-        TELEPHONY_LOGI("GetCurrentCellInfoResponse Invalid response: nullptr");
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
-        }
-    } else {
-        if (BuildCurrentCellList(cellList, responseInfo, response, responseLen) != 0) {
-            return HRIL_ERR_GENERIC_FAILURE;
-        }
-    }
-    return ResponseMessageParcel(responseInfo, cellList, requestNum);
-}
-
-int32_t HRilNetwork::GetNetworkSelectionModeResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
-{
-    struct SetNetworkModeInfo selectModeResultInfo = {};
-    if (((response == nullptr) && (responseLen != 0)) || ((response != nullptr) && (responseLen != sizeof(int32_t)))) {
-        TELEPHONY_LOGE("GetNetworkSelectionModeResponse check data: error");
-        return HRIL_ERR_GENERIC_FAILURE;
-    } else if ((response == nullptr) && (responseLen == 0)) {
-        TELEPHONY_LOGE("response is nullptr");
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
-        }
-    } else {
-        int32_t *resp = static_cast<int32_t *>(const_cast<void *>(response));
-        TELEPHONY_LOGI("selectModeResultInfo.selectMode: %{public}d", *resp);
-        selectModeResultInfo.selectMode = *resp;
-    }
-    return ResponseMessageParcel(responseInfo, selectModeResultInfo, requestNum);
-}
-
-void HRilNetwork::BuildOperatorList(AvailableNetworkList &availableNetworkList, HRilRadioResponseInfo &responseInfo,
+int32_t HRilNetwork::BuildCurrentCellList(HDI::Ril::V1_0::ICellListCurrentInfo &cellInfoList,
     const void *response, size_t responseLen)
 {
-    size_t numStrings = responseLen / sizeof(AvailableOperInfo *);
-    if (response == nullptr) {
-        TELEPHONY_LOGE("response is nullptr");
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
+    const CurrentCellInfoList *temp = reinterpret_cast<const CurrentCellInfoList *>(response);
+    cellInfoList.itemNum = temp->itemNum;
+    TELEPHONY_LOGI("BuildCurrentCellList cellInfoList.itemNum = %{public}d", cellInfoList.itemNum);
+    for (int32_t i = 0; i < temp->itemNum; i++) {
+        HDI::Ril::V1_0::ICurrentCellInfo cellInfo;
+        CurrentCellInfoVendor *cell = temp->currentCellInfo + i;
+        if (cell == nullptr) {
+            TELEPHONY_LOGE("BuildCurrentCellList cell is nullptr");
+            return HRIL_ERR_GENERIC_FAILURE;
         }
-    } else {
-        AvailableNetworkInfo operInfo = {};
-        availableNetworkList.itemNum = numStrings;
-        TELEPHONY_LOGI("availableNetworkList.itemNum: %{public}lu", (unsigned long)numStrings);
-        for (size_t i = 0; i < numStrings; i++) {
-            AvailableOperInfo *curPtr = ((AvailableOperInfo **)response)[i];
-            if (curPtr != nullptr) {
-                operInfo.status = curPtr->status;
-                TELEPHONY_LOGI("operInfo.status:%{public}d", curPtr->status);
-                operInfo.longName = curPtr->longName;
-                TELEPHONY_LOGI("operInfo.longName:%{public}s", curPtr->longName);
-                operInfo.numeric = curPtr->numeric;
-                TELEPHONY_LOGI("operInfo.numeric:%{public}s", curPtr->numeric);
-                operInfo.shortName = curPtr->shortName;
-                TELEPHONY_LOGI("operInfo.shortName:%{public}s", curPtr->shortName);
-                operInfo.rat = curPtr->rat;
-                TELEPHONY_LOGI("operInfo.rat:%{public}d", curPtr->rat);
-            }
-            availableNetworkList.availableNetworkInfo.push_back(operInfo);
-        }
+        FillCurrentCellInfo(cellInfo, cell);
+        cellInfoList.cellCurrentInfo.push_back(cellInfo);
     }
-}
-
-int32_t HRilNetwork::GetNetworkSearchInformationResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
-{
-    TELEPHONY_LOGI("GetNetworkSearchInformationResponse ---> response %{public}p", response);
-    AvailableNetworkList availableNetworkList = {};
-    availableNetworkList.itemNum = 0;
-    BuildOperatorList(availableNetworkList, responseInfo, response, responseLen);
-
-    return ResponseMessageParcel(responseInfo, availableNetworkList, requestNum);
-}
-
-int32_t HRilNetwork::GetPreferredNetworkResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
-{
-    PreferredNetworkTypeInfo preferredNetworkTypeInfo = {};
-
-    TELEPHONY_LOGI("GetPreferredNetworkResponse ---> response %{public}p", response);
-    if (((response == nullptr) && (responseLen != 0)) || ((response != nullptr) && (responseLen != sizeof(int32_t)))) {
-        TELEPHONY_LOGE("GetPreferredNetworkResponse check data: error");
-        return HRIL_ERR_GENERIC_FAILURE;
-    } else if ((response == nullptr) && (responseLen == 0)) {
-        TELEPHONY_LOGE("response is nullptr");
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
-        }
-    } else {
-        int32_t *resp = static_cast<int32_t *>(const_cast<void *>(response));
-        preferredNetworkTypeInfo.preferredNetworkType = *resp;
-        TELEPHONY_LOGI("preferredNetworkTypeInfo.preferredNetworkType: %{public}d", *resp);
-    }
-    return ResponseMessageParcel(responseInfo, preferredNetworkTypeInfo, requestNum);
-}
-
-int32_t HRilNetwork::SetPreferredNetworkResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
-{
-    return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));
-}
-
-int32_t HRilNetwork::SetNetworkSelectionModeResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
-{
-    return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));
-}
-
-int32_t HRilNetwork::GetRadioCapabilityResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
-{
-    RadioCapabilityInfo radioCapabilityInfo = {};
-    if (((response == nullptr) && (responseLen != 0)) ||
-        ((response != nullptr) && (responseLen != sizeof(HRilRadioCapability)))) {
-        TELEPHONY_LOGE("GetRadioCapabilityResponse check data: error");
-        return HRIL_ERR_GENERIC_FAILURE;
-    } else if ((response == nullptr) && (responseLen == 0)) {
-        TELEPHONY_LOGE("response is nullptr");
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
-        }
-    } else {
-        TELEPHONY_LOGE("GetRadioCapabilityResponse is success");
-        const HRilRadioCapability *hRilRadioCapability = static_cast<const HRilRadioCapability *>(response);
-        radioCapabilityInfo.ratFamily = hRilRadioCapability->ratFamily;
-        radioCapabilityInfo.modemId = hRilRadioCapability->modemId;
-    }
-    return ResponseMessageParcel(responseInfo, radioCapabilityInfo, requestNum);
-}
-
-int32_t HRilNetwork::GetPhysicalChannelConfigResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
-{
-    ChannelConfigInfoList phyChnlCfgList = {};
-    phyChnlCfgList.itemNum = 0;
-    phyChnlCfgList.channelConfigInfos.clear();
-    if (((response == nullptr) && (responseLen != 0)) ||
-        ((response != nullptr) && (responseLen != sizeof(HRilChannelConfigList)))) {
-        TELEPHONY_LOGE("GetPhysicalChannelConfigResponse check data: error");
-        return HRIL_ERR_GENERIC_FAILURE;
-    } else if ((response == nullptr) && (responseLen == 0)) {
-        TELEPHONY_LOGE("GetPhysicalChannelConfigResponse Invalid response: nullptr");
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
-        }
-    } else {
-        const HRilChannelConfigList *hrilChannelConfigList = static_cast<const HRilChannelConfigList *>(response);
-        phyChnlCfgList.itemNum = hrilChannelConfigList->itemNum;
-        for (int32_t i = 0; i < phyChnlCfgList.itemNum; i++) {
-            PhysicalChannelConfig phyChnlCfg;
-            phyChnlCfg.cellConnStatus = hrilChannelConfigList->channelConfigs[i].cellConnStatus;
-            phyChnlCfg.cellBandwidthDownlinkKhz = hrilChannelConfigList->channelConfigs[i].cellBandwidthDownlinkKhz;
-            phyChnlCfg.cellBandwidthUplinkKhz = hrilChannelConfigList->channelConfigs[i].cellBandwidthUplinkKhz;
-            phyChnlCfg.ratType = hrilChannelConfigList->channelConfigs[i].ratType;
-            phyChnlCfg.freqRange = hrilChannelConfigList->channelConfigs[i].freqRange;
-            phyChnlCfg.downlinkChannelNum = hrilChannelConfigList->channelConfigs[i].downlinkChannelNum;
-            phyChnlCfg.uplinkChannelNum = hrilChannelConfigList->channelConfigs[i].uplinkChannelNum;
-            phyChnlCfg.physicalCellId = hrilChannelConfigList->channelConfigs[i].physicalCellId;
-            phyChnlCfg.contextIdNum = hrilChannelConfigList->channelConfigs[i].contextIdNum;
-            TELEPHONY_LOGI(
-                "HRilNetwork::GetPhysicalChannelConfigResponse cellConnStatus:%{public}d, "
-                "cellBandwidthDownlinkKhz:%{public}d, cellBandwidthUplinkKhz:%{public}d, physicalCellId:%{public}d, "
-                "ratType:%{public}d, freqRange:%{public}d, downlinkChannelNum:%{public}d, "
-                "uplinkChannelNum:%{public}d, contextIdNum:%{public}d",
-                phyChnlCfg.cellConnStatus, phyChnlCfg.cellBandwidthDownlinkKhz, phyChnlCfg.cellBandwidthUplinkKhz,
-                phyChnlCfg.ratType, phyChnlCfg.freqRange, phyChnlCfg.downlinkChannelNum, phyChnlCfg.uplinkChannelNum,
-                phyChnlCfg.physicalCellId, phyChnlCfg.contextIdNum);
-            for (int32_t j = 0; j < phyChnlCfg.contextIdNum; j++) {
-                phyChnlCfg.contextIds.push_back(hrilChannelConfigList->channelConfigs[i].contextIds[j]);
-                TELEPHONY_LOGI("contextIds:%{public}d---contextId:%{public}d", j, phyChnlCfg.contextIds[j]);
-            }
-            phyChnlCfgList.channelConfigInfos.push_back(phyChnlCfg);
-        }
-        TELEPHONY_LOGI("GetPhysicalChannelConfigResponse itemNum:%{public}d", phyChnlCfgList.itemNum);
-    }
-    return ResponseMessageParcel(responseInfo, phyChnlCfgList, requestNum);
-}
-
-int32_t HRilNetwork::SetLocateUpdatesResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
-{
-    return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));
-}
-
-int32_t HRilNetwork::SetNotificationFilterResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
-{
-    return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));
-}
-
-int32_t HRilNetwork::SetDeviceStateResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
-{
-    return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));
+    return HRIL_ERR_SUCCESS;
 }
 
 bool HRilNetwork::IsNetworkResponse(uint32_t code)
@@ -1462,6 +791,7 @@ bool HRilNetwork::IsNetworkRespOrNotify(uint32_t code)
 {
     return IsNetworkResponse(code) || IsNetworkNotification(code);
 }
+
 void HRilNetwork::RegisterNetworkFuncs(const HRilNetworkReq *networkFuncs)
 {
     networkFuncs_ = networkFuncs;

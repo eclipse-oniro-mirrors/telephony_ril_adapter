@@ -925,27 +925,27 @@ void RilManagerTest::SetDeviceState(
 void RilManagerTest::SetNetworkSelectionMode(
     int32_t mode, std::string plmn, const AppExecFwk::InnerEvent::Pointer &result)
 {
-    if (cellularRadio_ != nullptr) {
-        std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_NETWORK_SET_NETWORK_SELECTION_MODE, result);
-        if (request == nullptr) {
-            TELEPHONY_LOGE("RilManagerTest::CreateRequest is null ");
-            return;
-        }
-        OHOS::MessageParcel wData;
-        SetNetworkModeInfo networkMode;
-        networkMode.serial = request->serialId_;
-        networkMode.selectMode = mode;
-        networkMode.oper = ConvertNullToEmptyString(plmn);
-        wData.WriteInt32(slotId_);
-        if (!networkMode.Marshalling(wData)) {
-            TELEPHONY_LOGE("ERROR : SetRilNetworkSelectionMode --> Marshalling (wData) failed !!!");
-            return;
-        }
-        TELEPHONY_LOGI("SetRilNetworkSelectionMode --> SetRilNetworkSelectionMode.Marshalling (wData) success");
-        SendBufferEvent(HREQ_NETWORK_SET_NETWORK_SELECTION_MODE, wData);
-    } else {
-        TELEPHONY_LOGE("ERROR : SetRilNetworkSelectionMode --> cellularRadio_ == nullptr !!!");
+    if (cellularRadio_ == nullptr) {
+        TELEPHONY_LOGE("RilManagerTest::SetNetworkSelectionMode cellularRadio_ is nullptr");
+        return;
     }
+    std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_NETWORK_SET_NETWORK_SELECTION_MODE, result);
+    if (request == nullptr) {
+        TELEPHONY_LOGE("RilManagerTest::SetNetworkSelectionMode request is nullptr");
+        return;
+    }
+    MessageParcel data;
+    SetNetworkModeInfo networkMode;
+    networkMode.selectMode = mode;
+    networkMode.oper = ConvertNullToEmptyString(plmn);
+    data.WriteInt32(slotId_);
+    data.WriteInt32(request->serialId_);
+    if (!networkMode.Marshalling(data)) {
+        TELEPHONY_LOGE("RilManagerTest::SetNetworkSelectionMode Marshalling data failed");
+        return;
+    }
+    TELEPHONY_LOGI("RilManagerTest::SetNetworkSelectionMode success");
+    SendBufferEvent(HREQ_NETWORK_SET_NETWORK_SELECTION_MODE, data);
 }
 
 void RilManagerTest::GetCellInfoList(const AppExecFwk::InnerEvent::Pointer &response)

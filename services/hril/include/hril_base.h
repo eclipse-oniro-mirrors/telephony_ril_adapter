@@ -66,6 +66,7 @@ protected:
     uint8_t ConvertHexCharToInt(uint8_t c);
     uint8_t *ConvertHexStringToBytes(const void *response, size_t responseLen);
     bool ConvertToString(char **dest, const std::string &src);
+    void CopyToCharPoint(char **a, const std::string &temp);
     HDI::Ril::V1_0::IHRilRadioResponseInfo BuildIHRilRadioResponseInfo(const HRilRadioResponseInfo &responseInfo);
     inline void SafeFrees() {}
     template<typename M, typename... Ms>

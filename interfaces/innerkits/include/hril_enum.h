@@ -311,7 +311,6 @@ typedef enum {
 } HRilVoiceSubMode;
 
 typedef enum {
-    RADIO_TECHNOLOGY_INVALID = -1,
     RADIO_TECHNOLOGY_UNKNOWN = 0,
     RADIO_TECHNOLOGY_GSM = 1,
     RADIO_TECHNOLOGY_1XRTT = 2,
@@ -325,6 +324,7 @@ typedef enum {
     RADIO_TECHNOLOGY_LTE_CA = 10,
     RADIO_TECHNOLOGY_IWLAN = 11,
     RADIO_TECHNOLOGY_NR = 12,
+    RADIO_TECHNOLOGY_INVALID = 65535,
 } HRilRadioTech;
 
 /* reference 3GPP TS 24.008 V17.4.0 (2021-09)
