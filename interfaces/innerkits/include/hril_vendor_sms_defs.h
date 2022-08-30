@@ -16,8 +16,6 @@
 #ifndef OHOS_RIL_VENDOR_SMS_DEFS_H
 #define OHOS_RIL_VENDOR_SMS_DEFS_H
 
-#include <stdint.h>
-
 #include "hril_enum.h"
 #include "hril_public_struct.h"
 

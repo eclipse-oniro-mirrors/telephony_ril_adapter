@@ -18,8 +18,6 @@
 
 #define MAX_CHAR_LEN 100
 
-#include <stdint.h>
-
 #include "hril_public_struct.h"
 
 #ifdef __cplusplus

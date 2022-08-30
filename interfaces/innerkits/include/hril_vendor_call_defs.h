@@ -16,7 +16,6 @@
 #ifndef OHOS_RIL_VENDOR_CALL_DEFS_H
 #define OHOS_RIL_VENDOR_CALL_DEFS_H
 
-#include <stdint.h>
 #include <stddef.h>
 
 #include "hril_enum.h"

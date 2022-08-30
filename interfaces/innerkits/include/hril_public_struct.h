@@ -16,6 +16,8 @@
 #ifndef OHOS_RIL_PUBLIC_STRUCT_H
 #define OHOS_RIL_PUBLIC_STRUCT_H
 
+#include <stdint.h>
+
 #include "hril_enum.h"
 
 typedef struct ReqDataInfo {
