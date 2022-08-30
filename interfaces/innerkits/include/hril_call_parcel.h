@@ -31,14 +31,6 @@ struct DialInfo : public HrilBaseParcel {
     void Dump(std::string, int32_t);
 };
 
-struct UusData : public HrilBaseParcel {
-    int32_t uusDcs; /* Cell Broadcast Data Coding Scheme(default 0). */
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<UusData> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
-};
-
 struct GetClipResult : public HrilBaseParcel {
     int32_t result; /* query results */
     int32_t action; /* parameter sets/shows the result code presentation status in the TA */
@@ -171,39 +163,6 @@ struct CallForwardQueryInfoList : public HrilBaseParcel {
     bool ReadFromParcel(Parcel &parcel);
     virtual bool Marshalling(Parcel &parcel) const override;
     std::shared_ptr<CallForwardQueryInfoList> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
-};
-
-struct CallImsServiceStatus : public HrilBaseParcel {
-    int32_t smsSrvStatus;
-    int32_t smsSrvRat;
-    int32_t voipSrvStatus;
-    int32_t voipSrvRat;
-    int32_t vtSrvStatus;
-    int32_t vtSrvRat;
-    int32_t vsSrvStatus;
-    int32_t vsSrvRat;
-
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<CallImsServiceStatus> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
-};
-
-struct UssdInfo : public HrilBaseParcel {
-    int32_t n; /* Integer value, the control result code is reported, the default value is 0.
-                            0: Disable the reporting of result codes;
-                            1: Enable result code reporting;
-                            2: Exit the session. */
-    std::string str; /* USSD string, the maximum length is 160 characters. */
-    int32_t dcs; /* Integer value, encoding method.
-                                15: Not specified (default 7bit encoding);
-                                68: 8bit encoding (not supported temporarily);
-                                72: UCS2 encoding (not supported temporarily). */
-
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<UssdInfo> UnMarshalling(Parcel &parcel);
     void Dump(std::string, int32_t);
 };
 
