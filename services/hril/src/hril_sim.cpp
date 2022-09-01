@@ -328,6 +328,10 @@ int32_t HRilSim::GetSimStatusResponse(
 int32_t HRilSim::GetImsiResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
+    int32_t ret = CheckCharData(response, responseLen);
+    if (ret != HRIL_ERR_SUCCESS) {
+        return ret;
+    }
     return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::GetImsiResponse, (const char *)response);
 }
 
@@ -538,17 +542,29 @@ int32_t HRilSim::SimStkSessionEndNotify(
 int32_t HRilSim::SimStkProactiveNotify(
     int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen)
 {
+    int32_t ret = CheckCharData(response, responseLen);
+    if (ret != HRIL_ERR_SUCCESS) {
+        return ret;
+    }
     return Notify(&HDI::Ril::V1_0::IRilCallback::SimStkProactiveNotify, (const char *)response);
 }
 
 int32_t HRilSim::SimStkAlphaNotify(int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen)
 {
+    int32_t ret = CheckCharData(response, responseLen);
+    if (ret != HRIL_ERR_SUCCESS) {
+        return ret;
+    }
     return Notify(&HDI::Ril::V1_0::IRilCallback::SimStkAlphaNotify, (const char *)response);
 }
 
 int32_t HRilSim::SimStkEventNotify(
     int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen)
 {
+    int32_t ret = CheckCharData(response, responseLen);
+    if (ret != HRIL_ERR_SUCCESS) {
+        return ret;
+    }
     return Notify(&HDI::Ril::V1_0::IRilCallback::SimStkEventNotify, (const char *)response);
 }
 
@@ -672,6 +688,18 @@ int32_t HRilSim::BuildSimIOResp(HDI::Ril::V1_0::IIccIoResultInfo &result, HRilRa
         return HRIL_ERR_NULL_POINT;
     }
     result = ProcessIccIoResponse(responseInfo, response, responseLen);
+    return HRIL_ERR_SUCCESS;
+}
+int32_t HRilSim::CheckCharData(const void *response, size_t responseLen)
+{
+    if ((response == nullptr && responseLen != 0) || (responseLen % sizeof(char)) != 0) {
+        TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null");
+        return HRIL_ERR_NULL_POINT;
+    }
     return HRIL_ERR_SUCCESS;
 }
 } // namespace Telephony

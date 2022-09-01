@@ -134,6 +134,7 @@ private:
         const void *response, size_t responseLen);
     int32_t BuildSimIOResp(HDI::Ril::V1_0::IIccIoResultInfo &result, HRilRadioResponseInfo &responseInfo,
         const void *response, size_t responseLen);
+    int32_t CheckCharData(const void *response, size_t responseLen);
 
     const HRilSimReq *simFuncs_ = nullptr;
 };

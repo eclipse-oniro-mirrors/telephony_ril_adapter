@@ -312,14 +312,19 @@ template<typename T>
 void HRilManager::OnReport(std::vector<std::unique_ptr<T>> &subModules, int32_t slotId, const ReportInfo *reportInfo,
     const uint8_t *response, size_t responseLen)
 {
-    TELEPHONY_LOGI("OnReport notifyId:%{public}d", reportInfo->notifyId);
     if (reportInfo == nullptr) {
         TELEPHONY_LOGE("OnReport reportInfo is null!!!");
         return;
     }
+    TELEPHONY_LOGI("OnReport notifyId:%{public}d", reportInfo->notifyId);
     switch (reportInfo->type) {
         case (int32_t)ReportType::HRIL_RESPONSE: {
             ReqDataInfo *reqInfo = (ReqDataInfo *)reportInfo->requestInfo;
+            if (reqInfo == nullptr) {
+                TELEPHONY_LOGE("OnReport reqInfo is null!!!");
+                return;
+            }
+            TELEPHONY_LOGI("OnReport requestId:%{public}d", reqInfo->request);
             HRilRadioResponseInfo responseInfo = {};
             responseInfo.serial = reqInfo->serial;
             responseInfo.error = (HRilErrType)reportInfo->error;
