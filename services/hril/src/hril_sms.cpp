@@ -135,7 +135,7 @@ int32_t HRilSms::UpdateSimMessage(int32_t serialId, const OHOS::HDI::Ril::V1_0::
     CopyToCharPoint(&msg.pdu, message.pdu);
     msg.index = message.index;
     int32_t result = RequestVendor(
-        serialId, HREQ_SMS_ADD_SIM_MESSAGE, smsFuncs_, &HRilSmsReq::UpdateSimMessage, &msg, sizeof(HRilSmsWriteSms));
+        serialId, HREQ_SMS_UPDATE_SIM_MESSAGE, smsFuncs_, &HRilSmsReq::UpdateSimMessage, &msg, sizeof(HRilSmsWriteSms));
     TELEPHONY_LOGI("UpdateSimMessage result is: %{public}d", result);
     SafeFrees(msg.pdu);
     return result;
@@ -187,7 +187,7 @@ int32_t HRilSms::SetCBConfig(int32_t serialId, const OHOS::HDI::Ril::V1_0::ICBCo
 
 int32_t HRilSms::GetCBConfig(int32_t serialId)
 {
-    return RequestVendor(serialId, HREQ_SMS_SET_CB_CONFIG, smsFuncs_, &HRilSmsReq::GetCBConfig);
+    return RequestVendor(serialId, HREQ_SMS_GET_CB_CONFIG, smsFuncs_, &HRilSmsReq::GetCBConfig);
 }
 
 int32_t HRilSms::SetCdmaCBConfig(
