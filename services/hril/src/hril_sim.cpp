@@ -300,6 +300,7 @@ int32_t HRilSim::GetSimIOResponse(
     HDI::Ril::V1_0::IIccIoResultInfo result = {};
     int32_t ret = BuildSimIOResp(result, responseInfo, response, responseLen);
     if (ret != HRIL_ERR_SUCCESS) {
+        Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::GetSimIOResponse, result);
         return ret;
     }
     return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::GetSimIOResponse, result);
