@@ -300,7 +300,6 @@ int32_t HRilSim::GetSimIOResponse(
     HDI::Ril::V1_0::IIccIoResultInfo result = {};
     int32_t ret = BuildSimIOResp(result, responseInfo, response, responseLen);
     if (ret != HRIL_ERR_SUCCESS) {
-        Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::GetSimIOResponse, result);
         return ret;
     }
     return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::GetSimIOResponse, result);
@@ -315,9 +314,12 @@ int32_t HRilSim::GetSimStatusResponse(
         TELEPHONY_LOGE("Invalid response: Vendor exception!");
         return HRIL_ERR_INVALID_PARAMETER;
     }
-    if (response == nullptr) {
+    if (response == nullptr && responseLen == 0) {
         TELEPHONY_LOGE("response is null");
-        return HRIL_ERR_NULL_POINT;
+        if (responseInfo.error == HRilErrType::NONE) {
+            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
+        }
+        return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::GetSimStatusResponse, rilCardStatus);
     }
     const HRilCardState *curPtr = static_cast<const HRilCardState *>(response);
     rilCardStatus.index = curPtr->index;
@@ -339,21 +341,23 @@ int32_t HRilSim::GetImsiResponse(
 int32_t HRilSim::GetSimLockStatusResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
+    int32_t simLockStatus = 0;
     if (response == nullptr || responseLen != sizeof(int32_t)) {
         TELEPHONY_LOGE("GetSimStatusResponse: Invalid response");
-        return HRIL_ERR_INVALID_PARAMETER;
+        if (responseInfo.error == HRilErrType::NONE) {
+            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
+        }
+        return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::GetSimLockStatusResponse, simLockStatus);
     }
-    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::GetSimLockStatusResponse,
-        *(static_cast<const int32_t *>(response)));
+    simLockStatus = *(static_cast<const int32_t *>(response));
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::GetSimLockStatusResponse, simLockStatus);
 }
 
 int32_t HRilSim::SetSimLockResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     HDI::Ril::V1_0::ILockStatusResp result = {};
-    if (ResponseLockStatus(result, responseInfo, response, responseLen) == HRIL_ERR_INVALID_PARAMETER) {
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
+    ResponseLockStatus(result, responseInfo, response, responseLen);
     return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::SetSimLockResponse, result);
 }
 
@@ -361,9 +365,7 @@ int32_t HRilSim::ChangeSimPasswordResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     HDI::Ril::V1_0::ILockStatusResp result = {};
-    if (ResponseLockStatus(result, responseInfo, response, responseLen) == HRIL_ERR_INVALID_PARAMETER) {
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
+    ResponseLockStatus(result, responseInfo, response, responseLen);
     return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::ChangeSimPasswordResponse, result);
 }
 
@@ -371,9 +373,7 @@ int32_t HRilSim::UnlockPinResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     HDI::Ril::V1_0::ILockStatusResp result = {};
-    if (ResponseLockStatus(result, responseInfo, response, responseLen) == HRIL_ERR_INVALID_PARAMETER) {
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
+    ResponseLockStatus(result, responseInfo, response, responseLen);
     return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::UnlockPinResponse, result);
 }
 
@@ -381,9 +381,7 @@ int32_t HRilSim::UnlockPukResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     HDI::Ril::V1_0::ILockStatusResp result = {};
-    if (ResponseLockStatus(result, responseInfo, response, responseLen) == HRIL_ERR_INVALID_PARAMETER) {
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
+    ResponseLockStatus(result, responseInfo, response, responseLen);
     return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::UnlockPukResponse, result);
 }
 
@@ -391,9 +389,7 @@ int32_t HRilSim::UnlockPin2Response(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     HDI::Ril::V1_0::ILockStatusResp result = {};
-    if (ResponseLockStatus(result, responseInfo, response, responseLen) == HRIL_ERR_INVALID_PARAMETER) {
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
+    ResponseLockStatus(result, responseInfo, response, responseLen);
     return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::UnlockPin2Response, result);
 }
 
@@ -401,9 +397,7 @@ int32_t HRilSim::UnlockPuk2Response(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     HDI::Ril::V1_0::ILockStatusResp result = {};
-    if (ResponseLockStatus(result, responseInfo, response, responseLen) == HRIL_ERR_INVALID_PARAMETER) {
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
+    ResponseLockStatus(result, responseInfo, response, responseLen);
     return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::UnlockPuk2Response, result);
 }
 
@@ -512,9 +506,7 @@ int32_t HRilSim::UnlockSimLockResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     HDI::Ril::V1_0::ILockStatusResp result = {};
-    if (ResponseLockStatus(result, responseInfo, response, responseLen) == HRIL_ERR_INVALID_PARAMETER) {
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
+    ResponseLockStatus(result, responseInfo, response, responseLen);
     return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::UnlockSimLockResponse, result);
 }
 
@@ -522,6 +514,14 @@ HDI::Ril::V1_0::IIccIoResultInfo HRilSim::ProcessIccIoResponse(
     HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     HDI::Ril::V1_0::IIccIoResultInfo result = {};
+    if (response == nullptr || responseLen != sizeof(HRilSimIOResponse)) {
+        TELEPHONY_LOGI("Invalid response: response is nullptr");
+        if (responseInfo.error == HRilErrType::NONE) {
+            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
+        }
+        result.response = std::string("");
+        return result;
+    }
     const HRilSimIOResponse *resp = static_cast<const HRilSimIOResponse *>(response);
     result.sw1 = resp->sw1;
     result.sw2 = resp->sw2;
@@ -666,14 +666,15 @@ bool HRilSim::BuildILockStatusResp(
     return true;
 }
 
-int32_t HRilSim::ResponseLockStatus(HDI::Ril::V1_0::ILockStatusResp &lockStatus, HRilRadioResponseInfo &responseInfo,
+void HRilSim::ResponseLockStatus(HDI::Ril::V1_0::ILockStatusResp &lockStatus, HRilRadioResponseInfo &responseInfo,
     const void *response, size_t responseLen)
 {
-    if (BuildILockStatusResp(response, responseLen, lockStatus)) {
-        TELEPHONY_LOGE("Invalid response: response is nullptr");
-        return HRIL_ERR_INVALID_PARAMETER;
+    if (!BuildILockStatusResp(response, responseLen, lockStatus)) {
+        TELEPHONY_LOGE("Invalid ResponseLockStatus: response is error");
+        if (responseInfo.error == HRilErrType::NONE) {
+            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
+        }
     }
-    return HRIL_ERR_SUCCESS;
 }
 
 int32_t HRilSim::BuildSimIOResp(HDI::Ril::V1_0::IIccIoResultInfo &result, HRilRadioResponseInfo &responseInfo,
@@ -681,12 +682,14 @@ int32_t HRilSim::BuildSimIOResp(HDI::Ril::V1_0::IIccIoResultInfo &result, HRilRa
 {
     if ((response == nullptr && responseLen != 0) ||
         (response != nullptr && responseLen != sizeof(HRilSimIOResponse))) {
-        TELEPHONY_LOGE("Invalid response: Vendor exception!");
+        TELEPHONY_LOGE("Invalid BuildSimIOResp: Vendor exception!");
         return HRIL_ERR_INVALID_PARAMETER;
     }
-    if (response == nullptr) {
-        TELEPHONY_LOGE("response is null");
-        return HRIL_ERR_NULL_POINT;
+    if (response == nullptr && responseLen == 0) {
+        TELEPHONY_LOGE("BuildSimIOResp response is null");
+        if (responseInfo.error == HRilErrType::NONE) {
+            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
+        }
     }
     result = ProcessIccIoResponse(responseInfo, response, responseLen);
     return HRIL_ERR_SUCCESS;
@@ -697,7 +700,7 @@ int32_t HRilSim::CheckCharData(const void *response, size_t responseLen)
         TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
         return HRIL_ERR_INVALID_PARAMETER;
     }
-    if (response == nullptr) {
+    if (response == nullptr && responseLen == 0) {
         TELEPHONY_LOGE("response is null");
         return HRIL_ERR_NULL_POINT;
     }

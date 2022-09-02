@@ -130,7 +130,7 @@ private:
     void CopyToHRilSimAuthentication(std::unique_ptr<HRilSimAuthenticationRequestInfo> &rilSimAuthInfo,
         const OHOS::HDI::Ril::V1_0::ISimAuthenticationRequestInfo &simAuthInfo);
     bool BuildILockStatusResp(const void *response, size_t responseLen, HDI::Ril::V1_0::ILockStatusResp &lockStatus);
-    int32_t ResponseLockStatus(HDI::Ril::V1_0::ILockStatusResp &lockStatus, HRilRadioResponseInfo &responseInfo,
+    void ResponseLockStatus(HDI::Ril::V1_0::ILockStatusResp &lockStatus, HRilRadioResponseInfo &responseInfo,
         const void *response, size_t responseLen);
     int32_t BuildSimIOResp(HDI::Ril::V1_0::IIccIoResultInfo &result, HRilRadioResponseInfo &responseInfo,
         const void *response, size_t responseLen);
