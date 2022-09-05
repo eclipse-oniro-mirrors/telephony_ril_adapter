@@ -19,12 +19,70 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-#include "securec.h"
-
 #include "hril_vendor_sim_defs.h"
+#include "securec.h"
 
 #define OHOS_AT_SIM_H
 
+#define BYTE_NUM_0 0x00FF
+#define BYTE_NUM_1 0xFF00
+#define BYTE_NUM_2 0xFF
+#define BYTE_NUM_3 0x80
+#define BYTE_NUM_4 0x0F
+#define CMD_GET_RESPONSE 192
+#define DECIMAL_MAX 10
+#define EF_TYPE_TRANSPARENT 0
+#define EF_TYPE_LINEAR_FIXED 1
+#define EF_TYPE_CYCLIC 3
+#define FCP_TEMP_T 0x62
+#define FIVE_LEN 5
+#define GET_RESPONSE_EF_SIZE_BYTES 15
+#define HALF_BYTE_LEN 4
+#define HALF_LEN 2
+#define HEX_DIGITS_LEN 16
+#define RESPONSE_DATA_FILE_SIZE_1 2
+#define RESPONSE_DATA_FILE_SIZE_2 3
+#define RESPONSE_DATA_FILE_ID_1 4
+#define RESPONSE_DATA_FILE_ID_2 5
+#define RESPONSE_DATA_FILE_TYPE 6
+#define RESPONSE_DATA_FILE_STATUS 11
+#define RESPONSE_DATA_LENGTH 12
+#define RESPONSE_DATA_STRUCTURE 13
+#define RESPONSE_DATA_RECORD_LENGTH 14
+#define THIRD_INDEX 3
+#define TYPE_DF 2
+#define TYPE_EF 4
+#define VALID_FILE_STATUS 0x01
+
+typedef enum {
+    FCP_FILE_DES_T = 0x82,
+    FCP_FILE_ID_T = 0x83,
+} UsimFcpTag;
+
+typedef struct {
+    uint8_t fd;
+    uint8_t dataCoding;
+    uint16_t recLen;
+    uint8_t numRec;
+    uint16_t dataSize;
+} UsimFileDescriptor;
+
+
+typedef struct {
+    uint16_t fileId;
+} UsimFileIdentifier;
+
+uint8_t *ConvertByteArrayToHexString(uint8_t *byteArray, int byteArrayLen);
+void ConvertHexStringToByteArray(uint8_t *originHexString, int responseLen, uint8_t *byteArray, int fcpLen);
+void ConvertUsimFcpToSimRsp(uint8_t **simResponse);
+void CreateSimRspByte(uint8_t simRspByte[], int responseLen, UsimFileIdentifier *fId, UsimFileDescriptor *fDescriptor);
+uint8_t FcpFileDescriptorQuery(uint8_t *fcpByte, uint16_t fcpLen, UsimFileDescriptor *filledStructPtr);
+uint8_t FcpFileIdentifierQuery(uint8_t *fcpByte, uint16_t fcpLen, UsimFileIdentifier *filledStructPtr);
+uint8_t FcpTlvSearchTag(uint8_t *dataPtr, uint16_t len, UsimFcpTag tag, uint8_t **outPtr);
+uint8_t IsCyclicFile(uint8_t fd);
+uint8_t IsDedicatedFile(uint8_t fd);
+uint8_t IsLinearFixedFile(uint8_t fd);
+uint8_t IsTransparentFile(uint8_t fd);
 void ReqGetSimStatus(const ReqDataInfo *requestInfo);
 void ReqGetSimIO(const ReqDataInfo *requestInfo, const HRilSimIO *data, size_t dataLen);
 void ReqGetSimImsi(const ReqDataInfo *requestInfo);
@@ -48,4 +106,5 @@ void ReqSimOpenLogicalChannel(const ReqDataInfo *requestInfo, const char *appID,
 void ReqSimCloseLogicalChannel(const ReqDataInfo *requestInfo, int32_t channelId);
 void ReqSimTransmitApduLogicalChannel(const ReqDataInfo *requestInfo, HRilApduSimIO *data, size_t dataLen);
 void ReqUnlockSimLock(const ReqDataInfo *requestInfo, int32_t lockType, const char *password);
+int ToByte(char c);
 #endif // OHOS_AT_SIM_H
