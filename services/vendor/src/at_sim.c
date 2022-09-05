@@ -320,11 +320,10 @@ void ReqGetSimIO(const ReqDataInfo *requestInfo, const HRilSimIO *data, size_t d
             TELEPHONY_LOGE("FDN is failed");
             HandlerSimIOResult(pResponse, NULL, requestInfo, pLine, &ret);
             return;
-        } else {
-            TELEPHONY_LOGE("FDN is success");
-            HandlerSimIOResult(pResponse, &simResponse, requestInfo, pLine, &ret);
-            return;
         }
+        TELEPHONY_LOGE("FDN is success");
+        HandlerSimIOResult(pResponse, &simResponse, requestInfo, pLine, &ret);
+        return;
     }
     char cmd[MAX_CMD_LENGTH] = {0};
     int32_t result = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CRSM=%d,%d,%d,%d,%d,\"%s\",\"%s\"", pSim->command,
@@ -345,6 +344,9 @@ void ReqGetSimIO(const ReqDataInfo *requestInfo, const HRilSimIO *data, size_t d
     if (ret != HRIL_ERR_SUCCESS) {
         HandlerSimIOResult(pResponse, NULL, requestInfo, pLine, &ret);
         return;
+    }
+    if (GetSimType() == HRIL_SIM_TYPE_USIM && pSim->command == CMD_GET_RESPONSE) {
+        ConvertUsimFcpToSimRsp((unsigned char **)&(simResponse.response));
     }
     struct ReportInfo reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
     OnSimReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&simResponse, sizeof(HRilSimIOResponse));
@@ -1224,4 +1226,218 @@ void ReqUnlockSimLock(const ReqDataInfo *requestInfo, int32_t lockType, const ch
     struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
     OnSimReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&lockStatus, sizeof(HRilLockStatus));
     FreeResponseInfo(pResponse);
+}
+
+void ConvertUsimFcpToSimRsp(uint8_t **simResponse)
+{
+    uint16_t fcpLen = strlen((char *)*simResponse) / HALF_LEN;
+    uint8_t *fcpByte = malloc(fcpLen);
+    UsimFileDescriptor fDescriptor = { 0 };
+    UsimFileIdentifier fId = { 0 };
+    uint8_t simRspByte[GET_RESPONSE_EF_SIZE_BYTES] = { 0 };
+    if (fcpByte == NULL) {
+        TELEPHONY_LOGE("fcpByte is NULL");
+        free(fcpByte);
+        return;
+    }
+    ConvertHexStringToByteArray(*simResponse, strlen((char *)*simResponse), fcpByte, fcpLen);
+    if (FcpFileDescriptorQuery(fcpByte, fcpLen, (UsimFileDescriptor *)&fDescriptor) == FALSE) {
+        TELEPHONY_LOGE("FcpFileDescriptorQuery failed");
+        free(fcpByte);
+        return;
+    }
+    if (FcpFileIdentifierQuery(fcpByte, fcpLen, (UsimFileIdentifier *)&fId) == FALSE) {
+        TELEPHONY_LOGE("FcpFileIdentifierQuery failed");
+        free(fcpByte);
+        return;
+    }
+    if (IsDedicatedFile(fDescriptor.fd)) {
+        simRspByte[RESPONSE_DATA_FILE_TYPE] = TYPE_DF;
+        *simResponse = ConvertByteArrayToHexString(simRspByte, fcpLen);
+        free(fcpByte);
+        return;
+    }
+    CreateSimRspByte(simRspByte, GET_RESPONSE_EF_SIZE_BYTES, &fId, &fDescriptor);
+    *simResponse = ConvertByteArrayToHexString(simRspByte, GET_RESPONSE_EF_SIZE_BYTES);
+    free(fcpByte);
+}
+
+void CreateSimRspByte(uint8_t simRspByte[], int responseLen, UsimFileIdentifier *fId, UsimFileDescriptor *fDescriptor)
+{
+    if (responseLen < RESPONSE_DATA_RECORD_LENGTH + 1) {
+        TELEPHONY_LOGE("simRspByte size error");
+        return;
+    }
+    if (fId == NULL || fDescriptor == NULL) {
+        TELEPHONY_LOGE("fId or  fDescriptor is null");
+        return;
+    }
+    simRspByte[RESPONSE_DATA_FILE_TYPE] = TYPE_EF;
+    simRspByte[RESPONSE_DATA_FILE_ID_1] = (fId->fileId & BYTE_NUM_1) >> ADDR_OFFSET_8BIT;
+    simRspByte[RESPONSE_DATA_FILE_ID_2] = fId->fileId & BYTE_NUM_2;
+    simRspByte[RESPONSE_DATA_LENGTH] = (GET_RESPONSE_EF_SIZE_BYTES - RESPONSE_DATA_LENGTH - 1);
+    if (IsLinearFixedFile(fDescriptor->fd)) {
+        simRspByte[RESPONSE_DATA_STRUCTURE] = EF_TYPE_LINEAR_FIXED;
+        simRspByte[RESPONSE_DATA_RECORD_LENGTH] = fDescriptor->recLen;
+        fDescriptor->dataSize = (fDescriptor->numRec & BYTE_NUM_0) * (fDescriptor->recLen);
+        simRspByte[RESPONSE_DATA_FILE_SIZE_1] = (fDescriptor->dataSize & BYTE_NUM_1) >> ADDR_OFFSET_8BIT;
+        simRspByte[RESPONSE_DATA_FILE_SIZE_2] = fDescriptor->dataSize & BYTE_NUM_2;
+        simRspByte[RESPONSE_DATA_FILE_STATUS] = VALID_FILE_STATUS;
+        return;
+    }
+    if (IsTransparentFile(fDescriptor->fd)) {
+        simRspByte[RESPONSE_DATA_STRUCTURE] = EF_TYPE_TRANSPARENT;
+        return;
+    }
+    if (IsCyclicFile(fDescriptor->fd)) {
+        simRspByte[RESPONSE_DATA_STRUCTURE] = EF_TYPE_CYCLIC;
+        simRspByte[RESPONSE_DATA_RECORD_LENGTH] = fDescriptor->recLen;
+        return;
+    }
+}
+
+uint8_t FcpTlvSearchTag(uint8_t *dataPtr, uint16_t len, UsimFcpTag tag, uint8_t **outPtr)
+{
+    uint8_t tagLen = 0;
+    uint16_t lenVar = len;
+    for (*outPtr = dataPtr; lenVar > 0; *outPtr += tagLen) {
+        tagLen = (*(*outPtr + 1) + HALF_LEN);
+        if (**outPtr == (uint8_t)tag) {
+            *outPtr += HALF_LEN;
+            return *(*outPtr - 1);
+        }
+        lenVar -= tagLen;
+    }
+    *outPtr = NULL;
+    return FALSE;
+}
+
+uint8_t FcpFileDescriptorQuery(uint8_t *fcpByte, uint16_t fcpLen, UsimFileDescriptor *filledStructPtr)
+{
+    if (fcpByte == NULL || fcpLen < HALF_LEN + 1) {
+        TELEPHONY_LOGE("fcpByte size error");
+        return FALSE;
+    }
+    uint8_t valueLen = fcpByte[1];
+    uint8_t *dataPtr = &fcpByte[HALF_LEN];
+    if (fcpByte[0] != FCP_TEMP_T) {
+        TELEPHONY_LOGE("fcpByte data error");
+        return FALSE;
+    }
+    uint8_t resultLen = 0;
+    uint8_t *outPtr = NULL;
+    UsimFileDescriptor *queryPtr = filledStructPtr;
+    resultLen = FcpTlvSearchTag(dataPtr, valueLen, FCP_FILE_DES_T, &outPtr);
+    if (!((outPtr != NULL) && ((resultLen == HALF_LEN) || (resultLen == FIVE_LEN)))) {
+        TELEPHONY_LOGE("resultLen value error");
+        return FALSE;
+    }
+    queryPtr->fd = outPtr[0];
+    queryPtr->dataCoding = outPtr[1];
+    if (resultLen == FIVE_LEN) {
+        queryPtr->recLen = (short)((outPtr[HALF_LEN] << ADDR_OFFSET_8BIT) | outPtr[THIRD_INDEX]);
+        queryPtr->numRec = outPtr[HALF_BYTE_LEN];
+        return TRUE;
+    }
+    queryPtr->recLen = 0;
+    queryPtr->numRec = 0;
+    return TRUE;
+}
+
+uint8_t FcpFileIdentifierQuery(uint8_t *fcpByte, uint16_t fcpLen, UsimFileIdentifier *filledStructPtr)
+{
+    if (fcpByte == NULL || fcpLen < HALF_LEN + 1) {
+        TELEPHONY_LOGE("fcpByte size error");
+        return FALSE;
+    }
+    uint8_t valueLen = fcpByte[1];
+    uint8_t *dataPtr = &fcpByte[HALF_LEN];
+    if (fcpByte[0] != FCP_TEMP_T) {
+        TELEPHONY_LOGE("fcpByte data error");
+        return FALSE;
+    }
+    uint8_t resultLen = 0;
+    uint8_t *outPtr = NULL;
+    UsimFileIdentifier *queryPtr = (UsimFileIdentifier *)filledStructPtr;
+    resultLen = FcpTlvSearchTag(dataPtr, valueLen, FCP_FILE_ID_T, &outPtr);
+    if (outPtr == NULL) {
+        queryPtr->fileId = 0;
+        return FALSE;
+    }
+    if (resultLen != HALF_LEN) {
+        TELEPHONY_LOGE("resultLen size error");
+        return FALSE;
+    }
+    queryPtr->fileId = (short)((outPtr[0] << ADDR_OFFSET_8BIT) | outPtr[1]);
+    return TRUE;
+}
+
+uint8_t IsCyclicFile(uint8_t fd)
+{
+    return (0x07 & (fd)) == 0x06;
+}
+
+uint8_t IsDedicatedFile(uint8_t fd)
+{
+    return (0x38 & (fd)) == 0x38;
+}
+
+uint8_t IsLinearFixedFile(uint8_t fd)
+{
+    return (0x07 & (fd)) == 0x02;
+}
+
+uint8_t IsTransparentFile(uint8_t fd)
+{
+    return (0x07 & (fd)) == 0x01;
+}
+
+void ConvertHexStringToByteArray(uint8_t *originHexString, int responseLen, uint8_t *byteArray, int fcpLen)
+{
+    if (responseLen <= 0 || fcpLen <= 0) {
+        TELEPHONY_LOGE("originHexString is error, size=%{public}d", responseLen);
+        return;
+    }
+    for (int i = 0; i < fcpLen; i++) {
+        int hexIndex = i * HALF_LEN;
+        if (hexIndex + 1 >= responseLen) {
+            break;
+        }
+        byteArray[i] =
+            (uint8_t)((ToByte(originHexString[hexIndex]) << HALF_BYTE_LEN) | ToByte(originHexString[hexIndex + 1]));
+    }
+}
+
+uint8_t *ConvertByteArrayToHexString(uint8_t *byteArray, int byteArrayLen)
+{
+    uint8_t *buf = malloc(byteArrayLen * HALF_LEN + 1);
+    if (buf == NULL) {
+        TELEPHONY_LOGE("buf is NULL");
+        return NULL;
+    }
+    int bufIndex = 0;
+    const char HEX_DIGITS[HEX_DIGITS_LEN] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E',
+        'F' };
+    for (int i = 0; i < byteArrayLen; i++) {
+        uint8_t b = byteArray[i];
+        buf[bufIndex++] = HEX_DIGITS[(b >> HALF_BYTE_LEN) & BYTE_NUM_4];
+        buf[bufIndex++] = HEX_DIGITS[b & BYTE_NUM_4];
+    }
+    buf[bufIndex] = '\0';
+    return buf;
+}
+
+int ToByte(char c)
+{
+    if (c >= '0' && c <= '9') {
+        return (c - '0');
+    }
+    if (c >= 'A' && c <= 'F') {
+        return (c - 'A' + DECIMAL_MAX);
+    }
+    if (c >= 'a' && c <= 'f') {
+        return (c - 'a' + DECIMAL_MAX);
+    }
+    TELEPHONY_LOGE("ToByte Error: %{public}c", c);
+    return FALSE;
 }
