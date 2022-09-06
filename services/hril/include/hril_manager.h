@@ -43,7 +43,7 @@ public:
     sptr<OHOS::HDI::Power::V1_0::IPowerInterface> powerInterface_ { nullptr };
     std::unique_ptr<HRilTimerCallback> timerCallback_ = nullptr;
     std::unique_ptr<std::thread> eventLoop_ = nullptr;
-    static const uint32_t RUNNING_LOCK_DEFAULT_TIMEOUT_S = 60; // 60s
+    static const uint32_t RUNNING_LOCK_DEFAULT_TIMEOUT_US = 200 * 1000; // 200ms
     std::mutex mutexRunningLock_;
     std::atomic_uint runningLockCount_ = 0;
     std::atomic_int runningSerialNum_ = 0;

@@ -272,7 +272,7 @@ void HRilManager::ApplyRunningLock(void)
     std::lock_guard<std::mutex> lockRequest(mutexRunningLock_);
     if (powerInterface_ != nullptr) {
         powerInterface_->SuspendBlock("HRilRunningLock");
-        struct timeval tv = { RUNNING_LOCK_DEFAULT_TIMEOUT_S, 0 };
+        struct timeval tv = { 0, RUNNING_LOCK_DEFAULT_TIMEOUT_US };
         runningLockCount_++;
         runningSerialNum_++;
         int *serialNum = new int((int)runningSerialNum_);
