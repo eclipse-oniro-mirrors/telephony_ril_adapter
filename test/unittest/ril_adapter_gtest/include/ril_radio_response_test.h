@@ -53,7 +53,6 @@ public:
     void OnResponseGetNetworkRegistrationState(MessageParcel &data);
     void OnResponseGetCurrentOperator(MessageParcel &data);
     void OnRequestSetRadioStateTest(MessageParcel &data);
-    void OnResponseGetRadioCapability(MessageParcel &data);
     void OnRequestShutDownTest(MessageParcel &data);
     void OnRequestGetRadioStateTest(MessageParcel &data);
     void OnRequestGetImeiTest(MessageParcel &data);

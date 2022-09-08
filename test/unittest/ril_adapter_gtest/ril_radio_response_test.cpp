@@ -496,24 +496,6 @@ void RilRadioResponseTest::OnResponseGetCurrentOperator(MessageParcel &data)
     }
 }
 
-void RilRadioResponseTest::OnResponseGetRadioCapability(MessageParcel &data)
-{
-    TELEPHONY_LOGI("RilRadioResponseTest::OnResponseGetRadioCapability --> ");
-    const uint8_t *spBuffer = data.ReadUnpadBuffer(sizeof(HRilRadioResponseInfo));
-    if (spBuffer == nullptr) {
-        TELEPHONY_LOGE("RilRadioResponseTest::OnResponseGetRadioCapability read spBuffer failed");
-        return;
-    }
-    std::shared_ptr<RadioCapabilityInfo> radioCapabilityInfo = std::make_shared<RadioCapabilityInfo>();
-    if (radioCapabilityInfo == nullptr) {
-        TELEPHONY_LOGE("RilRadioResponseTest::OnResponseGetRadioCapability radioCapabilityInfo  == nullptr");
-        return;
-    }
-    radioCapabilityInfo->ReadFromParcel(data);
-    TELEPHONY_LOGI("RilRadioResponseTest::OnResponseGetRadioCapability --> finished: ratFamily=%{public}d",
-        radioCapabilityInfo->ratFamily);
-}
-
 void RilRadioResponseTest::OnRequestShutDownTest(MessageParcel &data)
 {
     TELEPHONY_LOGI("RilRadioResponseTest::OnRequestShutDownTest -->");

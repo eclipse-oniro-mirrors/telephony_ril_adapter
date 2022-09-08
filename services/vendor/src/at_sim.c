@@ -15,6 +15,7 @@
 
 #include "at_sim.h"
 
+#include "hril_notification.h"
 #include "securec.h"
 
 #include "vendor_adapter.h"
@@ -1031,42 +1032,40 @@ void ReqSimStkIsReady(const ReqDataInfo *requestInfo)
     FreeResponseInfo(pResponse);
 }
 
-void ReqSetRadioProtocol(const ReqDataInfo *requestInfo, const HRilSimProtocolRequest *data, size_t dataLen)
+void ReqGetRadioProtocol(const ReqDataInfo *requestInfo)
 {
-    ResponseInfo *pResponse = NULL;
-    HRilSimProtocolResponse simResponse = {0};
-    HRilSimProtocolRequest *pSim = (HRilSimProtocolRequest *)data;
-    if (pSim == NULL || dataLen == 0) {
-        struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_RESPONSE, HRIL_RESPONSE, 0);
-        OnSimReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
-        FreeResponseInfo(pResponse);
-        return;
-    }
-    if (simResponse.phase == 0) {
-        simResponse.phase = pSim->phase;
-        simResponse.result = 0;
-        simResponse.slotId = pSim->slotId;
-    } else {
-        simResponse.phase = pSim->phase;
-        simResponse.result = 1;
-        simResponse.slotId = pSim->slotId;
-    }
-    int32_t ret = SendCommandLock("AT+SPTESTMODE", "+SPTESTMODE", 0, &pResponse);
-    if (ret != 0 || (pResponse != NULL && !pResponse->success)) {
-        TELEPHONY_LOGE("AT+SPTESTMODE send failed");
-        if (pResponse && pResponse->result) {
-            ret = HRIL_ERR_SUCCESS;
-        } else {
-            ret = HRIL_ERR_GENERIC_FAILURE;
-        }
-        struct ReportInfo reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
-        OnSimReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
-        FreeResponseInfo(pResponse);
-        return;
-    }
+    TELEPHONY_LOGI("ReqGetRadioProtocol");
     struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
-    OnSimReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&simResponse, sizeof(simResponse));
-    FreeResponseInfo(pResponse);
+    HRilRadioProtocol radioProtocol = {};
+    radioProtocol.sessionId = 0;
+    radioProtocol.phase = HRIL_RADIO_PROTOCOL_PHASE_INITIAL;
+    radioProtocol.technology = HRIL_RADIO_PROTOCOL_TECH_LTE;
+    radioProtocol.modemId = 0;
+    radioProtocol.status = HRIL_RADIO_PROTOCOL_STATUS_NONE;
+    OnSimReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&radioProtocol, sizeof(HRilRadioProtocol));
+}
+
+void ReqSetRadioProtocol(const ReqDataInfo *requestInfo, const HRilRadioProtocol *data)
+{
+    HRilRadioProtocol *radioProtocol = (HRilRadioProtocol *)data;
+    struct ReportInfo reportInfo = { 0 };
+    if (radioProtocol == NULL) {
+        reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_RESPONSE, HRIL_RESPONSE, 0);
+        OnSimReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
+        return;
+    }
+
+    if (radioProtocol->phase != HRIL_RADIO_PROTOCOL_PHASE_UPDATE) {
+        reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
+        OnSimReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)radioProtocol, sizeof(HRilRadioProtocol));
+        return;
+    }
+    radioProtocol->phase = HRIL_RADIO_PROTOCOL_PHASE_NOTIFY;
+    radioProtocol->status = HRIL_RADIO_PROTOCOL_STATUS_SUCCESS;
+    reportInfo.error = HRIL_ERR_SUCCESS;
+    reportInfo.type = HRIL_NOTIFICATION;
+    reportInfo.notifyId = HNOTI_SIM_RADIO_PROTOCOL_UPDATED;
+    OnSimReport(GetSlotId(NULL), reportInfo, (const uint8_t *)radioProtocol, sizeof(HRilRadioProtocol));
 }
 
 void ReqSimOpenLogicalChannel(const ReqDataInfo *requestInfo, const char *appID, int32_t p2)

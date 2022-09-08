@@ -763,10 +763,15 @@ int32_t HRilManager::SimStkIsReady(int32_t slotId, int32_t serialId)
     return TaskSchedule(MODULE_HRIL_SIM, hrilSim_[slotId], &HRilSim::SimStkIsReady, serialId);
 }
 
-int32_t HRilManager::SetRadioProtocol(
-    int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::ISimProtocolRequest &protocol)
+int32_t HRilManager::GetRadioProtocol(int32_t slotId, int32_t serialId)
 {
-    return TaskSchedule(MODULE_HRIL_SIM, hrilSim_[slotId], &HRilSim::SetRadioProtocol, serialId, protocol);
+    return TaskSchedule(MODULE_HRIL_SIM, hrilSim_[slotId], &HRilSim::GetRadioProtocol, serialId);
+}
+
+int32_t HRilManager::SetRadioProtocol(
+    int32_t slotId, int32_t serialId, const HDI::Ril::V1_0::IRadioProtocol &radioProtocol)
+{
+    return TaskSchedule(MODULE_HRIL_SIM, hrilSim_[slotId], &HRilSim::SetRadioProtocol, serialId, radioProtocol);
 }
 
 int32_t HRilManager::SimOpenLogicalChannel(int32_t slotId, int32_t serialId, const std::string &appID, int32_t p2)
@@ -860,11 +865,6 @@ int32_t HRilManager::SetPreferredNetwork(int32_t slotId, int32_t serialId, int32
 int32_t HRilManager::GetPreferredNetwork(int32_t slotId, int32_t serialId)
 {
     return TaskSchedule(MODULE_HRIL_NETWORK, hrilNetwork_[slotId], &HRilNetwork::GetPreferredNetwork, serialId);
-}
-
-int32_t HRilManager::GetRadioCapability(int32_t slotId, int32_t serialId)
-{
-    return TaskSchedule(MODULE_HRIL_NETWORK, hrilNetwork_[slotId], &HRilNetwork::GetRadioCapability, serialId);
 }
 
 int32_t HRilManager::GetPhysicalChannelConfig(int32_t slotId, int32_t serialId)

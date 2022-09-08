@@ -138,27 +138,6 @@ struct SimPinInputTimes : public HrilBaseParcel {
     void Dump(std::string, int32_t);
 };
 
-struct SimProtocolRequest : public HrilBaseParcel {
-    int32_t serial;
-    int32_t phase;
-    int32_t protocol;
-    int32_t slotId;
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<SimProtocolRequest> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
-};
-
-struct SimProtocolResponse : public HrilBaseParcel {
-    int32_t phase;
-    int32_t result;
-    int32_t slotId;
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<SimProtocolResponse> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
-};
-
 struct ApduSimIORequestInfo : public HrilBaseParcel {
     int32_t serial;
     int32_t channelId;

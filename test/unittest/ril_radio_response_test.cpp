@@ -15,8 +15,6 @@
 
 #include "ril_radio_response_test.h"
 
-#include <iostream>
-
 #include "hril_request.h"
 #include "telephony_log_wrapper.h"
 
@@ -189,9 +187,6 @@ int32_t RilRadioResponseTest::OnRemoteRequest(
         case HREQ_NETWORK_GET_PHYSICAL_CHANNEL_CONFIG:
             OnResponseGetPhysicalChannelConfig(data);
             break;
-        case HREQ_NETWORK_GET_RADIO_CAPABILITY:
-            OnResponseGetRadioCapability(data);
-            break;
         case HREQ_MODEM_GET_MEID:
             OnRequestGetMeidTest(data);
             break;
@@ -270,7 +265,7 @@ int32_t RilRadioResponseTest::OnRemoteRequest(
     return 0;
 }
 
-void PrintResponseInfo(const struct HRilRadioResponseInfo *rspInfo)
+void RilRadioResponseTest::PrintResponseInfo(const struct HRilRadioResponseInfo *rspInfo)
 {
     if (rspInfo == nullptr) {
         return;
@@ -1318,22 +1313,6 @@ void RilRadioResponseTest::OnResponseGetPhysicalChannelConfig(OHOS::MessageParce
         cout << "====> [physicalCellId]: " << configs[i].physicalCellId << endl;
         cout << "====> [contextIdNum]: " << configs[i].contextIdNum << endl;
     }
-}
-
-void RilRadioResponseTest::OnResponseGetRadioCapability(OHOS::MessageParcel &data)
-{
-    const uint8_t *spBuffer = data.ReadUnpadBuffer(sizeof(HRilRadioResponseInfo));
-    if (spBuffer == nullptr) {
-        TELEPHONY_LOGE("RilRadioResponseTest::OnResponseGetRadioCapability read spBuffer failed");
-        return;
-    }
-    std::shared_ptr<RadioCapabilityInfo> radioCapabilityInfo = std::make_shared<RadioCapabilityInfo>();
-    if (radioCapabilityInfo == nullptr) {
-        TELEPHONY_LOGE("RilRadioResponseTest::OnResponseGetRadioCapability radioCapabilityInfo  == nullptr");
-        return;
-    }
-    radioCapabilityInfo->ReadFromParcel(data);
-    cout << "OnResponseGetRadioCapability: ratFamily = " << radioCapabilityInfo->ratFamily << endl;
 }
 
 void RilRadioResponseTest::OnRequestGetLinkBandwidthInfoTest(OHOS::MessageParcel &data)

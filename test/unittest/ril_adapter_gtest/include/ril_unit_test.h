@@ -75,7 +75,6 @@ private:
     void GetRilNetworkSearchInfoTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void GetRilNetworkSelectionModeTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void SetRilNetworkSelectionModeTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
-    void GetRilRadioCapabilityTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void GetPhysicalChannelConfigTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result);
     void SendRilCmSmsTest(const AppExecFwk::InnerEvent::Pointer &result);
     void SendRilCmSmsMoreModeTest(const AppExecFwk::InnerEvent::Pointer &result);

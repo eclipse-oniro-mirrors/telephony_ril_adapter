@@ -282,11 +282,6 @@ typedef struct {
 } CurrentCellInfoList;
 
 typedef struct {
-    int32_t ratFamily;
-    char modemId[MAX_CHAR_LEN];
-} HRilRadioCapability;
-
-typedef struct {
     void (*GetImsRegStatus)(const ReqDataInfo *requestInfo);
     void (*GetSignalStrength)(const ReqDataInfo *requestInfo);
     void (*GetCsRegStatus)(const ReqDataInfo *requestInfo);
@@ -299,7 +294,6 @@ typedef struct {
     void (*SetNetworkSelectionMode)(const ReqDataInfo *requestInfo, const HRilSetNetworkModeInfo *data);
     void (*GetPreferredNetwork)(const ReqDataInfo *requestInfo);
     void (*SetPreferredNetwork)(const ReqDataInfo *requestInfo, const int32_t *data);
-    void (*GetRadioCapability)(const ReqDataInfo *requestInfo);
     void (*GetPhysicalChannelConfig)(const ReqDataInfo *requestInfo);
     void (*SetLocateUpdates)(const ReqDataInfo *requestInfo, HRilRegNotifyMode mode);
     void (*SetNotificationFilter)(const ReqDataInfo *requestInfo, const int32_t *newFilter);

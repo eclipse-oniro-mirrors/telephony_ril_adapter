@@ -1360,36 +1360,5 @@ std::shared_ptr<PreferredNetworkTypeInfo> PreferredNetworkTypeInfo::UnMarshallin
     }
     return param;
 }
-
-bool RadioCapabilityInfo::ReadFromParcel(Parcel &parcel)
-{
-    if (!ReadBaseInt32(parcel, ratFamily)) {
-        return false;
-    }
-    if (!ReadBaseString(parcel, modemId)) {
-        return false;
-    }
-    return true;
-}
-
-bool RadioCapabilityInfo::Marshalling(Parcel &parcel) const
-{
-    if (!WriteBaseInt32(parcel, ratFamily)) {
-        return false;
-    }
-    if (!WriteBaseString(parcel, modemId)) {
-        return false;
-    }
-    return true;
-}
-
-std::shared_ptr<RadioCapabilityInfo> RadioCapabilityInfo::UnMarshalling(Parcel &parcel)
-{
-    std::shared_ptr<RadioCapabilityInfo> param = std::make_shared<RadioCapabilityInfo>();
-    if (param == nullptr || !param->ReadFromParcel(parcel)) {
-        param = nullptr;
-    }
-    return param;
-}
 } // namespace Telephony
 } // namespace OHOS

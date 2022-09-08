@@ -47,7 +47,8 @@ public:
     int32_t SimStkSendEnvelope(int32_t serialId, const std::string &strCmd);
     int32_t SimStkSendCallSetupRequestResult(int32_t serialId, int32_t accept);
     int32_t SimStkIsReady(int32_t serialId);
-    int32_t SetRadioProtocol(int32_t serialId, const OHOS::HDI::Ril::V1_0::ISimProtocolRequest &protocol);
+    int32_t GetRadioProtocol(int32_t serialId);
+    int32_t SetRadioProtocol(int32_t serialId, const HDI::Ril::V1_0::IRadioProtocol &radioProtocol);
     int32_t SimOpenLogicalChannel(int32_t serialId, const std::string &appID, int32_t p2);
     int32_t SimCloseLogicalChannel(int32_t serialId, int32_t channelId);
     int32_t SimTransmitApduLogicalChannel(
@@ -89,6 +90,8 @@ private:
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t SimStkIsReadyResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t GetRadioProtocolResponse(
+        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t SetRadioProtocolResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t SimOpenLogicalChannelResponse(
@@ -114,6 +117,8 @@ private:
     int32_t SimStkEventNotify(int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen);
     int32_t SimStkCallSetupNotify(int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen);
     int32_t SimRefreshNotify(int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen);
+    int32_t SimRadioProtocolUpdated(
+        int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen);
 
 private:
     bool IsSimResponse(uint32_t code);
@@ -123,8 +128,6 @@ private:
         std::unique_ptr<HRilSimClock> &rilSimLock, const OHOS::HDI::Ril::V1_0::ISimLockInfo &simLockInfo);
     void CopyToHRilSimPassword(
         std::unique_ptr<HRilSimPassword> &rilSimPassword, const OHOS::HDI::Ril::V1_0::ISimPasswordInfo &simPassword);
-    void CopyToHRilSimProtocolRequest(std::unique_ptr<HRilSimProtocolRequest> &hRilSimProtocolRequest,
-        const OHOS::HDI::Ril::V1_0::ISimProtocolRequest &protocol);
     void CopyToHRilApduSimIO(
         std::unique_ptr<HRilApduSimIO> &rilApduSimIO, const OHOS::HDI::Ril::V1_0::IApduSimIORequestInfo &apduSimIO);
     void CopyToHRilSimAuthentication(std::unique_ptr<HRilSimAuthenticationRequestInfo> &rilSimAuthInfo,
@@ -135,7 +138,9 @@ private:
     int32_t BuildSimIOResp(HDI::Ril::V1_0::IIccIoResultInfo &result, HRilRadioResponseInfo &responseInfo,
         const void *response, size_t responseLen);
     int32_t CheckCharData(const void *response, size_t responseLen);
+    void BuildRadioProtocol(HDI::Ril::V1_0::IRadioProtocol &radioProtocol, const void *response);
 
+private:
     const HRilSimReq *simFuncs_ = nullptr;
 };
 } // namespace Telephony

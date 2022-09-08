@@ -163,7 +163,6 @@ void RilUnitTest::AddNetworkRequestToMap()
     memberFuncMap_[HREQ_NETWORK_GET_NETWORK_SEARCH_INFORMATION] = &RilUnitTest::GetRilNetworkSearchInfoTest;
     memberFuncMap_[HREQ_NETWORK_GET_NETWORK_SELECTION_MODE] = &RilUnitTest::GetRilNetworkSelectionModeTest;
     memberFuncMap_[HREQ_NETWORK_SET_NETWORK_SELECTION_MODE] = &RilUnitTest::SetRilNetworkSelectionModeTest;
-    memberFuncMap_[HREQ_NETWORK_GET_RADIO_CAPABILITY] = &RilUnitTest::GetRilRadioCapabilityTest;
     memberFuncMap_[HREQ_NETWORK_GET_PHYSICAL_CHANNEL_CONFIG] = &RilUnitTest::GetPhysicalChannelConfigTest;
 }
 
@@ -412,14 +411,6 @@ void RilUnitTest::SetRilNetworkSelectionModeTest(const OHOS::AppExecFwk::InnerEv
     string plmn = "46000";
     int32_t ret = mRilManager_->SetNetworkSelectionMode(mode, plmn, result);
     TELEPHONY_LOGI("RilUnitTest::SetRilNetworkSelectionModeTest --> finished, return: %{public}d", ret);
-    ASSERT_EQ(0, ret);
-}
-
-void RilUnitTest::GetRilRadioCapabilityTest(const OHOS::AppExecFwk::InnerEvent::Pointer &result)
-{
-    TELEPHONY_LOGI("RilUnitTest::GetRilRadioCapabilityTest -->");
-    int32_t ret = mRilManager_->GetRadioCapability(result);
-    TELEPHONY_LOGI("RilUnitTest::GetRilRadioCapabilityTest --> finished, return: %{public}d", ret);
     ASSERT_EQ(0, ret);
 }
 
@@ -1253,24 +1244,6 @@ HWTEST_F(RilUnitTest, Telephony_RilAdapter_SetRilNetworkSelectionModeTest_1100, 
     event->SetOwner(GetHandler());
     RilManagerTest::slotId = HRIL_SIM_SLOT_1;
     OnProcessTest(HREQ_NETWORK_SET_NETWORK_SELECTION_MODE, event);
-}
-
-HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetRilRadioCapabilityTest_0100, Function | MediumTest | Level3)
-{
-    OnInit();
-    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_NETWORK_GET_RADIO_CAPABILITY);
-    event->SetOwner(GetHandler());
-    RilManagerTest::slotId = HRIL_SIM_SLOT_0;
-    OnProcessTest(HREQ_NETWORK_GET_RADIO_CAPABILITY, event);
-}
-
-HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetRilRadioCapabilityTest_1100, Function | MediumTest | Level3)
-{
-    OnInit();
-    auto event = OHOS::AppExecFwk::InnerEvent::Get(HREQ_NETWORK_GET_RADIO_CAPABILITY);
-    event->SetOwner(GetHandler());
-    RilManagerTest::slotId = HRIL_SIM_SLOT_1;
-    OnProcessTest(HREQ_NETWORK_GET_RADIO_CAPABILITY, event);
 }
 
 HWTEST_F(RilUnitTest, Telephony_RilAdapter_GetPhysicalChannelConfigTest_0100, Function | MediumTest | Level3)

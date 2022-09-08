@@ -104,7 +104,7 @@ typedef enum {
     REG_NOTIFY_STAT_LAC_CELLID, /* AT command: +CREG,+CGREG,+CEREG,+C5GREG,n=2,notify data format type 2 */
 } HRilRegNotifyMode;
 
-// 3GPP TS 27.007 V3.9.0 (2001-06) 7.11	Call forwarding number and conditions +CCFC
+// 3GPP TS 27.007 V3.9.0 (2001-06) 7.11 Call forwarding number and conditions +CCFC
 typedef enum {
     CALL_FORWARD_REASON_UNCONDITIONAL,
     CALL_FORWARD_REASON_MOBILE_BUSY,
@@ -114,7 +114,7 @@ typedef enum {
     CALL_FORWARD_REASON_ALL_CCF, /* all conditional call forwarding */
 } CallForwardReasonType;
 
-// 3GPP TS 27.007 V3.9.0 (2001-06) 7.11	Call forwarding number and conditions +CCFC
+// 3GPP TS 27.007 V3.9.0 (2001-06) 7.11 Call forwarding number and conditions +CCFC
 typedef enum {
     CALL_FORWARD_ClassX_VOICE = 1,
     CALL_FORWARD_ClassX_DATA = 2,
@@ -126,7 +126,7 @@ typedef enum {
     CALL_FORWARD_ClassX_DPADA = 128, /* dedicated PAD access */
 } CallForwardClassX;
 
-// 3GPP TS 27.007 V3.9.0 (2001-06) 7.11	Call forwarding number and conditions +CCFC
+// 3GPP TS 27.007 V3.9.0 (2001-06) 7.11 Call forwarding number and conditions +CCFC
 typedef enum {
     CALL_FORWARD_MODE_DISABLE,
     CALL_FORWARD_MODE_ENABLE,
@@ -136,7 +136,7 @@ typedef enum {
 } CallForwardMode;
 
 // 3GPP TS 27.007 V3.9.0 (2001-06) Call related supplementary services +CHLD
-// 3GPP TS 27.007 V3.9.0 (2001-06) 7.22	Informative examples
+// 3GPP TS 27.007 V3.9.0 (2001-06) 7.22 Informative examples
 typedef enum {
     TYPE_HANG_UP_HOLD_WAIT = 1,
     TYPE_HANG_UP_ACTIVE = 2,
@@ -391,5 +391,42 @@ typedef enum {
     HRIL_SERVING_CELL_PRIMARY,
     HRIL_SERVING_CELL_SECONDARY
 } HRilCellConnectionStatus;
+
+typedef enum {
+    HRIL_RADIO_PROTOCOL_PHASE_INITIAL, /* LM is configured is initial value and value after COMPLETE. */
+    HRIL_RADIO_PROTOCOL_PHASE_CHECK, /* CHECK is sent before UPDATE and indicates that an UPDATE will be
+                                      * forthcoming with these same parameters. */
+    HRIL_RADIO_PROTOCOL_PHASE_UPDATE, /* UPDATE is sent after all LM's receive CHECK and returned success,
+                                       * if any CHECK's fail no UPDATE will be sent. */
+    HRIL_RADIO_PROTOCOL_PHASE_NOTIFY, /* NOTIFY is sent with HNOTI_SIM_RADIO_PROTOCOL_UPDATED. */
+    HRIL_RADIO_PROTOCOL_PHASE_COMPLETE /* COMPLETE is sent after all previous phases have completed.
+                                        * If an error occurs in any previous commands the
+                                        * and fields will be the prior configuration thus
+                                        * restoring the configuration to the previous value. An error returned
+                                        * by this command will generally be ignored or may cause that logical
+                                        * modem to be removed from service */
+} HRilRadioProtocolPhase;
+
+typedef enum {
+    HRIL_RADIO_PROTOCOL_TECH_UNKNOWN = 1 << RADIO_TECHNOLOGY_UNKNOWN,
+    HRIL_RADIO_PROTOCOL_TECH_GSM = 1 << RADIO_TECHNOLOGY_GSM,
+    HRIL_RADIO_PROTOCOL_TECH_1XRTT = 1 << RADIO_TECHNOLOGY_1XRTT,
+    HRIL_RADIO_PROTOCOL_TECH_WCDMA = 1 << RADIO_TECHNOLOGY_WCDMA,
+    HRIL_RADIO_PROTOCOL_TECH_HSPA = 1 << RADIO_TECHNOLOGY_HSPA,
+    HRIL_RADIO_PROTOCOL_TECH_HSPAP = 1 << RADIO_TECHNOLOGY_HSPAP,
+    HRIL_RADIO_PROTOCOL_TECH_TD_SCDMA = 1 << RADIO_TECHNOLOGY_TD_SCDMA,
+    HRIL_RADIO_PROTOCOL_TECH_EVDO = 1 << RADIO_TECHNOLOGY_EVDO,
+    HRIL_RADIO_PROTOCOL_TECH_EHRPD = 1 << RADIO_TECHNOLOGY_EHRPD,
+    HRIL_RADIO_PROTOCOL_TECH_LTE = 1 << RADIO_TECHNOLOGY_LTE,
+    HRIL_RADIO_PROTOCOL_TECH_LTE_CA = 1 << RADIO_TECHNOLOGY_LTE_CA,
+    HRIL_RADIO_PROTOCOL_TECH_IWLAN = 1 << RADIO_TECHNOLOGY_IWLAN,
+    HRIL_RADIO_PROTOCOL_TECH_NR = 1 << RADIO_TECHNOLOGY_NR
+} HRilRadioProtocolTech;
+
+typedef enum {
+    HRIL_RADIO_PROTOCOL_STATUS_NONE,
+    HRIL_RADIO_PROTOCOL_STATUS_SUCCESS,
+    HRIL_RADIO_PROTOCOL_STATUS_FAIL
+} HRilRadioProtocolStatus;
 
 #endif // OHOS_HRIL_ENUM_H
