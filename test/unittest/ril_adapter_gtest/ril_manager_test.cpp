@@ -689,23 +689,6 @@ int32_t RilManagerTest::SetNetworkSelectionMode(
     return ret;
 }
 
-int32_t RilManagerTest::GetRadioCapability(const AppExecFwk::InnerEvent::Pointer &response)
-{
-    TELEPHONY_LOGI("RilManagerTest GetRadioCapability");
-    if (cellularRadio_ == nullptr) {
-        TELEPHONY_LOGE("RilManagerTest::GetRadioCapability cellularRadio_ == nullptr");
-        return HRIL_ERR_NULL_POINT;
-    }
-    std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_NETWORK_GET_RADIO_CAPABILITY, response);
-    if (request == nullptr) {
-        TELEPHONY_LOGE("RilManagerTest::GetRadioCapability request == nullptr");
-        return HRIL_ERR_NULL_POINT;
-    }
-    int32_t ret = SendInt32Event(HREQ_NETWORK_GET_RADIO_CAPABILITY, request->serialId_);
-    TELEPHONY_LOGI("SendInt32Event(ID:%{public}d) return: %{public}d", HREQ_NETWORK_GET_RADIO_CAPABILITY, ret);
-    return ret;
-}
-
 int32_t RilManagerTest::GetPhysicalChannelConfig(const AppExecFwk::InnerEvent::Pointer &response)
 {
     TELEPHONY_LOGI("RilManagerTest GetPhysicalChannelConfig");

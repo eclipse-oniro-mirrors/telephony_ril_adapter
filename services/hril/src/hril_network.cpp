@@ -53,7 +53,6 @@ void HRilNetwork::AddHandlerToMap()
     respMemberFuncMap_[HREQ_NETWORK_GET_PREFERRED_NETWORK] = &HRilNetwork::GetPreferredNetworkResponse;
     respMemberFuncMap_[HREQ_NETWORK_GET_NEIGHBORING_CELLINFO_LIST] = &HRilNetwork::GetNeighboringCellInfoListResponse;
     respMemberFuncMap_[HREQ_NETWORK_GET_CURRENT_CELL_INFO] = &HRilNetwork::GetCurrentCellInfoResponse;
-    respMemberFuncMap_[HREQ_NETWORK_GET_RADIO_CAPABILITY] = &HRilNetwork::GetRadioCapabilityResponse;
     respMemberFuncMap_[HREQ_NETWORK_GET_PHYSICAL_CHANNEL_CONFIG] = &HRilNetwork::GetPhysicalChannelConfigResponse;
     respMemberFuncMap_[HREQ_NETWORK_SET_LOCATE_UPDATES] = &HRilNetwork::SetLocateUpdatesResponse;
     respMemberFuncMap_[HREQ_NETWORK_SET_NOTIFICATION_FILTER] = &HRilNetwork::SetNotificationFilterResponse;
@@ -125,12 +124,6 @@ int32_t HRilNetwork::GetPreferredNetwork(int32_t serialId)
 {
     return RequestVendor(serialId, HREQ_NETWORK_GET_PREFERRED_NETWORK, networkFuncs_,
         &HRilNetworkReq::GetPreferredNetwork);
-}
-
-int32_t HRilNetwork::GetRadioCapability(int32_t serialId)
-{
-    return RequestVendor(
-        serialId, HREQ_NETWORK_GET_RADIO_CAPABILITY, networkFuncs_, &HRilNetworkReq::GetRadioCapability);
 }
 
 int32_t HRilNetwork::GetPhysicalChannelConfig(int32_t serialId)
@@ -312,20 +305,6 @@ int32_t HRilNetwork::GetPreferredNetworkResponse(
         TELEPHONY_LOGI("GetPreferredNetworkResponse preferredNetworkType: %{public}d", *resp);
     }
     return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::GetPreferredNetworkResponse, preferredNetworkTypeInfo);
-}
-
-int32_t HRilNetwork::GetRadioCapabilityResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
-{
-    if (response == nullptr || responseLen != sizeof(HRilRadioCapability)) {
-        TELEPHONY_LOGE("GetRadioCapabilityResponse response is invalid");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    HDI::Ril::V1_0::IRadioCapabilityInfo radioCapabilityInfo = {};
-    const HRilRadioCapability *hRilRadioCapability = static_cast<const HRilRadioCapability *>(response);
-    radioCapabilityInfo.ratFamily = hRilRadioCapability->ratFamily;
-    radioCapabilityInfo.modemId = hRilRadioCapability->modemId;
-    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::GetRadioCapabilityResponse, radioCapabilityInfo);
 }
 
 int32_t HRilNetwork::GetNeighboringCellInfoListResponse(

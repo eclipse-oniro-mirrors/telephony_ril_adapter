@@ -156,8 +156,8 @@ public:
     int32_t SimStkSendEnvelope(int32_t slotId, int32_t serialId, const std::string &strCmd);
     int32_t SimStkSendCallSetupRequestResult(int32_t slotId, int32_t serialId, int32_t accept);
     int32_t SimStkIsReady(int32_t slotId, int32_t serialId);
-    int32_t SetRadioProtocol(
-        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::ISimProtocolRequest &protocol);
+    int32_t GetRadioProtocol(int32_t slotId, int32_t serialId);
+    int32_t SetRadioProtocol(int32_t slotId, int32_t serialId, const HDI::Ril::V1_0::IRadioProtocol &radioProtocol);
     int32_t SimOpenLogicalChannel(int32_t slotId, int32_t serialId, const std::string &appID, int32_t p2);
     int32_t SimCloseLogicalChannel(int32_t slotId, int32_t serialId, int32_t channelId);
     int32_t SimTransmitApduLogicalChannel(
@@ -181,7 +181,6 @@ public:
     int32_t GetCurrentCellInfo(int32_t slotId, int32_t serialId);
     int32_t SetPreferredNetwork(int32_t slotId, int32_t serialId, int32_t preferredNetworkType);
     int32_t GetPreferredNetwork(int32_t slotId, int32_t serialId);
-    int32_t GetRadioCapability(int32_t slotId, int32_t serialId);
     int32_t GetPhysicalChannelConfig(int32_t slotId, int32_t serialId);
     int32_t SetLocateUpdates(int32_t slotId, int32_t serialId, const HDI::Ril::V1_0::IHRilRegNotifyMode mode);
     int32_t SetNotificationFilter(int32_t slotId, int32_t serialId, int32_t newFilter);

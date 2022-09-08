@@ -1836,24 +1836,6 @@ void ReqGetPreferredNetwork(const ReqDataInfo *requestInfo)
     ResponseNetworkReport(requestInfo->slotId, requestInfo, HRIL_ERR_SUCCESS, &respDataAck);
 }
 
-static HRilRadioCapability *GetRadioCapability(void)
-{
-    static HRilRadioCapability hRilRadioCapability = {0};
-    return &hRilRadioCapability;
-}
-
-void ReqGetRadioCapability(const ReqDataInfo *requestInfo)
-{
-    int32_t err = HRIL_ERR_SUCCESS;
-    struct ReportInfo reportInfo;
-    TELEPHONY_LOGE("ReqGetRadioCapability before ratFamily:%{public}d", GetRadioCapability()->ratFamily);
-    GetRadioCapability()->ratFamily = RAF_AUTO;
-    TELEPHONY_LOGE("ReqGetRadioCapability OnNetworkReport ");
-    reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-    OnNetworkReport(
-        requestInfo->slotId, reportInfo, (const uint8_t *)GetRadioCapability(), sizeof(HRilRadioCapability));
-}
-
 void ProcessPhyChnlCfgNotify(struct ReportInfo reportInfo, char *srcStr)
 {
     int32_t contextIds[] = { 7, 8, 9 };

@@ -122,7 +122,7 @@ bool SimIoRequestInfo::ReadFromParcel(Parcel &parcel)
     }
     if (!ReadBaseString(parcel, aid)) {
         return false;
-    };
+    }
     return true;
 }
 
@@ -329,86 +329,6 @@ bool SimPinInputTimes::Marshalling(Parcel &parcel) const
 std::shared_ptr<SimPinInputTimes> SimPinInputTimes::UnMarshalling(Parcel &parcel)
 {
     std::shared_ptr<SimPinInputTimes> param = std::make_shared<SimPinInputTimes>();
-    if (param == nullptr || !param->ReadFromParcel(parcel)) {
-        param = nullptr;
-    }
-    return param;
-}
-
-bool SimProtocolRequest::ReadFromParcel(Parcel &parcel)
-{
-    if (!ReadBaseInt32(parcel, serial)) {
-        return false;
-    }
-    if (!ReadBaseInt32(parcel, phase)) {
-        return false;
-    }
-    if (!ReadBaseInt32(parcel, protocol)) {
-        return false;
-    }
-    if (!ReadBaseInt32(parcel, slotId)) {
-        return false;
-    }
-    return true;
-}
-
-bool SimProtocolRequest::Marshalling(Parcel &parcel) const
-{
-    if (!WriteBaseInt32(parcel, serial)) {
-        return false;
-    }
-    if (!WriteBaseInt32(parcel, phase)) {
-        return false;
-    }
-    if (!WriteBaseInt32(parcel, protocol)) {
-        return false;
-    }
-    if (!WriteBaseInt32(parcel, slotId)) {
-        return false;
-    }
-    return true;
-}
-
-std::shared_ptr<SimProtocolRequest> SimProtocolRequest::UnMarshalling(Parcel &parcel)
-{
-    std::shared_ptr<SimProtocolRequest> param = std::make_shared<SimProtocolRequest>();
-    if (param == nullptr || !param->ReadFromParcel(parcel)) {
-        param = nullptr;
-    }
-    return param;
-}
-
-bool SimProtocolResponse::ReadFromParcel(Parcel &parcel)
-{
-    if (!ReadBaseInt32(parcel, phase)) {
-        return false;
-    }
-    if (!ReadBaseInt32(parcel, result)) {
-        return false;
-    }
-    if (!ReadBaseInt32(parcel, slotId)) {
-        return false;
-    }
-    return true;
-}
-
-bool SimProtocolResponse::Marshalling(Parcel &parcel) const
-{
-    if (!WriteBaseInt32(parcel, phase)) {
-        return false;
-    }
-    if (!WriteBaseInt32(parcel, result)) {
-        return false;
-    }
-    if (!WriteBaseInt32(parcel, slotId)) {
-        return false;
-    }
-    return true;
-}
-
-std::shared_ptr<SimProtocolResponse> SimProtocolResponse::UnMarshalling(Parcel &parcel)
-{
-    std::shared_ptr<SimProtocolResponse> param = std::make_shared<SimProtocolResponse>();
     if (param == nullptr || !param->ReadFromParcel(parcel)) {
         param = nullptr;
     }

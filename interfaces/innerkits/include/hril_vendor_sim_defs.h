@@ -18,7 +18,6 @@
 
 #include <stddef.h>
 
-#include "hril_enum.h"
 #include "hril_public_struct.h"
 
 #ifdef __cplusplus
@@ -28,14 +27,14 @@ extern "C" {
 /* Form 3GPP TS 27.007 V4.3.0 (2001-12) 8.18, + CRSM */
 typedef struct {
     int32_t command; /* command passed on by the MT to the SIM; refer 3GPP TS 51.011 [28]
-                      * 176	READ BINARY
-                      * 178	READ RECORD
-                      * 192	GET RESPONSE
-                      * 214	UPDATE BINARY
-                      * 220	UPDATE RECORD
-                      * 242	STATUS
-                      * 203	RETRIEVE DATA
-                      * 219	SET DATA
+                      * 176 READ BINARY
+                      * 178 READ RECORD
+                      * 192 GET RESPONSE
+                      * 214 UPDATE BINARY
+                      * 220 UPDATE RECORD
+                      * 242 STATUS
+                      * 203 RETRIEVE DATA
+                      * 219 SET DATA
                       */
     int32_t fileid; /* this is the identifier of an elementary datafile on SIM.
                      * Mandatory for every command except STATUS. */
@@ -96,17 +95,17 @@ typedef struct {
 typedef struct {
     char *fac; /* ("SC","AO","OI","OX","AI","IR","AB","AG","AC","FD","PN","PU","PP") */
     int32_t mode; /* 0 unlock
-                   * 1	lock
-                   * 2	query status */
+                   * 1 lock
+                   * 2 query status */
     int32_t status; /* 0 not active
                      * 1 active */
     char *passwd; /* shall be the same as password specified for the facility
                    * from the MT user interface or with command Change Password +CPWD */
     int32_t classx; /* is a sum of integers each representing a class of information (default 7 - voice, data and
-                     * fax): 1	voice (telephony) 2	data (refers to all bearer services; with <mode>=2 this may refer
-                     * only to some bearer service if TA does not support values 16, 32, 64 and 128) 4	fax (facsimile
-                     * services) 8	short message service 16	data circuit sync 32	data circuit async 64
-                     * dedicated packet access 128	dedicated PAD access  */
+                     * fax): 1 voice (telephony) 2 data (refers to all bearer services; with <mode>=2 this may refer
+                     * only to some bearer service if TA does not support values 16, 32, 64 and 128) 4 fax (facsimile
+                     * services) 8 short message service 16 data circuit sync 32 data circuit async 64
+                     * dedicated packet access 128 dedicated PAD access  */
 } HRilSimClock;
 
 /* From 3GPP TS 27.007 7.5 */
@@ -129,16 +128,12 @@ typedef struct {
 } HRilPinInputTimes;
 
 typedef struct {
-    int32_t phase;
-    int32_t protocol;
-    int32_t slotId;
-} HRilSimProtocolRequest;
-
-typedef struct {
-    int32_t phase;
-    int32_t result;
-    int32_t slotId;
-} HRilSimProtocolResponse;
+    int32_t sessionId;
+    HRilRadioProtocolPhase phase;
+    int32_t technology;
+    int32_t modemId;
+    HRilRadioProtocolStatus status;
+} HRilRadioProtocol;
 
 typedef struct {
     int32_t channelId;
@@ -174,7 +169,8 @@ typedef struct {
     void (*SimStkSendEnvelope)(const ReqDataInfo *requestInfo, const char *strCmd);
     void (*SimStkSendCallSetupRequestResult)(const ReqDataInfo *requestInfo, int32_t accept);
     void (*SimStkIsReady)(const ReqDataInfo *requestInfo);
-    void (*SetRadioProtocol)(const ReqDataInfo *requestInfo, const HRilSimProtocolRequest *data, size_t dataLen);
+    void (*GetRadioProtocol)(const ReqDataInfo *requestInfo);
+    void (*SetRadioProtocol)(const ReqDataInfo *requestInfo, const HRilRadioProtocol *data);
     void (*SimOpenLogicalChannel)(const ReqDataInfo *requestInfo, const char *appID, int32_t p2);
     void (*SimCloseLogicalChannel)(const ReqDataInfo *requestInfo, int32_t channelId);
     void (*SimTransmitApduLogicalChannel)(const ReqDataInfo *requestInfo, HRilApduSimIO *data, size_t dataLen);

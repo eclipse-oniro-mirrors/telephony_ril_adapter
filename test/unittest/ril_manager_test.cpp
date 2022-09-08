@@ -771,20 +771,6 @@ void RilManagerTest::GetPhysicalChannelConfig(const AppExecFwk::InnerEvent::Poin
     SendInt32Event(HREQ_NETWORK_GET_PHYSICAL_CHANNEL_CONFIG, request->serialId_);
 }
 
-void RilManagerTest::GetRadioCapability(const AppExecFwk::InnerEvent::Pointer &response)
-{
-    if (cellularRadio_ == nullptr) {
-        TELEPHONY_LOGE("RilManagerTest::GetRadioCapability cellularRadio_ == nullptr");
-        return;
-    }
-    std::shared_ptr<HRilRequestTest> request = CreateRequest(HREQ_NETWORK_GET_RADIO_CAPABILITY, response);
-    if (request == nullptr) {
-        TELEPHONY_LOGE("RilManagerTest::GetRadioCapability request == nullptr");
-        return;
-    }
-    SendInt32Event(HREQ_NETWORK_GET_RADIO_CAPABILITY, request->serialId_);
-}
-
 void RilManagerTest::GetMeid(const AppExecFwk::InnerEvent::Pointer &response)
 {
     if (cellularRadio_ != nullptr) {

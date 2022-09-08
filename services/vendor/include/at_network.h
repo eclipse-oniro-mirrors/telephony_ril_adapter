@@ -66,7 +66,6 @@ void ReqGetCurrentCellInfo(const ReqDataInfo *requestInfo);
 void ReqGetNetworkSearchInformation(const ReqDataInfo *requestInfo);
 void ReqGetNetworkSelectionMode(const ReqDataInfo *requestInfo);
 void ReqSetNetworkSelectionMode(const ReqDataInfo *requestInfo, const HRilSetNetworkModeInfo *data);
-void ReqGetRadioCapability(const ReqDataInfo *requestInfo);
 void ReqSetPreferredNetwork(const ReqDataInfo *requestInfo, const int32_t *data);
 void ReqGetPreferredNetwork(const ReqDataInfo *requestInfo);
 void ReqGetPhysicalChannelConfig(const ReqDataInfo *requestInfo);

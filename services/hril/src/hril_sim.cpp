@@ -54,7 +54,8 @@ void HRilSim::AddHandlerToMap()
     respMemberFuncMap_[HREQ_SIM_STK_SEND_CALL_SETUP_REQUEST_RESULT] =
         &HRilSim::SimStkSendCallSetupRequestResultResponse;
     respMemberFuncMap_[HREQ_SIM_STK_IS_READY] = &HRilSim::SimStkIsReadyResponse;
-    respMemberFuncMap_[HREQ_SIM_RADIO_PROTOCOL] = &HRilSim::SetRadioProtocolResponse;
+    respMemberFuncMap_[HREQ_SIM_GET_RADIO_PROTOCOL] = &HRilSim::GetRadioProtocolResponse;
+    respMemberFuncMap_[HREQ_SIM_SET_RADIO_PROTOCOL] = &HRilSim::SetRadioProtocolResponse;
     respMemberFuncMap_[HREQ_SIM_OPEN_LOGICAL_CHANNEL] = &HRilSim::SimOpenLogicalChannelResponse;
     respMemberFuncMap_[HREQ_SIM_CLOSE_LOGICAL_CHANNEL] = &HRilSim::SimCloseLogicalChannelResponse;
     respMemberFuncMap_[HREQ_SIM_TRANSMIT_APDU_LOGICAL_CHANNEL] = &HRilSim::SimTransmitApduLogicalChannelResponse;
@@ -78,7 +79,7 @@ void HRilSim::AddHandlerToMap()
     reqMemberFuncMap_[HREQ_SIM_STK_SEND_ENVELOPE] = &HRilSim::SimStkSendEnvelope;
     reqMemberFuncMap_[HREQ_SIM_STK_SEND_CALL_SETUP_REQUEST_RESULT] = &HRilSim::SimStkSendCallSetupRequestResult;
     reqMemberFuncMap_[HREQ_SIM_STK_IS_READY] = &HRilSim::SimStkIsReady;
-    reqMemberFuncMap_[HREQ_SIM_RADIO_PROTOCOL] = &HRilSim::SetRadioProtocol;
+    reqMemberFuncMap_[HREQ_SIM_SET_RADIO_PROTOCOL] = &HRilSim::SetRadioProtocol;
     reqMemberFuncMap_[HREQ_SIM_OPEN_LOGICAL_CHANNEL] = &HRilSim::SimOpenLogicalChannel;
     reqMemberFuncMap_[HREQ_SIM_CLOSE_LOGICAL_CHANNEL] = &HRilSim::SimCloseLogicalChannel;
     reqMemberFuncMap_[HREQ_SIM_TRANSMIT_APDU_LOGICAL_CHANNEL] = &HRilSim::SimTransmitApduLogicalChannel;
@@ -97,6 +98,7 @@ void HRilSim::AddNotificationHandlerToMap()
     notiMemberFuncMap_[HNOTI_SIM_STK_EVENT_NOTIFY] = &HRilSim::SimStkEventNotify;
     notiMemberFuncMap_[HNOTI_SIM_STK_CALL_SETUP_NOTIFY] = &HRilSim::SimStkCallSetupNotify;
     notiMemberFuncMap_[HNOTI_SIM_REFRESH_NOTIFY] = &HRilSim::SimRefreshNotify;
+    notiMemberFuncMap_[HNOTI_SIM_RADIO_PROTOCOL_UPDATED] = &HRilSim::SimRadioProtocolUpdated;
 }
 
 int32_t HRilSim::GetSimIO(int32_t serialId, const OHOS::HDI::Ril::V1_0::ISimIoRequestInfo &simIO)
@@ -226,12 +228,26 @@ int32_t HRilSim::SimStkIsReady(int32_t serialId)
     return RequestVendor(serialId, HREQ_SIM_STK_IS_READY, simFuncs_, &HRilSimReq::SimStkIsReady);
 }
 
-int32_t HRilSim::SetRadioProtocol(int32_t serialId, const OHOS::HDI::Ril::V1_0::ISimProtocolRequest &protocol)
+int32_t HRilSim::GetRadioProtocol(int32_t serialId)
 {
-    std::unique_ptr<HRilSimProtocolRequest> hRilSimProtocolRequest = std::make_unique<HRilSimProtocolRequest>();
-    CopyToHRilSimProtocolRequest(hRilSimProtocolRequest, protocol);
-    return RequestVendor(serialId, HREQ_SIM_RADIO_PROTOCOL, simFuncs_, &HRilSimReq::SetRadioProtocol,
-        hRilSimProtocolRequest.get(), sizeof(*hRilSimProtocolRequest));
+    TELEPHONY_LOGI("HRilSim::GetRadioProtocol slotId:%{public}d", GetSlotId());
+    return RequestVendor(serialId, HREQ_SIM_GET_RADIO_PROTOCOL, simFuncs_, &HRilSimReq::GetRadioProtocol);
+}
+
+int32_t HRilSim::SetRadioProtocol(int32_t serialId, const HDI::Ril::V1_0::IRadioProtocol &radioProtocol)
+{
+    HRilRadioProtocol hrilRadioProtocol = {};
+    hrilRadioProtocol.sessionId = radioProtocol.sessionId;
+    hrilRadioProtocol.phase = static_cast<HRilRadioProtocolPhase>(radioProtocol.phase);
+    hrilRadioProtocol.technology = radioProtocol.technology;
+    hrilRadioProtocol.modemId = radioProtocol.modemId;
+    hrilRadioProtocol.status = static_cast<HRilRadioProtocolStatus>(radioProtocol.status);
+    TELEPHONY_LOGI("HRilSim::SetRadioProtocol slotId:%{public}d, serialId:%{public}d"
+        "sessionId:%{public}d, phase:%{public}d, technology:%{public}d, modemId:%{public}d, status:%{public}d",
+        GetSlotId(), serialId, hrilRadioProtocol.sessionId, hrilRadioProtocol.phase, hrilRadioProtocol.technology,
+        hrilRadioProtocol.modemId, hrilRadioProtocol.status);
+    return RequestVendor(serialId, HREQ_SIM_SET_RADIO_PROTOCOL, simFuncs_,
+        &HRilSimReq::SetRadioProtocol, &hrilRadioProtocol);
 }
 
 int32_t HRilSim::SimOpenLogicalChannel(int32_t serialId, const std::string &appID, int32_t p2)
@@ -431,19 +447,42 @@ int32_t HRilSim::SimStkIsReadyResponse(
     return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::SimStkIsReadyResponse);
 }
 
+int32_t HRilSim::GetRadioProtocolResponse(
+    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+{
+    HDI::Ril::V1_0::IRadioProtocol radioProtocol = {};
+    if (response == nullptr || responseLen != sizeof(HRilRadioProtocol)) {
+        TELEPHONY_LOGE("GetRadioProtocolResponse response is invalid");
+        if (responseInfo.error == HRilErrType::NONE) {
+            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
+        }
+    } else {
+        BuildRadioProtocol(radioProtocol, response);
+        TELEPHONY_LOGI("HRilSim::GetRadioProtocolResponse slotId:%{public}d, serial:%{public}d"
+            "sessionId:%{public}d, phase:%{public}d, technology:%{public}d, modemId:%{public}d, status:%{public}d",
+            GetSlotId(), responseInfo.serial, radioProtocol.sessionId, radioProtocol.phase, radioProtocol.technology,
+            radioProtocol.modemId, radioProtocol.status);
+    }
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::GetRadioProtocolResponse, radioProtocol);
+}
+
 int32_t HRilSim::SetRadioProtocolResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    HDI::Ril::V1_0::ISimProtocolResponse pSimProtocol = {};
-    if (response == nullptr || responseLen != sizeof(HRilSimProtocolResponse)) {
-        TELEPHONY_LOGE("Invalid response: response is nullptr");
-        return HRIL_ERR_INVALID_PARAMETER;
+    HDI::Ril::V1_0::IRadioProtocol radioProtocol = {};
+    if (response == nullptr || responseLen != sizeof(HRilRadioProtocol)) {
+        TELEPHONY_LOGE("SetRadioProtocolResponse response is invalid");
+        if (responseInfo.error == HRilErrType::NONE) {
+            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
+        }
+    } else {
+        BuildRadioProtocol(radioProtocol, response);
+        TELEPHONY_LOGI("HRilSim::SetRadioProtocolResponse slotId:%{public}d, serial:%{public}d"
+            "sessionId:%{public}d, phase:%{public}d, technology:%{public}d, modemId:%{public}d, status:%{public}d",
+            GetSlotId(), responseInfo.serial, radioProtocol.sessionId, radioProtocol.phase, radioProtocol.technology,
+            radioProtocol.modemId, radioProtocol.status);
     }
-    const HRilSimProtocolResponse *pSimProtocolResponse = static_cast<const HRilSimProtocolResponse *>(response);
-    pSimProtocol.phase = pSimProtocolResponse->phase;
-    pSimProtocol.result = pSimProtocolResponse->result;
-    pSimProtocol.slotId = pSimProtocolResponse->slotId;
-    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::SetRadioProtocolResponse, pSimProtocol);
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::SetRadioProtocolResponse, radioProtocol);
 }
 
 int32_t HRilSim::SimOpenLogicalChannelResponse(
@@ -580,6 +619,22 @@ int32_t HRilSim::SimRefreshNotify(int32_t notifyType, const HRilErrNumber e, con
     return Notify(&HDI::Ril::V1_0::IRilCallback::SimRefreshNotify);
 }
 
+int32_t HRilSim::SimRadioProtocolUpdated(
+    int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen)
+{
+    if (response == nullptr || responseLen != sizeof(HRilRadioProtocol)) {
+        TELEPHONY_LOGE("SimRadioProtocolUpdated response is invalid");
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    HDI::Ril::V1_0::IRadioProtocol radioProtocol = {};
+    BuildRadioProtocol(radioProtocol, response);
+    TELEPHONY_LOGI("SimRadioProtocolUpdated slotId:%{public}d, sessionId:%{public}d, phase:%{public}d, "
+        "technology:%{public}d, modemId:%{public}d, status:%{public}d",
+        radioProtocol.slotId, radioProtocol.sessionId, static_cast<int32_t>(radioProtocol.phase),
+        radioProtocol.technology, radioProtocol.modemId, static_cast<int32_t>(radioProtocol.status));
+    return Notify(&HDI::Ril::V1_0::IRilCallback::SimRadioProtocolUpdated, radioProtocol);
+}
+
 bool HRilSim::IsSimResponse(uint32_t code)
 {
     return ((code >= HREQ_SIM_BASE) && (code < HREQ_DATA_BASE));
@@ -624,14 +679,6 @@ void HRilSim::CopyToHRilSimPassword(
     CopyToCharPoint(&(rilSimPassword->oldPassword), simPassword.oldPassword);
     CopyToCharPoint(&(rilSimPassword->newPassword), simPassword.newPassword);
     rilSimPassword->passwordLength = simPassword.passwordLength;
-}
-
-void HRilSim::CopyToHRilSimProtocolRequest(std::unique_ptr<HRilSimProtocolRequest> &hRilSimProtocolRequest,
-    const OHOS::HDI::Ril::V1_0::ISimProtocolRequest &protocol)
-{
-    hRilSimProtocolRequest->phase = protocol.phase;
-    hRilSimProtocolRequest->protocol = protocol.protocol;
-    hRilSimProtocolRequest->slotId = protocol.slotId;
 }
 
 void HRilSim::CopyToHRilApduSimIO(
@@ -694,6 +741,7 @@ int32_t HRilSim::BuildSimIOResp(HDI::Ril::V1_0::IIccIoResultInfo &result, HRilRa
     result = ProcessIccIoResponse(responseInfo, response, responseLen);
     return HRIL_ERR_SUCCESS;
 }
+
 int32_t HRilSim::CheckCharData(const void *response, size_t responseLen)
 {
     if ((response == nullptr && responseLen != 0) || (responseLen % sizeof(char)) != 0) {
@@ -705,6 +753,17 @@ int32_t HRilSim::CheckCharData(const void *response, size_t responseLen)
         return HRIL_ERR_NULL_POINT;
     }
     return HRIL_ERR_SUCCESS;
+}
+
+void HRilSim::BuildRadioProtocol(HDI::Ril::V1_0::IRadioProtocol &radioProtocol, const void *response)
+{
+    const HRilRadioProtocol *hrilRadioProtocol = static_cast<const HRilRadioProtocol *>(response);
+    radioProtocol.slotId = GetSlotId();
+    radioProtocol.sessionId = hrilRadioProtocol->sessionId;
+    radioProtocol.phase = static_cast<HDI::Ril::V1_0::IRadioProtocolPhase>(hrilRadioProtocol->phase);
+    radioProtocol.technology = hrilRadioProtocol->technology;
+    radioProtocol.modemId = hrilRadioProtocol->modemId;
+    radioProtocol.status = static_cast<HDI::Ril::V1_0::IRadioProtocolStatus>(hrilRadioProtocol->status);
 }
 } // namespace Telephony
 } // namespace OHOS

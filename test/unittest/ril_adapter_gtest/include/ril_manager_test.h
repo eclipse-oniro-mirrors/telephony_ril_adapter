@@ -90,7 +90,6 @@ public:
     int32_t GetNetworkSelectionMode(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t SetNetworkSelectionMode(int32_t mode, std::string plmn, const AppExecFwk::InnerEvent::Pointer &result);
     int32_t GetPhysicalChannelConfig(const AppExecFwk::InnerEvent::Pointer &response);
-    int32_t GetRadioCapability(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t SetDeviceState(int32_t deviceStateType, bool deviceStateOn, const AppExecFwk::InnerEvent::Pointer &result);
     int32_t SendSms(std::string smscPdu, std::string pdu, const std::shared_ptr<AppExecFwk::EventHandler> &handler,
         const AppExecFwk::InnerEvent::Pointer &response);

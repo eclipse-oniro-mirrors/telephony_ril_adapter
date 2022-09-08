@@ -114,7 +114,6 @@ public:
     void SetDeviceState(int32_t deviceStateType, bool deviceStateOn, const AppExecFwk::InnerEvent::Pointer &result);
     void SetNetworkSelectionMode(int32_t mode, std::string plmn, const AppExecFwk::InnerEvent::Pointer &result);
     void GetPhysicalChannelConfig(const AppExecFwk::InnerEvent::Pointer &response);
-    void GetRadioCapability(const AppExecFwk::InnerEvent::Pointer &response);
     void ShutDown(const AppExecFwk::InnerEvent::Pointer &result);
     void GetMeid(const AppExecFwk::InnerEvent::Pointer &response);
     void GetVoiceRadioTechnology(const AppExecFwk::InnerEvent::Pointer &response);

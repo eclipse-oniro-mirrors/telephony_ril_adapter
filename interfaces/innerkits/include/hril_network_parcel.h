@@ -332,15 +332,6 @@ struct PreferredNetworkTypeInfo : public HrilBaseParcel {
     std::shared_ptr<PreferredNetworkTypeInfo> UnMarshalling(Parcel &parcel);
     void Dump(std::string, int32_t);
 };
-
-struct RadioCapabilityInfo : public HrilBaseParcel {
-    int32_t ratFamily;
-    std::string modemId;
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<RadioCapabilityInfo> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
-};
 } // namespace Telephony
 } // namespace OHOS
 #endif // OHOS_RIL_NETWORK_PARCEL_H

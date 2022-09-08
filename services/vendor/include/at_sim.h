@@ -101,7 +101,8 @@ void ReqSimStkSendTerminalResponse(const ReqDataInfo *requestInfo, const char *s
 void ReqSimStkSendEnvelope(const ReqDataInfo *requestInfo, const char *strCmd);
 void ReqSimStkSendCallSetupRequestResult(const ReqDataInfo *requestInfo, int32_t accept);
 void ReqSimStkIsReady(const ReqDataInfo *requestInfo);
-void ReqSetRadioProtocol(const ReqDataInfo *requestInfo, const HRilSimProtocolRequest *data, size_t dataLen);
+void ReqGetRadioProtocol(const ReqDataInfo *requestInfo);
+void ReqSetRadioProtocol(const ReqDataInfo *requestInfo, const HRilRadioProtocol *data);
 void ReqSimOpenLogicalChannel(const ReqDataInfo *requestInfo, const char *appID, int32_t p2);
 void ReqSimCloseLogicalChannel(const ReqDataInfo *requestInfo, int32_t channelId);
 void ReqSimTransmitApduLogicalChannel(const ReqDataInfo *requestInfo, HRilApduSimIO *data, size_t dataLen);

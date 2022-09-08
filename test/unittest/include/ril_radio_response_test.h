@@ -75,7 +75,6 @@ public:
     void OnRequestSetDeviceStateTest(OHOS::MessageParcel &data);
     void OnRequestGetPreferredNetworkTypeInfoTest(OHOS::MessageParcel &data);
     void OnResponseGetPhysicalChannelConfig(OHOS::MessageParcel &data);
-    void OnResponseGetRadioCapability(OHOS::MessageParcel &data);
     void OnRequestGetMeidTest(OHOS::MessageParcel &data);
     void OnRequestGetModemVoiceRadioTest(OHOS::MessageParcel &data);
     void OnRequestGetBasebandVersionTest(OHOS::MessageParcel &data);
@@ -94,6 +93,7 @@ public:
     void OnResponseSendEnvelopeCmd(OHOS::MessageParcel &data);
     void OnResponseSendCallSetupRequestResult(OHOS::MessageParcel &data);
     void OnResponseSimStkIsReady(OHOS::MessageParcel &data);
+    void PrintResponseInfo(const struct HRilRadioResponseInfo *rspInfo);
 
 private:
     RilManagerTest *mRilManager_;
