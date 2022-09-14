@@ -67,7 +67,7 @@ protected:
     uint8_t *ConvertHexStringToBytes(const void *response, size_t responseLen);
     bool ConvertToString(char **dest, const std::string &src);
     void CopyToCharPoint(char **a, const std::string &temp);
-    HDI::Ril::V1_0::IHRilRadioResponseInfo BuildIHRilRadioResponseInfo(const HRilRadioResponseInfo &responseInfo);
+    HDI::Ril::V1_0::RilRadioResponseInfo BuildIHRilRadioResponseInfo(const HRilRadioResponseInfo &responseInfo);
     inline void SafeFrees() {}
     template<typename M, typename... Ms>
     inline void SafeFrees(M &m, Ms &...ms)
@@ -85,6 +85,8 @@ protected:
     inline int32_t Response(HRilRadioResponseInfo &responseInfo, FuncType &&_func, ParamTypes &&... _args);
     template<typename SourceType, typename ToType>
     int32_t Notify(int32_t indType, const SourceType *notifyData, size_t notifyDataLen, int32_t notifyId);
+    template<typename FuncType, typename... ParamTypes>
+    inline int32_t Notify(int32_t notifyType, const HRilErrNumber error, FuncType &&_func, ParamTypes &&... _args);
     template<typename FuncType, typename... ParamTypes>
     inline int32_t Notify(FuncType &&_func, ParamTypes &&... _args);
     template<typename T>
@@ -224,12 +226,12 @@ int32_t HRilBase::ProcessNotify(
     if (reportInfo == nullptr) {
         return HRIL_ERR_INVALID_PARAMETER;
     }
-    using NotiFunc = int32_t (T::*)(int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen);
+    using NotiFunc = int32_t (T::*)(int32_t notifyType, HRilErrNumber error, const void *response, size_t responseLen);
     int32_t code = reportInfo->notifyId;
-    HRilErrNumber e = (HRilErrNumber)reportInfo->error;
+    HRilErrNumber error = (HRilErrNumber)reportInfo->error;
     auto func = GetFunc<NotiFunc>(notiMemberFuncMap_, code);
     if (func != nullptr) {
-        return (static_cast<T *>(this)->*func)(notifyType, e, response, responseLen);
+        return (static_cast<T *>(this)->*func)(notifyType, error, response, responseLen);
     }
     return HRIL_ERR_INVALID_PARAMETER;
 }
@@ -269,8 +271,8 @@ template<typename FuncType, typename... ParamTypes>
 inline int32_t HRilBase::Response(HRilRadioResponseInfo &responseInfo, FuncType &&_func, ParamTypes &&... _args)
 {
     if (callback_ == nullptr) {
-        TELEPHONY_LOGE("Invalid parameter, callback_ is null");
-        return HRIL_ERR_INVALID_PARAMETER;
+        TELEPHONY_LOGE("callback_ is null");
+        return HRIL_ERR_NULL_POINT;
     }
     (callback_->*(_func))(BuildIHRilRadioResponseInfo(responseInfo), std::forward<ParamTypes>(_args)...);
     return HRIL_ERR_SUCCESS;
@@ -299,6 +301,20 @@ int32_t HRilBase::Notify(int32_t indType, const SourceType *notifyData, size_t n
     }
     TELEPHONY_LOGE("write failed for report header, event id=%{public}d", notifyId);
     return ret;
+}
+
+template<typename FuncType, typename... ParamTypes>
+inline int32_t HRilBase::Notify(int32_t notifyType, const HRilErrNumber error, FuncType &&_func, ParamTypes &&... _args)
+{
+    if (callback_ == nullptr) {
+        TELEPHONY_LOGE("callback_ is null");
+        return HRIL_ERR_NULL_POINT;
+    }
+    HDI::Ril::V1_0::RilRadioResponseInfo mResponseInfo = { 0 };
+    mResponseInfo.slotId = GetSlotId();
+    mResponseInfo.type = (HDI::Ril::V1_0::RilResponseTypes)notifyType;
+    (callback_->*(_func))(mResponseInfo, std::forward<ParamTypes>(_args)...);
+    return HRIL_ERR_SUCCESS;
 }
 
 template<typename FuncType, typename... ParamTypes>

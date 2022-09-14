@@ -40,15 +40,8 @@ class HRilManager : public IHRilReporter {
 public:
     HRilManager();
     virtual ~HRilManager();
-    sptr<OHOS::HDI::Power::V1_0::IPowerInterface> powerInterface_ { nullptr };
-    std::unique_ptr<HRilTimerCallback> timerCallback_ = nullptr;
-    std::unique_ptr<std::thread> eventLoop_ = nullptr;
-    static const uint32_t RUNNING_LOCK_DEFAULT_TIMEOUT_US = 200 * 1000; // 200ms
-    std::mutex mutexRunningLock_;
-    std::atomic_uint runningLockCount_ = 0;
-    std::atomic_int runningSerialNum_ = 0;
-    int32_t GetMaxSimSlotCount();
 
+    int32_t GetMaxSimSlotCount();
     virtual int32_t ReportToParent(int32_t requestNum, const HdfSBuf *dataSbuf) override;
     virtual int32_t NotifyToParent(int32_t requestNum, const HdfSBuf *dataSbuf) override;
     virtual ReqDataInfo *CreateHRilRequest(int32_t serial, int32_t slotId, int32_t request) override;
@@ -79,11 +72,10 @@ public:
 
     // Call
     int32_t SetEmergencyCallList(
-        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::IEmergencyInfoList &emergencyInfoList);
+        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::EmergencyInfoList &emergencyInfoList);
     int32_t GetEmergencyCallList(int32_t slotId, int32_t serialId);
     int32_t GetCallList(int32_t slotId, int32_t serialId);
-    int32_t Dial(
-        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::IDialInfo &dialInfo);
+    int32_t Dial(int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::DialInfo &dialInfo);
     int32_t Reject(int32_t slotId, int32_t serialId);
     int32_t Hangup(int32_t slotId, int32_t serialId, int32_t gsmIndex);
     int32_t Answer(int32_t slotId, int32_t serialId);
@@ -96,10 +88,10 @@ public:
     int32_t SetCallWaiting(int32_t slotId, int32_t serialId, int32_t activate);
     int32_t GetCallTransferInfo(int32_t slotId, int32_t serialId, int32_t reason);
     int32_t SetCallTransferInfo(
-        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::ICallForwardSetInfo &callForwardSetInfo);
+        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::CallForwardSetInfo &callForwardSetInfo);
     int32_t GetCallRestriction(int32_t slotId, int32_t serialId, const std::string &fac);
     int32_t SetCallRestriction(
-        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::ICallRestrictionInfo &callRestrictionInfo);
+        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::CallRestrictionInfo &callRestrictionInfo);
     int32_t GetClip(int32_t slotId, int32_t serialId);
     int32_t SetClip(int32_t slotId, int32_t serialId, int32_t action);
     int32_t GetClir(int32_t slotId, int32_t serialId);
@@ -112,25 +104,29 @@ public:
     int32_t GetMute(int32_t slotId, int32_t serialId);
     int32_t GetCallFailReason(int32_t slotId, int32_t serialId);
     int32_t CallSupplement(int32_t slotId, int32_t serialId, int32_t type);
-    int32_t SendDtmf(int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::IDtmfInfo &dtmfInfo);
-    int32_t StartDtmf(int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::IDtmfInfo &dtmfInfo);
-    int32_t StopDtmf(int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::IDtmfInfo &dtmfInfo);
+    int32_t SendDtmf(int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::DtmfInfo &dtmfInfo);
+    int32_t StartDtmf(int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::DtmfInfo &dtmfInfo);
+    int32_t StopDtmf(int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::DtmfInfo &dtmfInfo);
     int32_t SetBarringPassword(
-        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::ISetBarringInfo &setBarringInfo);
+        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::SetBarringInfo &setBarringInfo);
 
     // Data
     int32_t ActivatePdpContext(
-        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::IDataCallInfo &dataCallInfo);
-    int32_t DeactivatePdpContext(int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::IUniInfo &uniInfo);
-    int32_t GetPdpContextList(int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::IUniInfo &uniInfo);
+        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::DataCallInfo &dataCallInfo);
+    int32_t DeactivatePdpContext(int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::UniInfo &uniInfo);
+    int32_t GetPdpContextList(int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::UniInfo &uniInfo);
     int32_t SetInitApnInfo(
-        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::IDataProfileDataInfo &dataProfileDataInfo);
+        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::DataProfileDataInfo &dataProfileDataInfo);
     int32_t GetLinkBandwidthInfo(int32_t slotId, int32_t serialId, int32_t cid);
     int32_t SetLinkBandwidthReportingRule(int32_t slotId, int32_t serialId,
-        const OHOS::HDI::Ril::V1_0::IDataLinkBandwidthReportingRule &dataLinkBandwidthReportingRule);
+        const OHOS::HDI::Ril::V1_0::DataLinkBandwidthReportingRule &dataLinkBandwidthReportingRule);
     int32_t SetDataPermitted(int32_t slotId, int32_t serialId, int32_t dataPermitted);
     int32_t SetDataProfileInfo(
-        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::IDataProfilesInfo &dataProfilesInfo);
+        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::DataProfilesInfo &dataProfilesInfo);
+    int32_t SendDataPerformanceMode(
+        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::DataPerformanceInfo &dataPerformanceInfo);
+    int32_t SendDataSleepMode(
+        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::DataSleepInfo &dataSleepInfo);
 
     int32_t SetRadioState(int32_t slotId, int32_t serialId, int32_t fun, int32_t rst);
     int32_t GetRadioState(int32_t slotId, int32_t serialId);
@@ -140,13 +136,13 @@ public:
     int32_t GetBasebandVersion(int32_t slotId, int32_t serialId);
     int32_t ShutDown(int32_t slotId, int32_t serialId);
 
-    int32_t GetSimIO(int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::ISimIoRequestInfo &simIO);
+    int32_t GetSimIO(int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::SimIoRequestInfo &simIO);
     int32_t GetSimStatus(int32_t slotId, int32_t serialId);
     int32_t GetImsi(int32_t slotId, int32_t serialId);
-    int32_t GetSimLockStatus(int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::ISimLockInfo &simLockInfo);
-    int32_t SetSimLock(int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::ISimLockInfo &simLockInfo);
+    int32_t GetSimLockStatus(int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::SimLockInfo &simLockInfo);
+    int32_t SetSimLock(int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::SimLockInfo &simLockInfo);
     int32_t ChangeSimPassword(
-        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::ISimPasswordInfo &simPassword);
+        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::SimPasswordInfo &simPassword);
     int32_t UnlockPin(int32_t slotId, int32_t serialId, const std::string &pin);
     int32_t UnlockPuk(int32_t slotId, int32_t serialId, const std::string &puk, const std::string &pin);
     int32_t UnlockPin2(int32_t slotId, int32_t serialId, const std::string &pin2);
@@ -157,15 +153,15 @@ public:
     int32_t SimStkSendCallSetupRequestResult(int32_t slotId, int32_t serialId, int32_t accept);
     int32_t SimStkIsReady(int32_t slotId, int32_t serialId);
     int32_t GetRadioProtocol(int32_t slotId, int32_t serialId);
-    int32_t SetRadioProtocol(int32_t slotId, int32_t serialId, const HDI::Ril::V1_0::IRadioProtocol &radioProtocol);
+    int32_t SetRadioProtocol(int32_t slotId, int32_t serialId, const HDI::Ril::V1_0::RadioProtocol &radioProtocol);
     int32_t SimOpenLogicalChannel(int32_t slotId, int32_t serialId, const std::string &appID, int32_t p2);
     int32_t SimCloseLogicalChannel(int32_t slotId, int32_t serialId, int32_t channelId);
     int32_t SimTransmitApduLogicalChannel(
-        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::IApduSimIORequestInfo &apduSimIO);
+        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::ApduSimIORequestInfo &apduSimIO);
     int32_t SimTransmitApduBasicChannel(
-        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::IApduSimIORequestInfo &apduSimIO);
+        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::ApduSimIORequestInfo &apduSimIO);
     int32_t SimAuthentication(
-        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::ISimAuthenticationRequestInfo &simAuthInfo);
+        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::SimAuthenticationRequestInfo &simAuthInfo);
     int32_t UnlockSimLock(int32_t slotId, int32_t serialId, int32_t lockType, const std::string &key);
 
     // Network
@@ -176,52 +172,65 @@ public:
     int32_t GetNetworkSearchInformation(int32_t slotId, int32_t serialId);
     int32_t GetNetworkSelectionMode(int32_t slotId, int32_t serialId);
     int32_t SetNetworkSelectionMode(
-        int32_t slotId, int32_t serialId, const HDI::Ril::V1_0::ISetNetworkModeInfo &networkModeInfo);
+        int32_t slotId, int32_t serialId, const HDI::Ril::V1_0::SetNetworkModeInfo &networkModeInfo);
     int32_t GetNeighboringCellInfoList(int32_t slotId, int32_t serialId);
     int32_t GetCurrentCellInfo(int32_t slotId, int32_t serialId);
     int32_t SetPreferredNetwork(int32_t slotId, int32_t serialId, int32_t preferredNetworkType);
     int32_t GetPreferredNetwork(int32_t slotId, int32_t serialId);
     int32_t GetPhysicalChannelConfig(int32_t slotId, int32_t serialId);
-    int32_t SetLocateUpdates(int32_t slotId, int32_t serialId, const HDI::Ril::V1_0::IHRilRegNotifyMode mode);
+    int32_t SetLocateUpdates(int32_t slotId, int32_t serialId, const HDI::Ril::V1_0::RilRegNotifyMode mode);
     int32_t SetNotificationFilter(int32_t slotId, int32_t serialId, int32_t newFilter);
     int32_t SetDeviceState(int32_t slotId, int32_t serialId, int32_t deviceStateType, int32_t deviceStateOn);
 
     // Sms
     int32_t SendGsmSms(
-        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::IGsmSmsMessageInfo &gsmSmsMessageInfo);
+        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::GsmSmsMessageInfo &gsmSmsMessageInfo);
     int32_t SendCdmaSms(
-        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::ISendCdmaSmsMessageInfo &cdmaSmsMessageInfo);
+        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::SendCdmaSmsMessageInfo &cdmaSmsMessageInfo);
     int32_t AddSimMessage(
-        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::ISmsMessageIOInfo &smsMessageIOInfo);
+        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::SmsMessageIOInfo &smsMessageIOInfo);
     int32_t DelSimMessage(int32_t slotId, int32_t serialId, int32_t index);
     int32_t UpdateSimMessage(
-        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::ISmsMessageIOInfo &smsMessageIOInfo);
+        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::SmsMessageIOInfo &smsMessageIOInfo);
     int32_t AddCdmaSimMessage(
-        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::ISmsMessageIOInfo &smsMessageIOInfo);
+        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::SmsMessageIOInfo &smsMessageIOInfo);
     int32_t DelCdmaSimMessage(int32_t slotId, int32_t serialId, int32_t index);
     int32_t UpdateCdmaSimMessage(
-        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::ISmsMessageIOInfo &smsMessageIOInfo);
+        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::SmsMessageIOInfo &smsMessageIOInfo);
     int32_t SetSmscAddr(
-        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::IServiceCenterAddress &serviceCenterAddress);
+        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::ServiceCenterAddress &serviceCenterAddress);
     int32_t GetSmscAddr(int32_t slotId, int32_t serialId);
-    int32_t SetCBConfig(int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::ICBConfigInfo &cellBroadcastInfo);
+    int32_t SetCBConfig(int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::CBConfigInfo &cellBroadcastInfo);
     int32_t GetCBConfig(int32_t slotId, int32_t serialId);
     int32_t SetCdmaCBConfig(
-        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::ICdmaCBConfigInfoList &cdmaCBConfigInfoList);
+        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::CdmaCBConfigInfoList &cdmaCBConfigInfoList);
     int32_t GetCdmaCBConfig(int32_t slotId, int32_t serialId);
     int32_t SendSmsMoreMode(
-        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::IGsmSmsMessageInfo &gsmSmsMessageInfo);
-    int32_t SendSmsAck(int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::IModeData &modeData);
+        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::GsmSmsMessageInfo &gsmSmsMessageInfo);
+    int32_t SendSmsAck(int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::ModeData &modeData);
 
+    int32_t SendRilAck()
+    {
+        return 0;
+    }
+
+public:
+    sptr<OHOS::HDI::Power::V1_0::IPowerInterface> powerInterface_ { nullptr };
+    std::unique_ptr<HRilTimerCallback> timerCallback_ = nullptr;
+    std::unique_ptr<std::thread> eventLoop_ = nullptr;
+    static const uint32_t RUNNING_LOCK_DEFAULT_TIMEOUT_US = 200 * 1000;
+    std::mutex mutexRunningLock_;
+    std::atomic_uint runningLockCount_ = 0;
+    std::atomic_int runningSerialNum_ = 0;
     static std::shared_ptr<HRilManager> manager_;
-    template<typename ClassTypePtr, typename FuncType, typename... ParamTypes>
-    inline int32_t TaskSchedule(
-        const std::string _module, ClassTypePtr &_obj, FuncType &&_func, ParamTypes &&... _args);
 
 private:
     template<typename T>
     void OnReport(std::vector<std::unique_ptr<T>> &subModules, int32_t slotId, const ReportInfo *reportInfo,
         const uint8_t *response, size_t responseLen);
+    template<typename ClassTypePtr, typename FuncType, typename... ParamTypes>
+    inline int32_t TaskSchedule(
+        const std::string _module, ClassTypePtr &_obj, FuncType &&_func, ParamTypes &&... _args);
 
 private:
     const int32_t hrilSimSlotCount_;

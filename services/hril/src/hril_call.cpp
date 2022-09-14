@@ -102,7 +102,7 @@ int32_t HRilCall::GetCallList(int32_t serialId)
     return RequestVendor(serialId, HREQ_CALL_GET_CALL_LIST, callFuncs_, &HRilCallReq::GetCallList);
 }
 
-int32_t HRilCall::Dial(int32_t serialId, const OHOS::HDI::Ril::V1_0::IDialInfo &dialInfo)
+int32_t HRilCall::Dial(int32_t serialId, const OHOS::HDI::Ril::V1_0::DialInfo &dialInfo)
 {
     HRilDial dial = {};
     dial.address = StringToCString(dialInfo.address);
@@ -185,7 +185,7 @@ int32_t HRilCall::GetCallRestriction(int32_t serialId, const std::string &fac)
 }
 
 int32_t HRilCall::SetCallRestriction(
-    int32_t serialId, const OHOS::HDI::Ril::V1_0::ICallRestrictionInfo &callRestrictionInfo)
+    int32_t serialId, const OHOS::HDI::Ril::V1_0::CallRestrictionInfo &callRestrictionInfo)
 {
     CallRestrictionInfo info = {};
     info.fac = StringToCString(callRestrictionInfo.fac);
@@ -211,7 +211,7 @@ int32_t HRilCall::GetCallTransferInfo(int32_t serialId, int32_t reason)
 }
 
 int32_t HRilCall::SetCallTransferInfo(
-    int32_t serialId, const OHOS::HDI::Ril::V1_0::ICallForwardSetInfo &callForwardSetInfo)
+    int32_t serialId, const OHOS::HDI::Ril::V1_0::CallForwardSetInfo &callForwardSetInfo)
 {
     HRilCFInfo cFInfo = {};
     cFInfo.number = StringToCString(callForwardSetInfo.number);
@@ -265,7 +265,7 @@ int32_t HRilCall::GetEmergencyCallList(int32_t serialId)
     return RequestVendor(serialId, HREQ_CALL_GET_EMERGENCY_LIST, callFuncs_, &HRilCallReq::GetEmergencyCallList);
 }
 
-int32_t HRilCall::SetBarringPassword(int32_t serialId, const OHOS::HDI::Ril::V1_0::ISetBarringInfo &setBarringInfo)
+int32_t HRilCall::SetBarringPassword(int32_t serialId, const OHOS::HDI::Ril::V1_0::SetBarringInfo &setBarringInfo)
 {
     HRilSetBarringInfo info = {};
     info.fac = StringToCString(setBarringInfo.fac);
@@ -275,7 +275,7 @@ int32_t HRilCall::SetBarringPassword(int32_t serialId, const OHOS::HDI::Ril::V1_
         serialId, HREQ_CALL_SET_BARRING_PASSWORD, callFuncs_, &HRilCallReq::SetBarringPassword, info);
 }
 
-int32_t HRilCall::StartDtmf(int32_t serialId, const OHOS::HDI::Ril::V1_0::IDtmfInfo &dtmfInfo)
+int32_t HRilCall::StartDtmf(int32_t serialId, const OHOS::HDI::Ril::V1_0::DtmfInfo &dtmfInfo)
 {
     CallDtmfInfo info = {};
     info.callId = dtmfInfo.callId;
@@ -283,7 +283,7 @@ int32_t HRilCall::StartDtmf(int32_t serialId, const OHOS::HDI::Ril::V1_0::IDtmfI
     return RequestVendor(serialId, HREQ_CALL_START_DTMF, callFuncs_, &HRilCallReq::StartDtmf, info);
 }
 
-int32_t HRilCall::SendDtmf(int32_t serialId, const OHOS::HDI::Ril::V1_0::IDtmfInfo &dtmfInfo)
+int32_t HRilCall::SendDtmf(int32_t serialId, const OHOS::HDI::Ril::V1_0::DtmfInfo &dtmfInfo)
 {
     CallDtmfInfo info = {};
     info.callId = dtmfInfo.callId;
@@ -294,7 +294,7 @@ int32_t HRilCall::SendDtmf(int32_t serialId, const OHOS::HDI::Ril::V1_0::IDtmfIn
     return RequestVendor(serialId, HREQ_CALL_SEND_DTMF, callFuncs_, &HRilCallReq::SendDtmf, info);
 }
 
-int32_t HRilCall::StopDtmf(int32_t serialId, const OHOS::HDI::Ril::V1_0::IDtmfInfo &dtmfInfo)
+int32_t HRilCall::StopDtmf(int32_t serialId, const OHOS::HDI::Ril::V1_0::DtmfInfo &dtmfInfo)
 {
     CallDtmfInfo info = {};
     info.callId = dtmfInfo.callId;
@@ -303,10 +303,10 @@ int32_t HRilCall::StopDtmf(int32_t serialId, const OHOS::HDI::Ril::V1_0::IDtmfIn
 }
 
 void HRilCall::BuildICallList(
-    HDI::Ril::V1_0::ICallInfoList &callInfoList, const void *response, size_t responseLen)
+    HDI::Ril::V1_0::CallInfoList &callInfoList, const void *response, size_t responseLen)
 {
     size_t num = responseLen / sizeof(HRilCallInfo);
-    HDI::Ril::V1_0::ICallInfo callInfo;
+    HDI::Ril::V1_0::CallInfo callInfo;
     callInfoList.callSize = num;
     for (size_t i = 0; i < num; i++) {
         HRilCallInfo *curPtr = ((HRilCallInfo *)response + i);
@@ -336,12 +336,10 @@ int32_t HRilCall::GetCallListResponse(
         TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
         return HRIL_ERR_INVALID_PARAMETER;
     }
-    if (response == nullptr) {
-        TELEPHONY_LOGE("GetCallListResponse response is null");
-        return HRIL_ERR_NULL_POINT;
+    HDI::Ril::V1_0::CallInfoList callList = {};
+    if (response != nullptr) {
+        BuildICallList(callList, response, responseLen);
     }
-    HDI::Ril::V1_0::ICallInfoList callList = {};
-    BuildICallList(callList, response, responseLen);
     return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::GetCallListResponse, callList);
 }
 
@@ -382,15 +380,13 @@ int32_t HRilCall::GetClipResponse(
         TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
         return HRIL_ERR_INVALID_PARAMETER;
     }
-    if (response == nullptr) {
-        TELEPHONY_LOGE("GetClipResponse response is null");
-        return HRIL_ERR_NULL_POINT;
-    }
-    const HRilGetClipResult *pGetClip = static_cast<const HRilGetClipResult *>(response);
-    HDI::Ril::V1_0::IGetClipResult getClipResult = {};
+    HDI::Ril::V1_0::GetClipResult getClipResult = {};
     getClipResult.result = static_cast<int32_t>(responseInfo.error);
-    getClipResult.action = pGetClip->action;
-    getClipResult.clipStat = pGetClip->clipStat;
+    if (response != nullptr) {
+        const HRilGetClipResult *pGetClip = static_cast<const HRilGetClipResult *>(response);
+        getClipResult.action = pGetClip->action;
+        getClipResult.clipStat = pGetClip->clipStat;
+    }
     return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::GetClipResponse, getClipResult);
 }
 
@@ -437,15 +433,13 @@ int32_t HRilCall::GetCallWaitingResponse(
         TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
         return HRIL_ERR_INVALID_PARAMETER;
     }
-    if (response == nullptr) {
-        TELEPHONY_LOGE("GetCallWaitingResponse response is null");
-        return HRIL_ERR_NULL_POINT;
-    }
-    const HRilCallWaitResult *result = static_cast<const HRilCallWaitResult *>(response);
-    HDI::Ril::V1_0::ICallWaitResult callWaitResult = {};
+    HDI::Ril::V1_0::CallWaitResult callWaitResult = {};
     callWaitResult.result = static_cast<int32_t>(responseInfo.error);
-    callWaitResult.status = result->status;
-    callWaitResult.classCw = result->classCw;
+    if (response != nullptr) {
+        const HRilCallWaitResult *result = static_cast<const HRilCallWaitResult *>(response);
+        callWaitResult.status = result->status;
+        callWaitResult.classCw = result->classCw;
+    }
     return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::GetCallWaitingResponse, callWaitResult);
 }
 
@@ -462,20 +456,18 @@ int32_t HRilCall::GetCallTransferInfoResponse(
         TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
         return HRIL_ERR_INVALID_PARAMETER;
     }
-    if (response == nullptr) {
-        TELEPHONY_LOGE("GetCallTransferInfoResponse response is null");
-        return HRIL_ERR_NULL_POINT;
+    HDI::Ril::V1_0::CallForwardQueryInfoList cFQueryList = {};
+    if (response != nullptr) {
+        BuildICallForwardQueryInfoList(cFQueryList, responseInfo, response, responseLen);
     }
-    HDI::Ril::V1_0::ICallForwardQueryInfoList cFQueryList = {};
-    BuildICallForwardQueryInfoList(cFQueryList, responseInfo, response, responseLen);
     return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::GetCallTransferInfoResponse, cFQueryList);
 }
 
-void HRilCall::BuildICallForwardQueryInfoList(HDI::Ril::V1_0::ICallForwardQueryInfoList &cFQueryList,
+void HRilCall::BuildICallForwardQueryInfoList(HDI::Ril::V1_0::CallForwardQueryInfoList &cFQueryList,
     HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     size_t num = responseLen / sizeof(HRilCFQueryInfo);
-    HDI::Ril::V1_0::ICallForwardQueryResult cFQueryResult;
+    HDI::Ril::V1_0::CallForwardQueryResult cFQueryResult;
     cFQueryList.callSize = num;
     for (size_t i = 0; i < num; i++) {
         HRilCFQueryInfo *curPtr = ((HRilCFQueryInfo *)response + i);
@@ -509,15 +501,13 @@ int32_t HRilCall::GetClirResponse(
         TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
         return HRIL_ERR_INVALID_PARAMETER;
     }
-    if (response == nullptr) {
-        TELEPHONY_LOGE("GetClirResponse response is null");
-        return HRIL_ERR_NULL_POINT;
-    }
-    const HRilGetCallClirResult *pGetClir = static_cast<const HRilGetCallClirResult *>(response);
-    HDI::Ril::V1_0::IGetClirResult getClirResult = {};
+    HDI::Ril::V1_0::GetClirResult getClirResult = {};
     getClirResult.result = static_cast<int32_t>(responseInfo.error);
-    getClirResult.action = pGetClir->action;
-    getClirResult.clirStat = pGetClir->clirStat;
+    if (response != nullptr) {
+        const HRilGetCallClirResult *pGetClir = static_cast<const HRilGetCallClirResult *>(response);
+        getClirResult.action = pGetClir->action;
+        getClirResult.clirStat = pGetClir->clirStat;
+    }
     return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::GetClirResponse, getClirResult);
 }
 
@@ -534,15 +524,13 @@ int32_t HRilCall::GetCallRestrictionResponse(
         TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
         return HRIL_ERR_INVALID_PARAMETER;
     }
-    if (response == nullptr) {
-        TELEPHONY_LOGE("GetCallRestrictionResponse response is null");
-        return HRIL_ERR_NULL_POINT;
-    }
-    const HRilCallRestrictionResult *result = static_cast<const HRilCallRestrictionResult *>(response);
-    HDI::Ril::V1_0::ICallRestrictionResult resultT = {};
+    HDI::Ril::V1_0::CallRestrictionResult resultT = {};
     resultT.result = static_cast<int32_t>(responseInfo.error);
-    resultT.status = result->status;
-    resultT.classCw = result->classCw;
+    if (response != nullptr) {
+        const HRilCallRestrictionResult *result = static_cast<const HRilCallRestrictionResult *>(response);
+        resultT.status = result->status;
+        resultT.classCw = result->classCw;
+    }
     return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::GetCallRestrictionResponse, resultT);
 }
 
@@ -651,10 +639,10 @@ int32_t HRilCall::GetCallFailReasonResponse(
 }
 
 void HRilCall::BuildIEmergencyCallList(
-    HDI::Ril::V1_0::IEmergencyInfoList &emergencyCallInfoList, const void *response, size_t responseLen)
+    HDI::Ril::V1_0::EmergencyInfoList &emergencyCallInfoList, const void *response, size_t responseLen)
 {
     size_t num = responseLen / sizeof(HRilEmergencyInfo);
-    HDI::Ril::V1_0::IEmergencyCall callInfo;
+    HDI::Ril::V1_0::EmergencyCall callInfo;
     emergencyCallInfoList.callSize = num;
     for (size_t i = 0; i < num; i++) {
         HRilEmergencyInfo *curPtr = ((HRilEmergencyInfo *)response + i);
@@ -662,10 +650,10 @@ void HRilCall::BuildIEmergencyCallList(
             callInfo.index = curPtr->index;
             callInfo.total = curPtr->total;
             callInfo.eccNum = curPtr->eccNum;
-            callInfo.eccType = static_cast<OHOS::HDI::Ril::V1_0::IEccType>(curPtr->category);
-            callInfo.simpresent = static_cast<OHOS::HDI::Ril::V1_0::ISimpresentType>(curPtr->simpresent);
+            callInfo.eccType = static_cast<OHOS::HDI::Ril::V1_0::EccType>(curPtr->category);
+            callInfo.simpresent = static_cast<OHOS::HDI::Ril::V1_0::SimpresentType>(curPtr->simpresent);
             callInfo.mcc = curPtr->mcc;
-            callInfo.abnormalService = static_cast<OHOS::HDI::Ril::V1_0::IAbnormalServiceType>(curPtr->abnormalService);
+            callInfo.abnormalService = static_cast<OHOS::HDI::Ril::V1_0::AbnormalServiceType>(curPtr->abnormalService);
             emergencyCallInfoList.calls.push_back(callInfo);
         } else {
             TELEPHONY_LOGE("BuildIEmergencyCallList: Invalid curPtr");
@@ -681,17 +669,15 @@ int32_t HRilCall::GetEmergencyCallListResponse(
         TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
         return HRIL_ERR_INVALID_PARAMETER;
     }
-    if (response == nullptr) {
-        TELEPHONY_LOGE("GetEmergencyCallListResponse response is null");
-        return HRIL_ERR_NULL_POINT;
+    HDI::Ril::V1_0::EmergencyInfoList callList = {};
+    if (response != nullptr) {
+        BuildIEmergencyCallList(callList, response, responseLen);
     }
-    HDI::Ril::V1_0::IEmergencyInfoList callList = {};
-    BuildIEmergencyCallList(callList, response, responseLen);
     return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::GetEmergencyCallListResponse, callList);
 }
 
 int32_t HRilCall::SetEmergencyCallList(
-    int32_t serialId, const OHOS::HDI::Ril::V1_0::IEmergencyInfoList &emergencyInfoList)
+    int32_t serialId, const OHOS::HDI::Ril::V1_0::EmergencyInfoList &emergencyInfoList)
 {
     auto size = emergencyInfoList.calls.size();
     std::unique_ptr<HRilEmergencyInfo[]> emergencyInfoCalls = std::make_unique<HRilEmergencyInfo[]>(size);
@@ -701,7 +687,7 @@ int32_t HRilCall::SetEmergencyCallList(
 }
 
 void HRilCall::CopyToHRilEmergencyInfoArray(
-    HRilEmergencyInfo *emergencyInfoCalls, std::vector<OHOS::HDI::Ril::V1_0::IEmergencyCall> calls)
+    HRilEmergencyInfo *emergencyInfoCalls, std::vector<HDI::Ril::V1_0::EmergencyCall> calls)
 {
     for (unsigned int i = 0; i < calls.size(); i++) {
         auto call = calls.at(i);
@@ -731,73 +717,77 @@ int32_t HRilCall::SetEmergencyCallListResponse(
     return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::SetEmergencyCallListResponse);
 }
 
-int32_t HRilCall::CallStateUpdated(int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen)
+int32_t HRilCall::CallStateUpdated(
+    int32_t notifyType, const HRilErrNumber error, const void *response, size_t responseLen)
 {
-    return Notify(&HDI::Ril::V1_0::IRilCallback::CallStateUpdated, notifyType);
+    return Notify(notifyType, error, &HDI::Ril::V1_0::IRilCallback::CallStateUpdated);
 }
 
-int32_t HRilCall::CallUssdNotice(int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen)
+int32_t HRilCall::CallUssdNotice(
+    int32_t notifyType, const HRilErrNumber error, const void *response, size_t responseLen)
 {
     if ((response == nullptr) || (responseLen % sizeof(HRilUssdNoticeInfo)) != 0) {
         TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
         return HRIL_ERR_INVALID_PARAMETER;
     }
-    HDI::Ril::V1_0::IUssdNoticeInfo ussdNoticeInfo = {};
+    HDI::Ril::V1_0::UssdNoticeInfo ussdNoticeInfo = {};
     const HRilUssdNoticeInfo *hUssdNoticeInfo = reinterpret_cast<const HRilUssdNoticeInfo *>(response);
-    ussdNoticeInfo.m = hUssdNoticeInfo->m;
-    ussdNoticeInfo.str = hUssdNoticeInfo->str == nullptr ? "" : hUssdNoticeInfo->str;
-    return Notify(&HDI::Ril::V1_0::IRilCallback::CallUssdNotice, ussdNoticeInfo);
+    ussdNoticeInfo.type = hUssdNoticeInfo->m;
+    ussdNoticeInfo.message = hUssdNoticeInfo->str == nullptr ? "" : hUssdNoticeInfo->str;
+    return Notify(notifyType, error, &HDI::Ril::V1_0::IRilCallback::CallUssdNotice, ussdNoticeInfo);
 }
 
-int32_t HRilCall::CallSsNotice(int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen)
+int32_t HRilCall::CallSsNotice(int32_t notifyType, const HRilErrNumber error, const void *response, size_t responseLen)
 {
     if ((response == nullptr) || (responseLen % sizeof(HRilSsNoticeInfo)) != 0) {
         TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
         return HRIL_ERR_INVALID_PARAMETER;
     }
-    HDI::Ril::V1_0::ISsNoticeInfo ssNoticeInfo = {};
+    HDI::Ril::V1_0::SsNoticeInfo ssNoticeInfo = {};
     const HRilSsNoticeInfo *hSsNoticeInfo = reinterpret_cast<const HRilSsNoticeInfo *>(response);
     ssNoticeInfo.serviceType = hSsNoticeInfo->serviceType;
     ssNoticeInfo.requestType = hSsNoticeInfo->requestType;
     ssNoticeInfo.serviceClass = hSsNoticeInfo->serviceClass;
     ssNoticeInfo.result = hSsNoticeInfo->result;
-    return Notify(&HDI::Ril::V1_0::IRilCallback::CallSsNotice, ssNoticeInfo);
+    return Notify(notifyType, error, &HDI::Ril::V1_0::IRilCallback::CallSsNotice, ssNoticeInfo);
 }
 
-int32_t HRilCall::CallSrvccStatusNotice(int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen)
+int32_t HRilCall::CallSrvccStatusNotice(
+    int32_t notifyType, HRilErrNumber error, const void *response, size_t responseLen)
 {
     if ((response == nullptr) || (responseLen % sizeof(HRilCallSrvccStatus)) != 0) {
         TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
         return HRIL_ERR_INVALID_PARAMETER;
     }
-    HDI::Ril::V1_0::ISrvccStatus srvccStatus = {};
+    HDI::Ril::V1_0::SrvccStatus srvccStatus = {};
     const HRilCallSrvccStatus *hSrvccStatus = reinterpret_cast<const HRilCallSrvccStatus *>(response);
     srvccStatus.status = hSrvccStatus->status;
-    return Notify(&HDI::Ril::V1_0::IRilCallback::CallSrvccStatusNotice, srvccStatus);
+    return Notify(notifyType, error, &HDI::Ril::V1_0::IRilCallback::CallSrvccStatusNotice, srvccStatus);
 }
 
-int32_t HRilCall::CallRingbackVoiceNotice(int32_t notifyType, HRilErrNumber e, const void *response, size_t responseLen)
+int32_t HRilCall::CallRingbackVoiceNotice(
+    int32_t notifyType, HRilErrNumber error, const void *response, size_t responseLen)
 {
     if ((response == nullptr) || (responseLen % sizeof(int32_t)) != 0) {
         TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
         return HRIL_ERR_INVALID_PARAMETER;
     }
-    HDI::Ril::V1_0::IRingbackVoice ringbackVoice = {};
+    HDI::Ril::V1_0::RingbackVoice ringbackVoice = {};
     const int32_t *ringbackVoiceFlag = reinterpret_cast<const int32_t *>(response);
     ringbackVoice.status = *ringbackVoiceFlag;
-    return Notify(&HDI::Ril::V1_0::IRilCallback::CallRingbackVoiceNotice, ringbackVoice);
+    return Notify(notifyType, error, &HDI::Ril::V1_0::IRilCallback::CallRingbackVoiceNotice, ringbackVoice);
 }
 
 int32_t HRilCall::CallEmergencyNotice(
-    int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen)
+    int32_t notifyType, const HRilErrNumber error, const void *response, size_t responseLen)
 {
     if (response == nullptr || responseLen == 0 || (responseLen % sizeof(HRilEmergencyInfo)) != 0) {
         TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
         return HRIL_ERR_INVALID_PARAMETER;
     }
-    HDI::Ril::V1_0::IEmergencyInfoList callList = {};
+    HDI::Ril::V1_0::EmergencyInfoList callList = {};
     BuildIEmergencyCallList(callList, response, responseLen);
-    return Notify(&HDI::Ril::V1_0::IRilCallback::CallEmergencyNotice, callList);
+    return Notify(notifyType, error, &HDI::Ril::V1_0::IRilCallback::CallEmergencyNotice, callList);
 }
 
 void HRilCall::RegisterCallFuncs(const HRilCallReq *callFuncs)
