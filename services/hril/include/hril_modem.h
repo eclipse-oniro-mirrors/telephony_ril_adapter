@@ -47,8 +47,8 @@ public:
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t GetBasebandVersionResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
-    int32_t RadioStateUpdated(int32_t indType, HRilErrNumber e, const void *response, size_t responseLen);
-    int32_t VoiceRadioTechUpdated(int32_t indType, HRilErrNumber e, const void *response, size_t responseLen);
+    int32_t RadioStateUpdated(int32_t indType, HRilErrNumber error, const void *response, size_t responseLen);
+    int32_t VoiceRadioTechUpdated(int32_t indType, HRilErrNumber error, const void *response, size_t responseLen);
     void AddHandlerToMap();
     bool IsModemRespOrNotify(uint32_t code);
     void RegisterModemFuncs(const HRilModemReq *modemFuncs);
@@ -57,7 +57,7 @@ private:
     bool IsModemResponse(uint32_t code);
     bool IsModemNotification(uint32_t code);
     void BuildIVoiceRadioTechnology(
-        HDI::Ril::V1_0::IVoiceRadioTechnology &voiceRadioTech, const HRilVoiceRadioInfo &hRiadioInfo);
+        HDI::Ril::V1_0::VoiceRadioTechnology &voiceRadioTech, const HRilVoiceRadioInfo &hRiadioInfo);
     const HRilModemReq *modemFuncs_ = nullptr;
 };
 } // namespace Telephony

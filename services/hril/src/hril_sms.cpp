@@ -68,20 +68,20 @@ void HRilSms::AddHandlerToMap()
     notiMemberFuncMap_[HNOTI_CB_CONFIG_REPORT] = &HRilSms::CBConfigNotify;
 }
 
-int32_t HRilSms::SendGsmSms(int32_t serialId, const OHOS::HDI::Ril::V1_0::IGsmSmsMessageInfo &gsmSmsMessageInfo)
+int32_t HRilSms::SendGsmSms(int32_t serialId, const OHOS::HDI::Ril::V1_0::GsmSmsMessageInfo &gsmSmsMessageInfo)
 {
     const int32_t COUNT_STRINGS_VALUE = 2;
     return RequestWithStrings(serialId, HREQ_SMS_SEND_GSM_SMS, COUNT_STRINGS_VALUE, gsmSmsMessageInfo.smscPdu.c_str(),
         gsmSmsMessageInfo.pdu.c_str());
 }
 
-int32_t HRilSms::SendCdmaSms(int32_t serialId, const OHOS::HDI::Ril::V1_0::ISendCdmaSmsMessageInfo &cdmaSmsMessageInfo)
+int32_t HRilSms::SendCdmaSms(int32_t serialId, const OHOS::HDI::Ril::V1_0::SendCdmaSmsMessageInfo &cdmaSmsMessageInfo)
 {
     return RequestVendor(serialId, HREQ_SMS_SEND_CDMA_SMS, smsFuncs_, &HRilSmsReq::SendCdmaSms,
         cdmaSmsMessageInfo.smscPdu.c_str(), cdmaSmsMessageInfo.smscPdu.size());
 }
 
-int32_t HRilSms::AddSimMessage(int32_t serialId, const OHOS::HDI::Ril::V1_0::ISmsMessageIOInfo &message)
+int32_t HRilSms::AddSimMessage(int32_t serialId, const OHOS::HDI::Ril::V1_0::SmsMessageIOInfo &message)
 {
     HRilSmsWriteSms msg = {};
     msg.state = message.state;
@@ -123,7 +123,7 @@ int32_t HRilSms::DelSimMessage(int32_t serialId, int32_t index)
     return HRIL_ERR_SUCCESS;
 }
 
-int32_t HRilSms::UpdateSimMessage(int32_t serialId, const OHOS::HDI::Ril::V1_0::ISmsMessageIOInfo &message)
+int32_t HRilSms::UpdateSimMessage(int32_t serialId, const OHOS::HDI::Ril::V1_0::SmsMessageIOInfo &message)
 {
     HRilSmsWriteSms msg = {};
     size_t len = 0;
@@ -141,7 +141,7 @@ int32_t HRilSms::UpdateSimMessage(int32_t serialId, const OHOS::HDI::Ril::V1_0::
     return result;
 }
 
-int32_t HRilSms::SetSmscAddr(int32_t serialId, const OHOS::HDI::Ril::V1_0::IServiceCenterAddress &serCenterAddress)
+int32_t HRilSms::SetSmscAddr(int32_t serialId, const OHOS::HDI::Ril::V1_0::ServiceCenterAddress &serCenterAddress)
 {
     HRilServiceCenterAddress address;
     size_t len = 0;
@@ -163,7 +163,7 @@ int32_t HRilSms::GetSmscAddr(int32_t serialId)
     return RequestVendor(serialId, HREQ_SMS_GET_SMSC_ADDR, smsFuncs_, &HRilSmsReq::GetSmscAddr);
 }
 
-int32_t HRilSms::SetCBConfig(int32_t serialId, const OHOS::HDI::Ril::V1_0::ICBConfigInfo &broadcastInfo)
+int32_t HRilSms::SetCBConfig(int32_t serialId, const OHOS::HDI::Ril::V1_0::CBConfigInfo &broadcastInfo)
 {
     HRilCBConfigInfo cellBroadcastInfo;
     cellBroadcastInfo.mode = broadcastInfo.mode;
@@ -191,7 +191,7 @@ int32_t HRilSms::GetCBConfig(int32_t serialId)
 }
 
 int32_t HRilSms::SetCdmaCBConfig(
-    int32_t serialId, const OHOS::HDI::Ril::V1_0::ICdmaCBConfigInfoList &cellBroadcastInfoList)
+    int32_t serialId, const OHOS::HDI::Ril::V1_0::CdmaCBConfigInfoList &cellBroadcastInfoList)
 {
     if ((smsFuncs_ == nullptr) || (smsFuncs_->SetCdmaCBConfig == nullptr)) {
         TELEPHONY_LOGE("SetCdmaCBConfig::smsFuncs_:%{public}p", smsFuncs_);
@@ -213,14 +213,14 @@ int32_t HRilSms::GetCdmaCBConfig(int32_t serialId)
     return RequestVendor(serialId, HREQ_SMS_GET_CDMA_CB_CONFIG, smsFuncs_, &HRilSmsReq::GetCdmaCBConfig);
 }
 
-int32_t HRilSms::SendSmsMoreMode(int32_t serialId, const OHOS::HDI::Ril::V1_0::IGsmSmsMessageInfo &gsmSmsMessageInfo)
+int32_t HRilSms::SendSmsMoreMode(int32_t serialId, const OHOS::HDI::Ril::V1_0::GsmSmsMessageInfo &gsmSmsMessageInfo)
 {
     const int32_t COUNT_STRINGS_VALUE = 2;
     return RequestWithStrings(serialId, HREQ_SMS_SEND_SMS_MORE_MODE, COUNT_STRINGS_VALUE,
         gsmSmsMessageInfo.smscPdu.c_str(), gsmSmsMessageInfo.pdu.c_str());
 }
 
-int32_t HRilSms::SendSmsAck(int32_t serialId, const OHOS::HDI::Ril::V1_0::IModeData &modeData)
+int32_t HRilSms::SendSmsAck(int32_t serialId, const OHOS::HDI::Ril::V1_0::ModeData &modeData)
 {
     if ((smsFuncs_ == nullptr) || (smsFuncs_->SendSmsAck == nullptr)) {
         TELEPHONY_LOGE("SendSmsAck::smsFuncs_:%{public}p", smsFuncs_);
@@ -240,7 +240,7 @@ int32_t HRilSms::SendSmsAck(int32_t serialId, const OHOS::HDI::Ril::V1_0::IModeD
     return HRIL_ERR_SUCCESS;
 }
 
-int32_t HRilSms::AddCdmaSimMessage(int32_t serialId, const OHOS::HDI::Ril::V1_0::ISmsMessageIOInfo &message)
+int32_t HRilSms::AddCdmaSimMessage(int32_t serialId, const OHOS::HDI::Ril::V1_0::SmsMessageIOInfo &message)
 {
     HRilSmsWriteSms msg = {};
     int32_t pduLen = 0;
@@ -279,7 +279,7 @@ int32_t HRilSms::DelCdmaSimMessage(int32_t serialId, int32_t index)
     return HRIL_ERR_SUCCESS;
 }
 
-int32_t HRilSms::UpdateCdmaSimMessage(int32_t serialId, const OHOS::HDI::Ril::V1_0::ISmsMessageIOInfo &message)
+int32_t HRilSms::UpdateCdmaSimMessage(int32_t serialId, const OHOS::HDI::Ril::V1_0::SmsMessageIOInfo &message)
 {
     HRilSmsWriteSms msg = {};
     size_t len = 0;
@@ -299,7 +299,7 @@ int32_t HRilSms::UpdateCdmaSimMessage(int32_t serialId, const OHOS::HDI::Ril::V1
 int32_t HRilSms::SendGsmSmsResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    HDI::Ril::V1_0::ISendSmsResultInfo result =
+    HDI::Ril::V1_0::SendSmsResultInfo result =
         MakeSendSmsResult(responseInfo, responseInfo.serial, response, responseLen);
     return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::SendGsmSmsResponse, result);
 }
@@ -307,7 +307,7 @@ int32_t HRilSms::SendGsmSmsResponse(
 int32_t HRilSms::SendCdmaSmsResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    HDI::Ril::V1_0::ISendSmsResultInfo result =
+    HDI::Ril::V1_0::SendSmsResultInfo result =
         MakeSendSmsResult(responseInfo, responseInfo.serial, response, responseLen);
     return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::SendCdmaSmsResponse, result);
 }
@@ -339,7 +339,7 @@ int32_t HRilSms::SetSmscAddrResponse(
 int32_t HRilSms::GetSmscAddrResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    HDI::Ril::V1_0::IServiceCenterAddress result;
+    HDI::Ril::V1_0::ServiceCenterAddress result;
     if (response == nullptr || responseLen != sizeof(HRilServiceCenterAddress)) {
         TELEPHONY_LOGE("Invalid response: response is nullptr");
         if (responseInfo.error == HRilErrType::NONE) {
@@ -369,7 +369,7 @@ int32_t HRilSms::SetCBConfigResponse(
 int32_t HRilSms::GetCBConfigResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    HDI::Ril::V1_0::ICBConfigInfo broadcastInfo;
+    HDI::Ril::V1_0::CBConfigInfo broadcastInfo;
     if (response == nullptr || responseLen != sizeof(HRilCBConfigInfo)) {
         TELEPHONY_LOGE("Invalid response: response is nullptr");
         broadcastInfo.mode = -1;
@@ -407,7 +407,7 @@ int32_t HRilSms::SetCdmaCBConfigResponse(
 int32_t HRilSms::GetCdmaCBConfigResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    HDI::Ril::V1_0::ICdmaCBConfigInfo broadcastInfo;
+    HDI::Ril::V1_0::CdmaCBConfigInfo broadcastInfo;
     if (response == nullptr || responseLen != sizeof(HRilCdmaCBConfigInfo)) {
         TELEPHONY_LOGE("Invalid response: response is nullptr");
         broadcastInfo.checked = -1;
@@ -427,7 +427,7 @@ int32_t HRilSms::GetCdmaCBConfigResponse(
 int32_t HRilSms::SendSmsMoreModeResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    HDI::Ril::V1_0::ISendSmsResultInfo result =
+    HDI::Ril::V1_0::SendSmsResultInfo result =
         MakeSendSmsResult(responseInfo, responseInfo.serial, response, responseLen);
     return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::SendSmsMoreModeResponse, result);
 }
@@ -457,13 +457,13 @@ int32_t HRilSms::UpdateCdmaSimMessageResponse(
 }
 
 int32_t HRilSms::SmsStatusReportNotify(
-    int32_t indType, const HRilErrNumber e, const void *response, size_t responseLen)
+    int32_t indType, const HRilErrNumber error, const void *response, size_t responseLen)
 {
     if (response == nullptr || responseLen == 0) {
         TELEPHONY_LOGE("invalid response");
         return HRIL_ERR_GENERIC_FAILURE;
     }
-    HDI::Ril::V1_0::ISmsMessageInfo smsMessageInfo;
+    HDI::Ril::V1_0::SmsMessageInfo smsMessageInfo;
     uint8_t *bytes = ConvertHexStringToBytes(response, responseLen);
     if (bytes == nullptr) {
         TELEPHONY_LOGE("ConvertHexStringToBytes in SmsStatusReportNotify is failed!");
@@ -478,11 +478,11 @@ int32_t HRilSms::SmsStatusReportNotify(
         temp++;
     }
     SafeFrees(bytes);
-    return Notify(&HDI::Ril::V1_0::IRilCallback::SmsStatusReportNotify, smsMessageInfo);
+    return Notify(indType, error, &HDI::Ril::V1_0::IRilCallback::SmsStatusReportNotify, smsMessageInfo);
 }
 
 int32_t HRilSms::NewSmsStoredOnSimNotify(
-    int32_t indType, const HRilErrNumber e, const void *response, size_t responseLen)
+    int32_t indType, const HRilErrNumber error, const void *response, size_t responseLen)
 {
     if (response == nullptr || responseLen != sizeof(int32_t)) {
         TELEPHONY_LOGE("invalid response");
@@ -490,10 +490,10 @@ int32_t HRilSms::NewSmsStoredOnSimNotify(
     }
     int32_t recordNumber = *(static_cast<const int32_t *>(response));
     indType = (int32_t)ConvertIntToRadioNoticeType(indType);
-    return Notify(&HDI::Ril::V1_0::IRilCallback::NewSmsStoredOnSimNotify, recordNumber, indType);
+    return Notify(indType, error, &HDI::Ril::V1_0::IRilCallback::NewSmsStoredOnSimNotify, recordNumber, indType);
 }
 
-int32_t HRilSms::NewSmsNotify(int32_t indType, const HRilErrNumber e, const void *response, size_t responseLen)
+int32_t HRilSms::NewSmsNotify(int32_t indType, const HRilErrNumber error, const void *response, size_t responseLen)
 {
     HRilSmsResponse *smsResponse = nullptr;
     if (response == nullptr || responseLen == 0) {
@@ -507,7 +507,7 @@ int32_t HRilSms::NewSmsNotify(int32_t indType, const HRilErrNumber e, const void
         TELEPHONY_LOGE("NewSmsNotify: ConvertHexStringToBytes failed");
         return HRIL_ERR_GENERIC_FAILURE;
     }
-    HDI::Ril::V1_0::ISmsMessageInfo smsMessageInfo;
+    HDI::Ril::V1_0::SmsMessageInfo smsMessageInfo;
     const size_t NEW_SMS_SIZE = responseLen / HEX_WIDTH;
     smsMessageInfo.size = NEW_SMS_SIZE;
     smsMessageInfo.indicationType = indType;
@@ -517,10 +517,10 @@ int32_t HRilSms::NewSmsNotify(int32_t indType, const HRilErrNumber e, const void
         temp++;
     }
     SafeFrees(bytes);
-    return Notify(&HDI::Ril::V1_0::IRilCallback::NewSmsNotify, smsMessageInfo);
+    return Notify(indType, error, &HDI::Ril::V1_0::IRilCallback::NewSmsNotify, smsMessageInfo);
 }
 
-int32_t HRilSms::NewCdmaSmsNotify(int32_t indType, const HRilErrNumber e, const void *response, size_t responseLen)
+int32_t HRilSms::NewCdmaSmsNotify(int32_t indType, const HRilErrNumber error, const void *response, size_t responseLen)
 {
     HRilSmsResponse *message = nullptr;
     if (response == nullptr || responseLen == 0) {
@@ -529,7 +529,7 @@ int32_t HRilSms::NewCdmaSmsNotify(int32_t indType, const HRilErrNumber e, const 
     } else {
         message = (HRilSmsResponse *)response;
     }
-    HDI::Ril::V1_0::ISmsMessageInfo messageInfo;
+    HDI::Ril::V1_0::SmsMessageInfo messageInfo;
     messageInfo.indicationType = indType;
     if (message->pdu == nullptr) {
         std::move(messageInfo.pdu);
@@ -543,14 +543,14 @@ int32_t HRilSms::NewCdmaSmsNotify(int32_t indType, const HRilErrNumber e, const 
         }
         SafeFrees(bytes);
     }
-    return Notify(&HDI::Ril::V1_0::IRilCallback::NewCdmaSmsNotify, messageInfo);
+    return Notify(indType, error, &HDI::Ril::V1_0::IRilCallback::NewCdmaSmsNotify, messageInfo);
 }
 
-int32_t HRilSms::CBConfigNotify(int32_t indType, const HRilErrNumber e, const void *response, size_t responseLen)
+int32_t HRilSms::CBConfigNotify(int32_t indType, const HRilErrNumber error, const void *response, size_t responseLen)
 {
-    HDI::Ril::V1_0::ICBConfigReportInfo result = MakeCBConfigResult(response, responseLen);
+    HDI::Ril::V1_0::CBConfigReportInfo result = MakeCBConfigResult(response, responseLen);
     result.indicationType = indType;
-    return Notify(&HDI::Ril::V1_0::IRilCallback::CBConfigNotify, result);
+    return Notify(indType, error, &HDI::Ril::V1_0::IRilCallback::CBConfigNotify, result);
 }
 
 bool HRilSms::IsSmsResponse(uint32_t code)
@@ -640,9 +640,9 @@ int32_t HRilSms::RequestWithStrings(int32_t serial, int32_t request, int32_t cou
     return result;
 }
 
-HDI::Ril::V1_0::ICBConfigReportInfo HRilSms::MakeCBConfigResult(const void *response, const size_t responseLen)
+HDI::Ril::V1_0::CBConfigReportInfo HRilSms::MakeCBConfigResult(const void *response, const size_t responseLen)
 {
-    HDI::Ril::V1_0::ICBConfigReportInfo result;
+    HDI::Ril::V1_0::CBConfigReportInfo result;
     if (response == nullptr || responseLen != sizeof(HRilCBConfigReportInfo)) {
         TELEPHONY_LOGE("Invalid response: response is nullptr");
         result.data = std::string("");
@@ -680,10 +680,10 @@ HDI::Ril::V1_0::ICBConfigReportInfo HRilSms::MakeCBConfigResult(const void *resp
     return result;
 }
 
-HDI::Ril::V1_0::ISendSmsResultInfo HRilSms::MakeSendSmsResult(
+HDI::Ril::V1_0::SendSmsResultInfo HRilSms::MakeSendSmsResult(
     HRilRadioResponseInfo &responseInfo, int32_t serial, const void *response, const size_t responseLen)
 {
-    HDI::Ril::V1_0::ISendSmsResultInfo result;
+    HDI::Ril::V1_0::SendSmsResultInfo result;
     if (response == nullptr || responseLen != sizeof(HRilSmsResponse)) {
         TELEPHONY_LOGE("Invalid response: response is nullptr");
         if (responseInfo.error == HRilErrType::NONE) {
@@ -705,7 +705,7 @@ HDI::Ril::V1_0::ISendSmsResultInfo HRilSms::MakeSendSmsResult(
 }
 
 void HRilSms::CopyToHRilCdmaCBConfigInfo(
-    HRilCdmaCBConfigInfo *list, OHOS::HDI::Ril::V1_0::ICdmaCBConfigInfoList cellBroadcastInfoList)
+    HRilCdmaCBConfigInfo *list, OHOS::HDI::Ril::V1_0::CdmaCBConfigInfoList cellBroadcastInfoList)
 {
     for (int32_t i = 0; i < cellBroadcastInfoList.size; i++) {
         list[i].service = cellBroadcastInfoList.list[i].service;

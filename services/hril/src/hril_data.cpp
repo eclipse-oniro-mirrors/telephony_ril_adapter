@@ -58,14 +58,9 @@ void HRilData::AddHandlerToMap()
     respMemberFuncMap_[HREQ_DATA_GET_LINK_BANDWIDTH_INFO] = &HRilData::GetLinkBandwidthInfoResponse;
     respMemberFuncMap_[HREQ_DATA_SET_LINK_BANDWIDTH_REPORTING_RULE] = &HRilData::SetLinkBandwidthReportingRuleResponse;
     respMemberFuncMap_[HREQ_DATA_SET_DATA_PERMITTED] = &HRilData::SetDataPermittedResponse;
-
-    // ReqFunc
-    reqMemberFuncMap_[HREQ_DATA_SEND_DATA_PERFORMANCE_MODE] = &HRilData::SendDataPerformanceMode;
-    reqMemberFuncMap_[HREQ_DATA_SEND_DATA_SLEEP_MODE] = &HRilData::SendDataSleepMode;
 }
 
-void HRilData::SwitchRilDataToHal(
-    const HRilDataCallResponse *response, HDI::Ril::V1_0::ISetupDataCallResultInfo &result)
+void HRilData::SwitchRilDataToHal(const HRilDataCallResponse *response, HDI::Ril::V1_0::SetupDataCallResultInfo &result)
 {
     if (response == nullptr) {
         TELEPHONY_LOGE("SwitchRilDataToHal response is null!!!");
@@ -88,7 +83,7 @@ void HRilData::SwitchRilDataToHal(
 }
 
 void HRilData::SwitchHRilDataListToHal(
-    const void *response, size_t responseLen, std::vector<HDI::Ril::V1_0::ISetupDataCallResultInfo> &dcResultList)
+    const void *response, size_t responseLen, std::vector<HDI::Ril::V1_0::SetupDataCallResultInfo> &dcResultList)
 {
     if (response == nullptr) {
         TELEPHONY_LOGE("SwitchHRilDataListToHal response is null!!!");
@@ -105,7 +100,7 @@ void HRilData::SwitchHRilDataListToHal(
     }
 }
 
-int32_t HRilData::DeactivatePdpContext(int32_t serialId, const OHOS::HDI::Ril::V1_0::IUniInfo &uniInfo)
+int32_t HRilData::DeactivatePdpContext(int32_t serialId, const OHOS::HDI::Ril::V1_0::UniInfo &uniInfo)
 {
     HRilDataInfo dataInfo = {};
     dataInfo.cid = uniInfo.gsmIndex;
@@ -114,7 +109,7 @@ int32_t HRilData::DeactivatePdpContext(int32_t serialId, const OHOS::HDI::Ril::V
         serialId, HREQ_DATA_DEACTIVATE_PDP_CONTEXT, dataFuncs_, &HRilDataReq::DeactivatePdpContext, &dataInfo);
 }
 
-int32_t HRilData::ActivatePdpContext(int32_t serialId, const OHOS::HDI::Ril::V1_0::IDataCallInfo &dataCallInfo)
+int32_t HRilData::ActivatePdpContext(int32_t serialId, const OHOS::HDI::Ril::V1_0::DataCallInfo &dataCallInfo)
 {
     HRilDataInfo dataInfo;
     dataInfo.apn = StringToCString(dataCallInfo.dataProfileInfo.apn);
@@ -122,97 +117,47 @@ int32_t HRilData::ActivatePdpContext(int32_t serialId, const OHOS::HDI::Ril::V1_
     dataInfo.roamingType = StringToCString(dataCallInfo.dataProfileInfo.roamingProtocol);
     dataInfo.userName = StringToCString(dataCallInfo.dataProfileInfo.userName);
     dataInfo.password = StringToCString(dataCallInfo.dataProfileInfo.password);
-    dataInfo.verType = dataCallInfo.dataProfileInfo.verType;
+    dataInfo.verType = dataCallInfo.dataProfileInfo.authenticationType;
     dataInfo.rat = dataCallInfo.radioTechnology;
     dataInfo.roamingEnable = dataCallInfo.roamingAllowed ? 1 : 0;
     return RequestVendor(
         serialId, HREQ_DATA_ACTIVATE_PDP_CONTEXT, dataFuncs_, &HRilDataReq::ActivatePdpContext, &dataInfo);
 }
 
-int32_t HRilData::GetPdpContextList(int32_t serialId, const OHOS::HDI::Ril::V1_0::IUniInfo &uniInfo)
+int32_t HRilData::GetPdpContextList(int32_t serialId, const OHOS::HDI::Ril::V1_0::UniInfo &uniInfo)
 {
     TELEPHONY_LOGI("serial %{public}d on %{public}d", uniInfo.serial, uniInfo.flag);
     return RequestVendor(serialId, HREQ_DATA_GET_PDP_CONTEXT_LIST, dataFuncs_, &HRilDataReq::GetPdpContextList);
 }
 
-int32_t HRilData::SetInitApnInfo(
-    int32_t serialId, const OHOS::HDI::Ril::V1_0::IDataProfileDataInfo &dataProfileDataInfo)
+int32_t HRilData::SetInitApnInfo(int32_t serialId, const OHOS::HDI::Ril::V1_0::DataProfileDataInfo &dataProfileDataInfo)
 {
     HRilDataInfo dataInfo = BuildDataInfo(dataProfileDataInfo);
     return RequestVendor(serialId, HREQ_DATA_SET_INIT_APN_INFO, dataFuncs_, &HRilDataReq::SetInitApnInfo, &dataInfo);
 }
 
-int32_t HRilData::SendDataPerformanceMode(struct HdfSBuf *data)
+int32_t HRilData::SendDataPerformanceMode(
+    int32_t serialId, const OHOS::HDI::Ril::V1_0::DataPerformanceInfo &dataPerformanceInfo)
 {
-    if (dataFuncs_ == nullptr || dataFuncs_->SendDataPerformanceMode == nullptr || data == nullptr) {
-        TELEPHONY_LOGE(
-            "dataFuncs_:%{public}p or dataFuncs_->SendDataPerformanceMode or data:%{public}p is nullptr!",
-            dataFuncs_, data);
-        return HRIL_ERR_NULL_POINT;
-    }
-    int32_t serial = 0;
-    if (!HdfSbufReadInt32(data, &serial)) {
-        TELEPHONY_LOGE("SendDataPerformanceMode miss serial parameter");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    DataPerformanceInfo dataPerformanceInfo;
     HRilDataPerformanceInfo hrilDataPerformanceInfo;
-    MessageParcel *parcel = nullptr;
-    if (SbufToParcel(data, &parcel) || parcel == nullptr) {
-        TELEPHONY_LOGE("RilAdapter failed to do SbufToParcel:");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    if (!dataPerformanceInfo.ReadFromParcel(*parcel)) {
-        TELEPHONY_LOGE("RilAdapter failed to do ReadFromParcel!");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
     hrilDataPerformanceInfo.performanceEnable = dataPerformanceInfo.performanceEnable;
     hrilDataPerformanceInfo.enforce = dataPerformanceInfo.enforce;
     TELEPHONY_LOGI("SendDataPerformanceMode: performanceEnable=%{public}d enforce=%{public}d",
         hrilDataPerformanceInfo.performanceEnable, hrilDataPerformanceInfo.enforce);
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_DATA_SEND_DATA_PERFORMANCE_MODE);
-    if (requestInfo == nullptr) {
-        return HRIL_ERR_NULL_POINT;
-    }
-    dataFuncs_->SendDataPerformanceMode(requestInfo, &hrilDataPerformanceInfo);
-    return HRIL_ERR_SUCCESS;
+    return RequestVendor(serialId, HREQ_DATA_SEND_DATA_PERFORMANCE_MODE, dataFuncs_,
+        &HRilDataReq::SendDataPerformanceMode, &hrilDataPerformanceInfo);
 }
 
-int32_t HRilData::SendDataSleepMode(struct HdfSBuf *data)
+int32_t HRilData::SendDataSleepMode(int32_t serialId, const OHOS::HDI::Ril::V1_0::DataSleepInfo &dataSleepInfo)
 {
-    if (dataFuncs_ == nullptr || dataFuncs_->SendDataSleepMode == nullptr || data == nullptr) {
-        TELEPHONY_LOGE(
-            "dataFuncs_:%{public}p or dataFuncs_->SendDataSleepMode or data:%{public}p is nullptr!",
-            dataFuncs_, data);
-        return HRIL_ERR_NULL_POINT;
-    }
-    int32_t serial = 0;
-    if (!HdfSbufReadInt32(data, &serial)) {
-        TELEPHONY_LOGE("SendDataSleepMode miss serial parameter");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    DataSleepInfo dataSleepInfo;
-    HRilDataSleepInfo hrilDataSleepInfo;
-    MessageParcel *parcel = nullptr;
-    if (SbufToParcel(data, &parcel) || parcel == nullptr) {
-        TELEPHONY_LOGE("RilAdapter failed to do SbufToParcel:");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    if (!dataSleepInfo.ReadFromParcel(*parcel)) {
-        TELEPHONY_LOGE("RilAdapter failed to do ReadFromParcel!");
-        return HRIL_ERR_INVALID_PARAMETER;
-    }
-    hrilDataSleepInfo.sleepEnable = dataSleepInfo.sleepEnable;
-    TELEPHONY_LOGI("SendDataSleepMode: sleepEnable=%{public}d", hrilDataSleepInfo.sleepEnable);
-    ReqDataInfo *requestInfo = CreateHRilRequest(serial, HREQ_DATA_SEND_DATA_SLEEP_MODE);
-    if (requestInfo == nullptr) {
-        return HRIL_ERR_NULL_POINT;
-    }
-    dataFuncs_->SendDataSleepMode(requestInfo, &hrilDataSleepInfo);
-    return HRIL_ERR_SUCCESS;
+   HRilDataSleepInfo hrilDataSleepInfo;
+   hrilDataSleepInfo.sleepEnable = dataSleepInfo.sleepEnable;
+   TELEPHONY_LOGI("SendDataSleepMode: sleepEnable=%{public}d", hrilDataSleepInfo.sleepEnable);
+   return RequestVendor(
+       serialId, HREQ_DATA_SEND_DATA_SLEEP_MODE, dataFuncs_, &HRilDataReq::SendDataSleepMode, &hrilDataSleepInfo);
 }
 
-int32_t HRilData::SetDataProfileInfo(int32_t serialId, const OHOS::HDI::Ril::V1_0::IDataProfilesInfo &dataProfilesInfo)
+int32_t HRilData::SetDataProfileInfo(int32_t serialId, const OHOS::HDI::Ril::V1_0::DataProfilesInfo &dataProfilesInfo)
 {
     int32_t size = dataProfilesInfo.profilesSize;
     if (size <= 0 || size != static_cast<int32_t>(dataProfilesInfo.profiles.size())) {
@@ -227,7 +172,7 @@ int32_t HRilData::SetDataProfileInfo(int32_t serialId, const OHOS::HDI::Ril::V1_
         serialId, HREQ_DATA_SET_DATA_PROFILE_INFO, dataFuncs_, &HRilDataReq::SetDataProfileInfo, dataInfos.get(), size);
 }
 
-HRilDataInfo HRilData::BuildDataInfo(const OHOS::HDI::Ril::V1_0::IDataProfileDataInfo &dataProfileInfo)
+HRilDataInfo HRilData::BuildDataInfo(const OHOS::HDI::Ril::V1_0::DataProfileDataInfo &dataProfileInfo)
 {
     HRilDataInfo dataInfo;
     dataInfo.cid = dataProfileInfo.profileId;
@@ -236,7 +181,7 @@ HRilDataInfo HRilData::BuildDataInfo(const OHOS::HDI::Ril::V1_0::IDataProfileDat
     dataInfo.roamingType = StringToCString(dataProfileInfo.roamingProtocol);
     dataInfo.userName = StringToCString(dataProfileInfo.userName);
     dataInfo.password = StringToCString(dataProfileInfo.password);
-    dataInfo.verType = dataProfileInfo.verType;
+    dataInfo.verType = dataProfileInfo.authenticationType;
     return dataInfo;
 }
 
@@ -247,7 +192,7 @@ int32_t HRilData::GetLinkBandwidthInfo(int32_t serialId, int32_t cid)
 }
 
 int32_t HRilData::SetLinkBandwidthReportingRule(
-    int32_t serialId, const OHOS::HDI::Ril::V1_0::IDataLinkBandwidthReportingRule &linkBandwidthRule)
+    int32_t serialId, const OHOS::HDI::Ril::V1_0::DataLinkBandwidthReportingRule &linkBandwidthRule)
 {
     HRilLinkBandwidthReportingRule hLinkBandwidthRule;
     hLinkBandwidthRule.rat = (RatType)linkBandwidthRule.rat;
@@ -282,11 +227,7 @@ int32_t HRilData::SetDataPermitted(int32_t serialId, int32_t dataPermitted)
 int32_t HRilData::DeactivatePdpContextResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    if (callback_ == nullptr) {
-        TELEPHONY_LOGE("DeactivatePdpContextResponse callback_ is null");
-        return HRIL_ERR_NULL_POINT;
-    }
-    return callback_->DeactivatePdpContextResponse(BuildIHRilRadioResponseInfo(responseInfo));
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::DeactivatePdpContextResponse);
 }
 
 int32_t HRilData::ActivatePdpContextResponse(
@@ -296,15 +237,13 @@ int32_t HRilData::ActivatePdpContextResponse(
         TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
         return HRIL_ERR_INVALID_PARAMETER;
     }
-    if (callback_ == nullptr || response == nullptr) {
-        TELEPHONY_LOGE("ActivatePdpContextResponse callback_ or response is null");
-        return HRIL_ERR_NULL_POINT;
-    }
-    HDI::Ril::V1_0::ISetupDataCallResultInfo result = {};
+    HDI::Ril::V1_0::SetupDataCallResultInfo result = {};
     result.reason = HRIL_ERROR_UNSPECIFIED_RSN;
     result.cid = -1;
-    SwitchRilDataToHal((HRilDataCallResponse *)response, result);
-    return callback_->ActivatePdpContextResponse(BuildIHRilRadioResponseInfo(responseInfo), result);
+    if (response != nullptr) {
+        SwitchRilDataToHal((HRilDataCallResponse *)response, result);
+    }
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::ActivatePdpContextResponse, result);
 }
 
 int32_t HRilData::GetPdpContextListResponse(
@@ -314,24 +253,18 @@ int32_t HRilData::GetPdpContextListResponse(
         TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
         return HRIL_ERR_INVALID_PARAMETER;
     }
-    if (callback_ == nullptr || response == nullptr) {
-        TELEPHONY_LOGE("GetPdpContextListResponse callback_ or response is null");
-        return HRIL_ERR_NULL_POINT;
+    HDI::Ril::V1_0::DataCallResultList dataCallResultList = {};
+    if (response != nullptr) {
+        SwitchHRilDataListToHal(response, responseLen, dataCallResultList.dcList);
     }
-    HDI::Ril::V1_0::IDataCallResultList dataCallResultList = {};
-    SwitchHRilDataListToHal(response, responseLen, dataCallResultList.dcList);
     dataCallResultList.size = dataCallResultList.dcList.size();
-    return callback_->GetPdpContextListResponse(BuildIHRilRadioResponseInfo(responseInfo), dataCallResultList);
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::GetPdpContextListResponse, dataCallResultList);
 }
 
 int32_t HRilData::SetInitApnInfoResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    if (callback_ == nullptr) {
-        TELEPHONY_LOGE("SetInitApnInfoResponse callback_ is null");
-        return HRIL_ERR_NULL_POINT;
-    }
-    return callback_->SetInitApnInfoResponse(BuildIHRilRadioResponseInfo(responseInfo));
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::SetInitApnInfoResponse);
 }
 
 int32_t HRilData::SetDataProfileInfoResponse(
@@ -343,28 +276,22 @@ int32_t HRilData::SetDataProfileInfoResponse(
 int32_t HRilData::SetLinkBandwidthReportingRuleResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    if (callback_ == nullptr) {
-        TELEPHONY_LOGE("SetLinkBandwidthReportingRuleResponse callback_ is null");
-        return HRIL_ERR_NULL_POINT;
-    }
-    return callback_->SetLinkBandwidthReportingRuleResponse(BuildIHRilRadioResponseInfo(responseInfo));
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::SetLinkBandwidthReportingRuleResponse);
 }
 
 int32_t HRilData::PdpContextListUpdated(
-    int32_t notifyType, const HRilErrNumber e, const void *response, size_t responseLen)
+    int32_t notifyType, const HRilErrNumber error, const void *response, size_t responseLen)
 {
     if ((response == nullptr) || (responseLen % sizeof(HRilDataCallResponse)) != 0) {
         TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
         return HRIL_ERR_INVALID_PARAMETER;
     }
-    if (callback_ == nullptr || response == nullptr) {
-        TELEPHONY_LOGE("PdpContextListUpdated callback_ or response is null");
-        return HRIL_ERR_NULL_POINT;
+    HDI::Ril::V1_0::DataCallResultList dataCallResultList = {};
+    if (response != nullptr) {
+        SwitchHRilDataListToHal(response, responseLen, dataCallResultList.dcList);
     }
-    HDI::Ril::V1_0::IDataCallResultList dataCallResultList = {};
-    SwitchHRilDataListToHal(response, responseLen, dataCallResultList.dcList);
     dataCallResultList.size = dataCallResultList.dcList.size();
-    return callback_->PdpContextListUpdated(GetSlotId(), dataCallResultList);
+    return Notify(notifyType, error, &HDI::Ril::V1_0::IRilCallback::PdpContextListUpdated, dataCallResultList);
 }
 
 int32_t HRilData::GetLinkBandwidthInfoResponse(
@@ -374,33 +301,27 @@ int32_t HRilData::GetLinkBandwidthInfoResponse(
         TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
         return HRIL_ERR_INVALID_PARAMETER;
     }
-    if (callback_ == nullptr || response == nullptr) {
-        TELEPHONY_LOGE("GetLinkBandwidthInfoResponse callback_ or response is null");
-        return HRIL_ERR_NULL_POINT;
+    HDI::Ril::V1_0::DataLinkBandwidthInfo uplinkAndDownlinkBandwidthInfo = {};
+    if (response != nullptr) {
+        const HRilLinkBandwidthInfo *result = static_cast<const HRilLinkBandwidthInfo *>(response);
+        uplinkAndDownlinkBandwidthInfo.cid = result->cid;
+        uplinkAndDownlinkBandwidthInfo.qi = result->qi;
+        uplinkAndDownlinkBandwidthInfo.dlGfbr = result->dlGfbr;
+        uplinkAndDownlinkBandwidthInfo.ulGfbr = result->ulGfbr;
+        uplinkAndDownlinkBandwidthInfo.dlMfbr = result->dlMfbr;
+        uplinkAndDownlinkBandwidthInfo.ulMfbr = result->ulMfbr;
+        uplinkAndDownlinkBandwidthInfo.ulSambr = result->ulSambr;
+        uplinkAndDownlinkBandwidthInfo.dlSambr = result->dlSambr;
+        uplinkAndDownlinkBandwidthInfo.averagingWindow = result->averagingWindow;
     }
-    HDI::Ril::V1_0::IDataLinkBandwidthInfo uplinkAndDownlinkBandwidthInfo = {};
-    const HRilLinkBandwidthInfo *result = static_cast<const HRilLinkBandwidthInfo *>(response);
-    uplinkAndDownlinkBandwidthInfo.cid = result->cid;
-    uplinkAndDownlinkBandwidthInfo.qi = result->qi;
-    uplinkAndDownlinkBandwidthInfo.dlGfbr = result->dlGfbr;
-    uplinkAndDownlinkBandwidthInfo.ulGfbr = result->ulGfbr;
-    uplinkAndDownlinkBandwidthInfo.dlMfbr = result->dlMfbr;
-    uplinkAndDownlinkBandwidthInfo.ulMfbr = result->ulMfbr;
-    uplinkAndDownlinkBandwidthInfo.ulSambr = result->ulSambr;
-    uplinkAndDownlinkBandwidthInfo.dlSambr = result->dlSambr;
-    uplinkAndDownlinkBandwidthInfo.averagingWindow = result->averagingWindow;
-    return callback_->GetLinkBandwidthInfoResponse(
-        BuildIHRilRadioResponseInfo(responseInfo), uplinkAndDownlinkBandwidthInfo);
+    return Response(
+        responseInfo, &HDI::Ril::V1_0::IRilCallback::GetLinkBandwidthInfoResponse, uplinkAndDownlinkBandwidthInfo);
 }
 
 int32_t HRilData::SetDataPermittedResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    if (callback_ == nullptr) {
-        TELEPHONY_LOGE("SetDataPermittedResponse callback_ is null");
-        return HRIL_ERR_NULL_POINT;
-    }
-    return callback_->SetDataPermittedResponse(BuildIHRilRadioResponseInfo(responseInfo));
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::SetDataPermittedResponse);
 }
 
 void HRilData::RegisterDataFuncs(const HRilDataReq *dataFuncs)

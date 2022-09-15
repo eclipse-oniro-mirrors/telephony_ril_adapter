@@ -61,7 +61,7 @@ int32_t HRilModem::GetBasebandVersion(int32_t serialId)
 }
 
 int32_t HRilModem::RadioStateUpdated(
-    const int32_t indType, const HRilErrNumber e, const void *response, size_t responseLen)
+    const int32_t indType, const HRilErrNumber error, const void *response, size_t responseLen)
 {
     if ((response == nullptr && responseLen != 0) || (responseLen % sizeof(int32_t)) != 0) {
         TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
@@ -71,11 +71,11 @@ int32_t HRilModem::RadioStateUpdated(
         TELEPHONY_LOGE("response is null");
         return HRIL_ERR_NULL_POINT;
     }
-    return Notify(&HDI::Ril::V1_0::IRilCallback::RadioStateUpdated, *(const int32_t *)response);
+    return Notify(indType, error, &HDI::Ril::V1_0::IRilCallback::RadioStateUpdated, *(const int32_t *)response);
 }
 
 int32_t HRilModem::VoiceRadioTechUpdated(
-    const int32_t indType, const HRilErrNumber e, const void *response, size_t responseLen)
+    const int32_t indType, const HRilErrNumber error, const void *response, size_t responseLen)
 {
     if ((response == nullptr && responseLen != 0) || (responseLen % sizeof(HRilVoiceRadioInfo)) != 0) {
         TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
@@ -85,9 +85,9 @@ int32_t HRilModem::VoiceRadioTechUpdated(
         TELEPHONY_LOGE("response is null");
         return HRIL_ERR_NULL_POINT;
     }
-    HDI::Ril::V1_0::IVoiceRadioTechnology voiceRadioTech = {};
+    HDI::Ril::V1_0::VoiceRadioTechnology voiceRadioTech = {};
     BuildIVoiceRadioTechnology(voiceRadioTech, *(const HRilVoiceRadioInfo *)response);
-    return Notify(&HDI::Ril::V1_0::IRilCallback::VoiceRadioTechUpdated, voiceRadioTech);
+    return Notify(indType, error, &HDI::Ril::V1_0::IRilCallback::VoiceRadioTechUpdated, voiceRadioTech);
 }
 
 int32_t HRilModem::ShutDownResponse(
@@ -147,7 +147,7 @@ int32_t HRilModem::GetMeidResponse(
 int32_t HRilModem::GetVoiceRadioTechnologyResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    HDI::Ril::V1_0::IVoiceRadioTechnology voiceRadioTech = {};
+    HDI::Ril::V1_0::VoiceRadioTechnology voiceRadioTech = {};
     if (response == nullptr) {
         TELEPHONY_LOGE("GetVoiceRadioTechnologyResponse Invalid response: nullptr");
         if (responseInfo.error == HRilErrType::NONE) {
@@ -160,16 +160,16 @@ int32_t HRilModem::GetVoiceRadioTechnologyResponse(
 }
 
 void HRilModem::BuildIVoiceRadioTechnology(
-    HDI::Ril::V1_0::IVoiceRadioTechnology &voiceRadioTech, const HRilVoiceRadioInfo &hRiadioInfo)
+    HDI::Ril::V1_0::VoiceRadioTechnology &voiceRadioTech, const HRilVoiceRadioInfo &hRiadioInfo)
 {
-    voiceRadioTech.srvStatus = static_cast<OHOS::HDI::Ril::V1_0::IHRilSrvStatus>(hRiadioInfo.srvStatus);
-    voiceRadioTech.srvDomain = static_cast<OHOS::HDI::Ril::V1_0::IHRilSrvDomain>(hRiadioInfo.srvDomain);
-    voiceRadioTech.roamStatus = static_cast<OHOS::HDI::Ril::V1_0::IHRilRoamStatus>(hRiadioInfo.roamStatus);
-    voiceRadioTech.simStatus = static_cast<OHOS::HDI::Ril::V1_0::IHRilSimStatus>(hRiadioInfo.simStatus);
-    voiceRadioTech.lockStatus = static_cast<OHOS::HDI::Ril::V1_0::IHRilSimLockStatus>(hRiadioInfo.lockStatus);
-    voiceRadioTech.sysMode = static_cast<OHOS::HDI::Ril::V1_0::IHRilSysMode>(hRiadioInfo.sysMode);
+    voiceRadioTech.srvStatus = static_cast<OHOS::HDI::Ril::V1_0::RilSrvStatus>(hRiadioInfo.srvStatus);
+    voiceRadioTech.srvDomain = static_cast<OHOS::HDI::Ril::V1_0::RilSrvDomain>(hRiadioInfo.srvDomain);
+    voiceRadioTech.roamStatus = static_cast<OHOS::HDI::Ril::V1_0::RilRoamStatus>(hRiadioInfo.roamStatus);
+    voiceRadioTech.simStatus = static_cast<OHOS::HDI::Ril::V1_0::RilSimStatus>(hRiadioInfo.simStatus);
+    voiceRadioTech.lockStatus = static_cast<OHOS::HDI::Ril::V1_0::RilSimLockStatus>(hRiadioInfo.lockStatus);
+    voiceRadioTech.sysMode = static_cast<OHOS::HDI::Ril::V1_0::RilSysMode>(hRiadioInfo.sysMode);
     voiceRadioTech.sysModeName = (hRiadioInfo.sysModeName == nullptr) ? "" : hRiadioInfo.sysModeName;
-    voiceRadioTech.actType = static_cast<OHOS::HDI::Ril::V1_0::IHRilRadioTech>(hRiadioInfo.actType);
+    voiceRadioTech.actType = static_cast<OHOS::HDI::Ril::V1_0::RilRadioTech>(hRiadioInfo.actType);
     voiceRadioTech.actName = (hRiadioInfo.actName == nullptr) ? "" : hRiadioInfo.actName;
 }
 
