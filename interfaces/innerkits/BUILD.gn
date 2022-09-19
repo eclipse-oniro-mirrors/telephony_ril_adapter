@@ -38,7 +38,6 @@ ohos_shared_library("hril_innerkits") {
   sources = [
     "$RIL_FRAMEWORKS/hril_base_parcel.cpp",
     "$RIL_FRAMEWORKS/hril_call_parcel.cpp",
-    "$RIL_FRAMEWORKS/hril_data_parcel.cpp",
     "$RIL_FRAMEWORKS/hril_modem_parcel.cpp",
     "$RIL_FRAMEWORKS/hril_network_parcel.cpp",
     "$RIL_FRAMEWORKS/hril_sim_parcel.cpp",

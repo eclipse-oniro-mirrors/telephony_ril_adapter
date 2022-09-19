@@ -20,77 +20,52 @@
 
 namespace OHOS {
 namespace Telephony {
-struct GsmSmsMessageInfo : public HrilBaseParcel {
+struct GsmSmsMessageInfo {
     int32_t serial;
     std::string smscPdu; /* Short Message Service Center Protocol Data Unit see GSM 03.40 */
     std::string pdu; /* Protocol Data Unit */
     int32_t state;
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<GsmSmsMessageInfo> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
-struct SendCdmaSmsMessageInfo : public HrilBaseParcel {
+struct SendCdmaSmsMessageInfo {
     int32_t serial;
     std::string smscPdu; /* Short Message Service Center Protocol Data Unit see GSM 03.40 */
     int32_t state;
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<SendCdmaSmsMessageInfo> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
-struct SmsMessageIOInfo : public HrilBaseParcel {
+struct SmsMessageIOInfo {
     int32_t serial;
     std::string smscPdu; /* Short Message Service Center Protocol Data Unit see GSM 03.40 */
     std::string pdu; /* Protocol Data Unit */
     int32_t state;
     int32_t index;
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<SmsMessageIOInfo> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
-struct ServiceCenterAddress : public HrilBaseParcel {
+struct ServiceCenterAddress {
     int32_t serial;
     int32_t tosca;
     std::string address; /* Protocol Data Unit */
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<ServiceCenterAddress> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
 /* From 3GPP TS 27.005  AT+CSCB = [<mode>[,<mids>[,<dcss>]]] */
-struct CBConfigInfo : public HrilBaseParcel {
+struct CBConfigInfo {
     int32_t serial;
     int32_t mode;
     int32_t indicationType;
     std::string mids;
     std::string dcss;
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<CBConfigInfo> UnMarshalling(Parcel &parcel);
 };
 
-struct CdmaCBConfigInfo : public HrilBaseParcel {
+struct CdmaCBConfigInfo {
     int32_t service;
     int32_t language;
     int32_t checked;
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<CdmaCBConfigInfo> UnMarshalling(Parcel &parcel);
 };
 
-struct CdmaCBConfigInfoList : public HrilBaseParcel {
+struct CdmaCBConfigInfoList {
     int32_t serial;
     int32_t size;
     std::vector<CdmaCBConfigInfo> list;
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<CdmaCBConfigInfoList> UnMarshalling(Parcel &parcel);
 };
 
 /* From 3GPP TS 27.005   if text mode (+CMGF=1):
@@ -100,7 +75,7 @@ struct CdmaCBConfigInfoList : public HrilBaseParcel {
     (+CMGF=0):
     <CR><LF>+CBM: <length><CR><LF><pdu><CR><LF>
 */
-struct CBConfigReportInfo : public HrilBaseParcel {
+struct CBConfigReportInfo {
     int32_t indicationType;
     int32_t sn;
     int32_t mid;
@@ -110,31 +85,20 @@ struct CBConfigReportInfo : public HrilBaseParcel {
     std::string data;
     int32_t length;
     std::string pdu;
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<CBConfigReportInfo> UnMarshalling(Parcel &parcel);
 };
 
 
-struct SmsMessageInfo : public HrilBaseParcel {
+struct SmsMessageInfo {
     int32_t indicationType;
     int32_t size;
     std::vector<uint8_t> pdu; /* Protocol Data Unit */
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<SmsMessageInfo> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
-struct ModeData : public HrilBaseParcel {
+struct ModeData {
     int32_t serial;
     bool result;
     int32_t mode;
     std::string pdu; /* Protocol Data Unit */
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<ModeData> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
 struct SendSmsResultInfo : public HrilBaseParcel {
@@ -176,7 +140,7 @@ struct CdmaSmsMessageInfo {
     unsigned char bytes[255];
 };
 
-struct CdmaSmsInfo : public HrilBaseParcel {
+struct CdmaSmsInfo {
     int32_t indicationType;
     int32_t msgRef; /* TP-Message-Reference for GSM, and BearerData MessageId for CDMA
                  * from 3GPP2 C.S0015-B, v2.0, 4.5-1 */
@@ -184,10 +148,6 @@ struct CdmaSmsInfo : public HrilBaseParcel {
     int32_t errCode; /* if unknown or not applicable, that is -1
                   * from 3GPP 27.005, 3.2.5 for GSM/UMTS,
                   * 3GPP2 N.S0005 (IS-41C) Table 171 for CDMA */
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<CdmaSmsInfo> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -20,18 +20,13 @@
 
 namespace OHOS {
 namespace Telephony {
-struct UniInfo : public HrilBaseParcel {
+struct UniInfo {
     int32_t serial;
     int32_t gsmIndex; /* Index of Global System for Mobile Communications */
     bool flag;
     int32_t arg1;
     int32_t arg2;
     std::string strTmp;
-
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<UniInfo> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
 struct VoiceRadioTechnology : public HrilBaseParcel {

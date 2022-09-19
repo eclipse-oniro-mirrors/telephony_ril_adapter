@@ -20,7 +20,7 @@
 
 namespace OHOS {
 namespace Telephony {
-struct SetupDataCallResultInfo : public HrilBaseParcel {
+struct SetupDataCallResultInfo {
     int32_t flag;
     int32_t reason; /* Data call fail reason. success is 0 */
     int32_t retryTime; /* if errorCode != 0, suggested retry time */
@@ -64,24 +64,15 @@ struct SetupDataCallResultInfo : public HrilBaseParcel {
                                * execute form of +CGCONTRDP. */
     int32_t pduSessionId; /* from 3GPP TS 27.007 10.1.23 V4.3.0 (2001-12)
                            * integer type; identifies the PDU session, see 3GPP TS 24.501 [161]. */
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<SetupDataCallResultInfo> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
-struct DataCallResultList : public HrilBaseParcel {
+struct DataCallResultList {
     size_t size; /* Size of DataCall List */
     std::vector<SetupDataCallResultInfo> dcList; /* DataCall List */
-
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<DataCallResultList> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
 /* from 3GPP TS 27.007 10.1 V4.3.0 (2001-12) */
-struct DataProfileDataInfo : public HrilBaseParcel {
+struct DataProfileDataInfo {
     int32_t serial;
     int32_t profileId; /* Id of data profiles */
     std::string apn; /* (Access Point Name) a string parameter
@@ -92,40 +83,25 @@ struct DataProfileDataInfo : public HrilBaseParcel {
     int32_t verType; /* APN verification type */
     std::string userName;
     std::string password;
-
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<DataProfileDataInfo> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
-struct DataProfilesInfo : public HrilBaseParcel {
+struct DataProfilesInfo {
     int32_t serial;
     int32_t profilesSize;
     std::vector<DataProfileDataInfo> profiles;
     bool isRoaming;
-
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<DataProfilesInfo> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
-struct DataCallInfo : public HrilBaseParcel {
+struct DataCallInfo {
     int32_t serial;
     int32_t radioTechnology; /* Voice radio technology */
     DataProfileDataInfo dataProfileInfo;
     bool modemCognitive; /* 1: APN setting setDataProfile. 0: no */
     bool roamingAllowed;
     bool isRoaming;
-
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<DataCallInfo> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
-struct DataLinkBandwidthInfo : public HrilBaseParcel {
+struct DataLinkBandwidthInfo {
     int32_t serial;
     int32_t cid; /* from 3GPP TS 27.007 10.1.50 V4.3.0 (2021-10)
                   * integer type; specifies a particular QoS flow definition, Traffic Flows
@@ -160,14 +136,9 @@ struct DataLinkBandwidthInfo : public HrilBaseParcel {
     int32_t averagingWindow; /* from 3GPP TS 27.007 10.1.50 V4.3.0 (2021-10)
                               * integer type; indicates the averaging window(see 3GPP TS 24.501 [161]) .The value is
                               * in milliseconds. */
-
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<DataLinkBandwidthInfo> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
-struct DataLinkBandwidthReportingRule : public HrilBaseParcel {
+struct DataLinkBandwidthReportingRule {
     int32_t serial;
     int32_t rat;
     int32_t delayMs;
@@ -177,30 +148,15 @@ struct DataLinkBandwidthReportingRule : public HrilBaseParcel {
     int32_t maximumDownlinkKbpsSize;
     std::vector<int32_t> maximumUplinkKbps;
     std::vector<int32_t> maximumDownlinkKbps;
-
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<DataLinkBandwidthReportingRule> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
-struct DataPerformanceInfo : public HrilBaseParcel {
+struct DataPerformanceInfo {
     int32_t performanceEnable; /* Data Performance Enable. eg: 1-enable, 0-disable */
     int32_t enforce; /* Whether Enforce Data Performance. eg: 1-enable, 0-disable */
-
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<DataPerformanceInfo> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
-struct DataSleepInfo : public HrilBaseParcel {
+struct DataSleepInfo {
     int32_t sleepEnable; /* Sleep Mode Enable. eg: 1-enable, 0-disable */
-
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<DataSleepInfo> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -17,61 +17,6 @@
 
 namespace OHOS {
 namespace Telephony {
-bool UniInfo::ReadFromParcel(Parcel &parcel)
-{
-    if (!Read(parcel, serial)) {
-        return false;
-    }
-    if (!Read(parcel, gsmIndex)) {
-        return false;
-    }
-    if (!Read(parcel, flag)) {
-        return false;
-    }
-    if (!Read(parcel, arg1)) {
-        return false;
-    }
-    if (!Read(parcel, arg2)) {
-        return false;
-    }
-    if (!Read(parcel, strTmp)) {
-        return false;
-    }
-    return true;
-}
-
-bool UniInfo::Marshalling(Parcel &parcel) const
-{
-    if (!Write(parcel, serial)) {
-        return false;
-    }
-    if (!Write(parcel, gsmIndex)) {
-        return false;
-    }
-    if (!Write(parcel, flag)) {
-        return false;
-    }
-    if (!Write(parcel, arg1)) {
-        return false;
-    }
-    if (!Write(parcel, arg2)) {
-        return false;
-    }
-    if (!Write(parcel, strTmp)) {
-        return false;
-    }
-    return true;
-}
-
-std::shared_ptr<UniInfo> UniInfo::UnMarshalling(Parcel &parcel)
-{
-    std::shared_ptr<UniInfo> param = std::make_shared<UniInfo>();
-    if (param == nullptr || !param->ReadFromParcel(parcel)) {
-        param = nullptr;
-    }
-    return param;
-}
-
 VoiceRadioTechnology::VoiceRadioTechnology(const HRilVoiceRadioInfo &hrilVoiceRadioInfo)
 {
     *this = hrilVoiceRadioInfo;

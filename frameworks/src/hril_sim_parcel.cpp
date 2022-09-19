@@ -17,80 +17,6 @@
 
 namespace OHOS {
 namespace Telephony {
-bool CardStatusInfo::ReadFromParcel(Parcel &parcel)
-{
-    if (!ReadBaseInt32(parcel, index)) {
-        return false;
-    }
-    if (!ReadBaseInt32(parcel, simType)) {
-        return false;
-    }
-    if (!ReadBaseInt32(parcel, simState)) {
-        return false;
-    }
-    return true;
-}
-
-bool CardStatusInfo::Marshalling(Parcel &parcel) const
-{
-    if (!WriteBaseInt32(parcel, index)) {
-        return false;
-    }
-    if (!WriteBaseInt32(parcel, simType)) {
-        return false;
-    }
-    if (!WriteBaseInt32(parcel, simState)) {
-        return false;
-    }
-    return true;
-}
-
-std::shared_ptr<CardStatusInfo> CardStatusInfo::UnMarshalling(Parcel &parcel)
-{
-    std::shared_ptr<CardStatusInfo> param = std::make_shared<CardStatusInfo>();
-    if (param == nullptr || !param->ReadFromParcel(parcel)) {
-        param = nullptr;
-    }
-    return param;
-}
-
-bool IccIoResultInfo::ReadFromParcel(Parcel &parcel)
-{
-    if (!ReadBaseInt32(parcel, sw1)) {
-        return false;
-    }
-    if (!ReadBaseInt32(parcel, sw2)) {
-        return false;
-    }
-    if (!ReadBaseString(parcel, response)) {
-        return false;
-    }
-    return true;
-}
-
-bool IccIoResultInfo::Marshalling(Parcel &parcel) const
-{
-    if (!WriteBaseInt32(parcel, sw1)) {
-        return false;
-    }
-    if (!WriteBaseInt32(parcel, sw2)) {
-        return false;
-    }
-    if (!WriteBaseString(parcel, response)) {
-        return false;
-    }
-    return true;
-}
-
-std::shared_ptr<IccIoResultInfo> IccIoResultInfo::UnMarshalling(Parcel &parcel)
-{
-    std::shared_ptr<IccIoResultInfo> param = std::make_shared<IccIoResultInfo>();
-    if (param == nullptr || !param->ReadFromParcel(parcel)) {
-        param = nullptr;
-    }
-    return param;
-}
-
 bool SimIoRequestInfo::ReadFromParcel(Parcel &parcel)
 {
     if (!ReadBaseInt32(parcel, command)) {
@@ -476,37 +402,6 @@ bool SimAuthenticationRequestInfo::Marshalling(Parcel &parcel) const
 std::shared_ptr<SimAuthenticationRequestInfo> SimAuthenticationRequestInfo::UnMarshalling(Parcel &parcel)
 {
     std::shared_ptr<SimAuthenticationRequestInfo> param = std::make_shared<SimAuthenticationRequestInfo>();
-    if (param == nullptr || !param->ReadFromParcel(parcel)) {
-        param = nullptr;
-    }
-    return param;
-}
-
-bool LockStatusResp::ReadFromParcel(Parcel &parcel)
-{
-    if (!ReadBaseInt32(parcel, result)) {
-        return false;
-    }
-    if (!ReadBaseInt32(parcel, remain)) {
-        return false;
-    }
-    return true;
-}
-
-bool LockStatusResp::Marshalling(Parcel &parcel) const
-{
-    if (!WriteBaseInt32(parcel, result)) {
-        return false;
-    }
-    if (!WriteBaseInt32(parcel, remain)) {
-        return false;
-    }
-    return true;
-}
-
-std::shared_ptr<LockStatusResp> LockStatusResp::UnMarshalling(Parcel &parcel)
-{
-    std::shared_ptr<LockStatusResp> param = std::make_shared<LockStatusResp>();
     if (param == nullptr || !param->ReadFromParcel(parcel)) {
         param = nullptr;
     }

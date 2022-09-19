@@ -20,15 +20,10 @@
 
 namespace OHOS {
 namespace Telephony {
-struct CardStatusInfo : public HrilBaseParcel {
+struct CardStatusInfo {
     int32_t index;
     int32_t simType;
     int32_t simState;
-
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<CardStatusInfo> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
 /* Form 3GPP TS 27.007 V4.3.0 (2001-12) 8.18, + CRSM */
@@ -59,17 +54,12 @@ struct SimIoRequestInfo : public HrilBaseParcel {
 };
 
 /* Form 3GPP TS 27.007 V4.3.0 (2001-12) 8.18, + CRSM */
-struct IccIoResultInfo : public HrilBaseParcel {
+struct IccIoResultInfo {
     int32_t sw1; /* information from the SIM about the execution of the actual command.
                   * These parameters are delivered to the TE in both cases,
                   * on successful or failed execution of the command */
     int32_t sw2;
     std::string response;
-
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<IccIoResultInfo> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
 struct SimLockInfo : public HrilBaseParcel {
@@ -176,13 +166,9 @@ struct OpenLogicalChannelResponse : public HrilBaseParcel {
     void Dump(std::string, int32_t);
 };
 
-struct LockStatusResp : public HrilBaseParcel {
+struct LockStatusResp {
     int32_t result;
     int32_t remain;
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<LockStatusResp> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 } // namespace Telephony
 } // namespace OHOS
