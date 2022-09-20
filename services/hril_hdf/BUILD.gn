@@ -27,7 +27,6 @@ ohos_shared_library("hril_hdf") {
   public_deps = [ "//third_party/eudev:libudev" ]
 
   deps = [
-    "$RIL_ADAPTER/interfaces/innerkits:hril_innerkits",
     "$RIL_ADAPTER/services/hril:hril",
     "${hdf_uhdf_path}/host:libhdf_host",
     "${hdf_uhdf_path}/utils:libhdf_utils",
