@@ -18,6 +18,7 @@
 #include <stddef.h>
 #include <sys/types.h>
 
+#include "bits/errno.h"
 #include "errno.h"
 #include "securec.h"
 #include "string.h"

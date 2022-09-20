@@ -18,15 +18,15 @@
 
 #include <stdint.h>
 #include <string.h>
+#include <sys/time.h>
 
 #include "hril.h"
+#include "hril_public_struct.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 struct HdfSBuf;
-struct ReportInfo;
-struct timeval;
 
 extern int32_t DispatchRequest(int32_t cmd, struct HdfSBuf *data);
 extern void HRilInit(void);

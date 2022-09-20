@@ -16,7 +16,6 @@
 #include "hril_hdf.h"
 
 #include <libudev.h>
-#include <pthread.h>
 
 #include "dlfcn.h"
 #include "hdf_base.h"
@@ -30,8 +29,6 @@
 
 #define RIL_VENDOR_LIB_PATH "persist.sys.radio.vendorlib.path"
 #define BASE_HEX 16
-
-struct HdfSBuf;
 
 static void *g_dlHandle = NULL;
 static struct HRilReport g_reportOps = {
