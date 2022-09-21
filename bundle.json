@@ -28,16 +28,13 @@
         "ram": "1MB",
         "deps": {
             "components": [
+                "c_utils",
+                "drivers_interface_power",
+                "drivers_interface_ril",
                 "hdf_core",
-                "faultloggerd",
                 "hiviewdfx_hilog_native",
-                "ipc",
                 "init",
-                "utils_base"
-            ],
-            "third_party": [
-                "eudev",
-                "json"
+                "ipc"
             ]
         },
         "build": {
