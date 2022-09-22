@@ -270,7 +270,7 @@ int32_t HRilData::SetInitApnInfoResponse(
 int32_t HRilData::SetDataProfileInfoResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    return ResponseRequestInfo(requestNum, &responseInfo, sizeof(responseInfo));
+    return HRIL_ERR_SUCCESS;
 }
 
 int32_t HRilData::SetLinkBandwidthReportingRuleResponse(

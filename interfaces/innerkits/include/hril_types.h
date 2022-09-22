@@ -150,11 +150,6 @@ struct HRilRadioResponseInfo {
     int32_t serial = -1;
     HRilErrType error;
     HRilResponseTypes type;
-
-    bool IsInvalid(void) const
-    {
-        return flag == -1 && serial == -1;
-    }
 };
 
 struct HRilRadioStateInfo {
