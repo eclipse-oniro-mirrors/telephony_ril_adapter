@@ -165,65 +165,11 @@ void InitRilAdapter(void)
     LoadVendor();
 }
 
-static int32_t RilAdapterDispatch(
-    struct HdfDeviceIoClient *client, int32_t cmd, struct HdfSBuf *data, struct HdfSBuf *reply)
+void ReleaseRilAdapter(void)
 {
-    int32_t ret;
-    TELEPHONY_LOGI("RilAdapterDispatch cmd:%{public}d", cmd);
-    ret = DispatchRequest(cmd, data);
-    return ret;
-}
-
-static struct IDeviceIoService g_rilAdapterService = {
-    .Dispatch = RilAdapterDispatch,
-    .Open = NULL,
-    .Release = NULL,
-};
-
-static int32_t RilAdapterBind(struct HdfDeviceObject *device)
-{
-    if (device == NULL) {
-        return HDF_ERR_INVALID_OBJECT;
-    }
-    device->service = &g_rilAdapterService;
-    return HDF_SUCCESS;
-}
-
-static int32_t RilAdapterInit(struct HdfDeviceObject *device)
-{
-    if (device == NULL) {
-        return HDF_ERR_INVALID_OBJECT;
-    }
-    struct HdfSBuf *sbuf = HdfSbufTypedObtain(SBUF_IPC);
-    if (sbuf == NULL) {
-        TELEPHONY_LOGE("HdfSampleDriverBind, failed to obtain ipc sbuf");
-        return HDF_ERR_INVALID_OBJECT;
-    }
-    if (!HdfSbufWriteString(sbuf, "string")) {
-        TELEPHONY_LOGE("HdfSampleDriverBind, failed to write string to ipc sbuf");
-        HdfSbufRecycle(sbuf);
-        return HDF_FAILURE;
-    }
-    if (sbuf != NULL) {
-        HdfSbufRecycle(sbuf);
-    }
-    TELEPHONY_LOGI("sbuf IPC obtain success!");
-    return HDF_SUCCESS;
-}
-
-static void RilAdapterRelease(struct HdfDeviceObject *device)
-{
-    if (device == NULL) {
+    if (g_dlHandle == NULL) {
+        TELEPHONY_LOGI("g_dlHandle has been null");
         return;
     }
     dlclose(g_dlHandle);
 }
-
-struct HdfDriverEntry g_rilAdapterDevEntry = {
-    .moduleVersion = 1,
-    .moduleName = "hril_hdf",
-    .Bind = RilAdapterBind,
-    .Init = RilAdapterInit,
-    .Release = RilAdapterRelease,
-};
-HDF_INIT(g_rilAdapterDevEntry);

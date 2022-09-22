@@ -36,75 +36,10 @@ std::unordered_map<int32_t, int32_t> HRilManager::notificationMap_ = {
 };
 
 using namespace OHOS::HDI::Power::V1_0;
-// Distribute the request event to a specific card slot processing flow
-static int32_t DispatchModule(int32_t slotId, int32_t cmd, struct HdfSBuf *data)
-{
-    if (g_manager == nullptr) {
-        TELEPHONY_LOGE("Manager is nullptr, id:%{public}d!", slotId);
-        return HDF_FAILURE;
-    }
-    pthread_mutex_lock(&dispatchMutex);
-    int32_t ret = g_manager->Dispatch(slotId, cmd, data);
-    pthread_mutex_unlock(&dispatchMutex);
-    if (ret != HRIL_ERR_SUCCESS) {
-        TELEPHONY_LOGE("HRilManager::Dispatch is failed!");
-        return ret;
-    }
-    return ret;
-}
-
-static int32_t RegisterManagerNotifyCallback(const HdfRemoteService *serviceCallbackInd)
-{
-    if (g_manager == nullptr) {
-        TELEPHONY_LOGE("HRilManager is nullptr!");
-        return HDF_FAILURE;
-    }
-    g_manager->RegisterModulesNotifyCallback(serviceCallbackInd);
-    return HRIL_ERR_SUCCESS;
-}
-
-static int32_t RegisterManagerResponseCallback(const HdfRemoteService *serviceCallbackResp)
-{
-    if (g_manager == nullptr) {
-        TELEPHONY_LOGE("HRilManager is nullptr!");
-        return HDF_FAILURE;
-    }
-    g_manager->RegisterModulesResponseCallback(serviceCallbackResp);
-    return HRIL_ERR_SUCCESS;
-}
 
 int32_t HRilManager::GetMaxSimSlotCount()
 {
     return hrilSimSlotCount_;
-}
-
-int32_t HRilManager::Dispatch(int32_t slotId, int32_t code, struct HdfSBuf *data)
-{
-    if (hrilCall_[slotId] != nullptr && hrilCall_[slotId]->IsCallRespOrNotify(code)) {
-        hrilCall_[slotId]->ProcessRequest<HRilCall>(code, data);
-        return HRIL_ERR_SUCCESS;
-    }
-    if (hrilSms_[slotId] != nullptr && hrilSms_[slotId]->IsSmsRespOrNotify(code)) {
-        hrilSms_[slotId]->ProcessRequest<HRilSms>(code, data);
-        return HRIL_ERR_SUCCESS;
-    }
-    if (hrilSim_[slotId] != nullptr && hrilSim_[slotId]->IsSimRespOrNotify(code)) {
-        hrilSim_[slotId]->ProcessRequest<HRilSim>(code, data);
-        return HRIL_ERR_SUCCESS;
-    }
-    if (hrilNetwork_[slotId] != nullptr && hrilNetwork_[slotId]->IsNetworkRespOrNotify(code)) {
-        hrilNetwork_[slotId]->ProcessRequest<HRilNetwork>(code, data);
-        return HRIL_ERR_SUCCESS;
-    }
-    if (hrilModem_[slotId] != nullptr && hrilModem_[slotId]->IsModemRespOrNotify(code)) {
-        hrilModem_[slotId]->ProcessRequest<HRilModem>(code, data);
-        return HRIL_ERR_SUCCESS;
-    }
-    if (hrilData_[slotId] != nullptr && hrilData_[slotId]->IsDataRespOrNotify(code)) {
-        hrilData_[slotId]->ProcessRequest<HRilData>(code, data);
-        return HRIL_ERR_SUCCESS;
-    }
-    return HDF_FAILURE;
 }
 
 ReqDataInfo *HRilManager::CreateHRilRequest(int32_t serial, int32_t slotId, int32_t request)
@@ -162,42 +97,6 @@ inline int32_t HRilManager::TaskSchedule(
     int32_t ret = (_obj.get()->*(_func))(std::forward<ParamTypes>(_args)...);
     pthread_mutex_unlock(&dispatchMutex);
     return ret;
-}
-
-int32_t HRilManager::ReportToParent(int32_t requestNum, const HdfSBuf *dataSbuf)
-{
-    int32_t ret;
-    if (serviceCallback_ != nullptr && serviceCallback_->dispatcher != nullptr) {
-        ret = serviceCallback_->dispatcher->Dispatch(
-            const_cast<HdfRemoteService *>(serviceCallback_), requestNum, const_cast<HdfSBuf *>(dataSbuf), nullptr);
-    } else {
-        TELEPHONY_LOGE("it is null, serviceCallback_=%{public}p", serviceCallback_);
-        ret = HDF_FAILURE;
-    }
-    return ret;
-}
-
-int32_t HRilManager::NotifyToParent(int32_t requestNum, const HdfSBuf *dataSbuf)
-{
-    int32_t ret;
-    if (serviceCallbackNotify_ != nullptr && serviceCallbackNotify_->dispatcher != nullptr) {
-        ret = serviceCallbackNotify_->dispatcher->Dispatch(const_cast<HdfRemoteService *>(serviceCallbackNotify_),
-            requestNum, const_cast<HdfSBuf *>(dataSbuf), nullptr);
-    } else {
-        TELEPHONY_LOGE("it is null, serviceCallbackNotify_=%{public}p", serviceCallbackNotify_);
-        ret = HDF_FAILURE;
-    }
-    return ret;
-}
-
-void HRilManager::RegisterModulesNotifyCallback(const HdfRemoteService *serviceCallbackInd)
-{
-    serviceCallbackNotify_ = serviceCallbackInd;
-}
-
-void HRilManager::RegisterModulesResponseCallback(const HdfRemoteService *serviceCallback)
-{
-    serviceCallback_ = serviceCallback;
 }
 
 void HRilManager::RegisterCallFuncs(int32_t slotId, const HRilCallReq *callFuncs)
@@ -994,6 +893,12 @@ int32_t HRilManager::SendSmsAck(int32_t slotId, int32_t serialId, const OHOS::HD
     return TaskSchedule(MODULE_HRIL_SMS, hrilSms_[slotId], &HRilSms::SendSmsAck, serialId, modeData);
 }
 
+int32_t HRilManager::SendRilAck()
+{
+    ReleaseRunningLock();
+    return HRIL_ERR_SUCCESS;
+}
+
 HRilManager::~HRilManager() {}
 
 #ifdef __cplusplus
@@ -1005,49 +910,6 @@ int32_t GetSimSlotCount()
     char simSlotCount[HRIL_SYSPARA_SIZE] = { 0 };
     GetParameter(HRIL_TEL_SIM_SLOT_COUNT, HRIL_DEFAULT_SLOT_COUNT, simSlotCount, HRIL_SYSPARA_SIZE);
     return std::atoi(simSlotCount);
-}
-
-int32_t DispatchRequest(int32_t cmd, struct HdfSBuf *data)
-{
-    if (data == nullptr) {
-        TELEPHONY_LOGE("miss callback parameter");
-        return HDF_ERR_INVALID_PARAM;
-    }
-    switch (cmd) {
-        case HRIL_ADAPTER_RADIO_SEND_ACK: {
-            if (g_manager == nullptr) {
-                TELEPHONY_LOGE("g_manager is nullptr! cmd:%{public}d", cmd);
-                return HDF_ERR_INVALID_OBJECT;
-            }
-            g_manager->ReleaseRunningLock();
-            break;
-        }
-        case HRIL_ADAPTER_RADIO_INDICATION: {
-            HdfRemoteService *serviceCallbackInd = HdfSbufReadRemoteService(data);
-            if (serviceCallbackInd == nullptr) {
-                TELEPHONY_LOGE("miss callback parameter");
-                return HDF_ERR_INVALID_PARAM;
-            }
-            RegisterManagerNotifyCallback(serviceCallbackInd);
-            break;
-        }
-        case HRIL_ADAPTER_RADIO_RESPONSE: {
-            HdfRemoteService *serviceCallback = HdfSbufReadRemoteService(data);
-            if (serviceCallback == nullptr) {
-                TELEPHONY_LOGE("miss callback parameter");
-                return HDF_ERR_INVALID_PARAM;
-            }
-            RegisterManagerResponseCallback(serviceCallback);
-            break;
-        }
-        default:
-            int32_t slotId = 0;
-            if (!HdfSbufReadInt32(data, &slotId)) {
-                TELEPHONY_LOGE("Hdf sbuf read slotId is failed!");
-            }
-            return DispatchModule(slotId, cmd, data);
-    }
-    return HRIL_ERR_SUCCESS;
 }
 
 static void HRilBootUpEventLoop()

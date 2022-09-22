@@ -42,8 +42,7 @@ public:
     virtual ~HRilManager();
 
     int32_t GetMaxSimSlotCount();
-    virtual int32_t ReportToParent(int32_t requestNum, const HdfSBuf *dataSbuf) override;
-    virtual int32_t NotifyToParent(int32_t requestNum, const HdfSBuf *dataSbuf) override;
+
     virtual ReqDataInfo *CreateHRilRequest(int32_t serial, int32_t slotId, int32_t request) override;
     virtual void ReleaseHRilRequest(int32_t request, ReqDataInfo *requestInfo) override;
 
@@ -55,12 +54,6 @@ public:
     void RegisterSmsFuncs(int32_t slotId, const HRilSmsReq *smsFuncs);
     void ApplyRunningLock(void);
     void ReleaseRunningLock(void);
-
-    int32_t Dispatch(int32_t slotId, int32_t cmd, struct HdfSBuf *data);
-
-    void RegisterModulesNotifyCallback(const HdfRemoteService *serviceCallbackInd);
-
-    void RegisterModulesResponseCallback(const HdfRemoteService *serviceCallbackInd);
 
     void OnCallReport(int32_t slotId, const ReportInfo *reportInfo, const uint8_t *response, size_t responseLen);
     void OnDataReport(int32_t slotId, const ReportInfo *reportInfo, const uint8_t *response, size_t responseLen);
@@ -209,16 +202,13 @@ public:
         int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::GsmSmsMessageInfo &gsmSmsMessageInfo);
     int32_t SendSmsAck(int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::ModeData &modeData);
 
-    int32_t SendRilAck()
-    {
-        return 0;
-    }
+    int32_t SendRilAck();
 
 public:
     sptr<OHOS::HDI::Power::V1_0::IPowerInterface> powerInterface_ { nullptr };
     std::unique_ptr<HRilTimerCallback> timerCallback_ = nullptr;
     std::unique_ptr<std::thread> eventLoop_ = nullptr;
-    static const uint32_t RUNNING_LOCK_DEFAULT_TIMEOUT_US = 200 * 1000;
+    static const uint32_t RUNNING_LOCK_DEFAULT_TIMEOUT_US = 200 * 1000; // 200ms
     std::mutex mutexRunningLock_;
     std::atomic_uint runningLockCount_ = 0;
     std::atomic_int runningSerialNum_ = 0;
@@ -240,8 +230,6 @@ private:
     std::vector<std::unique_ptr<HRilSim>> hrilSim_;
     std::vector<std::unique_ptr<HRilSms>> hrilSms_;
     std::vector<std::unique_ptr<HRilData>> hrilData_;
-    const struct HdfRemoteService *serviceCallback_ = nullptr;
-    const struct HdfRemoteService *serviceCallbackNotify_ = nullptr;
     std::unordered_map<int32_t, std::list<ReqDataInfo *>> requestList_;
     static std::unordered_map<int32_t, int32_t> notificationMap_;
     std::mutex requestListLock_;
@@ -252,7 +240,6 @@ extern "C" {
 #endif
 
 int32_t GetSimSlotCount(void);
-int32_t DispatchRequest(int32_t cmd, struct HdfSBuf *data);
 void HRilRegOps(const HRilOps *hrilOps);
 void OnCallReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen);
 void OnDataReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen);

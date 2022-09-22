@@ -25,13 +25,10 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-struct HdfSBuf;
-
-extern int32_t DispatchRequest(int32_t cmd, struct HdfSBuf *data);
 extern void HRilInit(void);
 extern void HRilRegOps(const HRilOps *g_hrilOps);
 void InitRilAdapter(void);
+void ReleaseRilAdapter(void);
 extern void OnCallReport(
     int32_t slotId, const struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen);
 extern void OnDataReport(
