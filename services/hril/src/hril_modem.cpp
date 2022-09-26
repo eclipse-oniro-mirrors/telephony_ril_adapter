@@ -120,7 +120,7 @@ int32_t HRilModem::GetImeiResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     if ((response == nullptr && responseLen != 0) || (responseLen % sizeof(char)) != 0) {
-        TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
+        TELEPHONY_LOGE("GetImeiResponse:Invalid parameter, responseLen:%{public}zu", responseLen);
         return HRIL_ERR_INVALID_PARAMETER;
     }
     if (response == nullptr) {
@@ -134,7 +134,7 @@ int32_t HRilModem::GetMeidResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     if ((response == nullptr && responseLen != 0) || (responseLen % sizeof(char)) != 0) {
-        TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
+        TELEPHONY_LOGE("GetMeidResponse:Invalid parameter, responseLen:%{public}zu", responseLen);
         return HRIL_ERR_INVALID_PARAMETER;
     }
     if (response == nullptr) {
@@ -177,7 +177,7 @@ int32_t HRilModem::GetBasebandVersionResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     if ((response == nullptr && responseLen != 0) || (responseLen % sizeof(char)) != 0) {
-        TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
+        TELEPHONY_LOGE("GetBasebandVersionResponse:Invalid parameter, responseLen:%{public}zu", responseLen);
         return HRIL_ERR_INVALID_PARAMETER;
     }
     if (response == nullptr) {
