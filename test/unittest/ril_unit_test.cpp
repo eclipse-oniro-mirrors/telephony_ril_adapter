@@ -45,6 +45,16 @@ static int32_t InputInt32(int32_t start, int32_t end, string title)
 namespace OHOS {
 namespace Telephony {
 namespace {
+constexpr int32_t MODULE_EXIT = 0;
+constexpr int32_t MODULE_MODEM = 1;
+constexpr int32_t MODULE_CALL = 2;
+constexpr int32_t MODULE_NETWORK = 3;
+constexpr int32_t MODULE_SIM = 4;
+constexpr int32_t MODULE_DATA = 5;
+constexpr int32_t MODULE_SMS = 6;
+constexpr int32_t MODULE_STRESS = 7;
+constexpr useconds_t MICRO_SECOND = 500000;
+
 RilUnitTest::RilUnitTest(int32_t opt) : slotId_(opt) {}
 
 RilUnitTest::~RilUnitTest() {}
@@ -1413,30 +1423,30 @@ static int32_t SwitchMenu(int32_t module, bool *loopFlag)
 {
     int32_t mWhat = -1;
     switch (module) {
-        case 0: /* exit */
+        case MODULE_EXIT: /* exit */
             if (loopFlag != nullptr) {
                 *loopFlag = false;
             }
             break;
-        case 1: /* modem */
+        case MODULE_MODEM: /* modem */
             mWhat = PrintModemMenu();
             break;
-        case 2: /* call */
+        case MODULE_CALL: /* call */
             mWhat = PrintCallMenu();
             break;
-        case 3: /* network */
+        case MODULE_NETWORK: /* network */
             mWhat = PrintNetworkMenu();
             break;
-        case 4: /* sim */
+        case MODULE_SIM: /* sim */
             mWhat = PrintSimMenu();
             break;
-        case 5: /* data */
+        case MODULE_DATA: /* data */
             mWhat = PrintDataMenu();
             break;
-        case 6: /* sms */
+        case MODULE_SMS: /* sms */
             mWhat = PrintSmsMenu();
             break;
-        case 7: /* stress */
+        case MODULE_STRESS: /* stress */
             mWhat = PrintStressMenu();
             break;
         default:
@@ -1474,14 +1484,14 @@ int32_t main()
             auto event = OHOS::AppExecFwk::InnerEvent::Get(mWhat);
             event->SetOwner(handler);
 
-            if (module == 7) {
+            if (module == MODULE_STRESS) {
                 rilUnitTest->OnStressInput(mWhat, event);
             } else {
                 rilUnitTest->OnProcessInput(mWhat, event);
             }
 
             /* 等待结果回复打印 */
-            usleep(500000);
+            usleep(MICRO_SECOND);
         }
     }
 
