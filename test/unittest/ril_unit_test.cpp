@@ -53,7 +53,7 @@ constexpr int32_t MODULE_SIM = 4;
 constexpr int32_t MODULE_DATA = 5;
 constexpr int32_t MODULE_SMS = 6;
 constexpr int32_t MODULE_STRESS = 7;
-constexpr useconds_t microSecond = 500000;
+constexpr useconds_t MICRO_SECOND = 500000;
 
 RilUnitTest::RilUnitTest(int32_t opt) : slotId_(opt) {}
 
@@ -1491,7 +1491,7 @@ int32_t main()
             }
 
             /* 等待结果回复打印 */
-            usleep(microSecond);
+            usleep(MICRO_SECOND);
         }
     }
 
