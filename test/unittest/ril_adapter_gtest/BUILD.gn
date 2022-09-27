@@ -14,8 +14,6 @@
 import("//build/test.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
-RIL_ADAPTER = "//base/telephony/ril_adapter"
-
 ohos_unittest("tel_ril_adapter_gtest") {
   install_enable = true
   subsystem_name = "telephony"
@@ -24,37 +22,11 @@ ohos_unittest("tel_ril_adapter_gtest") {
   module_out_path = part_name + "/" + test_module
 
   sources = [
-    "ril_manager_test.cpp",
-    "ril_radio_indication_test.cpp",
-    "ril_radio_response_test.cpp",
-    "ril_unit_test.cpp",
+    "ril_callback_test.cpp",
+    "ril_interface_test.cpp",
   ]
 
-  include_dirs = [
-    "//base/telephony/ril_adapter/services/hril/include",
-    "//commonlibrary/c_utils/base/include",
-    "//third_party/json/include",
-    "//drivers/hdf_core/adapter/uhdf2/include/hdi",
-    "include",
-  ]
-  configs = [ "$RIL_ADAPTER/utils:utils_config" ]
-  deps = [
-    "$RIL_ADAPTER/services/hril:hril",
-    "$RIL_ADAPTER/services/vendor:ril_vendor",
-    "$hdf_uhdf_path/hdi:libhdi",
-    "//drivers/hdf_core/adapter/uhdf2/host:libhdf_host",
-    "//drivers/hdf_core/adapter/uhdf2/ipc:libhdf_ipc_adapter",
-    "//drivers/hdf_core/adapter/uhdf2/utils:libhdf_utils",
-    "//third_party/googletest:gtest_main",
-  ]
-
-  external_deps = [
-    "c_utils:utils",
-    "drivers_interface_ril:ril_idl_headers",
-    "eventhandler:libeventhandler",
-    "ipc:ipc_core",
-    "ril_adapter:hril_innerkits",
-  ]
+  include_dirs = [ "include" ]
 
   defines = [
     "TELEPHONY_LOG_TAG = \"RilAdapterGtest\"",
@@ -62,12 +34,19 @@ ohos_unittest("tel_ril_adapter_gtest") {
   ]
 
   # defines += [ "TEL_TEST_PIN_PUK" ]
-
+  configs = [ "//base/telephony/ril_adapter/utils:utils_config" ]
   if (is_standard_system) {
-    external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
+    external_deps = [
+      "c_utils:utils",
+      "drivers_interface_ril:libril_proxy_1.0",
+      "hdf_core:libhdf_utils",
+      "hiviewdfx_hilog_native:libhilog",
+      "ipc:ipc_single",
+    ]
   } else {
-    external_deps += [ "hilog:libhilog" ]
+    external_deps = [ "hilog:libhilog" ]
   }
+  external_deps += [ "ipc:ipc_single" ]
 }
 
 group("unittest") {
