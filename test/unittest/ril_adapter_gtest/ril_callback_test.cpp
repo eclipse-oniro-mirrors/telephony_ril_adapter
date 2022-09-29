@@ -748,6 +748,13 @@ int32_t RilCallbackTest::CallSsNotice(const RilRadioResponseInfo &responseInfo, 
     return 0;
 }
 
+int32_t RilCallbackTest::CallRsrvccStatusNotify(const RilRadioResponseInfo &responseInfo)
+{
+    TELEPHONY_LOGI(
+        "CallRsrvccStatusNotify slotId : %{public}d, type: %{public}d", responseInfo.slotId, responseInfo.type);
+    return 0;
+}
+
 int32_t RilCallbackTest::GetEmergencyCallListResponse(
     const RilRadioResponseInfo &responseInfo, const EmergencyInfoList &emergencyInfoList)
 {
