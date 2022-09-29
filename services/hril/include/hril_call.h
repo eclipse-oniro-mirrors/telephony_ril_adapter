@@ -144,6 +144,7 @@ public:
     int32_t CallSrvccStatusNotice(int32_t notifyType, HRilErrNumber error, const void *response, size_t responseLen);
     int32_t CallEmergencyNotice(int32_t notifyType, HRilErrNumber error, const void *response, size_t responseLen);
     int32_t CallSsNotice(int32_t notifyType, HRilErrNumber error, const void *response, size_t responseLen);
+    int32_t CallRsrvccStatusNotify(int32_t notifyType, HRilErrNumber error, const void *response, size_t responseLen);
     void BuildICallList(
         HDI::Ril::V1_0::CallInfoList &callInfoList, const void *response, size_t responseLen);
     void BuildIEmergencyCallList(

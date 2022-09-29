@@ -56,6 +56,7 @@ void HRilCall::AddCallNotificationToMap()
     notiMemberFuncMap_[HNOTI_CALL_RINGBACK_VOICE_REPORT] = &HRilCall::CallRingbackVoiceNotice;
     notiMemberFuncMap_[HNOTI_CALL_EMERGENCY_NUMBER_REPORT] = &HRilCall::CallEmergencyNotice;
     notiMemberFuncMap_[HNOTI_CALL_SS_REPORT] = &HRilCall::CallSsNotice;
+    notiMemberFuncMap_[HNOTI_CALL_RSRVCC_STATUS_REPORT] = &HRilCall::CallRsrvccStatusNotify;
 }
 
 void HRilCall::AddCallResponseToMap()
@@ -788,6 +789,12 @@ int32_t HRilCall::CallEmergencyNotice(
     HDI::Ril::V1_0::EmergencyInfoList callList = {};
     BuildIEmergencyCallList(callList, response, responseLen);
     return Notify(notifyType, error, &HDI::Ril::V1_0::IRilCallback::CallEmergencyNotice, callList);
+}
+
+int32_t HRilCall::CallRsrvccStatusNotify(
+    int32_t notifyType, HRilErrNumber error, const void *response, size_t responseLen)
+{
+    return Notify(notifyType, error, &HDI::Ril::V1_0::IRilCallback::CallRsrvccStatusNotify);
 }
 
 void HRilCall::RegisterCallFuncs(const HRilCallReq *callFuncs)
