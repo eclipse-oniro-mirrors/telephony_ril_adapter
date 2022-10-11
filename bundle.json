@@ -14,7 +14,7 @@
     "author": {},
     "contributors": [],
     "segment": {
-        "destPath": "//base/telephony/ril_adapter"
+        "destPath": "base/telephony/ril_adapter"
     },
     "component": {
         "name": "ril_adapter",
