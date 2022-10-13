@@ -27,7 +27,7 @@ struct CardStatusInfo {
 };
 
 /* Form 3GPP TS 27.007 V4.3.0 (2001-12) 8.18, + CRSM */
-struct SimIoRequestInfo : public HrilBaseParcel {
+struct SimIoRequestInfo {
     int32_t command; /* command passed on by the ME to the SIM; refer GSM 51.011 [28] */
     int32_t fileId; /* this is the identifier of an elementary datafile on SIM.
                      * Mandatory for every command except STATUS */
@@ -47,10 +47,6 @@ struct SimIoRequestInfo : public HrilBaseParcel {
     int32_t serial;
     std::string pin2;
     std::string aid;
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<SimIoRequestInfo> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
 /* Form 3GPP TS 27.007 V4.3.0 (2001-12) 8.18, + CRSM */
@@ -62,7 +58,7 @@ struct IccIoResultInfo {
     std::string response;
 };
 
-struct SimLockInfo : public HrilBaseParcel {
+struct SimLockInfo {
     int32_t serial;
     std::string fac; /* String type, which specifies the object operated by this command.
                       * "SC": SIM PIN1;
@@ -82,14 +78,9 @@ struct SimLockInfo : public HrilBaseParcel {
     int32_t status;
     std::string passwd;
     int32_t classx;
-
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<SimLockInfo> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
-struct SimPasswordInfo : public HrilBaseParcel {
+struct SimPasswordInfo {
     int32_t serial;
     std::string fac; /* String type, which specifies the object operated by this command.
                       * “SC”：SIM PIN1；
@@ -104,14 +95,9 @@ struct SimPasswordInfo : public HrilBaseParcel {
     std::string oldPassword;
     std::string newPassword;
     int32_t passwordLength; /* Max length of oldPassword or newPassword */
-
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<SimPasswordInfo> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
-struct SimPinInputTimes : public HrilBaseParcel {
+struct SimPinInputTimes {
     int32_t serial;
     std::string code; /* param of string.
                        * SIM PIN2 is mean that SIM PIN2 request. SIM PUK2 is mean that SIM PUK2 request. */
@@ -121,14 +107,9 @@ struct SimPinInputTimes : public HrilBaseParcel {
     int32_t pinTimes; /* The remaining number of PIN, the maximum number of entries is 3 times. */
     int32_t puk2Times; /* The remaining number of PUK2, the maximum number of entries is 10 times. */
     int32_t pin2Times; /* The remaining number of PIN2, the maximum number of entries is 3 times. */
-
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<SimPinInputTimes> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
-struct ApduSimIORequestInfo : public HrilBaseParcel {
+struct ApduSimIORequestInfo {
     int32_t serial;
     int32_t channelId;
     int32_t type;
@@ -137,33 +118,21 @@ struct ApduSimIORequestInfo : public HrilBaseParcel {
     int32_t p2;
     int32_t p3;
     std::string data;
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<ApduSimIORequestInfo> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
-struct SimAuthenticationRequestInfo : public HrilBaseParcel {
+struct SimAuthenticationRequestInfo {
     int32_t serial;
     std::string aid;
     std::string authData;
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<SimAuthenticationRequestInfo> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
-struct OpenLogicalChannelResponse : public HrilBaseParcel {
+struct OpenLogicalChannelResponse {
     int32_t sw1; /* information from the SIM about the execution of the actual command.
                   * These parameters are delivered to the TE in both cases,
                   * on successful or failed execution of the command */
     int32_t sw2;
     int32_t channelId;
     std::string response;
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<OpenLogicalChannelResponse> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
 struct LockStatusResp {

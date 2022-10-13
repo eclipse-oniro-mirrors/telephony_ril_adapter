@@ -45,7 +45,6 @@ ohos_shared_library("hril_innerkits") {
     "$RIL_FRAMEWORKS/hril_call_parcel.cpp",
     "$RIL_FRAMEWORKS/hril_modem_parcel.cpp",
     "$RIL_FRAMEWORKS/hril_network_parcel.cpp",
-    "$RIL_FRAMEWORKS/hril_sim_parcel.cpp",
     "$RIL_FRAMEWORKS/hril_sms_parcel.cpp",
   ]
 
