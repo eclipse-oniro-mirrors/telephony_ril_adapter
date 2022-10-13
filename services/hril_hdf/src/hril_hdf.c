@@ -19,8 +19,6 @@
 
 #include "dlfcn.h"
 #include "hdf_base.h"
-#include "hdf_device_desc.h"
-#include "hdf_sbuf.h"
 #include "hril_enum.h"
 #include "modem_adapter.h"
 #include "parameter.h"
