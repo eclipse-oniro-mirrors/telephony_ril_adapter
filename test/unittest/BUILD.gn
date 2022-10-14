@@ -60,7 +60,7 @@ ohos_executable("ril_adapter_test") {
     external_deps += [ "hilog:libhilog" ]
   }
 
-  #install_images = [ "vendor" ]
+  #install_images = [ chipset_base_dir ]
 
   part_name = "ril_adapter"
   subsystem_name = "telephony"
