@@ -304,6 +304,9 @@ static int32_t InitCallListCmdBuffer(const ResponseInfo *pResponse, int32_t *cal
     ret = memset_s(pCallsTmp, callNumTmp * sizeof(HRilCallInfo), 0, callNumTmp * sizeof(HRilCallInfo));
     if (ret != EOK) {
         TELEPHONY_LOGE("memset_s is failed!");
+        free(pCallsTmp);
+        pCallsTmp = NULL;
+        return ret;
     }
 
     *pCalls = pCallsTmp;
@@ -1343,6 +1346,9 @@ static int32_t InitGetEmergencyCallList(const ResponseInfo *pResponse, int32_t *
         pEmergencyCallsTmp, callNumTmp * sizeof(HRilEmergencyInfo), 0, callNumTmp * sizeof(HRilEmergencyInfo));
     if (ret != EOK) {
         TELEPHONY_LOGE("memset_s is failed!");
+        free(pEmergencyCallsTmp);
+        pEmergencyCallsTmp = NULL;
+        return ret;
     }
 
     *pEmergencyCalls = pEmergencyCallsTmp;
