@@ -24,7 +24,7 @@ base/telephony/ril_adapter
 │   └── innerkits
 ├── services                            # 服务
 │   ├── hril                            # hril层的各个业务模块接口实现
-│   ├── hril_hdf                        # HDF服务
+│   ├── hril_hdf                        # 提供初始化厂商库接口
 │   └── vendor                          # 厂商库文件
 │── test                                # 测试代码
 │   ├── BUILD.gn
@@ -34,12 +34,12 @@ base/telephony/ril_adapter
 
 ## 约束<a name="section126mcpsimp"></a>
 
--   软件上，需要与以下服务配合使用：Telephony核心服务（core\_service），需要Modem厂商库实现接口。
+-   软件上，需要与以下服务配合使用：HDF(drivers\_interface，driver\_peripheral), 需要Modem厂商库实现接口。
 -   硬件上，需要搭载的设备支持以下硬件：可以进行独立蜂窝通信的Modem。
 
 ## 使用说明<a name="section264mcpsimp"></a>
 
-ril\_adapter不对外暴露接口，可通过核心服务调用。
+ril\_adapter不对外暴露接口，可通过driver\_peripheral调用。
 
 ## 相关仓<a name="section279mcpsimp"></a>
 
@@ -47,5 +47,7 @@ ril\_adapter不对外暴露接口，可通过核心服务调用。
 
 **telephony_ril_adapter**
 
-[telephony_core_service](https://gitee.com/openharmony/telephony_core_service/blob/master/README_zh.md)
+[drivers_interface](https://gitee.com/openharmony/drivers_interface)
+
+[drivers_peripheral](https://gitee.com/openharmony/drivers_peripheral)
 
