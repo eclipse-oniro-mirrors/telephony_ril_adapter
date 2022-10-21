@@ -382,17 +382,17 @@ int32_t HRilSms::GetCBConfigResponse(
             broadcastInfo.mids = std::string("");
             TELEPHONY_LOGE("result.mids is nullptr");
         } else {
-            TELEPHONY_LOGE("result.mids :%{public}s", cellBroadcastInfo->mids);
+            TELEPHONY_LOGD("result.mids :%{private}s", cellBroadcastInfo->mids);
             broadcastInfo.mids = std::string(cellBroadcastInfo->mids);
         }
         if (cellBroadcastInfo->dcss == nullptr) {
             broadcastInfo.dcss = std::string("");
             TELEPHONY_LOGE("result.dcss is nullptr");
         } else {
-            TELEPHONY_LOGE("result.dcss :%{public}s", cellBroadcastInfo->dcss);
+            TELEPHONY_LOGD("result.dcss :%{private}s", cellBroadcastInfo->dcss);
             broadcastInfo.dcss = std::string(cellBroadcastInfo->dcss);
         }
-        TELEPHONY_LOGE("mode:%{public}d, mids:%{public}s, dcss:%{public}s", cellBroadcastInfo->mode,
+        TELEPHONY_LOGD("mode:%{private}d, mids:%{private}s, dcss:%{private}s", cellBroadcastInfo->mode,
             cellBroadcastInfo->mids, cellBroadcastInfo->dcss);
     }
     return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::GetCBConfigResponse, broadcastInfo);
@@ -659,21 +659,21 @@ HDI::Ril::V1_0::CBConfigReportInfo HRilSms::MakeCBConfigResult(const void *respo
             result.data = std::string("");
             TELEPHONY_LOGE("result.data is nullptr");
         } else {
-            TELEPHONY_LOGE("result.data :%{public}s", cellBroadcastReportInfo->data);
+            TELEPHONY_LOGD("result.data :%{private}s", cellBroadcastReportInfo->data);
             result.data = std::string(cellBroadcastReportInfo->data);
         }
         if (cellBroadcastReportInfo->pdu == nullptr) {
             result.pdu = std::string("");
             TELEPHONY_LOGE("result.pdu is nullptr");
         } else {
-            TELEPHONY_LOGE("result.pdu :%{public}s", cellBroadcastReportInfo->pdu);
+            TELEPHONY_LOGD("result.pdu :%{private}s", cellBroadcastReportInfo->pdu);
             result.pdu = std::string(cellBroadcastReportInfo->pdu);
         }
         if (cellBroadcastReportInfo->dcs == nullptr) {
             result.dcs = std::string("");
             TELEPHONY_LOGE("result.dcs is nullptr");
         } else {
-            TELEPHONY_LOGE("result.dcs :%{public}s", cellBroadcastReportInfo->dcs);
+            TELEPHONY_LOGD("result.dcs :%{private}s", cellBroadcastReportInfo->dcs);
             result.dcs = std::string(cellBroadcastReportInfo->dcs);
         }
     }

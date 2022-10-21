@@ -186,8 +186,9 @@ int32_t HRilNetwork::GetCsRegStatusResponse(
         csRegStatusInfo.lacCode = hrilRegStatusInfo->lacCode;
         csRegStatusInfo.cellId = hrilRegStatusInfo->cellId;
         csRegStatusInfo.radioTechnology = static_cast<HDI::Ril::V1_0::RilRadioTech>(hrilRegStatusInfo->actType);
-        TELEPHONY_LOGI("GetCsRegStatusResponse notifyType:%{public}d, regStatus:%{public}d, "
-            "lacCode:%{public}d, cellId:%{public}d, radioTechnology:%{public}d",
+        TELEPHONY_LOGD(
+            "GetCsRegStatusResponse notifyType:%{public}d, regStatus:%{public}d, "
+            "lacCode:%{private}d, cellId:%{private}d, radioTechnology:%{public}d",
             csRegStatusInfo.notifyType, csRegStatusInfo.regStatus, csRegStatusInfo.lacCode, csRegStatusInfo.cellId,
             csRegStatusInfo.radioTechnology);
     }
@@ -213,12 +214,13 @@ int32_t HRilNetwork::GetPsRegStatusResponse(
         psRegStatusInfo.isDcNrRestricted = hrilRegStatusInfo->isDcNrRestricted;
         psRegStatusInfo.isNrAvailable = hrilRegStatusInfo->isNrAvailable;
         psRegStatusInfo.isEnDcAvailable = hrilRegStatusInfo->isEnDcAvailable;
-        TELEPHONY_LOGI(
-            "GetPsRegStatusResponse notifyType:%{public}d, regStatus:%{public}d, lacCode:%{public}d, cellId:%{public}d,"
-            "technology:%{public}d, isDcNrRestricted:%{public}d, isNrAvailable:%{public}d, isEnDcAvailable:%{public}d",
-            psRegStatusInfo.notifyType, psRegStatusInfo.regStatus, psRegStatusInfo.lacCode,
-            psRegStatusInfo.cellId, psRegStatusInfo.radioTechnology, psRegStatusInfo.isDcNrRestricted,
-            psRegStatusInfo.isNrAvailable, psRegStatusInfo.isEnDcAvailable);
+        TELEPHONY_LOGD(
+            "GetPsRegStatusResponse notifyType:%{public}d, regStatus:%{public}d, lacCode:%{private}d, "
+            "cellId:%{private}d, technology:%{public}d, isDcNrRestricted:%{private}d, isNrAvailable:%{private}d, "
+            "isEnDcAvailable:%{private}d",
+            psRegStatusInfo.notifyType, psRegStatusInfo.regStatus, psRegStatusInfo.lacCode, psRegStatusInfo.cellId,
+            psRegStatusInfo.radioTechnology, psRegStatusInfo.isDcNrRestricted, psRegStatusInfo.isNrAvailable,
+            psRegStatusInfo.isEnDcAvailable);
     }
     return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::GetPsRegStatusResponse, psRegStatusInfo);
 }
@@ -374,17 +376,17 @@ int32_t HRilNetwork::GetPhysicalChannelConfigResponse(
             phyChnlCfg.uplinkChannelNum = hrilChannelConfigList->channelConfigs[i].uplinkChannelNum;
             phyChnlCfg.physicalCellId = hrilChannelConfigList->channelConfigs[i].physicalCellId;
             phyChnlCfg.contextIdNum = hrilChannelConfigList->channelConfigs[i].contextIdNum;
-            TELEPHONY_LOGI(
-                "GetPhysicalChannelConfigResponse cellConnStatus:%{public}d, "
-                "cellBandwidthDownlinkKhz:%{public}d, cellBandwidthUplinkKhz:%{public}d, physicalCellId:%{public}d, "
-                "ratType:%{public}d, freqRange:%{public}d, downlinkChannelNum:%{public}d, "
-                "uplinkChannelNum:%{public}d, contextIdNum:%{public}d",
+            TELEPHONY_LOGD(
+                "GetPhysicalChannelConfigResponse cellConnStatus:%{private}d, "
+                "cellBandwidthDownlinkKhz:%{private}d, cellBandwidthUplinkKhz:%{private}d, physicalCellId:%{private}d, "
+                "ratType:%{private}d, freqRange:%{private}d, downlinkChannelNum:%{private}d, "
+                "uplinkChannelNum:%{private}d, contextIdNum:%{private}d",
                 phyChnlCfg.cellConnStatus, phyChnlCfg.cellBandwidthDownlinkKhz, phyChnlCfg.cellBandwidthUplinkKhz,
                 phyChnlCfg.ratType, phyChnlCfg.freqRange, phyChnlCfg.downlinkChannelNum, phyChnlCfg.uplinkChannelNum,
                 phyChnlCfg.physicalCellId, phyChnlCfg.contextIdNum);
             for (int32_t j = 0; j < phyChnlCfg.contextIdNum; j++) {
                 phyChnlCfg.contextIds.push_back(hrilChannelConfigList->channelConfigs[i].contextIds[j]);
-                TELEPHONY_LOGI("contextIds:%{public}d---contextId:%{public}d", j, phyChnlCfg.contextIds[j]);
+                TELEPHONY_LOGD("contextIds:%{public}d---contextId:%{private}d", j, phyChnlCfg.contextIds[j]);
             }
             phyChnlCfgList.channelConfigInfos.push_back(phyChnlCfg);
         }
@@ -425,8 +427,8 @@ int32_t HRilNetwork::NetworkCsRegStatusUpdated(
     regStatusInfoNotify.lacCode = hrilRegStatusInfo->lacCode;
     regStatusInfoNotify.cellId = hrilRegStatusInfo->cellId;
     regStatusInfoNotify.radioTechnology = static_cast<HDI::Ril::V1_0::RilRadioTech>(hrilRegStatusInfo->actType);
-    TELEPHONY_LOGI("NetworkCsRegStatusUpdated notifyType:%{public}d, regStatus:%{public}d, "
-        "lacCode:%{public}d, cellId:%{public}d, radioTechnology:%{public}d",
+    TELEPHONY_LOGD("NetworkCsRegStatusUpdated notifyType:%{public}d, regStatus:%{public}d, "
+        "lacCode:%{private}d, cellId:%{private}d, radioTechnology:%{public}d",
         regStatusInfoNotify.notifyType, regStatusInfoNotify.regStatus, regStatusInfoNotify.lacCode,
         regStatusInfoNotify.cellId, regStatusInfoNotify.radioTechnology);
     return Notify(indType, error, &HDI::Ril::V1_0::IRilCallback::NetworkCsRegStatusUpdated, regStatusInfoNotify);
@@ -449,9 +451,10 @@ int32_t HRilNetwork::NetworkPsRegStatusUpdated(
     regStatusInfoNotify.isDcNrRestricted = hrilRegStatusInfo->isDcNrRestricted;
     regStatusInfoNotify.isNrAvailable = hrilRegStatusInfo->isNrAvailable;
     regStatusInfoNotify.isEnDcAvailable = hrilRegStatusInfo->isEnDcAvailable;
-    TELEPHONY_LOGI(
-        "GetPsRegStatusResponse notifyType:%{public}d, regStatus:%{public}d, lacCode:%{public}d, cellId:%{public}d, "
-        "radioTechnology:%{public}d, isDcNrRestricted:%{public}d, isNrAvailable:%{public}d, isEnDcAvailable:%{public}d",
+    TELEPHONY_LOGD(
+        "GetPsRegStatusResponse notifyType:%{public}d, regStatus:%{public}d, lacCode:%{private}d, cellId:%{private}d, "
+        "radioTechnology:%{public}d, isDcNrRestricted:%{private}d, isNrAvailable:%{private}d, "
+        "isEnDcAvailable:%{private}d",
         regStatusInfoNotify.notifyType, regStatusInfoNotify.regStatus, regStatusInfoNotify.lacCode,
         regStatusInfoNotify.cellId, regStatusInfoNotify.radioTechnology, regStatusInfoNotify.isDcNrRestricted,
         regStatusInfoNotify.isNrAvailable, regStatusInfoNotify.isEnDcAvailable);
