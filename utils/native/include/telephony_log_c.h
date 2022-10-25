@@ -57,6 +57,7 @@ __attribute__((always_inline)) inline const char *GetRawFileName(const char *pat
 #define TELEPHONY_LOGW(fmt, args...) DECORATOR_HILOG(HILOG_WARN, fmt, ##args)
 #define TELEPHONY_LOGI(fmt, args...) DECORATOR_HILOG(HILOG_INFO, fmt, ##args)
 #define TELEPHONY_LOGF(fmt, args...) DECORATOR_HILOG(HILOG_FATAL, fmt, ##args)
+#define TELEPHONY_LOGD(fmt, args...) DECORATOR_HILOG(HILOG_DEBUG, fmt, ##args)
 
 #ifdef __cplusplus
 }
