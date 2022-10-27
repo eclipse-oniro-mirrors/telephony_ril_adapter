@@ -23,28 +23,28 @@
 
 using namespace OHOS::Telephony;
 namespace OHOS {
-    bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
-    {
-        if (data == nullptr || size <= 0) {
-            return false;
-        }
-
-        int32_t slotId = static_cast<int32_t>(size % 2);
-        struct ReportInfo reportInfo;
-        reportInfo.error = static_cast<HRilErrNumber>(size);
-        reportInfo.notifyId = HNOTI_SMS_NEW_SMS;
-
-        HRilSmsResponse response;
-        response.msgRef = static_cast<int32_t>(size);
-        response.pdu = reinterpret_cast<char*>(const_cast<uint8_t*>(data));
-        response.errCode = static_cast<int32_t>(size);
-
-        HRilManager hrilManager;
-        std::shared_ptr<HRilSms> hrilSms = std::make_shared<HRilSms>(slotId, hrilManager);
-        hrilSms->ProcessNotify<HRilSms>(HRIL_RESPONSE_NOTICE, &reportInfo, &response, size);
-
-        return true;
+void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
+{
+    if (data == nullptr || size <= 0) {
+        return;
     }
+
+    int32_t slotId = static_cast<int32_t>(size % 2);
+    struct ReportInfo reportInfo;
+    reportInfo.error = static_cast<HRilErrNumber>(size);
+    reportInfo.notifyId = HNOTI_SMS_NEW_SMS;
+
+    HRilSmsResponse response;
+    response.msgRef = static_cast<int32_t>(size);
+    response.pdu = reinterpret_cast<char *>(const_cast<uint8_t *>(data));
+    response.errCode = static_cast<int32_t>(size);
+
+    HRilManager hrilManager;
+    std::shared_ptr<HRilSms> hrilSms = std::make_shared<HRilSms>(slotId, hrilManager);
+    hrilSms->ProcessNotify<HRilSms>(HRIL_RESPONSE_NOTICE, &reportInfo, &response, size);
+
+    return;
+}
 }  // namespace OHOS
 
 /* Fuzzer entry point */
