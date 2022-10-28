@@ -748,7 +748,7 @@ int32_t HRilSim::ConvertRadioProtocolTech(int32_t tech)
     int32_t radioProtocolTech = HRIL_RADIO_PROTOCOL_TECH_UNKNOWN;
     for (int32_t radioTech = RADIO_TECHNOLOGY_GSM; radioTech <= RADIO_TECHNOLOGY_NR; radioTech++) {
         int32_t protocolTech = 1 << radioTech;
-        if ((tech & protocolTech) == 1) {
+        if ((tech & protocolTech) != 0) {
             radioProtocolTech |= protocolTech;
         }
     }
