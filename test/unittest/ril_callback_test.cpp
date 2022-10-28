@@ -32,7 +32,8 @@ enum class RatType {
     NETWORK_TYPE_NR
 };
 
-void RilCallbackTest::PrintResponseInfo(const std::string &method, const RilRadioResponseInfo &responseInfo) {
+void RilCallbackTest::PrintResponseInfo(const std::string &method, const RilRadioResponseInfo &responseInfo)
+{
     cout << "-------------" << method << "-------------" << endl
          << "[responseInfo] ----> [slotId]: " << responseInfo.slotId << " ----> [serial]: " << responseInfo.serial
          << " ----> [error]: " << static_cast<int>(responseInfo.error) << endl;
