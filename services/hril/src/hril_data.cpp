@@ -150,11 +150,11 @@ int32_t HRilData::SendDataPerformanceMode(
 
 int32_t HRilData::SendDataSleepMode(int32_t serialId, const OHOS::HDI::Ril::V1_0::DataSleepInfo &dataSleepInfo)
 {
-   HRilDataSleepInfo hrilDataSleepInfo;
-   hrilDataSleepInfo.sleepEnable = dataSleepInfo.sleepEnable;
-   TELEPHONY_LOGI("SendDataSleepMode: sleepEnable=%{public}d", hrilDataSleepInfo.sleepEnable);
-   return RequestVendor(
-       serialId, HREQ_DATA_SEND_DATA_SLEEP_MODE, dataFuncs_, &HRilDataReq::SendDataSleepMode, &hrilDataSleepInfo);
+    HRilDataSleepInfo hrilDataSleepInfo;
+    hrilDataSleepInfo.sleepEnable = dataSleepInfo.sleepEnable;
+    TELEPHONY_LOGI("SendDataSleepMode: sleepEnable=%{public}d", hrilDataSleepInfo.sleepEnable);
+    return RequestVendor(
+        serialId, HREQ_DATA_SEND_DATA_SLEEP_MODE, dataFuncs_, &HRilDataReq::SendDataSleepMode, &hrilDataSleepInfo);
 }
 
 int32_t HRilData::SetDataProfileInfo(int32_t serialId, const OHOS::HDI::Ril::V1_0::DataProfilesInfo &dataProfilesInfo)
