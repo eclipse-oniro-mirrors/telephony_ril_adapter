@@ -745,14 +745,14 @@ void HRilSim::BuildRadioProtocol(HDI::Ril::V1_0::RadioProtocol &radioProtocol, c
 
 int32_t HRilSim::ConvertRadioProtocolTech(int32_t tech)
 {
-    int32_t radioProtocolTech = HRIL_RADIO_PROTOCOL_TECH_UNKNOWN;
-    for (int32_t radioTech = RADIO_TECHNOLOGY_GSM; radioTech <= RADIO_TECHNOLOGY_NR; radioTech++) {
-        int32_t protocolTech = 1 << radioTech;
-        if ((tech & protocolTech) == 1) {
+    uint32_t radioProtocolTech = HRIL_RADIO_PROTOCOL_TECH_UNKNOWN;
+    for (uint32_t radioTech = RADIO_TECHNOLOGY_GSM; radioTech <= RADIO_TECHNOLOGY_NR; radioTech++) {
+        uint32_t protocolTech = 1 << radioTech;
+        if ((static_cast<uint32_t>(tech) & protocolTech) != 0) {
             radioProtocolTech |= protocolTech;
         }
     }
-    return radioProtocolTech;
+    return static_cast<int32_t>(radioProtocolTech);
 }
 } // namespace Telephony
 } // namespace OHOS
