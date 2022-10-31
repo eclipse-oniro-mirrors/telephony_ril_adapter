@@ -183,7 +183,7 @@ typedef enum {
 
 enum class TestMenu : int32_t { NONE = -1, EXIT, MODEM, CALL, NETWORK, SIM, DATA, SMS, STRESS };
 
-static int32_t InputInt32(int32_t start, int32_t end, string title)
+static int32_t InputInt32(int32_t start, int32_t end, const string &title)
 {
     int32_t choice;
     bool firstFlg = true;
@@ -1670,9 +1670,9 @@ int32_t main()
     RilInterfaceTest rilInterfaceTest;
     rilInterfaceTest.OnInitInterface();
     bool loopFlag = true;
-    int32_t mWhat = static_cast<int32_t>(TestMenu::NONE);
-    int32_t module = static_cast<int32_t>(TestMenu::NONE);
     while (loopFlag) {
+        int32_t mWhat = static_cast<int32_t>(TestMenu::NONE);
+        int32_t module = static_cast<int32_t>(TestMenu::NONE);
         module = PrintMenu();
         mWhat = SwitchMenu(static_cast<TestMenu>(module), &loopFlag);
         if (mWhat <= 0) {

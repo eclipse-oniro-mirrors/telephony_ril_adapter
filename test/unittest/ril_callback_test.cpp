@@ -1006,7 +1006,7 @@ int32_t RilCallbackTest::PdpContextListUpdated(
 {
     PrintResponseInfo("PdpContextListUpdated", responseInfo);
     cout << "[dataCallResultList] -->[size] : " << dataCallResultList.size << endl;
-    for (auto &setupDataCallResultInfo : dataCallResultList.dcList) {
+    for (const auto &setupDataCallResultInfo : dataCallResultList.dcList) {
         cout << "[setupDataCallResultInfo] -->[flag] : " << setupDataCallResultInfo.flag << endl;
         cout << "[setupDataCallResultInfo] -->[reason] : " << setupDataCallResultInfo.reason << endl;
         cout << "[setupDataCallResultInfo] -->[retryTime] : " << setupDataCallResultInfo.retryTime << endl;
@@ -1061,7 +1061,7 @@ int32_t RilCallbackTest::GetPdpContextListResponse(
 {
     PrintResponseInfo("GetPdpContextListResponse", responseInfo);
     cout << "[dataCallResultList] -->[size] : " << dataCallResultList.size << endl;
-    for (auto &setupDataCallResultInfo : dataCallResultList.dcList) {
+    for (const auto &setupDataCallResultInfo : dataCallResultList.dcList) {
         cout << "[setupDataCallResultInfo] -->[flag] : " << setupDataCallResultInfo.flag << endl;
         cout << "[setupDataCallResultInfo] -->[reason] : " << setupDataCallResultInfo.reason << endl;
         cout << "[setupDataCallResultInfo] -->[retryTime] : " << setupDataCallResultInfo.retryTime << endl;
