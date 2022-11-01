@@ -120,7 +120,7 @@ static int32_t ParseSimPinInputTimesResult(char *pLine, HRilPinInputTimes *pinIn
     }
     err = NextInt(&pLine, &pinInputTimes->times);
     size_t atProlen = 0;
-    if (err != 0 && strlen(pLine) <= atProlen) {
+    if (err != 0 && strlen(pLine) == atProlen) {
         return err;
     }
     err = NextInt(&pLine, &pinInputTimes->pukTimes);

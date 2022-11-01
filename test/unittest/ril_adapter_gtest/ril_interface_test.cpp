@@ -71,9 +71,10 @@ void RilInterfaceTest::TearDown() {}
 HWTEST_F(RilInterfaceTest, CheckRilInstanceIsEmpty, Function | MediumTest | Level1)
 {
     g_rilInterface = IRil::Get();
-    if (g_rilInterface != nullptr) {
-        g_rilInterface->SetCallback(&g_callback);
+    if (g_rilInterface == nullptr) {
+        return;
     }
+    g_rilInterface->SetCallback(&g_callback);
 }
 
 HWTEST_F(RilInterfaceTest, SendRilAck, Function | MediumTest | Level1)
