@@ -21,6 +21,8 @@
 #include "vendor_adapter.h"
 #include "vendor_report.h"
 
+static const int32_t ERR = -1;
+
 static int32_t GetSimType(void)
 {
     char *pLine = NULL;
@@ -79,7 +81,7 @@ static int32_t GetSimState(char *pLine, char *pResult, ResponseInfo *pResponse)
 static int32_t ParseSimResponseResult(char *pLine, HRilSimIOResponse *pSimResponse)
 {
     if (pSimResponse == NULL) {
-        return -1;
+        return ERR;
     }
     int32_t err = SkipATPrefix(&pLine);
     if (err != 0) {

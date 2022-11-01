@@ -699,6 +699,7 @@ void HRilCall::CopyToHRilEmergencyInfoArray(
             emergencyInfoCalls[i].eccNum = eccNum;
         } else {
             delete[] eccNum;
+            eccNum = nullptr;
         }
         emergencyInfoCalls[i].category = static_cast<int32_t>(call.eccType);
         emergencyInfoCalls[i].simpresent = call.simpresent;
@@ -707,6 +708,7 @@ void HRilCall::CopyToHRilEmergencyInfoArray(
             emergencyInfoCalls[i].mcc = mcc;
         } else {
             delete[] mcc;
+            mcc = nullptr;
         }
         emergencyInfoCalls[i].abnormalService = call.abnormalService;
     }

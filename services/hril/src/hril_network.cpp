@@ -572,7 +572,8 @@ void HRilNetwork::BuildOperatorList(
     size_t numStrings = responseLen / sizeof(AvailableOperInfo *);
     HDI::Ril::V1_0::AvailableNetworkInfo operInfo = {};
     availableNetworkList.itemNum = numStrings;
-    TELEPHONY_LOGI("BuildOperatorList availableNetworkList.itemNum: %{public}lu", (unsigned long)numStrings);
+    TELEPHONY_LOGI(
+        "BuildOperatorList availableNetworkList.itemNum: %{public}lu", static_cast<unsigned long>(numStrings));
     for (size_t i = 0; i < numStrings; i++) {
         AvailableOperInfo *curPtr = ((AvailableOperInfo **)response)[i];
         if (curPtr != nullptr) {
