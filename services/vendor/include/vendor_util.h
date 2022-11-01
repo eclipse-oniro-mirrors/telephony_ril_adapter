@@ -43,9 +43,9 @@ typedef enum {
 } VendorErrorType;
 
 typedef enum {
-    AT_RESPONSE_INCORRECT_PASSWORD = 16,
-    AT_RESPONSE_SIM_FAILURE = 13,
     AT_RESPONSE_SIM_PIN_REQUIRE = 11,
+    AT_RESPONSE_SIM_FAILURE = 13,
+    AT_RESPONSE_INCORRECT_PASSWORD = 16,
 } ATPesponseCMEErr;
 
 int32_t GenerateCommand(char *buffer, size_t bufferLen, const char *fmt, ...);
