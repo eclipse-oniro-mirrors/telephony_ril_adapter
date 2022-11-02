@@ -147,13 +147,13 @@ static void RunningLockCallback(uint8_t *param)
         TELEPHONY_LOGE("check nullptr fail.");
         return;
     }
-    int serialNum = *((int *)param);
+    int serialNum = static_cast<int>(*param);
     delete param;
     param = nullptr;
     std::lock_guard<std::mutex> lockRequest(g_manager->mutexRunningLock_);
     TELEPHONY_LOGI("RunningLockCallback, serialNum:%{public}d, runningSerialNum_:%{public}d", serialNum,
-        (int)g_manager->runningSerialNum_);
-    if (g_manager->powerInterface_ == nullptr || serialNum != (int)g_manager->runningSerialNum_) {
+        static_cast<int>(g_manager->runningSerialNum_));
+    if (g_manager->powerInterface_ == nullptr || serialNum != static_cast<int>(g_manager->runningSerialNum_)) {
         return;
     }
     g_manager->runningLockCount_ = 0;
@@ -174,10 +174,10 @@ void HRilManager::ApplyRunningLock(void)
         struct timeval tv = { 0, RUNNING_LOCK_DEFAULT_TIMEOUT_US };
         runningLockCount_++;
         runningSerialNum_++;
-        int *serialNum = new int((int)runningSerialNum_);
-        timerCallback_->HRilSetTimerCallbackInfo(RunningLockCallback, (uint8_t *)serialNum, &tv);
+        uint8_t *serialNum = new uint8_t(static_cast<uint8_t>(runningSerialNum_));
+        timerCallback_->HRilSetTimerCallbackInfo(RunningLockCallback, serialNum, &tv);
         TELEPHONY_LOGI("ApplyRunningLock, runningLockCount_:%{public}d, runningSerialNum_:%{public}d",
-            (int)runningLockCount_, (int)runningSerialNum_);
+            static_cast<int>(runningLockCount_), static_cast<int>(runningSerialNum_));
     } else {
         /* Since the power management subsystem starts slower than the RilAdapter,
          * the wakelock needs to be recreated.
@@ -193,7 +193,7 @@ void HRilManager::ApplyRunningLock(void)
 void HRilManager::ReleaseRunningLock(void)
 {
     std::lock_guard<std::mutex> lockRequest(mutexRunningLock_);
-    TELEPHONY_LOGI("ReleaseRunningLock, runningLockCount_:%{public}d", (int)runningLockCount_);
+    TELEPHONY_LOGI("ReleaseRunningLock, runningLockCount_:%{public}d", static_cast<int>(runningLockCount_));
     if (powerInterface_ == nullptr) {
         TELEPHONY_LOGE("powerInterface_ is nullptr");
         return;
@@ -217,7 +217,7 @@ void HRilManager::OnReport(std::vector<std::unique_ptr<T>> &subModules, int32_t 
     }
     TELEPHONY_LOGI("OnReport notifyId:%{public}d", reportInfo->notifyId);
     switch (reportInfo->type) {
-        case (int32_t)ReportType::HRIL_RESPONSE: {
+        case static_cast<int32_t>(ReportType::HRIL_RESPONSE): {
             ReqDataInfo *reqInfo = (ReqDataInfo *)reportInfo->requestInfo;
             if (reqInfo == nullptr) {
                 TELEPHONY_LOGE("OnReport reqInfo is null!!!");
@@ -237,7 +237,7 @@ void HRilManager::OnReport(std::vector<std::unique_ptr<T>> &subModules, int32_t 
             subModules[slotId]->template ProcessResponse<T>(requestId, responseInfo, response, responseLen);
             break;
         }
-        case (int32_t)ReportType::HRIL_NOTIFICATION: {
+        case static_cast<int32_t>(ReportType::HRIL_NOTIFICATION): {
             int32_t notifyType = HRIL_RESPONSE_NOTICE;
             auto iter = notificationMap_.find(reportInfo->notifyId);
             if (iter != notificationMap_.end()) {
@@ -333,11 +333,9 @@ int32_t HRilManager::GetCallList(int32_t slotId, int32_t serialId)
     return TaskSchedule(MODULE_HRIL_CALL, hrilCall_[slotId], &HRilCall::GetCallList, serialId);
 }
 
-int32_t HRilManager::Dial(
-    int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::DialInfo &dialInfo)
+int32_t HRilManager::Dial(int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::DialInfo &dialInfo)
 {
-    return TaskSchedule(
-        MODULE_HRIL_CALL, hrilCall_[slotId], &HRilCall::Dial, serialId, dialInfo);
+    return TaskSchedule(MODULE_HRIL_CALL, hrilCall_[slotId], &HRilCall::Dial, serialId, dialInfo);
 }
 
 int32_t HRilManager::Reject(int32_t slotId, int32_t serialId)
@@ -375,8 +373,7 @@ int32_t HRilManager::CombineConference(int32_t slotId, int32_t serialId, int32_t
     return TaskSchedule(MODULE_HRIL_CALL, hrilCall_[slotId], &HRilCall::CombineConference, serialId, callType);
 }
 
-int32_t HRilManager::SeparateConference(
-    int32_t slotId, int32_t serialId, int32_t callIndex, int32_t callType)
+int32_t HRilManager::SeparateConference(int32_t slotId, int32_t serialId, int32_t callIndex, int32_t callType)
 {
     return TaskSchedule(
         MODULE_HRIL_CALL, hrilCall_[slotId], &HRilCall::SeparateConference, serialId, callIndex, callType);
@@ -476,20 +473,17 @@ int32_t HRilManager::CallSupplement(int32_t slotId, int32_t serialId, int32_t ty
     return TaskSchedule(MODULE_HRIL_CALL, hrilCall_[slotId], &HRilCall::CallSupplement, serialId, type);
 }
 
-int32_t HRilManager::SendDtmf(
-    int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::DtmfInfo &dtmfInfo)
+int32_t HRilManager::SendDtmf(int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::DtmfInfo &dtmfInfo)
 {
     return TaskSchedule(MODULE_HRIL_CALL, hrilCall_[slotId], &HRilCall::SendDtmf, serialId, dtmfInfo);
 }
 
-int32_t HRilManager::StartDtmf(
-    int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::DtmfInfo &dtmfInfo)
+int32_t HRilManager::StartDtmf(int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::DtmfInfo &dtmfInfo)
 {
     return TaskSchedule(MODULE_HRIL_CALL, hrilCall_[slotId], &HRilCall::StartDtmf, serialId, dtmfInfo);
 }
 
-int32_t HRilManager::StopDtmf(
-    int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::DtmfInfo &dtmfInfo)
+int32_t HRilManager::StopDtmf(int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::DtmfInfo &dtmfInfo)
 {
     return TaskSchedule(MODULE_HRIL_CALL, hrilCall_[slotId], &HRilCall::StopDtmf, serialId, dtmfInfo);
 }
@@ -497,8 +491,7 @@ int32_t HRilManager::StopDtmf(
 int32_t HRilManager::SetBarringPassword(
     int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::SetBarringInfo &setBarringInfo)
 {
-    return TaskSchedule(
-        MODULE_HRIL_CALL, hrilCall_[slotId], &HRilCall::SetBarringPassword, serialId, setBarringInfo);
+    return TaskSchedule(MODULE_HRIL_CALL, hrilCall_[slotId], &HRilCall::SetBarringPassword, serialId, setBarringInfo);
 }
 
 // Data

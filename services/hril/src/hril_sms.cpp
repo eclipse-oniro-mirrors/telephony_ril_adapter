@@ -20,10 +20,13 @@
 
 namespace OHOS {
 namespace Telephony {
+namespace {
 const size_t HEX_WIDTH = 2;
 const size_t MAX_PDU_LEN = 255;
 const size_t MAX_LEN = 100;
 const size_t MAX_CHN_LEN = 50000;
+const int32_t MSG_DEFAULT_INDEX = -1;
+} // namespace
 
 HRilSms::HRilSms(int32_t slotId, IHRilReporter &hrilReporter) : HRilBase(slotId, hrilReporter)
 {
@@ -85,7 +88,7 @@ int32_t HRilSms::AddSimMessage(int32_t serialId, const OHOS::HDI::Ril::V1_0::Sms
 {
     HRilSmsWriteSms msg = {};
     msg.state = message.state;
-    msg.index = -1;
+    msg.index = MSG_DEFAULT_INDEX;
     size_t pduLen = message.pdu.length();
     if (pduLen > MAX_PDU_LEN) {
         return HRIL_ERR_INVALID_PARAMETER;
@@ -489,7 +492,7 @@ int32_t HRilSms::NewSmsStoredOnSimNotify(
         return HRIL_ERR_SUCCESS;
     }
     int32_t recordNumber = *(static_cast<const int32_t *>(response));
-    indType = (int32_t)ConvertIntToRadioNoticeType(indType);
+    indType = static_cast<int32_t>(ConvertIntToRadioNoticeType(indType));
     return Notify(indType, error, &HDI::Ril::V1_0::IRilCallback::NewSmsStoredOnSimNotify, recordNumber, indType);
 }
 
@@ -572,7 +575,7 @@ int32_t HRilSms::RequestWithInts(int32_t **p, ReqDataInfo *requestInfo, int32_t 
     *p = static_cast<int32_t *>(malloc(argCount * len));
     if (*p == nullptr) {
         TELEPHONY_LOGE("req: [%{public}d,%{public}d,%{public}d], malloc fail", requestInfo->serial,
-            (int32_t)requestInfo->slotId, requestInfo->request);
+            static_cast<int32_t>(requestInfo->slotId), requestInfo->request);
         return false;
     }
     if (memset_s(*p, argCount * len, 0, argCount * len) != EOK) {
@@ -601,12 +604,13 @@ int32_t HRilSms::RequestWithStrings(int32_t serial, int32_t request, int32_t cou
     if (count <= 0) {
         return HRIL_ERR_NULL_POINT;
     }
-    pBuff = (char **)malloc(count * sizeof(int8_t));
+    int32_t len = count * sizeof(char) + 1;
+    pBuff = (char **)malloc(len);
     if (pBuff == nullptr) {
         TELEPHONY_LOGE("req: [%{public}d,%{public}d], malloc fail", serial, request);
         return HRIL_ERR_NULL_POINT;
     }
-    if (memset_s(*pBuff, count * sizeof(int8_t), 0, count * sizeof(int8_t)) != EOK) {
+    if (memset_s(*pBuff, len, 0, len) != EOK) {
         TELEPHONY_LOGE("RequestWithInts memset_s failed");
         SafeFrees(*pBuff);
         return false;
