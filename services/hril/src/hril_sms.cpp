@@ -110,7 +110,7 @@ int32_t HRilSms::AddSimMessage(int32_t serialId, const OHOS::HDI::Ril::V1_0::Sms
 int32_t HRilSms::DelSimMessage(int32_t serialId, int32_t index)
 {
     if ((smsFuncs_ == nullptr) || (smsFuncs_->DelSimMessage == nullptr)) {
-        TELEPHONY_LOGE("DelSimMessage::smsFuncs_:%{public}p", smsFuncs_);
+        TELEPHONY_LOGE("smsFuncs_ or smsFuncs_->DelSimMessage is null");
         return HRIL_ERR_NULL_POINT;
     }
     ReqDataInfo *requestInfo = CreateHRilRequest(serialId, HREQ_SMS_DEL_SIM_MESSAGE);
@@ -197,7 +197,7 @@ int32_t HRilSms::SetCdmaCBConfig(
     int32_t serialId, const OHOS::HDI::Ril::V1_0::CdmaCBConfigInfoList &cellBroadcastInfoList)
 {
     if ((smsFuncs_ == nullptr) || (smsFuncs_->SetCdmaCBConfig == nullptr)) {
-        TELEPHONY_LOGE("SetCdmaCBConfig::smsFuncs_:%{public}p", smsFuncs_);
+        TELEPHONY_LOGE("(smsFuncs_ or msFuncs_->SetCdmaCBConfig is null");
         return HRIL_ERR_NULL_POINT;
     }
     ReqDataInfo *requestInfo = CreateHRilRequest(serialId, HREQ_SMS_SET_CDMA_CB_CONFIG);
@@ -226,7 +226,7 @@ int32_t HRilSms::SendSmsMoreMode(int32_t serialId, const OHOS::HDI::Ril::V1_0::G
 int32_t HRilSms::SendSmsAck(int32_t serialId, const OHOS::HDI::Ril::V1_0::ModeData &modeData)
 {
     if ((smsFuncs_ == nullptr) || (smsFuncs_->SendSmsAck == nullptr)) {
-        TELEPHONY_LOGE("SendSmsAck::smsFuncs_:%{public}p", smsFuncs_);
+        TELEPHONY_LOGE("smsFuncs_ or smsFuncs_->SendSmsAck is null");
         return HRIL_ERR_NULL_POINT;
     }
     ReqDataInfo *requestInfo = CreateHRilRequest(serialId, HREQ_SMS_SEND_SMS_ACK);
@@ -266,7 +266,7 @@ int32_t HRilSms::AddCdmaSimMessage(int32_t serialId, const OHOS::HDI::Ril::V1_0:
 int32_t HRilSms::DelCdmaSimMessage(int32_t serialId, int32_t index)
 {
     if ((smsFuncs_ == nullptr) || (smsFuncs_->DelCdmaSimMessage == nullptr)) {
-        TELEPHONY_LOGE("DelCdmaSimMessage::smsFuncs_:%{public}p", smsFuncs_);
+        TELEPHONY_LOGE("smsFuncs_ or smsFuncs_->DelCdmaSimMessage is null");
         return HRIL_ERR_NULL_POINT;
     }
     ReqDataInfo *requestInfo = CreateHRilRequest(serialId, HREQ_SMS_DEL_CDMA_SIM_MESSAGE);
@@ -597,7 +597,7 @@ int32_t HRilSms::RequestWithInts(int32_t **p, ReqDataInfo *requestInfo, int32_t 
 int32_t HRilSms::RequestWithStrings(int32_t serial, int32_t request, int32_t count, ...)
 {
     if ((smsFuncs_ == nullptr) || (smsFuncs_->SendGsmSms == nullptr)) {
-        TELEPHONY_LOGE("SendGsmSms::smsFuncs_:%{public}p", smsFuncs_);
+        TELEPHONY_LOGE("smsFuncs_ or smsFuncs_->SendGsmSms is null");
         return HRIL_ERR_NULL_POINT;
     }
     char **pBuff = nullptr;

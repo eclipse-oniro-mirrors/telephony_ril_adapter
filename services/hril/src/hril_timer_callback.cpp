@@ -48,7 +48,7 @@ void HRilTimerCallback::TimerCallback(int32_t fd, int16_t events, std::shared_pt
     if (pCbMsg->func != nullptr) {
         pCbMsg->func(pCbMsg->param);
     } else {
-        TELEPHONY_LOGE("HRilTimerCallbackMessage func is nullptr addr:%{public}p", pCbMsg->func);
+        TELEPHONY_LOGE("HRilTimerCallbackMessage func is nullptr");
     }
 }
 
