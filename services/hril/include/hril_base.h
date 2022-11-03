@@ -107,7 +107,7 @@ int32_t HRilBase::RequestVendor(
     int32_t serial, int32_t requestId, ReqFuncSet reqFuncSet, FuncPointer func, ValueTypes &&... vals)
 {
     if (reqFuncSet == nullptr || (reqFuncSet->*func) == nullptr) {
-        TELEPHONY_LOGE("it is null: func set=%{public}p", reqFuncSet);
+        TELEPHONY_LOGE("reqFunSet or reqFuncSet->*fun is null");
         if (callback_ == nullptr) {
             TELEPHONY_LOGE("callback is null");
             return HRIL_ERR_NULL_POINT;

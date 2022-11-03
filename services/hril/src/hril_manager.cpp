@@ -972,7 +972,7 @@ void HRilRegOps(const HRilOps *hrilOps)
 void OnCallReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen)
 {
     if (g_manager == nullptr) {
-        TELEPHONY_LOGE("HrilManager is nullptr, id:%{public}d, addr:%{public}p!", slotId, &g_manager);
+        TELEPHONY_LOGE("HrilManager is nullptr, id:%{public}d", slotId);
         return;
     }
     g_manager->OnCallReport(slotId, &reportInfo, response, responseLen);
@@ -981,7 +981,7 @@ void OnCallReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *r
 void OnDataReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen)
 {
     if (g_manager == nullptr) {
-        TELEPHONY_LOGE("HrilManager is nullptr, id:%{public}d, addr:%{public}p!", slotId, &g_manager);
+        TELEPHONY_LOGE("HrilManager is nullptr, id:%{public}d", slotId);
         return;
     }
     g_manager->OnDataReport(slotId, &reportInfo, response, responseLen);
@@ -990,7 +990,7 @@ void OnDataReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *r
 void OnModemReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen)
 {
     if (g_manager == nullptr) {
-        TELEPHONY_LOGE("HrilManager is nullptr, id:%{public}d, addr:%{public}p!", slotId, &g_manager);
+        TELEPHONY_LOGE("HrilManager is nullptr, id:%{public}d", slotId);
         return;
     }
     g_manager->OnModemReport(slotId, &reportInfo, response, responseLen);
@@ -999,7 +999,7 @@ void OnModemReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *
 void OnNetworkReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen)
 {
     if (g_manager == nullptr) {
-        TELEPHONY_LOGE("HrilManager is nullptr, id:%{public}d, addr:%{public}p!", slotId, &g_manager);
+        TELEPHONY_LOGE("HrilManager is nullptr, id:%{public}d", slotId);
         return;
     }
     g_manager->OnNetworkReport(slotId, &reportInfo, response, responseLen);
@@ -1008,7 +1008,7 @@ void OnNetworkReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t
 void OnSimReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen)
 {
     if (g_manager == nullptr) {
-        TELEPHONY_LOGE("HrilManager is nullptr, id:%{public}d, addr:%{public}p!", slotId, &g_manager);
+        TELEPHONY_LOGE("HrilManager is nullptr, id:%{public}d", slotId);
         return;
     }
     g_manager->OnSimReport(slotId, &reportInfo, response, responseLen);
@@ -1017,7 +1017,7 @@ void OnSimReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *re
 void OnSmsReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen)
 {
     if (g_manager == nullptr) {
-        TELEPHONY_LOGE("HrilManager is nullptr, id:%{public}d, addr:%{public}p!", slotId, &g_manager);
+        TELEPHONY_LOGE("HrilManager is nullptr, id:%{public}d", slotId);
         return;
     }
     g_manager->OnSmsReport(slotId, &reportInfo, response, responseLen);
@@ -1026,7 +1026,7 @@ void OnSmsReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *re
 void OnTimerCallback(HRilCallbackFun func, uint8_t *param, const struct timeval *tv)
 {
     if (g_manager == nullptr || g_manager->timerCallback_ == nullptr) {
-        TELEPHONY_LOGE("HrilManager or timerCallback is nullptr, addr:%{public}p!", &g_manager);
+        TELEPHONY_LOGE("HrilManager or timerCallback is nullptr");
         return;
     }
     g_manager->timerCallback_->HRilSetTimerCallbackInfo(func, param, tv);
