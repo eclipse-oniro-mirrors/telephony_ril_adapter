@@ -86,7 +86,7 @@ HWTEST_F(RilInterfaceTest, SendRilAck, Function | MediumTest | Level1)
     EXPECT_EQ(SUCCESS, ret);
 }
 
-HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetSimStatus_V1_0100, Function | MediumTest | Level3)
+HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetSimStatus_V1_0100, Function | MediumTest | Level2)
 {
     if (g_rilInterface == nullptr) {
         return;
@@ -97,7 +97,7 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetSimStatus_V1_0100, Function
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SIM_GET_SIM_STATUS));
 }
 
-HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetSimStatus_V1_0200, Function | MediumTest | Level3)
+HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetSimStatus_V1_0200, Function | MediumTest | Level2)
 {
     if (g_rilInterface == nullptr) {
         return;
@@ -195,7 +195,7 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetCallList_V1_0200, Function 
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_GET_CALL_LIST));
 }
 
-HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_Dial_V1_0100, Function | MediumTest | Level3)
+HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_Dial_V1_0100, Function | MediumTest | Level2)
 {
     if (!IsReady(SLOTID_1)) {
         return;
@@ -209,7 +209,7 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_Dial_V1_0100, Function | Mediu
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_DIAL));
 }
 
-HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_Dial_V1_0200, Function | MediumTest | Level3)
+HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_Dial_V1_0200, Function | MediumTest | Level2)
 {
     if (!IsReady(SLOTID_2)) {
         return;
@@ -2751,7 +2751,7 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SendSmsAck_V1_0200, Function |
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SMS_SEND_SMS_ACK));
 }
 
-HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SendGsmSms_V1_0100, Function | MediumTest | Level3)
+HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SendGsmSms_V1_0100, Function | MediumTest | Level2)
 {
     if (!IsReady(SLOTID_1)) {
         return;
@@ -2765,7 +2765,7 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SendGsmSms_V1_0100, Function |
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SMS_SEND_GSM_SMS));
 }
 
-HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SendGsmSms_V1_0200, Function | MediumTest | Level3)
+HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SendGsmSms_V1_0200, Function | MediumTest | Level2)
 {
     if (!IsReady(SLOTID_2)) {
         return;
