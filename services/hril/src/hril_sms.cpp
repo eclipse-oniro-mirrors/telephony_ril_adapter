@@ -358,7 +358,7 @@ int32_t HRilSms::GetSmscAddrResponse(
         } else {
             result.address = std::string(address->address);
         }
-        TELEPHONY_LOGE("result address:%{public}s, tosca:%{public}d", result.address.c_str(), result.tosca);
+        TELEPHONY_LOGD("result address:%{private}s, tosca:%{private}d", result.address.c_str(), result.tosca);
     }
     return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::GetSmscAddrResponse, result);
 }
