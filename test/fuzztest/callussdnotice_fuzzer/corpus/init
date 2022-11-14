@@ -13,10 +13,7 @@
  * limitations under the License.
  */
 
-#ifndef NEWSMSNOTIFY_FUZZER_H
-#define NEWSMSNOTIFY_FUZZER_H
-
-#define FUZZ_PROJECT_NAME "newsmsnotify_fuzzer"
-
-#endif // NEWSMSNOTIFY_FUZZER_H
-
+/*
+ * corpus is necessary
+ */
+FUZZ
