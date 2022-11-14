@@ -13,10 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef NEWSMSNOTIFY_FUZZER_H
-#define NEWSMSNOTIFY_FUZZER_H
+#ifndef CALLUSSDNOTICE_FUZZER_H
+#define CALLUSSDNOTICE_FUZZER_H
 
-#define FUZZ_PROJECT_NAME "newsmsnotify_fuzzer"
+#define FUZZ_PROJECT_NAME "callussdnotice_fuzzer"
 
-#endif // NEWSMSNOTIFY_FUZZER_H
-
+#endif // CALLUSSDNOTICE_FUZZER_H
