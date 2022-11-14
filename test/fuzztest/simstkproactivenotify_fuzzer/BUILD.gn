@@ -1,0 +1,71 @@
+# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+#####################hydra-fuzz###################
+import("//base/telephony/core_service/telephony.gni")
+import("//build/config/features.gni")
+import("//build/ohos.gni")
+import("//build/test.gni")
+
+##############################fuzztest##########################################
+ohos_fuzztest("SimStkProactiveNotifyFuzzTest") {
+  module_output_path = "ril_adapter/SimStkProactiveNotifyFuzzTest"
+  module_out_path = module_output_path
+  fuzz_config_file =
+      "//base/telephony/ril_adapter/test/fuzztest/simstkproactivenotify_fuzzer"
+  include_dirs = [ "//base/telephony/ril_adapter/services/hril/include" ]
+
+  configs = [ "//base/telephony/ril_adapter/utils:utils_config" ]
+
+  deps = [
+    "//base/telephony/ril_adapter/interfaces/innerkits:hril_innerkits",
+    "//base/telephony/ril_adapter/services/hril:hril",
+    "//drivers/hdf_core/adapter/uhdf2/host:libhdf_host",
+    "//drivers/hdf_core/adapter/uhdf2/ipc:libhdf_ipc_adapter",
+    "//drivers/hdf_core/adapter/uhdf2/utils:libhdf_utils",
+  ]
+
+  external_deps = [
+    "drivers_interface_power:libpower_proxy_1.0",
+    "drivers_interface_ril:ril_idl_headers",
+    "ipc:ipc_core",
+    "samgr:samgr_proxy",
+  ]
+  defines += [
+    "TELEPHONY_LOG_TAG = \"RilAdapterFuzzTest\"",
+    "LOG_DOMAIN = 0xD000F00",
+  ]
+  cflags = [
+    "-g",
+    "-O0",
+    "-Wno-unused-variable",
+    "-fno-omit-frame-pointer",
+  ]
+  sources = [ "simstkproactivenotify_fuzzer.cpp" ]
+  if (is_standard_system) {
+    external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
+  } else {
+    external_deps += [ "hilog:libhilog" ]
+  }
+}
+
+###############################################################################
+group("fuzztest") {
+  testonly = true
+  deps = []
+  deps += [
+    # deps file
+    ":SimStkProactiveNotifyFuzzTest",
+  ]
+}
+###############################################################################

@@ -19,4 +19,8 @@ group("fuzztest") {
   deps = []
 
   deps += [ "newsmsnotify_fuzzer:fuzztest" ]
+  deps += [ "callussdnotice_fuzzer:fuzztest" ]
+  deps += [ "callemergencynotice_fuzzer:fuzztest" ]
+  deps += [ "pdpcontextlistupdated_fuzzer:fuzztest" ]
+  deps += [ "simstkproactivenotify_fuzzer:fuzztest" ]
 }
