@@ -20,51 +20,34 @@
 
 namespace OHOS {
 namespace Telephony {
-struct OperatorInfoResult : public HrilBaseParcel {
+struct OperatorInfoResult {
     std::string longName;
     std::string shortName;
     std::string numeric;
-
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<OperatorInfoResult> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
-struct AvailableNetworkInfo : public HrilBaseParcel {
+struct AvailableNetworkInfo {
     std::string longName;
     std::string shortName;
     std::string numeric;
     int32_t status;
     int32_t rat;
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<AvailableNetworkInfo> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
-struct AvailableNetworkList : public HrilBaseParcel {
+struct AvailableNetworkList {
     int32_t itemNum;
     std::vector<AvailableNetworkInfo> availableNetworkInfo;
     int64_t flag;
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<AvailableNetworkList> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
-struct SetNetworkModeInfo : public HrilBaseParcel {
+struct SetNetworkModeInfo {
     int32_t selectMode;
     std::string oper; /* Operator information */
     int64_t flag;
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<SetNetworkModeInfo> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
 /* Voice registration status results */
-struct CsRegStatusInfo : public HrilBaseParcel {
+struct CsRegStatusInfo {
     int32_t notifyType; /* The notifyType,Indicate the content of the notification */
     HRilRegStatus regStatus; /* The corresponding valid registration states are NOT_REG_MT_NOT_SEARCHING_OP,
                               * "REG_MT_HOME, NOT_REG_MT_SEARCHING_OP, REG_DENIED,  UNKNOWN, REG_ROAMING". */
@@ -72,13 +55,9 @@ struct CsRegStatusInfo : public HrilBaseParcel {
     int32_t cellId;
     HRilRadioTech radioTechnology; /* Available voice radio technology, RMS defined by radio technology */
     int64_t flag; /* flag, Used by search network manager in response */
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<CsRegStatusInfo> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
-struct PsRegStatusResultInfo : public HrilBaseParcel {
+struct PsRegStatusResultInfo {
     int32_t notifyType; /* The notifyType,Indicate the content of the notification */
     HRilRegStatus regStatus; /* valid when are is ITE UNKNOWN REG = REG, otherwise it defined in RegStatus */
     int32_t lacCode;
@@ -88,13 +67,9 @@ struct PsRegStatusResultInfo : public HrilBaseParcel {
     bool isEnDcAvailable;
     bool isDcNrRestricted;
     int64_t flag; /* flag, Used by search network manager in response */
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<PsRegStatusResultInfo> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
-struct PhysicalChannelConfig : public HrilBaseParcel {
+struct PhysicalChannelConfig {
     HRilCellConnectionStatus cellConnStatus;
     HRilRadioTech ratType;
     int32_t cellBandwidthDownlinkKhz;
@@ -105,20 +80,12 @@ struct PhysicalChannelConfig : public HrilBaseParcel {
     int32_t physicalCellId;
     int32_t contextIdNum;
     std::vector<int32_t> contextIds;
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<PhysicalChannelConfig> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
-struct ChannelConfigInfoList : public HrilBaseParcel {
+struct ChannelConfigInfoList {
     int32_t itemNum;
     std::vector<PhysicalChannelConfig> channelConfigInfos;
     int64_t flag; /* flag, Used by search network manager in response */
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<ChannelConfigInfoList> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
 typedef struct {
@@ -185,7 +152,7 @@ typedef struct {
     int64_t nci;
 } CellRatNr;
 
-struct CurrentCellInfo : public HrilBaseParcel {
+struct CurrentCellInfo {
     int32_t ratType;
     int32_t mcc;
     int32_t mnc;
@@ -198,34 +165,11 @@ struct CurrentCellInfo : public HrilBaseParcel {
         CellRatTdscdma tdscdma;
         CellRatNr nr;
     } ServiceCellParas;
-
-    bool ReadRayTypeGsmParcel(Parcel &parcel);
-    bool ReadRayTypeLteParcel(Parcel &parcel);
-    bool ReadRayTypeWcdmaParcel(Parcel &parcel);
-    bool ReadRayTypeCdmaParcel(Parcel &parcel);
-    bool ReadRayTypeTdscdmaParcel(Parcel &parcel);
-    bool ReadRayTypeNrParcel(Parcel &parcel);
-    bool WriteRayTypeGsmParcel(Parcel &parcel) const;
-    bool WriteRayTypeLteParcel(Parcel &parcel) const;
-    bool WriteRayTypeWcdmaParcel(Parcel &parcel) const;
-    bool WriteRayTypeCdmaParcel(Parcel &parcel) const;
-    bool WriteRayTypeTdscdmaParcel(Parcel &parcel) const;
-    bool WriteRayTypeNrParcel(Parcel &parcel) const;
-
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<CurrentCellInfo> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
-struct CellListCurrentInfo : public HrilBaseParcel {
+struct CellListCurrentInfo {
     int32_t itemNum;
     std::vector<CurrentCellInfo> cellCurrentInfo;
-
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<CellListCurrentInfo> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
 typedef struct {
@@ -283,7 +227,7 @@ typedef struct {
     int64_t nci;
 } CellListRatNr;
 
-struct CellNearbyInfo : public HrilBaseParcel {
+struct CellNearbyInfo {
     int32_t ratType;
 
     union {
@@ -294,43 +238,16 @@ struct CellNearbyInfo : public HrilBaseParcel {
         CellListRatTdscdma tdscdma;
         CellListRatNr nr;
     } ServiceCellParas;
-
-    bool ReadRayTypeGsmListParcel(Parcel &parcel);
-    bool ReadRayTypeLteListParcel(Parcel &parcel);
-    bool ReadRayTypeWcdmaListParcel(Parcel &parcel);
-    bool ReadRayTypeCdmaListParcel(Parcel &parcel);
-    bool ReadRayTypeTdscdmaListParcel(Parcel &parcel);
-    bool ReadRayTypeNrListParcel(Parcel &parcel);
-    bool WriteRayTypeGsmListParcel(Parcel &parcel) const;
-    bool WriteRayTypeLteListParcel(Parcel &parcel) const;
-    bool WriteRayTypeWcdmaListParcel(Parcel &parcel) const;
-    bool WriteRayTypeCdmaListParcel(Parcel &parcel) const;
-    bool WriteRayTypeTdscdmaListParcel(Parcel &parcel) const;
-    bool WriteRayTypeNrListParcel(Parcel &parcel) const;
-
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<CellNearbyInfo> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
-struct CellListNearbyInfo : public HrilBaseParcel {
+struct CellListNearbyInfo {
     int32_t itemNum;
     std::vector<CellNearbyInfo> cellNearbyInfo;
-
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<CellListNearbyInfo> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
-struct PreferredNetworkTypeInfo : public HrilBaseParcel {
+struct PreferredNetworkTypeInfo {
     int32_t preferredNetworkType;
     int64_t flag;
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<PreferredNetworkTypeInfo> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 } // namespace Telephony
 } // namespace OHOS

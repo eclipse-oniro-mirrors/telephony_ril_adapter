@@ -40,13 +40,7 @@ ohos_shared_library("hril_innerkits") {
     "$RIL_ADAPTER/utils:utils_config",
   ]
 
-  sources = [
-    "$RIL_FRAMEWORKS/hril_base_parcel.cpp",
-    "$RIL_FRAMEWORKS/hril_call_parcel.cpp",
-    "$RIL_FRAMEWORKS/hril_modem_parcel.cpp",
-    "$RIL_FRAMEWORKS/hril_network_parcel.cpp",
-    "$RIL_FRAMEWORKS/hril_sms_parcel.cpp",
-  ]
+  sources = [ "$RIL_FRAMEWORKS/hril_base_parcel.cpp" ]
 
   public_configs = [
     ":hril_config",
