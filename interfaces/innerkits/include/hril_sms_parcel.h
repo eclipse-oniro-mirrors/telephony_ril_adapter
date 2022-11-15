@@ -87,7 +87,6 @@ struct CBConfigReportInfo {
     std::string pdu;
 };
 
-
 struct SmsMessageInfo {
     int32_t indicationType;
     int32_t size;
@@ -107,8 +106,39 @@ struct SendSmsResultInfo : public HrilBaseParcel {
     std::string pdu; /* Protocol Data Unit */
     int32_t errCode;
     int64_t flag;
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
+    bool ReadFromParcel(Parcel &parcel)
+    {
+        if (!ReadBaseInt32(parcel, msgRef)) {
+            return false;
+        }
+        if (!ReadBaseString(parcel, pdu)) {
+            return false;
+        }
+        if (!ReadBaseInt32(parcel, errCode)) {
+            return false;
+        }
+        if (!ReadBaseInt64(parcel, flag)) {
+            return false;
+        }
+        return true;
+    }
+
+    bool Marshalling(Parcel &parcel) const
+    {
+        if (!WriteBaseInt32(parcel, msgRef)) {
+            return false;
+        }
+        if (!WriteBaseString(parcel, pdu)) {
+            return false;
+        }
+        if (!WriteBaseInt32(parcel, errCode)) {
+            return false;
+        }
+        if (!WriteBaseInt64(parcel, flag)) {
+            return false;
+        }
+        return true;
+    }
     std::shared_ptr<SendSmsResultInfo> UnMarshalling(Parcel &parcel);
     void Dump(std::string, int32_t);
 };
