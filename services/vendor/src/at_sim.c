@@ -893,7 +893,7 @@ void ReqGetSimPin2InputTimes(const ReqDataInfo *requestInfo)
     if (ret != 0 || (pResponse != NULL && !pResponse->success)) {
         TELEPHONY_LOGE("AT^CPIN2? send failed");
     }
-    if (pResponse->head) {
+    if (pResponse != NULL && pResponse->head != NULL) {
         pLine = pResponse->head->data;
     }
     ret = ParseSimPinInputTimesResult(pLine, &pin2InputTimes);
@@ -1246,6 +1246,11 @@ void ConvertUsimFcpToSimRsp(uint8_t **simResponse)
     uint8_t simRspByte[GET_RESPONSE_EF_SIZE_BYTES] = { 0 };
     if (fcpByte == NULL) {
         TELEPHONY_LOGE("fcpByte is NULL");
+        free(fcpByte);
+        return;
+    }
+    if (memset_s(fcpByte, fcpLen, 0, fcpLen) != EOK) {
+        TELEPHONY_LOGE("ConvertUsimFcpToSimRsp memset_s failed");
         free(fcpByte);
         return;
     }
