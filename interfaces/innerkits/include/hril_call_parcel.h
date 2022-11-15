@@ -21,57 +21,37 @@
 namespace OHOS {
 namespace Telephony {
 /* From 3GPP TS 27.007 V4.3.0 (2001-12) 7.7, AT + ATD */
-struct DialInfo : public HrilBaseParcel {
+struct DialInfo {
     int32_t serial;
     std::string address;
     int32_t clir; /* Calling Line Identification Restriction. From TS 27.007 V3.4.0 (2000-03) */
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<DialInfo> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
-struct GetClipResult : public HrilBaseParcel {
+struct GetClipResult {
     int32_t result; /* query results */
     int32_t action; /* parameter sets/shows the result code presentation status in the TA */
     int32_t clipStat; /* parameter shows the subscriber CLIP service status in the network, <0-4> */
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<GetClipResult> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
-struct GetClirResult : public HrilBaseParcel {
+struct GetClirResult {
     int32_t result; /* query results */
     int32_t action; /* parameter sets/shows the result code presentation status in the TA */
     int32_t clirStat; /* parameter shows the subscriber CLIP service status in the network, <0-4> */
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<GetClirResult> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
-struct CallWaitResult : public HrilBaseParcel {
+struct CallWaitResult {
     int32_t result; /* query results */
     int32_t status; /* parameter sets/shows the result code presentation status in the TA */
     int32_t classCw; /* parameter shows the subscriber CLIP service status in the network, <0-4> */
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<CallWaitResult> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
-struct CallRestrictionResult : public HrilBaseParcel {
+struct CallRestrictionResult {
     int32_t result; /* query results */
     int32_t status; /* parameter sets/shows the result code presentation status in the TA */
     int32_t classCw; /* parameter shows the subscriber CLIP service status in the network, <0-4> */
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<CallRestrictionResult> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
-struct CallInfo : public HrilBaseParcel {
+struct CallInfo {
     int32_t index;
     int32_t dir;
     int32_t state;
@@ -82,25 +62,15 @@ struct CallInfo : public HrilBaseParcel {
     std::string number;
     int32_t type;
     std::string alpha;
-
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<CallInfo> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
-struct CallInfoList : public HrilBaseParcel {
+struct CallInfoList {
     int32_t callSize;
     int32_t flag;
     std::vector<CallInfo> calls;
-
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<CallInfoList> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
-struct EmergencyInfo : public HrilBaseParcel {
+struct EmergencyInfo {
     int32_t index;
     int32_t total;
     std::string eccNum;
@@ -108,38 +78,23 @@ struct EmergencyInfo : public HrilBaseParcel {
     int32_t simpresent;
     std::string mcc;
     int32_t abnormalService;
-
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<EmergencyInfo> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
-struct EmergencyInfoList : public HrilBaseParcel {
+struct EmergencyInfoList {
     int32_t callSize;
     int32_t flag;
     std::vector<EmergencyInfo> calls;
-
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<EmergencyInfoList> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
-struct CallForwardSetInfo : public HrilBaseParcel {
+struct CallForwardSetInfo {
     int32_t serial;
     int32_t reason;
     int32_t mode;
     std::string number;
     int32_t classx;
-
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<CallForwardSetInfo> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
-struct CallForwardQueryResult : public HrilBaseParcel {
+struct CallForwardQueryResult {
     int32_t serial;
     int32_t result; /* query results */
     int32_t status;
@@ -148,25 +103,15 @@ struct CallForwardQueryResult : public HrilBaseParcel {
     int32_t type;
     int32_t reason;
     int32_t time;
-
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<CallForwardQueryResult> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
-struct CallForwardQueryInfoList : public HrilBaseParcel {
+struct CallForwardQueryInfoList {
     int32_t callSize;
     int32_t flag;
     std::vector<CallForwardQueryResult> calls;
-
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<CallForwardQueryInfoList> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
-struct UssdNoticeInfo : public HrilBaseParcel {
+struct UssdNoticeInfo {
     int32_t m; /* Integer value.
                             0: The network does not require a TE reply (USSD-Notify initiated by the network or TE
                             The network does not need further information after starting operation);
@@ -177,30 +122,20 @@ struct UssdNoticeInfo : public HrilBaseParcel {
                             4: The operation is not supported;
                             5: The network timed out. */
     std::string str; /* USSD string, the maximum length is 160 characters. */
-
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<UssdNoticeInfo> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
-struct SsNoticeInfo : public HrilBaseParcel {
+struct SsNoticeInfo {
     int32_t serviceType;
     int32_t requestType;
     int32_t serviceClass;
     int32_t result; /* the result of the SS request */
-
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<SsNoticeInfo> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
 /*
  * Active reporting of SRVCC status is controlled by the +CIREP command.
  * This command complies with the 3GPP TS 27.007 protocol.
  */
-struct SrvccStatus : public HrilBaseParcel {
+struct SrvccStatus {
     /*
      * SRVCC status.
      *  1: SRVCC starts;
@@ -209,25 +144,15 @@ struct SrvccStatus : public HrilBaseParcel {
      *   4: SRVCC failed.
      */
     int32_t status;
-
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<SrvccStatus> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
 /*
  * The ringback voice event reported by the modem during dialing.
  * Note: Modem private commands, not a reported field specified by the 3gpp protocol.
  */
-struct RingbackVoice : public HrilBaseParcel {
+struct RingbackVoice {
     /* 0 network alerting; 1 local alerting */
     int32_t status;
-
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<RingbackVoice> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 } // namespace Telephony
 } // namespace OHOS
