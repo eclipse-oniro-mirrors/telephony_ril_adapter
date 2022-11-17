@@ -29,7 +29,7 @@ struct UniInfo {
     std::string strTmp;
 };
 
-struct VoiceRadioTechnology : public HrilBaseParcel {
+struct VoiceRadioTechnology {
     HRilSrvStatus srvStatus;
     HRilSrvDomain srvDomain;
     HRilRoamStatus roamStatus;
@@ -44,11 +44,6 @@ struct VoiceRadioTechnology : public HrilBaseParcel {
     VoiceRadioTechnology() = default;
     VoiceRadioTechnology(const HRilVoiceRadioInfo &hrilVoiceRadioInfo);
     VoiceRadioTechnology &operator=(const HRilVoiceRadioInfo &hrilVoiceRadioInfo);
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    std::shared_ptr<VoiceRadioTechnology> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
-    virtual const char *ToString() const override;
 };
 } // namespace Telephony
 } // namespace OHOS
