@@ -68,6 +68,11 @@ void RilInterfaceTest::SetUp() {}
 
 void RilInterfaceTest::TearDown() {}
 
+/**
+ * @tc.number   CheckRilInstanceIsEmpty
+ * @tc.name     Check whether the ril instance is empty ril instance
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, CheckRilInstanceIsEmpty, Function | MediumTest | Level1)
 {
     g_rilInterface = IRil::Get();
@@ -77,6 +82,11 @@ HWTEST_F(RilInterfaceTest, CheckRilInstanceIsEmpty, Function | MediumTest | Leve
     g_rilInterface->SetCallback(&g_callback);
 }
 
+/**
+ * @tc.number   SendRilAck
+ * @tc.name     Send ril ack
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, SendRilAck, Function | MediumTest | Level1)
 {
     if (g_rilInterface == nullptr) {
@@ -86,6 +96,11 @@ HWTEST_F(RilInterfaceTest, SendRilAck, Function | MediumTest | Level1)
     EXPECT_EQ(SUCCESS, ret);
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetSimStatus_V1_0100
+ * @tc.name     Get sim status
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetSimStatus_V1_0100, Function | MediumTest | Level2)
 {
     if (g_rilInterface == nullptr) {
@@ -97,6 +112,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetSimStatus_V1_0100, Function
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SIM_GET_SIM_STATUS));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetSimStatus_V1_0200
+ * @tc.name     Get sim status
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetSimStatus_V1_0200, Function | MediumTest | Level2)
 {
     if (g_rilInterface == nullptr) {
@@ -108,7 +128,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetSimStatus_V1_0200, Function
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SIM_GET_SIM_STATUS));
 }
 
-// Call
+/**
+ * @tc.number   Telephony_DriverSystem_GetEmergencyCallList_V1_0100
+ * @tc.name     Get emergency call list
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetEmergencyCallList_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -120,6 +144,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetEmergencyCallList_V1_0100, 
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_GET_EMERGENCY_LIST));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetEmergencyCallList_V1_0200
+ * @tc.name     Get emergency call list
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetEmergencyCallList_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -131,6 +160,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetEmergencyCallList_V1_0200, 
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_GET_EMERGENCY_LIST));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetEmergencyCallList_V1_0100
+ * @tc.name     Set emergency call list
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetEmergencyCallList_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -152,6 +186,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetEmergencyCallList_V1_0100, 
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_SET_EMERGENCY_LIST));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetEmergencyCallList_V2_0100
+ * @tc.name     Set emergency call list
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetEmergencyCallList_V2_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -173,6 +212,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetEmergencyCallList_V2_0100, 
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_SET_EMERGENCY_LIST));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetCallList_V1_0100
+ * @tc.name     Get call list
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetCallList_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -184,6 +228,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetCallList_V1_0100, Function 
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_GET_CALL_LIST));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetCallList_V1_0200
+ * @tc.name     Get call list
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetCallList_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -195,6 +244,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetCallList_V1_0200, Function 
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_GET_CALL_LIST));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetCallList_V1_0200
+ * @tc.name     Get call list
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_Dial_V1_0100, Function | MediumTest | Level2)
 {
     if (!IsReady(SLOTID_1)) {
@@ -209,6 +263,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_Dial_V1_0100, Function | Mediu
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_DIAL));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_Dial_V1_0200
+ * @tc.name     Dial
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_Dial_V1_0200, Function | MediumTest | Level2)
 {
     if (!IsReady(SLOTID_2)) {
@@ -223,6 +282,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_Dial_V1_0200, Function | Mediu
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_DIAL));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_Reject_V1_0100
+ * @tc.name     Reject
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_Reject_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -234,6 +298,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_Reject_V1_0100, Function | Med
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_REJECT));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_Reject_V1_0200
+ * @tc.name     Reject
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_Reject_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -245,6 +314,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_Reject_V1_0200, Function | Med
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_REJECT));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_Hangup_V1_0100
+ * @tc.name     Hangup
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_Hangup_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -256,6 +330,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_Hangup_V1_0100, Function | Med
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_HANGUP));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_Hangup_V1_0200
+ * @tc.name     Hangup
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_Hangup_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -267,6 +346,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_Hangup_V1_0200, Function | Med
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_HANGUP));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_Answer_V1_0100
+ * @tc.name     Answer
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_Answer_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -278,6 +362,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_Answer_V1_0100, Function | Med
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_ANSWER));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_Answer_V1_0200
+ * @tc.name     Answer
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_Answer_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -289,6 +378,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_Answer_V1_0200, Function | Med
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_ANSWER));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_HoldCall_V1_0100
+ * @tc.name     HoldCall
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_HoldCall_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -300,6 +394,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_HoldCall_V1_0100, Function | M
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_HOLD_CALL));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_HoldCall_V1_0200
+ * @tc.name     HoldCall
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_HoldCall_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -311,6 +410,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_HoldCall_V1_0200, Function | M
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_HOLD_CALL));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_UnHoldCall_V1_0100
+ * @tc.name     UnHoldCall
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_UnHoldCall_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -322,6 +426,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_UnHoldCall_V1_0100, Function |
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_UNHOLD_CALL));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_UnHoldCall_V1_0200
+ * @tc.name     UnHoldCall
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_UnHoldCall_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -333,6 +442,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_UnHoldCall_V1_0200, Function |
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_UNHOLD_CALL));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SwitchCall_V1_0100
+ * @tc.name     Switch call
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SwitchCall_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -344,6 +458,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SwitchCall_V1_0100, Function |
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_SWITCH_CALL));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SwitchCall_V1_0200
+ * @tc.name     Switch call
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SwitchCall_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -355,6 +474,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SwitchCall_V1_0200, Function |
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_SWITCH_CALL));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_CombineConference_V1_0100
+ * @tc.name     Combine conference
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_CombineConference_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -366,6 +490,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_CombineConference_V1_0100, Fun
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_COMBINE_CONFERENCE));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_CombineConference_V1_0200
+ * @tc.name     Combine conference
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_CombineConference_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -377,6 +506,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_CombineConference_V1_0200, Fun
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_COMBINE_CONFERENCE));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SeparateConference_V1_0100
+ * @tc.name     Separate conference
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SeparateConference_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -388,6 +522,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SeparateConference_V1_0100, Fu
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_SEPARATE_CONFERENCE));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SeparateConference_V1_0200
+ * @tc.name     Separate conference
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SeparateConference_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -399,6 +538,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SeparateConference_V1_0200, Fu
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_SEPARATE_CONFERENCE));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetCallWaiting_V1_0100
+ * @tc.name     Get call waiting
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetCallWaiting_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -410,6 +554,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetCallWaiting_V1_0100, Functi
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_GET_CALL_WAITING));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetCallWaiting_V1_0200
+ * @tc.name     Get call waiting
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetCallWaiting_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -421,6 +570,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetCallWaiting_V1_0200, Functi
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_GET_CALL_WAITING));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetCallWaiting_V1_0100
+ * @tc.name     Set call waiting
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetCallWaiting_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -432,6 +586,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetCallWaiting_V1_0100, Functi
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_SET_CALL_WAITING));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetCallWaiting_V1_0200
+ * @tc.name     Set call waiting
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetCallWaiting_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -443,6 +602,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetCallWaiting_V1_0200, Functi
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_SET_CALL_WAITING));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetCallTransferInfo_V1_0100
+ * @tc.name     Get call transfer info
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetCallTransferInfo_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -454,6 +618,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetCallTransferInfo_V1_0100, F
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_GET_CALL_TRANSFER_INFO));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetCallTransferInfo_V1_0200
+ * @tc.name     Get call transfer info
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetCallTransferInfo_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -465,6 +634,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetCallTransferInfo_V1_0200, F
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_GET_CALL_TRANSFER_INFO));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetCallTransferInfo_V1_0100
+ * @tc.name     Set call transfer info
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetCallTransferInfo_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -481,6 +655,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetCallTransferInfo_V1_0100, F
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_SET_CALL_TRANSFER_INFO));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetCallTransferInfo_V1_0200
+ * @tc.name     Set call transfer info
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetCallTransferInfo_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -497,6 +676,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetCallTransferInfo_V1_0200, F
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_SET_CALL_TRANSFER_INFO));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetCallRestriction_V1_0100
+ * @tc.name     Get call restriction
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetCallRestriction_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -509,6 +693,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetCallRestriction_V1_0100, Fu
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_GET_CALL_RESTRICTION));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetCallRestriction_V1_0200
+ * @tc.name     Get call restriction
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetCallRestriction_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -521,6 +710,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetCallRestriction_V1_0200, Fu
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_GET_CALL_RESTRICTION));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetCallRestriction_V1_0100
+ * @tc.name     Set call restriction
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetCallRestriction_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -536,6 +730,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetCallRestriction_V1_0100, Fu
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_SET_CALL_RESTRICTION));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetCallRestriction_V1_0200
+ * @tc.name     Set call restriction
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetCallRestriction_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -551,6 +750,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetCallRestriction_V1_0200, Fu
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_SET_CALL_RESTRICTION));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetClip_V1_0100
+ * @tc.name     Get clip
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetClip_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -562,6 +766,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetClip_V1_0100, Function | Me
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_GET_CLIP));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetClip_V1_0200
+ * @tc.name     Get clip
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetClip_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -573,6 +782,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetClip_V1_0200, Function | Me
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_GET_CLIP));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetClip_V1_0100
+ * @tc.name     Set clip
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetClip_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -584,6 +798,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetClip_V1_0100, Function | Me
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_SET_CLIP));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetClip_V1_0200
+ * @tc.name     Set clip
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetClip_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -595,6 +814,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetClip_V1_0200, Function | Me
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_SET_CLIP));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetClir_V1_0100
+ * @tc.name     Get clip
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetClir_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -606,6 +830,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetClir_V1_0100, Function | Me
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_GET_CLIR));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetClir_V1_0200
+ * @tc.name     Get clip
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetClir_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -617,6 +846,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetClir_V1_0200, Function | Me
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_GET_CLIR));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetClir_V1_0100
+ * @tc.name     Set clir
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetClir_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -628,6 +862,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetClir_V1_0100, Function | Me
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_SET_CLIR));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetClir_V1_0200
+ * @tc.name     Set clir
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetClir_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -639,6 +878,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetClir_V1_0200, Function | Me
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_SET_CLIR));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetCallPreferenceMode_V1_0100
+ * @tc.name     Set call preference mode
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetCallPreferenceMode_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -650,6 +894,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetCallPreferenceMode_V1_0100,
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_SET_CALL_PREFERENCE));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetCallPreferenceMode_V1_0200
+ * @tc.name     Set call preference mode
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetCallPreferenceMode_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -661,6 +910,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetCallPreferenceMode_V1_0200,
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_SET_CALL_PREFERENCE));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetCallPreferenceMode_V1_0100
+ * @tc.name     Get call preference mode
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetCallPreferenceMode_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -672,6 +926,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetCallPreferenceMode_V1_0100,
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_GET_CALL_PREFERENCE));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetCallPreferenceMode_V1_0200
+ * @tc.name     Get call preference mode
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetCallPreferenceMode_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -683,6 +942,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetCallPreferenceMode_V1_0200,
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_GET_CALL_PREFERENCE));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetUssd_V1_0100
+ * @tc.name     Set ussd
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetUssd_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -694,6 +958,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetUssd_V1_0100, Function | Me
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_SET_USSD));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetUssd_V1_0200
+ * @tc.name     Set ussd
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetUssd_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -705,6 +974,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetUssd_V1_0200, Function | Me
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_SET_USSD));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetUssd_V1_0100
+ * @tc.name     Get ussd
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetUssd_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -716,6 +990,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetUssd_V1_0100, Function | Me
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_GET_USSD));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetUssd_V1_0200
+ * @tc.name     Get ussd
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetUssd_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -727,6 +1006,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetUssd_V1_0200, Function | Me
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_GET_USSD));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetMute_V1_0100
+ * @tc.name     Set mute
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetMute_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -738,6 +1022,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetMute_V1_0100, Function | Me
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_SET_MUTE));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetMute_V1_0200
+ * @tc.name     Set mute
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetMute_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -749,6 +1038,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetMute_V1_0200, Function | Me
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_SET_MUTE));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetMute_V1_0100
+ * @tc.name     Get mute
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetMute_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -760,6 +1054,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetMute_V1_0100, Function | Me
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_GET_MUTE));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetMute_V1_0200
+ * @tc.name     Get mute
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetMute_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -771,6 +1070,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetMute_V1_0200, Function | Me
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_GET_MUTE));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetCallFailReason_V1_0100
+ * @tc.name     Get call fail reason
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetCallFailReason_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -782,6 +1086,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetCallFailReason_V1_0100, Fun
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_GET_FAIL_REASON));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetCallFailReason_V1_0200
+ * @tc.name     Get call fail reason
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetCallFailReason_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -793,6 +1102,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetCallFailReason_V1_0200, Fun
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_GET_FAIL_REASON));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_CallSupplement_V1_0100
+ * @tc.name     Call supplement
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_CallSupplement_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -804,6 +1118,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_CallSupplement_V1_0100, Functi
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_CALL_SUPPLEMENT));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_CallSupplement_V1_0200
+ * @tc.name     Call supplement
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_CallSupplement_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -815,6 +1134,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_CallSupplement_V1_0200, Functi
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_CALL_SUPPLEMENT));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SendDtmf_V1_0100
+ * @tc.name     Send dtmf
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SendDtmf_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -832,6 +1156,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SendDtmf_V1_0100, Function | M
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_SEND_DTMF));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SendDtmf_V1_0200
+ * @tc.name     Send dtmf
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SendDtmf_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -849,6 +1178,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SendDtmf_V1_0200, Function | M
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_SEND_DTMF));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_StartDtmf_V1_0100
+ * @tc.name     Start dtmf
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_StartDtmf_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -863,6 +1197,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_StartDtmf_V1_0100, Function | 
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_START_DTMF));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_StartDtmf_V1_0200
+ * @tc.name     Start dtmf
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_StartDtmf_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -877,6 +1216,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_StartDtmf_V1_0200, Function | 
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_START_DTMF));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_StopDtmf_V1_0100
+ * @tc.name     Stop dtmf
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_StopDtmf_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -891,6 +1235,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_StopDtmf_V1_0100, Function | M
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_STOP_DTMF));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_StopDtmf_V1_0200
+ * @tc.name     Stop dtmf
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_StopDtmf_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -905,6 +1254,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_StopDtmf_V1_0200, Function | M
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_STOP_DTMF));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetBarringPassword_V1_0100
+ * @tc.name     Set barring password
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetBarringPassword_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -920,6 +1274,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetBarringPassword_V1_0100, Fu
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_SET_BARRING_PASSWORD));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetBarringPassword_V1_0200
+ * @tc.name     Set barring password
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetBarringPassword_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -935,7 +1294,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetBarringPassword_V1_0200, Fu
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_SET_BARRING_PASSWORD));
 }
 
-// Network
+/**
+ * @tc.number   Telephony_DriverSystem_GetSignalStrength_V1_0100
+ * @tc.name     Get signal strength
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetSignalStrength_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -947,6 +1310,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetSignalStrength_V1_0100, Fun
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_NETWORK_GET_SIGNAL_STRENGTH));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetSignalStrength_V1_0200
+ * @tc.name     Get signal strength
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetSignalStrength_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -958,6 +1326,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetSignalStrength_V1_0200, Fun
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_NETWORK_GET_SIGNAL_STRENGTH));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetCsRegStatus_V1_0100
+ * @tc.name     Get cs register status
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetCsRegStatus_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -969,6 +1342,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetCsRegStatus_V1_0100, Functi
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_NETWORK_GET_CS_REG_STATUS));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetCsRegStatus_V1_0200
+ * @tc.name     Get cs register status
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetCsRegStatus_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -980,6 +1358,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetCsRegStatus_V1_0200, Functi
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_NETWORK_GET_CS_REG_STATUS));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetPsRegStatus_V1_0100
+ * @tc.name     Get ps register status
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetPsRegStatus_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -991,6 +1374,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetPsRegStatus_V1_0100, Functi
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_NETWORK_GET_PS_REG_STATUS));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetPsRegStatus_V1_0200
+ * @tc.name     Get ps register status
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetPsRegStatus_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -1002,6 +1390,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetPsRegStatus_V1_0200, Functi
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_NETWORK_GET_PS_REG_STATUS));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetOperatorInfo_V1_0100
+ * @tc.name     Get operator info
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetOperatorInfo_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -1013,6 +1406,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetOperatorInfo_V1_0100, Funct
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_NETWORK_GET_OPERATOR_INFO));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetOperatorInfo_V1_0200
+ * @tc.name     Get operator info
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetOperatorInfo_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -1024,6 +1422,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetOperatorInfo_V1_0200, Funct
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_NETWORK_GET_OPERATOR_INFO));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetNetworkSearchInformation_V1_0100
+ * @tc.name     Get network search information
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetNetworkSearchInformation_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -1035,6 +1438,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetNetworkSearchInformation_V1
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_NETWORK_GET_NETWORK_SEARCH_INFORMATION));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetNetworkSearchInformation_V1_0200
+ * @tc.name     Get network search information
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetNetworkSearchInformation_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -1046,6 +1454,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetNetworkSearchInformation_V1
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_NETWORK_GET_NETWORK_SEARCH_INFORMATION));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetNetworkSelectionMode_V1_0100
+ * @tc.name     Get network search selection mode
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetNetworkSelectionMode_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -1057,6 +1470,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetNetworkSelectionMode_V1_010
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_NETWORK_GET_NETWORK_SELECTION_MODE));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetNetworkSelectionMode_V1_0200
+ * @tc.name     Get network search selection mode
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetNetworkSelectionMode_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -1068,6 +1486,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetNetworkSelectionMode_V1_020
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_NETWORK_GET_NETWORK_SELECTION_MODE));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetNetworkSelectionMode_V1_0100
+ * @tc.name     Set network search selection mode
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetNetworkSelectionMode_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -1082,6 +1505,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetNetworkSelectionMode_V1_010
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_NETWORK_SET_NETWORK_SELECTION_MODE));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetNetworkSelectionMode_V1_0200
+ * @tc.name     Set network search selection mode
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetNetworkSelectionMode_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -1096,6 +1524,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetNetworkSelectionMode_V1_020
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_NETWORK_SET_NETWORK_SELECTION_MODE));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetPreferredNetwork_V1_0100
+ * @tc.name     Set preferred network
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetPreferredNetwork_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -1108,6 +1541,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetPreferredNetwork_V1_0100, F
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_NETWORK_SET_PREFERRED_NETWORK));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetPreferredNetwork_V1_0200
+ * @tc.name     Set preferred network
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetPreferredNetwork_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -1120,6 +1558,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetPreferredNetwork_V1_0200, F
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_NETWORK_SET_PREFERRED_NETWORK));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetPreferredNetwork_V1_0100
+ * @tc.name     Get preferred network
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetPreferredNetwork_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -1131,6 +1574,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetPreferredNetwork_V1_0100, F
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_NETWORK_GET_PREFERRED_NETWORK));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetPreferredNetwork_V1_0200
+ * @tc.name     Get preferred network
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetPreferredNetwork_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -1142,6 +1590,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetPreferredNetwork_V1_0200, F
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_NETWORK_GET_PREFERRED_NETWORK));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetCellInfoList_V1_0100
+ * @tc.name     Get cell information list
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetCellInfoList_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -1153,6 +1606,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetCellInfoList_V1_0100, Funct
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_NETWORK_GET_NEIGHBORING_CELLINFO_LIST));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetCellInfoList_V1_0200
+ * @tc.name     Get cell information list
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetCellInfoList_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -1164,6 +1622,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetCellInfoList_V1_0200, Funct
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_NETWORK_GET_NEIGHBORING_CELLINFO_LIST));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetCurrentCellInfo_V1_0100
+ * @tc.name     Get current cell information
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetCurrentCellInfo_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -1175,6 +1638,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetCurrentCellInfo_V1_0100, Fu
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_NETWORK_GET_CURRENT_CELL_INFO));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetCurrentCellInfo_V1_0200
+ * @tc.name     Get current cell information
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetCurrentCellInfo_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -1186,6 +1654,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetCurrentCellInfo_V1_0200, Fu
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_NETWORK_GET_CURRENT_CELL_INFO));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetPhysicalChannelConfig_V1_0100
+ * @tc.name     Get physical channel config
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetPhysicalChannelConfig_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -1197,6 +1670,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetPhysicalChannelConfig_V1_01
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_NETWORK_GET_PHYSICAL_CHANNEL_CONFIG));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetPhysicalChannelConfig_V1_0200
+ * @tc.name     Get physical channel config
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetPhysicalChannelConfig_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -1208,6 +1686,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetPhysicalChannelConfig_V1_02
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_NETWORK_GET_PHYSICAL_CHANNEL_CONFIG));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetLocateUpdates_V1_0100
+ * @tc.name     Set locate updates
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetLocateUpdates_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -1220,6 +1703,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetLocateUpdates_V1_0100, Func
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_NETWORK_SET_LOCATE_UPDATES));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetLocateUpdates_V1_0200
+ * @tc.name     Set locate updates
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetLocateUpdates_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -1232,6 +1720,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetLocateUpdates_V1_0200, Func
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_NETWORK_SET_LOCATE_UPDATES));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetNotificationFilter_V1_0100
+ * @tc.name     SetNotificationFilter
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetNotificationFilter_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -1244,6 +1737,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetNotificationFilter_V1_0100,
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_NETWORK_SET_NOTIFICATION_FILTER));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetNotificationFilter_V1_0200
+ * @tc.name     SetNotificationFilter
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetNotificationFilter_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -1256,6 +1754,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetNotificationFilter_V1_0200,
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_NETWORK_SET_NOTIFICATION_FILTER));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetDeviceState_V1_0100
+ * @tc.name     Set device state
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetDeviceState_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -1268,6 +1771,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetDeviceState_V1_0100, Functi
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_NETWORK_SET_DEVICE_STATE));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetDeviceState_V1_0200
+ * @tc.name     Set device state
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetDeviceState_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -1281,8 +1789,10 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetDeviceState_V1_0200, Functi
 }
 
 /**
- * modem Test
- **/
+ * @tc.number   Telephony_DriverSystem_ShutDown_V1_0100
+ * @tc.name     Shut down
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_ShutDown_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -1294,6 +1804,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_ShutDown_V1_0100, Function | M
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_MODEM_SHUT_DOWN));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_ShutDown_V1_0200
+ * @tc.name     Shut down
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_ShutDown_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -1305,6 +1820,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_ShutDown_V1_0200, Function | M
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_MODEM_SHUT_DOWN));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetRadioState_V1_0100
+ * @tc.name     Set radio state
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetRadioState_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -1316,6 +1836,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetRadioState_V1_0100, Functio
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_MODEM_SET_RADIO_STATUS));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetRadioState_V1_0200
+ * @tc.name     Set radio state
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetRadioState_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -1327,6 +1852,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetRadioState_V1_0200, Functio
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_MODEM_SET_RADIO_STATUS));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetRadioState_V1_0100
+ * @tc.name     Get radio state
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetRadioState_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -1338,6 +1868,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetRadioState_V1_0100, Functio
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_MODEM_GET_RADIO_STATUS));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetRadioState_V1_0200
+ * @tc.name     Get radio state
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetRadioState_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -1349,6 +1884,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetRadioState_V1_0200, Functio
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_MODEM_GET_RADIO_STATUS));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetImei_V1_0100
+ * @tc.name     Get imei
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetImei_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -1360,6 +1900,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetImei_V1_0100, Function | Me
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_MODEM_GET_IMEI));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetImei_V1_0200
+ * @tc.name     Get imei
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetImei_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -1371,6 +1916,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetImei_V1_0200, Function | Me
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_MODEM_GET_IMEI));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetMeid_V1_0100
+ * @tc.name     Get meid
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetMeid_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -1382,6 +1932,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetMeid_V1_0100, Function | Me
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_MODEM_GET_MEID));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetMeid_V1_0200
+ * @tc.name     Get meid
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetMeid_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -1393,6 +1948,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetMeid_V1_0200, Function | Me
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_MODEM_GET_MEID));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetBasebandVersion_V1_0100
+ * @tc.name     Get base band version
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetBasebandVersion_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -1404,6 +1964,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetBasebandVersion_V1_0100, Fu
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_MODEM_GET_BASEBAND_VERSION));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetBasebandVersion_V1_0200
+ * @tc.name     Get base band version
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetBasebandVersion_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -1415,6 +1980,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetBasebandVersion_V1_0200, Fu
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_MODEM_GET_BASEBAND_VERSION));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetVoiceRadioTechnology_V1_0100
+ * @tc.name     Get voice radio technology
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetVoiceRadioTechnology_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -1426,6 +1996,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetVoiceRadioTechnology_V1_010
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_MODEM_GET_VOICE_RADIO));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetVoiceRadioTechnology_V1_0200
+ * @tc.name     Get voice radio technology
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetVoiceRadioTechnology_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -1437,7 +2012,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetVoiceRadioTechnology_V1_020
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_MODEM_GET_VOICE_RADIO));
 }
 
-// Data
+/**
+ * @tc.number   Telephony_DriverSystem_ActivatePdpContext_V1_0100
+ * @tc.name     Activate pdp context
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_ActivatePdpContext_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -1464,6 +2043,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_ActivatePdpContext_V1_0100, Fu
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_DATA_ACTIVATE_PDP_CONTEXT));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_ActivatePdpContext_V1_0200
+ * @tc.name     Activate pdp context
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_ActivatePdpContext_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -1490,6 +2074,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_ActivatePdpContext_V1_0200, Fu
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_DATA_ACTIVATE_PDP_CONTEXT));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_DeactivatePdpContext_V1_0100
+ * @tc.name     Deactivate pdp context
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_DeactivatePdpContext_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -1506,6 +2095,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_DeactivatePdpContext_V1_0100, 
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_DATA_DEACTIVATE_PDP_CONTEXT));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_DeactivatePdpContext_V1_0200
+ * @tc.name     Deactivate pdp context
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_DeactivatePdpContext_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -1522,6 +2116,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_DeactivatePdpContext_V1_0200, 
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_DATA_DEACTIVATE_PDP_CONTEXT));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetPdpContextList_V1_0100
+ * @tc.name     Get pdp context list
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetPdpContextList_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -1536,6 +2135,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetPdpContextList_V1_0100, Fun
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_DATA_GET_PDP_CONTEXT_LIST));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetPdpContextList_V1_0200
+ * @tc.name     Get pdp context list
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetPdpContextList_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -1550,6 +2154,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetPdpContextList_V1_0200, Fun
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_DATA_GET_PDP_CONTEXT_LIST));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetInitApnInfo_V1_0100
+ * @tc.name     Set init apn info
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetInitApnInfo_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -1571,6 +2180,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetInitApnInfo_V1_0100, Functi
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_DATA_SET_INIT_APN_INFO));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetInitApnInfo_V1_0200
+ * @tc.name     Set init apn info
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetInitApnInfo_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -1592,6 +2206,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetInitApnInfo_V1_0200, Functi
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_DATA_SET_INIT_APN_INFO));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetLinkBandwidthInfo_V1_0100
+ * @tc.name     Get link band width info
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetLinkBandwidthInfo_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -1603,6 +2222,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetLinkBandwidthInfo_V1_0100, 
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_DATA_GET_LINK_BANDWIDTH_INFO));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetLinkBandwidthInfo_V1_0200
+ * @tc.name     Get link band width info
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetLinkBandwidthInfo_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -1614,6 +2238,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetLinkBandwidthInfo_V1_0200, 
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_DATA_GET_LINK_BANDWIDTH_INFO));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetLinkBandwidthReportingRule_V1_0100
+ * @tc.name     Set link band width reporting rule
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetLinkBandwidthReportingRule_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -1642,6 +2271,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetLinkBandwidthReportingRule_
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_DATA_SET_LINK_BANDWIDTH_REPORTING_RULE));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetLinkBandwidthReportingRule_V1_0200
+ * @tc.name     Set link band width reporting rule
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetLinkBandwidthReportingRule_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -1670,6 +2304,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetLinkBandwidthReportingRule_
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_DATA_SET_LINK_BANDWIDTH_REPORTING_RULE));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetDataPermitted_V1_0100
+ * @tc.name     Set data permitted
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetDataPermitted_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -1681,6 +2320,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetDataPermitted_V1_0100, Func
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_DATA_SET_DATA_PERMITTED));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetDataPermitted_V1_0200
+ * @tc.name     Set data permitted
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetDataPermitted_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -1692,6 +2336,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetDataPermitted_V1_0200, Func
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_DATA_SET_DATA_PERMITTED));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetDataProfileInfo_V1_0100
+ * @tc.name     Set data profile info
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetDataProfileInfo_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -1717,6 +2366,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetDataProfileInfo_V1_0100, Fu
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_DATA_SET_DATA_PROFILE_INFO));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetDataProfileInfo_V1_0200
+ * @tc.name     Set data profile info
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetDataProfileInfo_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -1742,7 +2396,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetDataProfileInfo_V1_0200, Fu
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_DATA_SET_DATA_PROFILE_INFO));
 }
 
-// SIM
+/**
+ * @tc.number   Telephony_DriverSystem_GetSimIO_V1_0100
+ * @tc.name     Get sim IO
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetSimIO_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -1763,6 +2421,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetSimIO_V1_0100, Function | M
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SIM_GET_SIM_IO));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetSimIO_V1_0200
+ * @tc.name     Get sim IO
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetSimIO_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -1784,6 +2447,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetSimIO_V1_0200, Function | M
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SIM_GET_SIM_IO));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetImsi_V1_0100
+ * @tc.name     Get imsi
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetImsi_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -1795,6 +2463,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetImsi_V1_0100, Function | Me
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SIM_GET_IMSI));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetImsi_V1_0200
+ * @tc.name     Get imsi
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetImsi_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -1806,6 +2479,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetImsi_V1_0200, Function | Me
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SIM_GET_IMSI));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetActiveSim_V1_0100
+ * @tc.name     Set active sim
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetActiveSim_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -1819,6 +2497,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetActiveSim_V1_0100, Function
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SIM_SET_ACTIVE_SIM));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetActiveSim_V1_0200
+ * @tc.name     Set active sim
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetActiveSim_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -1832,6 +2515,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetActiveSim_V1_0200, Function
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SIM_SET_ACTIVE_SIM));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SimStkSendTerminalResponse_V1_0100
+ * @tc.name     Sim stk send terminal response
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SimStkSendTerminalResponse_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -1844,6 +2532,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SimStkSendTerminalResponse_V1_
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SIM_STK_SEND_TERMINAL_RESPONSE));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SimStkSendTerminalResponse_V1_0200
+ * @tc.name     Sim stk send terminal response
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SimStkSendTerminalResponse_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -1856,6 +2549,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SimStkSendTerminalResponse_V1_
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SIM_STK_SEND_TERMINAL_RESPONSE));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SimStkSendEnvelope_V1_0100
+ * @tc.name     Sim stk send envelope
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SimStkSendEnvelope_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -1868,6 +2566,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SimStkSendEnvelope_V1_0100, Fu
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SIM_STK_SEND_ENVELOPE));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SimStkSendEnvelope_V1_0200
+ * @tc.name     Sim stk send envelope
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SimStkSendEnvelope_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -1880,6 +2583,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SimStkSendEnvelope_V1_0200, Fu
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SIM_STK_SEND_ENVELOPE));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SimStkSendCallSetupRequestResult_V1_0100
+ * @tc.name     Sim stk send call setup requestResult
+ * @tc.desc     Function test
+ */
 HWTEST_F(
     RilInterfaceTest, Telephony_DriverSystem_SimStkSendCallSetupRequestResult_V1_0100, Function | MediumTest | Level3)
 {
@@ -1892,6 +2600,11 @@ HWTEST_F(
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SIM_STK_SEND_CALL_SETUP_REQUEST_RESULT));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SimStkSendCallSetupRequestResult_V1_0200
+ * @tc.name     Sim stk send call setup requestResult
+ * @tc.desc     Function test
+ */
 HWTEST_F(
     RilInterfaceTest, Telephony_DriverSystem_SimStkSendCallSetupRequestResult_V1_0200, Function | MediumTest | Level3)
 {
@@ -1904,6 +2617,11 @@ HWTEST_F(
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SIM_STK_SEND_CALL_SETUP_REQUEST_RESULT));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SimStkIsReady_V1_0100
+ * @tc.name     Sim stk is ready
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SimStkIsReady_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -1915,6 +2633,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SimStkIsReady_V1_0100, Functio
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SIM_STK_IS_READY));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SimStkIsReady_V1_0200
+ * @tc.name     Sim stk is ready
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SimStkIsReady_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -1926,6 +2649,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SimStkIsReady_V1_0200, Functio
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SIM_STK_IS_READY));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetRadioProtocol_V1_0100
+ * @tc.name     Set radio protocol
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetRadioProtocol_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -1939,6 +2667,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetRadioProtocol_V1_0100, Func
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SIM_RADIO_PROTOCOL));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetRadioProtocol_V1_0200
+ * @tc.name     Set radio protocol
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetRadioProtocol_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -1952,6 +2685,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetRadioProtocol_V1_0200, Func
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SIM_RADIO_PROTOCOL));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SimOpenLogicalChannel_V1_0100
+ * @tc.name     Sim open logical channel
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SimOpenLogicalChannel_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -1965,6 +2703,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SimOpenLogicalChannel_V1_0100,
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SIM_OPEN_LOGICAL_CHANNEL));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SimTransmitApduLogicalChannel_V1_0100
+ * @tc.name     Sim transmit apdu logical channel
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SimTransmitApduLogicalChannel_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -1984,6 +2727,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SimTransmitApduLogicalChannel_
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SIM_TRANSMIT_APDU_LOGICAL_CHANNEL));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SimCloseLogicalChannel_V1_0100
+ * @tc.name     Sim close logical channel
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SimCloseLogicalChannel_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -1995,6 +2743,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SimCloseLogicalChannel_V1_0100
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SIM_CLOSE_LOGICAL_CHANNEL));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SimCloseLogicalChannel_V1_0100
+ * @tc.name     Sim open logical channel
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SimOpenLogicalChannel_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -2008,6 +2761,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SimOpenLogicalChannel_V1_0200,
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SIM_OPEN_LOGICAL_CHANNEL));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SimTransmitApduLogicalChannel_V1_0200
+ * @tc.name     Sim transmit apdu logical channel
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SimTransmitApduLogicalChannel_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -2027,6 +2785,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SimTransmitApduLogicalChannel_
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SIM_TRANSMIT_APDU_LOGICAL_CHANNEL));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SimCloseLogicalChannel_V1_0100
+ * @tc.name     Sim close logical channel
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SimCloseLogicalChannel_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -2038,6 +2801,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SimCloseLogicalChannel_V1_0200
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SIM_CLOSE_LOGICAL_CHANNEL));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SimTransmitApduBasicChannel_V1_0100
+ * @tc.name     Sim transmit apdu basic channel
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SimTransmitApduBasicChannel_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -2056,6 +2824,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SimTransmitApduBasicChannel_V1
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SIM_TRANSMIT_APDU_BASIC_CHANNEL));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SimTransmitApduBasicChannel_V1_0200
+ * @tc.name     Sim transmit apdu basic channel
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SimTransmitApduBasicChannel_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -2074,6 +2847,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SimTransmitApduBasicChannel_V1
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SIM_TRANSMIT_APDU_BASIC_CHANNEL));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SimAuthentication_V1_0100
+ * @tc.name     Sim authentication
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SimAuthentication_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -2088,6 +2866,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SimAuthentication_V1_0100, Fun
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SIM_AUTHENTICATION));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SimAuthentication_V1_0200
+ * @tc.name     Sim authentication
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SimAuthentication_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -2102,6 +2885,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SimAuthentication_V1_0200, Fun
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SIM_AUTHENTICATION));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetSimLockStatus_V1_0100
+ * @tc.name     Get Sim lock status
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetSimLockStatus_V1_0100, Function | MediumTest | Level3)
 {
 #ifdef TEL_TEST_PIN_PUK
@@ -2121,6 +2909,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetSimLockStatus_V1_0100, Func
     ASSERT_TRUE(true);
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetSimLockStatus_V1_0200
+ * @tc.name     Get Sim lock status
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetSimLockStatus_V1_0200, Function | MediumTest | Level3)
 {
 #ifdef TEL_TEST_PIN_PUK
@@ -2140,6 +2933,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetSimLockStatus_V1_0200, Func
     ASSERT_TRUE(true);
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetSimLock_V1_0100
+ * @tc.name     Set Sim lock
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetSimLock_V1_0100, Function | MediumTest | Level3)
 {
 #ifdef TEL_TEST_PIN_PUK
@@ -2160,6 +2958,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetSimLock_V1_0100, Function |
     ASSERT_TRUE(true);
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetSimLock_V1_0200
+ * @tc.name     Set Sim lock
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetSimLock_V1_0200, Function | MediumTest | Level3)
 {
 #ifdef TEL_TEST_PIN_PUK
@@ -2180,6 +2983,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetSimLock_V1_0200, Function |
     ASSERT_TRUE(true);
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_ChangeSimPassword_V1_0100
+ * @tc.name     Change sim password
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_ChangeSimPassword_V1_0100, Function | MediumTest | Level3)
 {
 #ifdef TEL_TEST_PIN_PUK
@@ -2199,6 +3007,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_ChangeSimPassword_V1_0100, Fun
     ASSERT_TRUE(true);
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_ChangeSimPassword_V1_0200
+ * @tc.name     Change sim password
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_ChangeSimPassword_V1_0200, Function | MediumTest | Level3)
 {
 #ifdef TEL_TEST_PIN_PUK
@@ -2218,6 +3031,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_ChangeSimPassword_V1_0200, Fun
     ASSERT_TRUE(true);
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_UnlockPin_V1_0100
+ * @tc.name     Unlock pin
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_UnlockPin_V1_0100, Function | MediumTest | Level3)
 {
 #ifdef TEL_TEST_PIN_PUK
@@ -2233,6 +3051,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_UnlockPin_V1_0100, Function | 
     ASSERT_TRUE(true);
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_UnlockPin_V1_0200
+ * @tc.name     Unlock pin
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_UnlockPin_V1_0200, Function | MediumTest | Level3)
 {
 #ifdef TEL_TEST_PIN_PUK
@@ -2248,6 +3071,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_UnlockPin_V1_0200, Function | 
     ASSERT_TRUE(true);
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_UnlockPuk_V1_0100
+ * @tc.name     Unlock puk
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_UnlockPuk_V1_0100, Function | MediumTest | Level3)
 {
 #ifdef TEL_TEST_PIN_PUK
@@ -2264,6 +3092,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_UnlockPuk_V1_0100, Function | 
     ASSERT_TRUE(true);
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_UnlockPuk_V1_0200
+ * @tc.name     Unlock puk
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_UnlockPuk_V1_0200, Function | MediumTest | Level3)
 {
 #ifdef TEL_TEST_PIN_PUK
@@ -2280,6 +3113,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_UnlockPuk_V1_0200, Function | 
     ASSERT_TRUE(true);
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_UnlockPin2_V1_0100
+ * @tc.name     Unlock pin2
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_UnlockPin2_V1_0100, Function | MediumTest | Level3)
 {
 #ifdef TEL_TEST_PIN_PUK
@@ -2295,6 +3133,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_UnlockPin2_V1_0100, Function |
     ASSERT_TRUE(true);
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_UnlockPin2_V1_0200
+ * @tc.name     Unlock pin2
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_UnlockPin2_V1_0200, Function | MediumTest | Level3)
 {
 #ifdef TEL_TEST_PIN_PUK
@@ -2310,6 +3153,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_UnlockPin2_V1_0200, Function |
     ASSERT_TRUE(true);
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_UnlockPuk2_V1_0100
+ * @tc.name     Unlock puk2
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_UnlockPuk2_V1_0100, Function | MediumTest | Level3)
 {
 #ifdef TEL_TEST_PIN_PUK
@@ -2326,6 +3174,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_UnlockPuk2_V1_0100, Function |
     ASSERT_TRUE(true);
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_UnlockPuk2_V1_0200
+ * @tc.name     Unlock puk2
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_UnlockPuk2_V1_0200, Function | MediumTest | Level3)
 {
 #ifdef TEL_TEST_PIN_PUK
@@ -2342,6 +3195,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_UnlockPuk2_V1_0200, Function |
     ASSERT_TRUE(true);
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_UnlockSimLock_V1_0100
+ * @tc.name     Unlock sim lock
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_UnlockSimLock_V1_0100, Function | MediumTest | Level3)
 {
 #ifdef TEL_TEST_PIN_PUK
@@ -2358,6 +3216,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_UnlockSimLock_V1_0100, Functio
     ASSERT_TRUE(true);
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_UnlockSimLock_V1_0200
+ * @tc.name     Unlock sim lock
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_UnlockSimLock_V1_0200, Function | MediumTest | Level3)
 {
 #ifdef TEL_TEST_PIN_PUK
@@ -2374,7 +3237,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_UnlockSimLock_V1_0200, Functio
     ASSERT_TRUE(true);
 }
 
-// Sms
+/**
+ * @tc.number   Telephony_DriverSystem_AddSimMessage_V1_0100
+ * @tc.name     Add sim message
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_AddSimMessage_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -2390,6 +3257,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_AddSimMessage_V1_0100, Functio
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SMS_ADD_SIM_MESSAGE));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_AddSimMessage_V1_0200
+ * @tc.name     Add sim message
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_AddSimMessage_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -2405,6 +3277,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_AddSimMessage_V1_0200, Functio
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SMS_ADD_SIM_MESSAGE));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_UpdateSimMessage_V1_0100
+ * @tc.name     Update sim message
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_UpdateSimMessage_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -2421,6 +3298,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_UpdateSimMessage_V1_0100, Func
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SMS_UPDATE_SIM_MESSAGE));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_UpdateSimMessage_V1_0200
+ * @tc.name     Update sim message
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_UpdateSimMessage_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -2437,6 +3319,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_UpdateSimMessage_V1_0200, Func
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SMS_UPDATE_SIM_MESSAGE));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_DelSimMessage_V1_0100
+ * @tc.name     Delete sim message
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_DelSimMessage_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -2449,6 +3336,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_DelSimMessage_V1_0100, Functio
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SMS_DEL_SIM_MESSAGE));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_DelSimMessage_V1_0200
+ * @tc.name     Delete sim message
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_DelSimMessage_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -2461,6 +3353,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_DelSimMessage_V1_0200, Functio
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SMS_DEL_SIM_MESSAGE));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_AddCdmaSimMessage_V1_0100
+ * @tc.name     Add cdma sim message
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_AddCdmaSimMessage_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -2476,6 +3373,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_AddCdmaSimMessage_V1_0100, Fun
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SMS_ADD_CDMA_SIM_MESSAGE));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_AddCdmaSimMessage_V1_0200
+ * @tc.name     Add cdma sim message
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_AddCdmaSimMessage_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -2491,6 +3393,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_AddCdmaSimMessage_V1_0200, Fun
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SMS_ADD_CDMA_SIM_MESSAGE));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_UpdateCdmaSimMessage_V1_0100
+ * @tc.name     Update cdma sim message
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_UpdateCdmaSimMessage_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -2507,6 +3414,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_UpdateCdmaSimMessage_V1_0100, 
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SMS_UPDATE_CDMA_SIM_MESSAGE));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_UpdateCdmaSimMessage_V1_0200
+ * @tc.name     Update cdma sim message
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_UpdateCdmaSimMessage_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -2523,6 +3435,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_UpdateCdmaSimMessage_V1_0200, 
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SMS_UPDATE_CDMA_SIM_MESSAGE));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_DelCdmaSimMessage_V1_0100
+ * @tc.name     Delete cdma sim message
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_DelCdmaSimMessage_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -2535,6 +3452,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_DelCdmaSimMessage_V1_0100, Fun
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SMS_DEL_CDMA_SIM_MESSAGE));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_DelCdmaSimMessage_V1_0200
+ * @tc.name     Delete cdma sim message
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_DelCdmaSimMessage_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -2547,6 +3469,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_DelCdmaSimMessage_V1_0200, Fun
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SMS_DEL_CDMA_SIM_MESSAGE));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetSmscAddr_V1_0100
+ * @tc.name     Get smsc addr
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetSmscAddr_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -2558,6 +3485,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetSmscAddr_V1_0100, Function 
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SMS_GET_SMSC_ADDR));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetSmscAddr_V1_0200
+ * @tc.name     Get smsc addr
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetSmscAddr_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -2569,6 +3501,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetSmscAddr_V1_0200, Function 
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SMS_GET_SMSC_ADDR));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetSmscAddr_V1_0100
+ * @tc.name     Set smsc addr
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetSmscAddr_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -2583,6 +3520,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetSmscAddr_V1_0100, Function 
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SMS_SET_SMSC_ADDR));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetSmscAddr_V1_0200
+ * @tc.name     Set smsc addr
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetSmscAddr_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -2597,6 +3539,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetSmscAddr_V1_0200, Function 
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SMS_SET_SMSC_ADDR));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetCBConfig_V1_0100
+ * @tc.name     Set cb config
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetCBConfig_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -2612,6 +3559,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetCBConfig_V1_0100, Function 
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SMS_SET_CB_CONFIG));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetCBConfig_V1_0200
+ * @tc.name     Set cb config
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetCBConfig_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -2627,6 +3579,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetCBConfig_V1_0200, Function 
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SMS_SET_CB_CONFIG));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetCBConfig_V1_0100
+ * @tc.name     Get cb config
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetCBConfig_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -2638,6 +3595,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetCBConfig_V1_0100, Function 
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SMS_GET_CB_CONFIG));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetCBConfig_V1_0200
+ * @tc.name     Get cb config
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetCBConfig_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -2649,6 +3611,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetCBConfig_V1_0200, Function 
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SMS_GET_CB_CONFIG));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetCdmaCBConfig_V1_0100
+ * @tc.name     Set cdma cb config
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetCdmaCBConfig_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -2661,6 +3628,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetCdmaCBConfig_V1_0100, Funct
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SMS_SET_CDMA_CB_CONFIG));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SetCdmaCBConfig_V1_0200
+ * @tc.name     Set cdma cb config
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetCdmaCBConfig_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -2673,6 +3645,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetCdmaCBConfig_V1_0200, Funct
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SMS_SET_CDMA_CB_CONFIG));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetCdmaCBConfig_V1_0100
+ * @tc.name     Get cdma cb config
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetCdmaCBConfig_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -2684,6 +3661,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetCdmaCBConfig_V1_0100, Funct
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SMS_GET_CDMA_CB_CONFIG));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_GetCdmaCBConfig_V1_0200
+ * @tc.name     Get cdma cb config
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetCdmaCBConfig_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -2695,6 +3677,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetCdmaCBConfig_V1_0200, Funct
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SMS_GET_CDMA_CB_CONFIG));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SendSmsMoreMode_V1_0100
+ * @tc.name     Send sms more mode
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SendSmsMoreMode_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -2709,6 +3696,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SendSmsMoreMode_V1_0100, Funct
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SMS_SEND_SMS_MORE_MODE));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SendSmsMoreMode_V1_0200
+ * @tc.name     Send sms more mode
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SendSmsMoreMode_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -2723,6 +3715,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SendSmsMoreMode_V1_0200, Funct
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SMS_SEND_SMS_MORE_MODE));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SendSmsAck_V1_0100
+ * @tc.name     Send sms ack
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SendSmsAck_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -2737,6 +3734,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SendSmsAck_V1_0100, Function |
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SMS_SEND_SMS_ACK));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SendSmsAck_V1_0200
+ * @tc.name     Send sms ack
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SendSmsAck_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
@@ -2751,6 +3753,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SendSmsAck_V1_0200, Function |
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SMS_SEND_SMS_ACK));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SendGsmSms_V1_0100
+ * @tc.name     Send gsm sms
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SendGsmSms_V1_0100, Function | MediumTest | Level2)
 {
     if (!IsReady(SLOTID_1)) {
@@ -2765,6 +3772,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SendGsmSms_V1_0100, Function |
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SMS_SEND_GSM_SMS));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SendGsmSms_V1_0200
+ * @tc.name     Send gsm sms
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SendGsmSms_V1_0200, Function | MediumTest | Level2)
 {
     if (!IsReady(SLOTID_2)) {
@@ -2779,6 +3791,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SendGsmSms_V1_0200, Function |
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SMS_SEND_GSM_SMS));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SendGsmSms_V1_0200
+ * @tc.name     Send cdma sms
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SendCdmaSms_V1_0100, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_1)) {
@@ -2792,6 +3809,11 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SendCdmaSms_V1_0100, Function 
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_SMS_SEND_CDMA_SMS));
 }
 
+/**
+ * @tc.number   Telephony_DriverSystem_SendCdmaSms_V1_0200
+ * @tc.name     Send cdma sms
+ * @tc.desc     Function test
+ */
 HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SendCdmaSms_V1_0200, Function | MediumTest | Level3)
 {
     if (!IsReady(SLOTID_2)) {
