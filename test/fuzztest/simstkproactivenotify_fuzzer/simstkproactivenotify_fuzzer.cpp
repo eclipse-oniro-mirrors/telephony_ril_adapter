@@ -26,6 +26,7 @@
 using namespace OHOS::Telephony;
 namespace OHOS {
 constexpr int32_t SLOT_NUM = 3;
+constexpr const char *NUMBER = "123";
 
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 {
@@ -37,7 +38,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     struct ReportInfo reportInfo;
     reportInfo.error = static_cast<HRilErrNumber>(size);
     reportInfo.notifyId = HNOTI_SIM_STK_PROACTIVE_NOTIFY;
-    char *response = reinterpret_cast<char *>(const_cast<uint8_t *>(data));
+    char *response = const_cast<char *>(NUMBER);
 
     HRilManager hrilManager;
     std::shared_ptr<HRilSim> hrilSim = std::make_shared<HRilSim>(slotId, hrilManager);

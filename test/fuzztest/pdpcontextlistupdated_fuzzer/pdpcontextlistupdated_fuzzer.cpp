@@ -29,6 +29,7 @@ constexpr int32_t SLOT_NUM = 2;
 constexpr int32_t REASON_TYPE = 2;
 constexpr int32_t RETRY_TIME = 2;
 constexpr int32_t ACTIVE_NUM = 2;
+constexpr const char *NUMBER = "123";
 
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 {
@@ -44,15 +45,15 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     response.retryTime = static_cast<int32_t>(size) % RETRY_TIME;
     response.cid = static_cast<int32_t>(size);
     response.active = static_cast<int32_t>(size) % ACTIVE_NUM;
-    response.type = reinterpret_cast<char *>(const_cast<uint8_t *>(data));
-    response.netPortName = reinterpret_cast<char *>(const_cast<uint8_t *>(data));
-    response.address = reinterpret_cast<char *>(const_cast<uint8_t *>(data));
-    response.dns = reinterpret_cast<char *>(const_cast<uint8_t *>(data));
-    response.dnsSec = reinterpret_cast<char *>(const_cast<uint8_t *>(data));
-    response.gateway = reinterpret_cast<char *>(const_cast<uint8_t *>(data));
+    response.type = const_cast<char *>(NUMBER);
+    response.netPortName = const_cast<char *>(NUMBER);
+    response.address = const_cast<char *>(NUMBER);
+    response.dns = const_cast<char *>(NUMBER);
+    response.dnsSec = const_cast<char *>(NUMBER);
+    response.gateway = const_cast<char *>(NUMBER);
     response.maxTransferUnit = static_cast<int32_t>(size);
-    response.pCscfPrimAddr = reinterpret_cast<char *>(const_cast<uint8_t *>(data));
-    response.pCscfSecAddr = reinterpret_cast<char *>(const_cast<uint8_t *>(data));
+    response.pCscfPrimAddr = const_cast<char *>(NUMBER);
+    response.pCscfSecAddr = const_cast<char *>(NUMBER);
     response.pduSessionId = static_cast<int32_t>(size);
 
     HRilManager hrilManager;
