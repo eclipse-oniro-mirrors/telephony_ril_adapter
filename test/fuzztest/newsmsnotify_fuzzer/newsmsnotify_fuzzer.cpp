@@ -18,14 +18,15 @@
 #include <cstddef>
 #include <cstdint>
 
-#include "hril_notification.h"
 #include "hril_manager.h"
+#include "hril_notification.h"
 #include "hril_sms.h"
 #include "system_ability_definition.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
 constexpr int32_t SLOT_NUM = 2;
+constexpr const char *NUMBER = "123";
 
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 {
@@ -39,7 +40,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     reportInfo.notifyId = HNOTI_SMS_NEW_SMS;
     HRilSmsResponse response;
     response.msgRef = static_cast<int32_t>(size);
-    response.pdu = reinterpret_cast<char *>(const_cast<uint8_t *>(data));
+    response.pdu = const_cast<char *>(NUMBER);
     response.errCode = static_cast<int32_t>(size);
 
     HRilManager hrilManager;
@@ -47,10 +48,10 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     hrilSms->ProcessNotify<HRilSms>(HRIL_RESPONSE_NOTICE, &reportInfo, &response, size);
     return;
 }
-}  // namespace OHOS
+} // namespace OHOS
 
 /* Fuzzer entry point */
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     /* Run your code on data */
     OHOS::DoSomethingInterestingWithMyAPI(data, size);
