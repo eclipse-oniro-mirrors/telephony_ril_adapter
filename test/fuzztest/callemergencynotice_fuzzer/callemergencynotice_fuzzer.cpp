@@ -26,6 +26,7 @@
 using namespace OHOS::Telephony;
 namespace OHOS {
 constexpr int32_t SLOT_NUM = 3;
+constexpr const char *NUMBER = "123";
 
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 {
@@ -38,10 +39,10 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     HRilEmergencyInfo info;
     info.index = static_cast<int32_t>(size);
     info.total = static_cast<int32_t>(size);
-    info.eccNum = reinterpret_cast<char *>(const_cast<uint8_t *>(data));
+    info.eccNum = const_cast<char *>(NUMBER);
     info.category = static_cast<int32_t>(size);
     info.simpresent = static_cast<int32_t>(size);
-    info.mcc = reinterpret_cast<char *>(const_cast<uint8_t *>(data));
+    info.mcc = const_cast<char *>(NUMBER);
     info.abnormalService = static_cast<int32_t>(size);
 
     HRilManager hrilManger;
