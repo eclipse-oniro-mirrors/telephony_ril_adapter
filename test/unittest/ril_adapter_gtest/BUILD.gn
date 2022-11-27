@@ -24,10 +24,18 @@ ohos_unittest("tel_ril_adapter_gtest") {
   sources = [
     "ril_callback_test.cpp",
     "ril_interface_test.cpp",
+    "zero_branch_test.cpp",
   ]
 
-  include_dirs = [ "include" ]
-
+  include_dirs = [
+    "include",
+    "//base/telephony/ril_adapter/services/hril/include",
+    "//base/telephony/ril_adapter/services/hril_hdf/include",
+  ]
+  deps = [
+    "//base/telephony/ril_adapter/services/hril:hril",
+    "//base/telephony/ril_adapter/services/hril_hdf:hril_hdf",
+  ]
   defines = [
     "TELEPHONY_LOG_TAG = \"RilAdapterGtest\"",
     "LOG_DOMAIN = 0xD000F00",
@@ -38,6 +46,7 @@ ohos_unittest("tel_ril_adapter_gtest") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
+      "drivers_interface_power:libpower_proxy_1.0",
       "drivers_interface_ril:libril_proxy_1.0",
       "hdf_core:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
