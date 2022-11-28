@@ -534,11 +534,13 @@ int32_t HRilSms::NewCdmaSmsNotify(int32_t indType, const HRilErrNumber error, co
     }
     HDI::Ril::V1_0::SmsMessageInfo messageInfo;
     messageInfo.indicationType = indType;
-    if (message->pdu == nullptr) {
-        std::move(messageInfo.pdu);
-    } else {
+    if (message->pdu != nullptr) {
         messageInfo.size = strlen(message->pdu) / HEX_WIDTH;
         uint8_t *bytes = ConvertHexStringToBytes(message->pdu, strlen(message->pdu));
+        if (bytes == nullptr) {
+            TELEPHONY_LOGE("bytes is nullptr");
+            return HRIL_ERR_GENERIC_FAILURE;
+        }
         uint8_t *temp = bytes;
         for (int32_t i = 0; i < messageInfo.size; i++) {
             messageInfo.pdu.push_back(*temp);
@@ -604,15 +606,15 @@ int32_t HRilSms::RequestWithStrings(int32_t serial, int32_t request, int32_t cou
     if (count <= 0) {
         return HRIL_ERR_NULL_POINT;
     }
-    int32_t len = count * sizeof(char) + 1;
+    int32_t len = count * sizeof(char *);
     pBuff = (char **)malloc(len);
     if (pBuff == nullptr) {
         TELEPHONY_LOGE("req: [%{public}d,%{public}d], malloc fail", serial, request);
         return HRIL_ERR_NULL_POINT;
     }
-    if (memset_s(*pBuff, len, 0, len) != EOK) {
+    if (memset_s(pBuff, len, 0, len) != EOK) {
         TELEPHONY_LOGE("RequestWithInts memset_s failed");
-        SafeFrees(*pBuff);
+        SafeFrees(pBuff);
         return false;
     }
     va_list list;
