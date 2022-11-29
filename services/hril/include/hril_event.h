@@ -47,6 +47,8 @@ public:
     void AddEventMessage(const HRilEventMessage &eventMsg);
     void RemoveEventMessage(HRilEventMessage &eventMsg);
     void EventMessageLoop();
+    void SetNormalDestory(bool isDestory);
+    bool IsNormalDestory();
 
 private:
     void GetNowTime(struct timeval &tv);
@@ -62,6 +64,7 @@ private:
     std::vector<HRilEventMessage *> listenEventTable_;
     fd_set readFds_;
     int32_t nfds_;
+    bool isNormalDestory = false;
     const int32_t DEFAULT_INDEX = -1;
     const int32_t LISTEN_FD_EVENTS_MAX = 8;
     const int32_t TIME_UNIT = 1000;
