@@ -288,6 +288,27 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Data_001, Function | MediumTest | Lev
 }
 
 /**
+ * @tc.number   Telephony_HrilManager_Data_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_HrilManager_Data_002, Function | MediumTest | Level2)
+{
+    auto manager = std::make_shared<HRilManager>();
+    auto data = std::make_unique<HRilData>(0, *manager);
+    HRilRadioResponseInfo responseInfo;
+    EXPECT_NE(HDF_SUCCESS, data->ActivatePdpContextResponse(0, responseInfo, NULL, 0));
+    EXPECT_NE(HDF_SUCCESS, data->DeactivatePdpContextResponse(0, responseInfo, NULL, 0));
+    EXPECT_NE(HDF_SUCCESS, data->GetPdpContextListResponse(0, responseInfo, NULL, 0));
+    EXPECT_NE(HDF_SUCCESS, data->SetInitApnInfoResponse(0, responseInfo, NULL, 0));
+    EXPECT_NE(HDF_SUCCESS, data->PdpContextListUpdated(0, HRilErrNumber::HRIL_ERR_NULL_POINT, NULL, 0));
+    EXPECT_NE(HDF_SUCCESS, data->GetLinkBandwidthInfoResponse(0, responseInfo, NULL, 0));
+    EXPECT_NE(HDF_SUCCESS, data->SetLinkBandwidthReportingRuleResponse(0, responseInfo, NULL, 0));
+    EXPECT_NE(HDF_SUCCESS, data->SetDataProfileInfoResponse(0, responseInfo, NULL, 0));
+    EXPECT_NE(HDF_SUCCESS, data->SetDataPermittedResponse(0, responseInfo, NULL, 0));
+}
+
+/**
  * @tc.number   Telephony_HrilManager_Modem_001
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -302,6 +323,27 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Modem_001, Function | MediumTest | Le
 }
 
 /**
+ * @tc.number   Telephony_HrilManager_Modem_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_HrilManager_Modem_002, Function | MediumTest | Level2)
+{
+    auto manager = std::make_shared<HRilManager>();
+    auto modem = std::make_unique<HRilModem>(0, *manager);
+    HRilRadioResponseInfo responseInfo;
+    EXPECT_NE(HDF_SUCCESS, modem->ShutDownResponse(0, responseInfo, NULL, 0));
+    EXPECT_NE(HDF_SUCCESS, modem->SetRadioStateResponse(0, responseInfo, NULL, 0));
+    EXPECT_NE(HDF_SUCCESS, modem->GetRadioStateResponse(0, responseInfo, NULL, 0));
+    EXPECT_NE(HDF_SUCCESS, modem->GetImeiResponse(0, responseInfo, NULL, 0));
+    EXPECT_NE(HDF_SUCCESS, modem->GetMeidResponse(0, responseInfo, NULL, 0));
+    EXPECT_NE(HDF_SUCCESS, modem->GetVoiceRadioTechnologyResponse(0, responseInfo, NULL, 0));
+    EXPECT_NE(HDF_SUCCESS, modem->GetBasebandVersionResponse(0, responseInfo, NULL, 0));
+    EXPECT_NE(HDF_SUCCESS, modem->RadioStateUpdated(0, HRilErrNumber::HRIL_ERR_NULL_POINT, NULL, 0));
+    EXPECT_NE(HDF_SUCCESS, modem->VoiceRadioTechUpdated(0, HRilErrNumber::HRIL_ERR_NULL_POINT, NULL, 0));
+}
+
+/**
  * @tc.number   Telephony_HrilManager_Network_001
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -313,6 +355,50 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Sim_001, Function | MediumTest | Leve
     std::unique_ptr<HRilSim> data;
     manager->hrilSim_.push_back(std::move(data));
     EXPECT_EQ(true, TestSimInterface(manager));
+}
+
+/**
+ * @tc.number   Telephony_HrilManager_Sim_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_HrilManager_Sim_002, Function | MediumTest | Level2)
+{
+    auto manager = std::make_shared<HRilManager>();
+    auto sim = std::make_unique<HRilSim>(0, *manager);
+    HRilRadioResponseInfo responseInfo;
+    EXPECT_NE(HDF_SUCCESS, sim->GetSimIOResponse(0, responseInfo, NULL, 0));
+    EXPECT_NE(HDF_SUCCESS, sim->GetSimStatusResponse(0, responseInfo, NULL, 0));
+    EXPECT_NE(HDF_SUCCESS, sim->GetImsiResponse(0, responseInfo, NULL, 0));
+    EXPECT_NE(HDF_SUCCESS, sim->GetSimLockStatusResponse(0, responseInfo, NULL, 0));
+    EXPECT_NE(HDF_SUCCESS, sim->SetSimLockResponse(0, responseInfo, NULL, 0));
+    EXPECT_NE(HDF_SUCCESS, sim->ChangeSimPasswordResponse(0, responseInfo, NULL, 0));
+    EXPECT_NE(HDF_SUCCESS, sim->UnlockPinResponse(0, responseInfo, NULL, 0));
+    EXPECT_NE(HDF_SUCCESS, sim->UnlockPukResponse(0, responseInfo, NULL, 0));
+    EXPECT_NE(HDF_SUCCESS, sim->UnlockPin2Response(0, responseInfo, NULL, 0));
+    EXPECT_NE(HDF_SUCCESS, sim->UnlockPuk2Response(0, responseInfo, NULL, 0));
+    EXPECT_NE(HDF_SUCCESS, sim->SetActiveSimResponse(0, responseInfo, NULL, 0));
+    EXPECT_NE(HDF_SUCCESS, sim->SimStkSendTerminalResponseResponse(0, responseInfo, NULL, 0));
+    EXPECT_NE(HDF_SUCCESS, sim->SimStkSendEnvelopeResponse(0, responseInfo, NULL, 0));
+    EXPECT_NE(HDF_SUCCESS, sim->SimStkSendCallSetupRequestResultResponse(0, responseInfo, NULL, 0));
+    EXPECT_NE(HDF_SUCCESS, sim->SimStkIsReadyResponse(0, responseInfo, NULL, 0));
+    EXPECT_NE(HDF_SUCCESS, sim->GetRadioProtocolResponse(0, responseInfo, NULL, 0));
+    EXPECT_NE(HDF_SUCCESS, sim->SetRadioProtocolResponse(0, responseInfo, NULL, 0));
+    EXPECT_NE(HDF_SUCCESS, sim->SimOpenLogicalChannelResponse(0, responseInfo, NULL, 0));
+    EXPECT_NE(HDF_SUCCESS, sim->SimCloseLogicalChannelResponse(0, responseInfo, NULL, 0));
+    EXPECT_NE(HDF_SUCCESS, sim->SimTransmitApduLogicalChannelResponse(0, responseInfo, NULL, 0));
+    EXPECT_NE(HDF_SUCCESS, sim->SimTransmitApduBasicChannelResponse(0, responseInfo, NULL, 0));
+    EXPECT_NE(HDF_SUCCESS, sim->SimAuthenticationResponse(0, responseInfo, NULL, 0));
+    EXPECT_NE(HDF_SUCCESS, sim->UnlockSimLockResponse(0, responseInfo, NULL, 0));
+
+    EXPECT_NE(HDF_SUCCESS, sim->SimStateUpdated(0, HRilErrNumber::HRIL_ERR_NULL_POINT, NULL, 0));
+    EXPECT_NE(HDF_SUCCESS, sim->SimStkSessionEndNotify(0, HRilErrNumber::HRIL_ERR_NULL_POINT, NULL, 0));
+    EXPECT_NE(HDF_SUCCESS, sim->SimStkProactiveNotify(0, HRilErrNumber::HRIL_ERR_NULL_POINT, NULL, 0));
+    EXPECT_NE(HDF_SUCCESS, sim->SimStkAlphaNotify(0, HRilErrNumber::HRIL_ERR_NULL_POINT, NULL, 0));
+    EXPECT_NE(HDF_SUCCESS, sim->SimStkEventNotify(0, HRilErrNumber::HRIL_ERR_NULL_POINT, NULL, 0));
+    EXPECT_NE(HDF_SUCCESS, sim->SimStkCallSetupNotify(0, HRilErrNumber::HRIL_ERR_NULL_POINT, NULL, 0));
+    EXPECT_NE(HDF_SUCCESS, sim->SimRefreshNotify(0, HRilErrNumber::HRIL_ERR_NULL_POINT, NULL, 0));
+    EXPECT_NE(HDF_SUCCESS, sim->SimRadioProtocolUpdated(0, HRilErrNumber::HRIL_ERR_NULL_POINT, NULL, 0));
 }
 
 /**
@@ -406,6 +492,24 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Sms_002, Function | MediumTest | Leve
     EXPECT_NE(HDF_SUCCESS, sms->SmsStatusReportNotify(0, HRilErrNumber::HRIL_ERR_NULL_POINT, NULL, 0));
     EXPECT_NE(HDF_SUCCESS, sms->NewSmsNotify(0, HRilErrNumber::HRIL_ERR_NULL_POINT, NULL, 0));
     EXPECT_NE(HDF_SUCCESS, sms->NewCdmaSmsNotify(0, HRilErrNumber::HRIL_ERR_NULL_POINT, NULL, 0));
+}
+
+/**
+ * @tc.number   Telephony_HrilManager_Sms_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_HrilManager_HrilBase_001, Function | MediumTest | Level3)
+{
+    HRilManager manager;
+    HRilBase base { 0, manager };
+    EXPECT_EQ(HRIL_ERR_GENERIC_FAILURE, base.ConvertHexStringToInt(NULL, 0, 0));
+    EXPECT_EQ(10, base.ConvertHexCharToInt('a'));
+    EXPECT_EQ(0, base.ConvertHexCharToInt('0'));
+    EXPECT_EQ(HRIL_INVALID_HEX_CHAR, base.ConvertHexCharToInt('z'));
+    ASSERT_TRUE(base.ConvertHexStringToBytes(NULL, 0) == nullptr);
+    ASSERT_TRUE(base.ConvertHexStringToBytes(this, 0) == nullptr);
+    ASSERT_FALSE(base.ConvertToString(NULL, ""));
 }
 
 } // namespace Telephony
