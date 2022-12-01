@@ -34,21 +34,21 @@ class HRilTimerCallback {
 public:
     HRilTimerCallback() {};
     virtual ~HRilTimerCallback() = default;
+    std::unique_ptr<HRilEvent> event_ = nullptr;
 
     void EventLoop();
     std::shared_ptr<HRilTimerCallbackMessage> HRilSetTimerCallbackInfo(
         HRilCallbackFun func, uint8_t *param, const struct timeval *tv);
+    void OnTriggerEvent();
 
 private:
     void FdTriggerCallback(int32_t fd, int16_t events, std::shared_ptr<void> param);
     void TimerCallback(int32_t fd, int16_t events, std::shared_ptr<void> param);
-    void OnTriggerEvent();
 
 private:
     HRilEventMessage fdTriggerEvent_;
     int32_t triggerReadFd_;
     int32_t triggerWriteFd_;
-    std::unique_ptr<HRilEvent> event_ = nullptr;
     const int32_t PIPE_SIZE_MAX = 2;
     const int32_t READ_FD_BUFF_SIZE = 16;
     std::thread::id eventLoopTid_;

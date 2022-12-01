@@ -114,8 +114,11 @@ void HRilTimerCallback::EventLoop()
     event_->SetTimerEvent(fdTriggerEvent_, triggerReadFd_, true, func, NULL);
     event_->AddEventMessage(fdTriggerEvent_);
     event_->EventMessageLoop();
-    TELEPHONY_LOGE("error in EventMessageLoop errno:%{public}d", errno);
-    kill(0, SIGKILL);
+    TELEPHONY_LOGE("error in EventMessageLoop errno:%{public}d, isNormalDestory:%{public}d",
+        errno, event_->IsNormalDestory());
+    if (!event_->IsNormalDestory()) {
+        EventLoop();
+    }
 }
 } // namespace Telephony
 } // namespace OHOS

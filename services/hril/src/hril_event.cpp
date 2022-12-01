@@ -210,7 +210,10 @@ void HRilEvent::EventMessageLoop()
             pTimeOut = &timeout;
         }
         ret = select(nfds_, &rfds, nullptr, nullptr, pTimeOut);
-        TELEPHONY_LOGI("There are %{public}d events fired.", ret);
+        TELEPHONY_LOGI("There are %{public}d events fired, isNormalDestory: %{public}d.", ret, isNormalDestory);
+        if (isNormalDestory) {
+            return;
+        }
         if (ret < 0) {
             if (errno == EINTR) {
                 continue;
@@ -223,5 +226,15 @@ void HRilEvent::EventMessageLoop()
         ProcessPendingList();
     }
 }
+
+void HRilEvent::SetNormalDestory(bool isDestory)
+{
+    isNormalDestory = isDestory;
+}
+bool HRilEvent::IsNormalDestory()
+{
+    return isNormalDestory;
+}
+
 } // namespace Telephony
 } // namespace OHOS

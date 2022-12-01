@@ -892,7 +892,20 @@ int32_t HRilManager::SendRilAck()
     return HRIL_ERR_SUCCESS;
 }
 
-HRilManager::~HRilManager() {}
+HRilManager::~HRilManager()
+{
+    if (timerCallback_ == nullptr || timerCallback_->event_ == nullptr ||
+        timerCallback_->event_->IsNormalDestory()) {
+        return;
+    }
+    timerCallback_->event_->SetNormalDestory(true);
+    timerCallback_->OnTriggerEvent();
+    if (eventLoop_ == nullptr || !eventLoop_->joinable()) {
+        return;
+    }
+    eventLoop_->join();
+    TELEPHONY_LOGI("~HRilManager end");
+}
 
 #ifdef __cplusplus
 extern "C" {
