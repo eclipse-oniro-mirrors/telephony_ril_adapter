@@ -49,7 +49,7 @@ int32_t ATStartReadLoop(int32_t fd, OnNotify func); // at_open
 
 void ATCloseReadLoop(void); // at_close
 
-void AtSetOnUnusual(void (*OnAtUnusual)(void));
+void AtSetOnUnusual(void (*onAtUnusual)(void));
 
 void FreeResponseInfo(ResponseInfo *resp); // free ResponseResult
 
@@ -63,7 +63,7 @@ int32_t SendCommandSmsLock(
 
 int32_t SendCommandNoLock(const char *command, long long timeout, ResponseInfo **outResponse);
 
-void SetWatchFunction(void (*WatchFun)(void));
+void SetWatchFunction(void (*watchFun)(void));
 
 void SetAtPauseFlag(bool isNeedPause);
 bool GetAtPauseFlag(void);

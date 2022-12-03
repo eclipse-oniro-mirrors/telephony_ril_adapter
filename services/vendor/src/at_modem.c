@@ -132,12 +132,11 @@ void ReqGetImei(const ReqDataInfo *requestInfo)
     if (requestInfo == NULL) {
         return;
     }
-    const long TIME_OUT = DEFAULT_TIMEOUT;
     int32_t err = HRIL_ERR_SUCCESS;
     ResponseInfo *responseInfo = NULL;
     TELEPHONY_LOGI("enter to [%{public}s]:%{public}d", __func__, __LINE__);
-    int32_t ret = SendCommandLock("AT+CGSN", NULL, TIME_OUT, &responseInfo);
-    struct ResponseAck respDataAck = {responseInfo, NULL, 0};
+    int32_t ret = SendCommandLock("AT+CGSN", NULL, DEFAULT_TIMEOUT, &responseInfo);
+    struct ResponseAck respDataAck = { responseInfo, NULL, 0 };
     if (responseInfo == NULL) {
         TELEPHONY_LOGE("responseInfo is null");
         ResponseModemReport(requestInfo->slotId, requestInfo, HRIL_ERR_NULL_POINT, &respDataAck);
@@ -171,12 +170,11 @@ void ReqGetMeid(const ReqDataInfo *requestInfo)
     if (requestInfo == NULL) {
         return;
     }
-    const long TIME_OUT = DEFAULT_TIMEOUT;
     int32_t err = HRIL_ERR_SUCCESS;
     ResponseInfo *responseInfo = NULL;
     TELEPHONY_LOGI("enter to [%{public}s]:%{public}d", __func__, __LINE__);
-    int32_t ret = SendCommandLock("AT+MEID", NULL, TIME_OUT, &responseInfo);
-    struct ResponseAck respDataAck = {responseInfo, NULL, 0};
+    int32_t ret = SendCommandLock("AT+MEID", NULL, DEFAULT_TIMEOUT, &responseInfo);
+    struct ResponseAck respDataAck = { responseInfo, NULL, 0 };
     if (responseInfo == NULL) {
         ResponseModemReport(requestInfo->slotId, requestInfo, HRIL_ERR_NULL_POINT, &respDataAck);
         return;
@@ -306,8 +304,7 @@ void ReqGetVoiceRadioTechnology(const ReqDataInfo *requestInfo)
     struct ReportInfo reportInfo;
     ResponseInfo *responseInfo = NULL;
     char *result = NULL;
-    const long TIME_OUT = DEFAULT_TIMEOUT;
-    int32_t ret = SendCommandLock("AT^SYSINFOEX", "^SYSINFOEX:", TIME_OUT, &responseInfo);
+    int32_t ret = SendCommandLock("AT^SYSINFOEX", "^SYSINFOEX:", DEFAULT_TIMEOUT, &responseInfo);
     if (responseInfo == NULL) {
         TELEPHONY_LOGE("responseInfo is nullptr!");
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_NULL_POINT, HRIL_RESPONSE, 0);
