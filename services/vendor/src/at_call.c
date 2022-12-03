@@ -367,11 +367,17 @@ void ReqGetCallList(const ReqDataInfo *requestInfo)
     if (ret || (pResponse != NULL && !pResponse->success)) {
         err = ret ? ret : err;
         TELEPHONY_LOGE("cmd send failed, err:%{public}d", err);
+        if (err < HRIL_ERR_SUCCESS) {
+            err = HRIL_ERR_GENERIC_FAILURE;
+        }
         OnCallReportErrorMessages(requestInfo, err, pResponse);
         return;
     }
     err = BuildCallInfoList(requestInfo, pResponse);
     if (err != HRIL_ERR_SUCCESS) {
+        if (err < HRIL_ERR_SUCCESS) {
+            err = HRIL_ERR_GENERIC_FAILURE;
+        }
         TELEPHONY_LOGE("Build Call Info List is failed.");
         OnCallReportErrorMessages(requestInfo, err, pResponse);
     }

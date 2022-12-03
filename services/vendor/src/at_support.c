@@ -43,9 +43,9 @@ static void ReaderLoop(void);
 // clear command memory
 static void ClearCurCommand(void);
 
-void AtSetOnUnusual(void (*OnAtUnusual)(void))
+void AtSetOnUnusual(void (*onAtUnusual)(void))
 {
-    g_atnUnusual = OnAtUnusual;
+    g_atnUnusual = onAtUnusual;
 }
 
 int32_t ATStartReadLoop(int32_t fd, OnNotify func)
@@ -363,9 +363,9 @@ void ClearCurCommand(void)
     g_prefix = NULL;
 }
 
-void SetWatchFunction(void (*WatchFun)(void))
+void SetWatchFunction(void (*watchFun)(void))
 {
-    g_atWatch = WatchFun;
+    g_atWatch = watchFun;
 }
 
 void SetAtPauseFlag(bool isNeedPause)
