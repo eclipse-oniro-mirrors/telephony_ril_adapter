@@ -21,7 +21,7 @@
 #include "vendor_report.h"
 #include "vendor_util.h"
 
-#define numCount 3
+#define NUM_COUNT 3
 #define TIME_VALUE_LEN 30
 
 static struct ReportInfo g_reportInfoForOperListToUse;
@@ -62,6 +62,8 @@ const int32_t RAF_3G = WCDMA | EVDO | RAF_TD_SCDMA;
 const int32_t RAF_4G = LTE;
 const int32_t RAF_5G = NR;
 const int32_t RAF_AUTO = RAF_2G | RAF_3G | RAF_4G | RAF_5G;
+const size_t TIME_VALUE_OFFSET = 2;
+const int32_t ADD_LENGTH = 3;
 
 static int32_t GetResponseErrorCode(ResponseInfo *pResponseInfo)
 {
@@ -90,6 +92,9 @@ static int32_t ResponseNetworkReport(
     if (respDataAck == NULL) {
         TELEPHONY_LOGE("respDataAck is nullptr!");
         return HRIL_ERR_GENERIC_FAILURE;
+    }
+    if (err < HRIL_ERR_SUCCESS) {
+        err = HRIL_ERR_GENERIC_FAILURE;
     }
     struct ReportInfo reportInfo;
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
@@ -450,12 +455,11 @@ void ReqGetSignalStrength(const ReqDataInfo *requestInfo)
     }
     int32_t err = HRIL_ERR_SUCCESS;
     struct ReportInfo reportInfo;
-    const long TIME_OUT = DEFAULT_TIMEOUT;
     const int32_t REPORT_SIZE = 20;
     ResponseInfo *responseInfo = NULL;
     char *result = NULL;
     TELEPHONY_LOGI("enter to [%{public}s]:%{public}d", __func__, __LINE__);
-    int32_t ret = SendCommandLock("AT^HCSQ?", "^HCSQ:", TIME_OUT, &responseInfo);
+    int32_t ret = SendCommandLock("AT^HCSQ?", "^HCSQ:", DEFAULT_TIMEOUT, &responseInfo);
     if (responseInfo == NULL) {
         TELEPHONY_LOGE("responseInfo is nullptr!");
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_NULL_POINT, HRIL_RESPONSE, 0);
@@ -501,9 +505,8 @@ void ReqGetCsRegStatus(const ReqDataInfo *requestInfo)
     struct ReportInfo reportInfo;
     ResponseInfo *responseInfo = NULL;
     char *result = NULL;
-    const long TIME_OUT = DEFAULT_TIMEOUT;
 
-    int32_t ret = SendCommandLock("AT+CREG?", "+CREG:", TIME_OUT, &responseInfo);
+    int32_t ret = SendCommandLock("AT+CREG?", "+CREG:", DEFAULT_TIMEOUT, &responseInfo);
     if (responseInfo == NULL) {
         TELEPHONY_LOGE("responseInfo is nullptr!");
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_NULL_POINT, HRIL_RESPONSE, 0);
@@ -540,9 +543,8 @@ void ReqGetPsRegStatus(const ReqDataInfo *requestInfo)
     struct ReportInfo reportInfo;
     ResponseInfo *responseInfo = NULL;
     char *result = NULL;
-    const long TIME_OUT = DEFAULT_TIMEOUT;
 
-    int32_t ret = SendCommandLock("AT+CGREG?", "+CGREG:", TIME_OUT, &responseInfo);
+    int32_t ret = SendCommandLock("AT+CGREG?", "+CGREG:", DEFAULT_TIMEOUT, &responseInfo);
     if (responseInfo == NULL) {
         TELEPHONY_LOGE("responseInfo is nullptr!");
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_NULL_POINT, HRIL_RESPONSE, 0);
@@ -579,11 +581,10 @@ void ReqGetOperatorInfo(const ReqDataInfo *requestInfo)
     struct ReportInfo reportInfo;
     ResponseInfo *responseInfo = NULL;
     char *result = NULL;
-    char *response[numCount] = {"", "", ""};
-    const long TIME_OUT = DEFAULT_TIMEOUT;
+    char *response[NUM_COUNT] = { "", "", "" };
 
-    int32_t ret =
-        SendCommandLock("AT+COPS=3,0;+COPS?;+COPS=3,1;+COPS?;+COPS=3,2;+COPS?", "+COPS:", TIME_OUT, &responseInfo);
+    int32_t ret = SendCommandLock(
+        "AT+COPS=3,0;+COPS?;+COPS=3,1;+COPS?;+COPS=3,2;+COPS?", "+COPS:", DEFAULT_TIMEOUT, &responseInfo);
     if (responseInfo == NULL) {
         TELEPHONY_LOGE("responseInfo is nullptr!");
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_NULL_POINT, HRIL_RESPONSE, 0);
@@ -618,7 +619,7 @@ void ReqGetOperatorInfo(const ReqDataInfo *requestInfo)
         }
     }
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-    OnNetworkReport(requestInfo->slotId, reportInfo, (const uint8_t *)response, numCount);
+    OnNetworkReport(requestInfo->slotId, reportInfo, (const uint8_t *)response, NUM_COUNT);
     FreeResponseInfo(responseInfo);
 }
 
@@ -680,7 +681,6 @@ void ReqGetNetworkSearchInformation(const ReqDataInfo *requestInfo)
     if (requestInfo == NULL) {
         return;
     }
-    const long TIME_OUT = 3000;
     ResponseInfo *responseInfo = NULL;
     const int32_t SECOND = 120;
     TELEPHONY_LOGI("enter to [%{public}s]:%{public}d", __func__, __LINE__);
@@ -698,7 +698,7 @@ void ReqGetNetworkSearchInformation(const ReqDataInfo *requestInfo)
         pthread_mutex_unlock(&g_networkSearchInformationMutex);
         return;
     }
-    int32_t ret = SendCommandNetWorksLock("AT+COPS=?", "+COPS:", TIME_OUT, &responseInfo);
+    int32_t ret = SendCommandNetWorksLock("AT+COPS=?", "+COPS:", DEFAULT_TIMEOUT, &responseInfo);
 
     g_reportInfoForOperListToUse = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
     if ((ret != 0 && ret != AT_ERR_WAITING) || (responseInfo != NULL && !responseInfo->success)) {
@@ -1136,16 +1136,15 @@ void ReqGetNeighboringCellInfoList(const ReqDataInfo *requestInfo)
     if (requestInfo == NULL) {
         return;
     }
-    const long TIME_OUT = DEFAULT_TIMEOUT;
     int32_t err = HRIL_ERR_SUCCESS;
     int32_t countCellInfo = 0;
     int32_t index = 0;
     ResponseInfo *responseInfo = NULL;
     Line *pLine = NULL;
     CellInfo *cellInfo = NULL;
-    CellInfoList cellInfoList = {0, NULL};
-    int32_t ret = SendCommandLock("AT^MONNC", "^MONNC:", TIME_OUT, &responseInfo);
-    struct ResponseAck respDataAck = {responseInfo, NULL, 0};
+    CellInfoList cellInfoList = { 0, NULL };
+    int32_t ret = SendCommandLock("AT^MONNC", "^MONNC:", DEFAULT_TIMEOUT, &responseInfo);
+    struct ResponseAck respDataAck = { responseInfo, NULL, 0 };
     respDataAck.respDataPointer = (uint8_t *)&cellInfoList;
     respDataAck.respDataLen = sizeof(CellInfoList);
     if (responseInfo == NULL) {
@@ -1175,13 +1174,11 @@ void ReqGetNeighboringCellInfoList(const ReqDataInfo *requestInfo)
         return;
     }
     for (pLine = responseInfo->head; pLine != NULL; pLine = pLine->next) {
-        ret = ParseCellInfos(pLine->data, &cellInfo[index]);
-        if (ret != 0) {
+        if (ParseCellInfos(pLine->data, &cellInfo[index]) != 0) {
             continue;
         }
         index++;
     }
-
     cellInfoList.itemNum = index;
     cellInfoList.cellNearbyInfo = cellInfo;
     ResponseNetworkReport(requestInfo->slotId, requestInfo, err, &respDataAck);
@@ -1441,16 +1438,15 @@ void ReqGetCurrentCellInfo(const ReqDataInfo *requestInfo)
     if (requestInfo == NULL) {
         return;
     }
-    const long TIME_OUT = DEFAULT_TIMEOUT;
     int32_t err = HRIL_ERR_SUCCESS;
     int32_t countCellInfo = 0;
     int32_t index = 0;
     ResponseInfo *responseInfo = NULL;
     Line *pLine = NULL;
     CurrentCellInfoVendor *currCellInfo = NULL;
-    CurrentCellInfoList currCellInfoList = {0, NULL};
-    int32_t ret = SendCommandLock("AT^MONSC", "^MONSC:", TIME_OUT, &responseInfo);
-    struct ResponseAck respDataAck = {responseInfo, NULL, 0};
+    CurrentCellInfoList currCellInfoList = { 0, NULL };
+    int32_t ret = SendCommandLock("AT^MONSC", "^MONSC:", DEFAULT_TIMEOUT, &responseInfo);
+    struct ResponseAck respDataAck = { responseInfo, NULL, 0 };
     respDataAck.respDataPointer = (uint8_t *)&currCellInfoList;
     respDataAck.respDataLen = sizeof(CurrentCellInfoList);
     if (responseInfo == NULL) {
@@ -1613,13 +1609,12 @@ void ReqGetNetworkSelectionMode(const ReqDataInfo *requestInfo)
     if (requestInfo == NULL) {
         return;
     }
-    const long TIME_OUT = DEFAULT_TIMEOUT;
     int32_t err = HRIL_ERR_SUCCESS;
     ResponseInfo *responseInfo = NULL;
     int32_t state = 0;
     struct ReportInfo reportInfo;
-    int32_t ret = SendCommandLock("AT+COPS?", "+COPS:", TIME_OUT, &responseInfo);
-    struct ResponseAck respDataAck = {responseInfo, NULL, 0};
+    int32_t ret = SendCommandLock("AT+COPS?", "+COPS:", DEFAULT_TIMEOUT, &responseInfo);
+    struct ResponseAck respDataAck = { responseInfo, NULL, 0 };
     if (responseInfo == NULL) {
         TELEPHONY_LOGE("responseInfo is nullptr");
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_NULL_POINT, HRIL_RESPONSE, 0);
@@ -1673,6 +1668,9 @@ static int32_t IntToNetTypeCmd(int32_t value, char *dst, int32_t dstMaxSize)
         return CONVERT_FAIL;
     }
     int32_t pos = strlen(dst);
+    if (pos > len - ADD_LENGTH) {
+        return CONVERT_FAIL;
+    }
     if (value < DECIMAL) {
         dst[pos++] = '0';
         dst[pos++] = (value % DECIMAL) + '0';
@@ -1796,12 +1794,11 @@ void ReqGetPreferredNetwork(const ReqDataInfo *requestInfo)
     if (requestInfo == NULL) {
         return;
     }
-    const long TIME_OUT = DEFAULT_TIMEOUT;
     int32_t err = HRIL_ERR_SUCCESS;
     ResponseInfo *responseInfo = NULL;
     char *netTypeStr = "";
-    int32_t ret = SendCommandLock("AT^SYSCFGEX?", "^SYSCFGEX:", TIME_OUT, &responseInfo);
-    struct ResponseAck respDataAck = {responseInfo, NULL, 0};
+    int32_t ret = SendCommandLock("AT^SYSCFGEX?", "^SYSCFGEX:", DEFAULT_TIMEOUT, &responseInfo);
+    struct ResponseAck respDataAck = { responseInfo, NULL, 0 };
     if (responseInfo == NULL) {
         TELEPHONY_LOGE("responseInfo is null");
         ResponseNetworkReport(requestInfo->slotId, requestInfo, HRIL_ERR_NULL_POINT, &respDataAck);
@@ -1865,7 +1862,6 @@ void ReqSetLocateUpdates(const ReqDataInfo *requestInfo, HRilRegNotifyMode mode)
     if (requestInfo == NULL) {
         return;
     }
-    const long TIME_OUT = DEFAULT_TIMEOUT;
     ResponseInfo *responseInfo = NULL;
     char *cmd = NULL;
     if (mode == REG_NOTIFY_STAT_LAC_CELLID) {
@@ -1878,7 +1874,7 @@ void ReqSetLocateUpdates(const ReqDataInfo *requestInfo, HRilRegNotifyMode mode)
         TELEPHONY_LOGE("ReqSetLocateUpdates:  locateUpdateMode > 1");
         return;
     }
-    int32_t err = SendCommandLock(cmd, NULL, TIME_OUT, &responseInfo);
+    int32_t err = SendCommandLock(cmd, NULL, DEFAULT_TIMEOUT, &responseInfo);
     if (responseInfo == NULL) {
         struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
         OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 0);
@@ -1930,13 +1926,11 @@ void ReqSetDeviceState(const ReqDataInfo *requestInfo, const int32_t *deviceStat
 
 void NotifyNetWorkTime(int32_t slotId)
 {
-    const long TIME_OUT = DEFAULT_TIMEOUT;
     ResponseInfo *responseInfo = NULL;
-    const size_t TIME_VALUE_OFFSET = 2;
-    char timeStr[TIME_VALUE_LEN] = {0};
-    struct ReportInfo reportInfo = {0};
+    char timeStr[TIME_VALUE_LEN] = { 0 };
+    struct ReportInfo reportInfo = { 0 };
 
-    int32_t ret = SendCommandLock("AT+CCLK?", "+CCLK:", TIME_OUT, &responseInfo);
+    int32_t ret = SendCommandLock("AT+CCLK?", "+CCLK:", DEFAULT_TIMEOUT, &responseInfo);
     if (ret != 0 || responseInfo->success == 0) {
         TELEPHONY_LOGE("send AT CMD failed!");
         return;
