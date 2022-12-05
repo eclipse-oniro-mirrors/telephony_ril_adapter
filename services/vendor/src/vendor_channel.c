@@ -93,11 +93,11 @@ const char *ReadResponse(int32_t atFd)
     // process last response data
     endEol = ProcessLastResponse(&processed);
     while (endEol == NULL) {
-        if (MAX_RESPONSE_LEN == (processed - g_buffer)) {
+        if (MAX_RESPONSE_LEN == (processed - &g_buffer[0])) {
             ClearCurBuffer(&processed);
         }
         do {
-            size = read(atFd, processed, (MAX_RESPONSE_LEN - (processed - g_buffer)));
+            size = read(atFd, processed, (MAX_RESPONSE_LEN - (processed - &g_buffer[0])));
         } while (size < 0 && errno == EINTR);
         if (size > 0) {
             processed[size] = '\0';
