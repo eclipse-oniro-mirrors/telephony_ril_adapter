@@ -1515,7 +1515,7 @@ int32_t ProcessOperListToUse(const char *list)
     }
 
     item = item - UNUSED_ITEM_COUNT;
-    ppOperInfo = (AvailableOperInfo **)malloc(item * sizeof(AvailableOperInfo));
+    ppOperInfo = (AvailableOperInfo **)malloc(item * sizeof(AvailableOperInfo *));
     if (!ppOperInfo) {
         TELEPHONY_LOGE("ppOperInfo malloc fail");
         return OperListErrorHandler(ppOperInfo, pOperInfo);

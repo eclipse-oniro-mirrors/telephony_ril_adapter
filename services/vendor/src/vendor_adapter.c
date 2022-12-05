@@ -254,12 +254,7 @@ static void WaitAtClose(void)
 static int32_t ModemInit(void)
 {
     ResponseInfo *pResponse = NULL;
-    int32_t err = SetRadioState(HRIL_RADIO_POWER_STATE_ON, 0);
-    if (err == -1) {
-        TELEPHONY_LOGE("RadioState set failed");
-    }
-
-    err = SendCommandLock("ATE0Q0V1", NULL, 0, &pResponse);
+    int32_t err = SendCommandLock("ATE0Q0V1", NULL, 0, &pResponse);
     if (err != 0 || !pResponse->success) {
         TELEPHONY_LOGE("ATE0Q0V1 send failed");
     }
@@ -313,13 +308,16 @@ static int32_t ModemInit(void)
     /* Enabled SRVCC status to report actively: This command complies with the 3GPP TS 27.007 protocol. */
     SendCommandLock("AT+CIREP=1", NULL, 0, NULL);
 
-    sleep(SLEEP_TIME);
-    TELEPHONY_LOGI("enter to : ModemInit OnModemReport %{public}d", g_radioState);
-    struct ReportInfo reportInfo = {0};
-    reportInfo.notifyId = HNOTI_MODEM_RADIO_STATE_UPDATED;
-    reportInfo.type = HRIL_NOTIFICATION;
-    reportInfo.error = HRIL_ERR_SUCCESS;
-    OnModemReport(GetSlotId(NULL), reportInfo, (const uint8_t *)&g_radioState, sizeof(HRilRadioState));
+    err = SetRadioState(HRIL_RADIO_POWER_STATE_ON, 0);
+    if (err == -1) {
+        TELEPHONY_LOGE("RadioState set failed");
+        struct ReportInfo reportInfo = { 0 };
+        reportInfo.notifyId = HNOTI_MODEM_RADIO_STATE_UPDATED;
+        reportInfo.type = HRIL_NOTIFICATION;
+        reportInfo.error = HRIL_ERR_SUCCESS;
+        OnModemReport(GetSlotId(NULL), reportInfo, (const uint8_t *)&g_radioState, sizeof(HRilRadioState));
+    }
+    TELEPHONY_LOGI("ModemInit finish radioState %{public}d", g_radioState);
     return err;
 }
 

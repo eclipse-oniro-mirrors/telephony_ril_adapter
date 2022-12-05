@@ -314,7 +314,7 @@ static ModemReportErrorInfo GetLinkInformation(int32_t activeIndex, HRilDataCall
     ModemReportErrorInfo errInfo = {};
 
     ret = SendCommandLock("AT^DHCP?", "^DHCP:", 0, &pResponse);
-    if (ret != 0 || pResponse == NULL || !pResponse->success) {
+    if (ret != 0 || pResponse == NULL || pResponse->head == NULL || !pResponse->success) {
         errInfo = GetReportErrorInfo(pResponse);
         errInfo.errorNo = (ret != HRIL_ERR_SUCCESS) ? ret : errInfo.errorNo;
         TELEPHONY_LOGE("send AT CMD failed! ret:%{public}d", errInfo.errorNo);
@@ -659,15 +659,7 @@ static int32_t SendCmdNDISDUP(int32_t cid, int32_t activate, const ReqDataInfo *
 
 static int32_t RouteUp(void)
 {
-    int32_t ret;
-    char cmd[MAX_CMD_LENGTH] = {0};
-
-    ret = GenerateCommand(cmd, MAX_CMD_LENGTH, "ifconfig %s up", NET_NODE);
-    if (ret < 0) {
-        TELEPHONY_LOGE("GenerateCommand is failed!");
-        return ret;
-    }
-    ret = system(cmd);
+    int32_t ret = system("ifconfig usb0 up");
     if (ret != 0) {
         TELEPHONY_LOGE("exec system is failed! ret:%{public}d, %{public}s", ret, strerror(ret));
         return ret;
@@ -678,15 +670,7 @@ static int32_t RouteUp(void)
 
 static int32_t RouteDown(void)
 {
-    int32_t ret;
-    char cmd[MAX_CMD_LENGTH] = {0};
-
-    ret = GenerateCommand(cmd, MAX_CMD_LENGTH, "ifconfig %s down", NET_NODE);
-    if (ret < 0) {
-        TELEPHONY_LOGE("GenerateCommand is failed!");
-        return ret;
-    }
-    ret = system(cmd);
+    int32_t ret = system("ifconfig usb0 down");
     if (ret != 0) {
         TELEPHONY_LOGE("exec system is failed! ret:%{public}d, %{public}s", ret, strerror(ret));
         return ret;

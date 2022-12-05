@@ -329,7 +329,7 @@ int32_t SendCommandNoLock(const char *command, long long timeout, ResponseInfo *
         return err;
     }
     SetWaitTimeout(&time, (timeout != 0) ? timeout : defaultTimeOut);
-    while (g_response->result == NULL && g_readerClosed == 0) {
+    while (g_response != NULL && g_response->result == NULL && g_readerClosed == 0) {
         err = pthread_cond_timedwait(&g_commandcond, &g_commandmutex, &time);
         if (err == ETIMEDOUT) {
             err = AT_ERR_TIMEOUT;

@@ -503,7 +503,7 @@ void ReqGetClip(const ReqDataInfo *requestInfo)
             TELEPHONY_LOGE("CLIP return ERROR");
             err = HRIL_ERR_GENERIC_FAILURE;
         } else {
-            if (pResponse->head) {
+            if (pResponse != NULL && pResponse->head != NULL) {
                 char *line = pResponse->head->data;
                 SkipATPrefix(&line);
                 NextInt(&line, &result.action);
@@ -563,7 +563,7 @@ void ReqGetClir(const ReqDataInfo *requestInfo)
             TELEPHONY_LOGE("CLIR return ERROR");
             err = HRIL_ERR_GENERIC_FAILURE;
         } else {
-            if (pResponse->head) {
+            if (pResponse != NULL && pResponse->head != NULL) {
                 char *line = pResponse->head->data;
                 SkipATPrefix(&line);
                 NextInt(&line, &result.action);
@@ -858,7 +858,7 @@ void ReqGetCallWaiting(const ReqDataInfo *requestInfo)
         TELEPHONY_LOGE("Get CCWA return ERROR");
         err = HRIL_ERR_GENERIC_FAILURE;
     } else {
-        if (pResponse->head) {
+        if (pResponse != NULL && pResponse->head != NULL) {
             line = pResponse->head->data;
             SkipATPrefix(&line);
             NextInt(&line, &hrilCallWaitResult.status);
