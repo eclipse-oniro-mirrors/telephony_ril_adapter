@@ -72,7 +72,7 @@ static UsbDeviceInfo *GetUsbDeviceInfo(void)
 {
     struct udev *udev;
     struct udev_enumerate *enumerate;
-    struct udev_list_entry *devices, *dev_list_entry;
+    struct udev_list_entry *devices, *devListEntry;
     struct udev_device *dev;
     UsbDeviceInfo *uDevInfo = NULL;
 
@@ -90,8 +90,8 @@ static UsbDeviceInfo *GetUsbDeviceInfo(void)
     udev_enumerate_add_match_subsystem(enumerate, "tty");
     udev_enumerate_scan_devices(enumerate);
     devices = udev_enumerate_get_list_entry(enumerate);
-    udev_list_entry_foreach(dev_list_entry, devices) {
-        const char *path = udev_list_entry_get_name(dev_list_entry);
+    udev_list_entry_foreach(devListEntry, devices) {
+        const char *path = udev_list_entry_get_name(devListEntry);
         if (path == NULL) {
             continue;
         }

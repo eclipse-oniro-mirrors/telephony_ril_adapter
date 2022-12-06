@@ -1417,8 +1417,7 @@ void ConvertHexStringToByteArray(uint8_t *originHexString, int responseLen, uint
         if (hexIndex + 1 >= responseLen) {
             break;
         }
-        byteArray[i] =
-            (uint8_t)((ToByte(originHexString[hexIndex]) << HALF_BYTE_LEN) | ToByte(originHexString[hexIndex + 1]));
+        byteArray[i] = (ToByte(originHexString[hexIndex]) << HALF_BYTE_LEN) | ToByte(originHexString[hexIndex + 1]);
     }
 }
 
@@ -1441,7 +1440,7 @@ uint8_t *ConvertByteArrayToHexString(uint8_t *byteArray, int byteArrayLen)
     return buf;
 }
 
-int ToByte(char c)
+uint8_t ToByte(char c)
 {
     if (c >= '0' && c <= '9') {
         return (c - '0');
@@ -1453,5 +1452,5 @@ int ToByte(char c)
         return (c - 'a' + DECIMAL_MAX);
     }
     TELEPHONY_LOGE("ToByte Error: %{public}c", c);
-    return FALSE;
+    return 0;
 }

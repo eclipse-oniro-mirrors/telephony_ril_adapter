@@ -116,14 +116,14 @@ typedef enum {
 
 // 3GPP TS 27.007 V3.9.0 (2001-06) 7.11 Call forwarding number and conditions +CCFC
 typedef enum {
-    CALL_FORWARD_ClassX_VOICE = 1,
-    CALL_FORWARD_ClassX_DATA = 2,
-    CALL_FORWARD_ClassX_FAX = 4,
-    CALL_FORWARD_ClassX_SMS = 8, /* short message service */
-    CALL_FORWARD_ClassX_DCS = 16, /* data circuit sync */
-    CALL_FORWARD_ClassX_DCAS = 32, /* dedicated packet access */
-    CALL_FORWARD_ClassX_DPA = 64, /* all conditional call forwarding */
-    CALL_FORWARD_ClassX_DPADA = 128, /* dedicated PAD access */
+    CALL_FORWARD_CLASS_X_VOICE = 1,
+    CALL_FORWARD_CLASS_X_DATA = 2,
+    CALL_FORWARD_CLASS_X_FAX = 4,
+    CALL_FORWARD_CLASS_X_SMS = 8,     /* short message service */
+    CALL_FORWARD_CLASS_X_DCS = 16,    /* data circuit sync */
+    CALL_FORWARD_CLASS_X_DCAS = 32,   /* dedicated packet access */
+    CALL_FORWARD_CLASS_X_DPA = 64,    /* all conditional call forwarding */
+    CALL_FORWARD_CLASS_X_DPADA = 128, /* dedicated PAD access */
 } CallForwardClassX;
 
 // 3GPP TS 27.007 V3.9.0 (2001-06) 7.11 Call forwarding number and conditions +CCFC
