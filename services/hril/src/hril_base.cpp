@@ -81,6 +81,10 @@ uint8_t *HRilBase::ConvertHexStringToBytes(const void *response, size_t length)
 
 bool HRilBase::ConvertToString(char **dest, const std::string &srcStr)
 {
+    if (dest == nullptr) {
+        TELEPHONY_LOGE("ConvertToString dest is null");
+        return false;
+    }
     size_t size = srcStr.size();
     if (size == 0) {
         *dest = nullptr;
