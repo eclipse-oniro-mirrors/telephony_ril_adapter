@@ -24,9 +24,9 @@ base/telephony/ril_adapter
 ├── interfaces                          # Provide internal interfaces for each business
 │   └── innerkits
 ├── services                            # Service
-│   ├── hril                            # Implementation of each business module interface of the hri layer
-│   ├── hril_hdf                        # HDF service
-│   └── vendor                          # vendor file
+│   ├── hril                            # Implementation of service module APIs of the hril layer
+│   ├── hril_hdf                        # HDF service that provides initial vendor lib APIs
+│   └── vendor                          # Vendor file
 │── test                                # Test code
 │   ├── BUILD.gn
 │   └── unittest                        # Unit test code
@@ -35,12 +35,12 @@ base/telephony/ril_adapter
 
 ## Constraints<a name="section126mcpsimp"></a>
 
--   In terms of software, the RIL Adapter needs to work with the telephony core service \(core\_service\) and an interworking interface needs to be implemented by the modem vendor lib.
+-   In terms of software, the RIL Adapter needs to work with the HDF (drivers\_interface and drivers\_peripheral) and an interworking interface needs to be implemented by the modem vendor lib.
 -   In terms of hardware, the device must be equipped with a modem capable of independent cellular communication.
 
 ## Usage Guidelines<a name="section264mcpsimp"></a>
 
-The RIL Adapter does not provide external APIs and can only be called by the telephony core service.
+The RIL Adapter does not provide external APIs and can only be called by through drivers\_peripheral.
 
 ## Repositories Involved<a name="section279mcpsimp"></a>
 
@@ -49,3 +49,7 @@ The RIL Adapter does not provide external APIs and can only be called by the tel
 **telephony_ril_adapter**
 
 [telephony_core_service](https://gitee.com/openharmony/telephony_core_service/blob/master/README.md)
+
+[drivers_interface](https://gitee.com/openharmony/drivers_interface)
+
+[drivers_peripheral](https://gitee.com/openharmony/drivers_peripheral)
