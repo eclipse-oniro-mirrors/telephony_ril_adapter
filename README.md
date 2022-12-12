@@ -24,7 +24,7 @@ base/telephony/ril_adapter
 ├── interfaces                          # Provide internal interfaces for each business
 │   └── innerkits
 ├── services                            # Service
-│   ├── hril                            # Implementation of service module APIs of the hri layer
+│   ├── hril                            # Implementation of service module APIs of the hril layer
 │   ├── hril_hdf                        # HDF service that provides initial vendor lib APIs
 │   └── vendor                          # Vendor file
 │── test                                # Test code
@@ -40,7 +40,7 @@ base/telephony/ril_adapter
 
 ## Usage Guidelines<a name="section264mcpsimp"></a>
 
-The RIL Adapter does not provide external APIs and can only be called by through driver\_peripheral.
+The RIL Adapter does not provide external APIs and can only be called by through drivers\_peripheral.
 
 ## Repositories Involved<a name="section279mcpsimp"></a>
 
