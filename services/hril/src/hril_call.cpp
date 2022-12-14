@@ -650,10 +650,10 @@ void HRilCall::BuildIEmergencyCallList(
         if (curPtr != nullptr) {
             callInfo.index = curPtr->index;
             callInfo.total = curPtr->total;
-            callInfo.eccNum = curPtr->eccNum;
+            callInfo.eccNum = (curPtr->eccNum == nullptr) ? "" : curPtr->eccNum;
             callInfo.eccType = static_cast<OHOS::HDI::Ril::V1_0::EccType>(curPtr->category);
             callInfo.simpresent = static_cast<OHOS::HDI::Ril::V1_0::SimpresentType>(curPtr->simpresent);
-            callInfo.mcc = curPtr->mcc;
+            callInfo.mcc = (curPtr->mcc == nullptr) ? "" : curPtr->mcc;
             callInfo.abnormalService = static_cast<OHOS::HDI::Ril::V1_0::AbnormalServiceType>(curPtr->abnormalService);
             emergencyCallInfoList.calls.push_back(callInfo);
         } else {
