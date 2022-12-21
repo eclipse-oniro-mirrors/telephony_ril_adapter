@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,30 +25,6 @@ struct DialInfo {
     int32_t serial;
     std::string address;
     int32_t clir; /* Calling Line Identification Restriction. From TS 27.007 V3.4.0 (2000-03) */
-};
-
-struct GetClipResult {
-    int32_t result; /* query results */
-    int32_t action; /* parameter sets/shows the result code presentation status in the TA */
-    int32_t clipStat; /* parameter shows the subscriber CLIP service status in the network, <0-4> */
-};
-
-struct GetClirResult {
-    int32_t result; /* query results */
-    int32_t action; /* parameter sets/shows the result code presentation status in the TA */
-    int32_t clirStat; /* parameter shows the subscriber CLIP service status in the network, <0-4> */
-};
-
-struct CallWaitResult {
-    int32_t result; /* query results */
-    int32_t status; /* parameter sets/shows the result code presentation status in the TA */
-    int32_t classCw; /* parameter shows the subscriber CLIP service status in the network, <0-4> */
-};
-
-struct CallRestrictionResult {
-    int32_t result; /* query results */
-    int32_t status; /* parameter sets/shows the result code presentation status in the TA */
-    int32_t classCw; /* parameter shows the subscriber CLIP service status in the network, <0-4> */
 };
 
 struct CallInfo {
@@ -92,23 +68,6 @@ struct CallForwardSetInfo {
     int32_t mode;
     std::string number;
     int32_t classx;
-};
-
-struct CallForwardQueryResult {
-    int32_t serial;
-    int32_t result; /* query results */
-    int32_t status;
-    int32_t classx;
-    std::string number;
-    int32_t type;
-    int32_t reason;
-    int32_t time;
-};
-
-struct CallForwardQueryInfoList {
-    int32_t callSize;
-    int32_t flag;
-    std::vector<CallForwardQueryResult> calls;
 };
 
 struct UssdNoticeInfo {
