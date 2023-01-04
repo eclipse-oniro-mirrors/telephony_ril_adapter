@@ -215,7 +215,7 @@ void HRilManager::OnReport(std::vector<std::unique_ptr<T>> &subModules, int32_t 
         TELEPHONY_LOGE("OnReport reportInfo is null!!!");
         return;
     }
-    if (slotId < 0 || slotId >= subModules.size()) {
+    if (slotId < 0 || static_cast<uint32_t>(slotId) >= subModules.size()) {
         TELEPHONY_LOGE("OnReport subModules out of bounds!!!");
         return;
     }
