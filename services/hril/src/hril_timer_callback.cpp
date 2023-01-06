@@ -83,10 +83,11 @@ std::shared_ptr<HRilTimerCallbackMessage> HRilTimerCallback::HRilSetTimerCallbac
         (void)memcpy_s(&timeout, sizeof(timeout), tv, sizeof(timeout));
     }
 
+    HRilEventMessage eventMsg = { 0 };
     auto funcCallback = std::bind(
         &HRilTimerCallback::TimerCallback, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-    event_->SetTimerEvent(pCbMsg->event, event_->IVNALID_FD, false, funcCallback, pCbMsg);
-    event_->AddTimerEvent(pCbMsg->event, timeout);
+    event_->SetTimerEvent(eventMsg, event_->IVNALID_FD, false, funcCallback, pCbMsg);
+    event_->AddTimerEvent(eventMsg, timeout);
     OnTriggerEvent();
     return pCbMsg;
 }

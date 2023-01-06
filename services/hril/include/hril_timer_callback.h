@@ -27,7 +27,6 @@ typedef void (*HRilCallbackFun)(uint8_t *param);
 struct HRilTimerCallbackMessage {
     uint8_t *param;
     HRilCallbackFun func;
-    HRilEventMessage event;
 };
 
 class HRilTimerCallback {
