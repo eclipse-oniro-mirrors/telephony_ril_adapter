@@ -28,6 +28,7 @@ constexpr const char *MODULE_HRIL_MODEM = "hrilModem";
 constexpr const char *MODULE_HRIL_SIM = "hrilSim";
 constexpr const char *MODULE_HRIL_NETWORK = "hrilNetwork";
 constexpr const char *MODULE_HRIL_SMS = "hrilSms";
+#define MAX_UINT8_T 256
 static std::shared_ptr<HRilManager> g_manager = std::make_shared<HRilManager>();
 static pthread_mutex_t dispatchMutex = PTHREAD_MUTEX_INITIALIZER;
 std::shared_ptr<HRilManager> HRilManager::manager_ = g_manager;
@@ -153,7 +154,8 @@ static void RunningLockCallback(uint8_t *param)
     std::lock_guard<std::mutex> lockRequest(g_manager->mutexRunningLock_);
     TELEPHONY_LOGI("RunningLockCallback, serialNum:%{public}d, runningSerialNum_:%{public}d", serialNum,
         static_cast<int>(g_manager->runningSerialNum_));
-    if (g_manager->powerInterface_ == nullptr || serialNum != static_cast<int>(g_manager->runningSerialNum_)) {
+    if (g_manager->powerInterface_ == nullptr ||
+        serialNum != static_cast<int>(g_manager->runningSerialNum_) % MAX_UINT8_T) {
         return;
     }
     g_manager->runningLockCount_ = 0;
