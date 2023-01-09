@@ -28,7 +28,6 @@ constexpr const char *MODULE_HRIL_MODEM = "hrilModem";
 constexpr const char *MODULE_HRIL_SIM = "hrilSim";
 constexpr const char *MODULE_HRIL_NETWORK = "hrilNetwork";
 constexpr const char *MODULE_HRIL_SMS = "hrilSms";
-#define MAX_UINT8_T 256
 static std::shared_ptr<HRilManager> g_manager = std::make_shared<HRilManager>();
 static pthread_mutex_t dispatchMutex = PTHREAD_MUTEX_INITIALIZER;
 std::shared_ptr<HRilManager> HRilManager::manager_ = g_manager;
@@ -148,14 +147,13 @@ static void RunningLockCallback(uint8_t *param)
         TELEPHONY_LOGE("check nullptr fail.");
         return;
     }
-    int serialNum = static_cast<int>(*param);
+    int *serialNum = reinterpret_cast<int *>(param);
     delete param;
     param = nullptr;
     std::lock_guard<std::mutex> lockRequest(g_manager->mutexRunningLock_);
-    TELEPHONY_LOGI("RunningLockCallback, serialNum:%{public}d, runningSerialNum_:%{public}d", serialNum,
+    TELEPHONY_LOGI("RunningLockCallback, *serialNum:%{public}d, runningSerialNum_:%{public}d", *serialNum,
         static_cast<int>(g_manager->runningSerialNum_));
-    if (g_manager->powerInterface_ == nullptr ||
-        serialNum != static_cast<int>(g_manager->runningSerialNum_) % MAX_UINT8_T) {
+    if (g_manager->powerInterface_ == nullptr || *serialNum != static_cast<int>(g_manager->runningSerialNum_)) {
         return;
     }
     g_manager->runningLockCount_ = 0;
@@ -176,7 +174,7 @@ void HRilManager::ApplyRunningLock(void)
         struct timeval tv = { 0, RUNNING_LOCK_DEFAULT_TIMEOUT_US };
         runningLockCount_++;
         runningSerialNum_++;
-        uint8_t *serialNum = new uint8_t(static_cast<uint8_t>(runningSerialNum_));
+        uint8_t *serialNum = reinterpret_cast<uint8_t *>(new int(runningSerialNum_));
         timerCallback_->HRilSetTimerCallbackInfo(RunningLockCallback, serialNum, &tv);
         TELEPHONY_LOGI("ApplyRunningLock, runningLockCount_:%{public}d, runningSerialNum_:%{public}d",
             static_cast<int>(runningLockCount_), static_cast<int>(runningSerialNum_));
