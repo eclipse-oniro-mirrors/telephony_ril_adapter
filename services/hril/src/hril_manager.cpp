@@ -147,7 +147,7 @@ static void RunningLockCallback(uint8_t *param)
         TELEPHONY_LOGE("check nullptr fail.");
         return;
     }
-    int *serialNum = static_cast<int *>(param);
+    int *serialNum = reinterpret_cast<int *>(param);
     delete param;
     param = nullptr;
     std::lock_guard<std::mutex> lockRequest(g_manager->mutexRunningLock_);
