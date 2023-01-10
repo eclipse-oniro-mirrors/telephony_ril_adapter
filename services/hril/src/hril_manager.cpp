@@ -147,7 +147,7 @@ static void RunningLockCallback(uint8_t *param)
         TELEPHONY_LOGE("check nullptr fail.");
         return;
     }
-    int serialNum = static_cast<int>(*param);
+    int serialNum = *reinterpret_cast<int *>(param);
     delete param;
     param = nullptr;
     std::lock_guard<std::mutex> lockRequest(g_manager->mutexRunningLock_);
@@ -174,7 +174,7 @@ void HRilManager::ApplyRunningLock(void)
         struct timeval tv = { 0, RUNNING_LOCK_DEFAULT_TIMEOUT_US };
         runningLockCount_++;
         runningSerialNum_++;
-        uint8_t *serialNum = new uint8_t(static_cast<uint8_t>(runningSerialNum_));
+        uint8_t *serialNum = reinterpret_cast<uint8_t *>(new int(runningSerialNum_));
         timerCallback_->HRilSetTimerCallbackInfo(RunningLockCallback, serialNum, &tv);
         TELEPHONY_LOGI("ApplyRunningLock, runningLockCount_:%{public}d, runningSerialNum_:%{public}d",
             static_cast<int>(runningLockCount_), static_cast<int>(runningSerialNum_));
