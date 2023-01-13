@@ -186,9 +186,8 @@ int32_t HRilNetwork::GetCsRegStatusResponse(
         csRegStatusInfo.lacCode = hrilRegStatusInfo->lacCode;
         csRegStatusInfo.cellId = hrilRegStatusInfo->cellId;
         csRegStatusInfo.radioTechnology = static_cast<HDI::Ril::V1_0::RilRadioTech>(hrilRegStatusInfo->actType);
-        TELEPHONY_LOGD(
-            "GetCsRegStatusResponse notifyType:%{public}d, regStatus:%{public}d, "
-            "lacCode:%{private}d, cellId:%{private}d, radioTechnology:%{public}d",
+        TELEPHONY_LOGI("GetCsRegStatusResponse notifyType:%{public}d, regStatus:%{public}d, "
+                       "lacCode:%{private}d, cellId:%{private}d, radioTechnology:%{public}d",
             csRegStatusInfo.notifyType, csRegStatusInfo.regStatus, csRegStatusInfo.lacCode, csRegStatusInfo.cellId,
             csRegStatusInfo.radioTechnology);
     }
@@ -214,7 +213,7 @@ int32_t HRilNetwork::GetPsRegStatusResponse(
         psRegStatusInfo.isDcNrRestricted = hrilRegStatusInfo->isDcNrRestricted;
         psRegStatusInfo.isNrAvailable = hrilRegStatusInfo->isNrAvailable;
         psRegStatusInfo.isEnDcAvailable = hrilRegStatusInfo->isEnDcAvailable;
-        TELEPHONY_LOGD(
+        TELEPHONY_LOGI(
             "GetPsRegStatusResponse notifyType:%{public}d, regStatus:%{public}d, lacCode:%{private}d, "
             "cellId:%{private}d, technology:%{public}d, isDcNrRestricted:%{private}d, isNrAvailable:%{private}d, "
             "isEnDcAvailable:%{private}d",
@@ -376,7 +375,7 @@ int32_t HRilNetwork::GetPhysicalChannelConfigResponse(
             phyChnlCfg.uplinkChannelNum = hrilChannelConfigList->channelConfigs[i].uplinkChannelNum;
             phyChnlCfg.physicalCellId = hrilChannelConfigList->channelConfigs[i].physicalCellId;
             phyChnlCfg.contextIdNum = hrilChannelConfigList->channelConfigs[i].contextIdNum;
-            TELEPHONY_LOGD(
+            TELEPHONY_LOGI(
                 "GetPhysicalChannelConfigResponse cellConnStatus:%{private}d, "
                 "cellBandwidthDownlinkKhz:%{private}d, cellBandwidthUplinkKhz:%{private}d, physicalCellId:%{private}d, "
                 "ratType:%{private}d, freqRange:%{private}d, downlinkChannelNum:%{private}d, "
@@ -386,7 +385,7 @@ int32_t HRilNetwork::GetPhysicalChannelConfigResponse(
                 phyChnlCfg.physicalCellId, phyChnlCfg.contextIdNum);
             for (int32_t j = 0; j < phyChnlCfg.contextIdNum; j++) {
                 phyChnlCfg.contextIds.push_back(hrilChannelConfigList->channelConfigs[i].contextIds[j]);
-                TELEPHONY_LOGD("contextIds:%{public}d---contextId:%{private}d", j, phyChnlCfg.contextIds[j]);
+                TELEPHONY_LOGI("contextIds:%{public}d---contextId:%{private}d", j, phyChnlCfg.contextIds[j]);
             }
             phyChnlCfgList.channelConfigInfos.push_back(phyChnlCfg);
         }
@@ -427,8 +426,8 @@ int32_t HRilNetwork::NetworkCsRegStatusUpdated(
     regStatusInfoNotify.lacCode = hrilRegStatusInfo->lacCode;
     regStatusInfoNotify.cellId = hrilRegStatusInfo->cellId;
     regStatusInfoNotify.radioTechnology = static_cast<HDI::Ril::V1_0::RilRadioTech>(hrilRegStatusInfo->actType);
-    TELEPHONY_LOGD("NetworkCsRegStatusUpdated notifyType:%{public}d, regStatus:%{public}d, "
-        "lacCode:%{private}d, cellId:%{private}d, radioTechnology:%{public}d",
+    TELEPHONY_LOGI("NetworkCsRegStatusUpdated notifyType:%{public}d, regStatus:%{public}d, "
+                   "lacCode:%{private}d, cellId:%{private}d, radioTechnology:%{public}d",
         regStatusInfoNotify.notifyType, regStatusInfoNotify.regStatus, regStatusInfoNotify.lacCode,
         regStatusInfoNotify.cellId, regStatusInfoNotify.radioTechnology);
     return Notify(indType, error, &HDI::Ril::V1_0::IRilCallback::NetworkCsRegStatusUpdated, regStatusInfoNotify);
@@ -451,7 +450,7 @@ int32_t HRilNetwork::NetworkPsRegStatusUpdated(
     regStatusInfoNotify.isDcNrRestricted = hrilRegStatusInfo->isDcNrRestricted;
     regStatusInfoNotify.isNrAvailable = hrilRegStatusInfo->isNrAvailable;
     regStatusInfoNotify.isEnDcAvailable = hrilRegStatusInfo->isEnDcAvailable;
-    TELEPHONY_LOGD(
+    TELEPHONY_LOGI(
         "GetPsRegStatusResponse notifyType:%{public}d, regStatus:%{public}d, lacCode:%{private}d, cellId:%{private}d, "
         "radioTechnology:%{public}d, isDcNrRestricted:%{private}d, isNrAvailable:%{private}d, "
         "isEnDcAvailable:%{private}d",
