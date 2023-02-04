@@ -28,6 +28,7 @@ constexpr const char *MODULE_HRIL_MODEM = "hrilModem";
 constexpr const char *MODULE_HRIL_SIM = "hrilSim";
 constexpr const char *MODULE_HRIL_NETWORK = "hrilNetwork";
 constexpr const char *MODULE_HRIL_SMS = "hrilSms";
+static bool g_isHrilManagerDestory = false;
 static std::shared_ptr<HRilManager> g_manager = std::make_shared<HRilManager>();
 static pthread_mutex_t dispatchMutex = PTHREAD_MUTEX_INITIALIZER;
 std::shared_ptr<HRilManager> HRilManager::manager_ = g_manager;
@@ -36,6 +37,14 @@ std::unordered_map<int32_t, int32_t> HRilManager::notificationMap_ = {
 };
 
 using namespace OHOS::HDI::Power::V1_0;
+
+static bool IsHrilManagerValid()
+{
+    if (g_isHrilManagerDestory || g_manager == nullptr) {
+        return false;
+    }
+    return true;
+}
 
 int32_t HRilManager::GetMaxSimSlotCount()
 {
@@ -143,7 +152,7 @@ void HRilManager::RegisterSmsFuncs(int32_t slotId, const HRilSmsReq *smsFuncs)
 
 static void RunningLockCallback(uint8_t *param)
 {
-    if (g_manager == nullptr || param == nullptr) {
+    if (!IsHrilManagerValid() || param == nullptr) {
         TELEPHONY_LOGE("check nullptr fail.");
         return;
     }
@@ -163,7 +172,7 @@ static void RunningLockCallback(uint8_t *param)
 
 void HRilManager::ApplyRunningLock(void)
 {
-    if (g_manager == nullptr || timerCallback_ == nullptr) {
+    if (!IsHrilManagerValid() || timerCallback_ == nullptr) {
         TELEPHONY_LOGE("check nullptr fail.");
         return;
     }
@@ -898,6 +907,7 @@ int32_t HRilManager::SendRilAck()
 
 HRilManager::~HRilManager()
 {
+    g_isHrilManagerDestory = true;
     if (timerCallback_ == nullptr || timerCallback_->event_ == nullptr ||
         timerCallback_->event_->IsNormalDestory()) {
         return;
@@ -924,7 +934,7 @@ int32_t GetSimSlotCount()
 
 static void HRilBootUpEventLoop()
 {
-    if (g_manager == nullptr || g_manager->timerCallback_ == nullptr) {
+    if (!IsHrilManagerValid() || g_manager->timerCallback_ == nullptr) {
         return;
     }
     g_manager->timerCallback_->EventLoop();
@@ -932,7 +942,7 @@ static void HRilBootUpEventLoop()
 
 void HRilInit(void)
 {
-    if (g_manager == nullptr) {
+    if (!IsHrilManagerValid()) {
         TELEPHONY_LOGE("HRilInit: g_manager is nullptr");
         return;
     }
@@ -954,7 +964,7 @@ void HRilRegOps(const HRilOps *hrilOps)
     static HRilOps callBacks = { 0 };
     static RegisterState rilRegisterStatus = RIL_REGISTER_IS_NONE;
 
-    if (hrilOps == nullptr || g_manager == nullptr) {
+    if (hrilOps == nullptr || !IsHrilManagerValid()) {
         TELEPHONY_LOGE("HRilRegOps: param is nullptr");
         return;
     }
@@ -988,7 +998,7 @@ void HRilRegOps(const HRilOps *hrilOps)
 
 void OnCallReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen)
 {
-    if (g_manager == nullptr) {
+    if (!IsHrilManagerValid()) {
         TELEPHONY_LOGE("HrilManager is nullptr, id:%{public}d", slotId);
         return;
     }
@@ -997,7 +1007,7 @@ void OnCallReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *r
 
 void OnDataReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen)
 {
-    if (g_manager == nullptr) {
+    if (!IsHrilManagerValid()) {
         TELEPHONY_LOGE("HrilManager is nullptr, id:%{public}d", slotId);
         return;
     }
@@ -1006,7 +1016,7 @@ void OnDataReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *r
 
 void OnModemReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen)
 {
-    if (g_manager == nullptr) {
+    if (!IsHrilManagerValid()) {
         TELEPHONY_LOGE("HrilManager is nullptr, id:%{public}d", slotId);
         return;
     }
@@ -1015,7 +1025,7 @@ void OnModemReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *
 
 void OnNetworkReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen)
 {
-    if (g_manager == nullptr) {
+    if (!IsHrilManagerValid()) {
         TELEPHONY_LOGE("HrilManager is nullptr, id:%{public}d", slotId);
         return;
     }
@@ -1024,7 +1034,7 @@ void OnNetworkReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t
 
 void OnSimReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen)
 {
-    if (g_manager == nullptr) {
+    if (!IsHrilManagerValid()) {
         TELEPHONY_LOGE("HrilManager is nullptr, id:%{public}d", slotId);
         return;
     }
@@ -1033,7 +1043,7 @@ void OnSimReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *re
 
 void OnSmsReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen)
 {
-    if (g_manager == nullptr) {
+    if (!IsHrilManagerValid()) {
         TELEPHONY_LOGE("HrilManager is nullptr, id:%{public}d", slotId);
         return;
     }
@@ -1042,7 +1052,7 @@ void OnSmsReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *re
 
 void OnTimerCallback(HRilCallbackFun func, uint8_t *param, const struct timeval *tv)
 {
-    if (g_manager == nullptr || g_manager->timerCallback_ == nullptr) {
+    if (!IsHrilManagerValid() || g_manager->timerCallback_ == nullptr) {
         TELEPHONY_LOGE("HrilManager or timerCallback is nullptr");
         return;
     }
