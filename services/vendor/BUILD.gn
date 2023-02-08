@@ -11,7 +11,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//base/telephony/core_service/telephony.gni")
 import("//build/ohos.gni")
 RIL_ADAPTER = "//base/telephony/ril_adapter"
 RIL_VENDOR = "//base/telephony/ril_adapter/services/vendor/src"
@@ -32,7 +31,7 @@ ohos_shared_library("ril_vendor") {
   ]
   include_dirs = [ "$RIL_ADAPTER/services/vendor/include" ]
   configs = [ "$RIL_ADAPTER/utils:utils_config" ]
-  defines += [
+  defines = [
     "LOG_TAG = \"RilVendor\"",
     "LOG_DOMAIN = 0xD001F08",
   ]

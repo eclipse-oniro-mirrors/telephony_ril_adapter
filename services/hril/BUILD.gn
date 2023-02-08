@@ -11,7 +11,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//base/telephony/core_service/telephony.gni")
 import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
@@ -40,7 +39,7 @@ ohos_shared_library("hril") {
 
   configs = [ "$RIL_ADAPTER/utils:utils_config" ]
 
-  defines += [
+  defines = [
     "TELEPHONY_LOG_TAG = \"Hril\"",
     "LOG_DOMAIN = 0xD001F08",
   ]
