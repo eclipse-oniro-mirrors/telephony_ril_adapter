@@ -51,7 +51,7 @@ ohos_shared_library("hril") {
   ]
 
   external_deps = [
-    "drivers_interface_power:libpower_proxy_1.0",
+    "drivers_interface_power:libpower_proxy_1.1",
     "drivers_interface_ril:ril_idl_headers",
     "init:libbegetutil",
     "ipc:ipc_single",
