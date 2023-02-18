@@ -129,14 +129,19 @@ int32_t HRilSms::DelSimMessage(int32_t serialId, int32_t index)
 int32_t HRilSms::UpdateSimMessage(int32_t serialId, const OHOS::HDI::Ril::V1_0::SmsMessageIOInfo &message)
 {
     HRilSmsWriteSms msg = {};
-    size_t len = 0;
-    len = message.pdu.size() + 1;
     msg.state = message.state;
+    msg.index = message.index;
+    size_t len = message.pdu.size() + 1;
     if (len > MAX_PDU_LEN) {
         return HRIL_ERR_INVALID_PARAMETER;
     }
     CopyToCharPoint(&msg.pdu, message.pdu);
-    msg.index = message.index;
+    size_t smscPduLen = message.smscPdu.length() + 1;
+    if (smscPduLen > MAX_PDU_LEN) {
+        SafeFrees(msg.pdu);
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    CopyToCharPoint(&msg.smsc, message.smscPdu);
     int32_t result = RequestVendor(
         serialId, HREQ_SMS_UPDATE_SIM_MESSAGE, smsFuncs_, &HRilSmsReq::UpdateSimMessage, &msg, sizeof(HRilSmsWriteSms));
     TELEPHONY_LOGI("UpdateSimMessage result is: %{public}d", result);
