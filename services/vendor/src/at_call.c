@@ -33,6 +33,7 @@ CallNotify g_callNotifyTab[] = {
 };
 
 static int32_t lastCcCause = HRIL_ERR_CALL_CAUSE;
+static const int32_t MAX_PHONY_NUM = 100;
 
 static void OnCallReportErrorMessages(const ReqDataInfo *requestInfo, uint32_t err, ResponseInfo *pResponse)
 {
@@ -295,6 +296,10 @@ static int32_t InitCallListCmdBuffer(const ResponseInfo *pResponse, int32_t *cal
     }
     if (!callNumTmp) {
         callNumTmp++; // Malloc size cannot be 0.
+    }
+    if (callNumTmp > MAX_PHONY_NUM) {
+        TELEPHONY_LOGE("callNumTmp is invalid");
+        return HRIL_ERR_INVALID_PARAMETER;
     }
     pCallsTmp = (HRilCallInfo *)malloc(callNumTmp * sizeof(HRilCallInfo));
     if (pCallsTmp == NULL) {
