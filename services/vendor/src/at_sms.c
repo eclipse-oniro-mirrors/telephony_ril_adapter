@@ -254,6 +254,7 @@ static void WriteSimMessage(const ReqDataInfo *requestInfo, const HRilSmsWriteSm
     ResponseInfo *responseInfo = NULL;
     struct ReportInfo reportInfo = {0};
     if (data == NULL) {
+        TELEPHONY_LOGE("data is nullptr");
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
         OnSmsReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
         FreeResponseInfo(responseInfo);
@@ -263,6 +264,9 @@ static void WriteSimMessage(const ReqDataInfo *requestInfo, const HRilSmsWriteSm
     if (msg->smsc == NULL || (strcmp(msg->smsc, "") == 0)) {
         if (strcpy_s(msg->smsc, strlen("00") + 1, "00") != EOK) {
             TELEPHONY_LOGE("Set smsc failed");
+            reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
+            OnSmsReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
+            FreeResponseInfo(responseInfo);
             return;
         }
     }
@@ -279,8 +283,9 @@ static void WriteSimMessage(const ReqDataInfo *requestInfo, const HRilSmsWriteSm
         return;
     }
     err = SendCommandSmsLock(cmd, smsPdu, "+CMGW:", 0, &responseInfo);
-    (void)memset_s(cmd, MAX_CMD_LENGTH, 0, MAX_CMD_LENGTH);
-    if (err != 0 || (responseInfo != NULL && !responseInfo->success)) {
+    ret = memset_s(cmd, MAX_CMD_LENGTH, 0, MAX_CMD_LENGTH);
+    if (err != 0 || (responseInfo != NULL && !responseInfo->success) || ret != EOK) {
+        TELEPHONY_LOGE("ExecuteCommand failed");
         err = HRIL_ERR_GENERIC_FAILURE;
         SimMessageError(&reportInfo, requestInfo, &err, responseInfo);
         return;
@@ -299,19 +304,29 @@ static void UpdateSimMessage(const ReqDataInfo *requestInfo, const HRilSmsWriteS
     ResponseInfo *responseInfo = NULL;
     struct ReportInfo reportInfo = {0};
     if (data == NULL) {
+        TELEPHONY_LOGE("data is nullptr");
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
         OnSmsReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
         FreeResponseInfo(responseInfo);
         return;
     }
     msg = ((HRilSmsWriteSms *)data);
+    if (msg->smsc == NULL || (strcmp(msg->smsc, "") == 0)) {
+        if (strcpy_s(msg->smsc, strlen("00") + 1, "00") != EOK) {
+            TELEPHONY_LOGE("Set smsc failed");
+            reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
+            OnSmsReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
+            FreeResponseInfo(responseInfo);
+            return;
+        }
+    }
     err = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CMGW=%zu,%d", strlen(msg->pdu) / g_cmdLength, msg->state);
     if (err < 0) {
         TELEPHONY_LOGE("GenerateCommand failed, err = %{public}d\n", err);
         SimMessageError(&reportInfo, requestInfo, &err, responseInfo);
         return;
     }
-    err = GenerateCommand(smsPdu, MAX_CMD_LENGTH, "%s", msg->pdu);
+    err = GenerateCommand(smsPdu, MAX_CMD_LENGTH, "%s%s", msg->smsc, msg->pdu);
     if (err < 0) {
         TELEPHONY_LOGE("GenerateCommand failed, err = %{public}d\n", err);
         SimMessageError(&reportInfo, requestInfo, &err, responseInfo);
@@ -319,6 +334,7 @@ static void UpdateSimMessage(const ReqDataInfo *requestInfo, const HRilSmsWriteS
     }
     err = SendCommandSmsLock(cmd, smsPdu, "+CMGW:", 0, &responseInfo);
     if (err != 0 || (responseInfo != NULL && !responseInfo->success)) {
+        TELEPHONY_LOGE("ExecuteCommand failed");
         err = HRIL_ERR_GENERIC_FAILURE;
         SimMessageError(&reportInfo, requestInfo, &err, responseInfo);
         return;
@@ -330,7 +346,8 @@ static void UpdateSimMessage(const ReqDataInfo *requestInfo, const HRilSmsWriteS
         return;
     }
     err = SendCommandLock(cmd, "+CMGD:", 0, &responseInfo);
-    if (err != 0 || (responseInfo != NULL && !responseInfo->success)) {
+    int32_t ret = memset_s(cmd, MAX_CMD_LENGTH, 0, MAX_CMD_LENGTH);
+    if (err != 0 || (responseInfo != NULL && !responseInfo->success) || ret != EOK) {
         err = HRIL_ERR_GENERIC_FAILURE;
         SimMessageError(&reportInfo, requestInfo, &err, responseInfo);
         return;
