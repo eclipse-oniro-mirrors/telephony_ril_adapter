@@ -36,7 +36,7 @@ std::unordered_map<int32_t, int32_t> HRilManager::notificationMap_ = {
 #include "hril_notification_map.h"
 };
 
-using namespace OHOS::HDI::Power::V1_0;
+using namespace OHOS::HDI::Power::V1_1;
 
 static bool IsHrilManagerValid()
 {
