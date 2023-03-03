@@ -48,7 +48,7 @@ enum class HdiId {
     HREQ_CALL_HANGUP,
     HREQ_CALL_REJECT,
     HREQ_CALL_ANSWER,
-    HREQ_CALL_HOLD_CALL, // call hold value 6
+    HREQ_CALL_HOLD_CALL,   // call hold value 6
     HREQ_CALL_UNHOLD_CALL, // call active value 6
     HREQ_CALL_SWITCH_CALL,
     HREQ_CALL_COMBINE_CONFERENCE,
@@ -77,6 +77,7 @@ enum class HdiId {
     HREQ_CALL_SET_EMERGENCY_LIST,
     HREQ_CALL_GET_FAIL_REASON,
     HREQ_CALL_SET_BARRING_PASSWORD,
+    HREQ_CALL_CLOSE_UNFINISHED_USSD,
 
     HREQ_SMS_BASE = 100,
     HREQ_SMS_SEND_GSM_SMS,
@@ -293,6 +294,7 @@ public:
     int32_t GetCallFailReasonResponse(
         const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo, int32_t callFail) override;
     int32_t SetBarringPasswordResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo) override;
+    int32_t CloseUnFinishedUssdResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo) override;
 
     // Data
     int32_t PdpContextListUpdated(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo,

@@ -64,6 +64,7 @@ public:
     int32_t StopDtmf(int32_t serialId, const OHOS::HDI::Ril::V1_0::DtmfInfo &dtmfInfo);
     int32_t GetEmergencyCallList(int32_t serialId);
     int32_t SetEmergencyCallList(int32_t serialId, const OHOS::HDI::Ril::V1_0::EmergencyInfoList &emergencyInfoList);
+    int32_t CloseUnFinishedUssd(int32_t serialId);
     bool IsCallResponse(uint32_t code);
     bool IsCallNotification(uint32_t code);
 
@@ -136,6 +137,8 @@ public:
     int32_t SetEmergencyCallListResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t SetBarringPasswordResponse(
+        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t CloseUnFinishedUssdResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
 
     int32_t CallStateUpdated(int32_t notifyType, HRilErrNumber error, const void *response, size_t responseLen);

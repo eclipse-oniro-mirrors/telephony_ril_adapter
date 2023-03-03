@@ -911,6 +911,12 @@ int32_t RilCallbackTest::SetBarringPasswordResponse(const RilRadioResponseInfo &
     return 0;
 }
 
+int32_t RilCallbackTest::CloseUnFinishedUssdResponse(const RilRadioResponseInfo &responseInfo)
+{
+    PrintResponseInfo("CloseUnFinishedUssdResponse", responseInfo);
+    return 0;
+}
+
 /**
  * modem
  **/

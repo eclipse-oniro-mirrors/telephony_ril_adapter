@@ -1069,6 +1069,15 @@ int32_t RilCallbackTest::SetBarringPasswordResponse(const RilRadioResponseInfo &
     return 0;
 }
 
+int32_t RilCallbackTest::CloseUnFinishedUssdResponse(const RilRadioResponseInfo &responseInfo)
+{
+    TELEPHONY_LOGI("GetBoolResult CloseUnFinishedUssdResponse");
+    hdiId_ = HdiId::HREQ_CALL_CLOSE_UNFINISHED_USSD;
+    resultInfo_ = responseInfo;
+    NotifyAll();
+    return 0;
+}
+
 /**
  * modem
  **/

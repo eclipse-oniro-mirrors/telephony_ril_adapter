@@ -1295,6 +1295,38 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetBarringPassword_V1_0200, Fu
 }
 
 /**
+ * @tc.number   Telephony_DriverSystem_CloseUnFinishedUssd_V1_0100
+ * @tc.name     Set barring password
+ * @tc.desc     Function test
+ */
+HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_CloseUnFinishedUssd_V1_0100, Function | MediumTest | Level3)
+{
+    if (!IsReady(SLOTID_1)) {
+        return;
+    }
+    int32_t ret = g_rilInterface->CloseUnFinishedUssd(SLOTID_1, GetSerialId());
+    WaitFor(WAIT_TIME_SECOND);
+    EXPECT_EQ(SUCCESS, ret);
+    ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_CLOSE_UNFINISHED_USSD));
+}
+
+/**
+ * @tc.number   Telephony_DriverSystem_CloseUnFinishedUssd_V1_0100
+ * @tc.name     Set barring password
+ * @tc.desc     Function test
+ */
+HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_CloseUnFinishedUssd_V1_0200, Function | MediumTest | Level3)
+{
+    if (!IsReady(SLOTID_2)) {
+        return;
+    }
+    int32_t ret = g_rilInterface->CloseUnFinishedUssd(SLOTID_2, GetSerialId());
+    WaitFor(WAIT_TIME_SECOND);
+    EXPECT_EQ(SUCCESS, ret);
+    ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_CLOSE_UNFINISHED_USSD));
+}
+
+/**
  * @tc.number   Telephony_DriverSystem_GetSignalStrength_V1_0100
  * @tc.name     Get signal strength
  * @tc.desc     Function test

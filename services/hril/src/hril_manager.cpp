@@ -507,6 +507,11 @@ int32_t HRilManager::SetBarringPassword(
     return TaskSchedule(MODULE_HRIL_CALL, hrilCall_[slotId], &HRilCall::SetBarringPassword, serialId, setBarringInfo);
 }
 
+int32_t HRilManager::CloseUnFinishedUssd(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(MODULE_HRIL_CALL, hrilCall_[slotId], &HRilCall::CloseUnFinishedUssd, serialId);
+}
+
 // Data
 int32_t HRilManager::ActivatePdpContext(
     int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::DataCallInfo &dataCallInfo)

@@ -102,6 +102,7 @@ public:
     int32_t StopDtmf(int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::DtmfInfo &dtmfInfo);
     int32_t SetBarringPassword(
         int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_0::SetBarringInfo &setBarringInfo);
+    int32_t CloseUnFinishedUssd(int32_t slotId, int32_t serialId);
 
     // Data
     int32_t ActivatePdpContext(
