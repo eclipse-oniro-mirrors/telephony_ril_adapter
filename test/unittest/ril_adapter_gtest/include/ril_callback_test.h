@@ -19,7 +19,7 @@
 #include "condition_variable"
 #include "map"
 #include "mutex"
-#include "v1_0/iril.h"
+#include "v1_1/iril.h"
 
 namespace OHOS {
 namespace Telephony {

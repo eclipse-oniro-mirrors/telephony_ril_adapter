@@ -25,7 +25,7 @@
 #include "hdf_sbuf_ipc.h"
 #include "hril_types.h"
 #include "telephony_log_wrapper.h"
-#include "v1_0/iril_callback.h"
+#include "v1_1/iril_callback.h"
 
 namespace OHOS {
 namespace Telephony {

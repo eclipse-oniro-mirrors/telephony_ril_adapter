@@ -24,7 +24,7 @@
 #include "hril_sim.h"
 #include "hril_sms.h"
 #include "telephony_log_wrapper.h"
-#include "v1_0/iril.h"
+#include "v1_1/iril.h"
 
 namespace OHOS {
 namespace Telephony {
