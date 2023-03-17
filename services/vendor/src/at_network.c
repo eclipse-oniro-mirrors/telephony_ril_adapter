@@ -1199,6 +1199,7 @@ static void ParseGetGsmCellInfoLine(char *line, CurrentCellInfoVendor *response)
     NextInt(&line, &response->ServiceCellParas.gsm.rxlev);
     NextInt(&line, &response->ServiceCellParas.gsm.rxQuality);
     NextInt(&line, &response->ServiceCellParas.gsm.ta);
+    response->ServiceCellParas.gsm.rxlev = -response->ServiceCellParas.gsm.rxlev;
     TELEPHONY_LOGI("ParseGetGsmCellInfoLine band:%{private}d,arfcn:%{private}d,bsic:%{private}d,cellId:%{private}d"
                    "lac:%{private}d,rxlev:%{private}d,rxQuality:%{private}d,ta:%{private}d",
         response->ServiceCellParas.gsm.band, response->ServiceCellParas.gsm.arfcn, response->ServiceCellParas.gsm.bsic,
@@ -1218,6 +1219,7 @@ static void ParseGetLteCellInfoLine(char *line, CurrentCellInfoVendor *response)
     NextInt(&line, &response->ServiceCellParas.lte.rsrp);
     NextInt(&line, &response->ServiceCellParas.lte.rsrq);
     NextInt(&line, &response->ServiceCellParas.lte.rssi);
+    response->ServiceCellParas.lte.rsrp = -response->ServiceCellParas.lte.rsrp;
     TELEPHONY_LOGI("ParseGetLteCellInfoLine arfcn:%{private}d,cellId:%{private}d,pci:%{private}d"
                    "tac:%{private}d,rsrp:%{private}d,rsrq:%{private}d,rssi:%{private}d",
         response->ServiceCellParas.lte.arfcn, response->ServiceCellParas.lte.cellId, response->ServiceCellParas.lte.pci,
@@ -1239,6 +1241,7 @@ static void ParseGetWcdmaCellInfoLine(char *line, CurrentCellInfoVendor *respons
     NextInt(&line, &response->ServiceCellParas.wcdma.ecno);
     NextInt(&line, &response->ServiceCellParas.wcdma.drx);
     NextInt(&line, &response->ServiceCellParas.wcdma.ura);
+    response->ServiceCellParas.wcdma.rscp = -response->ServiceCellParas.wcdma.rscp;
     TELEPHONY_LOGI("ParseGetWcdmaCellInfoLine arfcn:%{private}d,psc:%{private}d,cellId:%{private}d,lac:%{private}d"
                    "rscp:%{private}d,rxlev:%{private}d,ecno:%{private}d,drx:%{private}d,ura:%{private}d",
         response->ServiceCellParas.wcdma.arfcn, response->ServiceCellParas.wcdma.psc,
@@ -1262,6 +1265,7 @@ static void ParseGetCdmaCellInfoLine(char *line, CurrentCellInfoVendor *response
     NextInt(&line, &response->ServiceCellParas.cdma.channel);
     NextInt(&line, &response->ServiceCellParas.cdma.longitude);
     NextInt(&line, &response->ServiceCellParas.cdma.latitude);
+    response->ServiceCellParas.cdma.pilotStrength = -response->ServiceCellParas.cdma.pilotStrength;
     TELEPHONY_LOGI(
         "ParseGetCdmaCellInfoLine systemId:%{private}d,networkId:%{private}d,baseId:%{private}d,zoneId:%{private}d"
         "pilotPn:%{private}d,pilotStrength:%{private}d,channel:%{private}d,longitude:%{private}d,latitude:%{private}d",
@@ -1286,6 +1290,7 @@ static void ParseGetTdscdmaCellInfoLine(char *line, CurrentCellInfoVendor *respo
     NextInt(&line, &response->ServiceCellParas.tdscdma.drx);
     NextIntFromHex(&line, &response->ServiceCellParas.tdscdma.rac);
     NextInt(&line, &response->ServiceCellParas.tdscdma.cpid);
+    response->ServiceCellParas.tdscdma.rscp = -response->ServiceCellParas.tdscdma.rscp;
     TELEPHONY_LOGI("ParseGetTdscdmaCellInfoLine arfcn:%{private}d,syncId:%{private}d,sc:%{private}d,cellId:%{private}d,"
                    "lac:%{private}d,rscp:%{private}d,drx:%{private}d,rac:%{private}d,cpid:%{private}d,",
         response->ServiceCellParas.tdscdma.arfcn, response->ServiceCellParas.tdscdma.syncId,
