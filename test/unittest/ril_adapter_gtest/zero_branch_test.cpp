@@ -46,11 +46,11 @@ void BranchTest::TearDown() {}
 
 bool TestCallInterface(std::shared_ptr<HRilManager> manager)
 {
-    OHOS::HDI::Ril::V1_0::EmergencyInfoList emergencyInfoList;
+    OHOS::HDI::Ril::V1_1::EmergencyInfoList emergencyInfoList;
     EXPECT_NE(HDF_SUCCESS, manager->SetEmergencyCallList(0, 0, emergencyInfoList));
     EXPECT_NE(HDF_SUCCESS, manager->GetEmergencyCallList(0, 0));
     EXPECT_NE(HDF_SUCCESS, manager->GetCallList(0, 0));
-    OHOS::HDI::Ril::V1_0::DialInfo dialInfo;
+    OHOS::HDI::Ril::V1_1::DialInfo dialInfo;
     EXPECT_NE(HDF_SUCCESS, manager->Dial(0, 0, dialInfo));
     EXPECT_NE(HDF_SUCCESS, manager->Reject(0, 0));
     EXPECT_NE(HDF_SUCCESS, manager->Hangup(0, 0, 0));
@@ -63,10 +63,10 @@ bool TestCallInterface(std::shared_ptr<HRilManager> manager)
     EXPECT_NE(HDF_SUCCESS, manager->GetCallWaiting(0, 0));
     EXPECT_NE(HDF_SUCCESS, manager->SetCallWaiting(0, 0, 0));
     EXPECT_NE(HDF_SUCCESS, manager->GetCallTransferInfo(0, 0, 0));
-    OHOS::HDI::Ril::V1_0::CallForwardSetInfo callForwardSetInfo;
+    OHOS::HDI::Ril::V1_1::CallForwardSetInfo callForwardSetInfo;
     EXPECT_NE(HDF_SUCCESS, manager->SetCallTransferInfo(0, 0, callForwardSetInfo));
     EXPECT_NE(HDF_SUCCESS, manager->GetCallRestriction(0, 0, "0"));
-    OHOS::HDI::Ril::V1_0::CallRestrictionInfo callRestrictionInfo;
+    OHOS::HDI::Ril::V1_1::CallRestrictionInfo callRestrictionInfo;
     EXPECT_NE(HDF_SUCCESS, manager->SetCallRestriction(0, 0, callRestrictionInfo));
     EXPECT_NE(HDF_SUCCESS, manager->GetClip(0, 0));
     EXPECT_NE(HDF_SUCCESS, manager->SetClip(0, 0, 0));
@@ -80,33 +80,33 @@ bool TestCallInterface(std::shared_ptr<HRilManager> manager)
     EXPECT_NE(HDF_SUCCESS, manager->GetMute(0, 0));
     EXPECT_NE(HDF_SUCCESS, manager->GetCallFailReason(0, 0));
     EXPECT_NE(HDF_SUCCESS, manager->CallSupplement(0, 0, 0));
-    OHOS::HDI::Ril::V1_0::DtmfInfo info;
+    OHOS::HDI::Ril::V1_1::DtmfInfo info;
     EXPECT_NE(HDF_SUCCESS, manager->SendDtmf(0, 0, info));
     EXPECT_NE(HDF_SUCCESS, manager->StartDtmf(0, 0, info));
     EXPECT_NE(HDF_SUCCESS, manager->StopDtmf(0, 0, info));
-    const OHOS::HDI::Ril::V1_0::SetBarringInfo setBarringInfo;
+    const OHOS::HDI::Ril::V1_1::SetBarringInfo setBarringInfo;
     EXPECT_NE(HDF_SUCCESS, manager->SetBarringPassword(0, 0, setBarringInfo));
     return true;
 }
 
 bool TestDataInterface(std::shared_ptr<HRilManager> manager)
 {
-    OHOS::HDI::Ril::V1_0::DataCallInfo dataCallInfo;
+    OHOS::HDI::Ril::V1_1::DataCallInfo dataCallInfo;
     EXPECT_NE(HDF_SUCCESS, manager->ActivatePdpContext(0, 0, dataCallInfo));
-    OHOS::HDI::Ril::V1_0::UniInfo uniInfo;
+    OHOS::HDI::Ril::V1_1::UniInfo uniInfo;
     EXPECT_NE(HDF_SUCCESS, manager->DeactivatePdpContext(0, 0, uniInfo));
     EXPECT_NE(HDF_SUCCESS, manager->GetPdpContextList(0, 0, uniInfo));
-    OHOS::HDI::Ril::V1_0::DataProfileDataInfo dataProfileDataInfo;
+    OHOS::HDI::Ril::V1_1::DataProfileDataInfo dataProfileDataInfo;
     EXPECT_NE(HDF_SUCCESS, manager->SetInitApnInfo(0, 0, dataProfileDataInfo));
     EXPECT_NE(HDF_SUCCESS, manager->GetLinkBandwidthInfo(0, 0, 0));
-    OHOS::HDI::Ril::V1_0::DataLinkBandwidthReportingRule dataLinkBandwidthReportingRule;
+    OHOS::HDI::Ril::V1_1::DataLinkBandwidthReportingRule dataLinkBandwidthReportingRule;
     EXPECT_NE(HDF_SUCCESS, manager->SetLinkBandwidthReportingRule(0, 0, dataLinkBandwidthReportingRule));
     EXPECT_NE(HDF_SUCCESS, manager->SetDataPermitted(0, 0, 0));
-    OHOS::HDI::Ril::V1_0::DataProfilesInfo dataProfilesInfo;
+    OHOS::HDI::Ril::V1_1::DataProfilesInfo dataProfilesInfo;
     EXPECT_NE(HDF_SUCCESS, manager->SetDataProfileInfo(0, 0, dataProfilesInfo));
-    OHOS::HDI::Ril::V1_0::DataPerformanceInfo dataPerformanceInfo;
+    OHOS::HDI::Ril::V1_1::DataPerformanceInfo dataPerformanceInfo;
     EXPECT_NE(HDF_SUCCESS, manager->SendDataPerformanceMode(0, 0, dataPerformanceInfo));
-    OHOS::HDI::Ril::V1_0::DataSleepInfo dataSleepInfo;
+    OHOS::HDI::Ril::V1_1::DataSleepInfo dataSleepInfo;
     EXPECT_NE(HDF_SUCCESS, manager->SendDataSleepMode(0, 0, dataSleepInfo));
     return true;
 }
@@ -125,14 +125,14 @@ bool TestModemInterface(std::shared_ptr<HRilManager> manager)
 
 bool TestSimInterface(std::shared_ptr<HRilManager> manager)
 {
-    OHOS::HDI::Ril::V1_0::SimIoRequestInfo simIO;
+    OHOS::HDI::Ril::V1_1::SimIoRequestInfo simIO;
     EXPECT_NE(HDF_SUCCESS, manager->GetSimIO(0, 0, simIO));
     EXPECT_NE(HDF_SUCCESS, manager->GetSimStatus(0, 0));
     EXPECT_NE(HDF_SUCCESS, manager->GetImsi(0, 0));
-    OHOS::HDI::Ril::V1_0::SimLockInfo simLockInfo;
+    OHOS::HDI::Ril::V1_1::SimLockInfo simLockInfo;
     EXPECT_NE(HDF_SUCCESS, manager->GetSimLockStatus(0, 0, simLockInfo));
     EXPECT_NE(HDF_SUCCESS, manager->SetSimLock(0, 0, simLockInfo));
-    OHOS::HDI::Ril::V1_0::SimPasswordInfo simPassword;
+    OHOS::HDI::Ril::V1_1::SimPasswordInfo simPassword;
     EXPECT_NE(HDF_SUCCESS, manager->ChangeSimPassword(0, 0, simPassword));
     EXPECT_NE(HDF_SUCCESS, manager->UnlockPin(0, 0, ""));
     EXPECT_NE(HDF_SUCCESS, manager->UnlockPuk(0, 0, "", ""));
@@ -144,14 +144,14 @@ bool TestSimInterface(std::shared_ptr<HRilManager> manager)
     EXPECT_NE(HDF_SUCCESS, manager->SimStkSendCallSetupRequestResult(0, 0, 0));
     EXPECT_NE(HDF_SUCCESS, manager->SimStkIsReady(0, 0));
     EXPECT_NE(HDF_SUCCESS, manager->GetRadioProtocol(0, 0));
-    HDI::Ril::V1_0::RadioProtocol radioProtocol;
+    HDI::Ril::V1_1::RadioProtocol radioProtocol;
     EXPECT_NE(HDF_SUCCESS, manager->SetRadioProtocol(0, 0, radioProtocol));
     EXPECT_NE(HDF_SUCCESS, manager->SimOpenLogicalChannel(0, 0, "0", 0));
     EXPECT_NE(HDF_SUCCESS, manager->SimCloseLogicalChannel(0, 0, 0));
-    OHOS::HDI::Ril::V1_0::ApduSimIORequestInfo apduSimIO;
+    OHOS::HDI::Ril::V1_1::ApduSimIORequestInfo apduSimIO;
     EXPECT_NE(HDF_SUCCESS, manager->SimTransmitApduLogicalChannel(0, 0, apduSimIO));
     EXPECT_NE(HDF_SUCCESS, manager->SimTransmitApduBasicChannel(0, 0, apduSimIO));
-    OHOS::HDI::Ril::V1_0::SimAuthenticationRequestInfo simAuthInfo;
+    OHOS::HDI::Ril::V1_1::SimAuthenticationRequestInfo simAuthInfo;
     EXPECT_NE(HDF_SUCCESS, manager->SimAuthentication(0, 0, simAuthInfo));
     EXPECT_NE(HDF_SUCCESS, manager->UnlockSimLock(0, 0, 0, ""));
     return true;
@@ -165,14 +165,14 @@ bool TestNetWorkInterface(std::shared_ptr<HRilManager> manager)
     EXPECT_NE(HDF_SUCCESS, manager->GetOperatorInfo(0, 0));
     EXPECT_NE(HDF_SUCCESS, manager->GetNetworkSearchInformation(0, 0));
     EXPECT_NE(HDF_SUCCESS, manager->GetNetworkSelectionMode(0, 0));
-    HDI::Ril::V1_0::SetNetworkModeInfo networkModeInfo;
+    HDI::Ril::V1_1::SetNetworkModeInfo networkModeInfo;
     EXPECT_NE(HDF_SUCCESS, manager->SetNetworkSelectionMode(0, 0, networkModeInfo));
     EXPECT_NE(HDF_SUCCESS, manager->GetNeighboringCellInfoList(0, 0));
     EXPECT_NE(HDF_SUCCESS, manager->GetCurrentCellInfo(0, 0));
     EXPECT_NE(HDF_SUCCESS, manager->SetPreferredNetwork(0, 0, 0));
     EXPECT_NE(HDF_SUCCESS, manager->GetPreferredNetwork(0, 0));
     EXPECT_NE(HDF_SUCCESS, manager->GetPhysicalChannelConfig(0, 0));
-    EXPECT_NE(HDF_SUCCESS, manager->SetLocateUpdates(0, 0, static_cast<HDI::Ril::V1_0::RilRegNotifyMode>(0)));
+    EXPECT_NE(HDF_SUCCESS, manager->SetLocateUpdates(0, 0, static_cast<HDI::Ril::V1_1::RilRegNotifyMode>(0)));
     EXPECT_NE(HDF_SUCCESS, manager->SetNotificationFilter(0, 0, 0));
     EXPECT_NE(HDF_SUCCESS, manager->SetDeviceState(0, 0, 0, 0));
     return true;
@@ -180,28 +180,28 @@ bool TestNetWorkInterface(std::shared_ptr<HRilManager> manager)
 
 bool TestSmsInterface(std::shared_ptr<HRilManager> manager)
 {
-    OHOS::HDI::Ril::V1_0::GsmSmsMessageInfo gsmSmsMessageInfo;
+    OHOS::HDI::Ril::V1_1::GsmSmsMessageInfo gsmSmsMessageInfo;
     EXPECT_NE(HDF_SUCCESS, manager->SendGsmSms(0, 0, gsmSmsMessageInfo));
-    OHOS::HDI::Ril::V1_0::SendCdmaSmsMessageInfo cdmaSmsMessageInfo;
+    OHOS::HDI::Ril::V1_1::SendCdmaSmsMessageInfo cdmaSmsMessageInfo;
     EXPECT_NE(HDF_SUCCESS, manager->SendCdmaSms(0, 0, cdmaSmsMessageInfo));
-    OHOS::HDI::Ril::V1_0::SmsMessageIOInfo smsMessageIOInfo;
+    OHOS::HDI::Ril::V1_1::SmsMessageIOInfo smsMessageIOInfo;
     EXPECT_NE(HDF_SUCCESS, manager->AddSimMessage(0, 0, smsMessageIOInfo));
     EXPECT_NE(HDF_SUCCESS, manager->DelSimMessage(0, 0, 0));
     EXPECT_NE(HDF_SUCCESS, manager->UpdateSimMessage(0, 0, smsMessageIOInfo));
     EXPECT_NE(HDF_SUCCESS, manager->AddCdmaSimMessage(0, 0, smsMessageIOInfo));
     EXPECT_NE(HDF_SUCCESS, manager->DelCdmaSimMessage(0, 0, 0));
     EXPECT_NE(HDF_SUCCESS, manager->UpdateCdmaSimMessage(0, 0, smsMessageIOInfo));
-    OHOS::HDI::Ril::V1_0::ServiceCenterAddress serviceCenterAddress;
+    OHOS::HDI::Ril::V1_1::ServiceCenterAddress serviceCenterAddress;
     EXPECT_NE(HDF_SUCCESS, manager->SetSmscAddr(0, 0, serviceCenterAddress));
     EXPECT_NE(HDF_SUCCESS, manager->GetSmscAddr(0, 0));
-    OHOS::HDI::Ril::V1_0::CBConfigInfo cellBroadcastInfo;
+    OHOS::HDI::Ril::V1_1::CBConfigInfo cellBroadcastInfo;
     EXPECT_NE(HDF_SUCCESS, manager->SetCBConfig(0, 0, cellBroadcastInfo));
     EXPECT_NE(HDF_SUCCESS, manager->GetCBConfig(0, 0));
-    OHOS::HDI::Ril::V1_0::CdmaCBConfigInfoList cdmaCBConfigInfoList;
+    OHOS::HDI::Ril::V1_1::CdmaCBConfigInfoList cdmaCBConfigInfoList;
     EXPECT_NE(HDF_SUCCESS, manager->SetCdmaCBConfig(0, 0, cdmaCBConfigInfoList));
     EXPECT_NE(HDF_SUCCESS, manager->GetCdmaCBConfig(0, 0));
     EXPECT_NE(HDF_SUCCESS, manager->SendSmsMoreMode(0, 0, gsmSmsMessageInfo));
-    OHOS::HDI::Ril::V1_0::ModeData modeData;
+    OHOS::HDI::Ril::V1_1::ModeData modeData;
     EXPECT_NE(HDF_SUCCESS, manager->SendSmsAck(0, 0, modeData));
     return true;
 }

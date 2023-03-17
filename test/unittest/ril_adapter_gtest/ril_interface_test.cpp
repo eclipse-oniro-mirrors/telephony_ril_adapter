@@ -20,7 +20,7 @@
 
 namespace OHOS {
 namespace Telephony {
-using namespace OHOS::HDI::Ril::V1_0;
+using namespace OHOS::HDI::Ril::V1_1;
 using namespace testing::ext;
 const int32_t BANDWIDTH_HYSTERESIS_MS = 3000;
 const int32_t BANDWIDTH_HYSTERESIS_KBPS = 50;

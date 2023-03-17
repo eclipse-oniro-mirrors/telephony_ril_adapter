@@ -19,7 +19,7 @@
 
 namespace OHOS {
 namespace Telephony {
-using namespace OHOS::HDI::Ril::V1_0;
+using namespace OHOS::HDI::Ril::V1_1;
 using namespace std;
 
 enum class RatType {
@@ -1132,7 +1132,7 @@ int32_t RilCallbackTest::SetDataProfileInfoResponse(const RilRadioResponseInfo &
 
 // Sms
 int32_t RilCallbackTest::NewSmsNotify(
-    const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo, const SmsMessageInfo &smsMessageInfo)
+    const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const SmsMessageInfo &smsMessageInfo)
 {
     PrintResponseInfo("NewSmsNotify", responseInfo);
     cout << "[smsMessageInfo] -->[size] : " << smsMessageInfo.size << endl << endl;
@@ -1140,7 +1140,7 @@ int32_t RilCallbackTest::NewSmsNotify(
 }
 
 int32_t RilCallbackTest::NewCdmaSmsNotify(
-    const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo, const SmsMessageInfo &smsMessageInfo)
+    const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const SmsMessageInfo &smsMessageInfo)
 {
     PrintResponseInfo("NewCdmaSmsNotify", responseInfo);
     cout << "[smsMessageInfo] -->[size] : " << smsMessageInfo.size << endl << endl;
@@ -1148,7 +1148,7 @@ int32_t RilCallbackTest::NewCdmaSmsNotify(
 }
 
 int32_t RilCallbackTest::SmsStatusReportNotify(
-    const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo, const SmsMessageInfo &smsMessageInfo)
+    const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const SmsMessageInfo &smsMessageInfo)
 {
     PrintResponseInfo("SmsStatusReportNotify", responseInfo);
     cout << "[smsMessageInfo] -->[size] : " << smsMessageInfo.size << endl << endl;
@@ -1156,7 +1156,7 @@ int32_t RilCallbackTest::SmsStatusReportNotify(
 }
 
 int32_t RilCallbackTest::NewSmsStoredOnSimNotify(
-    const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo, int32_t recordNumber, int32_t indicationType)
+    const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, int32_t recordNumber, int32_t indicationType)
 {
     PrintResponseInfo("NewSmsStoredOnSimNotify", responseInfo);
     cout << " [recordNumber] : " << recordNumber << endl;
@@ -1165,7 +1165,7 @@ int32_t RilCallbackTest::NewSmsStoredOnSimNotify(
 }
 
 int32_t RilCallbackTest::CBConfigNotify(
-    const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo, const CBConfigReportInfo &cellBroadConfigReportInfo)
+    const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const CBConfigReportInfo &cellBroadConfigReportInfo)
 {
     PrintResponseInfo("CBConfigNotify", responseInfo);
     cout << "[cellBroadConfigReportInfo] -->[dcs] : " << cellBroadConfigReportInfo.dcs.c_str() << endl << endl;
