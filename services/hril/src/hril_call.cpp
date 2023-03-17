@@ -729,7 +729,7 @@ int32_t HRilCall::SetEmergencyCallListResponse(
 int32_t HRilCall::CloseUnFinishedUssdResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::CloseUnFinishedUssdResponse);
+    return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::CloseUnFinishedUssdResponse);
 }
 
 int32_t HRilCall::CallStateUpdated(
