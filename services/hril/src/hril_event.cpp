@@ -44,8 +44,8 @@ bool HRilEvent::GetNextTimeOut(struct timeval &tv)
 
     struct timeval now;
     GetNowTime(now);
-    TELEPHONY_LOGI("now = %{public}ds + %{public}dus", (int32_t)now.tv_sec, (int32_t)now.tv_usec);
-    TELEPHONY_LOGI(
+    TELEPHONY_LOGD("now = %{public}ds + %{public}dus", (int32_t)now.tv_sec, (int32_t)now.tv_usec);
+    TELEPHONY_LOGD(
         "next = %{public}ds + %{public}dus", (int32_t)eventIt->timeout.tv_sec, (int32_t)eventIt->timeout.tv_usec);
     if (timercmp(&eventIt->timeout, &now, >)) {
         timersub(&eventIt->timeout, &now, &tv);
@@ -63,7 +63,7 @@ void HRilEvent::ProcessTimerList()
     std::list<HRilEventMessage>::iterator eventIt = timerList_.begin();
     GetNowTime(now);
 
-    TELEPHONY_LOGI("finding for timers <= %{public}ds + %{public}dus", (int32_t)now.tv_sec, (int32_t)now.tv_usec);
+    TELEPHONY_LOGD("finding for timers <= %{public}ds + %{public}dus", (int32_t)now.tv_sec, (int32_t)now.tv_usec);
     while ((eventIt != timerList_.end()) && (timercmp(&now, &eventIt->timeout, >))) {
         HRilEventMessage evMsg = {};
         evMsg.fd = eventIt->fd;
@@ -102,7 +102,7 @@ void HRilEvent::EraseListenEvent(HRilEventMessage &eventMsg, int32_t index)
             }
         }
         nfds_ = n + 1;
-        TELEPHONY_LOGI("Updated nfds = %{public}d", nfds_);
+        TELEPHONY_LOGD("Updated nfds = %{public}d", nfds_);
     }
 }
 
@@ -197,20 +197,20 @@ void HRilEvent::EventMessageLoop()
     struct timeval timeout;
     struct timeval *pTimeOut;
 
-    TELEPHONY_LOGI("****** EventMessageLoop start ******");
+    TELEPHONY_LOGD("****** EventMessageLoop start ******");
     while (1) {
         (void)memcpy_s(&rfds, sizeof(fd_set), &readFds_, sizeof(fd_set));
         if (!GetNextTimeOut(timeout)) {
             // Enter blocking wait without setting a timer.
-            TELEPHONY_LOGI("Enter blocking wait without setting a timer.");
+            TELEPHONY_LOGD("Enter blocking wait without setting a timer.");
             pTimeOut = nullptr;
         } else {
-            TELEPHONY_LOGI(
+            TELEPHONY_LOGD(
                 "Setting timeout for %{public}ds + %{public}dus", (int32_t)timeout.tv_sec, (int32_t)timeout.tv_usec);
             pTimeOut = &timeout;
         }
         ret = select(nfds_, &rfds, nullptr, nullptr, pTimeOut);
-        TELEPHONY_LOGI("There are %{public}d events fired, isNormalDestory: %{public}d.", ret, isNormalDestory);
+        TELEPHONY_LOGD("There are %{public}d events fired, isNormalDestory: %{public}d.", ret, isNormalDestory);
         if (isNormalDestory) {
             return;
         }

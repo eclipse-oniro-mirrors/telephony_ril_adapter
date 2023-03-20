@@ -126,7 +126,7 @@ int32_t HRilData::ActivatePdpContext(int32_t serialId, const OHOS::HDI::Ril::V1_
 
 int32_t HRilData::GetPdpContextList(int32_t serialId, const OHOS::HDI::Ril::V1_0::UniInfo &uniInfo)
 {
-    TELEPHONY_LOGI("serial %{public}d on %{public}d", uniInfo.serial, uniInfo.flag);
+    TELEPHONY_LOGD("serial %{public}d on %{public}d", uniInfo.serial, uniInfo.flag);
     return RequestVendor(serialId, HREQ_DATA_GET_PDP_CONTEXT_LIST, dataFuncs_, &HRilDataReq::GetPdpContextList);
 }
 

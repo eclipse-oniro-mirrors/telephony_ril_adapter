@@ -78,7 +78,7 @@ static int32_t GetResponseErrorCode(ResponseInfo *pResponseInfo)
     if (ret == -1) {
         ret = HRIL_ERR_INVALID_RESPONSE;
     }
-    TELEPHONY_LOGI("networks response error code: %{public}d", ret);
+    TELEPHONY_LOGD("networks response error code: %{public}d", ret);
     return ret;
 }
 
@@ -376,40 +376,40 @@ int32_t ProcessParamSignalStrength(const char *result, HRilRssi *hrilRssi)
         return err;
     }
     err = NextInt(&resultStr, &tmp);
-    TELEPHONY_LOGI("ProcessParamSignalStrength  enter -->, result %{public}s", resultStr);
+    TELEPHONY_LOGD("ProcessParamSignalStrength  enter -->, result %{public}s", resultStr);
     if (err < 0) {
         TELEPHONY_LOGE("read failed: %{public}d", err);
         return err;
     }
     err = NextInt(&resultStr, &tmp);
-    TELEPHONY_LOGI("ProcessParamSignalStrength  enter -->, result %{public}s", resultStr);
+    TELEPHONY_LOGD("ProcessParamSignalStrength  enter -->, result %{public}s", resultStr);
     if (err < 0) {
         TELEPHONY_LOGE("read failed: %{public}d", err);
         return err;
     }
     err = NextStr(&resultStr, &c);
-    TELEPHONY_LOGI("ProcessParamSignalStrength  enter -->, result %{public}s", resultStr);
+    TELEPHONY_LOGD("ProcessParamSignalStrength  enter -->, result %{public}s", resultStr);
     if (err < 0) {
         TELEPHONY_LOGE("read failed: %{public}d", err);
         return err;
     }
     if (!strcmp(c, "GSM")) {
-        TELEPHONY_LOGI("ProcessParamSignalStrength  enter GSM-->, result %{public}s", resultStr);
+        TELEPHONY_LOGD("ProcessParamSignalStrength  enter GSM-->, result %{public}s", resultStr);
         ParseGetGsmSignalStrength(resultStr, hrilRssi);
     } else if (!strcmp(c, "LTE")) {
-        TELEPHONY_LOGI("ProcessParamSignalStrength  enter LTE-->, result %{public}s", resultStr);
+        TELEPHONY_LOGD("ProcessParamSignalStrength  enter LTE-->, result %{public}s", resultStr);
         ParseGetLteSignalStrength(resultStr, hrilRssi);
     } else if (!strcmp(c, "WCDMA")) {
-        TELEPHONY_LOGI("ProcessParamSignalStrength  enter WCDMA-->, result %{public}s", resultStr);
+        TELEPHONY_LOGD("ProcessParamSignalStrength  enter WCDMA-->, result %{public}s", resultStr);
         ParseGetWcdmaSignalStrength(resultStr, hrilRssi);
     } else if (!strcmp(c, "TDSCDMA")) {
-        TELEPHONY_LOGI("ProcessParamSignalStrength  enter TDSCDMA-->, result %{public}s", resultStr);
+        TELEPHONY_LOGD("ProcessParamSignalStrength  enter TDSCDMA-->, result %{public}s", resultStr);
         ParseGetTdScdmaSignalStrength(resultStr, hrilRssi);
     } else if (!strcmp(c, "CDMA")) {
-        TELEPHONY_LOGI("ProcessParamSignalStrength  enter CDMA-->, result %{public}s", resultStr);
+        TELEPHONY_LOGD("ProcessParamSignalStrength  enter CDMA-->, result %{public}s", resultStr);
         ParseGetCdmaSignalStrength(resultStr, hrilRssi);
     } else if (!strcmp(c, "NR")) {
-        TELEPHONY_LOGI("ProcessParamSignalStrength  enter NR-->, result %{public}s", resultStr);
+        TELEPHONY_LOGD("ProcessParamSignalStrength  enter NR-->, result %{public}s", resultStr);
         ParseGetNrSignalStrength(resultStr, hrilRssi);
     }
     return HRIL_ERR_SUCCESS;
@@ -420,7 +420,7 @@ int32_t ProcessParamSignalStrengthNotify(const char *result, HRilRssi *hrilRssi)
     char *resultStr = (char *)result;
     char *c = NULL;
     int32_t err = SkipATPrefix(&resultStr);
-    TELEPHONY_LOGI("ProcessParamSignalStrengthNotify  enter -->, resultStr %{public}s", resultStr);
+    TELEPHONY_LOGD("ProcessParamSignalStrengthNotify  enter -->, resultStr %{public}s", resultStr);
     if (err < 0) {
         TELEPHONY_LOGE("skip failed: %{public}s", resultStr);
         return err;
@@ -458,7 +458,7 @@ void ReqGetSignalStrength(const ReqDataInfo *requestInfo)
     const int32_t REPORT_SIZE = 20;
     ResponseInfo *responseInfo = NULL;
     char *result = NULL;
-    TELEPHONY_LOGI("enter to [%{public}s]:%{public}d", __func__, __LINE__);
+    TELEPHONY_LOGD("enter to [%{public}s]:%{public}d", __func__, __LINE__);
     int32_t ret = SendCommandLock("AT^HCSQ?", "^HCSQ:", DEFAULT_TIMEOUT, &responseInfo);
     if (responseInfo == NULL) {
         TELEPHONY_LOGE("responseInfo is nullptr!");
@@ -611,7 +611,7 @@ void ReqGetOperatorInfo(const ReqDataInfo *requestInfo)
             break;
         }
         ret = NextStr(&result, &response[i]);
-        TELEPHONY_LOGI("result[%{public}d]: %{public}s", i, response[i]);
+        TELEPHONY_LOGD("result[%{public}d]: %{public}s", i, response[i]);
         if (ret == -1) {
             response[i] = "";
             TELEPHONY_LOGE("read failed");
@@ -640,7 +640,7 @@ static int32_t MoveLeftBracket(char **pStr)
 
 void GetNetworkSearchInformationPause(void)
 {
-    TELEPHONY_LOGI("enter to [%{public}s]:%{public}d", __func__, __LINE__);
+    TELEPHONY_LOGD("enter to [%{public}s]:%{public}d", __func__, __LINE__);
     pthread_mutex_lock(&g_networkSearchInformationMutex);
     g_reportInfoForOperListToUse.error = HRIL_ERR_NETWORK_SEARCHING_INTERRUPTED;
     if (g_reportInfoForOperListToUse.requestInfo != NULL) {
@@ -658,7 +658,7 @@ void PerformTimeOut(int32_t sigFlag)
     if (SIGALRM == sigFlag) {
         pthread_mutex_lock(&g_networkSearchInformationMutex);
         bool sendFlag = GetAtPauseFlag();
-        TELEPHONY_LOGI("enter to [%{public}s]:%{public}d", __func__, __LINE__);
+        TELEPHONY_LOGD("enter to [%{public}s]:%{public}d", __func__, __LINE__);
         if (sendFlag) {
             g_reportInfoForOperListToUse.error = HRIL_ERR_NETWORK_SEARCH_TIMEOUT;
             if (g_reportInfoForOperListToUse.requestInfo != NULL) {
@@ -683,7 +683,7 @@ void ReqGetNetworkSearchInformation(const ReqDataInfo *requestInfo)
     }
     ResponseInfo *responseInfo = NULL;
     const int32_t SECOND = 120;
-    TELEPHONY_LOGI("enter to [%{public}s]:%{public}d", __func__, __LINE__);
+    TELEPHONY_LOGD("enter to [%{public}s]:%{public}d", __func__, __LINE__);
     pthread_mutex_lock(&g_networkSearchInformationMutex);
     alarm(0);
     if (g_reportInfoForOperListToUse.requestInfo != NULL) {
@@ -737,19 +737,19 @@ static int32_t ParseOperInfoItem(
     if (ret < 0) {
         return -1;
     }
-    TELEPHONY_LOGI("ok , longName:%{public}s", *longNameInfoStr);
+    TELEPHONY_LOGD("ok , longName:%{public}s", *longNameInfoStr);
 
     ret = NextStr(&data, shortNameInfoStr);
     if (ret < 0) {
         return -1;
     }
-    TELEPHONY_LOGI("ok , shortName:%{public}s", *shortNameInfoStr);
+    TELEPHONY_LOGD("ok , shortName:%{public}s", *shortNameInfoStr);
 
     ret = NextStr(&data, numericInfoStr);
     if (ret < 0) {
         return -1;
     }
-    TELEPHONY_LOGI("ok , numeric:%{public}s", *numericInfoStr);
+    TELEPHONY_LOGD("ok , numeric:%{public}s", *numericInfoStr);
     *lineInfo = data;
     return 0;
 }
@@ -787,15 +787,15 @@ int32_t ParseOperListInfo(
         }
         if (state > 0) {
             pOperInfo[operCount].status = state;
-            TELEPHONY_LOGI("pOperInfo , status:%{public}d", pOperInfo[i].status);
+            TELEPHONY_LOGD("pOperInfo , status:%{public}d", pOperInfo[i].status);
             pOperInfo[operCount].longName = longName;
-            TELEPHONY_LOGI("pOperInfo , longName:%{public}s", longName);
+            TELEPHONY_LOGD("pOperInfo , longName:%{public}s", longName);
             pOperInfo[operCount].numeric = numeric;
-            TELEPHONY_LOGI("pOperInfo , numeric:%{public}s", numeric);
+            TELEPHONY_LOGD("pOperInfo , numeric:%{public}s", numeric);
             pOperInfo[operCount].shortName = shortName;
-            TELEPHONY_LOGI("pOperInfo , shortName:%{public}s", shortName);
+            TELEPHONY_LOGD("pOperInfo , shortName:%{public}s", shortName);
             pOperInfo[operCount].rat = rat;
-            TELEPHONY_LOGI("pOperInfo , rat:%{public}d", rat);
+            TELEPHONY_LOGD("pOperInfo , rat:%{public}d", rat);
             operCount++;
         }
     }
@@ -865,7 +865,7 @@ static int32_t ParseCellInfoGsm(const char *str, CellInfo *ci)
     char *pStr = (char *)str;
     char *pat = NULL;
     (void)memset_s(ci, sizeof(CellInfo), 0, sizeof(CellInfo));
-    TELEPHONY_LOGI("ParseCellInfoGsm %{public}s", pStr);
+    TELEPHONY_LOGD("ParseCellInfoGsm %{public}s", pStr);
     if (SkipATPrefix(&pStr) < 0) {
         return ErrorHandling();
     }
@@ -902,7 +902,7 @@ static int32_t ParseCellInfoLte(const char *str, CellInfo *ci)
     char *pStr = (char *)str;
     char *pat = NULL;
     (void)memset_s(ci, sizeof(CellInfo), 0, sizeof(CellInfo));
-    TELEPHONY_LOGI("ParseCellInfoLte %{public}s", pStr);
+    TELEPHONY_LOGD("ParseCellInfoLte %{public}s", pStr);
     if (SkipATPrefix(&pStr) < 0) {
         return ErrorHandling();
     }
@@ -936,7 +936,7 @@ static int32_t ParseCellInfoWcdma(const char *str, CellInfo *ci)
     char *pStr = (char *)str;
     char *pat = NULL;
     (void)memset_s(ci, sizeof(CellInfo), 0, sizeof(CellInfo));
-    TELEPHONY_LOGI("ParseCellInfoWcdma %{public}s", pStr);
+    TELEPHONY_LOGD("ParseCellInfoWcdma %{public}s", pStr);
     if (SkipATPrefix(&pStr) < 0) {
         return ErrorHandling();
     }
@@ -967,7 +967,7 @@ static int32_t ParseCellInfoCdma(const char *str, CellInfo *ci)
     char *pStr = (char *)str;
     char *pat = NULL;
     (void)memset_s(ci, sizeof(CellInfo), 0, sizeof(CellInfo));
-    TELEPHONY_LOGI("ParseCellInfoCdma %{public}s", pStr);
+    TELEPHONY_LOGD("ParseCellInfoCdma %{public}s", pStr);
     if (SkipATPrefix(&pStr) < 0) {
         return ErrorHandling();
     }
@@ -1013,7 +1013,7 @@ static int32_t ParseCellInfoTdscdma(const char *str, CellInfo *ci)
     char *pStr = (char *)str;
     char *pat = NULL;
     (void)memset_s(ci, sizeof(CellInfo), 0, sizeof(CellInfo));
-    TELEPHONY_LOGI("ParseCellInfoTdscdma %{public}s", pStr);
+    TELEPHONY_LOGD("ParseCellInfoTdscdma %{public}s", pStr);
     if (SkipATPrefix(&pStr) < 0) {
         return ErrorHandling();
     }
@@ -1059,7 +1059,7 @@ static int32_t ParseCellInfoNr(const char *str, CellInfo *ci)
     char *pStr = (char *)str;
     char *pat = NULL;
     (void)memset_s(ci, sizeof(CellInfo), 0, sizeof(CellInfo));
-    TELEPHONY_LOGI("ParseCellInfoNr %{public}s", pStr);
+    TELEPHONY_LOGD("ParseCellInfoNr %{public}s", pStr);
     if (SkipATPrefix(&pStr) < 0) {
         return ErrorHandling();
     }
@@ -1090,7 +1090,7 @@ static int32_t ParseCellInfos(const char *str, const CellInfo *cellInfo)
         TELEPHONY_LOGE("pStr is null.");
         return HRIL_ERR_GENERIC_FAILURE;
     }
-    TELEPHONY_LOGI("ParseCellInfos  %{public}s", pStr);
+    TELEPHONY_LOGD("ParseCellInfos %{public}s", pStr);
     if (ReportStrWith(pStr, "^MONNC: GSM")) {
         if (ParseCellInfoGsm(pStr, ci) != 0) {
             TELEPHONY_LOGE("parse gsm command failed!");
@@ -1123,7 +1123,7 @@ static int32_t ParseCellInfos(const char *str, const CellInfo *cellInfo)
         }
     } else if (ReportStrWith(pStr, "^MONNC: NONE")) {
         (void)memset_s(ci, sizeof(CellInfo), 0, sizeof(CellInfo));
-        TELEPHONY_LOGI("ParseCellInfos ^MONNC: NONE branch");
+        TELEPHONY_LOGD("ParseCellInfos ^MONNC: NONE branch");
     } else {
         TELEPHONY_LOGE("%{public}s This command resolution not supported.", pStr);
         return HRIL_ERR_GENERIC_FAILURE;
@@ -1166,7 +1166,7 @@ void ReqGetNeighboringCellInfoList(const ReqDataInfo *requestInfo)
         ResponseNetworkReport(requestInfo->slotId, requestInfo, HRIL_ERR_INVALID_RESPONSE, &respDataAck);
         return;
     }
-    TELEPHONY_LOGI("countCellInfo:%{public}d", countCellInfo);
+    TELEPHONY_LOGD("countCellInfo:%{public}d", countCellInfo);
     cellInfo = (CellInfo *)calloc(countCellInfo, sizeof(CellInfo));
     if (cellInfo == NULL) {
         TELEPHONY_LOGE("cellInfoList alloc failed!");
@@ -1200,7 +1200,7 @@ static void ParseGetGsmCellInfoLine(char *line, CurrentCellInfoVendor *response)
     NextInt(&line, &response->ServiceCellParas.gsm.rxQuality);
     NextInt(&line, &response->ServiceCellParas.gsm.ta);
     response->ServiceCellParas.gsm.rxlev = -response->ServiceCellParas.gsm.rxlev;
-    TELEPHONY_LOGI("ParseGetGsmCellInfoLine band:%{private}d,arfcn:%{private}d,bsic:%{private}d,cellId:%{private}d"
+    TELEPHONY_LOGD("ParseGetGsmCellInfoLine band:%{private}d,arfcn:%{private}d,bsic:%{private}d,cellId:%{private}d"
                    "lac:%{private}d,rxlev:%{private}d,rxQuality:%{private}d,ta:%{private}d",
         response->ServiceCellParas.gsm.band, response->ServiceCellParas.gsm.arfcn, response->ServiceCellParas.gsm.bsic,
         response->ServiceCellParas.gsm.cellId, response->ServiceCellParas.gsm.lac, response->ServiceCellParas.gsm.rxlev,
@@ -1220,7 +1220,7 @@ static void ParseGetLteCellInfoLine(char *line, CurrentCellInfoVendor *response)
     NextInt(&line, &response->ServiceCellParas.lte.rsrq);
     NextInt(&line, &response->ServiceCellParas.lte.rssi);
     response->ServiceCellParas.lte.rsrp = -response->ServiceCellParas.lte.rsrp;
-    TELEPHONY_LOGI("ParseGetLteCellInfoLine arfcn:%{private}d,cellId:%{private}d,pci:%{private}d"
+    TELEPHONY_LOGD("ParseGetLteCellInfoLine arfcn:%{private}d,cellId:%{private}d,pci:%{private}d"
                    "tac:%{private}d,rsrp:%{private}d,rsrq:%{private}d,rssi:%{private}d",
         response->ServiceCellParas.lte.arfcn, response->ServiceCellParas.lte.cellId, response->ServiceCellParas.lte.pci,
         response->ServiceCellParas.lte.tac, response->ServiceCellParas.lte.rsrp, response->ServiceCellParas.lte.rsrq,
@@ -1242,7 +1242,7 @@ static void ParseGetWcdmaCellInfoLine(char *line, CurrentCellInfoVendor *respons
     NextInt(&line, &response->ServiceCellParas.wcdma.drx);
     NextInt(&line, &response->ServiceCellParas.wcdma.ura);
     response->ServiceCellParas.wcdma.rscp = -response->ServiceCellParas.wcdma.rscp;
-    TELEPHONY_LOGI("ParseGetWcdmaCellInfoLine arfcn:%{private}d,psc:%{private}d,cellId:%{private}d,lac:%{private}d"
+    TELEPHONY_LOGD("ParseGetWcdmaCellInfoLine arfcn:%{private}d,psc:%{private}d,cellId:%{private}d,lac:%{private}d"
                    "rscp:%{private}d,rxlev:%{private}d,ecno:%{private}d,drx:%{private}d,ura:%{private}d",
         response->ServiceCellParas.wcdma.arfcn, response->ServiceCellParas.wcdma.psc,
         response->ServiceCellParas.wcdma.cellId, response->ServiceCellParas.wcdma.lac,
@@ -1266,7 +1266,7 @@ static void ParseGetCdmaCellInfoLine(char *line, CurrentCellInfoVendor *response
     NextInt(&line, &response->ServiceCellParas.cdma.longitude);
     NextInt(&line, &response->ServiceCellParas.cdma.latitude);
     response->ServiceCellParas.cdma.pilotStrength = -response->ServiceCellParas.cdma.pilotStrength;
-    TELEPHONY_LOGI(
+    TELEPHONY_LOGD(
         "ParseGetCdmaCellInfoLine systemId:%{private}d,networkId:%{private}d,baseId:%{private}d,zoneId:%{private}d"
         "pilotPn:%{private}d,pilotStrength:%{private}d,channel:%{private}d,longitude:%{private}d,latitude:%{private}d",
         response->ServiceCellParas.cdma.systemId, response->ServiceCellParas.cdma.networkId,
@@ -1291,7 +1291,7 @@ static void ParseGetTdscdmaCellInfoLine(char *line, CurrentCellInfoVendor *respo
     NextIntFromHex(&line, &response->ServiceCellParas.tdscdma.rac);
     NextInt(&line, &response->ServiceCellParas.tdscdma.cpid);
     response->ServiceCellParas.tdscdma.rscp = -response->ServiceCellParas.tdscdma.rscp;
-    TELEPHONY_LOGI("ParseGetTdscdmaCellInfoLine arfcn:%{private}d,syncId:%{private}d,sc:%{private}d,cellId:%{private}d,"
+    TELEPHONY_LOGD("ParseGetTdscdmaCellInfoLine arfcn:%{private}d,syncId:%{private}d,sc:%{private}d,cellId:%{private}d,"
                    "lac:%{private}d,rscp:%{private}d,drx:%{private}d,rac:%{private}d,cpid:%{private}d,",
         response->ServiceCellParas.tdscdma.arfcn, response->ServiceCellParas.tdscdma.syncId,
         response->ServiceCellParas.tdscdma.sc, response->ServiceCellParas.tdscdma.cellId,
@@ -1351,7 +1351,7 @@ static int32_t ParseGetCurrentCellInfoResponseLine(char *line, CurrentCellInfoVe
         return -1;
     }
     char *c = NULL;
-    TELEPHONY_LOGI("ParseGetCurrentCellInfoResponseLine  line %{public}s", line);
+    TELEPHONY_LOGD("ParseGetCurrentCellInfoResponseLine  line %{public}s", line);
     int32_t err = SkipATPrefix(&line);
     if (err < 0) {
         return err;
@@ -1544,7 +1544,7 @@ static bool PrepareSetNetworkSelectionMode(char *cmd, const HRilSetNetworkModeIn
         return false;
     }
     bool ret = true;
-    TELEPHONY_LOGI("setModeInfo, serial123 = %{public}d", setModeInfo->selectMode);
+    TELEPHONY_LOGD("setModeInfo, serial123 = %{public}d", setModeInfo->selectMode);
     if (setModeInfo->selectMode == 0) {
         (void)sprintf_s(cmd, MAX_CMD_LENGTH, "%s", "AT+COPS=0");
     } else if (setModeInfo->selectMode == 1) {
@@ -1582,7 +1582,7 @@ void ReqSetNetworkSelectionMode(const ReqDataInfo *requestInfo, const HRilSetNet
         TELEPHONY_LOGE("SetAutomaticMode HRIL_ERR_INVALID_PARAMETER");
         return;
     }
-    TELEPHONY_LOGI("requestSetAutomaticModeForNetworks, cmd = %{public}s", cmd);
+    TELEPHONY_LOGD("requestSetAutomaticModeForNetworks, cmd = %{public}s", cmd);
     int32_t err = SendCommandLock(cmd, NULL, 0, &responseInfo);
 
     if (responseInfo == NULL) {
@@ -1591,7 +1591,7 @@ void ReqSetNetworkSelectionMode(const ReqDataInfo *requestInfo, const HRilSetNet
         TELEPHONY_LOGE("SetAutomaticMode responseInfo == NULL");
         return;
     }
-    TELEPHONY_LOGI("SetAutomaticModeForNetworks, responseInfo->success = %{public}d", responseInfo->success);
+    TELEPHONY_LOGD("SetAutomaticModeForNetworks, responseInfo->success = %{public}d", responseInfo->success);
     if (err != 0 || responseInfo->success == 0) {
         TELEPHONY_LOGE("ret is not equal to HDF_SUCCESS!");
         err = GetResponseErrorCode(responseInfo);
@@ -1689,7 +1689,7 @@ static char *PrepareCommandByNetworkType(HRilPreferredNetworkType net)
 {
     char *cmd = (char *)calloc(1, MAX_CMD_LENGTH);
     if (cmd != NULL) {
-        TELEPHONY_LOGI("SetPreferredNetwork, net = %{public}d", net);
+        TELEPHONY_LOGD("SetPreferredNetwork, net = %{public}d", net);
         if (net == HRIL_NETWORK_AUTO) {
             GenerateCommand(cmd, MAX_CMD_LENGTH, "%s", "AT^SYSCFGEX=\"00\",3FFFFFFF,1,2,7FFFFFFFFFFFFFFF,0,0");
         } else if (net == HRIL_NETWORK_GSM) {
@@ -1760,12 +1760,12 @@ void ReqSetPreferredNetwork(const ReqDataInfo *requestInfo, const int32_t *data)
 
 static int32_t ParseNetTypeStr(const char *netType)
 {
-    TELEPHONY_LOGI("enter to [%{public}s]:%{public}d", __func__, __LINE__);
+    TELEPHONY_LOGD("enter to [%{public}s]:%{public}d", __func__, __LINE__);
     if (netType == NULL) {
         TELEPHONY_LOGE("ParseNetTypeStr netType is null");
         return -1;
     }
-    TELEPHONY_LOGI("netType: [%{public}s]", netType);
+    TELEPHONY_LOGD("netType: [%{public}s]", netType);
     if (strcmp(netType, AUTO_TYPE) == 0) {
         return HRIL_NETWORK_AUTO;
     } else if (strcmp(netType, GSM_TYPE) == 0) {
@@ -1883,7 +1883,7 @@ void ReqSetLocateUpdates(const ReqDataInfo *requestInfo, HRilRegNotifyMode mode)
         TELEPHONY_LOGE("ReqSetLocateUpdates responseInfo == NULL");
         return;
     }
-    TELEPHONY_LOGI("ReqSetLocateUpdates, responseInfo->success = %{public}d", responseInfo->success);
+    TELEPHONY_LOGD("ReqSetLocateUpdates, responseInfo->success = %{public}d", responseInfo->success);
     if (err != 0 || responseInfo->success == 0) {
         err = GetResponseErrorCode(responseInfo);
         TELEPHONY_LOGE("ReqSetLocateUpdates errcode = %{public}d", err);
@@ -1904,7 +1904,7 @@ void ReqSetNotificationFilter(const ReqDataInfo *requestInfo, const int32_t *new
         OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 0);
         return;
     }
-    TELEPHONY_LOGI("ReqSetNotificationFilter success");
+    TELEPHONY_LOGD("ReqSetNotificationFilter success");
     struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
     OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 0);
 }
@@ -1921,7 +1921,7 @@ void ReqSetDeviceState(const ReqDataInfo *requestInfo, const int32_t *deviceStat
         OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 0);
         return;
     }
-    TELEPHONY_LOGI("ReqSetDeviceState success");
+    TELEPHONY_LOGD("ReqSetDeviceState success");
     struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
     OnNetworkReport(requestInfo->slotId, reportInfo, NULL, 0);
 }
