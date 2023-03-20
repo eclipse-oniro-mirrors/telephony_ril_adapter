@@ -117,7 +117,7 @@ void FreeResponseInfo(ResponseInfo *resp)
 
 void ReaderLoop(void)
 {
-    TELEPHONY_LOGI("%{public}s enter", __func__);
+    TELEPHONY_LOGD("%{public}s enter", __func__);
     g_readerClosed = 0;
     while (1) {
         const char *str = NULL;
@@ -263,7 +263,7 @@ int32_t SendCommandNetWorksLock(const char *command, const char *prefix, long lo
     g_prefix = prefix;
     err = SendCommandNoLock(command, timeout, outResponse);
     pthread_mutex_unlock(&g_commandmutex);
-    TELEPHONY_LOGI("err = %{public}d", err);
+    TELEPHONY_LOGD("err = %{public}d", err);
     // when timeout to process
     if (err == AT_ERR_TIMEOUT) {
         err = AT_ERR_WAITING;
@@ -284,7 +284,7 @@ int32_t SendCommandSmsLock(
     g_smsPdu = smsPdu;
     err = SendCommandNoLock(command, timeout, outResponse);
     pthread_mutex_unlock(&g_commandmutex);
-    TELEPHONY_LOGI("err = %{public}d", err);
+    TELEPHONY_LOGD("err = %{public}d", err);
     // when timeout to process
     if (err == AT_ERR_TIMEOUT && g_onTimeout != NULL) {
         g_onTimeout();

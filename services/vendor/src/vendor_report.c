@@ -260,7 +260,7 @@ static int32_t ParseStkResponseStr(const char *s, char **cmdResponseInfo)
         return HRIL_ERR_INVALID_RESPONSE;
     }
     err = NextStr(&str, cmdResponseInfo);
-    TELEPHONY_LOGI("ParseStkResponseStr, cmdResponse: %{public}s", *cmdResponseInfo);
+    TELEPHONY_LOGD("ParseStkResponseStr, cmdResponse: %{public}s", *cmdResponseInfo);
     if (err != 0) {
         return HRIL_ERR_INVALID_PARAMETER;
     }
@@ -287,7 +287,7 @@ bool OnNotifyStkOps(const char *s, const char *strInfo)
             TELEPHONY_LOGE("cmdResponse is NULL");
             OnSimReport(GetSlotId(NULL), reportInfo, NULL, ZERO_RESPONSE_LEN);
         } else {
-            TELEPHONY_LOGI("OnNotifyStkOps, cmdResponse: %{public}s", cmdResponse);
+            TELEPHONY_LOGD("OnNotifyStkOps, cmdResponse: %{public}s", cmdResponse);
             OnSimReport(GetSlotId(NULL), reportInfo, (const uint8_t *)cmdResponse, sizeof(char));
         }
     } else if (ReportStrWith(s, "+CGMM:")) {
@@ -359,7 +359,7 @@ static void SignalStrengthNotify(struct ReportInfo reportInfo, int32_t ret, char
 {
     HRilRssi response = {0};
     reportInfo.notifyId = HNOTI_NETWORK_SIGNAL_STRENGTH_UPDATED;
-    TELEPHONY_LOGI("start report SignalStrengthNotify ");
+    TELEPHONY_LOGD("start report SignalStrengthNotify ");
     ret = ProcessParamSignalStrengthNotify(str, &response);
     if (ret == 0) {
         OnNetworkReport(GetSlotId(NULL), reportInfo, (const uint8_t *)(&response), sizeof(HRilRssi));

@@ -67,9 +67,9 @@ ReqDataInfo *HRilManager::CreateHRilRequest(int32_t serial, int32_t slotId, int3
     if (iter != requestList_.end()) {
         std::list<ReqDataInfo *> &reqDataSet = iter->second;
         reqDataSet.push_back(requestInfo);
-        TELEPHONY_LOGI("CreateHRilRequest requestId=%{public}d, list size: %{public}zu", request, reqDataSet.size());
+        TELEPHONY_LOGD("CreateHRilRequest requestId=%{public}d, list size: %{public}zu", request, reqDataSet.size());
     } else {
-        TELEPHONY_LOGI("CreateHRilRequest  create requestList, requestId=%{public}d", request);
+        TELEPHONY_LOGD("CreateHRilRequest create requestList, requestId=%{public}d", request);
         std::list<ReqDataInfo *> reqDataSet;
         reqDataSet.push_back(requestInfo);
         requestList_.emplace(request, reqDataSet);
@@ -97,7 +97,7 @@ template<typename ClassTypePtr, typename FuncType, typename... ParamTypes>
 inline int32_t HRilManager::TaskSchedule(
     const std::string module, ClassTypePtr &_obj, FuncType &&_func, ParamTypes &&... _args)
 {
-    TELEPHONY_LOGI("%{public}s enter", module.c_str());
+    TELEPHONY_LOGD("%{public}s enter", module.c_str());
     if (_func == nullptr || _obj == nullptr) {
         TELEPHONY_LOGE("%{public}s func or obj is null pointer", module.c_str());
         return HDF_FAILURE;
@@ -160,14 +160,14 @@ static void RunningLockCallback(uint8_t *param)
     delete param;
     param = nullptr;
     std::lock_guard<std::mutex> lockRequest(g_manager->mutexRunningLock_);
-    TELEPHONY_LOGI("RunningLockCallback, serialNum:%{public}d, runningSerialNum_:%{public}d", serialNum,
+    TELEPHONY_LOGD("RunningLockCallback, serialNum:%{public}d, runningSerialNum_:%{public}d", serialNum,
         static_cast<int>(g_manager->runningSerialNum_));
     if (g_manager->powerInterface_ == nullptr || serialNum != static_cast<int>(g_manager->runningSerialNum_)) {
         return;
     }
     g_manager->runningLockCount_ = 0;
     g_manager->powerInterface_->SuspendUnblock("HRilRunningLock");
-    TELEPHONY_LOGI("RunningLockCallback, UnLock");
+    TELEPHONY_LOGD("RunningLockCallback, UnLock");
 }
 
 void HRilManager::ApplyRunningLock(void)
@@ -185,7 +185,7 @@ void HRilManager::ApplyRunningLock(void)
         runningSerialNum_++;
         uint8_t *serialNum = reinterpret_cast<uint8_t *>(new int(runningSerialNum_));
         timerCallback_->HRilSetTimerCallbackInfo(RunningLockCallback, serialNum, &tv);
-        TELEPHONY_LOGI("ApplyRunningLock, runningLockCount_:%{public}d, runningSerialNum_:%{public}d",
+        TELEPHONY_LOGD("ApplyRunningLock, runningLockCount_:%{public}d, runningSerialNum_:%{public}d",
             static_cast<int>(runningLockCount_), static_cast<int>(runningSerialNum_));
     } else {
         /* Since the power management subsystem starts slower than the RilAdapter,
@@ -202,7 +202,7 @@ void HRilManager::ApplyRunningLock(void)
 void HRilManager::ReleaseRunningLock(void)
 {
     std::lock_guard<std::mutex> lockRequest(mutexRunningLock_);
-    TELEPHONY_LOGI("ReleaseRunningLock, runningLockCount_:%{public}d", static_cast<int>(runningLockCount_));
+    TELEPHONY_LOGD("ReleaseRunningLock, runningLockCount_:%{public}d", static_cast<int>(runningLockCount_));
     if (powerInterface_ == nullptr) {
         TELEPHONY_LOGE("powerInterface_ is nullptr");
         return;
@@ -212,7 +212,7 @@ void HRilManager::ReleaseRunningLock(void)
     } else {
         runningLockCount_ = 0;
         powerInterface_->SuspendUnblock("HRilRunningLock");
-        TELEPHONY_LOGI("ReleaseRunningLock UnLock");
+        TELEPHONY_LOGD("ReleaseRunningLock UnLock");
     }
 }
 
@@ -317,7 +317,7 @@ HRilManager::HRilManager() : hrilSimSlotCount_(GetSimSlotCount())
 
 void HRilManager::SetRilCallback(sptr<OHOS::HDI::Ril::V1_0::IRilCallback> callback)
 {
-    TELEPHONY_LOGI("SetRilCallback");
+    TELEPHONY_LOGD("SetRilCallback");
     for (int32_t slotId = HRIL_SIM_SLOT_0; slotId < hrilSimSlotCount_; slotId++) {
         hrilCall_[slotId]->SetRilCallback(callback);
         hrilModem_[slotId]->SetRilCallback(callback);
@@ -953,7 +953,7 @@ void HRilInit(void)
         }
     }
     if (g_manager->eventLoop_ != nullptr) {
-        TELEPHONY_LOGI("eventLoop_ has exit");
+        TELEPHONY_LOGD("eventLoop_ has exit");
         return;
     }
     g_manager->eventLoop_ = std::make_unique<std::thread>(HRilBootUpEventLoop);

@@ -160,8 +160,8 @@ static int32_t ParseUnlockSimLockResult(char *pLine, HRilLockStatus *lockStatus)
         return err;
     }
     err = NextInt(&pLine, &lockStatus->remain);
-    TELEPHONY_LOGI("ParseUnlockSimLockResult, lockStatus->result: %{public}d", lockStatus->result);
-    TELEPHONY_LOGI("ParseUnlockSimLockResult, lockStatus->remain: %{public}d", lockStatus->remain);
+    TELEPHONY_LOGD("ParseUnlockSimLockResult, lockStatus->result: %{public}d", lockStatus->result);
+    TELEPHONY_LOGD("ParseUnlockSimLockResult, lockStatus->remain: %{public}d", lockStatus->remain);
     if (err != 0) {
         return err;
     }
@@ -259,7 +259,7 @@ static int32_t ReqGetSimIOFDN(HRilSimIO *pSim, ResponseInfo **ppResponse, size_t
     int32_t clckRes = VENDOR_FAIL;
     NextInt(&pLine, &clckRes);
     clckRes = (clckRes > 0) ? 1 : 0;
-    TELEPHONY_LOGI("FDN had got FDN clck res:%{public}d", clckRes);
+    TELEPHONY_LOGD("FDN had got FDN clck res:%{public}d", clckRes);
     int32_t writeRet = ReqGetSimIOFDNWrite(pSim, ppResponse, dataLen);
     char cmd[MAX_CMD_LENGTH] = {0};
     int32_t tmp = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CLCK=\"%s\",%d,\"%s\"", "FD", clckRes, pSim->pin2);
@@ -595,11 +595,11 @@ void ReqUnlockPin(const ReqDataInfo *requestInfo, const char *pin)
         TELEPHONY_LOGE("AT+CPIN send failed");
         if (pResponse && pResponse->result) {
             pLine = pResponse->result;
-            TELEPHONY_LOGI("AT+CPIN send failed pLine1:%{public}s", pLine);
+            TELEPHONY_LOGD("AT+CPIN send failed pLine1:%{public}s", pLine);
             SkipATPrefix(&pLine);
-            TELEPHONY_LOGI("AT+CPIN send failed pLine2:%{public}s", pLine);
+            TELEPHONY_LOGD("AT+CPIN send failed pLine2:%{public}s", pLine);
             NextInt(&pLine, &ret);
-            TELEPHONY_LOGI("AT+CPIN send failed ret:%{public}d", ret);
+            TELEPHONY_LOGD("AT+CPIN send failed ret:%{public}d", ret);
             if (ret == AT_RESPONSE_INCORRECT_PASSWORD) {
                 HRilPinInputTimes pinInputTimes = {0};
                 ReqGetSimPinInputTimesRemain(requestInfo, &pinInputTimes);
@@ -649,11 +649,11 @@ void ReqUnlockPuk(const ReqDataInfo *requestInfo, const char *puk, const char *p
         TELEPHONY_LOGE("AT+CPIN send failed");
         if (pResponse && pResponse->result) {
             pLine = pResponse->result;
-            TELEPHONY_LOGI("AT+CPIN send failed pLine1:%{public}s", pLine);
+            TELEPHONY_LOGD("AT+CPIN send failed pLine1:%{public}s", pLine);
             SkipATPrefix(&pLine);
-            TELEPHONY_LOGI("AT+CPIN send failed pLine2:%{public}s", pLine);
+            TELEPHONY_LOGD("AT+CPIN send failed pLine2:%{public}s", pLine);
             NextInt(&pLine, &ret);
-            TELEPHONY_LOGI("AT+CPIN send failed ret:%{public}d", ret);
+            TELEPHONY_LOGD("AT+CPIN send failed ret:%{public}d", ret);
             if (ret == AT_RESPONSE_INCORRECT_PASSWORD) {
                 HRilPinInputTimes pinInputTimes = {0};
                 ReqGetSimPinInputTimesRemain(requestInfo, &pinInputTimes);
@@ -753,10 +753,10 @@ void ReqGetSimPinInputTimesRemain(const ReqDataInfo *requestInfo, HRilPinInputTi
     if (pResponse && pResponse->head) {
         pLine = pResponse->head->data;
     }
-    TELEPHONY_LOGI("ReqGetSimPinInputTimesRemain pLine:%{public}s, result:%{public}s, success:%{public}d", pLine,
+    TELEPHONY_LOGD("ReqGetSimPinInputTimesRemain pLine:%{public}s, result:%{public}s, success:%{public}d", pLine,
         pResponse->result, pResponse->success);
     ret = ParseSimPinInputTimesResult(pLine, pinInputTimes);
-    TELEPHONY_LOGI("code:%{public}s, times:%{public}d, puk:%{public}d,"
+    TELEPHONY_LOGD("code:%{public}s, times:%{public}d, puk:%{public}d,"
         " pin:%{public}d, puk2:%{public}d, pin2:%{public}d",
         pinInputTimes->code, pinInputTimes->times, pinInputTimes->pukTimes,
         pinInputTimes->pinTimes, pinInputTimes->puk2Times, pinInputTimes->pin2Times);
@@ -791,11 +791,11 @@ void ReqUnlockPin2(const ReqDataInfo *requestInfo, const char *pin2)
         TELEPHONY_LOGE("AT^CPIN2 send failed");
         if (pResponse && pResponse->result) {
             pLine = pResponse->result;
-            TELEPHONY_LOGI("AT^CPIN2 send failed pLine1:%{public}s", pLine);
+            TELEPHONY_LOGD("AT^CPIN2 send failed pLine1:%{public}s", pLine);
             SkipATPrefix(&pLine);
-            TELEPHONY_LOGI("AT^CPIN2 send failed pLine2:%{public}s", pLine);
+            TELEPHONY_LOGD("AT^CPIN2 send failed pLine2:%{public}s", pLine);
             NextInt(&pLine, &ret);
-            TELEPHONY_LOGI("AT^CPIN2 send failed ret:%{public}d", ret);
+            TELEPHONY_LOGD("AT^CPIN2 send failed ret:%{public}d", ret);
             if (ret == AT_RESPONSE_INCORRECT_PASSWORD) {
                 HRilPinInputTimes pinInputTimes = {0};
                 ReqGetSimPinInputTimesRemain(requestInfo, &pinInputTimes);
@@ -845,11 +845,11 @@ void ReqUnlockPuk2(const ReqDataInfo *requestInfo, const char *puk2, const char 
         TELEPHONY_LOGE("AT^CPIN2 send failed");
         if (pResponse && pResponse->result) {
             pLine = pResponse->result;
-            TELEPHONY_LOGI("AT^CPIN2 send failed pLine1:%{public}s", pLine);
+            TELEPHONY_LOGD("AT^CPIN2 send failed pLine1:%{public}s", pLine);
             SkipATPrefix(&pLine);
-            TELEPHONY_LOGI("AT^CPIN2 send failed pLine2:%{public}s", pLine);
+            TELEPHONY_LOGD("AT^CPIN2 send failed pLine2:%{public}s", pLine);
             NextInt(&pLine, &ret);
-            TELEPHONY_LOGI("AT^CPIN2 send failed ret:%{public}d", ret);
+            TELEPHONY_LOGD("AT^CPIN2 send failed ret:%{public}d", ret);
             if (ret == AT_RESPONSE_INCORRECT_PASSWORD) {
                 HRilPinInputTimes pinInputTimes = {0};
                 ReqGetSimPinInputTimesRemain(requestInfo, &pinInputTimes);
@@ -1042,7 +1042,7 @@ void ReqSimStkIsReady(const ReqDataInfo *requestInfo)
 
 void ReqGetRadioProtocol(const ReqDataInfo *requestInfo)
 {
-    TELEPHONY_LOGI("ReqGetRadioProtocol");
+    TELEPHONY_LOGD("ReqGetRadioProtocol");
     struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
     HRilRadioProtocol radioProtocol = {};
     radioProtocol.sessionId = 0;
