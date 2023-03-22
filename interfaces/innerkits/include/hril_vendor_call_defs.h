@@ -272,7 +272,6 @@ typedef struct {
     void (*GetCallFailReason)(const ReqDataInfo *requestInfo);
     void (*SetEmergencyCallList)(const ReqDataInfo *requestInfo, HRilEmergencyInfo *emergencyInfo, const int len);
     void (*SetBarringPassword)(const ReqDataInfo *requestInfo, HRilSetBarringInfo info);
-    void (*CloseUnFinishedUssd)(const ReqDataInfo *requestInfo);
 } HRilCallReq;
 #ifdef __cplusplus
 }

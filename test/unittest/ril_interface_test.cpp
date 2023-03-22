@@ -18,8 +18,8 @@
 using namespace std;
 namespace OHOS {
 namespace Telephony {
-using namespace OHOS::HDI::Ril::V1_1;
-sptr<OHOS::HDI::Ril::V1_1::IRil> g_rilInterface = nullptr;
+using namespace OHOS::HDI::Ril::V1_0;
+sptr<OHOS::HDI::Ril::V1_0::IRil> g_rilInterface = nullptr;
 constexpr int32_t DEFAULT_CHOICE = -1;
 constexpr int32_t MENU_OFFSET = 1;
 constexpr int32_t WAIT_TIME = 500000;

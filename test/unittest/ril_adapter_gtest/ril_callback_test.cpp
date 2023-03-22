@@ -19,7 +19,7 @@
 
 namespace OHOS {
 namespace Telephony {
-using namespace OHOS::HDI::Ril::V1_1;
+using namespace OHOS::HDI::Ril::V1_0;
 void RilCallbackTest::NotifyAll()
 {
     std::unique_lock<std::mutex> callbackLock(callbackMutex_);
@@ -118,7 +118,7 @@ int32_t RilCallbackTest::SimRefreshNotify(const RilRadioResponseInfo &responseIn
 }
 
 int32_t RilCallbackTest::GetSimStatusResponse(
-    const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_1::CardStatusInfo &result)
+    const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_0::CardStatusInfo &result)
 {
     TELEPHONY_LOGI(
         "GetBoolResult GetSimStatus result : slotId = %{public}d, simType = %{public}d, simState = %{public}d",
@@ -1069,15 +1069,6 @@ int32_t RilCallbackTest::SetBarringPasswordResponse(const RilRadioResponseInfo &
     return 0;
 }
 
-int32_t RilCallbackTest::CloseUnFinishedUssdResponse(const RilRadioResponseInfo &responseInfo)
-{
-    TELEPHONY_LOGI("GetBoolResult CloseUnFinishedUssdResponse");
-    hdiId_ = HdiId::HREQ_CALL_CLOSE_UNFINISHED_USSD;
-    resultInfo_ = responseInfo;
-    NotifyAll();
-    return 0;
-}
-
 /**
  * modem
  **/
@@ -1301,28 +1292,28 @@ int32_t RilCallbackTest::SetDataProfileInfoResponse(const RilRadioResponseInfo &
 
 // Sms
 int32_t RilCallbackTest::NewSmsNotify(
-    const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const SmsMessageInfo &smsMessageInfo)
+    const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo, const SmsMessageInfo &smsMessageInfo)
 {
     TELEPHONY_LOGI("RilCallbackTest::NewSmsNotify smsMessageInfo size : %{public}d", smsMessageInfo.size);
     return 0;
 }
 
 int32_t RilCallbackTest::NewCdmaSmsNotify(
-    const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const SmsMessageInfo &smsMessageInfo)
+    const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo, const SmsMessageInfo &smsMessageInfo)
 {
     TELEPHONY_LOGI("RilCallbackTest::NewCdmaSmsNotify smsMessageInfo size : %{public}d", smsMessageInfo.size);
     return 0;
 }
 
 int32_t RilCallbackTest::SmsStatusReportNotify(
-    const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const SmsMessageInfo &smsMessageInfo)
+    const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo, const SmsMessageInfo &smsMessageInfo)
 {
     TELEPHONY_LOGI("RilCallbackTest::SmsStatusReportNotify smsMessageInfo size : %{public}d", smsMessageInfo.size);
     return 0;
 }
 
 int32_t RilCallbackTest::NewSmsStoredOnSimNotify(
-    const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, int32_t recordNumber, int32_t indicationType)
+    const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo, int32_t recordNumber, int32_t indicationType)
 {
     TELEPHONY_LOGI("RilCallbackTest::NewSmsStoredOnSimNotify recordNumber : %{public}d, indicationType : %{public}d",
         recordNumber, indicationType);
@@ -1330,7 +1321,7 @@ int32_t RilCallbackTest::NewSmsStoredOnSimNotify(
 }
 
 int32_t RilCallbackTest::CBConfigNotify(
-    const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const CBConfigReportInfo &cellBroadConfigReportInfo)
+    const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo, const CBConfigReportInfo &cellBroadConfigReportInfo)
 {
     TELEPHONY_LOGI("RilCallbackTest::CBConfigNotify cellBroadConfigReportInfo dcs : %{public}s",
         cellBroadConfigReportInfo.dcs.c_str());

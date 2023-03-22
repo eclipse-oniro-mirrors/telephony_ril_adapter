@@ -34,11 +34,11 @@ public:
     int32_t GetCurrentCellInfo(int32_t serialId);
     int32_t GetNetworkSearchInformation(int32_t serialId);
     int32_t GetNetworkSelectionMode(int32_t serialId);
-    int32_t SetNetworkSelectionMode(int32_t serialId, const HDI::Ril::V1_1::SetNetworkModeInfo &networkModeInfo);
+    int32_t SetNetworkSelectionMode(int32_t serialId, const HDI::Ril::V1_0::SetNetworkModeInfo &networkModeInfo);
     int32_t SetPreferredNetwork(int32_t serialId, int32_t preferredNetworkType);
     int32_t GetPreferredNetwork(int32_t serialId);
     int32_t GetPhysicalChannelConfig(int32_t serialId);
-    int32_t SetLocateUpdates(int32_t serialId, const HDI::Ril::V1_1::RilRegNotifyMode mode);
+    int32_t SetLocateUpdates(int32_t serialId, const HDI::Ril::V1_0::RilRegNotifyMode mode);
     int32_t SetNotificationFilter(int32_t serialId, int32_t newFilter);
     int32_t SetDeviceState(int32_t serialId, int32_t deviceStateType, int32_t deviceStateOn);
 
@@ -88,17 +88,17 @@ public:
 
 private:
     void AddHandlerToMap();
-    void ExchangeRilRssiToHdf(const void *response, HDI::Ril::V1_1::Rssi &rssi);
+    void ExchangeRilRssiToHdf(const void *response, HDI::Ril::V1_0::Rssi &rssi);
     void BuildOperatorList(
-        HDI::Ril::V1_1::AvailableNetworkList &availableNetworkList, const void *response, size_t responseLen);
-    void FillCellNearbyInfo(HDI::Ril::V1_1::CellNearbyInfo &cellInfo, const CellInfo *cellPtr);
-    void FillCellNearbyInfoTdscdma(HDI::Ril::V1_1::CellNearbyInfo &cellInfo, const CellInfo *hrilCellPtr);
-    void FillCellNearbyInfoCdma(HDI::Ril::V1_1::CellNearbyInfo &cellInfo, const CellInfo *hrilCellPtr);
-    int32_t BuildNeighboringCellList(HDI::Ril::V1_1::CellListNearbyInfo &cellInfoList,
+        HDI::Ril::V1_0::AvailableNetworkList &availableNetworkList, const void *response, size_t responseLen);
+    void FillCellNearbyInfo(HDI::Ril::V1_0::CellNearbyInfo &cellInfo, const CellInfo *cellPtr);
+    void FillCellNearbyInfoTdscdma(HDI::Ril::V1_0::CellNearbyInfo &cellInfo, const CellInfo *hrilCellPtr);
+    void FillCellNearbyInfoCdma(HDI::Ril::V1_0::CellNearbyInfo &cellInfo, const CellInfo *hrilCellPtr);
+    int32_t BuildNeighboringCellList(HDI::Ril::V1_0::CellListNearbyInfo &cellInfoList,
         const void *response, size_t responseLen);
-    void FillCellInfoType(HDI::Ril::V1_1::CurrentCellInfo &cellInfo, const CurrentCellInfoVendor *hrilCellInfoVendor);
-    void FillCurrentCellInfo(HDI::Ril::V1_1::CurrentCellInfo &cellInfo, const CurrentCellInfoVendor *cellInfoVendor);
-    int32_t BuildCurrentCellList(HDI::Ril::V1_1::CellListCurrentInfo &cellInfoList,
+    void FillCellInfoType(HDI::Ril::V1_0::CurrentCellInfo &cellInfo, const CurrentCellInfoVendor *hrilCellInfoVendor);
+    void FillCurrentCellInfo(HDI::Ril::V1_0::CurrentCellInfo &cellInfo, const CurrentCellInfoVendor *cellInfoVendor);
+    int32_t BuildCurrentCellList(HDI::Ril::V1_0::CellListCurrentInfo &cellInfoList,
         const void *response, size_t responseLen);
     bool IsNetworkResponse(uint32_t code);
     bool IsNetworkNotification(uint32_t code);

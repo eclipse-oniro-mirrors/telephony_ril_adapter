@@ -134,18 +134,18 @@ ReqDataInfo *HRilBase::CreateHRilRequest(int32_t serial, int32_t request)
     return hrilReporter_.CreateHRilRequest(serial, slotId_, request);
 }
 
-HDI::Ril::V1_1::RilRadioResponseInfo HRilBase::BuildIHRilRadioResponseInfo(const HRilRadioResponseInfo &responseInfo)
+HDI::Ril::V1_0::RilRadioResponseInfo HRilBase::BuildIHRilRadioResponseInfo(const HRilRadioResponseInfo &responseInfo)
 {
-    HDI::Ril::V1_1::RilRadioResponseInfo iResponseInfo = { 0 };
+    HDI::Ril::V1_0::RilRadioResponseInfo iResponseInfo = { 0 };
     iResponseInfo.slotId = GetSlotId();
     iResponseInfo.flag = responseInfo.flag;
     iResponseInfo.serial = responseInfo.serial;
-    iResponseInfo.error = (HDI::Ril::V1_1::RilErrType)responseInfo.error;
-    iResponseInfo.type = (HDI::Ril::V1_1::RilResponseTypes)responseInfo.type;
+    iResponseInfo.error = (HDI::Ril::V1_0::RilErrType)responseInfo.error;
+    iResponseInfo.type = (HDI::Ril::V1_0::RilResponseTypes)responseInfo.type;
     return iResponseInfo;
 }
 
-void HRilBase::SetRilCallback(const sptr<HDI::Ril::V1_1::IRilCallback> &callback)
+void HRilBase::SetRilCallback(const sptr<HDI::Ril::V1_0::IRilCallback> &callback)
 {
     callback_ = callback;
 }

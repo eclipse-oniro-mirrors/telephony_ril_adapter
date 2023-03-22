@@ -71,7 +71,7 @@ int32_t HRilModem::RadioStateUpdated(
         TELEPHONY_LOGE("response is null");
         return HRIL_ERR_NULL_POINT;
     }
-    return Notify(indType, error, &HDI::Ril::V1_1::IRilCallback::RadioStateUpdated, *(const int32_t *)response);
+    return Notify(indType, error, &HDI::Ril::V1_0::IRilCallback::RadioStateUpdated, *(const int32_t *)response);
 }
 
 int32_t HRilModem::VoiceRadioTechUpdated(
@@ -85,21 +85,21 @@ int32_t HRilModem::VoiceRadioTechUpdated(
         TELEPHONY_LOGE("response is null");
         return HRIL_ERR_NULL_POINT;
     }
-    HDI::Ril::V1_1::VoiceRadioTechnology voiceRadioTech = {};
+    HDI::Ril::V1_0::VoiceRadioTechnology voiceRadioTech = {};
     BuildIVoiceRadioTechnology(voiceRadioTech, *(const HRilVoiceRadioInfo *)response);
-    return Notify(indType, error, &HDI::Ril::V1_1::IRilCallback::VoiceRadioTechUpdated, voiceRadioTech);
+    return Notify(indType, error, &HDI::Ril::V1_0::IRilCallback::VoiceRadioTechUpdated, voiceRadioTech);
 }
 
 int32_t HRilModem::ShutDownResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::ShutDownResponse);
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::ShutDownResponse);
 }
 
 int32_t HRilModem::SetRadioStateResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::SetRadioStateResponse);
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::SetRadioStateResponse);
 }
 
 int32_t HRilModem::GetRadioStateResponse(
@@ -113,7 +113,7 @@ int32_t HRilModem::GetRadioStateResponse(
         TELEPHONY_LOGE("response is null");
         return HRIL_ERR_NULL_POINT;
     }
-    return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::GetRadioStateResponse, *(const int32_t *)response);
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::GetRadioStateResponse, *(const int32_t *)response);
 }
 
 int32_t HRilModem::GetImeiResponse(
@@ -127,7 +127,7 @@ int32_t HRilModem::GetImeiResponse(
         TELEPHONY_LOGE("response is null");
         return HRIL_ERR_NULL_POINT;
     }
-    return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::GetImeiResponse, std::string((const char *)response));
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::GetImeiResponse, std::string((const char *)response));
 }
 
 int32_t HRilModem::GetMeidResponse(
@@ -141,13 +141,13 @@ int32_t HRilModem::GetMeidResponse(
         TELEPHONY_LOGE("response is null");
         return HRIL_ERR_NULL_POINT;
     }
-    return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::GetMeidResponse, std::string((const char *)response));
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::GetMeidResponse, std::string((const char *)response));
 }
 
 int32_t HRilModem::GetVoiceRadioTechnologyResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    HDI::Ril::V1_1::VoiceRadioTechnology voiceRadioTech = {};
+    HDI::Ril::V1_0::VoiceRadioTechnology voiceRadioTech = {};
     if (response == nullptr) {
         TELEPHONY_LOGE("GetVoiceRadioTechnologyResponse Invalid response: nullptr");
         if (responseInfo.error == HRilErrType::NONE) {
@@ -156,20 +156,20 @@ int32_t HRilModem::GetVoiceRadioTechnologyResponse(
     } else {
         BuildIVoiceRadioTechnology(voiceRadioTech, *(const HRilVoiceRadioInfo *)response);
     }
-    return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::GetVoiceRadioTechnologyResponse, voiceRadioTech);
+    return Response(responseInfo, &HDI::Ril::V1_0::IRilCallback::GetVoiceRadioTechnologyResponse, voiceRadioTech);
 }
 
 void HRilModem::BuildIVoiceRadioTechnology(
-    HDI::Ril::V1_1::VoiceRadioTechnology &voiceRadioTech, const HRilVoiceRadioInfo &hRiadioInfo)
+    HDI::Ril::V1_0::VoiceRadioTechnology &voiceRadioTech, const HRilVoiceRadioInfo &hRiadioInfo)
 {
-    voiceRadioTech.srvStatus = static_cast<OHOS::HDI::Ril::V1_1::RilSrvStatus>(hRiadioInfo.srvStatus);
-    voiceRadioTech.srvDomain = static_cast<OHOS::HDI::Ril::V1_1::RilSrvDomain>(hRiadioInfo.srvDomain);
-    voiceRadioTech.roamStatus = static_cast<OHOS::HDI::Ril::V1_1::RilRoamStatus>(hRiadioInfo.roamStatus);
-    voiceRadioTech.simStatus = static_cast<OHOS::HDI::Ril::V1_1::RilSimStatus>(hRiadioInfo.simStatus);
-    voiceRadioTech.lockStatus = static_cast<OHOS::HDI::Ril::V1_1::RilSimLockStatus>(hRiadioInfo.lockStatus);
-    voiceRadioTech.sysMode = static_cast<OHOS::HDI::Ril::V1_1::RilSysMode>(hRiadioInfo.sysMode);
+    voiceRadioTech.srvStatus = static_cast<OHOS::HDI::Ril::V1_0::RilSrvStatus>(hRiadioInfo.srvStatus);
+    voiceRadioTech.srvDomain = static_cast<OHOS::HDI::Ril::V1_0::RilSrvDomain>(hRiadioInfo.srvDomain);
+    voiceRadioTech.roamStatus = static_cast<OHOS::HDI::Ril::V1_0::RilRoamStatus>(hRiadioInfo.roamStatus);
+    voiceRadioTech.simStatus = static_cast<OHOS::HDI::Ril::V1_0::RilSimStatus>(hRiadioInfo.simStatus);
+    voiceRadioTech.lockStatus = static_cast<OHOS::HDI::Ril::V1_0::RilSimLockStatus>(hRiadioInfo.lockStatus);
+    voiceRadioTech.sysMode = static_cast<OHOS::HDI::Ril::V1_0::RilSysMode>(hRiadioInfo.sysMode);
     voiceRadioTech.sysModeName = (hRiadioInfo.sysModeName == nullptr) ? "" : hRiadioInfo.sysModeName;
-    voiceRadioTech.actType = static_cast<OHOS::HDI::Ril::V1_1::RilRadioTech>(hRiadioInfo.actType);
+    voiceRadioTech.actType = static_cast<OHOS::HDI::Ril::V1_0::RilRadioTech>(hRiadioInfo.actType);
     voiceRadioTech.actName = (hRiadioInfo.actName == nullptr) ? "" : hRiadioInfo.actName;
 }
 
@@ -185,7 +185,7 @@ int32_t HRilModem::GetBasebandVersionResponse(
         return HRIL_ERR_NULL_POINT;
     }
     return Response(
-        responseInfo, &HDI::Ril::V1_1::IRilCallback::GetBasebandVersionResponse, std::string((const char *)response));
+        responseInfo, &HDI::Ril::V1_0::IRilCallback::GetBasebandVersionResponse, std::string((const char *)response));
 }
 
 bool HRilModem::IsModemResponse(uint32_t code)

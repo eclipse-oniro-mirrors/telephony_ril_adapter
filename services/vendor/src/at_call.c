@@ -1194,25 +1194,6 @@ void ReqSetUssd(const ReqDataInfo *requestInfo, const char *str)
     FreeResponseInfo(pResponse);
 }
 
-void ReqCloseUnFinishedUssd(const ReqDataInfo *requestInfo)
-{
-    int32_t ret;
-    int32_t err = HRIL_ERR_SUCCESS;
-    ResponseInfo *pResponse = NULL;
-    ModemReportErrorInfo errInfo = {};
-
-    ret = SendCommandLock("AT+CUSD=2", NULL, 0, &pResponse);
-    if (ret || (pResponse != NULL && !pResponse->success)) {
-        errInfo = GetReportErrorInfo(pResponse);
-        err = errInfo.errorNo;
-        TELEPHONY_LOGE("cmd send failed, err:%{public}d", ret ? ret : err);
-    }
-    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-    reportInfo.modemErrInfo = errInfo;
-    OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
-    FreeResponseInfo(pResponse);
-}
-
 void ReqGetUssd(const ReqDataInfo *requestInfo)
 {
     int32_t ret;

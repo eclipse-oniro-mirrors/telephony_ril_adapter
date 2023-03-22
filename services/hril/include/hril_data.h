@@ -27,13 +27,13 @@ public:
     HRilData(int32_t slotId, IHRilReporter &hrilReporter);
     virtual ~HRilData();
 
-    int32_t DeactivatePdpContext(int32_t serialId, const OHOS::HDI::Ril::V1_1::UniInfo &uniInfo);
-    int32_t ActivatePdpContext(int32_t serialId, const OHOS::HDI::Ril::V1_1::DataCallInfo &dataCallInfo);
-    int32_t GetPdpContextList(int32_t serialId, const OHOS::HDI::Ril::V1_1::UniInfo &uniInfo);
-    int32_t SetInitApnInfo(int32_t serialId, const OHOS::HDI::Ril::V1_1::DataProfileDataInfo &dataProfileDataInfo);
+    int32_t DeactivatePdpContext(int32_t serialId, const OHOS::HDI::Ril::V1_0::UniInfo &uniInfo);
+    int32_t ActivatePdpContext(int32_t serialId, const OHOS::HDI::Ril::V1_0::DataCallInfo &dataCallInfo);
+    int32_t GetPdpContextList(int32_t serialId, const OHOS::HDI::Ril::V1_0::UniInfo &uniInfo);
+    int32_t SetInitApnInfo(int32_t serialId, const OHOS::HDI::Ril::V1_0::DataProfileDataInfo &dataProfileDataInfo);
     int32_t SendDataPerformanceMode(
-        int32_t serialId, const OHOS::HDI::Ril::V1_1::DataPerformanceInfo &dataPerformanceInfo);
-    int32_t SendDataSleepMode(int32_t serialId, const OHOS::HDI::Ril::V1_1::DataSleepInfo &dataSleepInfo);
+        int32_t serialId, const OHOS::HDI::Ril::V1_0::DataPerformanceInfo &dataPerformanceInfo);
+    int32_t SendDataSleepMode(int32_t serialId, const OHOS::HDI::Ril::V1_0::DataSleepInfo &dataSleepInfo);
     int32_t ActivatePdpContextResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t DeactivatePdpContextResponse(
@@ -52,10 +52,10 @@ public:
     int32_t GetLinkBandwidthInfoResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t SetLinkBandwidthReportingRule(
-        int32_t serialId, const OHOS::HDI::Ril::V1_1::DataLinkBandwidthReportingRule &linkBandwidthRule);
+        int32_t serialId, const OHOS::HDI::Ril::V1_0::DataLinkBandwidthReportingRule &linkBandwidthRule);
     int32_t SetLinkBandwidthReportingRuleResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
-    int32_t SetDataProfileInfo(int32_t serialId, const OHOS::HDI::Ril::V1_1::DataProfilesInfo &dataProfilesInfo);
+    int32_t SetDataProfileInfo(int32_t serialId, const OHOS::HDI::Ril::V1_0::DataProfilesInfo &dataProfilesInfo);
     int32_t SetDataProfileInfoResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t SetDataPermitted(int32_t serialId, int32_t dataPermitted);
@@ -71,10 +71,10 @@ public:
 
 private:
     void SwitchHRilDataListToHal(
-        const void *response, size_t responseLen, std::vector<HDI::Ril::V1_1::SetupDataCallResultInfo> &dcResultList);
-    void SwitchRilDataToHal(const HRilDataCallResponse *response, HDI::Ril::V1_1::SetupDataCallResultInfo &result);
+        const void *response, size_t responseLen, std::vector<HDI::Ril::V1_0::SetupDataCallResultInfo> &dcResultList);
+    void SwitchRilDataToHal(const HRilDataCallResponse *response, HDI::Ril::V1_0::SetupDataCallResultInfo &result);
     static void RilDataCallCharToString(const char *src, std::string dst);
-    HRilDataInfo BuildDataInfo(const OHOS::HDI::Ril::V1_1::DataProfileDataInfo &dataProfileInfo);
+    HRilDataInfo BuildDataInfo(const OHOS::HDI::Ril::V1_0::DataProfileDataInfo &dataProfileInfo);
 
 private:
     static constexpr uint32_t HRIL_ERROR_UNSPECIFIED_RSN = 0xffff;

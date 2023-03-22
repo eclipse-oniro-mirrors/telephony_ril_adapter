@@ -124,7 +124,7 @@ public:
     void OnInitModemProcessInterface();
     void OnInitProcessInterface();
     int32_t GetSerialId();
-    void InputTransmitApduChannelParam(OHOS::HDI::Ril::V1_1::ApduSimIORequestInfo &reqInfo);
+    void InputTransmitApduChannelParam(OHOS::HDI::Ril::V1_0::ApduSimIORequestInfo &reqInfo);
 
 private:
     using RilInterfaceTestTestFun = void (RilInterfaceTest::*)(int32_t slotId);
