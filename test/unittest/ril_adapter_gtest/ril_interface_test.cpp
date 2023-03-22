@@ -20,7 +20,7 @@
 
 namespace OHOS {
 namespace Telephony {
-using namespace OHOS::HDI::Ril::V1_0;
+using namespace OHOS::HDI::Ril::V1_1;
 using namespace testing::ext;
 const int32_t BANDWIDTH_HYSTERESIS_MS = 3000;
 const int32_t BANDWIDTH_HYSTERESIS_KBPS = 50;
@@ -1292,6 +1292,38 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetBarringPassword_V1_0200, Fu
     WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
     ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_SET_BARRING_PASSWORD));
+}
+
+/**
+ * @tc.number   Telephony_DriverSystem_CloseUnFinishedUssd_V1_0100
+ * @tc.name     Set barring password
+ * @tc.desc     Function test
+ */
+HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_CloseUnFinishedUssd_V1_0100, Function | MediumTest | Level3)
+{
+    if (!IsReady(SLOTID_1)) {
+        return;
+    }
+    int32_t ret = g_rilInterface->CloseUnFinishedUssd(SLOTID_1, GetSerialId());
+    WaitFor(WAIT_TIME_SECOND);
+    EXPECT_EQ(SUCCESS, ret);
+    ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_CLOSE_UNFINISHED_USSD));
+}
+
+/**
+ * @tc.number   Telephony_DriverSystem_CloseUnFinishedUssd_V1_0100
+ * @tc.name     Set barring password
+ * @tc.desc     Function test
+ */
+HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_CloseUnFinishedUssd_V1_0200, Function | MediumTest | Level3)
+{
+    if (!IsReady(SLOTID_2)) {
+        return;
+    }
+    int32_t ret = g_rilInterface->CloseUnFinishedUssd(SLOTID_2, GetSerialId());
+    WaitFor(WAIT_TIME_SECOND);
+    EXPECT_EQ(SUCCESS, ret);
+    ASSERT_TRUE(GetBoolResult(HdiId::HREQ_CALL_CLOSE_UNFINISHED_USSD));
 }
 
 /**

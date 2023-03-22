@@ -57,7 +57,7 @@ private:
     bool IsModemResponse(uint32_t code);
     bool IsModemNotification(uint32_t code);
     void BuildIVoiceRadioTechnology(
-        HDI::Ril::V1_0::VoiceRadioTechnology &voiceRadioTech, const HRilVoiceRadioInfo &hRiadioInfo);
+        HDI::Ril::V1_1::VoiceRadioTechnology &voiceRadioTech, const HRilVoiceRadioInfo &hRiadioInfo);
     const HRilModemReq *modemFuncs_ = nullptr;
 };
 } // namespace Telephony

@@ -25,7 +25,7 @@
 #include "hdf_sbuf_ipc.h"
 #include "hril_types.h"
 #include "telephony_log_wrapper.h"
-#include "v1_0/iril_callback.h"
+#include "v1_1/iril_callback.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -45,7 +45,7 @@ public:
     template<typename T>
     int32_t ProcessNotify(
         int32_t notifyType, const struct ReportInfo *reportInfo, const void *response, size_t responseLen);
-    void SetRilCallback(const sptr<HDI::Ril::V1_0::IRilCallback> &callback);
+    void SetRilCallback(const sptr<HDI::Ril::V1_1::IRilCallback> &callback);
 
 protected:
     HRilBase(int32_t slotId, IHRilReporter &hrilReporter) : hrilReporter_(hrilReporter), slotId_(slotId) {}
@@ -55,7 +55,7 @@ protected:
     uint8_t *ConvertHexStringToBytes(const void *response, size_t responseLen);
     bool ConvertToString(char **dest, const std::string &src);
     void CopyToCharPoint(char **a, const std::string &temp);
-    HDI::Ril::V1_0::RilRadioResponseInfo BuildIHRilRadioResponseInfo(const HRilRadioResponseInfo &responseInfo);
+    HDI::Ril::V1_1::RilRadioResponseInfo BuildIHRilRadioResponseInfo(const HRilRadioResponseInfo &responseInfo);
     inline void SafeFrees() {}
     template<typename M, typename... Ms>
     inline void SafeFrees(M &m, Ms &...ms)
@@ -90,7 +90,7 @@ protected:
 protected:
     std::map<uint32_t, std::any> respMemberFuncMap_;
     std::map<uint32_t, std::any> notiMemberFuncMap_;
-    sptr<HDI::Ril::V1_0::IRilCallback> callback_ = nullptr;
+    sptr<HDI::Ril::V1_1::IRilCallback> callback_ = nullptr;
 
 private:
     // Get the function pointer of the event handler.
@@ -112,10 +112,10 @@ int32_t HRilBase::RequestVendor(
             TELEPHONY_LOGE("callback is null");
             return HRIL_ERR_NULL_POINT;
         }
-        HDI::Ril::V1_0::RilRadioResponseInfo responseInfo = { 0 };
+        HDI::Ril::V1_1::RilRadioResponseInfo responseInfo = { 0 };
         responseInfo.slotId = GetSlotId();
         responseInfo.serial = serial;
-        responseInfo.error = HDI::Ril::V1_0::RilErrType::RIL_ERR_VENDOR_NOT_IMPLEMENT;
+        responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_VENDOR_NOT_IMPLEMENT;
         callback_->CommonErrorResponse(responseInfo);
         return HRIL_ERR_NULL_POINT;
     }
@@ -189,9 +189,9 @@ inline int32_t HRilBase::Notify(int32_t notifyType, const HRilErrNumber error, F
         TELEPHONY_LOGE("callback_ is null");
         return HRIL_ERR_NULL_POINT;
     }
-    HDI::Ril::V1_0::RilRadioResponseInfo mResponseInfo = { 0 };
+    HDI::Ril::V1_1::RilRadioResponseInfo mResponseInfo = { 0 };
     mResponseInfo.slotId = GetSlotId();
-    mResponseInfo.type = (HDI::Ril::V1_0::RilResponseTypes)notifyType;
+    mResponseInfo.type = (HDI::Ril::V1_1::RilResponseTypes)notifyType;
     (callback_->*(_func))(mResponseInfo, std::forward<ParamTypes>(_args)...);
     return HRIL_ERR_SUCCESS;
 }
