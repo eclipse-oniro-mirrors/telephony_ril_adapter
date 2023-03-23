@@ -79,7 +79,8 @@ HWTEST_F(RilInterfaceTest, CheckRilInstanceIsEmpty, Function | MediumTest | Leve
     if (g_rilInterface == nullptr) {
         return;
     }
-    g_rilInterface->SetCallback(&g_callback);
+    int ret = g_rilInterface->SetCallback(&g_callback);
+    EXPECT_GE(SUCCESS, ret);
 }
 
 /**
