@@ -224,7 +224,6 @@ void ReqSendCdmaSms(const ReqDataInfo *requestInfo, const char *data, size_t dat
 void ReqSendCdmaSmsAck(const ReqDataInfo *requestInfo, const char *data, size_t dataLen)
 {
     int32_t err = HRIL_ERR_SUCCESS;
-    TELEPHONY_LOGE("data=%{public}p dataLen=%{public}zu", data, dataLen);
     if (err > 0) {
         struct ReportInfo reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
         OnSmsReport(GetSlotId(requestInfo), reportInfo, NULL, 0);

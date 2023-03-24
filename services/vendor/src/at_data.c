@@ -126,7 +126,7 @@ int32_t ParsePdpCmd(char *str, HRilDataCallResponse *outData)
     char *pStr = NULL;
 
     if (str == NULL || outData == NULL) {
-        TELEPHONY_LOGE("param error: str=%{public}p,outData=%{public}p", str, outData);
+        TELEPHONY_LOGE("param error");
         return HRIL_ERR_NULL_POINT;
     }
     pStr = str;
