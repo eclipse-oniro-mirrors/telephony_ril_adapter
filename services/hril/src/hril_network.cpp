@@ -238,7 +238,7 @@ int32_t HRilNetwork::GetOperatorInfoResponse(
         operatorInfoResult.longName = (resp[HRIL_LONE_NAME] == nullptr) ? "" : resp[HRIL_LONE_NAME];
         operatorInfoResult.shortName = (resp[HRIL_SHORT_NAME] == nullptr) ? "" : resp[HRIL_SHORT_NAME];
         operatorInfoResult.numeric = (resp[HRIL_NUMERIC] == nullptr) ? "" : resp[HRIL_NUMERIC];
-        TELEPHONY_LOGI("GetOperatorInfoResponse longName:%{public}s, shortName:%{public}s, numeric:%{public}s",
+        TELEPHONY_LOGD("GetOperatorInfoResponse longName:%{public}s, shortName:%{public}s, numeric:%{public}s",
             operatorInfoResult.longName.c_str(), operatorInfoResult.shortName.c_str(),
             operatorInfoResult.numeric.c_str());
     }
@@ -562,7 +562,7 @@ void HRilNetwork::ExchangeRilRssiToHdf(const void *response, HDI::Ril::V1_0::Rss
     rssi.nr.rsrp = rilRssi->nrRssi.rsrp;
     rssi.nr.rsrq = rilRssi->nrRssi.rsrq;
     rssi.nr.sinr = rilRssi->nrRssi.sinr;
-    TELEPHONY_LOGI("ExchangeRilRssiToHdf rxlev:%{public}d, rsrp:%{public}d", rssi.lte.rxlev, rssi.lte.rsrp);
+    TELEPHONY_LOGD("ExchangeRilRssiToHdf rxlev:%{public}d, rsrp:%{public}d", rssi.lte.rxlev, rssi.lte.rsrp);
 }
 
 void HRilNetwork::BuildOperatorList(
