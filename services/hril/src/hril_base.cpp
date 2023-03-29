@@ -110,7 +110,7 @@ void HRilBase::CopyToCharPoint(char **dest, const std::string &src)
 {
     size_t size = src.size();
     if (size <= 0) {
-        TELEPHONY_LOGE("CopyToCharPoint  src is null");
+        TELEPHONY_LOGE("CopyToCharPoint src is null");
         return;
     }
     *dest = (char *)malloc((size + 1) * sizeof(char));

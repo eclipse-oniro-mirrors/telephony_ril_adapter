@@ -57,7 +57,7 @@ static int32_t GetResponseErrorCode(ResponseInfo *pResponseInfo)
     if (ret == -1) {
         ret = HRIL_ERR_INVALID_RESPONSE;
     }
-    TELEPHONY_LOGI("modem response error code: %{public}d", ret);
+    TELEPHONY_LOGD("modem response error code: %{public}d", ret);
     return ret;
 }
 
@@ -134,7 +134,7 @@ void ReqGetImei(const ReqDataInfo *requestInfo)
     }
     int32_t err = HRIL_ERR_SUCCESS;
     ResponseInfo *responseInfo = NULL;
-    TELEPHONY_LOGI("enter to [%{public}s]:%{public}d", __func__, __LINE__);
+    TELEPHONY_LOGD("enter to [%{public}s]:%{public}d", __func__, __LINE__);
     int32_t ret = SendCommandLock("AT+CGSN", NULL, DEFAULT_TIMEOUT, &responseInfo);
     struct ResponseAck respDataAck = { responseInfo, NULL, 0 };
     if (responseInfo == NULL) {
@@ -172,7 +172,7 @@ void ReqGetMeid(const ReqDataInfo *requestInfo)
     }
     int32_t err = HRIL_ERR_SUCCESS;
     ResponseInfo *responseInfo = NULL;
-    TELEPHONY_LOGI("enter to [%{public}s]:%{public}d", __func__, __LINE__);
+    TELEPHONY_LOGD("enter to [%{public}s]:%{public}d", __func__, __LINE__);
     int32_t ret = SendCommandLock("AT+MEID", NULL, DEFAULT_TIMEOUT, &responseInfo);
     struct ResponseAck respDataAck = { responseInfo, NULL, 0 };
     if (responseInfo == NULL) {
@@ -260,7 +260,7 @@ int32_t ProcessVoiceRadioInfo(const char *s, const HRilVoiceRadioInfo *hrilVoice
         return HRIL_ERR_NULL_POINT;
     } else {
         (void)memset_s(voiceRadioInfo, sizeof(HRilVoiceRadioInfo), 0, sizeof(HRilVoiceRadioInfo));
-        TELEPHONY_LOGI("result: %{public}s", str);
+        TELEPHONY_LOGD("result: %{public}s", str);
         int32_t err = SkipATPrefix(&str);
         if (err < 0) {
             TELEPHONY_LOGE("skip failed: [%{public}s]", str);

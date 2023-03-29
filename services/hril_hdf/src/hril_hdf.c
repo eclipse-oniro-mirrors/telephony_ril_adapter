@@ -166,7 +166,7 @@ void InitRilAdapter(void)
 void ReleaseRilAdapter(void)
 {
     if (g_dlHandle == NULL) {
-        TELEPHONY_LOGI("g_dlHandle has been null");
+        TELEPHONY_LOGE("g_dlHandle has been null");
         return;
     }
     dlclose(g_dlHandle);
