@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,6 +28,8 @@ constexpr const char *MODULE_HRIL_MODEM = "hrilModem";
 constexpr const char *MODULE_HRIL_SIM = "hrilSim";
 constexpr const char *MODULE_HRIL_NETWORK = "hrilNetwork";
 constexpr const char *MODULE_HRIL_SMS = "hrilSms";
+const std::string RUNNINGLOCK_NAME = "HRilRunningLock";
+constexpr int32_t RUNNINGLOCK_TIMEOUTMS_LASTING = -1;
 static bool g_isHrilManagerDestory = false;
 static std::shared_ptr<HRilManager> g_manager = std::make_shared<HRilManager>();
 static pthread_mutex_t dispatchMutex = PTHREAD_MUTEX_INITIALIZER;
@@ -150,6 +152,17 @@ void HRilManager::RegisterSmsFuncs(int32_t slotId, const HRilSmsReq *smsFuncs)
     }
 }
 
+static OHOS::HDI::Power::V1_1::RunningLockInfo FillRunningLockInfo(const std::string &name, int32_t timeoutMs)
+{
+    OHOS::HDI::Power::V1_1::RunningLockInfo filledInfo {};
+    filledInfo.name = name;
+    filledInfo.type = OHOS::HDI::Power::V1_1::RunningLockType::RUNNINGLOCK_BACKGROUND_PHONE;
+    filledInfo.timeoutMs = timeoutMs;
+    filledInfo.uid = static_cast<int32_t>(getuid());
+    filledInfo.pid = static_cast<int32_t>(getpid());
+    return filledInfo;
+}
+
 static void RunningLockCallback(uint8_t *param)
 {
     if (!IsHrilManagerValid() || param == nullptr) {
@@ -166,7 +179,9 @@ static void RunningLockCallback(uint8_t *param)
         return;
     }
     g_manager->runningLockCount_ = 0;
-    g_manager->powerInterface_->SuspendUnblock("HRilRunningLock");
+    OHOS::HDI::Power::V1_1::RunningLockInfo filledInfo = FillRunningLockInfo(
+        RUNNINGLOCK_NAME, RUNNINGLOCK_TIMEOUTMS_LASTING);
+    g_manager->powerInterface_->UnholdRunningLock(filledInfo);
     TELEPHONY_LOGD("RunningLockCallback, UnLock");
 }
 
@@ -179,7 +194,9 @@ void HRilManager::ApplyRunningLock(void)
 
     std::lock_guard<std::mutex> lockRequest(mutexRunningLock_);
     if (powerInterface_ != nullptr) {
-        powerInterface_->SuspendBlock("HRilRunningLock");
+        OHOS::HDI::Power::V1_1::RunningLockInfo filledInfo = FillRunningLockInfo(
+            RUNNINGLOCK_NAME, RUNNINGLOCK_TIMEOUTMS_LASTING);
+        powerInterface_->HoldRunningLock(filledInfo);
         struct timeval tv = { 0, RUNNING_LOCK_DEFAULT_TIMEOUT_US };
         runningLockCount_++;
         runningSerialNum_++;
@@ -211,7 +228,9 @@ void HRilManager::ReleaseRunningLock(void)
         runningLockCount_--;
     } else {
         runningLockCount_ = 0;
-        powerInterface_->SuspendUnblock("HRilRunningLock");
+        OHOS::HDI::Power::V1_1::RunningLockInfo filledInfo = FillRunningLockInfo(
+            RUNNINGLOCK_NAME, RUNNINGLOCK_TIMEOUTMS_LASTING);
+        powerInterface_->UnholdRunningLock(filledInfo);
         TELEPHONY_LOGD("ReleaseRunningLock UnLock");
     }
 }
