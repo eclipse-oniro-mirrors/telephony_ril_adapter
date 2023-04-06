@@ -305,7 +305,7 @@ typedef struct {
     void (*GetNrOptionMode)(const ReqDataInfo *requestInfo);
     void (*GetNrSsbId)(const ReqDataInfo *requestInfo);
 } HRilNetworkReq;
-#ifdef _r_cplusplus
+#ifdef __cplusplus
 }
 #endif
 #endif // OHOS_RIL_VENDOR_NETWORK_DEFS_H
