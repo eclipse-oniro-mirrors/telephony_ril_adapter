@@ -249,6 +249,31 @@ struct PreferredNetworkTypeInfo {
     int32_t preferredNetworkType;
     int64_t flag;
 };
+
+struct SsbIdInfo {
+    int32_t ssbId;
+    int32_t rsrp;
+};
+
+struct NeighboringCellSsbInfo {
+    int32_t pci;
+    int32_t arfcn;
+    int32_t rsrp;
+    int32_t sinr;
+    std::vector<SsbIdInfo> ssbIdList; // Neighboring cell ssbId list, always size is 4
+};
+
+struct NrCellSsbIds {
+    int32_t arfcn;
+    int64_t cid;
+    int32_t pic;
+    int32_t rsrp;
+    int32_t sinr;
+    int32_t timeAdvance;
+    std::vector<SsbIdInfo> sCellSsbList; // Service cell ssbId list, always size is 8
+    int32_t nbCellCount; // Neighboring cell ssb list count, mas size is 4
+    std::vector<NeighboringCellSsbInfo> nbCellSsbList; // Neighboring cell ssb info list, mas size is 4
+}
 } // namespace Telephony
 } // namespace OHOS
 #endif // OHOS_RIL_NETWORK_PARCEL_H

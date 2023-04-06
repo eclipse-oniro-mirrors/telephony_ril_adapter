@@ -167,6 +167,7 @@ typedef struct {
     void (*SetActiveSim)(const ReqDataInfo *requestInfo, int32_t index, int32_t enable);
     void (*SimStkSendTerminalResponse)(const ReqDataInfo *requestInfo, const char *strCmd);
     void (*SimStkSendEnvelope)(const ReqDataInfo *requestInfo, const char *strCmd);
+    void (*SimStkSendEnvelopeResponseContainStatus)(const ReqDataInfo *requestInfo, const char *strCmd);
     void (*SimStkSendCallSetupRequestResult)(const ReqDataInfo *requestInfo, int32_t accept);
     void (*SimStkIsReady)(const ReqDataInfo *requestInfo);
     void (*GetRadioProtocol)(const ReqDataInfo *requestInfo);

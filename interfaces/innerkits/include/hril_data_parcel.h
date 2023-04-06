@@ -158,6 +158,13 @@ struct DataPerformanceInfo {
 struct DataSleepInfo {
     int32_t sleepEnable; /* Sleep Mode Enable. eg: 1-enable, 0-disable */
 };
+
+struct DataLinkCapability {
+    int32_t primaryDownlinkKbps;
+    int32_t primaryUplinkKbps;
+    int32_t secondaryDownlinkKbps;
+    int32_t secondaryUplinkKbps;
+};
 } // namespace Telephony
 } // namespace OHOS
 #endif // OHOS_RIL_DATA_PARCEL_H
