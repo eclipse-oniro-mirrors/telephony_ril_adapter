@@ -273,7 +273,7 @@ struct NrCellSsbIds {
     std::vector<SsbIdInfo> sCellSsbList; // Service cell ssbId list, always size is 8
     int32_t nbCellCount; // Neighboring cell ssb list count, mas size is 4
     std::vector<NeighboringCellSsbInfo> nbCellSsbList; // Neighboring cell ssb info list, mas size is 4
-}
+};
 } // namespace Telephony
 } // namespace OHOS
 #endif // OHOS_RIL_NETWORK_PARCEL_H
