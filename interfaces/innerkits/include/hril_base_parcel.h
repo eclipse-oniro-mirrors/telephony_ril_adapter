@@ -69,32 +69,32 @@ bool Write(Parcel &parcel, E &&e)
  * @brief Write the data set from Parcel.
  * @tparam ValueTypes ValueTypes Support data types: uint8_t, int32_t, int64_t, bool, std::string.
  * @param parcel Serialized data structure.
- * @param __vals Output data set.
+ * @param vals Output data set.
  *      1st param: slotId
  *      2nd param: serialId
  * @return true success
  * @return false failed
  */
 template<typename... ValueTypes>
-bool WriteVals(Parcel &parcel, ValueTypes &&...__vals)
+bool WriteVals(Parcel &parcel, ValueTypes &&...vals)
 {
     // Write data with the return value "and".
-    return (Write(parcel, std::forward<ValueTypes>(__vals)) && ...);
+    return (Write(parcel, std::forward<ValueTypes>(vals)) && ...);
 }
 
 /**
  * @brief Read the data set from Parcel
  * @tparam ValueTypes Support data types: uint8_t, int32_t, int64_t, bool, std::string
  * @param parcel Serialized data structure
- * @param __vals Outgoing data reference
+ * @param vals Outgoing data reference
  * @return true success
  * @return false failed
  */
 template<typename... ValueTypes>
-bool ReadVals(Parcel &parcel, ValueTypes &&...__vals)
+bool ReadVals(Parcel &parcel, ValueTypes &&...vals)
 {
     // Read data with the return value "and".
-    return (Read(parcel, std::forward<ValueTypes>(__vals)) && ...);
+    return (Read(parcel, std::forward<ValueTypes>(vals)) && ...);
 }
 } // namespace BaseParcel
 
@@ -116,15 +116,15 @@ protected:
     virtual bool WriteBaseString(Parcel &parcel, std::string value) const;
 
     template<typename... ValueTypes>
-    bool Read(Parcel &parcel, ValueTypes &&...__vals)
+    bool Read(Parcel &parcel, ValueTypes &&...vals)
     {
-        return BaseParcel::ReadVals(parcel, std::forward<ValueTypes>(__vals)...);
+        return BaseParcel::ReadVals(parcel, std::forward<ValueTypes>(vals)...);
     }
 
     template<typename... ValueTypes>
-    bool Write(Parcel &parcel, ValueTypes &&...__vals) const
+    bool Write(Parcel &parcel, ValueTypes &&...vals) const
     {
-        return BaseParcel::WriteVals(parcel, std::forward<ValueTypes>(__vals)...);
+        return BaseParcel::WriteVals(parcel, std::forward<ValueTypes>(vals)...);
     }
 
     // String streams: thread variables. Used to optimize execution efficiency.
