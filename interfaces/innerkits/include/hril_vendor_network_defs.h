@@ -208,6 +208,8 @@ typedef struct {
     int32_t pci;
     int32_t tac;
     int64_t nci;
+    int32_t rsrp;
+    int32_t rsrq;
 } CellRatNr;
 
 typedef struct {
@@ -298,6 +300,10 @@ typedef struct {
     void (*SetLocateUpdates)(const ReqDataInfo *requestInfo, HRilRegNotifyMode mode);
     void (*SetNotificationFilter)(const ReqDataInfo *requestInfo, const int32_t *newFilter);
     void (*SetDeviceState)(const ReqDataInfo *requestInfo, const int32_t *deviceStateType, const int32_t *deviceState);
+    void (*GetRrcConnectionState)(const ReqDataInfo *requestInfo);
+    void (*SetNrOptionMode)(const ReqDataInfo *requestInfo, const int32_t *data);
+    void (*GetNrOptionMode)(const ReqDataInfo *requestInfo);
+    void (*GetNrSsbId)(const ReqDataInfo *requestInfo);
 } HRilNetworkReq;
 #ifdef __cplusplus
 }
