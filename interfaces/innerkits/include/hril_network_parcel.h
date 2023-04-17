@@ -21,71 +21,75 @@
 namespace OHOS {
 namespace Telephony {
 struct OperatorInfoResult {
-    std::string longName;
-    std::string shortName;
-    std::string numeric;
+    std::string longName = "";
+    std::string shortName = "";
+    std::string numeric = "";
 };
 
 struct AvailableNetworkInfo {
-    std::string longName;
-    std::string shortName;
-    std::string numeric;
-    int32_t status;
-    int32_t rat;
+    std::string longName = "";
+    std::string shortName = "";
+    std::string numeric = "";
+    int32_t status = 0;
+    int32_t rat = 0;
 };
 
 struct AvailableNetworkList {
-    int32_t itemNum;
-    std::vector<AvailableNetworkInfo> availableNetworkInfo;
-    int64_t flag;
+    int32_t itemNum = 0;
+    std::vector<AvailableNetworkInfo> availableNetworkInfo {};
+    int64_t flag = 0;
 };
 
 struct SetNetworkModeInfo {
-    int32_t selectMode;
-    std::string oper; /* Operator information */
-    int64_t flag;
+    int32_t selectMode = 0;
+    std::string oper = ""; /* Operator information */
+    int64_t flag = 0;
 };
 
 /* Voice registration status results */
 struct CsRegStatusInfo {
-    int32_t notifyType; /* The notifyType,Indicate the content of the notification */
-    HRilRegStatus regStatus; /* The corresponding valid registration states are NOT_REG_MT_NOT_SEARCHING_OP,
-                              * "REG_MT_HOME, NOT_REG_MT_SEARCHING_OP, REG_DENIED,  UNKNOWN, REG_ROAMING". */
-    int32_t lacCode;
-    int32_t cellId;
-    HRilRadioTech radioTechnology; /* Available voice radio technology, RMS defined by radio technology */
-    int64_t flag; /* flag, Used by search network manager in response */
+    int32_t notifyType = 0; /* The notifyType,Indicate the content of the notification */
+    HRilRegStatus regStatus =
+        HRilRegStatus::NO_REG_MT_NO_SEARCH; /* The corresponding valid registration states are
+                                             * NOT_REG_MT_NOT_SEARCHING_OP, "REG_MT_HOME, NOT_REG_MT_SEARCHING_OP,
+                                             * REG_DENIED,  UNKNOWN, REG_ROAMING". */
+    int32_t lacCode = 0;
+    int32_t cellId = 0;
+    HRilRadioTech radioTechnology =
+        HRilRadioTech::RADIO_TECHNOLOGY_UNKNOWN; /* Available voice radio technology, RMS defined by radio technology */
+    int64_t flag = 0; /* flag, Used by search network manager in response */
 };
 
 struct PsRegStatusResultInfo {
-    int32_t notifyType; /* The notifyType,Indicate the content of the notification */
-    HRilRegStatus regStatus; /* valid when are is ITE UNKNOWN REG = REG, otherwise it defined in RegStatus */
-    int32_t lacCode;
-    int32_t cellId;
-    HRilRadioTech radioTechnology;
-    bool isNrAvailable;
-    bool isEnDcAvailable;
-    bool isDcNrRestricted;
-    int64_t flag; /* flag, Used by search network manager in response */
+    int32_t notifyType = 0; /* The notifyType,Indicate the content of the notification */
+    HRilRegStatus regStatus = HRilRegStatus::NO_REG_MT_NO_SEARCH; /* valid when are is ITE UNKNOWN REG = REG, otherwise
+                                                                     it defined in RegStatus */
+    int32_t lacCode = 0;
+    int32_t cellId = 0;
+    HRilRadioTech radioTechnology = HRilRadioTech::RADIO_TECHNOLOGY_UNKNOWN;
+    bool isNrAvailable = false;
+    bool isEnDcAvailable = false;
+    bool isDcNrRestricted = false;
+    int64_t flag = 0; /* flag, Used by search network manager in response */
 };
 
 struct PhysicalChannelConfig {
-    HRilCellConnectionStatus cellConnStatus;
-    HRilRadioTech ratType;
-    int32_t cellBandwidthDownlinkKhz;
-    int32_t cellBandwidthUplinkKhz;
-    int32_t freqRange;
-    int32_t downlinkChannelNum;
-    int32_t uplinkChannelNum;
-    int32_t physicalCellId;
-    int32_t contextIdNum;
-    std::vector<int32_t> contextIds;
+    HRilCellConnectionStatus cellConnStatus = HRilCellConnectionStatus::HRIL_SERVING_CELL_UNKNOWN;
+    HRilRadioTech ratType = HRilRadioTech::RADIO_TECHNOLOGY_UNKNOWN;
+    int32_t cellBandwidthDownlinkKhz = 0;
+    int32_t cellBandwidthUplinkKhz = 0;
+    int32_t freqRange = 0;
+    int32_t downlinkChannelNum = 0;
+    int32_t uplinkChannelNum = 0;
+    int32_t physicalCellId = 0;
+    int32_t contextIdNum = 0;
+    std::vector<int32_t> contextIds {};
 };
 
 struct ChannelConfigInfoList {
-    int32_t itemNum;
-    std::vector<PhysicalChannelConfig> channelConfigInfos;
-    int64_t flag; /* flag, Used by search network manager in response */
+    int32_t itemNum = 0;
+    std::vector<PhysicalChannelConfig> channelConfigInfos {};
+    int64_t flag = 0; /* flag, Used by search network manager in response */
 };
 
 typedef struct {
@@ -153,9 +157,9 @@ typedef struct {
 } CellRatNr;
 
 struct CurrentCellInfo {
-    int32_t ratType;
-    int32_t mcc;
-    int32_t mnc;
+    int32_t ratType = 0;
+    int32_t mcc = 0;
+    int32_t mnc = 0;
 
     union {
         CellRatGsm gsm;
@@ -168,8 +172,8 @@ struct CurrentCellInfo {
 };
 
 struct CellListCurrentInfo {
-    int32_t itemNum;
-    std::vector<CurrentCellInfo> cellCurrentInfo;
+    int32_t itemNum = 0;
+    std::vector<CurrentCellInfo> cellCurrentInfo {};
 };
 
 typedef struct {
@@ -228,7 +232,7 @@ typedef struct {
 } CellListRatNr;
 
 struct CellNearbyInfo {
-    int32_t ratType;
+    int32_t ratType = 0;
 
     union {
         CellListRatGsm gsm;
@@ -241,13 +245,13 @@ struct CellNearbyInfo {
 };
 
 struct CellListNearbyInfo {
-    int32_t itemNum;
-    std::vector<CellNearbyInfo> cellNearbyInfo;
+    int32_t itemNum = 0;
+    std::vector<CellNearbyInfo> cellNearbyInfo {};
 };
 
 struct PreferredNetworkTypeInfo {
-    int32_t preferredNetworkType;
-    int64_t flag;
+    int32_t preferredNetworkType = 0;
+    int64_t flag = 0;
 };
 } // namespace Telephony
 } // namespace OHOS

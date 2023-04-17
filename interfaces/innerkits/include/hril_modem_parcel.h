@@ -21,25 +21,25 @@
 namespace OHOS {
 namespace Telephony {
 struct UniInfo {
-    int32_t serial;
-    int32_t gsmIndex; /* Index of Global System for Mobile Communications */
-    bool flag;
-    int32_t arg1;
-    int32_t arg2;
-    std::string strTmp;
+    int32_t serial = 0;
+    int32_t gsmIndex = 0; /* Index of Global System for Mobile Communications */
+    bool flag = false;
+    int32_t arg1 = 0;
+    int32_t arg2 = 0;
+    std::string strTmp = "";
 };
 
 struct VoiceRadioTechnology {
-    HRilSrvStatus srvStatus;
-    HRilSrvDomain srvDomain;
-    HRilRoamStatus roamStatus;
-    HRilSimStatus simStatus;
-    HRilSimLockStatus lockStatus;
-    HRilSysMode sysMode;
-    std::string sysModeName;
-    HRilRadioTech actType;
-    std::string actName;
-    int64_t flag;
+    HRilSrvStatus srvStatus = HRilSrvStatus::HRIL_NO_SRV_SERVICE;
+    HRilSrvDomain srvDomain = HRilSrvDomain::HRIL_NO_DOMAIN_SERVICE;
+    HRilRoamStatus roamStatus = HRilRoamStatus::HRIL_ROAM_UNKNOWN;
+    HRilSimStatus simStatus = HRilSimStatus::HRIL_USIM_INVALID;
+    HRilSimLockStatus lockStatus = HRilSimLockStatus::HRIL_SIM_CARD_UNLOCK;
+    HRilSysMode sysMode = HRilSysMode::HRIL_NO_SYSMODE_SERVICE;
+    std::string sysModeName = "";
+    HRilRadioTech actType = HRilRadioTech::RADIO_TECHNOLOGY_UNKNOWN;
+    std::string actName = "";
+    int64_t flag = 0;
 
     VoiceRadioTechnology() = default;
     VoiceRadioTechnology(const HRilVoiceRadioInfo &hrilVoiceRadioInfo);

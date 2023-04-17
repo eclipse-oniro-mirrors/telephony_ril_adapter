@@ -77,51 +77,51 @@ enum HRilResponseTypes {
 
 /* From 3GPP TS 27.007 V4.3.0 (2001-12) 8.5, AT + CSQ */
 struct GsmRssi {
-    int32_t rxlev; /* Received Signal Strength Indication, value range 0 ~ 31, max is 99, if unknown then set to
-                       max */
-    int32_t ber; /* bit error rate, value range 0 ~ 7, max is 99, if unknown then set to max
-                   * as RXQUAL values in the table in TS 45.008 [20] subclauses 8.2.4. */
+    int32_t rxlev = 0; /* Received Signal Strength Indication, value range 0 ~ 31, max is 99, if unknown then set to
+                         max */
+    int32_t ber = 0; /* bit error rate, value range 0 ~ 7, max is 99, if unknown then set to max
+                      * as RXQUAL values in the table in TS 45.008 [20] subclauses 8.2.4. */
 };
 
 /* From 3GPP TS 27.007 V17.1.0 (2021-03) 8.69 */
 struct CdmaRssi {
-    int32_t absoluteRssi; /* Absolute value of signal strength. This value is the actual Rssi value
-                            * multiplied by -1.
-                            * e.g: Rssi is -75, then this response value will be 75 */
-    int32_t ecno; /* integer type, ratio of the received energy per PN chip to the total received power spectral
-                    * density (see 3GPP TS 25.133 [95] subclauses) */
+    int32_t absoluteRssi = 0; /* Absolute value of signal strength. This value is the actual Rssi value
+                               * multiplied by -1.
+                               * e.g: Rssi is -75, then this response value will be 75 */
+    int32_t ecno = 0; /* integer type, ratio of the received energy per PN chip to the total received power spectral
+                       * density (see 3GPP TS 25.133 [95] subclauses) */
 };
 
 struct WCdmaRssi {
-    int32_t rxlev; /* integer type, received signal strength level
-                     * (see 3GPP TS 45.008 [20] sub-clause 8.1.4) value 0~99 */
-    int32_t ecio; /* integer type, ratio of the received energy per PN chip to the total received power
-                    * spectral density (see 3GPP TS 25.133 [95] sub-clause). */
-    int32_t rscp; /* integer type, received signal code power (see 3GPP TS 25.133 [95] sub-clause 9.1.1.3 and
-                    * 3GPP TS 25.123 [96] sub-clause 9.1.1.1.3).
-                    * range  value 0 ~ 96, 255 not known or not detectable */
-    int32_t ber; /* bit error rate, value range 0 ~ 7, max is 99, if unknown then set to max */
+    int32_t rxlev = 0; /* integer type, received signal strength level
+                        * (see 3GPP TS 45.008 [20] sub-clause 8.1.4) value 0~99 */
+    int32_t ecio = 0; /* integer type, ratio of the received energy per PN chip to the total received power
+                       * spectral density (see 3GPP TS 25.133 [95] sub-clause). */
+    int32_t rscp = 0; /* integer type, received signal code power (see 3GPP TS 25.133 [95] sub-clause 9.1.1.3 and
+                       * 3GPP TS 25.123 [96] sub-clause 9.1.1.1.3).
+                       * range  value 0 ~ 96, 255 not known or not detectable */
+    int32_t ber = 0; /* bit error rate, value range 0 ~ 7, max is 99, if unknown then set to max */
 };
 
 struct LteRssi {
-    int32_t rxlev; /* integer type, received signal strength level
-                     * (see 3GPP TS 45.008 [20] sub-clause 8.1.4) value 0~99 */
-    int32_t rsrq; /* integer type, reference signal received quality (see 3GPP TS 36.133 [96] sub-clause 9.1.7)
-                    * value range 0~33, 255 not known or not detectable */
-    int32_t rsrp; /* integer type, reference signal received power (see 3GPP TS 36.133 [96] sub-clause 9.1.4)
-                    * value range 0~97, 255 not known or not detectable */
-    int32_t snr; /* integer type, representing the signal-to-interference plus noise ratio, suitable for LTE mode
-                   * value range 0~251, 255 not known or not detectable */
+    int32_t rxlev = 0; /* integer type, received signal strength level
+                        * (see 3GPP TS 45.008 [20] sub-clause 8.1.4) value 0~99 */
+    int32_t rsrq = 0; /* integer type, reference signal received quality (see 3GPP TS 36.133 [96] sub-clause 9.1.7)
+                       * value range 0~33, 255 not known or not detectable */
+    int32_t rsrp = 0; /* integer type, reference signal received power (see 3GPP TS 36.133 [96] sub-clause 9.1.4)
+                       * value range 0~97, 255 not known or not detectable */
+    int32_t snr = 0; /* integer type, representing the signal-to-interference plus noise ratio, suitable for LTE mode
+                      * value range 0~251, 255 not known or not detectable */
 };
 
 struct TdScdmaRssi {
-    int32_t rscp;
+    int32_t rscp = 0;
 };
 
 struct NrRssi {
-    int32_t rsrp;
-    int32_t rsrq;
-    int32_t sinr;
+    int32_t rsrp = 0;
+    int32_t rsrq = 0;
+    int32_t sinr = 0;
 };
 
 struct Rssi {
@@ -135,26 +135,26 @@ struct Rssi {
 
 /* from 3GPP TS 27.007 V4.3.0 (2001-12) */
 struct GetCallWaitingInfo {
-    int32_t status; /* 0 not active
-                     * 1 active */
-    int32_t typeClass; /* <classx> default, SLM790 is 255 */
+    int32_t status = 0; /* 0 not active
+                         * 1 active */
+    int32_t typeClass = 0; /* <classx> default, SLM790 is 255 */
 };
 
 struct HRilResponseHeadInfo {
-    int32_t slotId;
-    HRilResponseTypes type;
+    int32_t slotId = 0;
+    HRilResponseTypes type = HRilResponseTypes::HRIL_RESPONSE_REQUEST;
 };
 
 struct HRilRadioResponseInfo {
     int32_t flag = -1;
     int32_t serial = -1;
-    HRilErrType error;
-    HRilResponseTypes type;
+    HRilErrType error = HRilErrType::NONE;
+    HRilResponseTypes type = HRilResponseTypes::HRIL_RESPONSE_REQUEST;
 };
 
 struct HRilRadioStateInfo {
-    int64_t flag;
-    int32_t state;
+    int64_t flag = 0;
+    int32_t state = 0;
 };
 
 enum HRilCommonNumber {
