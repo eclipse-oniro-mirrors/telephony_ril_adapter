@@ -22,72 +22,72 @@ namespace OHOS {
 namespace Telephony {
 /* From 3GPP TS 27.007 V4.3.0 (2001-12) 7.7, AT + ATD */
 struct DialInfo {
-    int32_t serial;
-    std::string address;
-    int32_t clir; /* Calling Line Identification Restriction. From TS 27.007 V3.4.0 (2000-03) */
+    int32_t serial = 0;
+    std::string address = "";
+    int32_t clir = 0; /* Calling Line Identification Restriction. From TS 27.007 V3.4.0 (2000-03) */
 };
 
 struct CallInfo {
-    int32_t index;
-    int32_t dir;
-    int32_t state;
-    int32_t mode;
-    int32_t mpty;
-    int32_t voiceDomain;
-    int32_t callType;
-    std::string number;
-    int32_t type;
-    std::string alpha;
+    int32_t index = 0;
+    int32_t dir = 0;
+    int32_t state = 0;
+    int32_t mode = 0;
+    int32_t mpty = 0;
+    int32_t voiceDomain = 0;
+    int32_t callType = 0;
+    std::string number = "";
+    int32_t type = 0;
+    std::string alpha = "";
 };
 
 struct CallInfoList {
-    int32_t callSize;
-    int32_t flag;
-    std::vector<CallInfo> calls;
+    int32_t callSize = 0;
+    int32_t flag = 0;
+    std::vector<CallInfo> calls {};
 };
 
 struct EmergencyInfo {
-    int32_t index;
-    int32_t total;
-    std::string eccNum;
-    int32_t category;
-    int32_t simpresent;
-    std::string mcc;
-    int32_t abnormalService;
+    int32_t index = 0;
+    int32_t total = 0;
+    std::string eccNum = "";
+    int32_t category = 0;
+    int32_t simpresent = 0;
+    std::string mcc = "";
+    int32_t abnormalService = 0;
 };
 
 struct EmergencyInfoList {
-    int32_t callSize;
-    int32_t flag;
-    std::vector<EmergencyInfo> calls;
+    int32_t callSize = 0;
+    int32_t flag = 0;
+    std::vector<EmergencyInfo> calls {};
 };
 
 struct CallForwardSetInfo {
-    int32_t serial;
-    int32_t reason;
-    int32_t mode;
-    std::string number;
-    int32_t classx;
+    int32_t serial = 0;
+    int32_t reason = 0;
+    int32_t mode = 0;
+    std::string number = "";
+    int32_t classx = 0;
 };
 
 struct UssdNoticeInfo {
-    int32_t m; /* Integer value.
-                            0: The network does not require a TE reply (USSD-Notify initiated by the network or TE
-                            The network does not need further information after starting operation);
-                            1: The network needs a TE reply (USSD-Request initiated by the network, or TE sent
-                            After starting the operation, the network needs further information);
-                            2: The USSD session is released by the network;
-                            3: Other local clients have responded;
-                            4: The operation is not supported;
-                            5: The network timed out. */
-    std::string str; /* USSD string, the maximum length is 160 characters. */
+    int32_t m = 0; /* Integer value.
+                              0: The network does not require a TE reply (USSD-Notify initiated by the network or TE
+                              The network does not need further information after starting operation);
+                              1: The network needs a TE reply (USSD-Request initiated by the network, or TE sent
+                              After starting the operation, the network needs further information);
+                              2: The USSD session is released by the network;
+                              3: Other local clients have responded;
+                              4: The operation is not supported;
+                              5: The network timed out. */
+    std::string str = ""; /* USSD string, the maximum length is 160 characters. */
 };
 
 struct SsNoticeInfo {
-    int32_t serviceType;
-    int32_t requestType;
-    int32_t serviceClass;
-    int32_t result; /* the result of the SS request */
+    int32_t serviceType = 0;
+    int32_t requestType = 0;
+    int32_t serviceClass = 0;
+    int32_t result = 0; /* the result of the SS request */
 };
 
 /*
@@ -102,7 +102,7 @@ struct SrvccStatus {
      *   3: SRVCC is cancelled;
      *   4: SRVCC failed.
      */
-    int32_t status;
+    int32_t status = 1;
 };
 
 /*
@@ -111,7 +111,7 @@ struct SrvccStatus {
  */
 struct RingbackVoice {
     /* 0 network alerting; 1 local alerting */
-    int32_t status;
+    int32_t status = 0;
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -26,12 +26,12 @@ namespace OHOS {
 namespace Telephony {
 typedef std::function<void(int32_t, int16_t, std::shared_ptr<void>)> HRilEventCallback;
 struct HRilEventMessage {
-    int32_t fd;
-    int32_t index;
-    bool isHolding;
+    int32_t fd = 0;
+    int32_t index = 0;
+    bool isHolding = false;
     struct timeval timeout;
     HRilEventCallback func;
-    std::shared_ptr<void> param;
+    std::shared_ptr<void> param = nullptr;
 };
 
 class HRilEvent {
