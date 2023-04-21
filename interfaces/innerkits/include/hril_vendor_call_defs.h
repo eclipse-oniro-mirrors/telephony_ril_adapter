@@ -274,7 +274,7 @@ typedef struct {
     void (*SetBarringPassword)(const ReqDataInfo *requestInfo, HRilSetBarringInfo info);
     void (*CloseUnFinishedUssd)(const ReqDataInfo *requestInfo);
     void (*ExplicitCallTransferConnection)(const ReqDataInfo *requestInfo);
-    void (*SetVoNRSwitch)(const ReqDataInfo *requestInfo, int32_t status);
+    void (*SetVonrSwitch)(const ReqDataInfo *requestInfo, int32_t status);
 } HRilCallReq;
 #ifdef __cplusplus
 }
