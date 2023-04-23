@@ -247,7 +247,7 @@ void HRilManager::OnReport(std::vector<std::unique_ptr<T>> &subModules, int32_t 
         TELEPHONY_LOGE("OnReport subModules out of bounds!!!");
         return;
     }
-    TELEPHONY_LOGI("OnReport notifyId:%{public}d", reportInfo->notifyId);
+    TELEPHONY_LOGD("OnReport notifyId:%{public}d", reportInfo->notifyId);
     switch (reportInfo->type) {
         case static_cast<int32_t>(ReportType::HRIL_RESPONSE): {
             ReqDataInfo *reqInfo = (ReqDataInfo *)reportInfo->requestInfo;
@@ -273,7 +273,7 @@ void HRilManager::OnReport(std::vector<std::unique_ptr<T>> &subModules, int32_t 
             int32_t notifyType = HRIL_RESPONSE_NOTICE;
             auto iter = notificationMap_.find(reportInfo->notifyId);
             if (iter != notificationMap_.end()) {
-                TELEPHONY_LOGI("OnReport notifyId:%{public}d, value:%{public}d", reportInfo->notifyId, iter->second);
+                TELEPHONY_LOGD("OnReport notifyId:%{public}d, value:%{public}d", reportInfo->notifyId, iter->second);
                 if (NEED_LOCK == iter->second) {
                     ApplyRunningLock();
                     notifyType = HRIL_RESPONSE_NOTICE_MUST_ACK;
