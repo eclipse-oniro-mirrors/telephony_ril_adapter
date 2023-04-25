@@ -272,6 +272,7 @@ void HRilManager::OnReport(std::vector<std::unique_ptr<T>> &subModules, int32_t 
             int32_t notifyType = HRIL_RESPONSE_NOTICE;
             auto iter = notificationMap_.find(reportInfo->notifyId);
             if (iter != notificationMap_.end()) {
+                TELEPHONY_LOGI("OnReport notifyId:%{public}d, value:%{public}d", reportInfo->notifyId, iter->second);
                 if (NEED_LOCK == iter->second) {
                     ApplyRunningLock();
                     notifyType = HRIL_RESPONSE_NOTICE_MUST_ACK;
