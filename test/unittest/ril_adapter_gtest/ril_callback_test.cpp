@@ -413,10 +413,9 @@ int32_t RilCallbackTest::NetworkPhyChnlCfgUpdated(
 int32_t RilCallbackTest::NetworkCurrentCellUpdated(
     const RilRadioResponseInfo &responseInfo, const CellListCurrentInfo &cellListCurrentInfo)
 {
-    TELEPHONY_LOGI("RilCallbackTest::NetworkCurrentCellUpdated itemNum:%{public}d", cellListCurrentInfo.itemNum);
+    TELEPHONY_LOGI("itemNum:%{public}d", cellListCurrentInfo.itemNum);
     for (auto info : cellListCurrentInfo.cellCurrentInfo) {
-        TELEPHONY_LOGI("RilCallbackTest::NetworkCurrentCellUpdated ratType:%{public}d, mcc:%{public}d, mnc:%{public}d",
-            info.ratType, info.mcc, info.mnc);
+        TELEPHONY_LOGI("ratType:%{public}d, mcc:%{public}d, mnc:%{public}d", info.ratType, info.mcc, info.mnc);
         switch (static_cast<RatType>(info.ratType)) {
             case RatType::NETWORK_TYPE_LTE:
                 TELEPHONY_LOGI("cellId:%{public}d", info.serviceCells.lte.cellId);
@@ -447,7 +446,49 @@ int32_t RilCallbackTest::NetworkCurrentCellUpdated(
                 TELEPHONY_LOGI("ecno:%{public}d", info.serviceCells.nr.nci);
                 break;
             default:
-                TELEPHONY_LOGE("RilCallbackTest::NetworkCurrentCellUpdated invalid ratType");
+                TELEPHONY_LOGE("invalid ratType");
+        }
+    }
+    return 0;
+}
+
+int32_t RilCallbackTest::NetworkCurrentCellUpdated_1_1(
+    const RilRadioResponseInfo &responseInfo, const CellListCurrentInfo_1_1 &cellListCurrentInfo)
+{
+    TELEPHONY_LOGI("itemNum:%{public}d", cellListCurrentInfo.itemNum);
+    for (auto info : cellListCurrentInfo.cellCurrentInfo) {
+        TELEPHONY_LOGI("ratType:%{public}d, mcc:%{public}d, mnc:%{public}d", info.ratType, info.mcc, info.mnc);
+        switch (static_cast<RatType>(info.ratType)) {
+            case RatType::NETWORK_TYPE_LTE:
+                TELEPHONY_LOGI("cellId:%{public}d", info.serviceCells.lte.cellId);
+                TELEPHONY_LOGI("arfcn:%{public}d", info.serviceCells.lte.arfcn);
+                TELEPHONY_LOGI("pci:%{public}d", info.serviceCells.lte.pci);
+                TELEPHONY_LOGI("rsrp:%{public}d", info.serviceCells.lte.rsrp);
+                TELEPHONY_LOGI("rsrq:%{public}d", info.serviceCells.lte.rsrq);
+                TELEPHONY_LOGI("rxlev:%{public}d", info.serviceCells.lte.rssi);
+                break;
+            case RatType::NETWORK_TYPE_GSM:
+                TELEPHONY_LOGI("band:%{public}d", info.serviceCells.gsm.band);
+                TELEPHONY_LOGI("arfcn:%{public}d", info.serviceCells.gsm.arfcn);
+                TELEPHONY_LOGI("bsic:%{public}d", info.serviceCells.gsm.bsic);
+                TELEPHONY_LOGI("cellId:%{public}d", info.serviceCells.gsm.cellId);
+                TELEPHONY_LOGI("rxlev:%{public}d", info.serviceCells.gsm.rxlev);
+                TELEPHONY_LOGI("lac:%{public}d", info.serviceCells.gsm.lac);
+                break;
+            case RatType::NETWORK_TYPE_WCDMA:
+                TELEPHONY_LOGI("arfcn:%{public}d", info.serviceCells.wcdma.arfcn);
+                TELEPHONY_LOGI("psc:%{public}d", info.serviceCells.wcdma.psc);
+                TELEPHONY_LOGI("rscp:%{public}d", info.serviceCells.wcdma.rscp);
+                TELEPHONY_LOGI("ecno:%{public}d", info.serviceCells.wcdma.ecno);
+                break;
+            case RatType::NETWORK_TYPE_NR:
+                TELEPHONY_LOGI("arfcn:%{public}d", info.serviceCells.nr.nrArfcn);
+                TELEPHONY_LOGI("psc:%{public}d", info.serviceCells.nr.pci);
+                TELEPHONY_LOGI("rscp:%{public}d", info.serviceCells.nr.tac);
+                TELEPHONY_LOGI("ecno:%{public}d", info.serviceCells.nr.nci);
+                break;
+            default:
+                TELEPHONY_LOGE("invalid ratType");
         }
     }
     return 0;
@@ -623,6 +664,51 @@ int32_t RilCallbackTest::GetCurrentCellInfoResponse(
                 break;
             default:
                 TELEPHONY_LOGE("RilCallbackTest::GetCurrentCellInfoResponse invalid ratType");
+        }
+    }
+    hdiId_ = HdiId::HREQ_NETWORK_GET_CURRENT_CELL_INFO;
+    resultInfo_ = responseInfo;
+    NotifyAll();
+    return 0;
+}
+
+int32_t RilCallbackTest::GetCurrentCellInfoResponse_1_1(
+    const RilRadioResponseInfo &responseInfo, const CellListCurrentInfo_1_1 &cellListCurrentInfo)
+{
+    TELEPHONY_LOGI("itemNum:%{public}d", cellListCurrentInfo.itemNum);
+    for (auto info : cellListCurrentInfo.cellCurrentInfo) {
+        TELEPHONY_LOGI("ratType:%{public}d, mcc:%{public}d, mnc:%{public}d", info.ratType, info.mcc, info.mnc);
+        switch (static_cast<RatType>(info.ratType)) {
+            case RatType::NETWORK_TYPE_LTE:
+                TELEPHONY_LOGI("cellId:%{public}d", info.serviceCells.lte.cellId);
+                TELEPHONY_LOGI("arfcn:%{public}d", info.serviceCells.lte.arfcn);
+                TELEPHONY_LOGI("pci:%{public}d", info.serviceCells.lte.pci);
+                TELEPHONY_LOGI("rsrp:%{public}d", info.serviceCells.lte.rsrp);
+                TELEPHONY_LOGI("rsrq:%{public}d", info.serviceCells.lte.rsrq);
+                TELEPHONY_LOGI("rxlev:%{public}d", info.serviceCells.lte.rssi);
+                break;
+            case RatType::NETWORK_TYPE_GSM:
+                TELEPHONY_LOGI("band:%{public}d", info.serviceCells.gsm.band);
+                TELEPHONY_LOGI("arfcn:%{public}d", info.serviceCells.gsm.arfcn);
+                TELEPHONY_LOGI("bsic:%{public}d", info.serviceCells.gsm.bsic);
+                TELEPHONY_LOGI("cellId:%{public}d", info.serviceCells.gsm.cellId);
+                TELEPHONY_LOGI("rxlev:%{public}d", info.serviceCells.gsm.rxlev);
+                TELEPHONY_LOGI("lac:%{public}d", info.serviceCells.gsm.lac);
+                break;
+            case RatType::NETWORK_TYPE_WCDMA:
+                TELEPHONY_LOGI("arfcn:%{public}d", info.serviceCells.wcdma.arfcn);
+                TELEPHONY_LOGI("psc:%{public}d", info.serviceCells.wcdma.psc);
+                TELEPHONY_LOGI("rscp:%{public}d", info.serviceCells.wcdma.rscp);
+                TELEPHONY_LOGI("ecno:%{public}d", info.serviceCells.wcdma.ecno);
+                break;
+            case RatType::NETWORK_TYPE_NR:
+                TELEPHONY_LOGI("arfcn:%{public}d", info.serviceCells.nr.nrArfcn);
+                TELEPHONY_LOGI("psc:%{public}d", info.serviceCells.nr.pci);
+                TELEPHONY_LOGI("rscp:%{public}d", info.serviceCells.nr.tac);
+                TELEPHONY_LOGI("ecno:%{public}d", info.serviceCells.nr.nci);
+                break;
+            default:
+                TELEPHONY_LOGE("GetCurrentCellInfoResponse_1_1 invalid ratType");
         }
     }
     hdiId_ = HdiId::HREQ_NETWORK_GET_CURRENT_CELL_INFO;
