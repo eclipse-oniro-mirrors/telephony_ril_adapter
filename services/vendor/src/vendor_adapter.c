@@ -115,6 +115,7 @@ static const HRilSimReq g_simReqOps = {
     .SimOpenLogicalChannel = ReqSimOpenLogicalChannel,
     .SimCloseLogicalChannel = ReqSimCloseLogicalChannel,
     .SimTransmitApduLogicalChannel = ReqSimTransmitApduLogicalChannel,
+    .SimAuthentication = ReqSimAuthentication,
     .UnlockSimLock = ReqUnlockSimLock,
 };
 

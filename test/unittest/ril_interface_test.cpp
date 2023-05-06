@@ -1120,9 +1120,16 @@ void RilInterfaceTest::SimAuthenticationTest(int32_t slotId)
 {
     cout << "RilInterfaceTest::SimAuthenticationTest -->" << endl;
     SimAuthenticationRequestInfo reqInfo = SimAuthenticationRequestInfo();
-    cout << "input aid:";
+    cout << "input authType:" << std::endl;
+    cout << "SIM_AUTH_EAP_SIM_TYPE is 128" << std::endl;
+    cout << "SIM_AUTH_EAP_AKA_TYPE is 129" << std::endl;
+    cin >> reqInfo.serial;
+    cout << "input aid:" << std::endl;
+    cout << "USIM_AID" << std::endl;
+    cout << "CDMA_FAKE_AID" << std::endl;
+    cout << "GSM_FAKE_AID" << std::endl;
     cin >> reqInfo.aid;
-    cout << "input authData:";
+    cout << "input authData:" << std::endl;
     cin >> reqInfo.authData;
     int32_t ret = g_rilInterface->SimAuthentication(slotId, GetSerialId(), reqInfo);
     cout << "RilInterfaceTest::SimAuthenticationTest finish ret : " << ret << endl << endl;
