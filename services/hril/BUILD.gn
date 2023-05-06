@@ -12,10 +12,13 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
-RIL_ADAPTER = "//base/telephony/ril_adapter"
-RIL_HRIL = "//base/telephony/ril_adapter/services/hril/src"
+RIL_ADAPTER = "../../"
+RIL_HRIL = "../../services/hril/src"
+
+config("ril_hril_config") {
+  include_dirs = [ "$RIL_ADAPTER/services/hril/include" ]
+}
 
 ohos_shared_library("hril") {
   sources = [
@@ -31,11 +34,7 @@ ohos_shared_library("hril") {
     "$RIL_HRIL/hril_timer_callback.cpp",
   ]
 
-  include_dirs = [
-    "$RIL_ADAPTER/services/hril/include",
-    "//drivers/hdf_core/adapter/uhdf2/include/hdi",
-    "//third_party/json/include",
-  ]
+  public_configs = [ ":ril_hril_config" ]
 
   configs = [ "$RIL_ADAPTER/utils:utils_config" ]
 
@@ -45,19 +44,19 @@ ohos_shared_library("hril") {
   ]
 
   deps = [
-    "//base/telephony/ril_adapter/interfaces/innerkits:hril_innerkits",
-    "//drivers/hdf_core/adapter/uhdf2/ipc:libhdf_ipc_adapter",
-    "//drivers/hdf_core/adapter/uhdf2/utils:libhdf_utils",
+    "$RIL_ADAPTER/interfaces/innerkits:hril_innerkits",
+    "//third_party/jsoncpp:jsoncpp",
   ]
 
   external_deps = [
+    "c_utils:utils",
     "drivers_interface_power:libpower_proxy_1.1",
     "drivers_interface_ril:ril_idl_headers",
+    "hdf_core:libhdf_ipc_adapter",
+    "hdf_core:libhdf_utils",
     "init:libbegetutil",
     "ipc:ipc_single",
   ]
-
-  public_deps = [ "//commonlibrary/c_utils/base:utils" ]
 
   if (is_standard_system) {
     external_deps += [ "hiviewdfx_hilog_native:libhilog" ]

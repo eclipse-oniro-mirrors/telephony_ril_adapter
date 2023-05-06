@@ -12,8 +12,8 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-RIL_ADAPTER = "//base/telephony/ril_adapter"
-RIL_VENDOR = "//base/telephony/ril_adapter/services/vendor/src"
+RIL_ADAPTER = "../.."
+RIL_VENDOR = "$RIL_ADAPTER/services/vendor/src"
 
 ohos_shared_library("ril_vendor") {
   sources = [
@@ -35,7 +35,7 @@ ohos_shared_library("ril_vendor") {
     "LOG_TAG = \"RilVendor\"",
     "LOG_DOMAIN = 0xD001F08",
   ]
-  deps = [ "//base/telephony/ril_adapter/interfaces/innerkits:hril_innerkits" ]
+  deps = [ "$RIL_ADAPTER/interfaces/innerkits:hril_innerkits" ]
 
   external_deps = [
     "c_utils:utils",
