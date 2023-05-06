@@ -1,6 +1,6 @@
 {
     "name": "@ohos/ril_adapter",
-    "version": "3.1.0",
+    "version": "4.0",
     "description": "telephony ril adapter service",
     "publishAs": "code-segment",
     "homePage": "https://gitee.com/openharmony",
@@ -19,7 +19,6 @@
     "component": {
         "name": "ril_adapter",
         "subsystem": "telephony",
-        "syscap": [ "" ],
         "features": [],
         "adapted_system_type": [
             "standard"
@@ -32,9 +31,15 @@
                 "drivers_interface_power",
                 "drivers_interface_ril",
                 "hdf_core",
+                "hilog",
                 "hiviewdfx_hilog_native",
                 "init",
-                "ipc"
+                "ipc",
+                "samgr"
+            ],
+            "third_party": [
+                "eudev",
+                "jsoncpp"
             ]
         },
         "build": {
@@ -75,6 +80,25 @@
                         ],
                         "header_base": "//base/telephony/ril_adapter/interfaces/innerkits/include"
                     }
+                },
+                {
+                    "header": {
+                        "header_base" : "//base/telephony/ril_adapter/services/hril_hdf/include",
+                        "header_files": [
+                            "hril_hdf.h"
+                        ]
+                    },
+                    "name":"//base/telephony/ril_adapter/services/hril_hdf:hril_hdf"
+                }
+                ,
+                {
+                    "header": {
+                        "header_base" : "//base/telephony/ril_adapter/services/hril/include",
+                        "header_files": [
+                            "hril_manager.h"
+                        ]
+                    },
+                    "name":"//base/telephony/ril_adapter/services/hril:hril"
                 }
             ],
             "test": [

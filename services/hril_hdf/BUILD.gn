@@ -12,27 +12,32 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
-RIL_ADAPTER = "//base/telephony/ril_adapter"
+RIL_ADAPTER = "../.."
 HRIL_HDF_ROOT = "$RIL_ADAPTER/services/hril_hdf"
+
+config("ril_hril_hdf_config") {
+  include_dirs = [ "$RIL_ADAPTER/services/hril_hdf/include" ]
+}
 
 ohos_shared_library("hril_hdf") {
   sources = [ "$HRIL_HDF_ROOT/src/hril_hdf.c" ]
 
-  include_dirs = [ "$HRIL_HDF_ROOT/include" ]
+  public_configs = [ ":ril_hril_hdf_config" ]
 
   configs = [ "$RIL_ADAPTER/utils:utils_config" ]
 
-  public_deps = [ "//third_party/eudev:libudev" ]
-
   deps = [
     "$RIL_ADAPTER/services/hril:hril",
-    "${hdf_uhdf_path}/host:libhdf_host",
-    "${hdf_uhdf_path}/utils:libhdf_utils",
+    "//third_party/eudev:libudev",
   ]
 
-  external_deps = [ "init:libbegetutil" ]
+  external_deps = [
+    "hdf_core:libhdf_host",
+    "hdf_core:libhdf_utils",
+    "init:libbegetutil",
+  ]
+
   defines = [
     "LOG_TAG = \"HrilHdf\"",
     "LOG_DOMAIN = 0xD001F08",

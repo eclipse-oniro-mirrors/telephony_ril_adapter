@@ -13,8 +13,8 @@
 
 import("//build/ohos.gni")
 
-RIL_ADAPTER = "//base/telephony/ril_adapter"
-RIL_FRAMEWORKS = "//base/telephony/ril_adapter/frameworks/src"
+RIL_ADAPTER = "../../"
+RIL_FRAMEWORKS = "../../frameworks/src"
 
 config("hril_config") {
   include_dirs = [ "$RIL_ADAPTER/interfaces/innerkits/include" ]

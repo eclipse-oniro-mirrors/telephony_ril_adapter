@@ -12,7 +12,7 @@
 # limitations under the License.
 
 #####################hydra-fuzz###################
-import("//base/telephony/core_service/telephony.gni")
+SUBSYSTEM_DIR = "../../../.."
 import("//build/config/features.gni")
 import("//build/ohos.gni")
 import("//build/test.gni")
@@ -22,26 +22,26 @@ ohos_fuzztest("PdpContextListUpdatedFuzzTest") {
   module_output_path = "ril_adapter/PdpContextListUpdatedFuzzTest"
   module_out_path = module_output_path
   fuzz_config_file =
-      "//base/telephony/ril_adapter/test/fuzztest/pdpcontextlistupdated_fuzzer"
-  include_dirs = [ "//base/telephony/ril_adapter/services/hril/include" ]
+      "$SUBSYSTEM_DIR/ril_adapter/test/fuzztest/pdpcontextlistupdated_fuzzer"
+  include_dirs = [ "$SUBSYSTEM_DIR/ril_adapter/services/hril/include" ]
 
-  configs = [ "//base/telephony/ril_adapter/utils:utils_config" ]
+  configs = [ "$SUBSYSTEM_DIR/ril_adapter/utils:utils_config" ]
 
   deps = [
-    "//base/telephony/ril_adapter/interfaces/innerkits:hril_innerkits",
-    "//base/telephony/ril_adapter/services/hril:hril",
-    "//drivers/hdf_core/adapter/uhdf2/host:libhdf_host",
-    "//drivers/hdf_core/adapter/uhdf2/ipc:libhdf_ipc_adapter",
-    "//drivers/hdf_core/adapter/uhdf2/utils:libhdf_utils",
+    "$SUBSYSTEM_DIR/ril_adapter/interfaces/innerkits:hril_innerkits",
+    "$SUBSYSTEM_DIR/ril_adapter/services/hril:hril",
   ]
 
   external_deps = [
     "drivers_interface_power:libpower_proxy_1.1",
     "drivers_interface_ril:ril_idl_headers",
+    "hdf_core:libhdf_host",
+    "hdf_core:libhdf_ipc_adapter",
+    "hdf_core:libpub_utils",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
   ]
-  defines += [
+  defines = [
     "TELEPHONY_LOG_TAG = \"RilAdapterFuzzTest\"",
     "LOG_DOMAIN = 0xD000F00",
   ]

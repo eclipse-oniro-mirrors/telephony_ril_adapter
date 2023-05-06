@@ -17,6 +17,7 @@
 
 #include <fcntl.h>
 #include <stddef.h>
+#include <sys/prctl.h>
 #include <termios.h>
 
 #include "at_call.h"
@@ -324,6 +325,7 @@ static int32_t ModemInit(void)
 
 static void EventListeners(void)
 {
+    prctl(PR_SET_NAME, "hril_event_listeners");
     int32_t waitNextTryTime = SLEEP_TIME;
     const char *devicePath = DEVICE_PATH;
     char atTtyPath[PARAMETER_SIZE] = {0};

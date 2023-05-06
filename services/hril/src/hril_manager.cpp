@@ -980,6 +980,7 @@ void HRilInit(void)
         return;
     }
     g_manager->eventLoop_ = std::make_unique<std::thread>(HRilBootUpEventLoop);
+    pthread_setname_np(g_manager->eventLoop_.get()->native_handle(), "hril_eventLoop");
 }
 
 void HRilRegOps(const HRilOps *hrilOps)

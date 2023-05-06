@@ -13,8 +13,7 @@
 
 #import("//build/test.gni")
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
-RIL_ADAPTER = "//base/telephony/ril_adapter"
+RIL_ADAPTER = "../../"
 
 ohos_executable("ril_adapter_test") {
   install_enable = true

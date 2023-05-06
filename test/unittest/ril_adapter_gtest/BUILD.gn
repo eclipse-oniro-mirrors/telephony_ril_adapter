@@ -12,7 +12,7 @@
 # limitations under the License.
 
 import("//build/test.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+SOURCE_DIR = "../../../"
 
 ohos_unittest("tel_ril_adapter_gtest") {
   install_enable = true
@@ -29,12 +29,12 @@ ohos_unittest("tel_ril_adapter_gtest") {
 
   include_dirs = [
     "include",
-    "//base/telephony/ril_adapter/services/hril/include",
-    "//base/telephony/ril_adapter/services/hril_hdf/include",
+    "$SOURCE_DIR/services/hril/include",
+    "$SOURCE_DIR/services/hril_hdf/include",
   ]
   deps = [
-    "//base/telephony/ril_adapter/services/hril:hril",
-    "//base/telephony/ril_adapter/services/hril_hdf:hril_hdf",
+    "$SOURCE_DIR/services/hril:hril",
+    "$SOURCE_DIR/services/hril_hdf:hril_hdf",
   ]
   defines = [
     "TELEPHONY_LOG_TAG = \"RilAdapterGtest\"",
@@ -42,7 +42,7 @@ ohos_unittest("tel_ril_adapter_gtest") {
   ]
 
   # defines += [ "TEL_TEST_PIN_PUK" ]
-  configs = [ "//base/telephony/ril_adapter/utils:utils_config" ]
+  configs = [ "$SOURCE_DIR/utils:utils_config" ]
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
