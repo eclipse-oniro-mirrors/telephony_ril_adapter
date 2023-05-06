@@ -17,4 +17,5 @@ group("unittest") {
   testonly = true
   deps = []
   deps += [ "unittest/ril_adapter_gtest:tel_ril_adapter_gtest" ]
+  deps += [ "unittest:ril_adapter_test" ]
 }

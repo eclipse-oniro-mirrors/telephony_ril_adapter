@@ -37,6 +37,7 @@ const int32_t MAX_DOWNLINK_LINK_BANDWIDTH[] = { 100, // VoIP
     500000, 1000000 };
 sptr<IRil> g_rilInterface = nullptr;
 RilCallbackTest g_callback;
+const int32_t SIM_AUTH_EAP_AKA_TYPE = 129;
 
 void WaitFor(int32_t timeoutSecond)
 {
@@ -1312,7 +1313,7 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_CloseUnFinishedUssd_V1_0100, F
 }
 
 /**
- * @tc.number   Telephony_DriverSystem_CloseUnFinishedUssd_V1_0100
+ * @tc.number   Telephony_DriverSystem_CloseUnFinishedUssd_V1_0200
  * @tc.name     Set barring password
  * @tc.desc     Function test
  */
@@ -2891,7 +2892,8 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SimAuthentication_V1_0100, Fun
         return;
     }
     SimAuthenticationRequestInfo simAuthInfo;
-    simAuthInfo.aid = "aid";
+    simAuthInfo.serial = SIM_AUTH_EAP_AKA_TYPE;
+    simAuthInfo.aid = "USIM_AID";
     simAuthInfo.authData = "authData";
     int32_t ret = g_rilInterface->SimAuthentication(SLOTID_1, GetSerialId(), simAuthInfo);
     WaitFor(WAIT_TIME_SECOND);
@@ -2910,7 +2912,8 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SimAuthentication_V1_0200, Fun
         return;
     }
     SimAuthenticationRequestInfo simAuthInfo;
-    simAuthInfo.aid = "aid";
+    simAuthInfo.serial = SIM_AUTH_EAP_AKA_TYPE;
+    simAuthInfo.aid = "USIM_AID";
     simAuthInfo.authData = "authData";
     int32_t ret = g_rilInterface->SimAuthentication(SLOTID_2, GetSerialId(), simAuthInfo);
     WaitFor(WAIT_TIME_SECOND);

@@ -1188,6 +1188,25 @@ void ReqSimTransmitApduLogicalChannel(const ReqDataInfo *requestInfo, HRilApduSi
     FreeResponseInfo(pResponse);
 }
 
+void ReqSimAuthentication(const ReqDataInfo *requestInfo, HRilSimAuthenticationRequestInfo *data, size_t dataLen)
+{
+    HRilSimAuthenticationRequestInfo *HRilSimAuthInfo = (HRilSimAuthenticationRequestInfo *)data;
+    if (HRilSimAuthInfo == NULL) {
+        struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_RESPONSE, HRIL_RESPONSE, 0);
+        OnSimReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
+        return;
+    }
+    TELEPHONY_LOGD("ReqSimAuthentication serial = %{public}d, aid = %{public}s, data = %{public}s",
+        HRilSimAuthInfo->serial, HRilSimAuthInfo->aid, HRilSimAuthInfo->data);
+    HRilSimIOResponse simAuthResponse = { 0 };
+    simAuthResponse.sw1 = (int32_t)0x90;
+    simAuthResponse.sw2 = (int32_t)0x00;
+    simAuthResponse.response = ("FFFFFFFFFFFFFF");
+    int32_t ret = 0;
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
+    OnSimReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&simAuthResponse, sizeof(HRilSimIOResponse));
+}
+
 void ReqUnlockSimLock(const ReqDataInfo *requestInfo, int32_t lockType, const char *password)
 {
     char cmd[MAX_CMD_LENGTH] = {0};

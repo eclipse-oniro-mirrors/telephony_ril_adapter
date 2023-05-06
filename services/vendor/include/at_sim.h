@@ -106,6 +106,7 @@ void ReqSetRadioProtocol(const ReqDataInfo *requestInfo, const HRilRadioProtocol
 void ReqSimOpenLogicalChannel(const ReqDataInfo *requestInfo, const char *appID, int32_t p2);
 void ReqSimCloseLogicalChannel(const ReqDataInfo *requestInfo, int32_t channelId);
 void ReqSimTransmitApduLogicalChannel(const ReqDataInfo *requestInfo, HRilApduSimIO *data, size_t dataLen);
+void ReqSimAuthentication(const ReqDataInfo *requestInfo, HRilSimAuthenticationRequestInfo *data, size_t dataLen);
 void ReqUnlockSimLock(const ReqDataInfo *requestInfo, int32_t lockType, const char *password);
 uint8_t ToByte(char c);
 #endif // OHOS_AT_SIM_H
