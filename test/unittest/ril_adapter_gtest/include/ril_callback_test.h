@@ -151,6 +151,9 @@ enum class HdiId {
     HREQ_NETWORK_SET_LOCATE_UPDATES,
     HREQ_NETWORK_SET_NOTIFICATION_FILTER,
     HREQ_NETWORK_SET_DEVICE_STATE,
+    HREQ_NETWORK_SET_NR_OPTION_MODE,
+    HREQ_NETWORK_GET_NR_OPTION_MODE,
+    HREQ_NETWORK_GET_RRC_CONNECTION_STATE,
 
     HREQ_COMMON_BASE = 500,
     HREQ_MODEM_SHUT_DOWN,
@@ -431,6 +434,12 @@ public:
     int32_t SetLocateUpdatesResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
     int32_t SetNotificationFilterResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
     int32_t SetDeviceStateResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
+    int32_t SetNrOptionModeResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
+    int32_t GetNrOptionModeResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, int32_t mode) override;
+    int32_t GetRrcConnectionStateResponse(
+        const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, int32_t rrcConnectionState) override;
+    int32_t GetRrcConnectionStateUpdated(
+        const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, int32_t state) override;
 
     // Sms
     int32_t NewSmsNotify(const HDI::Ril::V1_1::HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,

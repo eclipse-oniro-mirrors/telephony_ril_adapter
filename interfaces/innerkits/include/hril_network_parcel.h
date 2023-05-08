@@ -255,28 +255,28 @@ struct PreferredNetworkTypeInfo {
 };
 
 struct SsbIdInfo {
-    int32_t ssbId;
-    int32_t rsrp;
+    int32_t ssbId = 0;
+    int32_t rsrp = 0;
 };
 
 struct NeighboringCellSsbInfo {
-    int32_t pci;
-    int32_t arfcn;
-    int32_t rsrp;
-    int32_t sinr;
-    std::vector<SsbIdInfo> ssbIdList; // Neighboring cell ssbId list, always size is 4
+    int32_t pci = 0;
+    int32_t arfcn = 0;
+    int32_t rsrp = 0;
+    int32_t sinr = 0;
+    std::vector<SsbIdInfo> ssbIdList {}; /* Neighboring cell ssbId list, always size is 4 */
 };
 
 struct NrCellSsbIds {
-    int32_t arfcn;
-    int64_t cid;
-    int32_t pic;
-    int32_t rsrp;
-    int32_t sinr;
-    int32_t timeAdvance;
-    std::vector<SsbIdInfo> sCellSsbList; // Service cell ssbId list, always size is 8
-    int32_t nbCellCount; // Neighboring cell ssb list count, mas size is 4
-    std::vector<NeighboringCellSsbInfo> nbCellSsbList; // Neighboring cell ssb info list, mas size is 4
+    int32_t arfcn = 0;
+    int64_t cid = 0;
+    int32_t pic = 0;
+    int32_t rsrp = 0;
+    int32_t sinr = 0;
+    int32_t timeAdvance = 0;
+    std::vector<SsbIdInfo> sCellSsbList {}; /* Service cell ssbId list, always size is 8 */
+    int32_t nbCellCount  = 0; /* Neighboring cell ssb list count, mas size is 4 */
+    std::vector<NeighboringCellSsbInfo> nbCellSsbList {}; /* Neighboring cell ssb info list, mas size is 4 */
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -523,5 +523,101 @@ HWTEST_F(RILNetworkTest, Telephony_DriverSystem_SetDeviceState_V1_0200, Function
     EXPECT_EQ(SUCCESS, ret);
     ASSERT_TRUE(RilTestUtil::GetBoolResult(HdiId::HREQ_NETWORK_SET_DEVICE_STATE));
 }
+
+/**
+ * @tc.number   Telephony_DriverSystem_SetNrOptionMode_V1_0100
+ * @tc.name     Set the option mode of NR.
+ * @tc.desc     Function test
+ */
+HWTEST_F(RILNetworkTest, Telephony_DriverSystem_SetNrOptionMode_V1_0100, Function | MediumTest | Level3)
+{
+    if (!RilTestUtil::IsReady(SLOTID_1)) {
+        return;
+    }
+    int32_t ret = g_rilInterface->SetNrOptionMode(SLOTID_1, RilTestUtil::GetSerialId(), NR_OPTION_NSA_ONLY);
+    RilTestUtil::WaitFor(WAIT_TIME_SECOND);
+    EXPECT_EQ(SUCCESS, ret);
+    ASSERT_TRUE(RilTestUtil::GetBoolResult(HdiId::HREQ_NETWORK_SET_NR_OPTION_MODE));
+}
+
+/**
+ * @tc.number   Telephony_DriverSystem_SetNrOptionMode_V1_0200
+ * @tc.name     Set the option mode of NR.
+ * @tc.desc     Function test
+ */
+HWTEST_F(RILNetworkTest, Telephony_DriverSystem_SetNrOptionMode_V1_0200, Function | MediumTest | Level3)
+{
+    if (!RilTestUtil::IsReady(SLOTID_2)) {
+        return;
+    }
+    int32_t ret = g_rilInterface->SetNrOptionMode(SLOTID_2, RilTestUtil::GetSerialId(), NR_OPTION_NSA_ONLY);
+    RilTestUtil::WaitFor(WAIT_TIME_SECOND);
+    EXPECT_EQ(SUCCESS, ret);
+    ASSERT_TRUE(RilTestUtil::GetBoolResult(HdiId::HREQ_NETWORK_SET_NR_OPTION_MODE));
+}
+
+/**
+ * @tc.number   Telephony_DriverSystem_GetNrOptionMode_V1_0100
+ * @tc.name     Get the option mode of NR.
+ * @tc.desc     Function test
+ */
+HWTEST_F(RILNetworkTest, Telephony_DriverSystem_GetNrOptionMode_V1_0100, Function | MediumTest | Level3)
+{
+    if (!RilTestUtil::IsReady(SLOTID_1)) {
+        return;
+    }
+    int32_t ret = g_rilInterface->GetNrOptionMode(SLOTID_1, RilTestUtil::GetSerialId());
+    RilTestUtil::WaitFor(WAIT_TIME_SECOND);
+    EXPECT_EQ(SUCCESS, ret);
+    ASSERT_TRUE(RilTestUtil::GetBoolResult(HdiId::HREQ_NETWORK_GET_NR_OPTION_MODE));
+}
+
+/**
+ * @tc.number   Telephony_DriverSystem_GetNrOptionMode_V1_0200
+ * @tc.name     Get the option mode of NR.
+ * @tc.desc     Function test
+ */
+HWTEST_F(RILNetworkTest, Telephony_DriverSystem_GetNrOptionMode_V1_0200, Function | MediumTest | Level3)
+{
+    if (!RilTestUtil::IsReady(SLOTID_2)) {
+        return;
+    }
+    int32_t ret = g_rilInterface->GetNrOptionMode(SLOTID_2, RilTestUtil::GetSerialId());
+    RilTestUtil::WaitFor(WAIT_TIME_SECOND);
+    EXPECT_EQ(SUCCESS, ret);
+    ASSERT_TRUE(RilTestUtil::GetBoolResult(HdiId::HREQ_NETWORK_GET_NR_OPTION_MODE));
+}
+
+/**
+ * @tc.number   Telephony_DriverSystem_GetRrcConnectionState_V1_0100
+ * @tc.name     Get the rrc connection state
+ * @tc.desc     Function test
+ */
+HWTEST_F(RILNetworkTest, Telephony_DriverSystem_GetRrcConnectionState_V1_0100, Function | MediumTest | Level3)
+{
+    if (!RilTestUtil::IsReady(SLOTID_1)) {
+        return;
+    }
+    int32_t ret = g_rilInterface->GetRrcConnectionState(SLOTID_1, RilTestUtil::GetSerialId());
+    RilTestUtil::WaitFor(WAIT_TIME_SECOND);
+    EXPECT_EQ(SUCCESS, ret);
+    ASSERT_TRUE(RilTestUtil::GetBoolResult(HdiId::HREQ_NETWORK_GET_RRC_CONNECTION_STATE));
+}
+
+/**
+ * @tc.number   Telephony_DriverSystem_GetRrcConnectionState_V1_0200
+ * @tc.name     Get the rrc connection state
+ * @tc.desc     Function test
+ */
+HWTEST_F(RILNetworkTest, Telephony_DriverSystem_GetRrcConnectionState_V1_0200, Function | MediumTest | Level3)
+{
+    if (!RilTestUtil::IsReady(SLOTID_2)) {
+        return;
+    }
+    int32_t ret = g_rilInterface->GetRrcConnectionState(SLOTID_2, RilTestUtil::GetSerialId());
+    RilTestUtil::WaitFor(WAIT_TIME_SECOND);
+    EXPECT_EQ(SUCCESS, ret);
+    ASSERT_TRUE(RilTestUtil::GetBoolResult(HdiId::HREQ_NETWORK_GET_RRC_CONNECTION_STATE));
+}
 } // namespace Telephony
 } // namespace OHOS

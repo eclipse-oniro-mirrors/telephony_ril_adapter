@@ -86,6 +86,9 @@ public:
     void SetRilLocationUpdateTest(int32_t slotId);
     void SetRilNotificationFilterTest(int32_t slotId);
     void SetRilDeviceStateTest(int32_t slotId);
+    void GetNrOptionModeTest(int32_t slotId);
+    void SetNrOptionModeTest(int32_t slotId);
+    void GetRrcConnectionStateTest(int32_t slotId);
     void ActivatePdpContextTest(int32_t slotId);
     void DeactivatePdpContextTest(int32_t slotId);
     void GetPdpContextListTest(int32_t slotId);

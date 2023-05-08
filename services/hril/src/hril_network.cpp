@@ -40,6 +40,7 @@ void HRilNetwork::AddHandlerToMap()
     notiMemberFuncMap_[HNOTI_NETWORK_PS_REG_STATUS_UPDATED] = &HRilNetwork::NetworkPsRegStatusUpdated;
     notiMemberFuncMap_[HNOTI_NETWORK_PHY_CHNL_CFG_UPDATED] = &HRilNetwork::NetworkPhyChnlCfgUpdated;
     notiMemberFuncMap_[HNOTI_NETWORK_CURRENT_CELL_UPDATED] = &HRilNetwork::NetworkCurrentCellUpdated;
+    notiMemberFuncMap_[HNOTI_NETWORK_RRC_CONNECTION_STATE_UPDATED] = &HRilNetwork::GetRrcConnectionStateUpdated;
 
     // Response
     respMemberFuncMap_[HREQ_NETWORK_GET_SIGNAL_STRENGTH] = &HRilNetwork::GetSignalStrengthResponse;
@@ -57,6 +58,9 @@ void HRilNetwork::AddHandlerToMap()
     respMemberFuncMap_[HREQ_NETWORK_SET_LOCATE_UPDATES] = &HRilNetwork::SetLocateUpdatesResponse;
     respMemberFuncMap_[HREQ_NETWORK_SET_NOTIFICATION_FILTER] = &HRilNetwork::SetNotificationFilterResponse;
     respMemberFuncMap_[HREQ_NETWORK_SET_DEVICE_STATE] = &HRilNetwork::SetDeviceStateResponse;
+    respMemberFuncMap_[HREQ_NETWORK_SET_NR_OPTION_MODE] = &HRilNetwork::SetNrOptionModeResponse;
+    respMemberFuncMap_[HREQ_NETWORK_GET_NR_OPTION_MODE] = &HRilNetwork::GetNrOptionModeResponse;
+    respMemberFuncMap_[HREQ_NETWORK_GET_RRC_CONNECTION_STATE] = &HRilNetwork::GetRrcConnectionStateResponse;
 }
 
 int32_t HRilNetwork::GetSignalStrength(int32_t serialId)
@@ -153,6 +157,23 @@ int32_t HRilNetwork::SetDeviceState(int32_t serialId, int32_t deviceStateType, i
 {
     return RequestVendor(serialId, HREQ_NETWORK_SET_DEVICE_STATE, networkFuncs_,
         &HRilNetworkReq::SetDeviceState, &deviceStateType, &deviceStateOn);
+}
+
+int32_t HRilNetwork::SetNrOptionMode(int32_t serialId, int32_t mode)
+{
+    return RequestVendor(
+        serialId, HREQ_NETWORK_SET_NR_OPTION_MODE, networkFuncs_, &HRilNetworkReq::SetNrOptionMode, &mode);
+}
+
+int32_t HRilNetwork::GetNrOptionMode(int32_t serialId)
+{
+    return RequestVendor(serialId, HREQ_NETWORK_GET_NR_OPTION_MODE, networkFuncs_, &HRilNetworkReq::GetNrOptionMode);
+}
+
+int32_t HRilNetwork::GetRrcConnectionState(int32_t serialId)
+{
+    return RequestVendor(
+        serialId, HREQ_NETWORK_GET_RRC_CONNECTION_STATE, networkFuncs_, &HRilNetworkReq::GetRrcConnectionState);
 }
 
 int32_t HRilNetwork::GetSignalStrengthResponse(
@@ -412,6 +433,40 @@ int32_t HRilNetwork::SetDeviceStateResponse(
     return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::SetDeviceStateResponse);
 }
 
+int32_t HRilNetwork::SetNrOptionModeResponse(
+    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+{
+    return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::SetNrOptionModeResponse);
+}
+
+int32_t HRilNetwork::GetNrOptionModeResponse(
+    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+{
+    if (response == nullptr || responseLen != sizeof(int32_t)) {
+        TELEPHONY_LOGE("GetNrOptionModeResponse response is invalid");
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    int32_t *mode = static_cast<int32_t *>(const_cast<void *>(response));
+    TELEPHONY_LOGI("GetNrOptionModeResponse mode: %{public}d", *mode);
+    return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::GetNrOptionModeResponse, *mode);
+}
+
+int32_t HRilNetwork::GetRrcConnectionStateResponse(
+    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+{
+    int32_t rrcConnectionState = 0; // idle state
+    if (response == nullptr || responseLen != sizeof(int32_t)) {
+        TELEPHONY_LOGE("GetRrcConnectionStateResponse response is invalid");
+        if (responseInfo.error == HRilErrType::NONE) {
+            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
+        }
+    } else {
+        rrcConnectionState = *(static_cast<const int32_t *>(response));
+        TELEPHONY_LOGD("GetRrcConnectionStateResponse rrcConnectionState: %{public}d", rrcConnectionState);
+    }
+    return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::GetRrcConnectionStateResponse, rrcConnectionState);
+}
+
 int32_t HRilNetwork::NetworkCsRegStatusUpdated(
     int32_t indType, const HRilErrNumber error, const void *response, size_t responseLen)
 {
@@ -541,6 +596,21 @@ int32_t HRilNetwork::NetworkCurrentCellUpdated(
         return HRIL_ERR_GENERIC_FAILURE;
     }
     return Notify(indType, error, &HDI::Ril::V1_1::IRilCallback::NetworkCurrentCellUpdated, cellList);
+}
+
+int32_t HRilNetwork::GetRrcConnectionStateUpdated(
+    int32_t indType, const HRilErrNumber error, const void *response, size_t responseLen)
+{
+    if ((response == nullptr && responseLen != 0) || (responseLen % sizeof(int32_t)) != 0) {
+        TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null");
+        return HRIL_ERR_NULL_POINT;
+    }
+    return Notify(
+        indType, error, &HDI::Ril::V1_1::IRilCallback::GetRrcConnectionStateUpdated, *(const int32_t *)response);
 }
 
 void HRilNetwork::ExchangeRilRssiToHdf(const void *response, HDI::Ril::V1_1::Rssi &rssi)

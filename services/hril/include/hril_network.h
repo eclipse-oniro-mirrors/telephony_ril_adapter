@@ -41,6 +41,9 @@ public:
     int32_t SetLocateUpdates(int32_t serialId, const HDI::Ril::V1_1::RilRegNotifyMode mode);
     int32_t SetNotificationFilter(int32_t serialId, int32_t newFilter);
     int32_t SetDeviceState(int32_t serialId, int32_t deviceStateType, int32_t deviceStateOn);
+    int32_t SetNrOptionMode(int32_t serialId, int32_t mode);
+    int32_t GetNrOptionMode(int32_t serialId);
+    int32_t GetRrcConnectionState(int32_t serialId);
 
     int32_t GetSignalStrengthResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
@@ -72,6 +75,12 @@ public:
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t SetDeviceStateResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t SetNrOptionModeResponse(
+        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t GetNrOptionModeResponse(
+        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t GetRrcConnectionStateResponse(
+        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
 
     int32_t NetworkCsRegStatusUpdated(int32_t indType, HRilErrNumber error, const void *response, size_t responseLen);
     int32_t NetworkPsRegStatusUpdated(int32_t indType, HRilErrNumber error, const void *response, size_t responseLen);
@@ -82,7 +91,8 @@ public:
         int32_t indType, const HRilErrNumber error, const void *response, size_t responseLen);
     int32_t NetworkCurrentCellUpdated(
         int32_t indType, const HRilErrNumber error, const void *response, size_t responseLen);
-
+    int32_t GetRrcConnectionStateUpdated(
+        int32_t indType, const HRilErrNumber error, const void *response, size_t responseLen);
     void RegisterNetworkFuncs(const HRilNetworkReq *networkFuncs);
     bool IsNetworkRespOrNotify(uint32_t code);
 

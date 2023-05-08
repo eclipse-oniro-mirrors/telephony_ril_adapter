@@ -176,6 +176,9 @@ bool TestNetWorkInterface(std::shared_ptr<HRilManager> manager)
     EXPECT_NE(HDF_SUCCESS, manager->SetLocateUpdates(0, 0, static_cast<HDI::Ril::V1_1::RilRegNotifyMode>(0)));
     EXPECT_NE(HDF_SUCCESS, manager->SetNotificationFilter(0, 0, 0));
     EXPECT_NE(HDF_SUCCESS, manager->SetDeviceState(0, 0, 0, 0));
+    EXPECT_NE(HDF_SUCCESS, manager->GetRrcConnectionState(0, 0));
+    EXPECT_NE(HDF_SUCCESS, manager->GetNrOptionMode(0, 0));
+    EXPECT_NE(HDF_SUCCESS, manager->SetNrOptionMode(0, 0, 1));
     return true;
 }
 
@@ -469,6 +472,9 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Network_002, Function | MediumTest | 
     EXPECT_NE(HDF_SUCCESS, network->SetLocateUpdatesResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, network->SetNotificationFilterResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, network->SetDeviceStateResponse(0, responseInfo, nullptr, 0));
+    EXPECT_NE(HDF_SUCCESS, network->GetRrcConnectionStateResponse(0, responseInfo, nullptr, 0));
+    EXPECT_NE(HDF_SUCCESS, network->GetNrOptionModeResponse(0, responseInfo, nullptr, 0));
+    EXPECT_NE(HDF_SUCCESS, network->SetNrOptionModeResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, network->NetworkCsRegStatusUpdated(0, HRilErrNumber::HRIL_ERR_NULL_POINT, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, network->NetworkPsRegStatusUpdated(0, HRilErrNumber::HRIL_ERR_NULL_POINT, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, network->SignalStrengthUpdated(0, HRilErrNumber::HRIL_ERR_NULL_POINT, nullptr, 0));

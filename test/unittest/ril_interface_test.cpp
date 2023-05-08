@@ -170,6 +170,9 @@ typedef enum {
     HREQ_NETWORK_SET_LOCATE_UPDATES,
     HREQ_NETWORK_SET_NOTIFICATION_FILTER,
     HREQ_NETWORK_SET_DEVICE_STATE,
+    HREQ_NETWORK_SET_NR_OPTION_MODE,
+    HREQ_NETWORK_GET_NR_OPTION_MODE,
+    HREQ_NETWORK_GET_RRC_CONNECTION_STATE,
 
     HREQ_COMMON_BASE = 500,
     HREQ_MODEM_SHUT_DOWN,
@@ -617,6 +620,33 @@ void RilInterfaceTest::SetRilDeviceStateTest(int32_t slotId)
 
     int32_t ret = g_rilInterface->SetDeviceState(slotId, GetSerialId(), deviceStateType, deviceStateOn);
     cout << "SetRilDeviceStateTest finish ret : " << ret << endl << endl;
+}
+
+void RilInterfaceTest::SetNrOptionModeTest(int32_t slotId)
+{
+    cout << "RilInterfaceTest::SetNrOptionModeTest -->" << endl;
+
+    int32_t mode;
+    cout << "please enter the mode:" << endl;
+    cin >> mode;
+    cout << mode << endl;
+
+    int32_t ret = g_rilInterface->SetNrOptionMode(slotId, GetSerialId(), mode);
+    cout << "SetNrOptionModeTest finish ret : " << ret << endl << endl;
+}
+
+void RilInterfaceTest::GetNrOptionModeTest(int32_t slotId)
+{
+    cout << "RilInterfaceTest::GetNrOptionModeTest -->" << endl;
+    int32_t ret = g_rilInterface->GetNrOptionMode(slotId, GetSerialId());
+    cout << "GetNrOptionModeTest finish ret : " << ret << endl << endl;
+}
+
+void RilInterfaceTest::GetRrcConnectionStateTest(int32_t slotId)
+{
+    cout << "RilInterfaceTest::GetRrcConnectionStateTest -->" << endl;
+    int32_t ret = g_rilInterface->GetRrcConnectionState(slotId, GetSerialId());
+    cout << "GetRrcConnectionStateTest finish ret : " << ret << endl << endl;
 }
 
 void RilInterfaceTest::SetRilNetworkSelectionModeTest(int32_t slotId)
@@ -1416,6 +1446,9 @@ void RilInterfaceTest::OnInitNetworkProcessInterface()
     memberFuncMap_[HREQ_NETWORK_SET_LOCATE_UPDATES] = &RilInterfaceTest::SetRilLocationUpdateTest;
     memberFuncMap_[HREQ_NETWORK_SET_NOTIFICATION_FILTER] = &RilInterfaceTest::SetRilNotificationFilterTest;
     memberFuncMap_[HREQ_NETWORK_SET_DEVICE_STATE] = &RilInterfaceTest::SetRilDeviceStateTest;
+    memberFuncMap_[HREQ_NETWORK_SET_NR_OPTION_MODE] = &RilInterfaceTest::SetNrOptionModeTest;
+    memberFuncMap_[HREQ_NETWORK_GET_NR_OPTION_MODE] = &RilInterfaceTest::GetNrOptionModeTest;
+    memberFuncMap_[HREQ_NETWORK_GET_RRC_CONNECTION_STATE] = &RilInterfaceTest::GetRrcConnectionStateTest;
 }
 
 void RilInterfaceTest::OnInitModemProcessInterface()
@@ -1614,6 +1647,10 @@ static int32_t PrintNetworkMenu()
     cout << "----> [" << HREQ_NETWORK_SET_NOTIFICATION_FILTER << "] ---->[ HREQ_NETWORK_SET_NOTIFICATION_FILTER ]"
          << endl;
     cout << "----> [" << HREQ_NETWORK_SET_DEVICE_STATE << "] ---->[ HREQ_NETWORK_SET_DEVICE_STATE ]" << endl;
+    cout << "----> [" << HREQ_NETWORK_SET_NR_OPTION_MODE << "] ---->[ HREQ_NETWORK_SET_NR_OPTION_MODE ]" << endl;
+    cout << "----> [" << HREQ_NETWORK_GET_NR_OPTION_MODE << "] ---->[ HREQ_NETWORK_GET_NR_OPTION_MODE ]" << endl;
+    cout << "----> [" << HREQ_NETWORK_GET_RRC_CONNECTION_STATE << "] ---->[ HREQ_NETWORK_GET_RRC_CONNECTION_STATE ]"
+         << endl;
 
     int32_t choice = InputInt32(HREQ_NETWORK_BASE, HREQ_COMMON_BASE - MENU_OFFSET, "Command");
     cout << "---->You choose: " << choice << endl;
@@ -1668,6 +1705,7 @@ static int32_t SwitchMenu(TestMenu module, bool *loopFlag)
             break;
         case TestMenu::STRESS:
             mWhat = PrintStressMenu();
+            break;
         default:
             break;
     }
