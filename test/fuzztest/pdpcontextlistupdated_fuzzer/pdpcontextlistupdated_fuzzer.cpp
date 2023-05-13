@@ -29,6 +29,7 @@ constexpr int32_t SLOT_NUM = 2;
 constexpr int32_t REASON_TYPE = 2;
 constexpr int32_t RETRY_TIME = 2;
 constexpr int32_t ACTIVE_NUM = 2;
+constexpr int32_t KILO_BIT = 1000;
 constexpr const char *NUMBER = "123";
 
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
@@ -55,10 +56,16 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     response.pCscfPrimAddr = const_cast<char *>(NUMBER);
     response.pCscfSecAddr = const_cast<char *>(NUMBER);
     response.pduSessionId = static_cast<int32_t>(size);
-
     HRilManager hrilManager;
     std::shared_ptr<HRilData> hrilData = std::make_shared<HRilData>(slotId, hrilManager);
     hrilData->PdpContextListUpdated(HRIL_RESPONSE_NOTICE, error, &response, sizeof(HRilDataCallResponse));
+
+    HRilDataLinkCapability linkCapability;
+    linkCapability.primaryDownlinkKbps = static_cast<int32_t>(size) * KILO_BIT;
+    linkCapability.primaryUplinkKbps = static_cast<int32_t>(size) * KILO_BIT;
+    linkCapability.secondaryDownlinkKbps = static_cast<int32_t>(size) * KILO_BIT;
+    linkCapability.secondaryUplinkKbps = static_cast<int32_t>(size) * KILO_BIT;
+    hrilData->DataLinkCapabilityUpdated(HRIL_RESPONSE_NOTICE, error, &linkCapability, sizeof(HRilDataLinkCapability));
     return;
 }
 } // namespace OHOS

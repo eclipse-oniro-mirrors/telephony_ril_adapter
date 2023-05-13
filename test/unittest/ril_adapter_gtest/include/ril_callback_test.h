@@ -48,7 +48,7 @@ enum class HdiId {
     HREQ_CALL_HANGUP,
     HREQ_CALL_REJECT,
     HREQ_CALL_ANSWER,
-    HREQ_CALL_HOLD_CALL,   // call hold value 6
+    HREQ_CALL_HOLD_CALL, // call hold value 6
     HREQ_CALL_UNHOLD_CALL, // call active value 6
     HREQ_CALL_SWITCH_CALL,
     HREQ_CALL_COMBINE_CONFERENCE,
@@ -132,6 +132,7 @@ enum class HdiId {
     HREQ_DATA_SET_LINK_BANDWIDTH_REPORTING_RULE,
     HREQ_DATA_SET_DATA_PROFILE_INFO,
     HREQ_DATA_SET_DATA_PERMITTED,
+    HREQ_DATA_GET_LINK_CAPABILITY,
 
     HREQ_NETWORK_BASE = 400,
     HREQ_NETWORK_GET_SIGNAL_STRENGTH,
@@ -299,6 +300,8 @@ public:
     // Data
     int32_t PdpContextListUpdated(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_1::DataCallResultList &dataCallResultList) override;
+    int32_t DataLinkCapabilityUpdated(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_1::DataLinkCapability &dataLinkCapability) override;
     int32_t ActivatePdpContextResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_1::SetupDataCallResultInfo &setupDataCallResultInfo) override;
     int32_t DeactivatePdpContextResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
@@ -310,10 +313,13 @@ public:
         const HDI::Ril::V1_1::DataLinkBandwidthInfo &dataLinkBandwidthInfo) override;
     int32_t SetDataPermittedResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
     int32_t SetDataProfileInfoResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo);
+    int32_t GetLinkCapabilityResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_1::DataLinkCapability &dataLinkCapability) override;
     // Modem
     int32_t RadioStateUpdated(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, int32_t state) override;
     int32_t VoiceRadioTechUpdated(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_1::VoiceRadioTechnology &voiceRadioTechnology) override;
+    int32_t DsdsModeUpdated(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, int32_t mode) override;
     int32_t ShutDownResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
     int32_t SetRadioStateResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
     int32_t GetRadioStateResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, int32_t state) override;

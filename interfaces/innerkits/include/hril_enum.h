@@ -86,6 +86,11 @@ typedef enum {
     HRIL_RADIO_POWER_STATE_ON = 1,
 } HRilRadioState;
 
+typedef enum {
+    HRIL_DSDS_MODE_V2 = 0,
+    HRIL_DSDS_MODE_V3 = 1,
+} HRilDsdsMode;
+
 typedef enum { HRIL_CALL_VOICE, HRIL_CALL_DATA, HRIL_CALL_FAX } HRilCallMode;
 
 typedef enum {

@@ -1100,6 +1100,12 @@ int32_t RilCallbackTest::VoiceRadioTechUpdated(
     return 0;
 }
 
+int32_t RilCallbackTest::DsdsModeUpdated(const RilRadioResponseInfo &responseInfo, int32_t mode)
+{
+    TELEPHONY_LOGI("DsdsModeUpdated mode : %{public}d", mode);
+    return 0;
+}
+
 int32_t RilCallbackTest::ShutDownResponse(const RilRadioResponseInfo &responseInfo)
 {
     TELEPHONY_LOGI("ShutDownResponse");
@@ -1193,6 +1199,17 @@ int32_t RilCallbackTest::PdpContextListUpdated(
     return 0;
 }
 
+int32_t RilCallbackTest::DataLinkCapabilityUpdated(
+    const RilRadioResponseInfo &responseInfo, const DataLinkCapability &dataLinkCapability)
+{
+    TELEPHONY_LOGI(
+        "RilCallbackTest::DataLinkCapabilityUpdated primaryDownlinkKbps:%{public}d primaryUplinkKbps:%{public}d "
+        "secondaryDownlinkKbps:%{public}d secondaryUplinkKbps:%{public}d",
+        dataLinkCapability.primaryDownlinkKbps, dataLinkCapability.primaryUplinkKbps,
+        dataLinkCapability.secondaryDownlinkKbps, dataLinkCapability.secondaryUplinkKbps);
+    return 0;
+}
+
 int32_t RilCallbackTest::ActivatePdpContextResponse(
     const RilRadioResponseInfo &responseInfo, const SetupDataCallResultInfo &setupDataCallResultInfo)
 {
@@ -1276,6 +1293,20 @@ int32_t RilCallbackTest::GetLinkBandwidthInfoResponse(
         dataLinkBandwidthInfo.ulGfbr, dataLinkBandwidthInfo.dlMfbr, dataLinkBandwidthInfo.ulMfbr,
         dataLinkBandwidthInfo.ulSambr, dataLinkBandwidthInfo.dlSambr, dataLinkBandwidthInfo.averagingWindow);
     hdiId_ = HdiId::HREQ_DATA_GET_LINK_BANDWIDTH_INFO;
+    resultInfo_ = responseInfo;
+    NotifyAll();
+    return 0;
+}
+
+int32_t RilCallbackTest::GetLinkCapabilityResponse(
+    const RilRadioResponseInfo &responseInfo, const DataLinkCapability &dataLinkCapability)
+{
+    TELEPHONY_LOGI("RilCallbackTest::GetLinkCapabilityResponse primaryDownlinkKbps:%{public}d "
+                   "primaryUplinkKbps:%{public}d secondaryDownlinkKbps:%{public}d "
+                   "secondaryUplinkKbps:%{public}d",
+        dataLinkCapability.primaryDownlinkKbps, dataLinkCapability.primaryUplinkKbps,
+        dataLinkCapability.secondaryDownlinkKbps, dataLinkCapability.secondaryUplinkKbps);
+    hdiId_ = HdiId::HREQ_DATA_GET_LINK_CAPABILITY;
     resultInfo_ = responseInfo;
     NotifyAll();
     return 0;

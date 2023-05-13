@@ -329,6 +329,15 @@ static void RadioTurnNotify(struct ReportInfo reportInfo, char *str)
     }
 }
 
+static void DsdsModeNotify(struct ReportInfo reportInfo, char *str)
+{
+    HRilDsdsMode dsdsMode = HRIL_DSDS_MODE_V2;
+    reportInfo.error = HRIL_ERR_SUCCESS;
+    reportInfo.type = HRIL_NOTIFICATION;
+    reportInfo.notifyId = HNOTI_MODEM_DSDS_MODE_UPDATED;
+    OnModemReport(GetSlotId(NULL), reportInfo, (const uint8_t *)&dsdsMode, sizeof(HRilDsdsMode));
+}
+
 static void OnPsRegStatusNotify(struct ReportInfo reportInfo, int32_t ret, char *str, const char *s)
 {
     reportInfo.notifyId = HNOTI_NETWORK_PS_REG_STATUS_UPDATED;
@@ -405,6 +414,8 @@ void OnNotifyNetWorksOps(const char *s, const char *infoStr)
         ProcessPhyChnlCfgNotify(reportInfo, str);
     } else if (ReportStrWith(s, "^SYSINFOEX:")) {
         VoiceRadioInfoNotify(reportInfo, ret, str, s);
+    } else if (ReportStrWith(s, "^DSDS:")) {
+        DsdsModeNotify(reportInfo, str);
     } else {
         TELEPHONY_LOGW("enter to  is unrecognized command");
     }

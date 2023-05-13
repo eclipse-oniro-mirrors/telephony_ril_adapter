@@ -24,7 +24,7 @@ typedef enum {
     HREQ_CALL_HANGUP,
     HREQ_CALL_REJECT,
     HREQ_CALL_ANSWER,
-    HREQ_CALL_HOLD_CALL,   // call hold value 6
+    HREQ_CALL_HOLD_CALL, // call hold value 6
     HREQ_CALL_UNHOLD_CALL, // call active value 6
     HREQ_CALL_SWITCH_CALL,
     HREQ_CALL_COMBINE_CONFERENCE,

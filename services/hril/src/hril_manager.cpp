@@ -559,6 +559,11 @@ int32_t HRilManager::GetLinkBandwidthInfo(int32_t slotId, int32_t serialId, int3
     return TaskSchedule(MODULE_HRIL_DATA, hrilData_[slotId], &HRilData::GetLinkBandwidthInfo, serialId, cid);
 }
 
+int32_t HRilManager::GetLinkCapability(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(MODULE_HRIL_DATA, hrilData_[slotId], &HRilData::GetLinkCapability, serialId);
+}
+
 int32_t HRilManager::SetLinkBandwidthReportingRule(int32_t slotId, int32_t serialId,
     const OHOS::HDI::Ril::V1_1::DataLinkBandwidthReportingRule &dataLinkBandwidthReportingRule)
 {
