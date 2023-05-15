@@ -151,6 +151,7 @@ typedef enum {
     HREQ_DATA_SEND_DATA_PERFORMANCE_MODE,
     HREQ_DATA_SEND_DATA_SLEEP_MODE,
     HREQ_DATA_SET_DATA_PERMITTED,
+    HREQ_DATA_GET_LINK_CAPABILITY,
 
     HREQ_NETWORK_BASE = 400,
     HREQ_NETWORK_GET_SIGNAL_STRENGTH,
@@ -994,6 +995,13 @@ void RilInterfaceTest::GetLinkBandwidthInfoTest(int32_t slotId)
     cout << "GetLinkBandwidthInfoTest finished ret : " << ret << endl << endl;
 }
 
+void RilInterfaceTest::GetLinkCapabilityTest(int32_t slotId)
+{
+    cout << "RilInterfaceTest::GetLinkCapabilityTest -->" << endl;
+    int32_t ret = g_rilInterface->GetLinkCapability(slotId, GetSerialId());
+    cout << "GetLinkCapabilityTest finished ret : " << ret << endl << endl;
+}
+
 void RilInterfaceTest::SetLinkBandwidthReportingRuleTest(int32_t slotId)
 {
     cout << "RilInterfaceTest::SetLinkBandwidthReportingRuleTest -->" << endl;
@@ -1387,6 +1395,7 @@ void RilInterfaceTest::OnInitDataProcessInterface()
     memberFuncMap_[HREQ_DATA_SEND_DATA_PERFORMANCE_MODE] = &RilInterfaceTest::SendDataPerformanceModeTest;
     memberFuncMap_[HREQ_DATA_SEND_DATA_SLEEP_MODE] = &RilInterfaceTest::SendDataSleepModeTest;
     memberFuncMap_[HREQ_DATA_SET_DATA_PERMITTED] = &RilInterfaceTest::SetDataPermittedTest;
+    memberFuncMap_[HREQ_DATA_GET_LINK_CAPABILITY] = &RilInterfaceTest::GetLinkCapabilityTest;
 }
 
 void RilInterfaceTest::OnInitNetworkProcessInterface()
@@ -1572,6 +1581,7 @@ static int32_t PrintDataMenu()
          << endl;
     cout << "----> [" << HREQ_DATA_SEND_DATA_SLEEP_MODE << "] ---->[ HREQ_DATA_SEND_DATA_SLEEP_MODE ]" << endl;
     cout << "----> [" << HREQ_DATA_SET_DATA_PERMITTED << "] ---->[ HREQ_DATA_SET_DATA_PERMITTED ]" << endl;
+    cout << "----> [" << HREQ_DATA_GET_LINK_CAPABILITY << "] ---->[ HREQ_DATA_GET_LINK_CAPABILITY ]" << endl;
 
     int32_t choice = InputInt32(HREQ_DATA_BASE, HREQ_NETWORK_BASE - MENU_OFFSET, "Command");
     cout << "---->You choose: " << choice << endl;

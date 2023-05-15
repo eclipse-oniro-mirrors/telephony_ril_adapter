@@ -49,6 +49,7 @@ void HRilData::AddHandlerToMap()
 {
     // Notification
     notiMemberFuncMap_[HNOTI_DATA_PDP_CONTEXT_LIST_UPDATED] = &HRilData::PdpContextListUpdated;
+    notiMemberFuncMap_[HNOTI_DATA_LINK_CAPABILITY_UPDATED] = &HRilData::DataLinkCapabilityUpdated;
     // response
     respMemberFuncMap_[HREQ_DATA_SET_INIT_APN_INFO] = &HRilData::SetInitApnInfoResponse;
     respMemberFuncMap_[HREQ_DATA_SET_DATA_PROFILE_INFO] = &HRilData::SetDataProfileInfoResponse;
@@ -58,6 +59,7 @@ void HRilData::AddHandlerToMap()
     respMemberFuncMap_[HREQ_DATA_GET_LINK_BANDWIDTH_INFO] = &HRilData::GetLinkBandwidthInfoResponse;
     respMemberFuncMap_[HREQ_DATA_SET_LINK_BANDWIDTH_REPORTING_RULE] = &HRilData::SetLinkBandwidthReportingRuleResponse;
     respMemberFuncMap_[HREQ_DATA_SET_DATA_PERMITTED] = &HRilData::SetDataPermittedResponse;
+    respMemberFuncMap_[HREQ_DATA_GET_LINK_CAPABILITY] = &HRilData::GetLinkCapabilityResponse;
 }
 
 void HRilData::SwitchRilDataToHal(const HRilDataCallResponse *response, HDI::Ril::V1_1::SetupDataCallResultInfo &result)
@@ -185,6 +187,11 @@ HRilDataInfo HRilData::BuildDataInfo(const OHOS::HDI::Ril::V1_1::DataProfileData
     return dataInfo;
 }
 
+int32_t HRilData::GetLinkCapability(int32_t serialId)
+{
+    return RequestVendor(serialId, HREQ_DATA_GET_LINK_CAPABILITY, dataFuncs_, &HRilDataReq::GetLinkCapability);
+}
+
 int32_t HRilData::GetLinkBandwidthInfo(int32_t serialId, int32_t cid)
 {
     return RequestVendor(
@@ -292,6 +299,42 @@ int32_t HRilData::PdpContextListUpdated(
     }
     dataCallResultList.size = dataCallResultList.dcList.size();
     return Notify(notifyType, error, &HDI::Ril::V1_1::IRilCallback::PdpContextListUpdated, dataCallResultList);
+}
+
+int32_t HRilData::DataLinkCapabilityUpdated(
+    int32_t notifyType, const HRilErrNumber error, const void *response, size_t responseLen)
+{
+    if ((response == nullptr) || (responseLen % sizeof(HRilDataLinkCapability)) != 0) {
+        TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    HDI::Ril::V1_1::DataLinkCapability dataLinkCapability = { 0 };
+    if (response != nullptr) {
+        const HRilDataLinkCapability *result = static_cast<const HRilDataLinkCapability *>(response);
+        dataLinkCapability.primaryDownlinkKbps = result->primaryDownlinkKbps;
+        dataLinkCapability.primaryUplinkKbps = result->primaryUplinkKbps;
+        dataLinkCapability.secondaryDownlinkKbps = result->secondaryDownlinkKbps;
+        dataLinkCapability.secondaryUplinkKbps = result->secondaryUplinkKbps;
+    }
+    return Notify(notifyType, error, &HDI::Ril::V1_1::IRilCallback::DataLinkCapabilityUpdated, dataLinkCapability);
+}
+
+int32_t HRilData::GetLinkCapabilityResponse(
+    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+{
+    if ((response == nullptr && responseLen != 0) || (responseLen % sizeof(HRilDataLinkCapability)) != 0) {
+        TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    HDI::Ril::V1_1::DataLinkCapability dataLinkCapability = { 0 };
+    if (response != nullptr) {
+        const HRilDataLinkCapability *result = static_cast<const HRilDataLinkCapability *>(response);
+        dataLinkCapability.primaryDownlinkKbps = result->primaryDownlinkKbps;
+        dataLinkCapability.primaryUplinkKbps = result->primaryUplinkKbps;
+        dataLinkCapability.secondaryDownlinkKbps = result->secondaryDownlinkKbps;
+        dataLinkCapability.secondaryUplinkKbps = result->secondaryUplinkKbps;
+    }
+    return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::GetLinkCapabilityResponse, dataLinkCapability);
 }
 
 int32_t HRilData::GetLinkBandwidthInfoResponse(

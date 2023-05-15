@@ -44,10 +44,15 @@ public:
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t PdpContextListUpdated(
         int32_t notifyType, const HRilErrNumber error, const void *response, size_t responseLen);
+    int32_t DataLinkCapabilityUpdated(
+        int32_t notifyType, const HRilErrNumber error, const void *response, size_t responseLen);
     int32_t ProcessDataResponse(
         int32_t code, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t ProcessDataRequest(int32_t code, struct HdfSBuf *data);
     int32_t ProcessDataNotify(const struct ReportInfo *reportInfo, const void *response, size_t responseLen);
+    int32_t GetLinkCapability(int32_t serialId);
+    int32_t GetLinkCapabilityResponse(
+        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t GetLinkBandwidthInfo(int32_t serialId, int32_t cid);
     int32_t GetLinkBandwidthInfoResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);

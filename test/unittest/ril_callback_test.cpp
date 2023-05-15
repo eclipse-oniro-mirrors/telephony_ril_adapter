@@ -945,6 +945,14 @@ int32_t RilCallbackTest::VoiceRadioTechUpdated(
     return 0;
 }
 
+int32_t RilCallbackTest::DsdsModeUpdated(const RilRadioResponseInfo &responseInfo, int32_t mode)
+{
+    PrintResponseInfo("DsdsModeUpdated", responseInfo);
+    cout << "[mode] : " << mode << endl;
+    cout << endl;
+    return 0;
+}
+
 int32_t RilCallbackTest::ShutDownResponse(const RilRadioResponseInfo &responseInfo)
 {
     PrintResponseInfo("ShutDownResponse", responseInfo);
@@ -1033,6 +1041,18 @@ int32_t RilCallbackTest::PdpContextListUpdated(
     return 0;
 }
 
+int32_t RilCallbackTest::DataLinkCapabilityUpdated(
+    const RilRadioResponseInfo &responseInfo, const DataLinkCapability &dataLinkCapability)
+{
+    PrintResponseInfo("DataLinkCapabilityUpdated", responseInfo);
+    cout << "[dataLinkCapability] -->[primaryDownlinkKbps] : " << dataLinkCapability.primaryDownlinkKbps << endl;
+    cout << "[dataLinkCapability] -->[primaryUplinkKbps] : " << dataLinkCapability.primaryUplinkKbps << endl;
+    cout << "[dataLinkCapability] -->[secondaryDownlinkKbps] : " << dataLinkCapability.secondaryDownlinkKbps << endl;
+    cout << "[dataLinkCapability] -->[secondaryUplinkKbps] : " << dataLinkCapability.secondaryUplinkKbps << endl;
+    cout << endl;
+    return 0;
+}
+
 int32_t RilCallbackTest::ActivatePdpContextResponse(
     const RilRadioResponseInfo &responseInfo, const SetupDataCallResultInfo &setupDataCallResultInfo)
 {
@@ -1114,6 +1134,18 @@ int32_t RilCallbackTest::GetLinkBandwidthInfoResponse(
     cout << "[dataLinkBandwidthInfo] -->[ulSambr] : " << dataLinkBandwidthInfo.ulSambr << endl;
     cout << "[dataLinkBandwidthInfo] -->[dlSambr] : " << dataLinkBandwidthInfo.dlSambr << endl;
     cout << "[dataLinkBandwidthInfo] -->[averagingWindow] : " << dataLinkBandwidthInfo.averagingWindow << endl;
+    cout << endl;
+    return 0;
+}
+
+int32_t RilCallbackTest::GetLinkCapabilityResponse(
+    const RilRadioResponseInfo &responseInfo, const DataLinkCapability &dataLinkCapability)
+{
+    PrintResponseInfo("GetLinkCapabilityResponse", responseInfo);
+    cout << "[dataLinkCapability] -->[primaryDownlinkKbps] : " << dataLinkCapability.primaryDownlinkKbps << endl;
+    cout << "[dataLinkCapability] -->[primaryUplinkKbps] : " << dataLinkCapability.primaryUplinkKbps << endl;
+    cout << "[dataLinkCapability] -->[secondaryDownlinkKbps] : " << dataLinkCapability.secondaryDownlinkKbps << endl;
+    cout << "[dataLinkCapability] -->[secondaryUplinkKbps] : " << dataLinkCapability.secondaryUplinkKbps << endl;
     cout << endl;
     return 0;
 }

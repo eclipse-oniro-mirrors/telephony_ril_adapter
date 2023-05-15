@@ -99,6 +99,7 @@ bool TestDataInterface(std::shared_ptr<HRilManager> manager)
     OHOS::HDI::Ril::V1_1::DataProfileDataInfo dataProfileDataInfo;
     EXPECT_NE(HDF_SUCCESS, manager->SetInitApnInfo(0, 0, dataProfileDataInfo));
     EXPECT_NE(HDF_SUCCESS, manager->GetLinkBandwidthInfo(0, 0, 0));
+    EXPECT_NE(HDF_SUCCESS, manager->GetLinkCapability(0, 0));
     OHOS::HDI::Ril::V1_1::DataLinkBandwidthReportingRule dataLinkBandwidthReportingRule;
     EXPECT_NE(HDF_SUCCESS, manager->SetLinkBandwidthReportingRule(0, 0, dataLinkBandwidthReportingRule));
     EXPECT_NE(HDF_SUCCESS, manager->SetDataPermitted(0, 0, 0));
@@ -302,10 +303,12 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Data_002, Function | MediumTest | Lev
     EXPECT_NE(HDF_SUCCESS, data->GetPdpContextListResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, data->SetInitApnInfoResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, data->PdpContextListUpdated(0, HRilErrNumber::HRIL_ERR_NULL_POINT, nullptr, 0));
+    EXPECT_NE(HDF_SUCCESS, data->DataLinkCapabilityUpdated(0, HRilErrNumber::HRIL_ERR_NULL_POINT, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, data->GetLinkBandwidthInfoResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, data->SetLinkBandwidthReportingRuleResponse(0, responseInfo, nullptr, 0));
     EXPECT_EQ(HDF_SUCCESS, data->SetDataProfileInfoResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, data->SetDataPermittedResponse(0, responseInfo, nullptr, 0));
+    EXPECT_NE(HDF_SUCCESS, data->GetLinkCapabilityResponse(0, responseInfo, nullptr, 0));
 }
 
 /**
@@ -341,6 +344,7 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Modem_002, Function | MediumTest | Le
     EXPECT_NE(HDF_SUCCESS, modem->GetBasebandVersionResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, modem->RadioStateUpdated(0, HRilErrNumber::HRIL_ERR_NULL_POINT, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, modem->VoiceRadioTechUpdated(0, HRilErrNumber::HRIL_ERR_NULL_POINT, nullptr, 0));
+    EXPECT_NE(HDF_SUCCESS, modem->DsdsModeUpdated(0, HRilErrNumber::HRIL_ERR_NULL_POINT, nullptr, 0));
 }
 
 /**

@@ -160,10 +160,10 @@ struct DataSleepInfo {
 };
 
 struct DataLinkCapability {
-    int32_t primaryDownlinkKbps;
-    int32_t primaryUplinkKbps;
-    int32_t secondaryDownlinkKbps;
-    int32_t secondaryUplinkKbps;
+    int32_t primaryDownlinkKbps; /* Primary downlink capability in kbps */
+    int32_t primaryUplinkKbps; /* Primary uplink capability in kbps */
+    int32_t secondaryDownlinkKbps; /* Secondary downlink capability in kbps */
+    int32_t secondaryUplinkKbps; /* Secondary uplink capability in kbps */
 };
 } // namespace Telephony
 } // namespace OHOS

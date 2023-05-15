@@ -121,6 +121,7 @@ public:
         int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_1::DataPerformanceInfo &dataPerformanceInfo);
     int32_t SendDataSleepMode(
         int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_1::DataSleepInfo &dataSleepInfo);
+    int32_t GetLinkCapability(int32_t slotId, int32_t serialId);
 
     int32_t SetRadioState(int32_t slotId, int32_t serialId, int32_t fun, int32_t rst);
     int32_t GetRadioState(int32_t slotId, int32_t serialId);

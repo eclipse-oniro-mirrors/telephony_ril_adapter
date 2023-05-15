@@ -143,6 +143,13 @@ typedef struct {
 } HRilDataSleepInfo;
 
 typedef struct {
+    int32_t primaryDownlinkKbps; /* Primary downlink capability in kbps */
+    int32_t primaryUplinkKbps; /* Primary uplink capability in kbps */
+    int32_t secondaryDownlinkKbps; /* Secondary downlink capability in kbps */
+    int32_t secondaryUplinkKbps; /* Secondary uplink capability in kbps */
+} HRilDataLinkCapability;
+
+typedef struct {
     void (*SetInitApnInfo)(const ReqDataInfo *requestInfo, const HRilDataInfo *data);
     void (*ActivatePdpContext)(const ReqDataInfo *requestInfo, const HRilDataInfo *data);
     void (*DeactivatePdpContext)(const ReqDataInfo *requestInfo, const HRilDataInfo *data);

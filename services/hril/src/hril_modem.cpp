@@ -90,6 +90,20 @@ int32_t HRilModem::VoiceRadioTechUpdated(
     return Notify(indType, error, &HDI::Ril::V1_1::IRilCallback::VoiceRadioTechUpdated, voiceRadioTech);
 }
 
+int32_t HRilModem::DsdsModeUpdated(
+    const int32_t indType, const HRilErrNumber error, const void *response, size_t responseLen)
+{
+    if ((response == nullptr && responseLen != 0) || (responseLen % sizeof(int32_t)) != 0) {
+        TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null");
+        return HRIL_ERR_NULL_POINT;
+    }
+    return Notify(indType, error, &HDI::Ril::V1_1::IRilCallback::DsdsModeUpdated, *(const int32_t *)response);
+}
+
 int32_t HRilModem::ShutDownResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
@@ -195,7 +209,7 @@ bool HRilModem::IsModemResponse(uint32_t code)
 
 bool HRilModem::IsModemNotification(uint32_t code)
 {
-    return ((code >= HNOTI_COMMON_BASE) && (code <= HNOTI_MODEM_VOICE_TECH_UPDATED));
+    return ((code >= HNOTI_COMMON_BASE) && (code <= HNOTI_COMMON_END));
 }
 
 bool HRilModem::IsModemRespOrNotify(uint32_t code)
@@ -208,6 +222,7 @@ void HRilModem::AddHandlerToMap()
     // indication
     notiMemberFuncMap_[HNOTI_MODEM_RADIO_STATE_UPDATED] = &HRilModem::RadioStateUpdated;
     notiMemberFuncMap_[HNOTI_MODEM_VOICE_TECH_UPDATED] = &HRilModem::VoiceRadioTechUpdated;
+    notiMemberFuncMap_[HNOTI_MODEM_DSDS_MODE_UPDATED] = &HRilModem::DsdsModeUpdated;
     // response
     respMemberFuncMap_[HREQ_MODEM_SHUT_DOWN] = &HRilModem::ShutDownResponse;
     respMemberFuncMap_[HREQ_MODEM_SET_RADIO_STATUS] = &HRilModem::SetRadioStateResponse;

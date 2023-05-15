@@ -2241,6 +2241,38 @@ HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_SetInitApnInfo_V1_0200, Functi
 }
 
 /**
+ * @tc.number   Telephony_DriverSystem_GetLinkCapability_V1_0100
+ * @tc.name     Get link capability
+ * @tc.desc     Function test
+ */
+HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetLinkCapability_V1_0100, Function | MediumTest | Level3)
+{
+    if (!IsReady(SLOTID_1)) {
+        return;
+    }
+    int32_t ret = g_rilInterface->GetLinkCapability(SLOTID_1, GetSerialId());
+    WaitFor(WAIT_TIME_SECOND);
+    EXPECT_EQ(SUCCESS, ret);
+    ASSERT_TRUE(GetBoolResult(HdiId::HREQ_DATA_GET_LINK_CAPABILITY));
+}
+
+/**
+ * @tc.number   Telephony_DriverSystem_GetLinkCapability_V1_0200
+ * @tc.name     Get link capability
+ * @tc.desc     Function test
+ */
+HWTEST_F(RilInterfaceTest, Telephony_DriverSystem_GetLinkCapability_V1_0200, Function | MediumTest | Level3)
+{
+    if (!IsReady(SLOTID_2)) {
+        return;
+    }
+    int32_t ret = g_rilInterface->GetLinkCapability(SLOTID_2, GetSerialId());
+    WaitFor(WAIT_TIME_SECOND);
+    EXPECT_EQ(SUCCESS, ret);
+    ASSERT_TRUE(GetBoolResult(HdiId::HREQ_DATA_GET_LINK_CAPABILITY));
+}
+
+/**
  * @tc.number   Telephony_DriverSystem_GetLinkBandwidthInfo_V1_0100
  * @tc.name     Get link band width info
  * @tc.desc     Function test
