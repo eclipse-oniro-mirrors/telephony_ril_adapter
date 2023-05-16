@@ -35,4 +35,6 @@ void ReqAddCdmaSimMessage(const ReqDataInfo *requestInfo, const HRilSmsWriteSms 
 void ReqDelCdmaSimMessage(const ReqDataInfo *requestInfo, const int32_t *data, size_t dataLen);
 void ReqUpdateCdmaSimMessage(const ReqDataInfo *requestInfo, const HRilSmsWriteSms *data, size_t dataLen);
 int32_t ProcessCellBroadcast(char *pBuff, HRilCBConfigReportInfo *response);
+bool CheckSimMessageValid(
+    const ReqDataInfo *requestInfo, const HRilSmsWriteSms *data, size_t dataLen, HRilSmsWriteSms *msg);
 #endif // OHOS_AT_SMS_H

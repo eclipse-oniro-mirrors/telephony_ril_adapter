@@ -302,22 +302,14 @@ static void UpdateSimMessage(const ReqDataInfo *requestInfo, const HRilSmsWriteS
     HRilSmsWriteSms *msg = NULL;
     ResponseInfo *responseInfo = NULL;
     struct ReportInfo reportInfo = {0};
-    if (data == NULL) {
-        TELEPHONY_LOGE("data is nullptr");
-        reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
-        OnSmsReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
-        FreeResponseInfo(responseInfo);
+    if (!CheckSimMessageValid(requestInfo, data, dataLen, msg)) {
+        TELEPHONY_LOGE("sim message data error");
         return;
     }
     msg = ((HRilSmsWriteSms *)data);
-    if (msg->smsc == NULL || (strcmp(msg->smsc, "") == 0)) {
-        if (strcpy_s(msg->smsc, strlen("00") + 1, "00") != EOK) {
-            TELEPHONY_LOGE("Set smsc failed");
-            reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
-            OnSmsReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
-            FreeResponseInfo(responseInfo);
-            return;
-        }
+    if (msg == NULL) {
+        TELEPHONY_LOGE("msg is nullptr");
+        return;
     }
     err = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CMGW=%zu,%d", strlen(msg->pdu) / g_cmdLength, msg->state);
     if (err < 0) {
@@ -354,6 +346,31 @@ static void UpdateSimMessage(const ReqDataInfo *requestInfo, const HRilSmsWriteS
     reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
     OnSmsReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
     FreeResponseInfo(responseInfo);
+}
+
+bool CheckSimMessageValid(
+    const ReqDataInfo *requestInfo, const HRilSmsWriteSms *data, size_t dataLen, HRilSmsWriteSms *msg)
+{
+    ResponseInfo *responseInfo = NULL;
+    struct ReportInfo reportInfo = { 0 };
+    if (data == NULL) {
+        TELEPHONY_LOGE("data is nullptr");
+        reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
+        OnSmsReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
+        FreeResponseInfo(responseInfo);
+        return false;
+    }
+    msg = ((HRilSmsWriteSms *)data);
+    if (msg->smsc == NULL || (strcmp(msg->smsc, "") == 0)) {
+        if (strcpy_s(msg->smsc, strlen("00") + 1, "00") != EOK) {
+            TELEPHONY_LOGE("Set smsc failed");
+            reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
+            OnSmsReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
+            FreeResponseInfo(responseInfo);
+            return false;
+        }
+    }
+    return true;
 }
 
 void ReqWriteSimMessage(const ReqDataInfo *requestInfo, const HRilSmsWriteSms *data, size_t dataLen)
