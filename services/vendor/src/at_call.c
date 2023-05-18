@@ -1498,3 +1498,13 @@ void ReqGetCallFailReason(const ReqDataInfo *requestInfo)
     OnCallReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&lastCcCause, sizeof(lastCcCause));
     FreeResponseInfo(pResponse);
 }
+
+void ReqSetVonrSwitch(const ReqDataInfo *requestInfo, int32_t status)
+{
+    int32_t err = HRIL_ERR_SUCCESS;
+    ResponseInfo *pResponse = NULL;
+
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
+    OnCallReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
+    FreeResponseInfo(pResponse);
+}

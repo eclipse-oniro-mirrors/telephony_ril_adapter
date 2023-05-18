@@ -67,6 +67,7 @@ public:
     int32_t CloseUnFinishedUssd(int32_t serialId);
     bool IsCallResponse(uint32_t code);
     bool IsCallNotification(uint32_t code);
+    int32_t SetVonrSwitch(int32_t serialId, int32_t status);
 
     int32_t GetCallListResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
@@ -139,6 +140,8 @@ public:
     int32_t SetBarringPasswordResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t CloseUnFinishedUssdResponse(
+        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t SetVonrSwitchResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
 
     int32_t CallStateUpdated(int32_t notifyType, HRilErrNumber error, const void *response, size_t responseLen);
