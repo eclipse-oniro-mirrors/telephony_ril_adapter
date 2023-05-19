@@ -107,7 +107,8 @@ static void HandleResult(int32_t *err, char *result, const ResponseInfo *respons
 
 void ReqSendGsmSms(const ReqDataInfo *requestInfo, const char *const *data, size_t dataLen)
 {
-    if (data == NULL) {
+    if (data == NULL || dataLen <= 1) {
+        TELEPHONY_LOGE("data error");
         return;
     }
     char *smsc = NULL;
@@ -158,7 +159,8 @@ void ReqSendSmsAck(const ReqDataInfo *requestInfo, const int32_t *data, size_t d
 {
     int32_t ackFlag;
     int32_t err;
-    if (data == NULL) {
+    if (data == NULL || dataLen == 0) {
+        TELEPHONY_LOGE("data error");
         struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_RESPONSE, HRIL_RESPONSE, 0);
         OnSmsReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
         return;
@@ -248,6 +250,7 @@ static void WriteSimMessage(const ReqDataInfo *requestInfo, const HRilSmsWriteSm
 {
     char cmd[MAX_CMD_LENGTH] = {0};
     char smsPdu[MAX_CMD_LENGTH] = {0};
+    char smscArr[MIN_SMSC_LEN + 1] = { 0 };
     int32_t err;
     HRilSmsWriteSms *msg = NULL;
     ResponseInfo *responseInfo = NULL;
@@ -261,6 +264,7 @@ static void WriteSimMessage(const ReqDataInfo *requestInfo, const HRilSmsWriteSm
     }
     msg = ((HRilSmsWriteSms *)data);
     if (msg->smsc == NULL || (strcmp(msg->smsc, "") == 0)) {
+        msg->smsc = smscArr;
         if (strcpy_s(msg->smsc, strlen("00") + 1, "00") != EOK) {
             TELEPHONY_LOGE("Set smsc failed");
             reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
@@ -297,7 +301,7 @@ static void WriteSimMessage(const ReqDataInfo *requestInfo, const HRilSmsWriteSm
 static void UpdateSimMessage(const ReqDataInfo *requestInfo, const HRilSmsWriteSms *data, size_t dataLen)
 {
     char cmd[MAX_CMD_LENGTH] = {0};
-    char smsPdu[MAX_CMD_LENGTH] = {0};
+    char smsPdu[MAX_CMD_LENGTH] = { 0 };
     int32_t err;
     HRilSmsWriteSms *msg = NULL;
     ResponseInfo *responseInfo = NULL;
@@ -311,6 +315,7 @@ static void UpdateSimMessage(const ReqDataInfo *requestInfo, const HRilSmsWriteS
         TELEPHONY_LOGE("msg is nullptr");
         return;
     }
+
     err = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CMGW=%zu,%d", strlen(msg->pdu) / g_cmdLength, msg->state);
     if (err < 0) {
         TELEPHONY_LOGE("GenerateCommand failed, err = %{public}d\n", err);
@@ -353,6 +358,7 @@ bool CheckSimMessageValid(
 {
     ResponseInfo *responseInfo = NULL;
     struct ReportInfo reportInfo = { 0 };
+    char smscArr[MIN_SMSC_LEN + 1] = { 0 };
     if (data == NULL) {
         TELEPHONY_LOGE("data is nullptr");
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
@@ -362,6 +368,7 @@ bool CheckSimMessageValid(
     }
     msg = ((HRilSmsWriteSms *)data);
     if (msg->smsc == NULL || (strcmp(msg->smsc, "") == 0)) {
+        msg->smsc = smscArr;
         if (strcpy_s(msg->smsc, strlen("00") + 1, "00") != EOK) {
             TELEPHONY_LOGE("Set smsc failed");
             reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
@@ -399,7 +406,8 @@ void ReqDelSimMessage(const ReqDataInfo *requestInfo, const int32_t *data, size_
     int32_t index;
     ResponseInfo *responseInfo = NULL;
 
-    if (data == NULL) {
+    if (data == NULL || dataLen == 0) {
+        TELEPHONY_LOGE("data error");
         struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
         OnSmsReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
         FreeResponseInfo(responseInfo);
@@ -715,7 +723,8 @@ void ReqDelCdmaSimMessage(const ReqDataInfo *requestInfo, const int32_t *data, s
     int32_t err;
     int32_t index;
     ResponseInfo *responseInfo = NULL;
-    if (data == NULL) {
+    if (data == NULL || dataLen == 0) {
+        TELEPHONY_LOGE("data error");
         struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
         OnSmsReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
         FreeResponseInfo(responseInfo);
