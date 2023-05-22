@@ -219,6 +219,32 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Call_001, Function | MediumTest | Lev
     std::unique_ptr<HRilCall> call;
     manager->hrilCall_.push_back(std::move(call));
     EXPECT_EQ(true, TestCallInterface(manager));
+    ReqDataInfo *requestInfo = manager->CreateHRilRequest(0, 0, 0);
+    manager->ReleaseHRilRequest(0, requestInfo);
+    manager->RegisterCallFuncs(0, nullptr);
+    manager->RegisterDataFuncs(0, nullptr);
+    manager->RegisterModemFuncs(0, nullptr);
+    manager->RegisterNetworkFuncs(0, nullptr);
+    manager->RegisterSimFuncs(0, nullptr);
+    manager->RegisterSmsFuncs(0, nullptr);
+    manager->ApplyRunningLock();
+    manager->ReleaseRunningLock();
+    manager->OnCallReport(0, nullptr, nullptr, 0);
+    manager->OnDataReport(0, nullptr, nullptr, 0);
+    manager->OnModemReport(0, nullptr, nullptr, 0);
+    manager->OnNetworkReport(0, nullptr, nullptr, 0);
+    manager->OnSimReport(0, nullptr, nullptr, 0);
+    manager->OnSmsReport(0, nullptr, nullptr, 0);
+    HRilRegOps(nullptr);
+    HRilInit();
+    OnTimerCallback(nullptr, nullptr, nullptr);
+    std::shared_ptr<VoiceRadioTechnology> mVoiceRadioTechnology = std::make_shared<VoiceRadioTechnology>();
+    std::shared_ptr<VoiceRadioTechnology> voiceRadioTechnology;
+    voiceRadioTechnology = mVoiceRadioTechnology;
+    EXPECT_EQ(manager->SendRilAck(), 0);
+    manager->hrilCall_.clear();
+    EXPECT_NE(manager->CloseUnFinishedUssd(0, 0), 0);
+    EXPECT_GT(manager->GetMaxSimSlotCount(), 0);
 }
 
 /**
