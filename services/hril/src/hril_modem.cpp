@@ -101,7 +101,8 @@ int32_t HRilModem::DsdsModeUpdated(
         TELEPHONY_LOGE("response is null");
         return HRIL_ERR_NULL_POINT;
     }
-    return Notify(indType, error, &HDI::Ril::V1_1::IRilCallback::DsdsModeUpdated, *(const int32_t *)response);
+    return Notify(
+        indType, error, &HDI::Ril::V1_1::IRilCallback::DsdsModeUpdated, *(static_cast<const int32_t *>(response)));
 }
 
 int32_t HRilModem::ShutDownResponse(
