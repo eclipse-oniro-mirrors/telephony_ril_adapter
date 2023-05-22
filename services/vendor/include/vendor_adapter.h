@@ -18,6 +18,7 @@
 
 #include <stdint.h>
 
+#include "hril.h"
 #include "hril_enum.h"
 
 #define SLEEP_TIME 10
