@@ -100,47 +100,12 @@ struct ModeData {
     std::string pdu = ""; /* Protocol Data Unit */
 };
 
-struct SendSmsResultInfo : public HrilBaseParcel {
+struct SendSmsResultInfo {
     int32_t msgRef = 0; /* TP-Message-Reference for GSM, and BearerData MessageId for CDMA
                          * from 3GPP2 C.S0015-B, v2.0, 4.5-1 */
     std::string pdu = ""; /* Protocol Data Unit */
     int32_t errCode = 0;
     int64_t flag = 0;
-    bool ReadFromParcel(Parcel &parcel)
-    {
-        if (!ReadBaseInt32(parcel, msgRef)) {
-            return false;
-        }
-        if (!ReadBaseString(parcel, pdu)) {
-            return false;
-        }
-        if (!ReadBaseInt32(parcel, errCode)) {
-            return false;
-        }
-        if (!ReadBaseInt64(parcel, flag)) {
-            return false;
-        }
-        return true;
-    }
-
-    bool Marshalling(Parcel &parcel) const
-    {
-        if (!WriteBaseInt32(parcel, msgRef)) {
-            return false;
-        }
-        if (!WriteBaseString(parcel, pdu)) {
-            return false;
-        }
-        if (!WriteBaseInt32(parcel, errCode)) {
-            return false;
-        }
-        if (!WriteBaseInt64(parcel, flag)) {
-            return false;
-        }
-        return true;
-    }
-    std::shared_ptr<SendSmsResultInfo> UnMarshalling(Parcel &parcel);
-    void Dump(std::string, int32_t);
 };
 
 struct CdmaSmsAddress {
