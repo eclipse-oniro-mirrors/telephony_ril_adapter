@@ -61,7 +61,6 @@ int32_t ATStartReadLoop(int32_t fd, OnNotify func)
         TELEPHONY_LOGE("create pthread error code： %{public}d", ret);
         return VENDOR_ERR_PROCESS;
     }
-    pthread_setname_np(g_reader, "ril_reader_loop");
     return VENDOR_SUCCESS;
 }
 
