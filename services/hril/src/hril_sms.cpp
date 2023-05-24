@@ -639,7 +639,7 @@ int32_t HRilSms::RequestWithStrings(int32_t serial, int32_t request, int32_t cou
         i++;
     }
     va_end(list);
-    int32_t result = RequestVendor(serial, request, smsFuncs_, &HRilSmsReq::SendGsmSms, pBuff, 0);
+    int32_t result = RequestVendor(serial, request, smsFuncs_, &HRilSmsReq::SendGsmSms, pBuff, count);
     if (pBuff != nullptr) {
         i = 0;
         while (i < count) {
