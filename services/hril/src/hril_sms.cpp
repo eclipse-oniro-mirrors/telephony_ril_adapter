@@ -119,7 +119,7 @@ int32_t HRilSms::DelSimMessage(int32_t serialId, int32_t index)
     }
     int32_t *pBuff = nullptr;
     RequestWithInts(&pBuff, requestInfo, 1, index);
-    smsFuncs_->DelSimMessage(requestInfo, pBuff, 0);
+    smsFuncs_->DelSimMessage(requestInfo, pBuff, 1);
     if (pBuff != nullptr) {
         SafeFrees(pBuff);
     }
@@ -280,7 +280,7 @@ int32_t HRilSms::DelCdmaSimMessage(int32_t serialId, int32_t index)
     }
     int32_t *pBuff = nullptr;
     RequestWithInts(&pBuff, requestInfo, 1, index);
-    smsFuncs_->DelCdmaSimMessage(requestInfo, pBuff, 0);
+    smsFuncs_->DelCdmaSimMessage(requestInfo, pBuff, 1);
     if (pBuff != nullptr) {
         SafeFrees(pBuff);
     }
