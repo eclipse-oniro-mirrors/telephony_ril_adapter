@@ -27,7 +27,6 @@
 #include "at_sim.h"
 #include "at_sms.h"
 #include "at_support.h"
-#include "hril.h"
 #include "hril_notification.h"
 #include "hril_public_struct.h"
 #include "hril_vendor_call_defs.h"
