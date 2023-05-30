@@ -1144,13 +1144,10 @@ void ReqGetNeighboringCellInfoList(const ReqDataInfo *requestInfo)
     CellInfo *cellInfo = NULL;
     CellInfoList cellInfoList = { 0, NULL };
     int32_t ret = SendCommandLock("AT^MONNC", "^MONNC:", DEFAULT_TIMEOUT, &responseInfo);
-    struct ResponseAck respDataAck = { responseInfo, NULL, 0 };
-    respDataAck.respDataPointer = (uint8_t *)&cellInfoList;
-    respDataAck.respDataLen = sizeof(CellInfoList);
+    struct ResponseAck respDataAck = { responseInfo, (uint8_t *)&cellInfoList, sizeof(CellInfoList) };
     if (responseInfo == NULL) {
         TELEPHONY_LOGE("responseInfo is nullptr");
-        err = HRIL_ERR_INVALID_RESPONSE;
-        ResponseNetworkReport(HRIL_SIM_SLOT_0, requestInfo, err, &respDataAck);
+        ResponseNetworkReport(HRIL_SIM_SLOT_0, requestInfo, HRIL_ERR_INVALID_RESPONSE, &respDataAck);
         return;
     }
     if (ret != 0 || responseInfo->success == 0) {
@@ -1448,9 +1445,7 @@ void ReqGetCurrentCellInfo(const ReqDataInfo *requestInfo)
     CurrentCellInfoVendor *currCellInfo = NULL;
     CurrentCellInfoList currCellInfoList = { 0, NULL };
     int32_t ret = SendCommandLock("AT^MONSC", "^MONSC:", DEFAULT_TIMEOUT, &responseInfo);
-    struct ResponseAck respDataAck = { responseInfo, NULL, 0 };
-    respDataAck.respDataPointer = (uint8_t *)&currCellInfoList;
-    respDataAck.respDataLen = sizeof(CurrentCellInfoList);
+    struct ResponseAck respDataAck = { responseInfo, (uint8_t *)&currCellInfoList, sizeof(CurrentCellInfoList) };
     if (responseInfo == NULL) {
         TELEPHONY_LOGE("AT^MONSC responseInfo is nullptr");
         ResponseNetworkReport(requestInfo->slotId, requestInfo, HRIL_ERR_INVALID_RESPONSE, &respDataAck);
