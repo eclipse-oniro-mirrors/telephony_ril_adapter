@@ -318,7 +318,6 @@ void ReqGetSimIO(const ReqDataInfo *requestInfo, const HRilSimIO *data, size_t d
     }
     if (pSim->pin2 != NULL && strcmp(pSim->pin2, "") != 0 && pSim->fileid == FILEID) {
         ret = ReqGetSimIOFDN(pSim, &pResponse, dataLen);
-        TELEPHONY_LOGE("ReqGetSimIOFDN call over");
         if (ret != HRIL_ERR_SUCCESS || !pResponse->success) {
             TELEPHONY_LOGE("FDN is failed");
             HandlerSimIOResult(pResponse, NULL, requestInfo, pLine, &ret);
@@ -331,9 +330,7 @@ void ReqGetSimIO(const ReqDataInfo *requestInfo, const HRilSimIO *data, size_t d
     char cmd[MAX_CMD_LENGTH] = {0};
     int32_t result = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CRSM=%d,%d,%d,%d,%d,\"%s\",\"%s\"", pSim->command,
         pSim->fileid, pSim->p1, pSim->p2, pSim->p3, ((pSim->data == NULL) ? "" : (pSim->data)), pSim->pathid);
-    if (result <= 0) {
-        TELEPHONY_LOGE("GenerateCommand is failed");
-    }
+    TELEPHONY_LOGI("GenerateCommand result is %{public}d", result);
     ret = SendCommandLock(cmd, "+CRSM", 0, &pResponse);
     if (ret != HRIL_ERR_SUCCESS || pResponse == NULL || !pResponse->success) {
         TELEPHONY_LOGE("send failed dataLen:%{public}zu", dataLen);
@@ -470,10 +467,8 @@ void ReqSetSimLock(const ReqDataInfo *requestInfo, const HRilSimClock *data, siz
     char cmd[MAX_CMD_LENGTH] = {0};
     char *pLine = NULL;
     int32_t ret;
-    HRilSimClock *pSimClck = NULL;
+    HRilSimClock *pSimClck = (HRilSimClock *)data;
     ResponseInfo *pResponse = NULL;
-
-    pSimClck = (HRilSimClock *)data;
     if (pSimClck == NULL) {
         struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_RESPONSE, HRIL_RESPONSE, 0);
         OnSimReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
@@ -482,13 +477,9 @@ void ReqSetSimLock(const ReqDataInfo *requestInfo, const HRilSimClock *data, siz
     }
     int32_t result = GenerateCommand(
         cmd, MAX_CMD_LENGTH, "AT+CLCK=\"%s\",%d,\"%s\"", pSimClck->fac, pSimClck->mode, pSimClck->passwd);
-    if (result <= 0) {
-        TELEPHONY_LOGE("GenerateCommand is failed");
-    }
+    TELEPHONY_LOGI("GenerateCommand result is %{public}d", result);
     ret = SendCommandLock(cmd, "+CLCK", 0, &pResponse);
-    HRilLockStatus lockStatus = {0};
-    lockStatus.result = HRIL_UNLOCK_OTHER_ERR;
-    lockStatus.remain = -1;
+    HRilLockStatus lockStatus = { HRIL_UNLOCK_OTHER_ERR, -1 };
     if (ret != 0 || (pResponse != NULL && !pResponse->success)) {
         TELEPHONY_LOGE("AT+CLCK send failed dataLen:%{public}zu", dataLen);
         if (pResponse && pResponse->result) {
@@ -509,7 +500,6 @@ void ReqSetSimLock(const ReqDataInfo *requestInfo, const HRilSimClock *data, siz
             FreeResponseInfo(pResponse);
         } else {
             ret = HRIL_ERR_GENERIC_FAILURE;
-
             struct ReportInfo reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
             OnSimReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&lockStatus, sizeof(lockStatus));
             FreeResponseInfo(pResponse);
@@ -529,7 +519,6 @@ void ReqChangeSimPassword(const ReqDataInfo *requestInfo, const HRilSimPassword 
     HRilSimPassword *pSimPassword = NULL;
     int32_t ret;
     ResponseInfo *pResponse = NULL;
-
     pSimPassword = (HRilSimPassword *)data;
     if (pSimPassword == NULL) {
         struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_RESPONSE, HRIL_RESPONSE, 0);
@@ -539,13 +528,9 @@ void ReqChangeSimPassword(const ReqDataInfo *requestInfo, const HRilSimPassword 
     }
     int32_t result = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CPWD=\"%s\",\"%s\",\"%s\"", pSimPassword->fac,
         pSimPassword->oldPassword, pSimPassword->newPassword);
-    if (result <= 0) {
-        TELEPHONY_LOGE("GenerateCommand is failed");
-    }
+    TELEPHONY_LOGI("GenerateCommand result is %{public}d", result);
     ret = SendCommandLock(cmd, "+CPWD", 0, &pResponse);
-    HRilLockStatus lockStatus = {0};
-    lockStatus.result = HRIL_UNLOCK_OTHER_ERR;
-    lockStatus.remain = -1;
+    HRilLockStatus lockStatus = { HRIL_UNLOCK_OTHER_ERR, -1 };
     if (ret != 0 || (pResponse != NULL && !pResponse->success)) {
         TELEPHONY_LOGE("AT+CPWD send failed dataLen:%{public}zu", dataLen);
         if (pResponse && pResponse->result) {
