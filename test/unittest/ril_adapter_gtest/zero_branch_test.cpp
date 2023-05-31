@@ -236,11 +236,10 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Call_001, Function | MediumTest | Lev
     manager->OnSimReport(0, nullptr, nullptr, 0);
     manager->OnSmsReport(0, nullptr, nullptr, 0);
     HRilRegOps(nullptr);
-    HRilInit();
+    ReleaseRilAdapter();
     OnTimerCallback(nullptr, nullptr, nullptr);
-    std::shared_ptr<VoiceRadioTechnology> mVoiceRadioTechnology = std::make_shared<VoiceRadioTechnology>();
-    std::shared_ptr<VoiceRadioTechnology> voiceRadioTechnology;
-    voiceRadioTechnology = mVoiceRadioTechnology;
+    VoiceRadioTechnology voiceRadioTechnology;
+    VoiceRadioTechnology test = voiceRadioTechnology;
     EXPECT_EQ(manager->SendRilAck(), 0);
     manager->hrilCall_.clear();
     EXPECT_NE(manager->CloseUnFinishedUssd(0, 0), 0);
