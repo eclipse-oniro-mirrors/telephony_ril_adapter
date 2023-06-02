@@ -19,8 +19,6 @@
 #include "at_support.h"
 #include "hril_vendor_sms_defs.h"
 
-#define MIN_SMSC_LEN 2
-
 void ReqSendGsmSms(const ReqDataInfo *requestInfo, const char *const *data, size_t dataLen);
 void ReqSendSmsAck(const ReqDataInfo *requestInfo, const int32_t *data, size_t dataLen);
 void ReqSendCdmaSms(const ReqDataInfo *requestInfo, const char *data, size_t dataLen);
