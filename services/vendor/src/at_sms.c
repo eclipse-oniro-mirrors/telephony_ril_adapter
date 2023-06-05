@@ -248,9 +248,8 @@ static void SimMessageError(
 
 static void WriteSimMessage(const ReqDataInfo *requestInfo, const HRilSmsWriteSms *data, size_t dataLen)
 {
-    char cmd[MAX_CMD_LENGTH] = {0};
-    char smsPdu[MAX_CMD_LENGTH] = {0};
-    char smscArr[MIN_SMSC_LEN + 1] = { 0 };
+    char cmd[MAX_CMD_LENGTH] = { 0 };
+    char smsPdu[MAX_CMD_LENGTH] = { 0 };
     int32_t err;
     HRilSmsWriteSms *msg = NULL;
     ResponseInfo *responseInfo = NULL;
@@ -264,7 +263,7 @@ static void WriteSimMessage(const ReqDataInfo *requestInfo, const HRilSmsWriteSm
     }
     msg = ((HRilSmsWriteSms *)data);
     if (msg->smsc == NULL || (strcmp(msg->smsc, "") == 0)) {
-        msg->smsc = smscArr;
+        msg->smsc = (char *)malloc(strlen("00") + 1);
         if (strcpy_s(msg->smsc, strlen("00") + 1, "00") != EOK) {
             TELEPHONY_LOGE("Set smsc failed");
             reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
@@ -358,7 +357,6 @@ bool CheckSimMessageValid(
 {
     ResponseInfo *responseInfo = NULL;
     struct ReportInfo reportInfo = { 0 };
-    char smscArr[MIN_SMSC_LEN + 1] = { 0 };
     if (data == NULL) {
         TELEPHONY_LOGE("data is nullptr");
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
@@ -368,7 +366,7 @@ bool CheckSimMessageValid(
     }
     msg = ((HRilSmsWriteSms *)data);
     if (msg->smsc == NULL || (strcmp(msg->smsc, "") == 0)) {
-        msg->smsc = smscArr;
+        msg->smsc = (char *)malloc(strlen("00") + 1);
         if (strcpy_s(msg->smsc, strlen("00") + 1, "00") != EOK) {
             TELEPHONY_LOGE("Set smsc failed");
             reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
