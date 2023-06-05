@@ -92,6 +92,7 @@ static const HRilCallReq g_callReqOps = {
     .SetEmergencyCallList = ReqSetEmergencyCallList,
     .SetBarringPassword = ReqSetBarringPassword,
     .CloseUnFinishedUssd = ReqCloseUnFinishedUssd,
+    .SetVonrSwitch = ReqSetVonrSwitch,
 };
 
 static const HRilSimReq g_simReqOps = {

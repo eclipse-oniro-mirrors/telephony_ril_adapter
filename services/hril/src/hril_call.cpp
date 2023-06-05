@@ -97,6 +97,7 @@ void HRilCall::AddCallResponseToMap()
     respMemberFuncMap_[HREQ_CALL_GET_FAIL_REASON] = &HRilCall::GetCallFailReasonResponse;
     respMemberFuncMap_[HREQ_CALL_SET_BARRING_PASSWORD] = &HRilCall::SetBarringPasswordResponse;
     respMemberFuncMap_[HREQ_CALL_CLOSE_UNFINISHED_USSD] = &HRilCall::CloseUnFinishedUssdResponse;
+    respMemberFuncMap_[HREQ_SET_VONR_SWITCH] = &HRilCall::SetVonrSwitchResponse;
 }
 
 int32_t HRilCall::GetCallList(int32_t serialId)
@@ -307,6 +308,11 @@ int32_t HRilCall::StopDtmf(int32_t serialId, const OHOS::HDI::Ril::V1_1::DtmfInf
 int32_t HRilCall::CloseUnFinishedUssd(int32_t serialId)
 {
     return RequestVendor(serialId, HREQ_CALL_CLOSE_UNFINISHED_USSD, callFuncs_, &HRilCallReq::CloseUnFinishedUssd);
+}
+
+int32_t HRilCall::SetVonrSwitch(int32_t serialId, int32_t status)
+{
+    return RequestVendor(serialId, HREQ_SET_VONR_SWITCH, callFuncs_, &HRilCallReq::SetVonrSwitch, status);
 }
 
 void HRilCall::BuildICallList(
@@ -730,6 +736,12 @@ int32_t HRilCall::CloseUnFinishedUssdResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::CloseUnFinishedUssdResponse);
+}
+
+int32_t HRilCall::SetVonrSwitchResponse(
+    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+{
+    return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::SetVonrSwitchResponse);
 }
 
 int32_t HRilCall::CallStateUpdated(

@@ -72,6 +72,7 @@ void ReqSetEmergencyCallList(const ReqDataInfo *requestInfo, HRilEmergencyInfo *
 void ReqGetCallFailReason(const ReqDataInfo *requestInfo);
 void ReqSetBarringPassword(const ReqDataInfo *requestInfo, HRilSetBarringInfo info);
 void ReqCloseUnFinishedUssd(const ReqDataInfo *requestInfo);
+void ReqSetVonrSwitch(const ReqDataInfo *requestInfo, int32_t status);
 
 void ReportCallStateUpdated(const char *str);
 void ReportSrvccStatusUpdate(const char *str);
