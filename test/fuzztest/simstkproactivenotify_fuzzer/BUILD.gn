@@ -38,7 +38,7 @@ ohos_fuzztest("SimStkProactiveNotifyFuzzTest") {
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libpub_utils",
-    "ipc:ipc_core",
+    "ipc:ipc_single",
     "samgr:samgr_proxy",
   ]
   defines = [

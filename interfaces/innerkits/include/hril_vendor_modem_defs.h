@@ -22,15 +22,45 @@
 extern "C" {
 #endif
 
+/**
+ * @brief Enumerates RIL system service states.
+ */
 typedef struct {
+    /**
+     * System service status
+     */
     HRilSrvStatus srvStatus;
+    /**
+     * System service domain
+     */
     HRilSrvDomain srvDomain;
+    /**
+     * Roaming status
+     */
     HRilRoamStatus roamStatus;
+    /**
+     * SIM card status
+     */
     HRilSimStatus simStatus;
+    /**
+     * SIM card lock status
+     */
     HRilSimLockStatus lockStatus;
+    /**
+     * System mode
+     */
     HRilSysMode sysMode;
+    /**
+     * String corresponding to the system mode
+     */
     char *sysModeName;
+    /**
+     * Radio access technology type. For details, see {@link RilRadioTech}.
+     */
     HRilRadioTech actType;
+    /**
+     * String corresponding to the radio access technology type
+     */
     char *actName;
 } HRilVoiceRadioInfo;
 
