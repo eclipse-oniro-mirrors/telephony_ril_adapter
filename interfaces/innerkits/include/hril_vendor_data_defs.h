@@ -136,7 +136,7 @@ typedef struct {
 
     /**
      * Authentication protocol used for this PDP context.
-     * 0: None. Used to indicate that no authentication protocol is used for this 
+     * 0: None. Used to indicate that no authentication protocol is used for this
      *    PDP context. Username and password are removed if previously specified.
      * 1: PAP
      * 2: CHAP
