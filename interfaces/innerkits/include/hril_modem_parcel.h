@@ -20,25 +20,61 @@
 
 namespace OHOS {
 namespace Telephony {
+/**
+ * @brief Defines the common information.
+ */
 struct UniInfo {
+    /** Request serial number. */
     int32_t serial = 0;
-    int32_t gsmIndex = 0; /* Index of Global System for Mobile Communications */
+
+    /** Index of Global System for Mobile Communications. */
+    int32_t gsmIndex = 0;
+
+    /** Common information ID. */
     bool flag = false;
+
+    /** Parameter 1. */
     int32_t arg1 = 0;
+
+    /** Parameter 2. */
     int32_t arg2 = 0;
+
+    /** Temporary string. */
     std::string strTmp = "";
 };
 
+/**
+ * @brief Defines the radio access technology of the CS domain.
+ */
 struct VoiceRadioTechnology {
+    /** System service status. */
     HRilSrvStatus srvStatus = HRilSrvStatus::HRIL_NO_SRV_SERVICE;
+
+    /** System service domain. */
     HRilSrvDomain srvDomain = HRilSrvDomain::HRIL_NO_DOMAIN_SERVICE;
+
+    /** Roaming status. */
     HRilRoamStatus roamStatus = HRilRoamStatus::HRIL_ROAM_UNKNOWN;
+
+    /** Sim card status. */
     HRilSimStatus simStatus = HRilSimStatus::HRIL_USIM_INVALID;
+
+    /** Sim card lock status. */
     HRilSimLockStatus lockStatus = HRilSimLockStatus::HRIL_SIM_CARD_UNLOCK;
+
+    /** System mode. */
     HRilSysMode sysMode = HRilSysMode::HRIL_NO_SYSMODE_SERVICE;
+
+    /** String corresponding to the system mode. */
     std::string sysModeName = "";
+
+    /** Radio access technology type. For details, see {@link RilRadioTech}. */
     HRilRadioTech actType = HRilRadioTech::RADIO_TECHNOLOGY_UNKNOWN;
+
+    /** String corresponding to the radio access technology type. */
     std::string actName = "";
+
+    /** Radio access technology ID. */
     int64_t flag = 0;
 
     VoiceRadioTechnology() = default;

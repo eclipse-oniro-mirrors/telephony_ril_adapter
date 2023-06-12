@@ -24,130 +24,311 @@
 extern "C" {
 #endif
 
-/* Form 3GPP TS 27.007 V4.3.0 (2001-12) 8.18, + CRSM */
+/**
+ * @brief Defines the SIM data request information.
+ *
+ * Form 3GPP TS 27.007 V4.3.0 (2001-12) 8.18, + CRSM
+ */
 typedef struct {
-    int32_t command; /* command passed on by the MT to the SIM; refer 3GPP TS 51.011 [28]
-                      * 176 READ BINARY
-                      * 178 READ RECORD
-                      * 192 GET RESPONSE
-                      * 214 UPDATE BINARY
-                      * 220 UPDATE RECORD
-                      * 242 STATUS
-                      * 203 RETRIEVE DATA
-                      * 219 SET DATA
-                      */
-    int32_t fileid; /* this is the identifier of an elementary datafile on SIM.
-                     * Mandatory for every command except STATUS. */
-    int32_t p1; /* parameters passed on by the MT to the SIM. These parameters are mandatory for every command,
-                 * except GET RESPONSE and STATUS. The values are described in 3GPP TS 51.011 [28]. */
-    int32_t p2; /* parameters passed on by the MT to the SIM. These parameters are mandatory for every command,
-                 * except GET RESPONSE and STATUS. The values are described in 3GPP TS 51.011 [28]. */
-    int32_t p3; /* parameters passed on by the MT to the SIM. These parameters are mandatory for every command,
-                 * except GET RESPONSE and STATUS. The values are described in 3GPP TS 51.011 [28]. */
-    char *data; /* information which shall be written to the SIM (hexadecimal character format; refer +CSCS). */
-    char *pathid; /* contains the path of an elementary file on the SIM/UICC in hexadecimal format
-                   * as defined in ETSI TS 102 221 [60] (e.g. "7F205F70" in SIM and UICC case).
-                   * The <pathid> shall only be used in the mode "select by path from MF"
-                   * as defined in ETSI TS 102 221 [60]. */
+    /**
+     * Command passed on by the MT to the SIM; refer 3GPP TS 51.011 [28]
+     * 176 READ BINARY
+     * 178 READ RECORD
+     * 192 GET RESPONSE
+     * 214 UPDATE BINARY
+     * 220 UPDATE RECORD
+     * 242 STATUS
+     * 203 RETRIEVE DATA
+     * 219 SET DATA
+     */
+    int32_t command;
+    /**
+     * This is the identifier of an elementary datafile on SIM.
+     * Mandatory for every command except STATUS.
+     */
+    int32_t fileid;
+    /**
+     * Parameters passed on by the MT to the SIM. These parameters are mandatory for every command,
+     * except GET RESPONSE and STATUS. The values are described in 3GPP TS 51.011 [28].
+     */
+    int32_t p1;
+    /**
+     * Parameters passed on by the MT to the SIM. These parameters are mandatory for every command,
+     * except GET RESPONSE and STATUS. The values are described in 3GPP TS 51.011 [28].
+     */
+    int32_t p2;
+    /**
+     * Parameters passed on by the MT to the SIM. These parameters are mandatory for every command,
+     * except GET RESPONSE and STATUS. The values are described in 3GPP TS 51.011 [28].
+     */
+    int32_t p3;
+    /**
+     *  Information which shall be written to the SIM (hexadecimal character format; refer +CSCS).
+     */
+    char *data;
+    /**
+     * Contains the path of an elementary file on the SIM/UICC in hexadecimal format
+     * as defined in ETSI TS 102 221 [60] (e.g. "7F205F70" in SIM and UICC case).
+     * The <pathid> shall only be used in the mode "select by path from MF"
+     * as defined in ETSI TS 102 221 [60].
+     */
+    char *pathid;
+    /**
+     * PIN2
+     */
     char *pin2;
 } HRilSimIO;
 
-/* Form TS 27.007.8.18 +CRSM */
+/**
+ * @brief Defines the response to the SIM data request.
+ *
+ * Form TS 27.007.8.18 +CRSM
+ */
 typedef struct {
-    int32_t sw1; /* information from the SIM about the execution of the actual command.
-                  * These parameters are delivered to the TE in both cases,
-                  * on successful or failed execution of the command. */
-    int32_t sw2; /* information from the SIM about the execution of the actual command.
-                  * These parameters are delivered to the TE in both cases,
-                  * on successful or failed execution of the command. */
-    char *response; /* response of a successful completion of the command previously issued
-                     * (hexadecimal character format; refer +CSCS). STATUS and GET RESPONSE return data,
-                     * which gives information about the current elementary datafield.This information
-                     * includes the type of file and its size (refer 3GPP TS 51.011 [28]). After READ BINARY,
-                     * READ RECORD or RETRIEVE DATA command the requested data will be returned.
-                     * <response> is not returned after a successful UPDATE BINARY,
-                     * UPDATE RECORD or SET DATA command */
+    /**
+     * Information from the SIM about the execution of the actual command.
+     * These parameters are delivered to the TE in both cases,
+     * on successful or failed execution of the command.
+     */
+    int32_t sw1;
+    /**
+     * Information from the SIM about the execution of the actual command.
+     * These parameters are delivered to the TE in both cases,
+     * on successful or failed execution of the command.
+     */
+    int32_t sw2;
+    /**
+     * Response of a successful completion of the command previously issued
+     * (hexadecimal character format; refer +CSCS). STATUS and GET RESPONSE return data,
+     * which gives information about the current elementary datafield.This information
+     * includes the type of file and its size (refer 3GPP TS 51.011 [28]). After READ BINARY,
+     * READ RECORD or RETRIEVE DATA command the requested data will be returned.
+     * <response> is not returned after a successful UPDATE BINARY,
+     * UPDATE RECORD or SET DATA command
+     */
+    char *response;
 } HRilSimIOResponse;
 
+/**
+ * @brief Defines the response to the request for enabling the logical channel of the APDU.
+ */
 typedef struct {
-    int32_t sw1; /* information from the SIM about the execution of the actual command.
-                  * These parameters are delivered to the TE in both cases,
-                  * on successful or failed execution of the command. */
-    int32_t sw2; /* information from the SIM about the execution of the actual command.
-                  * These parameters are delivered to the TE in both cases,
-                  * on successful or failed execution of the command. */
+    /**
+     * Information from the SIM about the execution of the actual command.
+     * These parameters are delivered to the TE in both cases,
+     * on successful or failed execution of the command.
+     */
+    int32_t sw1;
+    /**
+     * Information from the SIM about the execution of the actual command.
+     * These parameters are delivered to the TE in both cases,
+     * on successful or failed execution of the command.
+     */
+    int32_t sw2;
+    /**
+     * ID of the opened logical channel
+     */
     int32_t channelId;
+    /**
+     * Response information
+     */
     char *response;
 } HRilOpenLogicalChannelResponse;
 
+/**
+ * @brief Defines the SIM card status information.
+ */
 typedef struct {
-    int32_t index; /* sim index */
+    /**
+     * SIM card index
+     */
+    int32_t index;
+    /**
+     * SIM card type:
+     */
     HRilSimType simType;
+    /**
+     * SIM card status:
+     */
     HRilSimState simState;
 } HRilCardState;
 
+/**
+ * @brief Defines the lock status information.
+ */
 typedef struct {
+    /**
+     * Query result. For details, see {@link RilErrType}.
+     */
     int32_t result;
+    /**
+     * Number of remaining attempts
+     */
     int32_t remain;
 } HRilLockStatus;
 
-/* From 3GPP TS 27.007 7.4 */
+/**
+ * @brief Defines the SIM card lock information.
+ *
+ * From 3GPP TS 27.007 7.4
+ */
 typedef struct {
-    char *fac; /* ("SC","AO","OI","OX","AI","IR","AB","AG","AC","FD","PN","PU","PP") */
-    int32_t mode; /* 0 unlock
-                   * 1 lock
-                   * 2 query status */
-    int32_t status; /* 0 not active
-                     * 1 active */
-    char *passwd; /* shall be the same as password specified for the facility
-                   * from the MT user interface or with command Change Password +CPWD */
-    int32_t classx; /* is a sum of integers each representing a class of information (default 7 - voice, data and
-                     * fax): 1 voice (telephony) 2 data (refers to all bearer services; with <mode>=2 this may refer
-                     * only to some bearer service if TA does not support values 16, 32, 64 and 128) 4 fax (facsimile
-                     * services) 8 short message service 16 data circuit sync 32 data circuit async 64
-                     * dedicated packet access 128 dedicated PAD access  */
+    /**
+     * ("SC","AO","OI","OX","AI","IR","AB","AG","AC","FD","PN","PU","PP")
+     */
+    char *fac;
+    /**
+     * 0 unlock
+     * 1 lock
+     * 2 query status
+     */
+    int32_t mode;
+    /**
+     * 0 not active
+     * 1 active
+     */
+    int32_t status;
+    /**
+     * Shall be the same as password specified for the facility
+     * from the MT user interface or with command Change Password +CPWD
+     */
+    char *passwd;
+    /**
+     * Is a sum of integers each representing a class of information (default 7 - voice, data and
+     * fax): 1 voice (telephony) 2 data (refers to all bearer services; with <mode>=2 this may refer
+     * only to some bearer service if TA does not support values 16, 32, 64 and 128) 4 fax (facsimile
+     * services) 8 short message service 16 data circuit sync 32 data circuit async 64
+     * dedicated packet access 128 dedicated PAD access
+     */
+    int32_t classx;
 } HRilSimClock;
 
-/* From 3GPP TS 27.007 7.5 */
+/**
+ * @brief Defines the SIM card password information.
+ *
+ * From 3GPP TS 27.007 7.5
+ */
 typedef struct {
-    char *fac; /* ("SC","AO","OI","OX","AI","IR","AB","AG","AC","FD","PN","PU","PP") */
-    char *oldPassword; /* <oldPassword> shall be the same as password specified for the facility from the MT
-                        * user interface or with command Change Password +CPWD and <newPassword> is the new
-                        * password; maximum length of password can be determined with <passwordLength> */
+    /**
+     * ("SC","AO","OI","OX","AI","IR","AB","AG","AC","FD","PN","PU","PP")
+     */
+    char *fac;
+    /**
+     *  <oldPassword> shall be the same as password specified for the facility from the MT
+     * user interface or with command Change Password +CPWD and <newPassword> is the new
+     * password
+     */
+    char *oldPassword;
     char *newPassword;
-    int32_t passwordLength; /* maximum length of the password for the facility */
+    /**
+     * Maximum length of the password for the facility
+     */
+    int32_t passwordLength;
 } HRilSimPassword;
 
+/**
+ * @brief Defines the maximum number of SIM password attempts.
+ */
 typedef struct {
     char *code;
+    /**
+     * Number of remaining password attempts
+     */
     int32_t times;
+    /**
+     * Number of remaining PUK attempts
+     */
     int32_t pukTimes;
+    /**
+     * Number of remaining PIN attempts
+     */
     int32_t pinTimes;
+    /**
+     * Number of remaining PUK2 attempts
+     */
     int32_t puk2Times;
+    /**
+     * Number of remaining PIN2 attempts
+     */
     int32_t pin2Times;
 } HRilPinInputTimes;
 
+/**
+ * @brief Enumerates radio protocol phases.
+ */
 typedef struct {
+    /**
+     * Session ID
+     */
     int32_t sessionId;
+    /**
+     * Radio protocol parameters.
+     */
     HRilRadioProtocolPhase phase;
+    /**
+     * Radio protocol technology:
+     */
     int32_t technology;
+    /**
+     * Modem ID, corresponding to slotId at the bottom layer
+     */
     int32_t modemId;
+    /**
+     * Radio protocol status.
+     */
     HRilRadioProtocolStatus status;
 } HRilRadioProtocol;
 
+/**
+ * @brief Defines the APDU data transmission request information.
+ */
 typedef struct {
+    /**
+     * Channel ID
+     */
     int32_t channelId;
+    /**
+     * APDU instruction type. For details, see ETSI 102 221 [55].
+     */
     int32_t type;
+    /**
+     * APDU instruction. For details, see ETSI 102 221 [55].
+     */
     int32_t instruction;
+    /**
+     * Command parameter 1 of the SIM data request. For details, see 3GPP TS 51.011[28].
+     */
     int32_t p1;
+    /**
+     * Command parameter 2 of the SIM data request. For details, see 3GPP TS 51.011[28].
+     */
     int32_t p2;
+    /**
+     * Command parameter 3 of the SIM data request. For details, see 3GPP TS 51.011[28].
+     * If p3 is a negative value, a 4-byte APDU is sent to the SIM card.
+     */
     int32_t p3;
+    /**
+     * Data to be transmitted
+     */
     char *data;
 } HRilApduSimIO;
 
+/**
+ * @brief Defines the SIM card authentication request information.
+ */
 typedef struct {
+    /**
+     * Request SN
+     */
     int32_t serial;
+    /**
+     * App ID
+     */
     char *aid;
+    /**
+     * Authentication data
+     */
     char *data;
 } HRilSimAuthenticationRequestInfo;
 

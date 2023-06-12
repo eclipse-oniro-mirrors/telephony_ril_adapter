@@ -61,6 +61,6 @@ ohos_shared_library("hril_innerkits") {
   }
   relative_install_dir = "chipset-pub-sdk"
 
-  part_name = "drivers_interface_ril"
+  part_name = "ril_adapter"
   subsystem_name = "telephony"
 }
