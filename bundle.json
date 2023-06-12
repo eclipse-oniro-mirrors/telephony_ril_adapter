@@ -37,8 +37,8 @@
                 "ipc"
             ],
             "third_party": [
-                "jsoncpp",
-                "thirdparty_eudev"
+                "eudev",
+                "jsoncpp"
             ]
         },
         "build": {
