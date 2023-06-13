@@ -1288,5 +1288,37 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_CloseUnFinishedUssd_V1_0200, Functi
     EXPECT_EQ(SUCCESS, ret);
     ASSERT_TRUE(RilTestUtil::GetBoolResult(HdiId::HREQ_CALL_CLOSE_UNFINISHED_USSD));
 }
+
+/**
+ * @tc.number   Telephony_DriverSystem_SetVonrSwitch_V1_0100
+ * @tc.name     Set vonr switch
+ * @tc.desc     Function test
+ */
+HWTEST_F(RilCallTest, Telephony_DriverSystem_SetVonrSwitch_V1_0100, Function | MediumTest | Level3)
+{
+    if (!RilTestUtil::IsReady(SLOTID_1)) {
+        return;
+    }
+    int32_t ret = g_rilInterface->SetVonrSwitch(SLOTID_1, RilTestUtil::GetSerialId(), 0);
+    RilTestUtil::WaitFor(WAIT_TIME_SECOND);
+    EXPECT_EQ(SUCCESS, ret);
+    ASSERT_TRUE(RilTestUtil::GetBoolResult(HdiId::HREQ_SET_VONR_SWITCH));
+}
+
+/**
+ * @tc.number   Telephony_DriverSystem_SetVonrSwitch_V1_0200
+ * @tc.name     Set vonr switch
+ * @tc.desc     Function test
+ */
+HWTEST_F(RilCallTest, Telephony_DriverSystem_SetVonrSwitch_V1_0200, Function | MediumTest | Level3)
+{
+    if (!RilTestUtil::IsReady(SLOTID_2)) {
+        return;
+    }
+    int32_t ret = g_rilInterface->SetVonrSwitch(SLOTID_2, RilTestUtil::GetSerialId(), 0);
+    RilTestUtil::WaitFor(WAIT_TIME_SECOND);
+    EXPECT_EQ(SUCCESS, ret);
+    ASSERT_TRUE(RilTestUtil::GetBoolResult(HdiId::HREQ_SET_VONR_SWITCH));
+}
 } // namespace Telephony
 } // namespace OHOS

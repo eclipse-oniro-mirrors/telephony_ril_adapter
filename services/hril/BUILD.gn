@@ -34,6 +34,8 @@ ohos_shared_library("hril") {
     "$RIL_HRIL/hril_timer_callback.cpp",
   ]
 
+  version_script = "$RIL_ADAPTER/services/hril/libhril.versionscript"
+
   public_configs = [ ":ril_hril_config" ]
 
   configs = [ "$RIL_ADAPTER/utils:utils_config" ]

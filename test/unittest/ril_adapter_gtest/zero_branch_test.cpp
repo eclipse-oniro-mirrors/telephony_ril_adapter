@@ -86,6 +86,7 @@ bool TestCallInterface(std::shared_ptr<HRilManager> manager)
     EXPECT_NE(HDF_SUCCESS, manager->StopDtmf(0, 0, info));
     const OHOS::HDI::Ril::V1_1::SetBarringInfo setBarringInfo;
     EXPECT_NE(HDF_SUCCESS, manager->SetBarringPassword(0, 0, setBarringInfo));
+    EXPECT_NE(HDF_SUCCESS, manager->SetVonrSwitch(0, 0, 0));
     return true;
 }
 
@@ -300,6 +301,7 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Call_002, Function | MediumTest | Lev
     EXPECT_NE(HDF_SUCCESS, call->CallEmergencyNotice(0, HRilErrNumber::HRIL_ERR_NULL_POINT, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, call->CallSsNotice(0, HRilErrNumber::HRIL_ERR_NULL_POINT, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, call->CallRsrvccStatusNotify(0, HRilErrNumber::HRIL_ERR_NULL_POINT, nullptr, 0));
+    EXPECT_NE(HDF_SUCCESS, call->SetVonrSwitchResponse(0, responseInfo, nullptr, 1));
 }
 
 /**

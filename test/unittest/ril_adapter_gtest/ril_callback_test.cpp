@@ -1106,6 +1106,15 @@ int32_t RilCallbackTest::CloseUnFinishedUssdResponse(const RilRadioResponseInfo 
     return 0;
 }
 
+int32_t RilCallbackTest::SetVonrSwitchResponse(const RilRadioResponseInfo &responseInfo)
+{
+    TELEPHONY_LOGI("GetBoolResult SetVonrSwitchResponse");
+    hdiId_ = HdiId::HREQ_SET_VONR_SWITCH;
+    resultInfo_ = responseInfo;
+    NotifyAll();
+    return 0;
+}
+
 /**
  * modem
  **/

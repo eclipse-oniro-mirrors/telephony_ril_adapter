@@ -23,6 +23,8 @@ config("ril_hril_hdf_config") {
 ohos_shared_library("hril_hdf") {
   sources = [ "$HRIL_HDF_ROOT/src/hril_hdf.c" ]
 
+  version_script = "$HRIL_HDF_ROOT/libhril_hdf.versionscript"
+
   public_configs = [ ":ril_hril_hdf_config" ]
 
   configs = [ "$RIL_ADAPTER/utils:utils_config" ]

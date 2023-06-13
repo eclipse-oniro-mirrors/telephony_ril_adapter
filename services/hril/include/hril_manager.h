@@ -103,6 +103,7 @@ public:
     int32_t SetBarringPassword(
         int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_1::SetBarringInfo &setBarringInfo);
     int32_t CloseUnFinishedUssd(int32_t slotId, int32_t serialId);
+    int32_t SetVonrSwitch(int32_t slotId, int32_t serialId, int32_t status);
 
     // Data
     int32_t ActivatePdpContext(

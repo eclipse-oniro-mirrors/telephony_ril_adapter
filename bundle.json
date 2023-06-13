@@ -34,8 +34,7 @@
                 "hilog",
                 "hiviewdfx_hilog_native",
                 "init",
-                "ipc",
-                "samgr"
+                "ipc"
             ],
             "third_party": [
                 "eudev",
@@ -57,36 +56,9 @@
             },
             "inner_kits": [
                 {
-                    "type": "so",
-                    "name": "//base/telephony/ril_adapter/interfaces/innerkits:hril_innerkits",
-                    "header": {
-                        "header_files": [
-                            "hril_types.h",
-                            "hril_sms_parcel.h",
-                            "hril_sim_parcel.h",
-                            "hril_request.h",
-                            "hril_notification.h",
-                            "hril_network_parcel.h",
-                            "hril_modem_parcel.h",
-                            "hril_data_parcel.h",
-                            "hril_call_parcel.h",
-                            "hril.h",
-                            "hril_vendor_call_defs.h",
-                            "hril_vendor_data_defs.h",
-                            "hril_vendor_modem_defs.h",
-                            "hril_vendor_network_defs.h",
-                            "hril_vendor_sim_defs.h",
-                            "hril_vendor_sms_defs.h"
-                        ],
-                        "header_base": "//base/telephony/ril_adapter/interfaces/innerkits/include"
-                    }
-                },
-                {
                     "header": {
                         "header_base" : "//base/telephony/ril_adapter/services/hril_hdf/include",
-                        "header_files": [
-                            "hril_hdf.h"
-                        ]
+                        "header_files": []
                     },
                     "name":"//base/telephony/ril_adapter/services/hril_hdf:hril_hdf"
                 }
@@ -94,9 +66,7 @@
                 {
                     "header": {
                         "header_base" : "//base/telephony/ril_adapter/services/hril/include",
-                        "header_files": [
-                            "hril_manager.h"
-                        ]
+                        "header_files": []
                     },
                     "name":"//base/telephony/ril_adapter/services/hril:hril"
                 }

@@ -939,6 +939,12 @@ int32_t RilCallbackTest::CloseUnFinishedUssdResponse(const RilRadioResponseInfo 
     return 0;
 }
 
+int32_t RilCallbackTest::SetVonrSwitchResponse(const RilRadioResponseInfo &responseInfo)
+{
+    PrintResponseInfo("SetVonrSwitchResponse", responseInfo);
+    return 0;
+}
+
 /**
  * modem
  **/

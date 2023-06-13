@@ -23,55 +23,143 @@
 extern "C" {
 #endif
 
+/**
+ * @brief Defines the SMS response.
+ */
 typedef struct {
-    int32_t msgRef; /* TP-Message-Reference for GSM, and BearerData MessageId for CDMA
-                     * from 3GPP2 C.S0015-B, v2.0, 4.5-1 */
-    char *pdu; /* Protocol Data Unit */
-    int32_t errCode; /* if unknown or not applicable, that is -1
-                      * from 3GPP 27.005, 3.2.5 for GSM/UMTS,
-                      * 3GPP2 N.S0005 (IS-41C) Table 171 for CDMA */
+    /**
+     * TP-Message-Reference for GSM, and BearerData MessageId for CDMA
+     * from 3GPP2 C.S0015-B, v2.0, 4.5-1
+     */
+    int32_t msgRef;
+    /**
+      *Protocol Data Unit
+      */
+    char *pdu;
+    /**
+     * if unknown or not applicable, that is -1
+     * from 3GPP 27.005, 3.2.5 for GSM/UMTS,
+     * 3GPP2 N.S0005 (IS-41C) Table 171 for CDMA
+     */
+    int32_t errCode;
 } HRilSmsResponse;
 
+/**
+ * @brief Defines the SMS message information in a SIM card.
+ */
 typedef struct {
+    /**
+     * Number index
+     */
     int32_t index;
+    /**
+     * Status
+     */
     int32_t state;
+    /**
+     * Short message service center
+     */
     char *smsc;
-    char *pdu; /* Protocol Data Unit */
+    /**
+     * Protocol Data Unit
+     */
+    char *pdu;
 } HRilSmsWriteSms;
 
+/**
+ * @brief Defines the SMSC address information.
+ */
 typedef struct {
+    /**
+     * SMSC address type. For details, see 3GPP TS 24.011 [6].
+     */
     int32_t tosca;
+    /**
+     * SMSC address. For details, see 3GPP TS 24.011 [6].
+     */
     char *address;
 } HRilServiceCenterAddress;
 
-/* From 3GPP TS 27.005  AT+CSCB=[<mode>[,<mids>[,<dcss>]]] */
+/**
+ * @brief Defines the GSM cell broadcast configuration information.
+ *
+ * From 3GPP TS 27.005  AT+CSCB=[<mode>[,<mids>[,<dcss>]]]
+ */
 typedef struct {
+    /**
+     * Mode (activated or not)
+     */
     int32_t mode;
+    /**
+     * Message IDs
+     */
     char *mids;
+    /**
+     * Data coding schemes
+     */
     char *dcss;
 } HRilCBConfigInfo;
 
+/**
+ * @brief Defines the CDMA cell broadcast configuration information.
+ */
 typedef struct {
+    /**
+     * Service
+     */
     int32_t service;
+    /**
+     * Language
+     */
     int32_t language;
+    /**
+     * Selected or not
+     */
     unsigned char checked;
 } HRilCdmaCBConfigInfo;
 
-/* From 3GPP TS 27.005   if text mode (+CMGF=1):
-    <CR><LF>+CBM:
-    <sn>,<mid>,<dcs>,<page>,<pages><CR><LF><data><CR>
-    <LF> if PDU mode
-    (+CMGF=0):
-    <CR><LF>+CBM: <length><CR><LF><pdu><CR><LF>
-*/
+/**
+ * @brief Defines the cell broadcast report information.
+ *
+ * From 3GPP TS 27.005   if text mode (+CMGF=1):
+ * <CR><LF>+CBM:
+ * <sn>,<mid>,<dcs>,<page>,<pages><CR><LF><data><CR>
+ * <LF> if PDU mode
+ * (+CMGF=0):
+ * <CR><LF>+CBM: <length><CR><LF><pdu><CR><LF>
+ */
 typedef struct {
+    /**
+     * Cell broadcast SN
+     */
     int32_t sn;
+    /**
+     * Message IDs
+     */
     int32_t mid;
+    /**
+     * Cell broadcast page number
+     */
     int32_t page;
+    /**
+     * Total number of cell broadcast pages
+     */
     int32_t pages;
+    /**
+     * Data coding schemes
+     */
     char *dcs;
+    /**
+     * Decoded cell broadcast content
+     */
     char *data;
+    /**
+     * Number of PDU bytes
+     */
     int32_t length;
+    /**
+     * Protocol data unit
+     */
     char *pdu;
 } HRilCBConfigReportInfo;
 
