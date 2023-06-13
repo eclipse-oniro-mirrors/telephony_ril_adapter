@@ -355,13 +355,10 @@ static void UpdateSimMessage(const ReqDataInfo *requestInfo, const HRilSmsWriteS
 bool CheckSimMessageValid(
     const ReqDataInfo *requestInfo, const HRilSmsWriteSms *data, size_t dataLen, HRilSmsWriteSms *msg)
 {
-    ResponseInfo *responseInfo = NULL;
-    struct ReportInfo reportInfo = { 0 };
     if (data == NULL) {
         TELEPHONY_LOGE("data is nullptr");
-        reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
+        ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
         OnSmsReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
-        FreeResponseInfo(responseInfo);
         return false;
     }
     msg = ((HRilSmsWriteSms *)data);
@@ -369,9 +366,8 @@ bool CheckSimMessageValid(
         msg->smsc = (char *)malloc(strlen("00") + 1);
         if (strcpy_s(msg->smsc, strlen("00") + 1, "00") != EOK) {
             TELEPHONY_LOGE("Set smsc failed");
-            reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
+            ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
             OnSmsReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
-            FreeResponseInfo(responseInfo);
             return false;
         }
     }
