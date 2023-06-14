@@ -442,13 +442,17 @@ int32_t HRilNetwork::SetNrOptionModeResponse(
 int32_t HRilNetwork::GetNrOptionModeResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
+    int32_t nrOptionMode = 0;
     if (response == nullptr || responseLen != sizeof(int32_t)) {
         TELEPHONY_LOGE("GetNrOptionModeResponse response is invalid");
-        return HRIL_ERR_INVALID_PARAMETER;
+        if (responseInfo.error == HRilErrType::NONE) {
+            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
+        }
+    } else {
+        nrOptionMode = *(static_cast<const int32_t *>(response));
+        TELEPHONY_LOGI("GetNrOptionModeResponse nrOptionMode: %{public}d", nrOptionMode);
     }
-    int32_t *mode = static_cast<int32_t *>(const_cast<void *>(response));
-    TELEPHONY_LOGI("GetNrOptionModeResponse mode: %{public}d", *mode);
-    return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::GetNrOptionModeResponse, *mode);
+    return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::GetNrOptionModeResponse, nrOptionMode);
 }
 
 int32_t HRilNetwork::GetRrcConnectionStateResponse(
