@@ -458,7 +458,7 @@ int32_t HRilNetwork::GetNrOptionModeResponse(
 int32_t HRilNetwork::GetRrcConnectionStateResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    int32_t rrcConnectionState = 0; // idle state
+    int32_t rrcConnectionState = 0;
     if (response == nullptr || responseLen != sizeof(int32_t)) {
         TELEPHONY_LOGE("GetRrcConnectionStateResponse response is invalid");
         if (responseInfo.error == HRilErrType::NONE) {
@@ -554,7 +554,7 @@ int32_t HRilNetwork::NetworkTimeZoneUpdated(
 int32_t HRilNetwork::NetworkPhyChnlCfgUpdated(
     int32_t indType, const HRilErrNumber error, const void *response, size_t responseLen)
 {
-    if (response == nullptr || responseLen != sizeof(HRilRegStatusInfo)) {
+    if (response == nullptr || responseLen != sizeof(HRilChannelConfigList)) {
         TELEPHONY_LOGE("NetworkPhyChnlCfgUpdated response is invalid");
         return HRIL_ERR_INVALID_PARAMETER;
     }
