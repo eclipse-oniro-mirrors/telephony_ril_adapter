@@ -623,6 +623,28 @@ int32_t RilCallbackTest::SetDeviceStateResponse(const RilRadioResponseInfo &resp
     return 0;
 }
 
+int32_t RilCallbackTest::SetNrOptionModeResponse(const RilRadioResponseInfo &responseInfo)
+{
+    PrintResponseInfo("SetNrOptionModeResponse", responseInfo);
+    return 0;
+}
+
+int32_t RilCallbackTest::GetNrOptionModeResponse(const RilRadioResponseInfo &responseInfo, int32_t mode)
+{
+    PrintResponseInfo("GetNrOptionModeResponse", responseInfo);
+    cout << "[mode] : " << mode << endl;
+    cout << endl;
+    return 0;
+}
+
+int32_t RilCallbackTest::GetRrcConnectionStateResponse(
+    const RilRadioResponseInfo &responseInfo, int32_t rrcConnectionState)
+{
+    PrintResponseInfo("GetRrcConnectionStateResponse", responseInfo);
+    cout << "rrcConnectionState : " << rrcConnectionState << endl;
+    return 0;
+}
+
 // Call
 int32_t RilCallbackTest::CallEmergencyNotice(
     const RilRadioResponseInfo &responseInfo, const EmergencyInfoList &emergencyInfoList)
@@ -974,6 +996,14 @@ int32_t RilCallbackTest::SetRadioStateResponse(const RilRadioResponseInfo &respo
 int32_t RilCallbackTest::GetRadioStateResponse(const RilRadioResponseInfo &responseInfo, int32_t state)
 {
     PrintResponseInfo("GetRadioStateResponse", responseInfo);
+    cout << "[state] : " << state << endl;
+    cout << endl;
+    return 0;
+}
+
+int32_t RilCallbackTest::GetRrcConnectionStateUpdated(const RilRadioResponseInfo &responseInfo, int32_t state)
+{
+    PrintResponseInfo("GetRrcConnectionStateUpdated", responseInfo);
     cout << "[state] : " << state << endl;
     cout << endl;
     return 0;

@@ -702,6 +702,34 @@ int32_t RilCallbackTest::SetDeviceStateResponse(const RilRadioResponseInfo &resp
     return 0;
 }
 
+int32_t RilCallbackTest::SetNrOptionModeResponse(const RilRadioResponseInfo &responseInfo)
+{
+    TELEPHONY_LOGI("RilCallbackTest::SetNrOptionModeResponse error:%{public}d", responseInfo.error);
+    hdiId_ = HdiId::HREQ_NETWORK_SET_NR_OPTION_MODE;
+    resultInfo_ = responseInfo;
+    NotifyAll();
+    return 0;
+}
+
+int32_t RilCallbackTest::GetNrOptionModeResponse(const RilRadioResponseInfo &responseInfo, const int32_t mode)
+{
+    TELEPHONY_LOGI("RilCallbackTest::GetNrOptionModeResponse mode:%{public}d", mode);
+    hdiId_ = HdiId::HREQ_NETWORK_GET_NR_OPTION_MODE;
+    resultInfo_ = responseInfo;
+    NotifyAll();
+    return 0;
+}
+
+int32_t RilCallbackTest::GetRrcConnectionStateResponse(
+    const RilRadioResponseInfo &responseInfo, int32_t rrcConnectionState)
+{
+    TELEPHONY_LOGI("RilCallbackTest::GetRrcConnectionStateResponse rrcConnectionState:%{public}d", rrcConnectionState);
+    hdiId_ = HdiId::HREQ_NETWORK_GET_RRC_CONNECTION_STATE;
+    resultInfo_ = responseInfo;
+    NotifyAll();
+    return 0;
+}
+
 // Call
 int32_t RilCallbackTest::CallEmergencyNotice(
     const RilRadioResponseInfo &responseInfo, const EmergencyInfoList &emergencyInfoList)
@@ -1183,6 +1211,12 @@ int32_t RilCallbackTest::GetBasebandVersionResponse(
     hdiId_ = HdiId::HREQ_MODEM_GET_BASEBAND_VERSION;
     resultInfo_ = responseInfo;
     NotifyAll();
+    return 0;
+}
+
+int32_t RilCallbackTest::GetRrcConnectionStateUpdated(const RilRadioResponseInfo &responseInfo, int32_t state)
+{
+    TELEPHONY_LOGI("GetRrcConnectionStateUpdated state : %{public}d", state);
     return 0;
 }
 

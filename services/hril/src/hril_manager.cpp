@@ -840,6 +840,21 @@ int32_t HRilManager::SetDeviceState(int32_t slotId, int32_t serialId, int32_t de
         deviceStateType, deviceStateOn);
 }
 
+int32_t HRilManager::SetNrOptionMode(int32_t slotId, int32_t serialId, int32_t mode)
+{
+    return TaskSchedule(MODULE_HRIL_NETWORK, hrilNetwork_[slotId], &HRilNetwork::SetNrOptionMode, serialId, mode);
+}
+
+int32_t HRilManager::GetNrOptionMode(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(MODULE_HRIL_NETWORK, hrilNetwork_[slotId], &HRilNetwork::GetNrOptionMode, serialId);
+}
+
+int32_t HRilManager::GetRrcConnectionState(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(MODULE_HRIL_NETWORK, hrilNetwork_[slotId], &HRilNetwork::GetRrcConnectionState, serialId);
+}
+
 // Sms
 int32_t HRilManager::SendGsmSms(
     int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_1::GsmSmsMessageInfo &gsmSmsMessageInfo)
