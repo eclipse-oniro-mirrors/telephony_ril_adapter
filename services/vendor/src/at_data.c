@@ -565,10 +565,9 @@ static void InquirePdpContextList(int32_t cid, const ReqDataInfo *requestInfo)
     int32_t queryCount = 0;
     int32_t dataCallNum = 0;
     HRilDataCallResponse *pDataCalls = NULL;
-    ModemReportErrorInfo errInfo = {};
 
     do {
-        errInfo = SendInquireCGACT(&dataCallNum, &pDataCalls);
+        ModemReportErrorInfo errInfo = SendInquireCGACT(&dataCallNum, &pDataCalls);
         if (errInfo.errorNo != HRIL_ERR_SUCCESS) {
             TELEPHONY_LOGE("SendInquireCGACT send failed");
             OnDataReportErrorMessages(requestInfo, errInfo.errorNo, NULL);
@@ -583,9 +582,12 @@ static void InquirePdpContextList(int32_t cid, const ReqDataInfo *requestInfo)
                 break;
             }
         }
-    } while ((cid != DEFAULT_CID) && (errInfo.errorNo != HRIL_ERR_SUCCESS) && (queryCount < QUERY_MAX_COUNT));
+        if (errInfo.errorNo == HRIL_ERR_SUCCESS) {
+            break;
+        }
+    } while ((cid != DEFAULT_CID) && (queryCount < QUERY_MAX_COUNT));
 
-    errInfo = SendInquireCGDCONT(&validNum, dataCallNum, &pDataCalls);
+    ModemReportErrorInfo errInfo = SendInquireCGDCONT(&validNum, dataCallNum, &pDataCalls);
     if (errInfo.errorNo != HRIL_ERR_SUCCESS) {
         TELEPHONY_LOGE("SendInquireCGDCONT send failed");
         OnDataReportErrorMessages(requestInfo, errInfo.errorNo, NULL);

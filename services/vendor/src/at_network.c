@@ -656,7 +656,6 @@ void GetNetworkSearchInformationPause(void)
 void PerformTimeOut(int32_t sigFlag)
 {
     if (SIGALRM == sigFlag) {
-        pthread_mutex_lock(&g_networkSearchInformationMutex);
         bool sendFlag = GetAtPauseFlag();
         TELEPHONY_LOGD("enter to [%{public}s]:%{public}d", __func__, __LINE__);
         if (sendFlag) {
@@ -671,7 +670,6 @@ void PerformTimeOut(int32_t sigFlag)
             }
             TELEPHONY_LOGI("ReqGetNetworkSearchInformation response timeout!");
         }
-        pthread_mutex_unlock(&g_networkSearchInformationMutex);
     }
     return;
 }
