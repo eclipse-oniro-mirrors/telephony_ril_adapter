@@ -20,7 +20,16 @@ namespace OHOS {
 namespace Telephony {
 using namespace OHOS::HDI::Ril::V1_1;
 using namespace testing::ext;
-void RILNetworkTest::SetUpTestCase() {}
+namespace {
+sptr<IRil> g_rilInterface = nullptr;
+}
+
+void RILNetworkTest::SetUpTestCase()
+{
+    TELEPHONY_LOGI("----------RilCallTest gtest start ------------");
+    RilTestUtil::GetInstance().Init();
+    g_rilInterface = RilTestUtil::GetRilInterface();
+}
 
 void RILNetworkTest::TearDownTestCase() {}
 

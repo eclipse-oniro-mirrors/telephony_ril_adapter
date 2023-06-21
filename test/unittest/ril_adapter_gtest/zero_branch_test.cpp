@@ -29,6 +29,11 @@
 namespace OHOS {
 namespace Telephony {
 using namespace testing::ext;
+namespace {
+constexpr int32_t WAIT_TELEPHONY_RETART_TIME = 60;
+constexpr int32_t MAX_BUF_SIZE = 255;
+}
+
 class BranchTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -38,7 +43,26 @@ public:
 };
 void BranchTest::SetUpTestCase() {}
 
-void BranchTest::TearDownTestCase() {}
+void ReStartTelephony()
+{
+    FILE *fp;
+    char buf[MAX_BUF_SIZE];
+    std::string cmd = "pidof telephony";
+    pid_t pid = -1;
+    if ((fp = popen(cmd.c_str(), "r")) != nullptr) {
+        if (fgets(buf, MAX_BUF_SIZE, fp) != nullptr) {
+            pid = atoi(buf);
+        }
+    }
+    kill(pid, SIGKILL);
+    pclose(fp);
+    sleep(WAIT_TELEPHONY_RETART_TIME);
+}
+
+void BranchTest::TearDownTestCase()
+{
+    ReStartTelephony();
+}
 
 void BranchTest::SetUp() {}
 
