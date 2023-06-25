@@ -20,13 +20,54 @@ namespace OHOS {
 namespace Telephony {
 using namespace OHOS::HDI::Ril::V1_1;
 using namespace testing::ext;
-void RILSimTest::SetUpTestCase() {}
+namespace {
+sptr<IRil> g_rilInterface = nullptr;
+}
+
+void RILSimTest::SetUpTestCase()
+{
+    TELEPHONY_LOGI("----------RilCallTest gtest start ------------");
+    RilTestUtil::GetInstance().Init();
+    g_rilInterface = RilTestUtil::GetRilInterface();
+}
 
 void RILSimTest::TearDownTestCase() {}
 
 void RILSimTest::SetUp() {}
 
 void RILSimTest::TearDown() {}
+
+/**
+ * @tc.number   Telephony_DriverSystem_GetSimStatus_V1_0100
+ * @tc.name     Get sim status
+ * @tc.desc     Function test
+ */
+HWTEST_F(RILSimTest, Telephony_DriverSystem_GetSimStatus_V1_0100, Function | MediumTest | Level2)
+{
+    if (g_rilInterface == nullptr || !RilTestUtil::HasVoiceCapability() || !RilTestUtil::IsValidSlotId(SLOTID_1)) {
+        return;
+    }
+    int32_t ret = g_rilInterface->GetSimStatus(SLOTID_1, RilTestUtil::GetSerialId());
+    RilTestUtil::WaitFor(WAIT_TIME_SECOND);
+    EXPECT_EQ(SUCCESS, ret);
+    ASSERT_TRUE(RilTestUtil::GetBoolResult(HdiId::HREQ_SIM_GET_SIM_STATUS));
+}
+
+/**
+ * @tc.number   Telephony_DriverSystem_GetSimStatus_V1_0200
+ * @tc.name     Get sim status
+ * @tc.desc     Function test
+ */
+HWTEST_F(RILSimTest, Telephony_DriverSystem_GetSimStatus_V1_0200, Function | MediumTest | Level2)
+{
+    if (g_rilInterface == nullptr || !RilTestUtil::HasVoiceCapability() || !RilTestUtil::IsValidSlotId(SLOTID_2)) {
+        return;
+    }
+    int32_t ret = g_rilInterface->GetSimStatus(SLOTID_2, RilTestUtil::GetSerialId());
+    RilTestUtil::WaitFor(WAIT_TIME_SECOND);
+    EXPECT_EQ(SUCCESS, ret);
+    ASSERT_TRUE(RilTestUtil::GetBoolResult(HdiId::HREQ_SIM_GET_SIM_STATUS));
+}
 
 /**
  * @tc.number   Telephony_DriverSystem_GetSimIO_V1_0100
@@ -346,7 +387,7 @@ HWTEST_F(RILSimTest, Telephony_DriverSystem_SimTransmitApduLogicalChannel_V1_010
         return;
     }
     ApduSimIORequestInfo reqInfo;
-    reqInfo.channelId = g_callback.GetCurrentChannelId();
+    reqInfo.channelId = RilTestUtil::GetCallback()->GetCurrentChannelId();
     reqInfo.type = 0x80; // CLA
     reqInfo.instruction = 0xCA; // COMMAND;
     reqInfo.p1 = 0xFF;
@@ -369,8 +410,8 @@ HWTEST_F(RILSimTest, Telephony_DriverSystem_SimCloseLogicalChannel_V1_0100, Func
     if (!RilTestUtil::IsReady(SLOTID_1)) {
         return;
     }
-    int32_t ret = g_rilInterface->SimCloseLogicalChannel(SLOTID_1, RilTestUtil::GetSerialId(),
-        g_callback.GetCurrentChannelId());
+    int32_t ret = g_rilInterface->SimCloseLogicalChannel(
+        SLOTID_1, RilTestUtil::GetSerialId(), RilTestUtil::GetCallback()->GetCurrentChannelId());
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
     ASSERT_TRUE(RilTestUtil::GetBoolResult(HdiId::HREQ_SIM_CLOSE_LOGICAL_CHANNEL));
@@ -405,7 +446,7 @@ HWTEST_F(RILSimTest, Telephony_DriverSystem_SimTransmitApduLogicalChannel_V1_020
         return;
     }
     ApduSimIORequestInfo reqInfo;
-    reqInfo.channelId = g_callback.GetCurrentChannelId();
+    reqInfo.channelId = RilTestUtil::GetCallback()->GetCurrentChannelId();
     reqInfo.type = 0x80; // CLA
     reqInfo.instruction = 0xCA; // COMMAND;
     reqInfo.p1 = 0xFF;
@@ -428,8 +469,8 @@ HWTEST_F(RILSimTest, Telephony_DriverSystem_SimCloseLogicalChannel_V1_0200, Func
     if (!RilTestUtil::IsReady(SLOTID_2)) {
         return;
     }
-    int32_t ret = g_rilInterface->SimCloseLogicalChannel(SLOTID_2, RilTestUtil::GetSerialId(),
-        g_callback.GetCurrentChannelId());
+    int32_t ret = g_rilInterface->SimCloseLogicalChannel(
+        SLOTID_2, RilTestUtil::GetSerialId(), RilTestUtil::GetCallback()->GetCurrentChannelId());
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
     ASSERT_TRUE(RilTestUtil::GetBoolResult(HdiId::HREQ_SIM_CLOSE_LOGICAL_CHANNEL));

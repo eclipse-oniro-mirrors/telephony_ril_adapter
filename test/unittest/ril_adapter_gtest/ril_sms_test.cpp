@@ -20,7 +20,16 @@ namespace OHOS {
 namespace Telephony {
 using namespace OHOS::HDI::Ril::V1_1;
 using namespace testing::ext;
-void RILSmsTest::SetUpTestCase() {}
+namespace {
+sptr<IRil> g_rilInterface = nullptr;
+}
+
+void RILSmsTest::SetUpTestCase()
+{
+    TELEPHONY_LOGI("----------RilCallTest gtest start ------------");
+    RilTestUtil::GetInstance().Init();
+    g_rilInterface = RilTestUtil::GetRilInterface();
+}
 
 void RILSmsTest::TearDownTestCase() {}
 
@@ -303,7 +312,7 @@ HWTEST_F(RILSmsTest, Telephony_DriverSystem_SetSmscAddr_V1_0100, Function | Medi
         return;
     }
     ServiceCenterAddress address;
-    address.address = g_callback.GetSmscAddr();
+    address.address = RilTestUtil::GetCallback()->GetSmscAddr();
     address.tosca = TEST_TOSCA;
     int32_t ret = g_rilInterface->SetSmscAddr(SLOTID_1, RilTestUtil::GetSerialId(), address);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND_LONG);
@@ -322,7 +331,7 @@ HWTEST_F(RILSmsTest, Telephony_DriverSystem_SetSmscAddr_V1_0200, Function | Medi
         return;
     }
     ServiceCenterAddress address;
-    address.address = g_callback.GetSmscAddr();
+    address.address = RilTestUtil::GetCallback()->GetSmscAddr();
     address.tosca = TEST_TOSCA;
     int32_t ret = g_rilInterface->SetSmscAddr(SLOTID_2, RilTestUtil::GetSerialId(), address);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND_LONG);

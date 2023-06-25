@@ -286,6 +286,7 @@ int32_t SendCommandSmsLock(
     err = SendCommandNoLock(command, timeout, outResponse);
     pthread_mutex_unlock(&g_commandmutex);
     TELEPHONY_LOGD("err = %{public}d", err);
+    g_smsPdu = NULL;
     // when timeout to process
     if (err == AT_ERR_TIMEOUT && g_onTimeout != NULL) {
         g_onTimeout();

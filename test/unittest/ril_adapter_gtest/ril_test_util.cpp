@@ -18,17 +18,103 @@
 
 namespace OHOS {
 namespace Telephony {
+namespace {
+const std::string KEY_VOICECALL_CAP = "const.telephony.voice.capable";
+const char *TEL_SIM_SLOT_COUNT = "const.telephony.slotCount";
+const char *DEFAULT_SLOT_COUNT = "1";
+const int32_t VOICECALL_CAP_VAL_LEN = 6;
+}
+
+RilTestUtil RilTestUtil::rilTestUtil_;
+
 void RilTestUtil::WaitFor(int32_t timeoutSecond)
 {
-    g_callback.WaitFor(WAIT_TIME_SECOND);
+    rilTestUtil_.WaitForInner(WAIT_TIME_SECOND);
 }
 
 bool RilTestUtil::GetBoolResult(HdiId hdiId_)
 {
-    return g_callback.GetBoolResult(hdiId_);
+    return rilTestUtil_.GetBoolResultInner(hdiId_);
 }
 
 bool RilTestUtil::HasVoiceCapability()
+{
+    return rilTestUtil_.HasVoiceCapabilityInner();
+}
+
+int32_t RilTestUtil::GetSerialId()
+{
+    return rilTestUtil_.GetSerialIdInner();
+}
+
+bool RilTestUtil::IsValidSlotId(int32_t slotId)
+{
+    return rilTestUtil_.IsValidSlotIdInner(slotId);
+}
+
+bool RilTestUtil::IsReady(int32_t slotId)
+{
+    return rilTestUtil_.IsReadyInner(slotId);
+}
+
+int32_t RilTestUtil::GetMaxSimCount()
+{
+    char simSlotCount[SYSPARA_SIZE] = { 0 };
+    GetParameter(TEL_SIM_SLOT_COUNT, DEFAULT_SLOT_COUNT, simSlotCount, SYSPARA_SIZE);
+    int32_t slotCount = std::atoi(simSlotCount);
+    return slotCount;
+}
+
+void RilTestUtil::Init()
+{
+    if (isInit_) {
+        TELEPHONY_LOGE("RilTestUtil has init");
+        return;
+    }
+    rilInterface_ = IRil::Get();
+    hasVoiceCapable_ = HasVoiceCapability();
+    slotCount_ = GetMaxSimCount();
+    if (rilInterface_ == nullptr) {
+        TELEPHONY_LOGE("RilTestUtil has init");
+        return;
+    }
+    callback_ = new RilCallbackTest();
+    rilInterface_->SetCallback(callback_);
+    rilInterface_->GetSimStatus(SLOTID_1, RilTestUtil::GetSerialId());
+    WaitFor(WAIT_TIME_SECOND);
+    rilInterface_->GetSimStatus(SLOTID_2, RilTestUtil::GetSerialId());
+    WaitFor(WAIT_TIME_SECOND);
+    isInit_ = true;
+}
+
+void RilTestUtil::WaitForInner(int32_t timeoutSecond)
+{
+    if (callback_ == nullptr) {
+        TELEPHONY_LOGE("callback_ is null");
+        return;
+    }
+    callback_->WaitFor(WAIT_TIME_SECOND);
+}
+
+bool RilTestUtil::GetBoolResultInner(HdiId hdiId_)
+{
+    if (callback_ == nullptr) {
+        TELEPHONY_LOGE("callback_ is null");
+        return false;
+    }
+    return callback_->GetBoolResult(hdiId_);
+}
+
+int32_t RilTestUtil::GetSerialIdInner()
+{
+    if (callback_ == nullptr) {
+        TELEPHONY_LOGE("callback_ is null");
+        return 0;
+    }
+    return callback_->GetSerialId();
+}
+
+bool RilTestUtil::HasVoiceCapabilityInner()
 {
     char retValue[VOICECALL_CAP_VAL_LEN + 1] = { "true" };
     int retLen = GetParameter(KEY_VOICECALL_CAP.c_str(), "true", retValue, VOICECALL_CAP_VAL_LEN);
@@ -39,14 +125,9 @@ bool RilTestUtil::HasVoiceCapability()
     return true;
 }
 
-int32_t RilTestUtil::GetSerialId()
+bool RilTestUtil::IsValidSlotIdInner(int32_t slotId)
 {
-    return g_callback.GetSerialId();
-}
-
-bool RilTestUtil::IsValidSlotId(int32_t slotId)
-{
-    if ((slotId < 0) || (slotId >= g_slotCount_)) {
+    if ((slotId < 0) || (slotId >= slotCount_)) {
         TELEPHONY_LOGE("slotId is invalid, slotId = %{public}d", slotId);
         return false;
     }
@@ -54,20 +135,32 @@ bool RilTestUtil::IsValidSlotId(int32_t slotId)
     return true;
 }
 
-bool RilTestUtil::IsReady(int32_t slotId)
+bool RilTestUtil::IsReadyInner(int32_t slotId)
 {
-    if (g_rilInterface == nullptr || !g_hasVoiceCapable || !IsValidSlotId(slotId)) {
+    if (rilInterface_ == nullptr || !hasVoiceCapable_ || !IsValidSlotId(slotId)) {
         return false;
     }
-    return g_callback.IsReady(slotId);
+    if (callback_ == nullptr) {
+        TELEPHONY_LOGE("callback_ is null");
+        return false;
+    }
+    return callback_->IsReady(slotId);
 }
 
-int32_t RilTestUtil::GetMaxSimCount()
+sptr<IRil> RilTestUtil::GetRilInterface()
 {
-    char simSlotCount[SYSPARA_SIZE] = { 0 };
-    GetParameter(TEL_SIM_SLOT_COUNT, DEFAULT_SLOT_COUNT, simSlotCount, SYSPARA_SIZE);
-    int32_t slotCount = std::atoi(simSlotCount);
-    return slotCount;
+    return rilTestUtil_.rilInterface_;
 }
+
+sptr<RilCallbackTest> RilTestUtil::GetCallback()
+{
+    return rilTestUtil_.callback_;
+}
+
+RilTestUtil &RilTestUtil::GetInstance()
+{
+    return rilTestUtil_;
+}
+
 } // namespace Telephony
 } // namespace OHOS

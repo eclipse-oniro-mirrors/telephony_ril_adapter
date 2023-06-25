@@ -35,27 +35,39 @@ inline const int32_t MAX_DOWNLINK_LINK_BANDWIDTH[] = { 100, // VoIP
     100000,
     200000, // 5G
     500000, 1000000 };
-inline const std::string KEY_VOICECALL_CAP = "const.telephony.voice.capable";
-inline const char *TEL_SIM_SLOT_COUNT = "const.telephony.slotCount";
-inline const char *DEFAULT_SLOT_COUNT = "1";
-inline const int32_t VOICECALL_CAP_VAL_LEN = 6;
 inline const int32_t SYSPARA_SIZE = 128;
 inline const int32_t SIM_AUTH_EAP_AKA_TYPE = 129;
 inline const int32_t NR_OPTION_NSA_ONLY = 1;
-inline int g_slotCount_;
-inline bool g_hasVoiceCapable = true;
-inline sptr<IRil> g_rilInterface = nullptr;
-inline RilCallbackTest g_callback;
 
 class RilTestUtil {
 public:
     static void WaitFor(int32_t timeoutSecond);
     static bool GetBoolResult(HdiId hdiId_);
-    static bool HasVoiceCapability();
     static int32_t GetSerialId();
     static bool IsValidSlotId(int32_t slotId);
+    static bool HasVoiceCapability();
     static bool IsReady(int32_t slotId);
-    static int32_t GetMaxSimCount();
+    static RilTestUtil &GetInstance();
+    static sptr<IRil> GetRilInterface();
+    static sptr<RilCallbackTest> GetCallback();
+    void Init();
+
+private:
+    void WaitForInner(int32_t timeoutSecond);
+    bool GetBoolResultInner(HdiId hdiId_);
+    bool IsValidSlotIdInner(int32_t slotId);
+    bool HasVoiceCapabilityInner();
+    int32_t GetSerialIdInner();
+    bool IsReadyInner(int32_t slotId);
+    int32_t GetMaxSimCount();
+
+private:
+    int slotCount_;
+    bool hasVoiceCapable_ = true;
+    sptr<IRil> rilInterface_ = nullptr;
+    sptr<RilCallbackTest> callback_;
+    bool isInit_ = false;
+    static RilTestUtil rilTestUtil_;
 };
 
 } // namespace Telephony
