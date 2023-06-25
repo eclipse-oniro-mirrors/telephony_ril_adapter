@@ -630,6 +630,11 @@ struct PreferredNetworkTypeInfo {
     int64_t flag = 0;
 };
 
+struct NrModeInfo {
+    int32_t nrMode = 0;
+    int64_t flag = 0;
+};
+
 struct SsbIdInfo {
     /** SSB index. */
     int32_t ssbId;
