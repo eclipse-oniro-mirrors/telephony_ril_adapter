@@ -364,8 +364,6 @@ typedef struct {
 
     /** NR cell ID. */
     int64_t nci;
-    int32_t rsrp;
-    int32_t rsrq;
 } CellRatNr;
 
 /**
