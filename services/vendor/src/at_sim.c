@@ -278,8 +278,14 @@ static int32_t ReqGetSimIOFDN(HRilSimIO *pSim, ResponseInfo **ppResponse, size_t
 static void HandlerSimIOResult(ResponseInfo *pResponse, HRilSimIOResponse *simResponse,
     const ReqDataInfo *requestInfo, char *pLine, int32_t *ret)
 {
-    if (pResponse == NULL || ret == NULL) {
+    if (ret == NULL) {
+        TELEPHONY_LOGE("ret is NULL");
+        return;
+    }
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, *ret, HRIL_RESPONSE, 0);
+    if (pResponse == NULL) {
         TELEPHONY_LOGE("pResponse is NULL");
+        OnSimReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
         return;
     }
 
@@ -292,7 +298,6 @@ static void HandlerSimIOResult(ResponseInfo *pResponse, HRilSimIOResponse *simRe
             *ret = HRIL_ERR_GENERIC_FAILURE;
         }
     }
-    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, *ret, HRIL_RESPONSE, 0);
     if (simResponse == NULL) {
         TELEPHONY_LOGE("simResponse is NULL");
         OnSimReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
