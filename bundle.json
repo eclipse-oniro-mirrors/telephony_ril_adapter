@@ -32,7 +32,6 @@
                 "drivers_interface_ril",
                 "hdf_core",
                 "hilog",
-                "hiviewdfx_hilog_native",
                 "init",
                 "ipc"
             ],

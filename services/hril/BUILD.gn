@@ -56,15 +56,10 @@ ohos_shared_library("hril") {
     "drivers_interface_ril:ril_idl_headers",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
+    "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",
   ]
-
-  if (is_standard_system) {
-    external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
-  } else {
-    external_deps += [ "hilog:libhilog" ]
-  }
 
   install_images = [ chipset_base_dir ]
   part_name = "ril_adapter"

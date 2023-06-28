@@ -37,6 +37,7 @@ ohos_shared_library("hril_hdf") {
   external_deps = [
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_utils",
+    "hilog:libhilog",
     "init:libbegetutil",
   ]
 
@@ -44,11 +45,6 @@ ohos_shared_library("hril_hdf") {
     "LOG_TAG = \"HrilHdf\"",
     "LOG_DOMAIN = 0xD001F08",
   ]
-  if (is_standard_system) {
-    external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
-  } else {
-    external_deps += [ "hilog:libhilog" ]
-  }
 
   install_images = [ chipset_base_dir ]
   part_name = "ril_adapter"

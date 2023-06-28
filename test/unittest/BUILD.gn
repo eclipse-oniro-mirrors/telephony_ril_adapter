@@ -33,7 +33,7 @@ ohos_executable("ril_adapter_test") {
       "c_utils:utils",
       "drivers_interface_ril:libril_proxy_1.1",
       "hdf_core:libhdf_utils",
-      "hiviewdfx_hilog_native:libhilog",
+      "hilog:libhilog",
       "ipc:ipc_single",
     ]
   } else {
