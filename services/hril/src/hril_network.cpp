@@ -39,8 +39,8 @@ void HRilNetwork::AddHandlerToMap()
     notiMemberFuncMap_[HNOTI_NETWORK_TIME_ZONE_UPDATED] = &HRilNetwork::NetworkTimeZoneUpdated;
     notiMemberFuncMap_[HNOTI_NETWORK_PS_REG_STATUS_UPDATED] = &HRilNetwork::NetworkPsRegStatusUpdated;
     notiMemberFuncMap_[HNOTI_NETWORK_PHY_CHNL_CFG_UPDATED] = &HRilNetwork::NetworkPhyChnlCfgUpdated;
-    notiMemberFuncMap_[HNOTI_NETWORK_RRC_CONNECTION_STATE_UPDATED] = &HRilNetwork::GetRrcConnectionStateUpdated;
     notiMemberFuncMap_[HNOTI_NETWORK_CURRENT_CELL_UPDATED] = &HRilNetwork::NetworkCurrentCellUpdated_1_1;
+    notiMemberFuncMap_[HNOTI_NETWORK_RRC_CONNECTION_STATE_UPDATED] = &HRilNetwork::GetRrcConnectionStateUpdated;
 
     // Response
     respMemberFuncMap_[HREQ_NETWORK_GET_SIGNAL_STRENGTH] = &HRilNetwork::GetSignalStrengthResponse;
@@ -834,43 +834,50 @@ void HRilNetwork::FillCellInfoType(
 void HRilNetwork::FillCellInformationType(
     HDI::Ril::V1_1::CurrentCellInfo_1_1 &cellInfo, const CurrentCellInfoVendor *hrilCellInfoVendor)
 {
-    if (hrilCellInfoVendor->ratType == NETWORK_TYPE_WCDMA) {
-        cellInfo.serviceCells.wcdma.arfcn = hrilCellInfoVendor->ServiceCellParas.wcdma.arfcn;
-        cellInfo.serviceCells.wcdma.cellId = hrilCellInfoVendor->ServiceCellParas.wcdma.cellId;
-        cellInfo.serviceCells.wcdma.psc = hrilCellInfoVendor->ServiceCellParas.wcdma.psc;
-        cellInfo.serviceCells.wcdma.lac = hrilCellInfoVendor->ServiceCellParas.wcdma.lac;
-        cellInfo.serviceCells.wcdma.rxlev = hrilCellInfoVendor->ServiceCellParas.wcdma.rxlev;
-        cellInfo.serviceCells.wcdma.rscp = hrilCellInfoVendor->ServiceCellParas.wcdma.rscp;
-        cellInfo.serviceCells.wcdma.ecno = hrilCellInfoVendor->ServiceCellParas.wcdma.ecno;
-        cellInfo.serviceCells.wcdma.ura = hrilCellInfoVendor->ServiceCellParas.wcdma.ura;
-        cellInfo.serviceCells.wcdma.drx = hrilCellInfoVendor->ServiceCellParas.wcdma.drx;
-    } else if (hrilCellInfoVendor->ratType == NETWORK_TYPE_CDMA) {
-        cellInfo.serviceCells.cdma.systemId = hrilCellInfoVendor->ServiceCellParas.cdma.systemId;
-        cellInfo.serviceCells.cdma.networkId = hrilCellInfoVendor->ServiceCellParas.cdma.networkId;
-        cellInfo.serviceCells.cdma.baseId = hrilCellInfoVendor->ServiceCellParas.cdma.baseId;
-        cellInfo.serviceCells.cdma.zoneId = hrilCellInfoVendor->ServiceCellParas.cdma.zoneId;
-        cellInfo.serviceCells.cdma.pilotPn = hrilCellInfoVendor->ServiceCellParas.cdma.pilotPn;
-        cellInfo.serviceCells.cdma.pilotStrength = hrilCellInfoVendor->ServiceCellParas.cdma.pilotStrength;
-        cellInfo.serviceCells.cdma.channel = hrilCellInfoVendor->ServiceCellParas.cdma.channel;
-        cellInfo.serviceCells.cdma.longitude = hrilCellInfoVendor->ServiceCellParas.cdma.longitude;
-        cellInfo.serviceCells.cdma.latitude = hrilCellInfoVendor->ServiceCellParas.cdma.latitude;
-    } else if (hrilCellInfoVendor->ratType == NETWORK_TYPE_TDSCDMA) {
-        cellInfo.serviceCells.tdscdma.arfcn = hrilCellInfoVendor->ServiceCellParas.tdscdma.arfcn;
-        cellInfo.serviceCells.tdscdma.syncId = hrilCellInfoVendor->ServiceCellParas.tdscdma.syncId;
-        cellInfo.serviceCells.tdscdma.sc = hrilCellInfoVendor->ServiceCellParas.tdscdma.sc;
-        cellInfo.serviceCells.tdscdma.cellId = hrilCellInfoVendor->ServiceCellParas.tdscdma.cellId;
-        cellInfo.serviceCells.tdscdma.lac = hrilCellInfoVendor->ServiceCellParas.tdscdma.lac;
-        cellInfo.serviceCells.tdscdma.rscp = hrilCellInfoVendor->ServiceCellParas.tdscdma.rscp;
-        cellInfo.serviceCells.tdscdma.drx = hrilCellInfoVendor->ServiceCellParas.tdscdma.drx;
-        cellInfo.serviceCells.tdscdma.rac = hrilCellInfoVendor->ServiceCellParas.tdscdma.rac;
-        cellInfo.serviceCells.tdscdma.cpid = hrilCellInfoVendor->ServiceCellParas.tdscdma.cpid;
-    } else if (hrilCellInfoVendor->ratType == NETWORK_TYPE_NR) {
-        cellInfo.serviceCells.nr.nrArfcn = hrilCellInfoVendor->ServiceCellParas.nr.nrArfcn;
-        cellInfo.serviceCells.nr.pci = hrilCellInfoVendor->ServiceCellParas.nr.pci;
-        cellInfo.serviceCells.nr.tac = hrilCellInfoVendor->ServiceCellParas.nr.tac;
-        cellInfo.serviceCells.nr.nci = hrilCellInfoVendor->ServiceCellParas.nr.nci;
-        cellInfo.serviceCells.nr.rsrp = hrilCellInfoVendor->ServiceCellParas.nr.rsrp;
-        cellInfo.serviceCells.nr.rsrq = hrilCellInfoVendor->ServiceCellParas.nr.rsrq;
+    switch (hrilCellInfoVendor->ratType) {
+        case NETWORK_TYPE_WCDMA:
+            cellInfo.serviceCells.wcdma.arfcn = hrilCellInfoVendor->ServiceCellParas.wcdma.arfcn;
+            cellInfo.serviceCells.wcdma.cellId = hrilCellInfoVendor->ServiceCellParas.wcdma.cellId;
+            cellInfo.serviceCells.wcdma.psc = hrilCellInfoVendor->ServiceCellParas.wcdma.psc;
+            cellInfo.serviceCells.wcdma.lac = hrilCellInfoVendor->ServiceCellParas.wcdma.lac;
+            cellInfo.serviceCells.wcdma.rxlev = hrilCellInfoVendor->ServiceCellParas.wcdma.rxlev;
+            cellInfo.serviceCells.wcdma.rscp = hrilCellInfoVendor->ServiceCellParas.wcdma.rscp;
+            cellInfo.serviceCells.wcdma.ecno = hrilCellInfoVendor->ServiceCellParas.wcdma.ecno;
+            cellInfo.serviceCells.wcdma.ura = hrilCellInfoVendor->ServiceCellParas.wcdma.ura;
+            cellInfo.serviceCells.wcdma.drx = hrilCellInfoVendor->ServiceCellParas.wcdma.drx;
+            break;
+        case NETWORK_TYPE_CDMA:
+            cellInfo.serviceCells.cdma.systemId = hrilCellInfoVendor->ServiceCellParas.cdma.systemId;
+            cellInfo.serviceCells.cdma.networkId = hrilCellInfoVendor->ServiceCellParas.cdma.networkId;
+            cellInfo.serviceCells.cdma.baseId = hrilCellInfoVendor->ServiceCellParas.cdma.baseId;
+            cellInfo.serviceCells.cdma.zoneId = hrilCellInfoVendor->ServiceCellParas.cdma.zoneId;
+            cellInfo.serviceCells.cdma.pilotPn = hrilCellInfoVendor->ServiceCellParas.cdma.pilotPn;
+            cellInfo.serviceCells.cdma.pilotStrength = hrilCellInfoVendor->ServiceCellParas.cdma.pilotStrength;
+            cellInfo.serviceCells.cdma.channel = hrilCellInfoVendor->ServiceCellParas.cdma.channel;
+            cellInfo.serviceCells.cdma.longitude = hrilCellInfoVendor->ServiceCellParas.cdma.longitude;
+            cellInfo.serviceCells.cdma.latitude = hrilCellInfoVendor->ServiceCellParas.cdma.latitude;
+            break;
+        case NETWORK_TYPE_TDSCDMA:
+            cellInfo.serviceCells.tdscdma.arfcn = hrilCellInfoVendor->ServiceCellParas.tdscdma.arfcn;
+            cellInfo.serviceCells.tdscdma.syncId = hrilCellInfoVendor->ServiceCellParas.tdscdma.syncId;
+            cellInfo.serviceCells.tdscdma.sc = hrilCellInfoVendor->ServiceCellParas.tdscdma.sc;
+            cellInfo.serviceCells.tdscdma.cellId = hrilCellInfoVendor->ServiceCellParas.tdscdma.cellId;
+            cellInfo.serviceCells.tdscdma.lac = hrilCellInfoVendor->ServiceCellParas.tdscdma.lac;
+            cellInfo.serviceCells.tdscdma.rscp = hrilCellInfoVendor->ServiceCellParas.tdscdma.rscp;
+            cellInfo.serviceCells.tdscdma.drx = hrilCellInfoVendor->ServiceCellParas.tdscdma.drx;
+            cellInfo.serviceCells.tdscdma.rac = hrilCellInfoVendor->ServiceCellParas.tdscdma.rac;
+            cellInfo.serviceCells.tdscdma.cpid = hrilCellInfoVendor->ServiceCellParas.tdscdma.cpid;
+            break;
+        case NETWORK_TYPE_NR:
+            cellInfo.serviceCells.nr.nrArfcn = hrilCellInfoVendor->ServiceCellParas.nr.nrArfcn;
+            cellInfo.serviceCells.nr.pci = hrilCellInfoVendor->ServiceCellParas.nr.pci;
+            cellInfo.serviceCells.nr.tac = hrilCellInfoVendor->ServiceCellParas.nr.tac;
+            cellInfo.serviceCells.nr.nci = hrilCellInfoVendor->ServiceCellParas.nr.nci;
+            cellInfo.serviceCells.nr.rsrp = hrilCellInfoVendor->ServiceCellParas.nr.rsrp;
+            cellInfo.serviceCells.nr.rsrq = hrilCellInfoVendor->ServiceCellParas.nr.rsrq;
+            break;
+        default:
+            break;
     }
 }
 
