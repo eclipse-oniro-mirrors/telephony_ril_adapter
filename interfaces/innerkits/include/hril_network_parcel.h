@@ -402,6 +402,64 @@ struct CellListCurrentInfo {
 };
 
 /**
+ * @brief Defines the NR cellular information.
+ */
+typedef struct {
+    /** Absolute RF channel number of the BCCH carrier. */
+    int32_t nrArfcn;
+
+    /** Physical cell ID. */
+    int32_t pci;
+
+    /** Tracking Area Code, which ranges from 0 to FFFF. */
+    int32_t tac;
+
+    /** NR cell ID. */
+    int64_t nci;
+
+    /** Reference Signal Received Power. */
+    int32_t rsrp;
+
+    /** Reference Signal Received Quality. */
+    int32_t rsrq;
+} CellRatNrExt;
+
+/**
+ * @brief Defines the current cell information.
+ */
+struct CurrentCellInformation {
+    /** Radio access technology type. */
+    int32_t ratType = 0;
+
+    /** Mobile country code (MCC). */
+    int32_t mcc = 0;
+
+    /** Mobile network code (MNC). */
+    int32_t mnc = 0;
+
+    /** Cell information parameters. */
+    union {
+        CellRatGsm gsm;
+        CellRatLte lte;
+        CellRatWcdma wcdma;
+        CellRatCdma cdma;
+        CellRatTdscdma tdscdma;
+        CellRatNrExt nr;
+    } ServiceCellParas;
+};
+
+/**
+ * @brief Defines the current cell information list.
+ */
+struct CellListCurrentInformation {
+    /** The size of current cell information list. */
+    int32_t itemNum = 0;
+
+    /** Current cell information. */
+    std::vector<CurrentCellInformation> cellCurrentInfo {};
+};
+
+/**
  * @brief Defines the GSM cell information.
  */
 typedef struct {

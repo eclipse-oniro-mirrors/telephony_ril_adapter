@@ -67,6 +67,8 @@ public:
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t GetCurrentCellInfoResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t GetCurrentCellInfoResponse_1_1(
+        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t GetPhysicalChannelConfigResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t SetLocateUpdatesResponse(
@@ -93,6 +95,8 @@ public:
         int32_t indType, const HRilErrNumber error, const void *response, size_t responseLen);
     int32_t GetRrcConnectionStateUpdated(
         int32_t indType, const HRilErrNumber error, const void *response, size_t responseLen);
+    int32_t NetworkCurrentCellUpdated_1_1(
+        int32_t indType, const HRilErrNumber error, const void *response, size_t responseLen);
     void RegisterNetworkFuncs(const HRilNetworkReq *networkFuncs);
     bool IsNetworkRespOrNotify(uint32_t code);
 
@@ -107,9 +111,15 @@ private:
     int32_t BuildNeighboringCellList(HDI::Ril::V1_1::CellListNearbyInfo &cellInfoList,
         const void *response, size_t responseLen);
     void FillCellInfoType(HDI::Ril::V1_1::CurrentCellInfo &cellInfo, const CurrentCellInfoVendor *hrilCellInfoVendor);
+    void FillCellInformationType(
+        HDI::Ril::V1_1::CurrentCellInfo_1_1 &cellInfo, const CurrentCellInfoVendor *hrilCellInfoVendor);
     void FillCurrentCellInfo(HDI::Ril::V1_1::CurrentCellInfo &cellInfo, const CurrentCellInfoVendor *cellInfoVendor);
-    int32_t BuildCurrentCellList(HDI::Ril::V1_1::CellListCurrentInfo &cellInfoList,
-        const void *response, size_t responseLen);
+    void FillCurrentCellInformation(
+        HDI::Ril::V1_1::CurrentCellInfo_1_1 &cellInfo, const CurrentCellInfoVendor *cellInfoVendor);
+    int32_t BuildCurrentCellList(
+        HDI::Ril::V1_1::CellListCurrentInfo &cellInfoList, const void *response, size_t responseLen);
+    int32_t BuildCurrentCellInfoList(
+        HDI::Ril::V1_1::CellListCurrentInfo_1_1 &cellInfoList, const void *response, size_t responseLen);
     bool IsNetworkResponse(uint32_t code);
     bool IsNetworkNotification(uint32_t code);
 
