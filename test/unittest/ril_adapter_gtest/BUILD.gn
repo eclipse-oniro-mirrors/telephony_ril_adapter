@@ -55,7 +55,7 @@ ohos_unittest("tel_ril_adapter_gtest") {
       "drivers_interface_power:libpower_proxy_1.1",
       "drivers_interface_ril:libril_proxy_1.1",
       "hdf_core:libhdf_utils",
-      "hiviewdfx_hilog_native:libhilog",
+      "hilog:libhilog",
       "init:libbegetutil",
       "ipc:ipc_single",
     ]
