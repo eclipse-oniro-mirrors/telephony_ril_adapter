@@ -47,7 +47,7 @@
 #define DEVICE_PATH "/dev/ttyUSB0"
 #define DEVICE_PATH_DEFAULT "/dev/ttyUSB"
 
-#define AT_TTY_PATH "persist.sys.radio.attty.path"
+#define AT_TTY_PATH "const.telephony.ril.attty.path"
 
 static HRilRadioState g_radioState = HRIL_RADIO_POWER_STATE_UNAVAILABLE;
 static pthread_mutex_t g_statusMutex = PTHREAD_MUTEX_INITIALIZER;
