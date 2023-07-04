@@ -299,7 +299,6 @@ static int32_t NewResponseInfo(void)
     if (g_response != NULL) {
         err = AT_ERR_COMMAND_PENDING;
         TELEPHONY_LOGE("g_response is not null, so the command cannot be sent.");
-        ClearCurCommand();
         return err;
     }
     g_response = (ResponseInfo *)calloc(1, sizeof(ResponseInfo));
