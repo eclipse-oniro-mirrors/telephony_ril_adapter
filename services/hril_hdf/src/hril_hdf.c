@@ -28,6 +28,7 @@
 #define RIL_VENDOR_LIB_PATH "persist.sys.radio.vendorlib.path"
 #define BASE_HEX 16
 
+const char *VENDOR_LIB_PATH = "const.telephony.ril.vendorlib.path";
 static void *g_dlHandle = NULL;
 static struct HRilReport g_reportOps = {
     OnCallReport,
@@ -41,7 +42,13 @@ static struct HRilReport g_reportOps = {
 
 static int32_t GetVendorLibPath(char *path)
 {
-    int32_t code = GetParameter(RIL_VENDOR_LIB_PATH, "", path, PARAMETER_SIZE);
+    int32_t code = GetParameter(VENDOR_LIB_PATH, "", path, PARAMETER_SIZE);
+    if (code > 0) {
+        return HDF_SUCCESS;
+    } else {
+        TELEPHONY_LOGE("Failed to get const vendor library path through system properties. err:%{public}d", code);
+    }
+    code = GetParameter(RIL_VENDOR_LIB_PATH, "", path, PARAMETER_SIZE);
     if (code <= 0) {
         TELEPHONY_LOGE("Failed to get vendor library path through system properties. err:%{public}d", code);
         return HDF_FAILURE;
