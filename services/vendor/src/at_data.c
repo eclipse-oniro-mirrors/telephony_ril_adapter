@@ -197,6 +197,13 @@ static ModemReportErrorInfo SendInquireCGACT(int32_t *outDataNum, HRilDataCallRe
     }
 
     *ppDcr = CreatDataCallResponseAndInit(dataCallNum);
+    if (*ppDcr == NULL) {
+        pResponse->success = 0;
+        errInfo = GetReportErrorInfo(pResponse);
+        FreeResponseInfo(pResponse);
+        TELEPHONY_LOGE("ppDcr is NULL! ret:%{public}d", errInfo.errorNo);
+        return errInfo;
+    }
     HRilDataCallResponse *pDataCall = *ppDcr;
     for (pLine = pResponse->head; pLine != NULL; pLine = pLine->next) {
         ret = ParsePdpCmd(pLine->data, pDataCall);
@@ -244,7 +251,9 @@ static void BuildDataInfoList(
         if (i >= dataCallNum) {
             continue;
         }
-        pDataCall->type = strdup(dataCGDCONT.type);
+        if (dataCGDCONT.type != NULL) {
+            pDataCall->type = strdup(dataCGDCONT.type);
+        }
         pDataCall->netPortName = strdup(NET_NODE);
         pDataCall++;
         count++;
@@ -385,7 +394,6 @@ static int32_t QueryAllSupportPDNInfos(PDNInfo *pdnInfo)
     }
     char *pStr = NULL;
     int32_t ret = -1;
-    int32_t err = HRIL_ERR_SUCCESS;
     Line *pLine = NULL;
     PDNInfo *pdns = pdnInfo;
     ResponseInfo *pResponse = NULL;
@@ -394,11 +402,10 @@ static int32_t QueryAllSupportPDNInfos(PDNInfo *pdnInfo)
     if (ret != 0 || pResponse == NULL || !pResponse->success) {
         ModemReportErrorInfo errInfo = GetReportErrorInfo(pResponse);
         errInfo.errorNo = (ret != HRIL_ERR_SUCCESS) ? ret : errInfo.errorNo;
-        TELEPHONY_LOGE("send AT CMD failed! ret:%{public}d", err);
+        TELEPHONY_LOGE("send AT CMD failed! ret:%{public}d", ret);
         FreeResponseInfo(pResponse);
-        return err;
+        return errInfo.errorNo;
     }
-
     for (pLine = pResponse->head; pLine != NULL; pLine = pLine->next) {
         pStr = pLine->data;
         ret = SkipATPrefix(&pStr);
@@ -476,10 +483,10 @@ static int32_t QuerySupportCID(const PDNInfo *pdnInfos, int32_t pdnSize, const c
             }
         }
         if (isUsedCid == 1) {
+            cid = i;
             break;
         }
     }
-    cid = i;
     return cid;
 }
 
@@ -492,9 +499,6 @@ static int32_t GetNeedActivateCid(const char *apn, const char *ipType)
 
     if (!QueryAllSupportPDNInfos(pdnInfos)) {
         cid = QuerySupportCID(pdnInfos, MAX_PDP_NUM, apn, ipType);
-    }
-    if (cid <= 0) {
-        cid = MIN_CID;
     }
     return cid;
 }
@@ -696,6 +700,12 @@ void ReqActivatePdpContext(const ReqDataInfo *requestInfo, const HRilDataInfo *d
         return;
     }
     cid = GetNeedActivateCid(pDataInfo->apn, pDataInfo->type);
+    if (cid == INT_DEFAULT_VALUE) {
+        TELEPHONY_LOGE("cid is invalid!!!");
+        OnDataReportPdpErrorMessages(requestInfo, HRIL_ERR_GENERIC_FAILURE, NULL);
+        RouteDown();
+        return;
+    }
     if (SendCmdCGDCONT(cid, requestInfo, pDataInfo) != HRIL_ERR_SUCCESS) {
         RouteDown();
         return;
@@ -801,6 +811,11 @@ void ReqSetInitApnInfo(const ReqDataInfo *requestInfo, const HRilDataInfo *data)
         return;
     }
     cid = GetNeedActivateCid(pDataInfo->apn, pDataInfo->type);
+    if (cid == INT_DEFAULT_VALUE) {
+        TELEPHONY_LOGE("cid is invalid!!!");
+        OnDataReportErrorMessages(requestInfo, HRIL_ERR_GENERIC_FAILURE, NULL);
+        return;
+    }
     if (SetDataProfileInfo(cid, requestInfo, pDataInfo) != HRIL_ERR_SUCCESS) {
         TELEPHONY_LOGE("Set data profile info is failed!");
         return;
