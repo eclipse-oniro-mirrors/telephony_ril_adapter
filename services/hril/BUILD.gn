@@ -45,10 +45,7 @@ ohos_shared_library("hril") {
     "LOG_DOMAIN = 0xD001F08",
   ]
 
-  deps = [
-    "$RIL_ADAPTER/interfaces/innerkits:hril_innerkits",
-    "//third_party/jsoncpp:jsoncpp",
-  ]
+  deps = [ "$RIL_ADAPTER/interfaces/innerkits:hril_innerkits" ]
 
   external_deps = [
     "c_utils:utils",
