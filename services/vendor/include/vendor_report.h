@@ -24,7 +24,7 @@
 #include "at_network.h"
 #include "vendor_util.h"
 
-struct ReportInfo CreateReportInfo(const ReqDataInfo *requestInfo, uint32_t err, uint32_t type, int32_t notifyId);
+struct ReportInfo CreateReportInfo(const ReqDataInfo *requestInfo, int32_t err, uint32_t type, int32_t notifyId);
 void SetReportOps(const struct HRilReport *reportOps);
 void OnModemReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen);
 void OnCallReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen);
