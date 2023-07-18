@@ -87,7 +87,7 @@ void OnTimerCallback(HRilCallbackFun func, uint8_t *param, const struct timeval 
     }
 }
 
-struct ReportInfo CreateReportInfo(const ReqDataInfo *requestInfo, uint32_t err, uint32_t type, int32_t notifyId)
+struct ReportInfo CreateReportInfo(const ReqDataInfo *requestInfo, int32_t err, uint32_t type, int32_t notifyId)
 {
     struct ReportInfo reportInfo = {(ReqDataInfo *)requestInfo, notifyId, type, err, {0, 0}};
     return reportInfo;
