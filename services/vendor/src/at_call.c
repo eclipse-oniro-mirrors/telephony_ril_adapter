@@ -35,9 +35,9 @@ CallNotify g_callNotifyTab[] = {
 static int32_t lastCcCause = HRIL_ERR_CALL_CAUSE;
 static const int32_t MAX_CALL_NUM = 100;
 
-static void OnCallReportErrorMessages(const ReqDataInfo *requestInfo, uint32_t err, ResponseInfo *pResponse)
+static void OnCallReportErrorMessages(const ReqDataInfo *requestInfo, int32_t err, ResponseInfo *pResponse)
 {
-    uint32_t errorNo = HRIL_ERR_SUCCESS;
+    int32_t errorNo = HRIL_ERR_SUCCESS;
     ModemReportErrorInfo errInfo = GetReportErrorInfo(pResponse);
     errorNo = (err != HRIL_ERR_SUCCESS) ? err : errInfo.errorNo;
     TELEPHONY_LOGW("Report error! ret:%{public}d", errorNo);
