@@ -29,10 +29,7 @@ ohos_shared_library("hril_hdf") {
 
   configs = [ "$RIL_ADAPTER/utils:utils_config" ]
 
-  deps = [
-    "$RIL_ADAPTER/services/hril:hril",
-    "//third_party/eudev:libudev",
-  ]
+  deps = [ "$RIL_ADAPTER/services/hril:hril" ]
 
   external_deps = [
     "hdf_core:libhdf_host",
