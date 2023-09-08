@@ -14,9 +14,9 @@
  */
 
 #include "hril_hdf.h"
-
+#ifdef UDEV_SUPPORT
 #include <libudev.h>
-
+#endif
 #include "dlfcn.h"
 #include "hdf_base.h"
 #include "hril_enum.h"
@@ -56,6 +56,7 @@ static int32_t GetVendorLibPath(char *path)
     return HDF_SUCCESS;
 }
 
+#ifdef UDEV_SUPPORT
 static UsbDeviceInfo *GetPresetInformation(const char *vId, const char *pId)
 {
     if (vId == NULL || pId == NULL) {
@@ -74,14 +75,16 @@ static UsbDeviceInfo *GetPresetInformation(const char *vId, const char *pId)
     }
     return uDevInfo;
 }
+#endif
 
 static UsbDeviceInfo *GetUsbDeviceInfo(void)
 {
+    UsbDeviceInfo *uDevInfo = NULL;
+#ifdef UDEV_SUPPORT
     struct udev *udev;
     struct udev_enumerate *enumerate;
     struct udev_list_entry *devices, *devListEntry;
     struct udev_device *dev;
-    UsbDeviceInfo *uDevInfo = NULL;
 
     udev = udev_new();
     if (udev == NULL) {
@@ -121,6 +124,7 @@ static UsbDeviceInfo *GetUsbDeviceInfo(void)
     }
     udev_enumerate_unref(enumerate);
     udev_unref(udev);
+#endif
     return uDevInfo;
 }
 

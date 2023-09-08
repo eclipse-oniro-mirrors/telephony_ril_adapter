@@ -34,9 +34,6 @@
                 "hilog",
                 "init",
                 "ipc"
-            ],
-            "third_party": [
-                "eudev"
             ]
         },
         "build": {
