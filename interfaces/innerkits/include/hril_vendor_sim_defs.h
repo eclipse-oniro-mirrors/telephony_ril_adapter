@@ -332,6 +332,28 @@ typedef struct {
     char *data;
 } HRilSimAuthenticationRequestInfo;
 
+/**
+ * @brief Defines ncfg request information.
+ */
+typedef struct {
+    /**
+     * Operator Name Matched with SIM card
+     */
+    char *operName;
+    /**
+     * Operator Key Matched with SIM card
+     */
+    char *operKey;
+    /**
+     * Current SIM State
+     */
+    int state;
+    /**
+     * Reserved Field
+     */
+    char *reserve;
+} HRilNcfgOperatorInfo;
+
 typedef struct {
     void (*GetSimStatus)(const ReqDataInfo *requestInfo);
     void (*GetSimIO)(const ReqDataInfo *requestInfo, const HRilSimIO *data, size_t dataLen);
@@ -359,6 +381,7 @@ typedef struct {
     void (*SimTransmitApduBasicChannel)(const ReqDataInfo *requestInfo, HRilApduSimIO *data, size_t dataLen);
     void (*SimAuthentication)(const ReqDataInfo *requestInfo, HRilSimAuthenticationRequestInfo *data, size_t dataLen);
     void (*UnlockSimLock)(const ReqDataInfo *requestInfo, int32_t lockType, const char *password);
+    void (*SendSimMatchedOperatorInfo)(const ReqDataInfo *requestInfo, HRilNcfgOperatorInfo *data, size_t dataLen);
 } HRilSimReq;
 #ifdef __cplusplus
 }
