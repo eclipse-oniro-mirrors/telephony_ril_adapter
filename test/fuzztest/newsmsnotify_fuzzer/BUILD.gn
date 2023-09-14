@@ -19,7 +19,7 @@ import("//build/test.gni")
 
 ##############################fuzztest##########################################
 ohos_fuzztest("NewSmsNotifyFuzzTest") {
-  module_output_path = "ril_adapter/NewSmsNotifyFuzzTest"
+  module_output_path = "ril_adapter/ril_adapter"
   module_out_path = module_output_path
   fuzz_config_file =
       "$SUBSYSTEM_DIR/ril_adapter/test/fuzztest/newsmsnotify_fuzzer"
