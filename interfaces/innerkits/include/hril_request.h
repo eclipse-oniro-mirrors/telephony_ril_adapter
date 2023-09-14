@@ -286,6 +286,9 @@ typedef enum {
     /** Unlocks a SIM card. */
     HREQ_SIM_UNLOCK_SIM_LOCK,
 
+    /** Send SIM matched OperatorInfo. */
+    HREQ_SIM_SEND_NCFG_OPER_INFO,
+
     HREQ_DATA_BASE = 300,
 
     /** Sets an apn to initial attach network. */
