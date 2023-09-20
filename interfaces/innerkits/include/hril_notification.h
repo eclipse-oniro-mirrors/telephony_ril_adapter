@@ -132,6 +132,9 @@ typedef enum {
     /** Called when update rrc connection state.*/
     HNOTI_NETWORK_RRC_CONNECTION_STATE_UPDATED,
 
+    /** Called when resident network is updated.*/
+    HNOTI_NETWORK_RESIDENT_NETWORK_UPDATED,
+
     HNOTI_COMMON_BASE = 1500,
 
     /** Called when radio state is updated. */
