@@ -395,11 +395,7 @@ void ReqWriteSimMessage(const ReqDataInfo *requestInfo, const HRilSmsWriteSms *d
 
 void ReqDelSimMessage(const ReqDataInfo *requestInfo, const int32_t *data, size_t dataLen)
 {
-    char cmd[MAX_CMD_LENGTH] = {0};
-    int32_t err;
-    int32_t index;
     ResponseInfo *responseInfo = NULL;
-
     if (data == NULL || dataLen == 0) {
         TELEPHONY_LOGE("data error");
         struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
@@ -407,8 +403,16 @@ void ReqDelSimMessage(const ReqDataInfo *requestInfo, const int32_t *data, size_
         FreeResponseInfo(responseInfo);
         return;
     }
-    index = ((int32_t *)data)[0];
-    err = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CMGD=%d", index);
+    int32_t index = ((int32_t *)data)[0] - 1;
+    if (index < 0) {
+        TELEPHONY_LOGE("invalid index:%d", index);
+        struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
+        OnSmsReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
+        FreeResponseInfo(responseInfo);
+        return;
+    }
+    char cmd[MAX_CMD_LENGTH] = { 0 };
+    int32_t err = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CMGD=%d", index);
     if (err < 0) {
         TELEPHONY_LOGE("GenerateCommand failed, err = %{public}d\n", err);
         struct ReportInfo reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
@@ -678,37 +682,24 @@ void ReqSetCdmaCBConfig(const ReqDataInfo *requestInfo, const HRilCdmaCBConfigIn
     FreeResponseInfo(responseInfo);
 }
 
-void ReqAddCdmaSimMessage(const ReqDataInfo *requestInfo, const HRilSmsWriteSms *data, size_t dataLen)
+void ReqAddCdmaSimMessage(const ReqDataInfo *requestInfo, const HRilSmsWriteCdmaSms *data, size_t dataLen)
 {
-    char cmd[MAX_CMD_LENGTH] = {0};
-    int32_t err;
-    HRilSmsWriteSms *cdmaMsg = NULL;
-    ResponseInfo *responseInfo = NULL;
     struct ReportInfo reportInfo = {0};
     if (data == NULL) {
         reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
         OnSmsReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
-        FreeResponseInfo(responseInfo);
         return;
     }
-    cdmaMsg = ((HRilSmsWriteSms *)data);
-    err = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CPMS=%d,%d%s", cdmaMsg->index, cdmaMsg->state, cdmaMsg->pdu);
-    if (err < 0) {
-        TELEPHONY_LOGE("GenerateCommand failed, err = %{public}d\n", err);
-        reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
-        OnSmsReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
-        FreeResponseInfo(responseInfo);
-        return;
-    }
-    err = SendCommandLock(cmd, "+CPMS:", 0, &responseInfo);
-    if (err != 0 || (responseInfo != NULL && !responseInfo->success)) {
-        err = HRIL_ERR_GENERIC_FAILURE;
-        SimMessageError(&reportInfo, requestInfo, &err, responseInfo);
-        return;
-    }
+    HRilSmsWriteCdmaSms *cdmaSms = (HRilSmsWriteCdmaSms *)data;
+    HRilCdmaSmsMessageInfo *cdmaMsg = &cdmaSms->cdmaMessageInfo;
+    TELEPHONY_LOGD(
+        "CreateCdmaPdu = %{public}x, %{public}x, %{public}x", cdmaMsg->serviceId, cdmaMsg->isExist, cdmaMsg->type);
+    TELEPHONY_LOGD("CreateCdmaPdu2 = %{public}x, %{public}x, %{public}x", cdmaMsg->address.digitMode,
+        cdmaMsg->address.mode, cdmaMsg->address.type);
+    TELEPHONY_LOGD("CreateCdmaPdu3 = %{public}x, %{public}x, %{public}s", cdmaMsg->address.plan,
+        cdmaMsg->address.number, cdmaMsg->address.bytes);
     reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
     OnSmsReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
-    FreeResponseInfo(responseInfo);
 }
 
 void ReqDelCdmaSimMessage(const ReqDataInfo *requestInfo, const int32_t *data, size_t dataLen)
@@ -724,7 +715,14 @@ void ReqDelCdmaSimMessage(const ReqDataInfo *requestInfo, const int32_t *data, s
         FreeResponseInfo(responseInfo);
         return;
     }
-    index = ((int32_t *)data)[0];
+    index = ((int32_t *)data)[0] - 1;
+    if (index < 0) {
+        TELEPHONY_LOGE("invalid index:%d", index);
+        struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
+        OnSmsReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
+        FreeResponseInfo(responseInfo);
+        return;
+    }
     err = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CMGD=%d", index);
     if (err < 0) {
         TELEPHONY_LOGE("GenerateCommand failed, err = %{public}d\n", err);

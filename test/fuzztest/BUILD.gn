@@ -23,4 +23,5 @@ group("fuzztest") {
   deps += [ "callemergencynotice_fuzzer:fuzztest" ]
   deps += [ "pdpcontextlistupdated_fuzzer:fuzztest" ]
   deps += [ "simstkproactivenotify_fuzzer:fuzztest" ]
+  deps += [ "createcdmasms_fuzzer:fuzztest" ]
 }

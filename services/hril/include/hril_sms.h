@@ -96,6 +96,8 @@ private:
         HRilRadioResponseInfo &responseInfo, int32_t serial, const void *response, const size_t responseLen);
     void CopyToHRilCdmaCBConfigInfo(
         HRilCdmaCBConfigInfo *list, OHOS::HDI::Ril::V1_1::CdmaCBConfigInfoList cellBroadcastInfoList);
+    bool CreateCdmaMessageInfo(HRilCdmaSmsMessageInfo &cdmaSmsInfo, const std::string &pdu);
+    bool CheckCdmaPduLength(HRilCdmaSmsMessageInfo &cdmaSmsInfo, const std::string &pdu);
 
     const HRilSmsReq *smsFuncs_ = nullptr;
 };
