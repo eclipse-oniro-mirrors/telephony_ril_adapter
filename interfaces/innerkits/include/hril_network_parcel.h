@@ -32,6 +32,9 @@ struct OperatorInfoResult {
 
     /** MCC+MNC of the registered network. */
     std::string numeric = "";
+
+    /** flag, Used by search network manager in response. */
+    int64_t flag = 0;
 };
 
 /**
