@@ -217,7 +217,8 @@ typedef struct {
     void (*GetCBConfig)(const ReqDataInfo *requestInfo);
     void (*GetCdmaCBConfig)(const ReqDataInfo *requestInfo);
     void (*SetCdmaCBConfig)(const ReqDataInfo *requestInfo, const HRilCdmaCBConfigInfo *data, size_t dataLen);
-    void (*AddCdmaSimMessage)(const ReqDataInfo *requestInfo, const HRilSmsWriteCdmaSms *data, size_t dataLen);
+    void (*AddCdmaSimMessage)(const ReqDataInfo *requestInfo, const HRilSmsWriteSms *data, size_t dataLen);
+    void (*AddCdmaSimMessageV2)(const ReqDataInfo *requestInfo, const HRilSmsWriteCdmaSms *data, size_t dataLen);
     void (*DelCdmaSimMessage)(const ReqDataInfo *requestInfo, const int32_t *data, size_t dataLen);
     void (*UpdateCdmaSimMessage)(const ReqDataInfo *requestInfo, const HRilSmsWriteSms *data, size_t dataLen);
 } HRilSmsReq;
