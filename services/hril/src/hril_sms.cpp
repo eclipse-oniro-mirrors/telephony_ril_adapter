@@ -15,6 +15,8 @@
 
 #include "hril_sms.h"
 
+#include <regex>
+
 #include "hril_notification.h"
 #include "hril_request.h"
 
@@ -26,6 +28,13 @@ const size_t MAX_PDU_LEN = 255;
 const size_t MAX_LEN = 100;
 const size_t MAX_CHN_LEN = 50000;
 const int32_t MSG_DEFAULT_INDEX = -1;
+const int32_t BYTE_LEN = 1;
+const int32_t INT_LEN = 4;
+const int32_t NUM_2 = 2;
+const int32_t NUM_3 = 3;
+const int32_t NUM_4 = 4;
+const int32_t NUM_5 = 5;
+const int HEXADECIMAL = 16;
 } // namespace
 
 HRilSms::HRilSms(int32_t slotId, IHRilReporter &hrilReporter) : HRilBase(slotId, hrilReporter)
@@ -119,7 +128,7 @@ int32_t HRilSms::DelSimMessage(int32_t serialId, int32_t index)
     }
     int32_t *pBuff = nullptr;
     RequestWithInts(&pBuff, requestInfo, 1, index);
-    smsFuncs_->DelSimMessage(requestInfo, pBuff, 1);
+    smsFuncs_->DelSimMessage(requestInfo, pBuff, sizeof(int32_t));
     if (pBuff != nullptr) {
         SafeFrees(pBuff);
     }
@@ -250,22 +259,96 @@ int32_t HRilSms::SendSmsAck(int32_t serialId, const OHOS::HDI::Ril::V1_1::ModeDa
 
 int32_t HRilSms::AddCdmaSimMessage(int32_t serialId, const OHOS::HDI::Ril::V1_1::SmsMessageIOInfo &message)
 {
-    HRilSmsWriteSms msg = {};
-    int32_t pduLen = 0;
-    const int32_t MSG_INDEX = -1;
+    HRilSmsWriteCdmaSms msg = {};
     msg.state = message.state;
-    msg.index = MSG_INDEX;
-    pduLen = message.pdu.length();
-    int32_t len = pduLen + 1;
-    if (len <= 0) {
+    if (!CreateCdmaMessageInfo(msg.cdmaMessageInfo, message.pdu)) {
+        TELEPHONY_LOGE("CreateCdmaMessageInfo failed");
         return HRIL_ERR_INVALID_PARAMETER;
     }
-    CopyToCharPoint(&msg.pdu, message.pdu);
     int32_t result = RequestVendor(serialId, HREQ_SMS_ADD_CDMA_SIM_MESSAGE, smsFuncs_, &HRilSmsReq::AddCdmaSimMessage,
-        &msg, sizeof(HRilSmsWriteSms));
+        &msg, sizeof(HRilSmsWriteCdmaSms));
     TELEPHONY_LOGI("AddCdmaSimMessage result is: %{public}d", result);
-    SafeFrees(msg.pdu);
     return result;
+}
+
+bool HRilSms::CreateCdmaMessageInfo(HRilCdmaSmsMessageInfo &cdmaSmsInfo, const std::string &pdu)
+{
+    if (!CheckCdmaPduLength(cdmaSmsInfo, pdu)) {
+        TELEPHONY_LOGE("pdu is invalid");
+        return false;
+    }
+    cdmaSmsInfo.serviceId = stoi(pdu.substr(0, INT_LEN), 0, HEXADECIMAL);
+    cdmaSmsInfo.isExist = stoi(pdu.substr(INT_LEN + BYTE_LEN * NUM_3, BYTE_LEN), 0, HEXADECIMAL);
+    cdmaSmsInfo.type = stoi(pdu.substr(INT_LEN + INT_LEN, INT_LEN), 0, HEXADECIMAL);
+    int32_t index = INT_LEN * NUM_3;
+    // adress
+    cdmaSmsInfo.address.digitMode = stoi(pdu.substr(index, BYTE_LEN), 0, HEXADECIMAL);
+    cdmaSmsInfo.address.mode = stoi(pdu.substr(index + BYTE_LEN, BYTE_LEN), 0, HEXADECIMAL);
+    cdmaSmsInfo.address.type = stoi(pdu.substr(index + BYTE_LEN * NUM_2, BYTE_LEN), 0, HEXADECIMAL);
+    cdmaSmsInfo.address.plan = stoi(pdu.substr(index + BYTE_LEN * NUM_3, BYTE_LEN), 0, HEXADECIMAL);
+    cdmaSmsInfo.address.number = stoi(pdu.substr(index + BYTE_LEN * NUM_4, BYTE_LEN), 0, HEXADECIMAL);
+    std::string addByte = pdu.substr(index + BYTE_LEN * NUM_5, BYTE_LEN * cdmaSmsInfo.address.number);
+    char *addressByte = reinterpret_cast<char *>(cdmaSmsInfo.address.bytes);
+    if (strcpy_s(addressByte, cdmaSmsInfo.address.number + 1, addByte.c_str()) != EOK) {
+        TELEPHONY_LOGE("strcpy_s fail.");
+        return false;
+    }
+    index += BYTE_LEN * NUM_5 + BYTE_LEN * cdmaSmsInfo.address.number;
+    // subAdress
+    cdmaSmsInfo.subAddress.type = stoi(pdu.substr(index, BYTE_LEN), 0, HEXADECIMAL);
+    cdmaSmsInfo.subAddress.odd = stoi(pdu.substr(index + BYTE_LEN, BYTE_LEN), 0, HEXADECIMAL);
+    cdmaSmsInfo.subAddress.number = stoi(pdu.substr(index + BYTE_LEN * NUM_2, BYTE_LEN), 0, HEXADECIMAL);
+    std::string subAddByte = pdu.substr(index + BYTE_LEN * NUM_3, BYTE_LEN * cdmaSmsInfo.subAddress.number);
+    char *subAddressByte = reinterpret_cast<char *>(cdmaSmsInfo.subAddress.bytes);
+    if (strcpy_s(subAddressByte, cdmaSmsInfo.subAddress.number + 1, subAddByte.c_str()) != EOK) {
+        TELEPHONY_LOGE("strcpy_s fail.");
+        return false;
+    }
+    index += BYTE_LEN * NUM_3 + BYTE_LEN * cdmaSmsInfo.subAddress.number;
+    // bearer Data
+    cdmaSmsInfo.size = stoi(pdu.substr(index, BYTE_LEN), 0, HEXADECIMAL);
+    std::string byte = pdu.substr(index + BYTE_LEN, BYTE_LEN * cdmaSmsInfo.size);
+    char *byteInfo = reinterpret_cast<char *>(cdmaSmsInfo.bytes);
+    if (strcpy_s(byteInfo, cdmaSmsInfo.size + 1, byte.c_str()) != EOK) {
+        TELEPHONY_LOGE("strcpy_s fail.");
+        return false;
+    }
+    return true;
+}
+
+bool HRilSms::CheckCdmaPduLength(HRilCdmaSmsMessageInfo &cdmaSmsInfo, const std::string &pdu)
+{
+    int32_t index = INT_LEN * NUM_3 + BYTE_LEN * NUM_5;
+    // adress
+    if (pdu.length() < index) {
+        TELEPHONY_LOGE("pdu length invalid.");
+        return false;
+    }
+    if (!regex_match(pdu, std::regex("[0-9a-fA-F]+"))) {
+        TELEPHONY_LOGE("pdu invalid.");
+        return false;
+    }
+    cdmaSmsInfo.address.number = stoi(pdu.substr(index - BYTE_LEN, BYTE_LEN), 0, HEXADECIMAL);
+    index += BYTE_LEN * cdmaSmsInfo.address.number + BYTE_LEN * NUM_3;
+    if (pdu.length() < index) {
+        TELEPHONY_LOGE("pdu length invalid.");
+        return false;
+    }
+    // subAdress
+    cdmaSmsInfo.subAddress.number = stoi(pdu.substr(index - BYTE_LEN, BYTE_LEN), 0, HEXADECIMAL);
+    index += BYTE_LEN * cdmaSmsInfo.subAddress.number + BYTE_LEN;
+    if (pdu.length() < index) {
+        TELEPHONY_LOGE("pdu length invalid.");
+        return false;
+    }
+    // bearer Data
+    cdmaSmsInfo.size = stoi(pdu.substr(index - BYTE_LEN, BYTE_LEN), 0, HEXADECIMAL);
+    index += BYTE_LEN * cdmaSmsInfo.size;
+    if (pdu.length() < index) {
+        TELEPHONY_LOGE("pdu length invalid.");
+        return false;
+    }
+    return true;
 }
 
 int32_t HRilSms::DelCdmaSimMessage(int32_t serialId, int32_t index)
@@ -280,7 +363,7 @@ int32_t HRilSms::DelCdmaSimMessage(int32_t serialId, int32_t index)
     }
     int32_t *pBuff = nullptr;
     RequestWithInts(&pBuff, requestInfo, 1, index);
-    smsFuncs_->DelCdmaSimMessage(requestInfo, pBuff, 1);
+    smsFuncs_->DelCdmaSimMessage(requestInfo, pBuff, sizeof(int32_t));
     if (pBuff != nullptr) {
         SafeFrees(pBuff);
     }
@@ -323,6 +406,7 @@ int32_t HRilSms::SendCdmaSmsResponse(
 int32_t HRilSms::AddSimMessageResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
+    TELEPHONY_LOGI("AddSimMessageResponse send");
     return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::AddSimMessageResponse);
 }
 
@@ -449,6 +533,7 @@ int32_t HRilSms::SendSmsAckResponse(
 int32_t HRilSms::AddCdmaSimMessageResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
+    TELEPHONY_LOGI("receive response");
     return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::AddCdmaSimMessageResponse);
 }
 

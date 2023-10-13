@@ -189,6 +189,20 @@ typedef struct {
     unsigned char bytes[HRIL_MAX_CDMA_MESSAGE_LEN];
 } HRilCdmaSmsMessageInfo;
 
+/**
+ * @brief Defines the CDMA SMS message information in a SIM card.
+ */
+typedef struct {
+    /**
+     * Status. For details, see TS 27.005 3.1
+     */
+    int32_t state;
+    /**
+     * CDMA message infomation.
+     */
+    HRilCdmaSmsMessageInfo cdmaMessageInfo;
+} HRilSmsWriteCdmaSms;
+
 typedef struct {
     void (*SendGsmSms)(const ReqDataInfo *requestInfo, const char *const *data, size_t dataLen);
     void (*SendSmsAck)(const ReqDataInfo *requestInfo, const int32_t *data, size_t dataLen);
@@ -203,7 +217,7 @@ typedef struct {
     void (*GetCBConfig)(const ReqDataInfo *requestInfo);
     void (*GetCdmaCBConfig)(const ReqDataInfo *requestInfo);
     void (*SetCdmaCBConfig)(const ReqDataInfo *requestInfo, const HRilCdmaCBConfigInfo *data, size_t dataLen);
-    void (*AddCdmaSimMessage)(const ReqDataInfo *requestInfo, const HRilSmsWriteSms *data, size_t dataLen);
+    void (*AddCdmaSimMessage)(const ReqDataInfo *requestInfo, const HRilSmsWriteCdmaSms *data, size_t dataLen);
     void (*DelCdmaSimMessage)(const ReqDataInfo *requestInfo, const int32_t *data, size_t dataLen);
     void (*UpdateCdmaSimMessage)(const ReqDataInfo *requestInfo, const HRilSmsWriteSms *data, size_t dataLen);
 } HRilSmsReq;
