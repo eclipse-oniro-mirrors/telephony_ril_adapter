@@ -134,7 +134,7 @@ static const HRilSmsReq g_smsReqOps = {
     .GetCBConfig = ReqGetCBConfig,
     .GetCdmaCBConfig = ReqGetCdmaCBConfig,
     .SetCdmaCBConfig = ReqSetCdmaCBConfig,
-    .AddCdmaSimMessage = ReqAddCdmaSimMessage,
+    .AddCdmaSimMessageV2 = ReqAddCdmaSimMessage,
     .DelCdmaSimMessage = ReqDelCdmaSimMessage,
     .UpdateCdmaSimMessage = ReqUpdateCdmaSimMessage,
 };

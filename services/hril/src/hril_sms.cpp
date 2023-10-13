@@ -265,9 +265,9 @@ int32_t HRilSms::AddCdmaSimMessage(int32_t serialId, const OHOS::HDI::Ril::V1_1:
         TELEPHONY_LOGE("CreateCdmaMessageInfo failed");
         return HRIL_ERR_INVALID_PARAMETER;
     }
-    int32_t result = RequestVendor(serialId, HREQ_SMS_ADD_CDMA_SIM_MESSAGE, smsFuncs_, &HRilSmsReq::AddCdmaSimMessage,
+    int32_t result = RequestVendor(serialId, HREQ_SMS_ADD_CDMA_SIM_MESSAGE, smsFuncs_, &HRilSmsReq::AddCdmaSimMessageV2,
         &msg, sizeof(HRilSmsWriteCdmaSms));
-    TELEPHONY_LOGI("AddCdmaSimMessage result is: %{public}d", result);
+    TELEPHONY_LOGI("AddCdmaSimMessageV2 result is: %{public}d", result);
     return result;
 }
 
