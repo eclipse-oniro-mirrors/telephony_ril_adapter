@@ -508,6 +508,7 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Network_002, Function | MediumTest | 
     EXPECT_NE(HDF_SUCCESS, network->NetworkTimeZoneUpdated(0, HRilErrNumber::HRIL_ERR_NULL_POINT, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, network->NetworkPhyChnlCfgUpdated(0, HRilErrNumber::HRIL_ERR_NULL_POINT, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, network->NetworkCurrentCellUpdated(0, HRilErrNumber::HRIL_ERR_NULL_POINT, nullptr, 0));
+    EXPECT_NE(HDF_SUCCESS, network->ResidentNetworkUpdated(0, HRilErrNumber::HRIL_ERR_NULL_POINT, nullptr, 0));
 }
 
 /**

@@ -23,6 +23,7 @@
 
 #define NUM_COUNT 3
 #define TIME_VALUE_LEN 30
+#define PLMN_LEN 10
 
 static struct ReportInfo g_reportInfoForOperListToUse;
 static pthread_mutex_t g_networkSearchInformationMutex = PTHREAD_MUTEX_INITIALIZER;
@@ -1384,6 +1385,42 @@ static int32_t ParseGetCurrentCellInfoResponseLine(char *line, CurrentCellInfoVe
         return err;
     }
     ParseGetCurrentCellInfoResponseLineSwitch(line, response);
+    return HRIL_ERR_SUCCESS;
+}
+
+int32_t ResidentNetworkUpdated(struct ReportInfo reportInfo, const char *s)
+{
+    char *str = (char *)s;
+    char *mcc = NULL;
+    char *mnc = NULL;
+    char plmn[PLMN_LEN] = { 0 };
+    if (str == NULL) {
+        TELEPHONY_LOGE("str is null.");
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
+    int32_t err = SkipATPrefix(&str);
+    if (err < 0) {
+        TELEPHONY_LOGE("ResidentNetworkUpdated skip failed: [%{public}s]", str);
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
+    if (NextStr(&str, &mcc) < 0) {
+        TELEPHONY_LOGE("invalid str!");
+        err = HRIL_ERR_INVALID_MODEM_PARAMETER;
+    }
+    if (NextStr(&str, &mnc) < 0) {
+        TELEPHONY_LOGE("invalid str!");
+        err = HRIL_ERR_INVALID_MODEM_PARAMETER;
+    }
+    if (strlen(mcc) + strlen(mnc) + 1 > PLMN_LEN) {
+        TELEPHONY_LOGE("len is invalid.");
+        return HRIL_ERR_INVALID_MODEM_PARAMETER;
+    }
+    snprintf(plmn, PLMN_LEN, "%s%s", mcc, mnc);
+    TELEPHONY_LOGI("plmn:%{public}s", plmn);
+    reportInfo.notifyId = HNOTI_NETWORK_RESIDENT_NETWORK_UPDATED;
+    reportInfo.type = HRIL_NOTIFICATION;
+    reportInfo.error = HRIL_ERR_SUCCESS;
+    OnNetworkReport(GetSlotId(NULL), reportInfo, (const uint8_t *)plmn, PLMN_LEN);
     return HRIL_ERR_SUCCESS;
 }
 
