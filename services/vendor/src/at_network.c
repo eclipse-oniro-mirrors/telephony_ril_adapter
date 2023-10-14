@@ -1393,7 +1393,6 @@ int32_t ResidentNetworkUpdated(struct ReportInfo reportInfo, const char *s)
     char *str = (char *)s;
     char *mcc = NULL;
     char *mnc = NULL;
-    char plmn[PLMN_LEN] = { 0 };
     if (str == NULL) {
         TELEPHONY_LOGE("str is null.");
         return HRIL_ERR_GENERIC_FAILURE;
@@ -1411,16 +1410,19 @@ int32_t ResidentNetworkUpdated(struct ReportInfo reportInfo, const char *s)
         TELEPHONY_LOGE("invalid str!");
         err = HRIL_ERR_INVALID_MODEM_PARAMETER;
     }
-    if (strlen(mcc) + strlen(mnc) + 1 > PLMN_LEN) {
+    int len = strlen(mcc) + strlen(mnc) + 1;
+    if (len > PLMN_LEN) {
         TELEPHONY_LOGE("len is invalid.");
         return HRIL_ERR_INVALID_MODEM_PARAMETER;
     }
-    snprintf(plmn, PLMN_LEN, "%s%s", mcc, mnc);
-    TELEPHONY_LOGI("plmn:%{public}s", plmn);
+    if (strcat_s(mcc, len, mnc) < 0) {
+        TELEPHONY_LOGE("strcat_s fail.");
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
     reportInfo.notifyId = HNOTI_NETWORK_RESIDENT_NETWORK_UPDATED;
     reportInfo.type = HRIL_NOTIFICATION;
     reportInfo.error = HRIL_ERR_SUCCESS;
-    OnNetworkReport(GetSlotId(NULL), reportInfo, (const uint8_t *)plmn, PLMN_LEN);
+    OnNetworkReport(GetSlotId(NULL), reportInfo, (const uint8_t *)mcc, len);
     return HRIL_ERR_SUCCESS;
 }
 

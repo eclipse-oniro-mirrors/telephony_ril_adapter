@@ -496,7 +496,7 @@ int32_t RilCallbackTest::NetworkCurrentCellUpdated_1_1(
 
 int32_t RilCallbackTest::ResidentNetworkUpdated(const RilRadioResponseInfo &responseInfo, const std::string &plmn)
 {
-    TELEPHONY_LOGI("RilCallbackTest::NetworkTimeZoneUpdated plmn:%{public}s", plmn.c_str());
+    TELEPHONY_LOGI("RilCallbackTest::ResidentNetworkUpdated plmn:%{public}s", plmn.c_str());
     return 0;
 }
 

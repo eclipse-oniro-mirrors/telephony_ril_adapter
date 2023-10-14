@@ -662,7 +662,7 @@ int32_t HRilNetwork::ResidentNetworkUpdated(int32_t indType, const HRilErrNumber
         TELEPHONY_LOGE("ResidentNetworkUpdated response is invalid");
         return HRIL_ERR_INVALID_PARAMETER;
     }
-    return Notify(indType, error, &HDI::Ril::V1_1::IRilCallback::ResidentNetworkUpdated, (const char *)response);
+    return Notify(indType, error, &HDI::Ril::V1_2::IRilCallback::ResidentNetworkUpdated, (const char *)response);
 }
 
 void HRilNetwork::ExchangeRilRssiToHdf(const void *response, HDI::Ril::V1_1::Rssi &rssi)

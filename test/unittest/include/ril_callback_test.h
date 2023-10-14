@@ -21,11 +21,11 @@
 #include "condition_variable"
 #include "map"
 #include "mutex"
-#include "v1_1/iril.h"
+#include "v1_2/iril.h"
 
 namespace OHOS {
 namespace Telephony {
-class RilCallbackTest : public HDI::Ril::V1_1::IRilCallback {
+class RilCallbackTest : public HDI::Ril::V1_2::IRilCallback {
 public:
     void PrintResponseInfo(const std::string &method, const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo);
 
