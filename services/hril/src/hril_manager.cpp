@@ -333,7 +333,7 @@ HRilManager::HRilManager() : hrilSimSlotCount_(GetSimSlotCount())
     timerCallback_ = std::make_unique<HRilTimerCallback>();
 }
 
-void HRilManager::SetRilCallback(sptr<OHOS::HDI::Ril::V1_1::IRilCallback> callback)
+void HRilManager::SetRilCallback(sptr<OHOS::HDI::Ril::V1_2::IRilCallback> callback)
 {
     TELEPHONY_LOGD("SetRilCallback");
     for (int32_t slotId = HRIL_SIM_SLOT_0; slotId < hrilSimSlotCount_; slotId++) {

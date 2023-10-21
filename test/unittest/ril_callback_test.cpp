@@ -439,6 +439,15 @@ int32_t RilCallbackTest::NetworkCurrentCellUpdated_1_1(
     return 0;
 }
 
+int32_t RilCallbackTest::ResidentNetworkUpdated(const RilRadioResponseInfo &responseInfo, const std::string &plmn)
+{
+    PrintResponseInfo("ResidentNetworkUpdated", responseInfo);
+    cout << "ResidentNetworkUpdated plmn : " << plmn << endl;
+    cout << "ResidentNetworkUpdated finish." << endl;
+
+    return 0;
+}
+
 int32_t RilCallbackTest::GetSignalStrengthResponse(const RilRadioResponseInfo &responseInfo, const Rssi &rssi)
 {
     PrintResponseInfo("GetSignalStrengthResponse", responseInfo);

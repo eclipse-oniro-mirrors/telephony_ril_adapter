@@ -61,7 +61,7 @@ public:
     void OnNetworkReport(int32_t slotId, const ReportInfo *reportInfo, const uint8_t *response, size_t responseLen);
     void OnSimReport(int32_t slotId, const ReportInfo *reportInfo, const uint8_t *response, size_t responseLen);
     void OnSmsReport(int32_t slotId, const ReportInfo *reportInfo, const uint8_t *response, size_t responseLen);
-    void SetRilCallback(const sptr<OHOS::HDI::Ril::V1_1::IRilCallback> callback);
+    void SetRilCallback(const sptr<OHOS::HDI::Ril::V1_2::IRilCallback> callback);
 
     // Call
     int32_t SetEmergencyCallList(

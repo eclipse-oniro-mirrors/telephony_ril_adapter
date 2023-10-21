@@ -99,6 +99,7 @@ public:
         int32_t indType, const HRilErrNumber error, const void *response, size_t responseLen);
     void RegisterNetworkFuncs(const HRilNetworkReq *networkFuncs);
     bool IsNetworkRespOrNotify(uint32_t code);
+    int32_t ResidentNetworkUpdated(int32_t indType, HRilErrNumber error, const void *response, size_t responseLen);
 
 private:
     void AddHandlerToMap();

@@ -494,6 +494,12 @@ int32_t RilCallbackTest::NetworkCurrentCellUpdated_1_1(
     return 0;
 }
 
+int32_t RilCallbackTest::ResidentNetworkUpdated(const RilRadioResponseInfo &responseInfo, const std::string &plmn)
+{
+    TELEPHONY_LOGI("RilCallbackTest::ResidentNetworkUpdated plmn:%{public}s", plmn.c_str());
+    return 0;
+}
+
 int32_t RilCallbackTest::GetSignalStrengthResponse(const RilRadioResponseInfo &responseInfo, const Rssi &rssi)
 {
     TELEPHONY_LOGI(

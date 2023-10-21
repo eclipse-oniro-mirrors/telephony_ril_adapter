@@ -41,6 +41,7 @@ void HRilNetwork::AddHandlerToMap()
     notiMemberFuncMap_[HNOTI_NETWORK_PHY_CHNL_CFG_UPDATED] = &HRilNetwork::NetworkPhyChnlCfgUpdated;
     notiMemberFuncMap_[HNOTI_NETWORK_CURRENT_CELL_UPDATED] = &HRilNetwork::NetworkCurrentCellUpdated_1_1;
     notiMemberFuncMap_[HNOTI_NETWORK_RRC_CONNECTION_STATE_UPDATED] = &HRilNetwork::GetRrcConnectionStateUpdated;
+    notiMemberFuncMap_[HNOTI_NETWORK_RESIDENT_NETWORK_UPDATED] = &HRilNetwork::ResidentNetworkUpdated;
 
     // Response
     respMemberFuncMap_[HREQ_NETWORK_GET_SIGNAL_STRENGTH] = &HRilNetwork::GetSignalStrengthResponse;
@@ -652,6 +653,16 @@ int32_t HRilNetwork::NetworkCurrentCellUpdated_1_1(
         return HRIL_ERR_GENERIC_FAILURE;
     }
     return Notify(indType, error, &HDI::Ril::V1_1::IRilCallback::NetworkCurrentCellUpdated_1_1, cellList);
+}
+
+int32_t HRilNetwork::ResidentNetworkUpdated(int32_t indType, const HRilErrNumber error, const void *response,
+    size_t responseLen)
+{
+    if (response == nullptr) {
+        TELEPHONY_LOGE("ResidentNetworkUpdated response is invalid");
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    return Notify(indType, error, &HDI::Ril::V1_2::IRilCallback::ResidentNetworkUpdated, (const char *)response);
 }
 
 void HRilNetwork::ExchangeRilRssiToHdf(const void *response, HDI::Ril::V1_1::Rssi &rssi)

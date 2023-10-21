@@ -74,6 +74,7 @@ void ReqSetNotificationFilter(const ReqDataInfo *requestInfo, const int32_t *new
 void ReqSetDeviceState(const ReqDataInfo *requestInfo, const int32_t *deviceStateType, const int32_t *deviceStateOn);
 void ProcessPhyChnlCfgNotify(struct ReportInfo reportInfo, char *srcStr);
 int32_t ProcessCurrentCellList(struct ReportInfo reportInfo, const char *s);
+int32_t ResidentNetworkUpdated(struct ReportInfo reportInfo, const char *s);
 int32_t ProcessRegStatus(const char *s, const HRilRegStatusInfo *hrilRegStateInfo);
 int32_t ProcessParamSignalStrength(const char *result, HRilRssi *hrilRssi);
 int32_t ProcessParamSignalStrengthNotify(const char *result, HRilRssi *hrilRssi);

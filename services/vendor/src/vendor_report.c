@@ -416,6 +416,8 @@ void OnNotifyNetWorksOps(const char *s, const char *infoStr)
         VoiceRadioInfoNotify(reportInfo, ret, str, s);
     } else if (ReportStrWith(s, "^DSDS:")) {
         DsdsModeNotify(reportInfo, str);
+    } else if (ReportStrWith(s, "^PLMN:")) {
+        ResidentNetworkUpdated(reportInfo, str);
     } else {
         TELEPHONY_LOGW("enter to  is unrecognized command");
     }
