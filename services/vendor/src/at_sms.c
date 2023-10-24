@@ -684,9 +684,8 @@ void ReqSetCdmaCBConfig(const ReqDataInfo *requestInfo, const HRilCdmaCBConfigIn
 
 void ReqAddCdmaSimMessage(const ReqDataInfo *requestInfo, const HRilSmsWriteCdmaSms *data, size_t dataLen)
 {
-    struct ReportInfo reportInfo = {0};
     if (data == NULL) {
-        reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
+        struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
         OnSmsReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
         return;
     }
@@ -698,7 +697,7 @@ void ReqAddCdmaSimMessage(const ReqDataInfo *requestInfo, const HRilSmsWriteCdma
         cdmaMsg->address.mode, cdmaMsg->address.type);
     TELEPHONY_LOGD("CreateCdmaPdu3 = %{public}x, %{public}x, %{public}s", cdmaMsg->address.plan,
         cdmaMsg->address.number, cdmaMsg->address.bytes);
-    reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
     OnSmsReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
 }
 

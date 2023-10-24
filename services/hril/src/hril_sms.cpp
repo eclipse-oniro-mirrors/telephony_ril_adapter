@@ -320,7 +320,7 @@ bool HRilSms::CheckCdmaPduLength(HRilCdmaSmsMessageInfo &cdmaSmsInfo, const std:
 {
     int32_t index = INT_LEN * NUM_3 + BYTE_LEN * NUM_5;
     // adress
-    if (pdu.length() < index) {
+    if (pdu.length() < static_cast<size_t>(index)) {
         TELEPHONY_LOGE("pdu length invalid.");
         return false;
     }
@@ -330,21 +330,21 @@ bool HRilSms::CheckCdmaPduLength(HRilCdmaSmsMessageInfo &cdmaSmsInfo, const std:
     }
     cdmaSmsInfo.address.number = stoi(pdu.substr(index - BYTE_LEN, BYTE_LEN), 0, HEXADECIMAL);
     index += BYTE_LEN * cdmaSmsInfo.address.number + BYTE_LEN * NUM_3;
-    if (pdu.length() < index) {
+    if (pdu.length() < static_cast<size_t>(index)) {
         TELEPHONY_LOGE("pdu length invalid.");
         return false;
     }
     // subAdress
     cdmaSmsInfo.subAddress.number = stoi(pdu.substr(index - BYTE_LEN, BYTE_LEN), 0, HEXADECIMAL);
     index += BYTE_LEN * cdmaSmsInfo.subAddress.number + BYTE_LEN;
-    if (pdu.length() < index) {
+    if (pdu.length() < static_cast<size_t>(index)) {
         TELEPHONY_LOGE("pdu length invalid.");
         return false;
     }
     // bearer Data
     cdmaSmsInfo.size = stoi(pdu.substr(index - BYTE_LEN, BYTE_LEN), 0, HEXADECIMAL);
     index += BYTE_LEN * cdmaSmsInfo.size;
-    if (pdu.length() < index) {
+    if (pdu.length() < static_cast<size_t>(index)) {
         TELEPHONY_LOGE("pdu length invalid.");
         return false;
     }
