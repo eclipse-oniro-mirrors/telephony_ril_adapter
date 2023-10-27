@@ -301,7 +301,6 @@ static void UpdateSimMessage(const ReqDataInfo *requestInfo, const HRilSmsWriteS
 {
     char cmd[MAX_CMD_LENGTH] = {0};
     char smsPdu[MAX_CMD_LENGTH] = { 0 };
-    int32_t err;
     HRilSmsWriteSms *msg = NULL;
     ResponseInfo *responseInfo = NULL;
     struct ReportInfo reportInfo = {0};
@@ -310,12 +309,7 @@ static void UpdateSimMessage(const ReqDataInfo *requestInfo, const HRilSmsWriteS
         return;
     }
     msg = ((HRilSmsWriteSms *)data);
-    if (msg == NULL) {
-        TELEPHONY_LOGE("msg is nullptr");
-        return;
-    }
-
-    err = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CMGW=%zu,%d", strlen(msg->pdu) / g_cmdLength, msg->state);
+    int32_t err = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CMGW=%zu,%d", strlen(msg->pdu) / g_cmdLength, msg->state);
     if (err < 0) {
         TELEPHONY_LOGE("GenerateCommand failed, err = %{public}d\n", err);
         SimMessageError(&reportInfo, requestInfo, &err, responseInfo);
@@ -362,6 +356,10 @@ bool CheckSimMessageValid(
         return false;
     }
     msg = ((HRilSmsWriteSms *)data);
+    if (msg == NULL) {
+        TELEPHONY_LOGE("msg is nullptr");
+        return false;
+    }
     if (msg->smsc == NULL || (strcmp(msg->smsc, "") == 0)) {
         msg->smsc = (char *)malloc(strlen("00") + 1);
         if (strcpy_s(msg->smsc, strlen("00") + 1, "00") != EOK) {
