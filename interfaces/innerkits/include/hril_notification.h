@@ -49,6 +49,9 @@ typedef enum {
     /** Called when RSRVCC status is updated. */
     HNOTI_CALL_RSRVCC_STATUS_REPORT,
 
+    /** Called when supplementary service related notification is received from the network. */
+    HNOTI_CALL_SUPP_SVC_NOTIFY,
+
     HNOTI_SMS_BASE = 1100,
 
     /** Called when new SMS is received. */
@@ -65,6 +68,9 @@ typedef enum {
 
     /** Called when new cell broadcast is received. */
     HNOTI_CB_CONFIG_REPORT,
+
+    /** Called when sms storage on SIM card is full. */
+    HNOTI_SMS_SIM_SMS_MEMORY_FULL,
 
     HNOTI_SIM_BASE = 1200,
 
@@ -134,6 +140,9 @@ typedef enum {
 
     /** Called when resident network is updated.*/
     HNOTI_NETWORK_RESIDENT_NETWORK_UPDATED,
+
+    /** Called when network restricted state is updated. */
+    HNOTI_NETWORK_RESTRICTED_STATE_UPDATED,
 
     HNOTI_COMMON_BASE = 1500,
 

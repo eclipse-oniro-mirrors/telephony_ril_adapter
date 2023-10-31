@@ -437,6 +437,26 @@ typedef struct {
     int32_t voiceDomain;
 } HRilCallCsChannelInfo;
 
+/**
+ * @brief Defines the supplementary service notifications information.
+ */
+typedef struct {
+    /** Type of notification: 0 = code1(MO); 1 = code2(MT) */
+    int32_t notificationType;
+
+    /** TS 27.007 7.17 "code1" or "code2" */
+    int32_t code;
+
+    /** TS 27.007 7.17 "index" */
+    int32_t index;
+
+    /** TS 27.007 7.17 "type" (MT only) */
+    int32_t type;
+
+    /** TS 27.007 7.17 "number" (MT only) */
+    char *number;
+} SuppSvcNotification;
+
 typedef struct {
     /**
      * @brief Gets the call status list.
@@ -823,6 +843,39 @@ typedef struct {
     void (*CloseUnFinishedUssd)(const ReqDataInfo *requestInfo);
     void (*ExplicitCallTransferConnection)(const ReqDataInfo *requestInfo);
     void (*SetVonrSwitch)(const ReqDataInfo *requestInfo, int32_t status);
+
+    /**
+     * @brief Enable or disable supplementary service related notification from the network.
+     *
+     * @param requestInfo Request data info, for details, see {@link
+     * ReqDataInfo}.
+     * @param enable Whether to enable notification, 0 indicates disable, 1 indicates enable.
+     * @see ReqDataInfo
+     */
+    void (*SetSuppSrvNotification)(const ReqDataInfo *requestInfo, int32_t enable);
+
+    /**
+     * @brief Get the TTY mode.
+     *
+     * @param requestInfo Request data info, for details, see {@link
+     * ReqDataInfo}.
+     * @see ReqDataInfo
+     */
+    void (*GetTTYMode)(const ReqDataInfo *requestInfo);
+
+    /**
+     * @brief Set the TTY mode.
+     *
+     * @param requestInfo Request data info, for details, see {@link
+     * ReqDataInfo}.
+     * @param mode The TTY mode to set, value as following:
+     * - 0 indicates TTYMode#TTY_MODE_OFF
+     * - 1 indicates TTYMode#TTY_MODE_FULL
+     * - 2 indicates TTYMode#TTY_MODE_HCO
+     * - 3 indicates TTYMode#TTY_MODE_VCO
+     * @see ReqDataInfo
+     */
+    void (*SetTTYMode)(const ReqDataInfo *requestInfo, int32_t mode);
 } HRilCallReq;
 #ifdef __cplusplus
 }
