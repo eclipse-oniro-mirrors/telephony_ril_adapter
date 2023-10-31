@@ -434,4 +434,17 @@ typedef enum {
     HRIL_RADIO_PROTOCOL_STATUS_FAIL
 } HRilRadioProtocolStatus;
 
+typedef enum {
+    TTY_MODE_OFF = 0,
+    TTY_MODE_FULL,
+    TTY_MODE_HCO,
+    TTY_MODE_VCO
+} TTYMode;
+
+typedef enum {
+    CARD_POWER_DOWN = 0,
+    CARD_POWER_UP,
+    CARD_POWER_UP_PASS_THROUGH
+} CardPowerState;
+
 #endif // OHOS_HRIL_ENUM_H

@@ -139,6 +139,15 @@ typedef enum {
     HREQ_EXPLICIT_CALL_TRANSFER_CONNECTION,
     HREQ_SET_VONR_SWITCH,
 
+    /** Enable or disable supplementary service related notification from the network. */
+    HREQ_CALL_SET_SUPP_SRV_NOTIFICATION,
+
+    /** Set the TTY mode. */
+    HREQ_CALL_GET_TTY_MODE,
+
+    /** Get the TTY mode. */
+    HREQ_CALL_SET_TTY_MODE,
+
     HREQ_SMS_BASE = 100,
 
     /** Send GSM SMS. */
@@ -191,6 +200,9 @@ typedef enum {
 
     /** Updates CDMA SMS messages from SIM card. */
     HREQ_SMS_UPDATE_CDMA_SIM_MESSAGE,
+
+    /** Set whether memory is available for new SMS messages. */
+    HREQ_SMS_SET_MEMORY_STATUS,
 
     HREQ_SIM_BASE = 200,
 
@@ -288,6 +300,9 @@ typedef enum {
 
     /** Send SIM matched OperatorInfo. */
     HREQ_SIM_SEND_NCFG_OPER_INFO,
+
+    /** Set SIM card power state. */
+    HREQ_SIM_SET_SIM_POWER_STATE,
 
     HREQ_DATA_BASE = 300,
 

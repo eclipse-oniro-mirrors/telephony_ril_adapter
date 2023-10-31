@@ -382,6 +382,18 @@ typedef struct {
     void (*SimAuthentication)(const ReqDataInfo *requestInfo, HRilSimAuthenticationRequestInfo *data, size_t dataLen);
     void (*UnlockSimLock)(const ReqDataInfo *requestInfo, int32_t lockType, const char *password);
     void (*SendSimMatchedOperatorInfo)(const ReqDataInfo *requestInfo, HRilNcfgOperatorInfo *data, size_t dataLen);
+    /**
+     * @brief Set SIM card power state.
+     *
+     * @param requestInfo Request data info, for details, see {@link
+     * ReqDataInfo}.
+     * @param state The power state of SIM card to set, value as following:
+     * - 0 indicates CardPowerState#CARD_POWER_DOWN
+     * - 1 indicates CardPowerState#CARD_POWER_UP
+     * - 2 indicates CardPowerState#CARD_POWER_UP_PASS_THROUGH
+     * @see ReqDataInfo
+     */
+    void (*SetSimPowerState)(const ReqDataInfo *requestInfo, int32_t state);
 } HRilSimReq;
 #ifdef __cplusplus
 }

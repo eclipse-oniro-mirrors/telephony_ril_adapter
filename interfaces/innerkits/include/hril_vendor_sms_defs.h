@@ -221,6 +221,16 @@ typedef struct {
     void (*AddCdmaSimMessageV2)(const ReqDataInfo *requestInfo, const HRilSmsWriteCdmaSms *data, size_t dataLen);
     void (*DelCdmaSimMessage)(const ReqDataInfo *requestInfo, const int32_t *data, size_t dataLen);
     void (*UpdateCdmaSimMessage)(const ReqDataInfo *requestInfo, const HRilSmsWriteSms *data, size_t dataLen);
+    /**
+     * @brief Set whether memory is available for new SMS messages.
+     *
+     * @param requestInfo Request data info, for details, see {@link
+     * ReqDataInfo}.
+     * @param available Whether memory is available, 0 indicates memory is not available,
+     * 1 indicates available otherwise.
+     * @see ReqDataInfo
+     */
+    void (*SetSmsMemoryStatus)(const ReqDataInfo *requestInfo, int32_t available);
 } HRilSmsReq;
 #ifdef __cplusplus
 }
