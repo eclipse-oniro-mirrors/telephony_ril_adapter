@@ -1404,11 +1404,11 @@ int32_t ResidentNetworkUpdated(struct ReportInfo reportInfo, const char *s)
     }
     if (NextStr(&str, &mcc) < 0) {
         TELEPHONY_LOGE("invalid str!");
-        err = HRIL_ERR_INVALID_MODEM_PARAMETER;
+        return HRIL_ERR_INVALID_MODEM_PARAMETER;
     }
     if (NextStr(&str, &mnc) < 0) {
         TELEPHONY_LOGE("invalid str!");
-        err = HRIL_ERR_INVALID_MODEM_PARAMETER;
+        return HRIL_ERR_INVALID_MODEM_PARAMETER;
     }
     int len = strlen(mcc) + strlen(mnc) + 1;
     if (len > PLMN_LEN) {
