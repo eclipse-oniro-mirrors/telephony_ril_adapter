@@ -46,6 +46,7 @@ public:
     int32_t ProcessNotify(
         int32_t notifyType, const struct ReportInfo *reportInfo, const void *response, size_t responseLen);
     void SetRilCallback(const sptr<HDI::Ril::V1_2::IRilCallback> &callback);
+    std::string StringToHex(const char *data, int byteLength);
 
 protected:
     HRilBase(int32_t slotId, IHRilReporter &hrilReporter) : hrilReporter_(hrilReporter), slotId_(slotId) {}

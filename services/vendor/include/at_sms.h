@@ -38,4 +38,5 @@ int32_t ProcessCellBroadcast(char *pBuff, HRilCBConfigReportInfo *response);
 bool CheckSimMessageValid(
     const ReqDataInfo *requestInfo, const HRilSmsWriteSms *data, size_t dataLen, HRilSmsWriteSms *msg);
 void CreateCdmaPdu(char *pdu, size_t dataLen, const HRilCdmaSmsMessageInfo *cdmaMsg);
+int32_t GetCBConfigData(char *token, char *dcss, int32_t mode, HRilCBConfigInfo *cellBroadcast, int32_t locate);
 #endif // OHOS_AT_SMS_H

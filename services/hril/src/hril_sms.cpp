@@ -35,6 +35,7 @@ const int32_t NUM_3 = 3;
 const int32_t NUM_4 = 4;
 const int32_t NUM_5 = 5;
 const int HEXADECIMAL = 16;
+const char *COMMA_STR = ",";
 } // namespace
 
 HRilSms::HRilSms(int32_t slotId, IHRilReporter &hrilReporter) : HRilBase(slotId, hrilReporter)
@@ -182,24 +183,99 @@ int32_t HRilSms::GetSmscAddr(int32_t serialId)
 
 int32_t HRilSms::SetCBConfig(int32_t serialId, const OHOS::HDI::Ril::V1_1::CBConfigInfo &broadcastInfo)
 {
-    HRilCBConfigInfo cellBroadcastInfo;
-    cellBroadcastInfo.mode = broadcastInfo.mode;
     size_t midsLen = broadcastInfo.mids.size() + 1;
-    if (midsLen > MAX_CHN_LEN) {
+    if (midsLen == 0 || midsLen > MAX_CHN_LEN) {
         return HRIL_ERR_INVALID_PARAMETER;
     }
-    CopyToCharPoint(&cellBroadcastInfo.mids, broadcastInfo.mids);
-    size_t dcssLen = broadcastInfo.dcss.size() + 1;
-    if (dcssLen <= 0) {
-        SafeFrees(cellBroadcastInfo.mids);
+
+    size_t dcssLen = broadcastInfo.dcss.size();
+    if (dcssLen == 0) {
         return HRIL_ERR_INVALID_PARAMETER;
     }
-    CopyToCharPoint(&cellBroadcastInfo.dcss, broadcastInfo.dcss);
-    int32_t result = RequestVendor(serialId, HREQ_SMS_SET_CB_CONFIG, smsFuncs_, &HRilSmsReq::SetCBConfig,
-        &cellBroadcastInfo, sizeof(HRilServiceCenterAddress));
+    int32_t result;
+    std::vector<HRilCBConfigInfo> configInfo;
+    if (!GetHRilCBConfigInfo(configInfo, broadcastInfo)) {
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    if (configInfo.size() == 0 || configInfo.size() > MAX_CHN_LEN) {
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    HRilCBConfigInfo *info = new HRilCBConfigInfo[configInfo.size()];
+    std::size_t locate = 0;
+    while (locate < configInfo.size()) {
+        info[locate].startOfServiceId = configInfo[locate].startOfServiceId;
+        info[locate].endOfServiceId = configInfo[locate].endOfServiceId;
+        info[locate].startOfCodeScheme = configInfo[locate].startOfCodeScheme;
+        info[locate].endOfCodeScheme = configInfo[locate].endOfCodeScheme;
+        info[locate].selected = configInfo[locate].selected;
+        locate++;
+    }
+    uint32_t len = sizeof(HRilCBConfigInfo) * configInfo.size();
+    result = RequestVendor(serialId, HREQ_SMS_SET_CB_CONFIG, smsFuncs_, &HRilSmsReq::SetCBConfig, info, len);
     TELEPHONY_LOGI("SetCBConfig result is: %{public}d", result);
-    SafeFrees(cellBroadcastInfo.mids, cellBroadcastInfo.dcss);
+    delete[] info;
     return result;
+}
+
+bool HRilSms::GetHRilCBConfigInfo(
+    std::vector<HRilCBConfigInfo> &cellBroadcastInfo, const OHOS::HDI::Ril::V1_1::CBConfigInfo &broadcastInfo)
+{
+    std::vector<std::string> mids;
+    SplitMids(broadcastInfo.mids, mids, COMMA_STR);
+    for (auto mid : mids) {
+        std::string startMid;
+        std::string endMid;
+        if (!SplitValue(mid, startMid, endMid, "-")) {
+            TELEPHONY_LOGE("cb channel invalid");
+            return false;
+        }
+        std::string startDcs;
+        std::string endDcs;
+        if (!SplitValue(broadcastInfo.dcss, startDcs, endDcs, "-")) {
+            TELEPHONY_LOGE("cb dcs invalid");
+            return false;
+        }
+        HRilCBConfigInfo info;
+        info.startOfServiceId = std::stoi(startMid);
+        info.endOfServiceId = std::stoi(endMid);
+        info.startOfCodeScheme = std::stoi(startDcs);
+        info.endOfCodeScheme = std::stoi(endDcs);
+        info.selected = broadcastInfo.mode;
+        cellBroadcastInfo.push_back(info);
+    }
+    return true;
+}
+
+void HRilSms::SplitMids(std::string src, std::vector<std::string> &dest, const std::string delimiter)
+{
+    if (src.empty()) {
+        return;
+    }
+    size_t pos = src.find(delimiter);
+    while (pos != std::string::npos) {
+        dest.push_back(src.substr(0, pos));
+        src.erase(0, pos + delimiter.length());
+        pos = src.find(delimiter);
+    }
+    dest.push_back(src);
+}
+
+bool HRilSms::SplitValue(std::string value, std::string &start, std::string &end, const std::string delimiter)
+{
+    if (value.empty()) {
+        return false;
+    }
+    size_t pos = value.find(delimiter);
+    if (pos == 0 || pos == value.size() - 1) {
+        return false;
+    } else if (pos == std::string::npos) {
+        start = value;
+        end = value;
+        return true;
+    }
+    start = value.substr(0, pos);
+    end = value.substr(pos + 1);
+    return true;
 }
 
 int32_t HRilSms::GetCBConfig(int32_t serialId)
@@ -462,32 +538,54 @@ int32_t HRilSms::GetCBConfigResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     HDI::Ril::V1_1::CBConfigInfo broadcastInfo;
-    if (response == nullptr || responseLen != sizeof(HRilCBConfigInfo)) {
+    if (response == nullptr) {
         TELEPHONY_LOGE("Invalid response: response is nullptr");
         broadcastInfo.mode = -1;
         broadcastInfo.mids = std::string("");
         broadcastInfo.dcss = std::string("");
     } else {
         HRilCBConfigInfo *cellBroadcastInfo = (HRilCBConfigInfo *)response;
-        broadcastInfo.mode = cellBroadcastInfo->mode;
-        if (cellBroadcastInfo->mids == nullptr) {
-            broadcastInfo.mids = std::string("");
-            TELEPHONY_LOGE("result.mids is nullptr");
-        } else {
-            TELEPHONY_LOGI("result.mids :%{private}s", cellBroadcastInfo->mids);
-            broadcastInfo.mids = std::string(cellBroadcastInfo->mids);
+        size_t len = responseLen / sizeof(HRilCBConfigInfo);
+        if (len != 0) {
+            if (!GetCBConfigInfo(cellBroadcastInfo, len, broadcastInfo)) {
+                TELEPHONY_LOGE("result is invalid");
+            }
         }
-        if (cellBroadcastInfo->dcss == nullptr) {
-            broadcastInfo.dcss = std::string("");
-            TELEPHONY_LOGE("result.dcss is nullptr");
-        } else {
-            TELEPHONY_LOGI("result.dcss :%{private}s", cellBroadcastInfo->dcss);
-            broadcastInfo.dcss = std::string(cellBroadcastInfo->dcss);
-        }
-        TELEPHONY_LOGD("mode:%{private}d, mids:%{private}s, dcss:%{private}s", cellBroadcastInfo->mode,
-            cellBroadcastInfo->mids, cellBroadcastInfo->dcss);
+        TELEPHONY_LOGD("mode:%{public}d, mids:%{public}s, dcss:%{public}s", broadcastInfo.mode,
+            broadcastInfo.mids.c_str(), broadcastInfo.dcss.c_str());
     }
     return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::GetCBConfigResponse, broadcastInfo);
+}
+
+bool HRilSms::GetCBConfigInfo(
+    HRilCBConfigInfo *cellBroadcastInfo, size_t len, OHOS::HDI::Ril::V1_1::CBConfigInfo &broadcastInfo)
+{
+    broadcastInfo.mode = cellBroadcastInfo[0].selected;
+    std::string mids;
+    std::string dcss;
+    for (size_t locate = 0; locate < len; locate++) {
+        if (cellBroadcastInfo[locate].startOfServiceId > cellBroadcastInfo[locate].endOfServiceId) {
+            TELEPHONY_LOGE("result.mids is invalid");
+            return false;
+        } else if (cellBroadcastInfo[locate].startOfServiceId < cellBroadcastInfo[locate].endOfServiceId) {
+            mids += std::to_string(cellBroadcastInfo[locate].startOfServiceId) + "-" +
+                    std::to_string(cellBroadcastInfo[locate].endOfServiceId) + COMMA_STR;
+        } else {
+            mids += std::to_string(cellBroadcastInfo[locate].startOfServiceId) + COMMA_STR;
+        }
+        if (cellBroadcastInfo[locate].startOfCodeScheme > cellBroadcastInfo[locate].endOfCodeScheme) {
+            TELEPHONY_LOGE("result.dcss is invalid");
+            return false;
+        } else if (cellBroadcastInfo[locate].startOfCodeScheme < cellBroadcastInfo[locate].endOfCodeScheme) {
+            dcss += std::to_string(cellBroadcastInfo[locate].startOfCodeScheme) + "-" +
+                    std::to_string(cellBroadcastInfo[locate].endOfCodeScheme) + COMMA_STR;
+        } else {
+            dcss += std::to_string(cellBroadcastInfo[locate].startOfCodeScheme) + COMMA_STR;
+        }
+    }
+    broadcastInfo.mids = mids;
+    broadcastInfo.dcss = dcss;
+    return true;
 }
 
 int32_t HRilSms::SetCdmaCBConfigResponse(
@@ -763,7 +861,7 @@ HDI::Ril::V1_1::CBConfigReportInfo HRilSms::MakeCBConfigResult(const void *respo
             TELEPHONY_LOGE("result.pdu is nullptr");
         } else {
             TELEPHONY_LOGI("result.pdu :%{private}s", cellBroadcastReportInfo->pdu);
-            result.pdu = std::string(cellBroadcastReportInfo->pdu);
+            result.pdu = StringToHex(cellBroadcastReportInfo->pdu, cellBroadcastReportInfo->length);
         }
         if (cellBroadcastReportInfo->dcs == nullptr) {
             result.dcs = std::string("");
