@@ -108,5 +108,6 @@ void ReqSimCloseLogicalChannel(const ReqDataInfo *requestInfo, int32_t channelId
 void ReqSimTransmitApduLogicalChannel(const ReqDataInfo *requestInfo, HRilApduSimIO *data, size_t dataLen);
 void ReqSimAuthentication(const ReqDataInfo *requestInfo, HRilSimAuthenticationRequestInfo *data, size_t dataLen);
 void ReqUnlockSimLock(const ReqDataInfo *requestInfo, int32_t lockType, const char *password);
+void ReqSendSimMatchedOperatorInfo(const ReqDataInfo *requestInfo, HRilNcfgOperatorInfo *data, size_t dataLen);
 uint8_t ToByte(char c);
 #endif // OHOS_AT_SIM_H

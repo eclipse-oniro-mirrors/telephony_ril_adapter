@@ -62,6 +62,7 @@ void HRilSim::AddHandlerToMap()
     respMemberFuncMap_[HREQ_SIM_TRANSMIT_APDU_BASIC_CHANNEL] = &HRilSim::SimTransmitApduBasicChannelResponse;
     respMemberFuncMap_[HREQ_SIM_AUTHENTICATION] = &HRilSim::SimAuthenticationResponse;
     respMemberFuncMap_[HREQ_SIM_UNLOCK_SIM_LOCK] = &HRilSim::UnlockSimLockResponse;
+    respMemberFuncMap_[HREQ_SIM_SEND_NCFG_OPER_INFO] = &HRilSim::SendSimMatchedOperatorInfoResponse;
 }
 
 void HRilSim::AddNotificationHandlerToMap()
@@ -283,6 +284,18 @@ int32_t HRilSim::UnlockSimLock(int32_t serialId, int32_t lockType, const std::st
     int32_t ret =
         RequestVendor(serialId, HREQ_SIM_UNLOCK_SIM_LOCK, simFuncs_, &HRilSimReq::UnlockSimLock, lockType, keyPoint);
     SafeFrees(keyPoint);
+    return ret;
+}
+
+int32_t HRilSim::SendSimMatchedOperatorInfo(
+    int32_t serialId, const OHOS::HDI::Ril::V1_2::NcfgOperatorInfo &ncfgOperatorInfo)
+{
+    std::unique_ptr<HRilNcfgOperatorInfo> rilNcfgOperatorInfo =
+        std::make_unique<HRilNcfgOperatorInfo>();
+    CopyToHRilNcfgOperatorInfo(rilNcfgOperatorInfo, ncfgOperatorInfo);
+    int32_t ret = RequestVendor(serialId, HREQ_SIM_SEND_NCFG_OPER_INFO, simFuncs_,
+        &HRilSimReq::SendSimMatchedOperatorInfo, rilNcfgOperatorInfo.get(), sizeof(*rilNcfgOperatorInfo));
+    SafeFrees(rilNcfgOperatorInfo->operName, rilNcfgOperatorInfo->operKey, rilNcfgOperatorInfo->reserve);
     return ret;
 }
 
@@ -544,6 +557,12 @@ HDI::Ril::V1_1::IccIoResultInfo HRilSim::ProcessIccIoResponse(
     return result;
 }
 
+int32_t HRilSim::SendSimMatchedOperatorInfoResponse(
+    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+{
+    return Response(responseInfo, &HDI::Ril::V1_2::IRilCallback::SendSimMatchedOperatorInfoResponse);
+}
+
 int32_t HRilSim::SimStateUpdated(
     int32_t notifyType, const HRilErrNumber error, const void *response, size_t responseLen)
 {
@@ -677,6 +696,15 @@ void HRilSim::CopyToHRilSimAuthentication(std::unique_ptr<HRilSimAuthenticationR
     rilSimAuthInfo->serial = simAuthInfo.serial;
     CopyToCharPoint(&(rilSimAuthInfo->aid), simAuthInfo.aid);
     CopyToCharPoint(&(rilSimAuthInfo->data), simAuthInfo.authData);
+}
+
+void HRilSim::CopyToHRilNcfgOperatorInfo(std::unique_ptr<HRilNcfgOperatorInfo> &rilNcfgOperatorInfo,
+    const OHOS::HDI::Ril::V1_2::NcfgOperatorInfo &ncfgOperatorInfo);
+{
+    CopyToCharPoint(&(rilNcfgOperatorInfo->operName), ncfgOperatorInfo.operName);
+    CopyToCharPoint(&(rilNcfgOperatorInfo->operKey), ncfgOperatorInfo.operKey);
+    rilNcfgOperatorInfo->state = ncfgOperatorInfo.state;
+    CopyToCharPoint(&(rilNcfgOperatorInfo->reserve), ncfgOperatorInfo.reserve);
 }
 
 bool HRilSim::BuildLockStatusResp(const void *response, size_t responseLen, HDI::Ril::V1_1::LockStatusResp &lockStatus)

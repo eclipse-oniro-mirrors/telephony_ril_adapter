@@ -118,6 +118,7 @@ static const HRilSimReq g_simReqOps = {
     .SimTransmitApduLogicalChannel = ReqSimTransmitApduLogicalChannel,
     .SimAuthentication = ReqSimAuthentication,
     .UnlockSimLock = ReqUnlockSimLock,
+    .SendSimMatchedOperatorInfo = ReqSendSimMatchedOperatorInfo,
 };
 
 static const HRilSmsReq g_smsReqOps = {

@@ -102,6 +102,7 @@ public:
     void SimCloseLogicalChannelTest(int32_t slotId);
     void SimTransmitApduLogicalChannelTest(int32_t slotId);
     void SimAuthenticationTest(int32_t slotId);
+    void SendSimMatchedOperatorInfoTest(int32_t slotId);
     void SetActiveSimTest(int32_t slotId);
     void SimTransmitApduBasicChannelTest(int32_t slotId);
     void UnlockSimLockTest(int32_t slotId);

@@ -1246,6 +1246,12 @@ void ReqUnlockSimLock(const ReqDataInfo *requestInfo, int32_t lockType, const ch
     FreeResponseInfo(pResponse);
 }
 
+void ReqSendSimMatchedOperatorInfo(const ReqDataInfo *requestInfo, HRilNcfgOperatorInfo *data, size_t dataLen)
+{
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
+    OnSimReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
+}
+
 void ConvertUsimFcpToSimRsp(uint8_t **simResponse)
 {
     uint16_t fcpLen = strlen((char *)*simResponse) / HALF_LEN;

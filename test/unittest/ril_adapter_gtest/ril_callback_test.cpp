@@ -19,7 +19,7 @@
 
 namespace OHOS {
 namespace Telephony {
-using namespace OHOS::HDI::Ril::V1_1;
+using namespace OHOS::HDI::Ril::V1_2;
 void RilCallbackTest::NotifyAll()
 {
     std::unique_lock<std::mutex> callbackLock(callbackMutex_);
@@ -71,7 +71,7 @@ bool RilCallbackTest::GetBoolResult(HdiId hdiId)
 int32_t RilCallbackTest::SimStateUpdated(const RilRadioResponseInfo &responseInfo)
 {
     TELEPHONY_LOGI("SimStateUpdated notice : slotId = %{public}d", responseInfo.slotId);
-    auto g_rilInterface = IRil::Get();
+    auto g_rilInterface = OHOS::HDI::Ril::V1_2::IRil::Get();
     if (g_rilInterface != nullptr) {
         g_rilInterface->GetSimStatus(GetSerialId(), responseInfo.slotId);
     }
@@ -342,6 +342,15 @@ int32_t RilCallbackTest::UnlockSimLockResponse(
     TELEPHONY_LOGI("GetBoolResult UnlockSimLock result : result = %{public}d, remain = %{public}d", lockStatus.result,
         lockStatus.remain);
     hdiId_ = HdiId::HREQ_SIM_UNLOCK_SIM_LOCK;
+    resultInfo_ = responseInfo;
+    NotifyAll();
+    return 0;
+}
+
+int32_t RilCallbackTest::SendSimMatchedOperatorInfoResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)
+{
+    TELEPHONY_LOGI("GetBoolResult SendSimMatchedOperatorInfo result");
+    hdiId_ = HdiId::HREQ_SIM_SEND_NCFG_OPER_INFO;
     resultInfo_ = responseInfo;
     NotifyAll();
     return 0;

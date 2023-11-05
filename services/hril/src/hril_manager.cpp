@@ -759,6 +759,13 @@ int32_t HRilManager::UnlockSimLock(int32_t slotId, int32_t serialId, int32_t loc
     return TaskSchedule(MODULE_HRIL_SIM, hrilSim_[slotId], &HRilSim::UnlockSimLock, serialId, lockType, key);
 }
 
+int32_t HRilManager::SendSimMatchedOperatorInfo(
+    int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_2::NcfgOperatorInfo &ncfgOperatorInfo)
+{
+    return TaskSchedule(
+        MODULE_HRIL_SIM, hrilSim_[slotId], &HRilSim::SendSimMatchedOperatorInfo, serialId, ncfgOperatorInfo);
+}
+
 // Network
 int32_t HRilManager::GetSignalStrength(int32_t slotId, int32_t serialId)
 {

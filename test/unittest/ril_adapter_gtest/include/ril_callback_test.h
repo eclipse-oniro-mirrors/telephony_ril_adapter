@@ -123,6 +123,7 @@ enum class HdiId {
     HREQ_SIM_TRANSMIT_APDU_BASIC_CHANNEL,
     HREQ_SIM_AUTHENTICATION,
     HREQ_SIM_UNLOCK_SIM_LOCK,
+    HREQ_SIM_SEND_NCFG_OPER_INFO,
 
     HREQ_DATA_BASE = 300,
     HREQ_DATA_SET_INIT_APN_INFO,
@@ -395,6 +396,7 @@ public:
         const HDI::Ril::V1_1::IccIoResultInfo &result) override;
     int32_t UnlockSimLockResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_1::LockStatusResp &lockStatus) override;
+    int32_t SendSimMatchedOperatorInfoResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
 
     // Network
     int32_t NetworkCsRegStatusUpdated(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
