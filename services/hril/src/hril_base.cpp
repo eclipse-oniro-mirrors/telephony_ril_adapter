@@ -15,8 +15,14 @@
 
 #include "hril_base.h"
 
+#include <sstream>
+#include <string_ex.h>
+
 namespace OHOS {
 namespace Telephony {
+static constexpr uint8_t HEX_OFFSET = 4;
+static constexpr char HEX_TABLE[] = "0123456789ABCDEF";
+
 int32_t HRilBase::ConvertHexStringToInt(char **response, int32_t index, int32_t length)
 {
     const int32_t hexBase = HRIL_INVALID_HEX_CHAR;
@@ -148,6 +154,16 @@ HDI::Ril::V1_1::RilRadioResponseInfo HRilBase::BuildIHRilRadioResponseInfo(const
 void HRilBase::SetRilCallback(const sptr<HDI::Ril::V1_2::IRilCallback> &callback)
 {
     callback_ = callback;
+}
+
+std::string HRilBase::StringToHex(const char *data, int byteLength)
+{
+    std::stringstream ss;
+    for (int i = 0; i < byteLength; ++i) {
+        unsigned char temp = static_cast<unsigned char>(data[i]) >> HEX_OFFSET;
+        ss << HEX_TABLE[temp] << HEX_TABLE[static_cast<unsigned char>(data[i]) & 0xf];
+    }
+    return ss.str();
 }
 } // namespace Telephony
 } // namespace OHOS

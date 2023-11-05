@@ -83,21 +83,28 @@ typedef struct {
 /**
  * @brief Defines the GSM cell broadcast configuration information.
  *
- * From 3GPP TS 27.005  AT+CSCB=[<mode>[,<mids>[,<dcss>]]]
  */
 typedef struct {
     /**
-     * Mode (activated or not)
+     * Message start ID
      */
-    int32_t mode;
+    int32_t startOfServiceId;
     /**
-     * Message IDs
+     * Message end ID
      */
-    char *mids;
+    int32_t endOfServiceId;
     /**
-     * Data coding schemes
+     * Data start coding scheme
      */
-    char *dcss;
+    int32_t startOfCodeScheme;
+    /**
+     * Data end coding scheme
+     */
+    int32_t endOfCodeScheme;
+    /**
+     * selected (activated or not)
+     */
+    unsigned char selected;
 } HRilCBConfigInfo;
 
 /**

@@ -98,7 +98,14 @@ private:
         HRilCdmaCBConfigInfo *list, OHOS::HDI::Ril::V1_1::CdmaCBConfigInfoList cellBroadcastInfoList);
     bool CreateCdmaMessageInfo(HRilCdmaSmsMessageInfo &cdmaSmsInfo, const std::string &pdu);
     bool CheckCdmaPduLength(HRilCdmaSmsMessageInfo &cdmaSmsInfo, const std::string &pdu);
+    bool GetHRilCBConfigInfo(
+        std::vector<HRilCBConfigInfo> &cellBroadcastInfo, const OHOS::HDI::Ril::V1_1::CBConfigInfo &broadcastInfo);
+    bool GetCBConfigInfo(
+        HRilCBConfigInfo *cellBroadcastInfo, size_t len, OHOS::HDI::Ril::V1_1::CBConfigInfo &broadcastInfo);
+    void SplitMids(std::string src, std::vector<std::string> &dest, const std::string delimiter);
+    bool SplitValue(std::string value, std::string &start, std::string &end, const std::string delimiter);
 
+private:
     const HRilSmsReq *smsFuncs_ = nullptr;
 };
 } // namespace Telephony
