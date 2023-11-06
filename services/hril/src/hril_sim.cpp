@@ -699,7 +699,7 @@ void HRilSim::CopyToHRilSimAuthentication(std::unique_ptr<HRilSimAuthenticationR
 }
 
 void HRilSim::CopyToHRilNcfgOperatorInfo(std::unique_ptr<HRilNcfgOperatorInfo> &rilNcfgOperatorInfo,
-    const OHOS::HDI::Ril::V1_2::NcfgOperatorInfo &ncfgOperatorInfo);
+    const OHOS::HDI::Ril::V1_2::NcfgOperatorInfo &ncfgOperatorInfo)
 {
     CopyToCharPoint(&(rilNcfgOperatorInfo->operName), ncfgOperatorInfo.operName);
     CopyToCharPoint(&(rilNcfgOperatorInfo->operKey), ncfgOperatorInfo.operKey);
