@@ -558,7 +558,7 @@ HDI::Ril::V1_1::IccIoResultInfo HRilSim::ProcessIccIoResponse(
 }
 
 int32_t HRilSim::SendSimMatchedOperatorInfoResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     return Response(responseInfo, &HDI::Ril::V1_2::IRilCallback::SendSimMatchedOperatorInfoResponse);
 }
