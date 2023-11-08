@@ -71,7 +71,7 @@ void RilTestUtil::Init()
         TELEPHONY_LOGE("RilTestUtil has init");
         return;
     }
-    rilInterface_ = IRil::Get();
+    rilInterface_ = OHOS::HDI::Ril::V1_2::IRil::Get();
     hasVoiceCapable_ = HasVoiceCapability();
     slotCount_ = GetMaxSimCount();
     if (rilInterface_ == nullptr) {
@@ -147,7 +147,7 @@ bool RilTestUtil::IsReadyInner(int32_t slotId)
     return callback_->IsReady(slotId);
 }
 
-sptr<IRil> RilTestUtil::GetRilInterface()
+sptr<OHOS::HDI::Ril::V1_2::IRil> RilTestUtil::GetRilInterface()
 {
     return rilTestUtil_.rilInterface_;
 }

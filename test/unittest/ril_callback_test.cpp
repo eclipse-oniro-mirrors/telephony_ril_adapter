@@ -19,7 +19,7 @@
 
 namespace OHOS {
 namespace Telephony {
-using namespace OHOS::HDI::Ril::V1_1;
+using namespace OHOS::HDI::Ril::V1_2;
 using namespace std;
 
 enum class RatType {
@@ -266,6 +266,12 @@ int32_t RilCallbackTest::UnlockSimLockResponse(
     PrintResponseInfo("UnlockPuk2Response", responseInfo);
     cout << "[LockStatusResp] -->[result] : " << lockStatus.result << " -->[remain] : " << lockStatus.remain;
     cout << endl << endl;
+    return 0;
+}
+
+int32_t RilCallbackTest::SendSimMatchedOperatorInfoResponse(const RilRadioResponseInfo &responseInfo)
+{
+    PrintResponseInfo("SendSimMatchedOperatorInfoResponse", responseInfo);
     return 0;
 }
 

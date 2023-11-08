@@ -56,6 +56,8 @@ public:
     int32_t SimTransmitApduBasicChannel(int32_t serialId, const OHOS::HDI::Ril::V1_1::ApduSimIORequestInfo &apduSimIO);
     int32_t SimAuthentication(int32_t serialId, const OHOS::HDI::Ril::V1_1::SimAuthenticationRequestInfo &simAuthInfo);
     int32_t UnlockSimLock(int32_t serialId, int32_t lockType, const std::string &key);
+    int32_t SendSimMatchedOperatorInfo(
+        int32_t serialId, const OHOS::HDI::Ril::V1_2::NcfgOperatorInfo &ncfgOperatorInfo);
 
 private:
     void AddHandlerToMap();
@@ -108,6 +110,8 @@ private:
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     HDI::Ril::V1_1::IccIoResultInfo ProcessIccIoResponse(
         HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t SendSimMatchedOperatorInfoResponse(
+        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
 
     int32_t SimStateUpdated(int32_t notifyType, const HRilErrNumber error, const void *response, size_t responseLen);
     int32_t SimStkSessionEndNotify(
@@ -134,6 +138,8 @@ private:
         std::unique_ptr<HRilApduSimIO> &rilApduSimIO, const OHOS::HDI::Ril::V1_1::ApduSimIORequestInfo &apduSimIO);
     void CopyToHRilSimAuthentication(std::unique_ptr<HRilSimAuthenticationRequestInfo> &rilSimAuthInfo,
         const OHOS::HDI::Ril::V1_1::SimAuthenticationRequestInfo &simAuthInfo);
+    void CopyToHRilNcfgOperatorInfo(std::unique_ptr<HRilNcfgOperatorInfo> &rilNcfgOperatorInfo,
+        const OHOS::HDI::Ril::V1_2::NcfgOperatorInfo &ncfgOperatorInfo);
     bool BuildLockStatusResp(const void *response, size_t responseLen, HDI::Ril::V1_1::LockStatusResp &lockStatus);
     void ResponseLockStatus(HDI::Ril::V1_1::LockStatusResp &lockStatus, HRilRadioResponseInfo &responseInfo,
         const void *response, size_t responseLen);

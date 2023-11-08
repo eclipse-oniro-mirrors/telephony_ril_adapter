@@ -298,6 +298,23 @@ struct SimAuthenticationRequestInfo {
 };
 
 /**
+ * @brief Defines the Send SIM matched operator info request information.
+ */
+struct NcfgOperatorInfo {
+    /** Operator Name Matched with SIM card */
+    std::string operName = "";
+
+    /** Operator Key Matched with SIM card */
+    std::string operKey = "";
+
+    /** Current SIM State */
+    int32_t state = 0;
+
+    /** Reserved Field */
+    std::string reserve = "";
+};
+
+/**
  * @brief Defines the response to the request for enabling the logical channel of the APDU.
  */
 struct OpenLogicalChannelResponse {

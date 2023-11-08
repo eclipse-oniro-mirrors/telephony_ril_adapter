@@ -159,6 +159,8 @@ public:
     int32_t SimAuthentication(
         int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_1::SimAuthenticationRequestInfo &simAuthInfo);
     int32_t UnlockSimLock(int32_t slotId, int32_t serialId, int32_t lockType, const std::string &key);
+    int32_t SendSimMatchedOperatorInfo(
+        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_2::NcfgOperatorInfo &ncfgOperatorInfo);
 
     // Network
     int32_t GetSignalStrength(int32_t slotId, int32_t serialId);

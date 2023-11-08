@@ -18,10 +18,10 @@
 
 namespace OHOS {
 namespace Telephony {
-using namespace OHOS::HDI::Ril::V1_1;
+using namespace OHOS::HDI::Ril::V1_2;
 using namespace testing::ext;
 namespace {
-sptr<IRil> g_rilInterface = nullptr;
+sptr<OHOS::HDI::Ril::V1_2::IRil> g_rilInterface = nullptr;
 }
 
 void RILSimTest::SetUpTestCase()
@@ -608,6 +608,48 @@ HWTEST_F(RILSimTest, Telephony_DriverSystem_GetSimLockStatus_V1_0200, Function |
     ASSERT_TRUE(RilTestUtil::GetBoolResult(HdiId::HREQ_SIM_GET_SIM_LOCK_STATUS));
 #endif
     ASSERT_TRUE(true);
+}
+
+/**
+ * @tc.number   Telephony_DriverSystem_SendSimMatchedOperatorInfo_V1_0100
+ * @tc.name     Send sim matched operator info
+ * @tc.desc     Function test
+ */
+HWTEST_F(RILSimTest, Telephony_DriverSystem_SendSimMatchedOperatorInfo_V1_0100, Function | MediumTest | Level3)
+{
+    if (!RilTestUtil::IsReady(SLOTID_1)) {
+        return;
+    }
+    NcfgOperatorInfo ncfgOperatorInfo;
+    ncfgOperatorInfo.operName = "operName";
+    ncfgOperatorInfo.operKey = "operKey";
+    ncfgOperatorInfo.state = 0;
+    ncfgOperatorInfo.reserve = "reserve";
+    int32_t ret = g_rilInterface->SendSimMatchedOperatorInfo(SLOTID_1, RilTestUtil::GetSerialId(), ncfgOperatorInfo);
+    RilTestUtil::WaitFor(WAIT_TIME_SECOND);
+    EXPECT_EQ(SUCCESS, ret);
+    ASSERT_TRUE(RilTestUtil::GetBoolResult(HdiId::HREQ_SIM_SEND_NCFG_OPER_INFO));
+}
+
+/**
+ * @tc.number   Telephony_DriverSystem_SendSimMatchedOperatorInfo_V1_0200
+ * @tc.name     Send sim matched operator info
+ * @tc.desc     Function test
+ */
+HWTEST_F(RILSimTest, Telephony_DriverSystem_SendSimMatchedOperatorInfo_V1_0200, Function | MediumTest | Level3)
+{
+    if (!RilTestUtil::IsReady(SLOTID_2)) {
+        return;
+    }
+    NcfgOperatorInfo ncfgOperatorInfo;
+    ncfgOperatorInfo.operName = "operName";
+    ncfgOperatorInfo.operKey = "operKey";
+    ncfgOperatorInfo.state = 0;
+    ncfgOperatorInfo.reserve = "reserve";
+    int32_t ret = g_rilInterface->SendSimMatchedOperatorInfo(SLOTID_2, RilTestUtil::GetSerialId(), ncfgOperatorInfo);
+    RilTestUtil::WaitFor(WAIT_TIME_SECOND);
+    EXPECT_EQ(SUCCESS, ret);
+    ASSERT_TRUE(RilTestUtil::GetBoolResult(HdiId::HREQ_SIM_SEND_NCFG_OPER_INFO));
 }
 
 /**

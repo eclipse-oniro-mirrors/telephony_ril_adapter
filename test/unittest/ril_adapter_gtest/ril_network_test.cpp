@@ -18,10 +18,10 @@
 
 namespace OHOS {
 namespace Telephony {
-using namespace OHOS::HDI::Ril::V1_1;
+using namespace OHOS::HDI::Ril::V1_2;
 using namespace testing::ext;
 namespace {
-sptr<IRil> g_rilInterface = nullptr;
+sptr<OHOS::HDI::Ril::V1_2::IRil> g_rilInterface = nullptr;
 }
 
 void RILNetworkTest::SetUpTestCase()

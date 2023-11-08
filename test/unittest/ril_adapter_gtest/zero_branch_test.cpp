@@ -180,6 +180,8 @@ bool TestSimInterface(std::shared_ptr<HRilManager> manager)
     OHOS::HDI::Ril::V1_1::SimAuthenticationRequestInfo simAuthInfo;
     EXPECT_NE(HDF_SUCCESS, manager->SimAuthentication(0, 0, simAuthInfo));
     EXPECT_NE(HDF_SUCCESS, manager->UnlockSimLock(0, 0, 0, ""));
+    OHOS::HDI::Ril::V1_2::NcfgOperatorInfo ncfgOperatorInfo;
+    EXPECT_NE(HDF_SUCCESS, manager->SendSimMatchedOperatorInfo(0, 0, ncfgOperatorInfo));
     return true;
 }
 
@@ -448,6 +450,7 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Sim_002, Function | MediumTest | Leve
     EXPECT_NE(HDF_SUCCESS, sim->SimTransmitApduBasicChannelResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, sim->SimAuthenticationResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, sim->UnlockSimLockResponse(0, responseInfo, nullptr, 0));
+    EXPECT_NE(HDF_SUCCESS, sim->SendSimMatchedOperatorInfoResponse(0, responseInfo, nullptr, 0));
 
     EXPECT_NE(HDF_SUCCESS, sim->SimStateUpdated(0, HRilErrNumber::HRIL_ERR_NULL_POINT, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, sim->SimStkSessionEndNotify(0, HRilErrNumber::HRIL_ERR_NULL_POINT, nullptr, 0));
