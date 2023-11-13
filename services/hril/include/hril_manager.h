@@ -27,7 +27,9 @@
 #include "hril_sim.h"
 #include "hril_sms.h"
 #include "hril_timer_callback.h"
+#ifdef ABILITY_POWER_SUPPORT
 #include "v1_1/ipower_interface.h"
+#endif
 
 namespace OHOS {
 namespace Telephony {
@@ -213,7 +215,9 @@ public:
     int32_t SendRilAck();
 
 public:
+#ifdef ABILITY_POWER_SUPPORT
     sptr<OHOS::HDI::Power::V1_1::IPowerInterface> powerInterface_ { nullptr };
+#endif
     std::unique_ptr<HRilTimerCallback> timerCallback_ = nullptr;
     std::unique_ptr<std::thread> eventLoop_ = nullptr;
     static const uint32_t RUNNING_LOCK_DEFAULT_TIMEOUT_US = 200 * 1000; // 200ms
