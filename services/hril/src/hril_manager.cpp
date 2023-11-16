@@ -29,6 +29,7 @@ constexpr const char *MODULE_HRIL_SIM = "hrilSim";
 constexpr const char *MODULE_HRIL_NETWORK = "hrilNetwork";
 constexpr const char *MODULE_HRIL_SMS = "hrilSms";
 const std::string RUNNINGLOCK_NAME = "HRilRunningLock";
+constexpr int32_t RUNNINGLOCK_TIMEOUTMS_LASTING = -1;
 static bool g_isHrilManagerDestory = false;
 static std::shared_ptr<HRilManager> g_manager = std::make_shared<HRilManager>();
 static pthread_mutex_t dispatchMutex = PTHREAD_MUTEX_INITIALIZER;
@@ -37,10 +38,7 @@ std::unordered_map<int32_t, int32_t> HRilManager::notificationMap_ = {
 #include "hril_notification_map.h"
 };
 
-#ifdef ABILITY_POWER_SUPPORT
-constexpr int32_t RUNNINGLOCK_TIMEOUTMS_LASTING = -1;
 using namespace OHOS::HDI::Power::V1_1;
-#endif
 
 static bool IsHrilManagerValid()
 {
@@ -154,7 +152,6 @@ void HRilManager::RegisterSmsFuncs(int32_t slotId, const HRilSmsReq *smsFuncs)
     }
 }
 
-#ifdef ABILITY_POWER_SUPPORT
 static OHOS::HDI::Power::V1_1::RunningLockInfo FillRunningLockInfo(const std::string &name, int32_t timeoutMs)
 {
     OHOS::HDI::Power::V1_1::RunningLockInfo filledInfo {};
@@ -187,11 +184,9 @@ static void RunningLockCallback(uint8_t *param)
     g_manager->powerInterface_->UnholdRunningLock(filledInfo);
     TELEPHONY_LOGD("RunningLockCallback, UnLock");
 }
-#endif
 
 void HRilManager::ApplyRunningLock(void)
 {
-#ifdef ABILITY_POWER_SUPPORT
     if (!IsHrilManagerValid() || timerCallback_ == nullptr) {
         TELEPHONY_LOGE("check nullptr fail.");
         return;
@@ -219,12 +214,10 @@ void HRilManager::ApplyRunningLock(void)
             TELEPHONY_LOGE("failed to get power hdi interface");
         }
     }
-#endif
 }
 
 void HRilManager::ReleaseRunningLock(void)
 {
-#ifdef ABILITY_POWER_SUPPORT
     std::lock_guard<std::mutex> lockRequest(mutexRunningLock_);
     TELEPHONY_LOGD("ReleaseRunningLock, runningLockCount_:%{public}d", static_cast<int>(runningLockCount_));
     if (powerInterface_ == nullptr) {
@@ -240,7 +233,6 @@ void HRilManager::ReleaseRunningLock(void)
         powerInterface_->UnholdRunningLock(filledInfo);
         TELEPHONY_LOGD("ReleaseRunningLock UnLock");
     }
-#endif
 }
 
 template<typename T>
@@ -1009,14 +1001,12 @@ void HRilInit(void)
         TELEPHONY_LOGE("HRilInit: g_manager is nullptr");
         return;
     }
-#ifdef ABILITY_POWER_SUPPORT
     if (g_manager->powerInterface_ == nullptr) {
         g_manager->powerInterface_ = IPowerInterface::Get();
         if (g_manager->powerInterface_ == nullptr) {
             TELEPHONY_LOGE("failed to get power hdi interface");
         }
     }
-#endif
     if (g_manager->eventLoop_ != nullptr) {
         TELEPHONY_LOGD("eventLoop_ has exit");
         return;

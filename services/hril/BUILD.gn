@@ -49,6 +49,7 @@ ohos_shared_library("hril") {
 
   external_deps = [
     "c_utils:utils",
+    "drivers_interface_power:libpower_proxy_1.1",
     "drivers_interface_ril:ril_idl_headers_1.2",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
@@ -56,13 +57,6 @@ ohos_shared_library("hril") {
     "init:libbegetutil",
     "ipc:ipc_single",
   ]
-
-  if (defined(global_parts_info) &&
-      defined(global_parts_info.hdf_drivers_interface_power) &&
-      global_parts_info.hdf_drivers_interface_power) {
-    external_deps += [ "drivers_interface_power:libpower_proxy_1.1" ]
-    defines += [ "ABILITY_POWER_SUPPORT" ]
-  }
 
   install_images = [ chipset_base_dir ]
   part_name = "ril_adapter"
