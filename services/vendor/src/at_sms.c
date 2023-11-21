@@ -630,6 +630,7 @@ int32_t GetCBConfigData(char *token, char *dcss, int32_t mode, HRilCBConfigInfo 
         ttoken = strtok_r(NULL, ddelimiter, &p);
     }
     char copyDcs[MAX_LENGTH] = { 0 };
+    bool dcssEmpty = (dcss == NULL || dcss[0] == '\0');
     if (strcpy_s(copyDcs, MAX_LENGTH, dcss) != EOK) {
         return MAX_LENGTH;
     }
@@ -639,7 +640,6 @@ int32_t GetCBConfigData(char *token, char *dcss, int32_t mode, HRilCBConfigInfo 
     char *tokenDcs;
     char *q = NULL;
     tokenDcs = strtok_r(copyDcs, delimiterDcs, &q);
-    bool dcssEmpty = (dcss == NULL || dcss[0] == '\0');
     for (int32_t index = 0; !dcssEmpty && tokenDcs != NULL; index++) {
         if (index == 0) {
             startDcs = tokenDcs;
@@ -765,7 +765,7 @@ void ReqSetCBConfig(const ReqDataInfo *requestInfo, const HRilCBConfigInfo *data
     int32_t err;
     int32_t ret;
     ResponseInfo *responseInfo = NULL;
-    int32_t len = dataLen / sizeof(HRilCBConfigInfo);
+    int32_t len = (int32_t)(dataLen / sizeof(HRilCBConfigInfo));
     if (data == NULL || len == 0) {
         struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
         OnSmsReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
