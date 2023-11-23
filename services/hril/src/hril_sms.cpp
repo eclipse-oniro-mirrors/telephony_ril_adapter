@@ -35,7 +35,7 @@ const int32_t NUM_3 = 3;
 const int32_t NUM_4 = 4;
 const int32_t NUM_5 = 5;
 const int HEXADECIMAL = 16;
-const char *COMMA_STR = ",";
+constexpr const char *COMMA_STR = ",";
 } // namespace
 
 HRilSms::HRilSms(int32_t slotId, IHRilReporter &hrilReporter) : HRilBase(slotId, hrilReporter)
