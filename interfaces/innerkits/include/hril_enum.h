@@ -21,8 +21,10 @@
 #define HRIL_MAX_CDMA_MESSAGE_LEN 255
 #define HRIL_MAX_CDMA_ADDRESS_LEN 36
 
+#ifndef TRUE
 #define TRUE 1
 #define FALSE 0
+#endif
 
 #define PARAMETER_SIZE 128
 
