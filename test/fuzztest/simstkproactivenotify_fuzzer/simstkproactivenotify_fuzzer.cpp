@@ -35,7 +35,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     }
 
     int32_t slotId = static_cast<HRilErrNumber>(size) % SLOT_NUM;
-    const uint8_t *response = (const uint8_t *)NUMBER;
+    const uint8_t *response = static_cast<const uint8_t *> NUMBER;
 
     struct ReportInfo report;
     report.error = static_cast<HRilErrNumber>(size);
