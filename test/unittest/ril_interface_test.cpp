@@ -154,6 +154,7 @@ typedef enum {
     HREQ_DATA_SEND_DATA_SLEEP_MODE,
     HREQ_DATA_SET_DATA_PERMITTED,
     HREQ_DATA_GET_LINK_CAPABILITY,
+    HREQ_DATA_CLEAN_ALL_CONNECTIONS,
 
     HREQ_NETWORK_BASE = 400,
     HREQ_NETWORK_GET_SIGNAL_STRENGTH,
@@ -1034,6 +1035,13 @@ void RilInterfaceTest::GetLinkCapabilityTest(int32_t slotId)
     cout << "GetLinkCapabilityTest finished ret : " << ret << endl << endl;
 }
 
+void RilInterfaceTest::CleanAllConnectionsTest(int32_t slotId)
+{
+    cout << "RilInterfaceTest::CleanAllConnectionsTest -->" << endl;
+    int32_t ret = g_rilInterface->CleanAllConnections(slotId, GetSerialId());
+    cout << "CleanAllConnectionsTest finished ret : " << ret << endl << endl;
+}
+
 void RilInterfaceTest::SetLinkBandwidthReportingRuleTest(int32_t slotId)
 {
     cout << "RilInterfaceTest::SetLinkBandwidthReportingRuleTest -->" << endl;
@@ -1444,6 +1452,7 @@ void RilInterfaceTest::OnInitDataProcessInterface()
     memberFuncMap_[HREQ_DATA_SEND_DATA_SLEEP_MODE] = &RilInterfaceTest::SendDataSleepModeTest;
     memberFuncMap_[HREQ_DATA_SET_DATA_PERMITTED] = &RilInterfaceTest::SetDataPermittedTest;
     memberFuncMap_[HREQ_DATA_GET_LINK_CAPABILITY] = &RilInterfaceTest::GetLinkCapabilityTest;
+    memberFuncMap_[HREQ_DATA_CLEAN_ALL_CONNECTIONS] = &RilInterfaceTest::CleanAllConnectionsTest;
 }
 
 void RilInterfaceTest::OnInitNetworkProcessInterface()
@@ -1633,6 +1642,7 @@ static int32_t PrintDataMenu()
     cout << "----> [" << HREQ_DATA_SEND_DATA_SLEEP_MODE << "] ---->[ HREQ_DATA_SEND_DATA_SLEEP_MODE ]" << endl;
     cout << "----> [" << HREQ_DATA_SET_DATA_PERMITTED << "] ---->[ HREQ_DATA_SET_DATA_PERMITTED ]" << endl;
     cout << "----> [" << HREQ_DATA_GET_LINK_CAPABILITY << "] ---->[ HREQ_DATA_GET_LINK_CAPABILITY ]" << endl;
+    cout << "----> [" << HREQ_DATA_CLEAN_ALL_CONNECTIONS << "] ---->[ HREQ_DATA_CLEAN_ALL_CONNECTIONS ]" << endl;
 
     int32_t choice = InputInt32(HREQ_DATA_BASE, HREQ_NETWORK_BASE - MENU_OFFSET, "Command");
     cout << "---->You choose: " << choice << endl;

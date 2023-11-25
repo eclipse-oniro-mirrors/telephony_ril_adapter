@@ -264,6 +264,38 @@ HWTEST_F(RilDataTest, Telephony_DriverSystem_GetLinkCapability_V1_0200, Function
 }
 
 /**
+ * @tc.number   Telephony_DriverSystem_CleanAllConnections_V1_0100
+ * @tc.name     Get link capability
+ * @tc.desc     Function test
+ */
+HWTEST_F(RilDataTest, Telephony_DriverSystem_CleanAllConnections_V1_0100, Function | MediumTest | Level3)
+{
+    if (!RilTestUtil::IsReady(SLOTID_1)) {
+        return;
+    }
+    int32_t ret = g_rilInterface->CleanAllConnections(SLOTID_1, RilTestUtil::GetSerialId());
+    RilTestUtil::WaitFor(WAIT_TIME_SECOND);
+    RilTestUtil::GetBoolResult(HdiId::HREQ_DATA_CLEAN_ALL_CONNECTIONS);
+    EXPECT_GE(ret, -1);
+}
+
+/**
+ * @tc.number   Telephony_DriverSystem_CleanAllConnections_V1_0200
+ * @tc.name     Get link capability
+ * @tc.desc     Function test
+ */
+HWTEST_F(RilDataTest, Telephony_DriverSystem_CleanAllConnections_V1_0200, Function | MediumTest | Level3)
+{
+    if (!RilTestUtil::IsReady(SLOTID_2)) {
+        return;
+    }
+    int32_t ret = g_rilInterface->CleanAllConnections(SLOTID_2, RilTestUtil::GetSerialId());
+    RilTestUtil::WaitFor(WAIT_TIME_SECOND);
+    RilTestUtil::GetBoolResult(HdiId::HREQ_DATA_CLEAN_ALL_CONNECTIONS);
+    EXPECT_GE(SUCCESS, ret);
+}
+
+/**
  * @tc.number   Telephony_DriverSystem_GetLinkBandwidthInfo_V1_0100
  * @tc.name     Get link band width info
  * @tc.desc     Function test

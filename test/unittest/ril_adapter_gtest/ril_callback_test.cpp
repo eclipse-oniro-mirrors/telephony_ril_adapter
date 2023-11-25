@@ -1474,6 +1474,15 @@ int32_t RilCallbackTest::SetDataProfileInfoResponse(const RilRadioResponseInfo &
     return 0;
 }
 
+int32_t RilCallbackTest::CleanAllConnectionsResponse(const RilRadioResponseInfo &responseInfo)
+{
+    TELEPHONY_LOGI("RilCallbackTest::CleanAllConnectionsResponse error:%{public}d", responseInfo.error);
+    hdiId_ = HdiId::HREQ_DATA_CLEAN_ALL_CONNECTIONS;
+    resultInfo_ = responseInfo;
+    NotifyAll();
+    return 0;
+}
+
 // Sms
 int32_t RilCallbackTest::NewSmsNotify(
     const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const SmsMessageInfo &smsMessageInfo)

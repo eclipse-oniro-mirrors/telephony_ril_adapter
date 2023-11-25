@@ -60,6 +60,7 @@ void HRilData::AddHandlerToMap()
     respMemberFuncMap_[HREQ_DATA_SET_LINK_BANDWIDTH_REPORTING_RULE] = &HRilData::SetLinkBandwidthReportingRuleResponse;
     respMemberFuncMap_[HREQ_DATA_SET_DATA_PERMITTED] = &HRilData::SetDataPermittedResponse;
     respMemberFuncMap_[HREQ_DATA_GET_LINK_CAPABILITY] = &HRilData::GetLinkCapabilityResponse;
+    respMemberFuncMap_[HREQ_DATA_CLEAN_ALL_CONNECTIONS] = &HRilData::CleanAllConnectionsResponse;
 }
 
 void HRilData::SwitchRilDataToHal(const HRilDataCallResponse *response, HDI::Ril::V1_1::SetupDataCallResultInfo &result)
@@ -229,6 +230,17 @@ int32_t HRilData::SetDataPermitted(int32_t serialId, int32_t dataPermitted)
 {
     return RequestVendor(
         serialId, HREQ_DATA_SET_DATA_PERMITTED, dataFuncs_, &HRilDataReq::SetDataPermitted, dataPermitted);
+}
+
+int32_t HRilData::CleanAllConnections(int32_t serialId)
+{
+    return RequestVendor(serialId, HREQ_DATA_CLEAN_ALL_CONNECTIONS, dataFuncs_, &HRilDataReq::CleanAllConnections);
+}
+
+int32_t HRilData::CleanAllConnectionsResponse(
+    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+{
+    return Response(responseInfo, &HDI::Ril::V1_2::IRilCallback::CleanAllConnectionsResponse);
 }
 
 int32_t HRilData::DeactivatePdpContextResponse(

@@ -134,6 +134,7 @@ bool TestDataInterface(std::shared_ptr<HRilManager> manager)
     EXPECT_NE(HDF_SUCCESS, manager->SendDataPerformanceMode(0, 0, dataPerformanceInfo));
     OHOS::HDI::Ril::V1_1::DataSleepInfo dataSleepInfo;
     EXPECT_NE(HDF_SUCCESS, manager->SendDataSleepMode(0, 0, dataSleepInfo));
+    EXPECT_NE(HDF_SUCCESS, manager->CleanAllConnections(0, 0));
     return true;
 }
 
@@ -365,6 +366,7 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Data_002, Function | MediumTest | Lev
     EXPECT_EQ(HDF_SUCCESS, data->SetDataProfileInfoResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, data->SetDataPermittedResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, data->GetLinkCapabilityResponse(0, responseInfo, nullptr, 0));
+    EXPECT_NE(HDF_SUCCESS, data->CleanAllConnectionsResponse(0, responseInfo, nullptr, 0));
 }
 
 /**

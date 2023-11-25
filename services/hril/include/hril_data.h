@@ -66,6 +66,9 @@ public:
     int32_t SetDataPermitted(int32_t serialId, int32_t dataPermitted);
     int32_t SetDataPermittedResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t CleanAllConnections(int32_t serialId);
+    int32_t CleanAllConnectionsResponse(
+        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     bool IsDataRespOrNotify(uint32_t code);
 
     bool IsDataResponse(uint32_t code);
