@@ -35,14 +35,13 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     }
 
     int32_t slotId = static_cast<HRilErrNumber>(size) % SLOT_NUM;
-    struct ReportInfo reportInfo;
-    reportInfo.error = static_cast<HRilErrNumber>(size);
-    reportInfo.notifyId = HNOTI_SIM_STK_PROACTIVE_NOTIFY;
-    char *response = const_cast<char *>(NUMBER);
+    const uint8_t *response = (const uint8_t *)NUMBER;
 
-    HRilManager hrilManager;
-    std::shared_ptr<HRilSim> hrilSim = std::make_shared<HRilSim>(slotId, hrilManager);
-    hrilSim->ProcessNotify<HRilSim>(HRIL_RESPONSE_NOTICE, &reportInfo, &response, sizeof(char));
+    struct ReportInfo report;
+    report.error = static_cast<HRilErrNumber>(size);
+    report.notifyId = HNOTI_SIM_STK_PROACTIVE_NOTIFY;
+    report.type = HRIL_NOTIFICATION;
+    HRilManager::manager_->OnSimReport(slotId, &report, response, sizeof(char));
     return;
 }
 } // namespace OHOS

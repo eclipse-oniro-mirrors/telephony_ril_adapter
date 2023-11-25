@@ -35,9 +35,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     OHOS::HDI::Ril::V1_1::SmsMessageIOInfo message;
     std::string pdu(reinterpret_cast<const char *>(data), size);
     message.pdu = pdu;
-    HRilManager hrilManager;
-    std::shared_ptr<HRilSms> hrilSms = std::make_shared<HRilSms>(slotId, hrilManager);
-    hrilSms->AddCdmaSimMessage(size, message);
+    HRilManager::manager_->AddCdmaSimMessage(slotId, size, message);
     return;
 }
 } // namespace OHOS

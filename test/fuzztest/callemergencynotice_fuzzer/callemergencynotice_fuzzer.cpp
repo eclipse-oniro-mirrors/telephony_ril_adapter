@@ -44,11 +44,11 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     info.simpresent = static_cast<int32_t>(size);
     info.mcc = const_cast<char *>(NUMBER);
     info.abnormalService = static_cast<int32_t>(size);
-
-    HRilManager hrilManger;
-    std::shared_ptr<HRilCall> hrilCall = std::make_shared<HRilCall>(slotId, hrilManger);
-
-    hrilCall->CallEmergencyNotice(HRIL_RESPONSE_NOTICE, error, &info, sizeof(HRilEmergencyInfo));
+    struct ReportInfo report;
+    report.error = error;
+    report.notifyId = HNOTI_CALL_EMERGENCY_NUMBER_REPORT;
+    report.type = HRIL_NOTIFICATION;
+    HRilManager::manager_->OnCallReport(slotId, &report, (const uint8_t *)&info, sizeof(HRilEmergencyInfo));
     return;
 }
 } // namespace OHOS

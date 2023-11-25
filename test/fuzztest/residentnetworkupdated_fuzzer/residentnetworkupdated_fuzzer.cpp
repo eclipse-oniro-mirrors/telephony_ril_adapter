@@ -33,12 +33,13 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
         return;
     }
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
-    HRilErrNumber error = static_cast<HRilErrNumber>(size);
     const char *plmn = reinterpret_cast<const char *>(data);
-    HRilManager hrilManger;
-    std::shared_ptr<HRilNetwork> hrilNetwork = std::make_shared<HRilNetwork>(slotId, hrilManger);
 
-    hrilNetwork->ResidentNetworkUpdated(HRIL_RESPONSE_NOTICE, error, plmn, size);
+    struct ReportInfo report;
+    report.error = static_cast<HRilErrNumber>(size);
+    report.notifyId = HNOTI_NETWORK_RESIDENT_NETWORK_UPDATED;
+    report.type = HRIL_NOTIFICATION;
+    HRilManager::manager_->OnNetworkReport(slotId, &report, (const uint8_t *)plmn, size);
     return;
 }
 } // namespace OHOS
