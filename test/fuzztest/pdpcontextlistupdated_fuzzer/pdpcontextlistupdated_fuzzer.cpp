@@ -39,7 +39,6 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     }
 
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
-    HRilErrNumber error = static_cast<HRilErrNumber>(size);
 
     HRilDataCallResponse response;
     response.reason = static_cast<int32_t>(size) % REASON_TYPE;
@@ -56,16 +55,21 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     response.pCscfPrimAddr = const_cast<char *>(NUMBER);
     response.pCscfSecAddr = const_cast<char *>(NUMBER);
     response.pduSessionId = static_cast<int32_t>(size);
-    HRilManager hrilManager;
-    std::shared_ptr<HRilData> hrilData = std::make_shared<HRilData>(slotId, hrilManager);
-    hrilData->PdpContextListUpdated(HRIL_RESPONSE_NOTICE, error, &response, sizeof(HRilDataCallResponse));
+
+    struct ReportInfo report;
+    report.error = static_cast<HRilErrNumber>(size);
+    report.notifyId = HNOTI_DATA_PDP_CONTEXT_LIST_UPDATED;
+    report.type = HRIL_NOTIFICATION;
+    HRilManager::manager_->OnDataReport(slotId, &report, (const uint8_t *)&response, sizeof(HRilDataCallResponse));
 
     HRilDataLinkCapability linkCapability;
     linkCapability.primaryDownlinkKbps = static_cast<int32_t>(size) * KILO_BIT;
     linkCapability.primaryUplinkKbps = static_cast<int32_t>(size) * KILO_BIT;
     linkCapability.secondaryDownlinkKbps = static_cast<int32_t>(size) * KILO_BIT;
     linkCapability.secondaryUplinkKbps = static_cast<int32_t>(size) * KILO_BIT;
-    hrilData->DataLinkCapabilityUpdated(HRIL_RESPONSE_NOTICE, error, &linkCapability, sizeof(HRilDataLinkCapability));
+    report.notifyId = HNOTI_DATA_LINK_CAPABILITY_UPDATED;
+    HRilManager::manager_->OnDataReport(
+        slotId, &report, (const uint8_t *)&linkCapability, sizeof(HRilDataLinkCapability));
     return;
 }
 } // namespace OHOS
