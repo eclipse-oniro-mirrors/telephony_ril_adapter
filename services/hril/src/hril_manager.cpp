@@ -331,12 +331,12 @@ void HRilManager::OnSmsReport(int32_t slotId, const ReportInfo *reportInfo, cons
 HRilManager::HRilManager() : hrilSimSlotCount_(GetSimSlotCount())
 {
     for (int32_t slotId = HRIL_SIM_SLOT_0; slotId < hrilSimSlotCount_; slotId++) {
-        hrilCall_.push_back(std::make_unique<HRilCall>(slotId, *this));
-        hrilModem_.push_back(std::make_unique<HRilModem>(slotId, *this));
-        hrilNetwork_.push_back(std::make_unique<HRilNetwork>(slotId, *this));
-        hrilSim_.push_back(std::make_unique<HRilSim>(slotId, *this));
-        hrilSms_.push_back(std::make_unique<HRilSms>(slotId, *this));
-        hrilData_.push_back(std::make_unique<HRilData>(slotId, *this));
+        hrilCall_.push_back(std::make_unique<HRilCall>(slotId));
+        hrilModem_.push_back(std::make_unique<HRilModem>(slotId));
+        hrilNetwork_.push_back(std::make_unique<HRilNetwork>(slotId));
+        hrilSim_.push_back(std::make_unique<HRilSim>(slotId));
+        hrilSms_.push_back(std::make_unique<HRilSms>(slotId));
+        hrilData_.push_back(std::make_unique<HRilData>(slotId));
     }
     timerCallback_ = std::make_unique<HRilTimerCallback>();
 }

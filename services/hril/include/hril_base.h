@@ -50,7 +50,7 @@ public:
     std::string StringToHex(const char *data, int byteLength);
 
 protected:
-    HRilBase(int32_t slotId, IHRilReporter &hrilReporter) : hrilReporter_(hrilReporter), slotId_(slotId) {}
+    HRilBase(int32_t slotId) : slotId_(slotId) {}
     virtual ~HRilBase() {}
     HRilNotiType ConvertIntToRadioNoticeType(int32_t indicationType);
     uint8_t ConvertHexCharToInt(uint8_t c);
@@ -100,7 +100,6 @@ private:
     F GetFunc(std::map<uint32_t, std::any> &funcs, uint32_t code);
 
 private:
-    IHRilReporter &hrilReporter_;
     int32_t slotId_;
 };
 

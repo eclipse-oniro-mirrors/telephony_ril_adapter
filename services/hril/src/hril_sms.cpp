@@ -38,7 +38,7 @@ const int HEXADECIMAL = 16;
 constexpr const char *COMMA_STR = ",";
 } // namespace
 
-HRilSms::HRilSms(int32_t slotId, IHRilReporter &hrilReporter) : HRilBase(slotId, hrilReporter)
+HRilSms::HRilSms(int32_t slotId) : HRilBase(slotId)
 {
     AddHandlerToMap();
 }

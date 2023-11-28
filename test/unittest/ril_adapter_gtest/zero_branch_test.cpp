@@ -284,7 +284,7 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Call_001, Function | MediumTest | Lev
 HWTEST_F(BranchTest, Telephony_HrilManager_Call_002, Function | MediumTest | Level2)
 {
     auto manager = std::make_shared<HRilManager>();
-    auto call = std::make_unique<HRilCall>(0, *manager);
+    auto call = std::make_unique<HRilCall>(0);
     HRilRadioResponseInfo responseInfo;
     EXPECT_NE(HDF_SUCCESS, call->GetCallListResponse(0, responseInfo, nullptr, 1));
     EXPECT_NE(HDF_SUCCESS, call->DialResponse(0, responseInfo, nullptr, 1));
@@ -352,7 +352,7 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Data_001, Function | MediumTest | Lev
 HWTEST_F(BranchTest, Telephony_HrilManager_Data_002, Function | MediumTest | Level2)
 {
     auto manager = std::make_shared<HRilManager>();
-    auto data = std::make_unique<HRilData>(0, *manager);
+    auto data = std::make_unique<HRilData>(0);
     HRilRadioResponseInfo responseInfo;
     EXPECT_NE(HDF_SUCCESS, data->ActivatePdpContextResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, data->DeactivatePdpContextResponse(0, responseInfo, nullptr, 0));
@@ -389,7 +389,7 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Modem_001, Function | MediumTest | Le
 HWTEST_F(BranchTest, Telephony_HrilManager_Modem_002, Function | MediumTest | Level2)
 {
     auto manager = std::make_shared<HRilManager>();
-    auto modem = std::make_unique<HRilModem>(0, *manager);
+    auto modem = std::make_unique<HRilModem>(0);
     HRilRadioResponseInfo responseInfo;
     EXPECT_NE(HDF_SUCCESS, modem->ShutDownResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, modem->SetRadioStateResponse(0, responseInfo, nullptr, 0));
@@ -425,7 +425,7 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Sim_001, Function | MediumTest | Leve
 HWTEST_F(BranchTest, Telephony_HrilManager_Sim_002, Function | MediumTest | Level2)
 {
     auto manager = std::make_shared<HRilManager>();
-    auto sim = std::make_unique<HRilSim>(0, *manager);
+    auto sim = std::make_unique<HRilSim>(0);
     HRilRadioResponseInfo responseInfo;
     EXPECT_NE(HDF_SUCCESS, sim->GetSimIOResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, sim->GetSimStatusResponse(0, responseInfo, nullptr, 0));
@@ -484,7 +484,7 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Network_001, Function | MediumTest | 
 HWTEST_F(BranchTest, Telephony_HrilManager_Network_002, Function | MediumTest | Level3)
 {
     auto manager = std::make_shared<HRilManager>();
-    auto network = std::make_unique<HRilNetwork>(0, *manager);
+    auto network = std::make_unique<HRilNetwork>(0);
     HRilRadioResponseInfo responseInfo;
     EXPECT_NE(HDF_SUCCESS, network->GetSignalStrengthResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, network->GetCsRegStatusResponse(0, responseInfo, nullptr, 0));
@@ -536,7 +536,7 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Sms_001, Function | MediumTest | Leve
 HWTEST_F(BranchTest, Telephony_HrilManager_Sms_002, Function | MediumTest | Level3)
 {
     auto manager = std::make_shared<HRilManager>();
-    auto sms = std::make_unique<HRilSms>(0, *manager);
+    auto sms = std::make_unique<HRilSms>(0);
     HRilRadioResponseInfo responseInfo;
     EXPECT_NE(HDF_SUCCESS, sms->SendGsmSmsResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, sms->SendCdmaSmsResponse(0, responseInfo, nullptr, 0));
@@ -566,8 +566,7 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Sms_002, Function | MediumTest | Leve
  */
 HWTEST_F(BranchTest, Telephony_HrilManager_HrilBase_001, Function | MediumTest | Level3)
 {
-    HRilManager manager;
-    HRilBase base { 0, manager };
+    HRilBase base { 0 };
     EXPECT_EQ(HRIL_ERR_GENERIC_FAILURE, base.ConvertHexStringToInt(nullptr, 0, 0));
     EXPECT_EQ(10, base.ConvertHexCharToInt('a'));
     EXPECT_EQ(0, base.ConvertHexCharToInt('0'));
@@ -577,6 +576,19 @@ HWTEST_F(BranchTest, Telephony_HrilManager_HrilBase_001, Function | MediumTest |
     ASSERT_FALSE(base.ConvertToString(nullptr, ""));
     char *dest = nullptr;
     ASSERT_TRUE(base.ConvertToString(&dest, ""));
+}
+
+/**
+ * @tc.number   Telephony_CreateHRilRequest_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_HrilManager_CreateHRilRequest_001, Function | MediumTest | Level3)
+{
+    auto &hrilData = HRilManager::manager_->hrilData_[0];
+    EXPECT_NE(hrilData->CreateHRilRequest(0, 0), nullptr);
+    HRilManager::manager_ = nullptr;
+    EXPECT_EQ(hrilData->CreateHRilRequest(0, 0), nullptr);
 }
 
 } // namespace Telephony

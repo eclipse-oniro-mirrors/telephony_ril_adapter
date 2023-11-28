@@ -18,6 +18,8 @@
 #include <sstream>
 #include <string_ex.h>
 
+#include "hril_manager.h"
+
 namespace OHOS {
 namespace Telephony {
 static constexpr uint8_t HEX_OFFSET = 4;
@@ -137,7 +139,11 @@ void HRilBase::CopyToCharPoint(char **dest, const std::string &src)
 
 ReqDataInfo *HRilBase::CreateHRilRequest(int32_t serial, int32_t request)
 {
-    return hrilReporter_.CreateHRilRequest(serial, slotId_, request);
+    if (HRilManager::manager_ == nullptr) {
+        TELEPHONY_LOGE("manager_ is nullptr");
+        return nullptr;
+    }
+    return HRilManager::manager_->CreateHRilRequest(serial, slotId_, request);
 }
 
 HDI::Ril::V1_1::RilRadioResponseInfo HRilBase::BuildIHRilRadioResponseInfo(const HRilRadioResponseInfo &responseInfo)

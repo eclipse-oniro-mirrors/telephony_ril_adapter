@@ -20,7 +20,7 @@
 
 namespace OHOS {
 namespace Telephony {
-HRilModem::HRilModem(int32_t slotId, IHRilReporter &hrilReporter) : HRilBase(slotId, hrilReporter)
+HRilModem::HRilModem(int32_t slotId) : HRilBase(slotId)
 {
     AddHandlerToMap();
 }

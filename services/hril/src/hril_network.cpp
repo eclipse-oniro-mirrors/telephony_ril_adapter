@@ -25,7 +25,7 @@ enum class NetworkParameter : int32_t {
     INVALID_RESPONSE_VALUE = 11,
 };
 
-HRilNetwork::HRilNetwork(int32_t slotId, IHRilReporter &hrilReporter) : HRilBase(slotId, hrilReporter)
+HRilNetwork::HRilNetwork(int32_t slotId) : HRilBase(slotId)
 {
     AddHandlerToMap();
 }

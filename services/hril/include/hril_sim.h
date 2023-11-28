@@ -23,7 +23,7 @@ namespace OHOS {
 namespace Telephony {
 class HRilSim : public HRilBase {
 public:
-    HRilSim(int32_t slotId, IHRilReporter &hrilReporter);
+    HRilSim(int32_t slotId);
     virtual ~HRilSim() = default;
 
     void ProcessSimRequest(int32_t code, struct HdfSBuf *data);
