@@ -427,6 +427,15 @@ typedef struct {
      * @see ReqDataInfo
      */
     void (*GetLinkCapability)(const ReqDataInfo *requestInfo);
+
+    /**
+     * @brief Clean all data connections.
+     *
+     * @param requestInfo Request data info, for details, see {@link
+     * ReqDataInfo}.
+     * @see ReqDataInfo
+     */
+    void (*CleanAllConnections)(const ReqDataInfo *requestInfo);
 } HRilDataReq;
 #ifdef __cplusplus
 }

@@ -103,4 +103,5 @@ void ReqSetLinkBandwidthReportingRule(const ReqDataInfo *requestInfo, const HRil
 void PdpContextListUpdate(void);
 void ReqSetDataPermitted(const ReqDataInfo *requestInfo, const int32_t dataPermitted);
 void ReqGetLinkCapability(const ReqDataInfo *requestInfo);
+void ReqCleanAllConnections(const ReqDataInfo *requestInfo);
 #endif // OHOS_AT_DATA_H

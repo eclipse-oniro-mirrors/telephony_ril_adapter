@@ -1299,6 +1299,12 @@ int32_t RilCallbackTest::SetDataProfileInfoResponse(const RilRadioResponseInfo &
     return 0;
 }
 
+int32_t RilCallbackTest::CleanAllConnectionsResponse(const RilRadioResponseInfo &responseInfo)
+{
+    PrintResponseInfo("CleanAllConnectionsResponse", responseInfo);
+    return 0;
+}
+
 // Sms
 int32_t RilCallbackTest::NewSmsNotify(
     const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const SmsMessageInfo &smsMessageInfo)

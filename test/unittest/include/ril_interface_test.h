@@ -108,6 +108,7 @@ public:
     void UnlockSimLockTest(int32_t slotId);
     void GetLinkBandwidthInfoTest(int32_t slotId);
     void GetLinkCapabilityTest(int32_t slotId);
+    void CleanAllConnectionsTest(int32_t slotId);
     void UnLockPINTest(int32_t slotId);
     void UnLockPIN2Test(int32_t slotId);
     void UnLockPUKTest(int32_t slotId);

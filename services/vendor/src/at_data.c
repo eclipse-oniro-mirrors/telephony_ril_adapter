@@ -940,3 +940,11 @@ void ReqGetLinkCapability(const ReqDataInfo *requestInfo)
     reportInfo.modemErrInfo = errInfo;
     OnDataReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
 }
+
+void ReqCleanAllConnections(const ReqDataInfo *requestInfo)
+{
+    ModemReportErrorInfo errInfo = { 0 };
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, errInfo.errorNo, HRIL_RESPONSE, 0);
+    reportInfo.modemErrInfo = errInfo;
+    OnDataReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
+}

@@ -167,6 +167,7 @@ static const HRilDataReq g_dataReqOps = {
     .SetLinkBandwidthReportingRule = ReqSetLinkBandwidthReportingRule,
     .SetDataPermitted = ReqSetDataPermitted,
     .GetLinkCapability = ReqGetLinkCapability,
+    .CleanAllConnections = ReqCleanAllConnections,
 };
 
 static const HRilModemReq g_modemReqOps = {

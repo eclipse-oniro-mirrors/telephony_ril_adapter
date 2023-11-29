@@ -608,6 +608,11 @@ int32_t HRilManager::SendDataSleepMode(
     return TaskSchedule(MODULE_HRIL_DATA, hrilData_[slotId], &HRilData::SendDataSleepMode, serialId, dataSleepInfo);
 }
 
+int32_t HRilManager::CleanAllConnections(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(MODULE_HRIL_DATA, hrilData_[slotId], &HRilData::CleanAllConnections, serialId);
+}
+
 // Modem
 int32_t HRilManager::SetRadioState(int32_t slotId, int32_t serialId, int32_t fun, int32_t rst)
 {

@@ -135,6 +135,7 @@ enum class HdiId {
     HREQ_DATA_SET_DATA_PROFILE_INFO,
     HREQ_DATA_SET_DATA_PERMITTED,
     HREQ_DATA_GET_LINK_CAPABILITY,
+    HREQ_DATA_CLEAN_ALL_CONNECTIONS,
 
     HREQ_NETWORK_BASE = 400,
     HREQ_NETWORK_GET_SIGNAL_STRENGTH,
@@ -321,6 +322,7 @@ public:
     int32_t SetDataProfileInfoResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo);
     int32_t GetLinkCapabilityResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_1::DataLinkCapability &dataLinkCapability) override;
+    int32_t CleanAllConnectionsResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
     // Modem
     int32_t RadioStateUpdated(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, int32_t state) override;
     int32_t VoiceRadioTechUpdated(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,

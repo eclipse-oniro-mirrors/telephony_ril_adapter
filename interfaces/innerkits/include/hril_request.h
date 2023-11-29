@@ -339,6 +339,9 @@ typedef enum {
     /** Get link capability. */
     HREQ_DATA_GET_LINK_CAPABILITY,
 
+    /** Clean all data connections. */
+    HREQ_DATA_CLEAN_ALL_CONNECTIONS,
+
     HREQ_NETWORK_BASE = 400,
 
     /** Gets the signal strength. */
