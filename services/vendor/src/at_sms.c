@@ -537,10 +537,13 @@ void ReqGetCBConfigInfo(const ReqDataInfo *requestInfo, ResponseInfo *responseIn
     int32_t position = 0;
     char midsTotal[MAX_LENGTH][MAX_DIMEN_LENGTH] = { 0 };
     while (!midsEmpty && token != NULL && position < MAX_LENGTH) {
+        size_t length = strlen(token);
         int32_t place = 0;
-        while (token[place] != '\0' && place < MAX_DIMEN_LENGTH) {
-            midsTotal[position][place] = token[place];
-            place++;
+        if ((size_t)place < length) {
+            while (token[place] != '\0' && place < MAX_DIMEN_LENGTH) {
+                midsTotal[position][place] = token[place];
+                place++;
+            }
         }
         position++;
         token = strtok_r(NULL, delimiter, &p);
