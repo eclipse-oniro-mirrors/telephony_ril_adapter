@@ -23,7 +23,7 @@ namespace OHOS {
 namespace Telephony {
 class HRilSms : public HRilBase {
 public:
-    HRilSms(int32_t slotId, IHRilReporter &hrilReporter);
+    HRilSms(int32_t slotId);
     virtual ~HRilSms() = default;
 
     bool IsSmsRespOrNotify(uint32_t code);

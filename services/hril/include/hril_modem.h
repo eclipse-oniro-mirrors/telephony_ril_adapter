@@ -23,7 +23,7 @@ namespace OHOS {
 namespace Telephony {
 class HRilModem : public HRilBase {
 public:
-    HRilModem(int32_t slotId, IHRilReporter &hrilReporter);
+    HRilModem(int32_t slotId);
     virtual ~HRilModem() = default;
 
     int32_t ShutDown(int32_t serialId);

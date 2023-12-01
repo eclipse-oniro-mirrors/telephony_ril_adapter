@@ -21,7 +21,7 @@
 
 namespace OHOS {
 namespace Telephony {
-HRilCall::HRilCall(int32_t slotId, IHRilReporter &hrilReporter) : HRilBase(slotId, hrilReporter)
+HRilCall::HRilCall(int32_t slotId) : HRilBase(slotId)
 {
     AddCallNotificationToMap();
     AddCallResponseToMap();

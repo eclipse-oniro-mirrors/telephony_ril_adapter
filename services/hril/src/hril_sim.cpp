@@ -19,7 +19,7 @@
 #include "hril_request.h"
 namespace OHOS {
 namespace Telephony {
-HRilSim::HRilSim(int32_t slotId, IHRilReporter &hrilReporter) : HRilBase(slotId, hrilReporter)
+HRilSim::HRilSim(int32_t slotId) : HRilBase(slotId)
 {
     AddNotificationHandlerToMap();
     AddHandlerToMap();

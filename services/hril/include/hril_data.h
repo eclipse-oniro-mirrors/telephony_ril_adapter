@@ -24,7 +24,7 @@ namespace OHOS {
 namespace Telephony {
 class HRilData : public HRilBase {
 public:
-    HRilData(int32_t slotId, IHRilReporter &hrilReporter);
+    HRilData(int32_t slotId);
     virtual ~HRilData();
 
     int32_t DeactivatePdpContext(int32_t serialId, const OHOS::HDI::Ril::V1_1::UniInfo &uniInfo);

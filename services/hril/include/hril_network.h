@@ -23,7 +23,7 @@ namespace OHOS {
 namespace Telephony {
 class HRilNetwork : public HRilBase {
 public:
-    HRilNetwork(int32_t slotId, IHRilReporter &hrilReporter);
+    HRilNetwork(int32_t slotId);
     virtual ~HRilNetwork() = default;
 
     int32_t GetSignalStrength(int32_t serialId);
