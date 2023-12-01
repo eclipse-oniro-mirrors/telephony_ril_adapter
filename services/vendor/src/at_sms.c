@@ -538,8 +538,8 @@ void ReqGetCBConfigInfo(const ReqDataInfo *requestInfo, ResponseInfo *responseIn
     char midsTotal[MAX_LENGTH][MAX_DIMEN_LENGTH] = { 0 };
     while (!midsEmpty && token != NULL && position < MAX_LENGTH) {
         size_t length = strlen(token);
-        int32_t place = 0;
-        if ((size_t)place < length) {
+        size_t place = 0;
+        if (place < length) {
             while (token[place] != '\0' && place < MAX_DIMEN_LENGTH) {
                 midsTotal[position][place] = token[place];
                 place++;
