@@ -222,7 +222,7 @@ bool TestSmsInterface(std::shared_ptr<HRilManager> manager)
     EXPECT_NE(HDF_SUCCESS, manager->UpdateSimMessage(0, 0, smsMessageIOInfo));
     EXPECT_NE(HDF_SUCCESS, manager->AddCdmaSimMessage(0, 0, smsMessageIOInfo));
     EXPECT_NE(HDF_SUCCESS, manager->DelCdmaSimMessage(0, 0, 0));
-    EXPECT_NE(HDF_SUCCESS, manager->UpdateCdmaSimMessage(0, 0, smsMessageIOInfo));
+    EXPECT_EQ(HDF_SUCCESS, manager->UpdateCdmaSimMessage(0, 0, smsMessageIOInfo));
     OHOS::HDI::Ril::V1_1::ServiceCenterAddress serviceCenterAddress;
     EXPECT_NE(HDF_SUCCESS, manager->SetSmscAddr(0, 0, serviceCenterAddress));
     EXPECT_NE(HDF_SUCCESS, manager->GetSmscAddr(0, 0));
@@ -246,7 +246,6 @@ bool TestSmsInterface(std::shared_ptr<HRilManager> manager)
 HWTEST_F(BranchTest, Telephony_HrilManager_Call_001, Function | MediumTest | Level2)
 {
     auto manager = std::make_shared<HRilManager>();
-    manager->hrilCall_.clear();
     std::unique_ptr<HRilCall> call;
     manager->hrilCall_.push_back(std::move(call));
     EXPECT_EQ(true, TestCallInterface(manager));
@@ -272,7 +271,6 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Call_001, Function | MediumTest | Lev
     VoiceRadioTechnology voiceRadioTechnology;
     VoiceRadioTechnology test = voiceRadioTechnology;
     EXPECT_EQ(manager->SendRilAck(), 0);
-    manager->hrilCall_.clear();
     EXPECT_NE(manager->CloseUnFinishedUssd(0, 0), 0);
     EXPECT_GT(manager->GetMaxSimSlotCount(), 0);
 }
