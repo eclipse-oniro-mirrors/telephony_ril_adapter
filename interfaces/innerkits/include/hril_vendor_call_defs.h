@@ -455,7 +455,7 @@ typedef struct {
 
     /** TS 27.007 7.17 "number" (MT only) */
     char *number;
-} SuppSvcNotification;
+} HRilSuppSvcNotification;
 
 typedef struct {
     /**
