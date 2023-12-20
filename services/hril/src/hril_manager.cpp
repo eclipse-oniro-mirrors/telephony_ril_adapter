@@ -875,6 +875,11 @@ int32_t HRilManager::GetRrcConnectionState(int32_t slotId, int32_t serialId)
     return TaskSchedule(MODULE_HRIL_NETWORK, hrilNetwork_[slotId], &HRilNetwork::GetRrcConnectionState, serialId);
 }
 
+int32_t HRilManager::GetNrSsbId(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(MODULE_HRIL_NETWORK, hrilNetwork_[slotId], &HRilNetwork::GetNrSsbId, serialId);
+}
+
 // Sms
 int32_t HRilManager::SendGsmSms(
     int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_1::GsmSmsMessageInfo &gsmSmsMessageInfo)

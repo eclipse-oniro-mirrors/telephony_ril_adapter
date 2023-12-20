@@ -84,4 +84,8 @@ int32_t ParseOperListInfo(
     const char *lineInfo, int32_t count, AvailableOperInfo *pOperInfo, AvailableOperInfo **ppOperInfo);
 void NotifyNetWorkTime(int32_t slotId);
 void GetNetworkSearchInformationPause(void);
+void ReqGetNrSsbId(const ReqDataInfo *requestInfo);
+int32_t ProcessNrSsbId(const char *str, NrCellSsbIdsVendor *nrSsbId);
+int32_t FillServingCellSsbId(const char *str, NrCellSsbIdsVendor *nrSsbIdInfo);
+int32_t FillNeighboringCellSsbId(const char *str, NrCellSsbIdsVendor *nrSsbIdInfo);
 #endif

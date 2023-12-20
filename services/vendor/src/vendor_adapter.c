@@ -156,6 +156,7 @@ static const HRilNetworkReq g_networkReqOps = {
     .SetLocateUpdates = ReqSetLocateUpdates,
     .SetNotificationFilter = ReqSetNotificationFilter,
     .SetDeviceState = ReqSetDeviceState,
+    .GetNrSsbId = ReqGetNrSsbId,
 };
 
 static const HRilDataReq g_dataReqOps = {

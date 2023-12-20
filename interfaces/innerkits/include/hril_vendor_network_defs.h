@@ -820,6 +820,60 @@ typedef struct {
 } CurrentCellInfoList;
 
 typedef struct {
+    /** SSB index. */
+    int32_t ssbId;
+
+    /** Reference Signal Received Power -140~-44, dBm */
+    int32_t rsrp;
+} SsbIdInfoVendor;
+
+typedef struct {
+    /** Physical cell ID. */
+    int32_t pci;
+
+    /** Absolute Radio Frequency Channel Number of the BCCH carrier 0~1023 */
+    int32_t arfcn;
+
+    /** Reference Signal Received Power -140~-44, dBm */
+    int32_t rsrp;
+
+    /** Signal To Interference Plus Noise Ratio. */
+    int32_t sinr;
+
+    /** Neighboring cell ssbId list, always size is 4 */
+    SsbIdInfoVendor *ssbIdList;
+} NeighboringCellSsbInfoVendor;
+
+typedef struct {
+    /** Absolute Radio Frequency Channel Number of the BCCH carrier 0~1023 */
+    int32_t arfcn;
+
+    /** Context Identifier. */
+    int64_t cid;
+
+    /** Physical cell ID. */
+    int32_t pic;
+
+    /** Reference Signal Received Power -140~-44, dBm */
+    int32_t rsrp;
+
+    /** Signal To Interference Plus Noise Ratio. */
+    int32_t sinr;
+
+    /** Time advance. */
+    int32_t timeAdvance;
+
+    /** Service cell ssbId list, always size is 8 */
+    SsbIdInfoVendor *sCellSsbList;
+
+    /** Neighboring cell ssb list count, max size is 4 */
+    int32_t nbCellCount;
+
+    /** Neighboring cell ssb info list, max size is 4 */
+    NeighboringCellSsbInfoVendor *nbCellSsbList;
+} NrCellSsbIdsVendor;
+
+typedef struct {
     void (*GetImsRegStatus)(const ReqDataInfo *requestInfo);
     void (*GetSignalStrength)(const ReqDataInfo *requestInfo);
     void (*GetCsRegStatus)(const ReqDataInfo *requestInfo);

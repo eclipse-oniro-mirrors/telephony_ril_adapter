@@ -176,6 +176,7 @@ typedef enum {
     HREQ_NETWORK_SET_NR_OPTION_MODE,
     HREQ_NETWORK_GET_NR_OPTION_MODE,
     HREQ_NETWORK_GET_RRC_CONNECTION_STATE,
+    HREQ_NETWORK_GET_NR_SSBID_INFO,
 
     HREQ_COMMON_BASE = 500,
     HREQ_MODEM_SHUT_DOWN,
@@ -650,6 +651,13 @@ void RilInterfaceTest::GetRrcConnectionStateTest(int32_t slotId)
     cout << "RilInterfaceTest::GetRrcConnectionStateTest -->" << endl;
     int32_t ret = g_rilInterface->GetRrcConnectionState(slotId, GetSerialId());
     cout << "GetRrcConnectionStateTest finish ret : " << ret << endl << endl;
+}
+
+void RilInterfaceTest::GetNrSsbIdTest(int32_t slotId)
+{
+    cout << "RilInterfaceTest::GetNrSsbIdTest -->" << endl;
+    int32_t ret = g_rilInterface->GetNrSsbId(slotId, GetSerialId());
+    cout << "GetNrSsbIdTest finish ret : " << ret << endl << endl;
 }
 
 void RilInterfaceTest::SetRilNetworkSelectionModeTest(int32_t slotId)
@@ -1476,6 +1484,7 @@ void RilInterfaceTest::OnInitNetworkProcessInterface()
     memberFuncMap_[HREQ_NETWORK_SET_NR_OPTION_MODE] = &RilInterfaceTest::SetNrOptionModeTest;
     memberFuncMap_[HREQ_NETWORK_GET_NR_OPTION_MODE] = &RilInterfaceTest::GetNrOptionModeTest;
     memberFuncMap_[HREQ_NETWORK_GET_RRC_CONNECTION_STATE] = &RilInterfaceTest::GetRrcConnectionStateTest;
+    memberFuncMap_[HREQ_NETWORK_GET_NR_SSBID_INFO] = &RilInterfaceTest::GetNrSsbIdTest;
 }
 
 void RilInterfaceTest::OnInitModemProcessInterface()
@@ -1679,6 +1688,7 @@ static int32_t PrintNetworkMenu()
     cout << "----> [" << HREQ_NETWORK_GET_NR_OPTION_MODE << "] ---->[ HREQ_NETWORK_GET_NR_OPTION_MODE ]" << endl;
     cout << "----> [" << HREQ_NETWORK_GET_RRC_CONNECTION_STATE << "] ---->[ HREQ_NETWORK_GET_RRC_CONNECTION_STATE ]"
          << endl;
+    cout << "----> [" << HREQ_NETWORK_GET_NR_SSBID_INFO << "] ---->[ HREQ_NETWORK_GET_NR_SSBID_INFO ]" << endl;
 
     int32_t choice = InputInt32(HREQ_NETWORK_BASE, HREQ_COMMON_BASE - MENU_OFFSET, "Command");
     cout << "---->You choose: " << choice << endl;
