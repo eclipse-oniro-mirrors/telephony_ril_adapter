@@ -44,6 +44,7 @@ public:
     int32_t SetNrOptionMode(int32_t serialId, int32_t mode);
     int32_t GetNrOptionMode(int32_t serialId);
     int32_t GetRrcConnectionState(int32_t serialId);
+    int32_t GetNrSsbId(int32_t serialId);
 
     int32_t GetSignalStrengthResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
@@ -83,6 +84,8 @@ public:
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t GetRrcConnectionStateResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t GetNrSsbIdResponse(
+        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
 
     int32_t NetworkCsRegStatusUpdated(int32_t indType, HRilErrNumber error, const void *response, size_t responseLen);
     int32_t NetworkPsRegStatusUpdated(int32_t indType, HRilErrNumber error, const void *response, size_t responseLen);
@@ -121,11 +124,15 @@ private:
         HDI::Ril::V1_1::CellListCurrentInfo &cellInfoList, const void *response, size_t responseLen);
     int32_t BuildCurrentCellInfoList(
         HDI::Ril::V1_1::CellListCurrentInfo_1_1 &cellInfoList, const void *response, size_t responseLen);
+    int32_t BuildNrCellSsbIdsInfo(HDI::Ril::V1_2::NrCellSsbIds &nrCellSsbIds, const void *response, size_t responseLen);
     bool IsNetworkResponse(uint32_t code);
     bool IsNetworkNotification(uint32_t code);
 
 private:
     const HRilNetworkReq *networkFuncs_ = nullptr;
+    const int32_t SCELL_SSB_LIST = 8;
+    const int32_t NBCELL_SSB_LIST = 4;
+    const int32_t MAX_NBCELL_COUNT = 4;
 };
 } // namespace Telephony
 } // namespace OHOS

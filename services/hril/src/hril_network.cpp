@@ -62,6 +62,7 @@ void HRilNetwork::AddHandlerToMap()
     respMemberFuncMap_[HREQ_NETWORK_SET_NR_OPTION_MODE] = &HRilNetwork::SetNrOptionModeResponse;
     respMemberFuncMap_[HREQ_NETWORK_GET_NR_OPTION_MODE] = &HRilNetwork::GetNrOptionModeResponse;
     respMemberFuncMap_[HREQ_NETWORK_GET_RRC_CONNECTION_STATE] = &HRilNetwork::GetRrcConnectionStateResponse;
+    respMemberFuncMap_[HREQ_NETWORK_GET_NR_SSBID_INFO] = &HRilNetwork::GetNrSsbIdResponse;
 }
 
 int32_t HRilNetwork::GetSignalStrength(int32_t serialId)
@@ -175,6 +176,12 @@ int32_t HRilNetwork::GetRrcConnectionState(int32_t serialId)
 {
     return RequestVendor(
         serialId, HREQ_NETWORK_GET_RRC_CONNECTION_STATE, networkFuncs_, &HRilNetworkReq::GetRrcConnectionState);
+}
+
+int32_t HRilNetwork::GetNrSsbId(int32_t serialId)
+{
+    return RequestVendor(
+        serialId, HREQ_NETWORK_GET_NR_SSBID_INFO, networkFuncs_, &HRilNetworkReq::GetNrSsbId);
 }
 
 int32_t HRilNetwork::GetSignalStrengthResponse(
@@ -490,6 +497,33 @@ int32_t HRilNetwork::GetRrcConnectionStateResponse(
         TELEPHONY_LOGD("GetRrcConnectionStateResponse rrcConnectionState: %{public}d", rrcConnectionState);
     }
     return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::GetRrcConnectionStateResponse, rrcConnectionState);
+}
+
+int32_t HRilNetwork::GetNrSsbIdResponse(
+    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+{
+    HDI::Ril::V1_2::NrCellSsbIds nrCellSsbIds;
+    if (response == nullptr || responseLen != sizeof(NrCellSsbIdsVendor)) {
+        TELEPHONY_LOGE("Response is invalid");
+        if (responseInfo.error == HRilErrType::NONE) {
+            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
+        }
+    } else {
+        nrCellSsbIds.arfcn = 0;
+        nrCellSsbIds.cid = 0;
+        nrCellSsbIds.pic = 0;
+        nrCellSsbIds.rsrp = 0;
+        nrCellSsbIds.sinr = 0;
+        nrCellSsbIds.timeAdvance = 0;
+        nrCellSsbIds.sCellSsbList.clear();
+        nrCellSsbIds.nbCellCount = 0;
+        nrCellSsbIds.nbCellSsbList.clear();
+        if (BuildNrCellSsbIdsInfo(nrCellSsbIds, response, responseLen) != 0) {
+            TELEPHONY_LOGE("BuildNrCellSsbIdsInfo failed");
+            return HRIL_ERR_GENERIC_FAILURE;
+        }
+    }
+    return Response(responseInfo, &HDI::Ril::V1_2::IRilCallback::GetNrSsbIdResponse, nrCellSsbIds);
 }
 
 int32_t HRilNetwork::NetworkCsRegStatusUpdated(
@@ -1023,6 +1057,46 @@ int32_t HRilNetwork::BuildCurrentCellInfoList(HDI::Ril::V1_1::CellListCurrentInf
         }
         FillCurrentCellInformation(cellInfo, cell);
         cellInfoList.cellCurrentInfo.push_back(cellInfo);
+    }
+    return HRIL_ERR_SUCCESS;
+}
+
+int32_t HRilNetwork::BuildNrCellSsbIdsInfo(HDI::Ril::V1_2::NrCellSsbIds &nrCellSsbIds,
+    const void *response, size_t responseLen)
+{
+    const NrCellSsbIdsVendor *temp = reinterpret_cast<const NrCellSsbIdsVendor *>(response);
+    if (temp->nbCellCount > MAX_NBCELL_COUNT) {
+        TELEPHONY_LOGE("NbCellCount > max size 4");
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
+    nrCellSsbIds.arfcn = temp->arfcn;
+    nrCellSsbIds.cid = temp->cid;
+    nrCellSsbIds.pic = temp->pic;
+    nrCellSsbIds.rsrp = temp->rsrp;
+    nrCellSsbIds.sinr = temp->sinr;
+    nrCellSsbIds.timeAdvance = temp->timeAdvance;
+    nrCellSsbIds.nbCellCount = temp->nbCellCount;
+    for (int32_t i = 0; i < SCELL_SSB_LIST; i++) {
+        HDI::Ril::V1_2::SsbIdInfo ssbIdInfo = {0};
+        SsbIdInfoVendor *sCellSsbList = temp->sCellSsbList + i;
+        ssbIdInfo.ssbId = sCellSsbList->ssbId;
+        ssbIdInfo.rsrp = sCellSsbList->rsrp;
+        nrCellSsbIds.sCellSsbList.push_back(ssbIdInfo);
+    }
+    for (int32_t i = 0; i < temp->nbCellCount; i++) {
+        HDI::Ril::V1_2::NeighboringCellSsbInfo neighboringCellSsbInfo;
+        neighboringCellSsbInfo.pci = temp->nbCellSsbList[i].pci;
+        neighboringCellSsbInfo.arfcn = temp->nbCellSsbList[i].arfcn;
+        neighboringCellSsbInfo.rsrp = temp->nbCellSsbList[i].rsrp;
+        neighboringCellSsbInfo.sinr = temp->nbCellSsbList[i].sinr;
+        for (int32_t j = 0; j < NBCELL_SSB_LIST; j++) {
+            HDI::Ril::V1_2::SsbIdInfo ssbIdInfo = {0};
+            SsbIdInfoVendor *sCellSsbList = temp->nbCellSsbList[i].ssbIdList + j;
+            ssbIdInfo.ssbId = sCellSsbList->ssbId;
+            ssbIdInfo.rsrp = sCellSsbList->rsrp;
+            neighboringCellSsbInfo.ssbIdList.push_back(ssbIdInfo);
+        }
+        nrCellSsbIds.nbCellSsbList.push_back(neighboringCellSsbInfo);
     }
     return HRIL_ERR_SUCCESS;
 }

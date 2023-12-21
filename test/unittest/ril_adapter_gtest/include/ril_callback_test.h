@@ -157,6 +157,7 @@ enum class HdiId {
     HREQ_NETWORK_SET_NR_OPTION_MODE,
     HREQ_NETWORK_GET_NR_OPTION_MODE,
     HREQ_NETWORK_GET_RRC_CONNECTION_STATE,
+    HREQ_NETWORK_GET_NR_SSBID_INFO,
 
     HREQ_COMMON_BASE = 500,
     HREQ_MODEM_SHUT_DOWN,
@@ -452,6 +453,8 @@ public:
         const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, int32_t rrcConnectionState) override;
     int32_t GetRrcConnectionStateUpdated(
         const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, int32_t state) override;
+    int32_t GetNrSsbIdResponse(const HDI::Ril::V1_2::RilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_2::NrCellSsbIds &nrCellSsbIds) override;
 
     // Sms
     int32_t NewSmsNotify(const HDI::Ril::V1_1::HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,

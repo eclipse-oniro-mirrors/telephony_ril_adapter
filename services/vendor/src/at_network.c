@@ -1999,3 +1999,160 @@ void NotifyNetWorkTime(int32_t slotId)
     OnNetworkReport(GetSlotId(NULL), reportInfo, (const uint8_t *)timeStr, TIME_VALUE_LEN);
     FreeResponseInfo(responseInfo);
 }
+
+int32_t FillNeighboringCellSsbId(const char *str, NrCellSsbIdsVendor *nrSsbIdInfo)
+{
+    int32_t tempData = 0;
+    const int32_t NBCELL_SSB_LIST = 4;
+    const int32_t MAX_NBCELL_COUNT = 4;
+    char *tempStr = (char *)str;
+    if (NextIntNotSkipNextComma(&tempStr, &tempData) != 0) {
+        return HRIL_ERR_INVALID_RESPONSE;
+    }
+    nrSsbIdInfo->nbCellCount = tempData;
+    if (nrSsbIdInfo->nbCellCount > MAX_NBCELL_COUNT) {
+        TELEPHONY_LOGE("ProcessNrSsbId failed nbCellCount: [%{public}d]", nrSsbIdInfo->nbCellCount);
+        return HRIL_ERR_INVALID_RESPONSE;
+    }
+    (void)memset_s(nrSsbIdInfo->nbCellSsbList->ssbIdList, sizeof(SsbIdInfoVendor) * NBCELL_SSB_LIST, 0,
+        sizeof(SsbIdInfoVendor) * NBCELL_SSB_LIST);
+    (void)memset_s(nrSsbIdInfo->nbCellSsbList, sizeof(NeighboringCellSsbInfoVendor) * tempData, 0,
+        sizeof(NeighboringCellSsbInfoVendor) * tempData);
+    for (int32_t i = 0; i < nrSsbIdInfo->nbCellCount; i++) {
+        if (NextIntNotSkipNextComma(&tempStr, &tempData) != 0) {
+            return HRIL_ERR_INVALID_RESPONSE;
+        }
+        nrSsbIdInfo->nbCellSsbList[i].pci = tempData;
+        if (NextIntNotSkipNextComma(&tempStr, &tempData) != 0) {
+            return HRIL_ERR_INVALID_RESPONSE;
+        }
+        nrSsbIdInfo->nbCellSsbList[i].arfcn = tempData;
+        if (NextIntNotSkipNextComma(&tempStr, &tempData) != 0) {
+            return HRIL_ERR_INVALID_RESPONSE;
+        }
+        nrSsbIdInfo->nbCellSsbList[i].rsrp = tempData;
+        if (NextIntNotSkipNextComma(&tempStr, &tempData) != 0) {
+            return HRIL_ERR_INVALID_RESPONSE;
+        }
+        nrSsbIdInfo->nbCellSsbList[i].sinr = tempData;
+        for (int32_t j = 0; j < NBCELL_SSB_LIST; j++) {
+            if (NextIntNotSkipNextComma(&tempStr, &tempData) != 0) {
+                return HRIL_ERR_INVALID_RESPONSE;
+            }
+            nrSsbIdInfo->nbCellSsbList[i].ssbIdList[j].ssbId = tempData;
+            if (NextIntNotSkipNextComma(&tempStr, &tempData) != 0) {
+                return HRIL_ERR_INVALID_RESPONSE;
+            }
+            nrSsbIdInfo->nbCellSsbList[i].ssbIdList[j].rsrp = tempData;
+        }
+    }
+    return HRIL_ERR_SUCCESS;
+}
+
+int32_t FillServingCellSsbId(const char *str, NrCellSsbIdsVendor *nrSsbIdInfo)
+{
+    int32_t tempData = 0;
+    const int32_t SCELL_SSB_LIST = 8;
+    char *tempStr = (char *)str;
+    (void)memset_s(nrSsbIdInfo->sCellSsbList, sizeof(SsbIdInfoVendor) * SCELL_SSB_LIST, 0,
+        sizeof(SsbIdInfoVendor) * SCELL_SSB_LIST);
+    for (int32_t i = 0; i < SCELL_SSB_LIST; i++) {
+        if (NextIntNotSkipNextComma(&tempStr, &tempData) != 0) {
+            return HRIL_ERR_INVALID_RESPONSE;
+        }
+        nrSsbIdInfo->sCellSsbList[i].ssbId = tempData;
+        if (NextIntNotSkipNextComma(&tempStr, &tempData) != 0) {
+            return HRIL_ERR_INVALID_RESPONSE;
+        }
+        nrSsbIdInfo->sCellSsbList[i].rsrp = tempData;
+    }
+    return HRIL_ERR_SUCCESS;
+}
+
+int32_t ProcessNrSsbId(const char *str, NrCellSsbIdsVendor *nrSsbId)
+{
+    int32_t tempData = 0;
+    int64_t tempData64 = 0;
+    char *tempStr = (char *)str;
+    NrCellSsbIdsVendor *nrSsbIdInfo = (NrCellSsbIdsVendor *)nrSsbId;
+    if ((tempStr == NULL) || (nrSsbIdInfo == NULL)) {
+        TELEPHONY_LOGE("ProcessNrSsbId s or nrSsbIdInfo param is null");
+        return HRIL_ERR_NULL_POINT;
+    } else {
+        (void)memset_s(nrSsbIdInfo, sizeof(NrCellSsbIdsVendor), 0, sizeof(NrCellSsbIdsVendor));
+        TELEPHONY_LOGD("result: %{public}s", tempStr);
+        int32_t err = SkipATPrefix(&tempStr);
+        if (err < 0) {
+            TELEPHONY_LOGE("skip failed: [%{public}s]", tempStr);
+            return HRIL_ERR_INVALID_RESPONSE;
+        }
+        if (NextIntNotSkipNextComma(&tempStr, &tempData) != 0) {
+            return HRIL_ERR_INVALID_RESPONSE;
+        }
+        nrSsbIdInfo->arfcn = tempData;
+        if (NextInt64(&tempStr, &tempData64) != 0) {
+            return HRIL_ERR_INVALID_RESPONSE;
+        }
+        nrSsbIdInfo->cid = tempData64;
+        if (NextIntNotSkipNextComma(&tempStr, &tempData) != 0) {
+            return HRIL_ERR_INVALID_RESPONSE;
+        }
+        nrSsbIdInfo->pic = tempData;
+        if (NextIntNotSkipNextComma(&tempStr, &tempData) != 0) {
+            return HRIL_ERR_INVALID_RESPONSE;
+        }
+        nrSsbIdInfo->rsrp = tempData;
+        if (NextIntNotSkipNextComma(&tempStr, &tempData) != 0) {
+            return HRIL_ERR_INVALID_RESPONSE;
+        }
+        nrSsbIdInfo->sinr = tempData;
+        if (NextIntNotSkipNextComma(&tempStr, &tempData) != 0) {
+            return HRIL_ERR_INVALID_RESPONSE;
+        }
+        nrSsbIdInfo->timeAdvance = tempData;
+        if ((FillServingCellSsbId(tempStr, nrSsbIdInfo) != HRIL_ERR_SUCCESS) ||
+            (FillNeighboringCellSsbId(tempStr, nrSsbIdInfo) != HRIL_ERR_SUCCESS)) {
+            return HRIL_ERR_INVALID_RESPONSE;
+        }
+        return HRIL_ERR_SUCCESS;
+    }
+}
+
+void ReqGetNrSsbId(const ReqDataInfo *requestInfo)
+{
+    if (requestInfo == NULL) {
+        return;
+    }
+    int32_t err = HRIL_ERR_SUCCESS;
+    struct ReportInfo reportInfo;
+    ResponseInfo *responseInfo = NULL;
+    char *result = NULL;
+    int32_t ret = SendCommandLock("AT+NRSSBID?", "+NRSSBID:", DEFAULT_TIMEOUT, &responseInfo);
+    if (responseInfo == NULL) {
+        TELEPHONY_LOGE("NRSSBID's responseInfo is nullptr!");
+        reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_NULL_POINT, HRIL_RESPONSE, 0);
+        OnModemReport(requestInfo->slotId, reportInfo, NULL, 0);
+        return;
+    }
+    if (ret != 0 || !responseInfo->success) {
+        err = GetResponseErrorCode(responseInfo);
+        TELEPHONY_LOGE("send AT+NRSSBID is failed!");
+    }
+    if (responseInfo->head != NULL) {
+        result = responseInfo->head->data;
+    }
+    NrCellSsbIdsVendor nrSsbIdInfo = {0};
+    ret = ProcessNrSsbId(result, &nrSsbIdInfo);
+    if (ret != 0) {
+        if (result != NULL) {
+            TELEPHONY_LOGE("ProcessNrSsbId format  unexpected: %{public}s", result);
+        }
+        reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_RESPONSE, HRIL_RESPONSE, 0);
+        OnModemReport(requestInfo->slotId, reportInfo, NULL, 0);
+        FreeResponseInfo(responseInfo);
+        return;
+    }
+    reportInfo = CreateReportInfo(requestInfo, err, HRIL_RESPONSE, 0);
+    OnModemReport(requestInfo->slotId, reportInfo, (const uint8_t *)&nrSsbIdInfo, sizeof(NrCellSsbIdsVendor));
+    FreeResponseInfo(responseInfo);
+}

@@ -831,6 +831,18 @@ int32_t RilCallbackTest::GetRrcConnectionStateResponse(
     return 0;
 }
 
+int32_t RilCallbackTest::GetNrSsbIdResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+    const HDI::Ril::V1_2::NrCellSsbIds &nrCellSsbIds)
+{
+    TELEPHONY_LOGI("GetNrSsbIdResponse rsrp:%{public}d", nrCellSsbIds.rsrp);
+    TELEPHONY_LOGI("GetNrSsbIdResponse sinr:%{public}d", nrCellSsbIds.sinr);
+    TELEPHONY_LOGI("GetNrSsbIdResponse nbCellCount:%{public}d", nrCellSsbIds.nbCellCount);
+    hdiId_ = HdiId::HREQ_NETWORK_GET_NR_SSBID_INFO;
+    resultInfo_ = responseInfo;
+    NotifyAll();
+    return 0;
+}
+
 // Call
 int32_t RilCallbackTest::CallEmergencyNotice(
     const RilRadioResponseInfo &responseInfo, const EmergencyInfoList &emergencyInfoList)

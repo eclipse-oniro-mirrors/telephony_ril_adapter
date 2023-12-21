@@ -746,6 +746,16 @@ int32_t RilCallbackTest::GetRrcConnectionStateResponse(
     return 0;
 }
 
+int32_t RilCallbackTest::GetNrSsbIdResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+    const HDI::Ril::V1_2::NrCellSsbIds &nrCellSsbIds)
+{
+    PrintResponseInfo("GetNrSsbIdResponse", responseInfo);
+    cout << "nrCellSsbIds rsrp: " << nrCellSsbIds.rsrp << endl;
+    cout << "nrCellSsbIds sinr: " << nrCellSsbIds.sinr << endl;
+    cout << "nrCellSsbIds nbCellCount: " << nrCellSsbIds.nbCellCount << endl;
+    return 0;
+}
+
 // Call
 int32_t RilCallbackTest::CallEmergencyNotice(
     const RilRadioResponseInfo &responseInfo, const EmergencyInfoList &emergencyInfoList)

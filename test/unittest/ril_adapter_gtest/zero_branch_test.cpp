@@ -207,6 +207,7 @@ bool TestNetWorkInterface(std::shared_ptr<HRilManager> manager)
     EXPECT_NE(HDF_SUCCESS, manager->GetRrcConnectionState(0, 0));
     EXPECT_NE(HDF_SUCCESS, manager->GetNrOptionMode(0, 0));
     EXPECT_NE(HDF_SUCCESS, manager->SetNrOptionMode(0, 0, 1));
+    EXPECT_NE(HDF_SUCCESS, manager->GetNrSsbId(0, 0));
     return true;
 }
 
@@ -504,6 +505,7 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Network_002, Function | MediumTest | 
     EXPECT_NE(HDF_SUCCESS, network->GetRrcConnectionStateResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, network->GetNrOptionModeResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, network->SetNrOptionModeResponse(0, responseInfo, nullptr, 0));
+    EXPECT_NE(HDF_SUCCESS, network->GetNrSsbIdResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, network->NetworkCsRegStatusUpdated(0, HRilErrNumber::HRIL_ERR_NULL_POINT, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, network->NetworkPsRegStatusUpdated(0, HRilErrNumber::HRIL_ERR_NULL_POINT, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, network->SignalStrengthUpdated(0, HRilErrNumber::HRIL_ERR_NULL_POINT, nullptr, 0));
