@@ -21,6 +21,8 @@
 #include "hril_manager.h"
 #include "hril_modem.h"
 #include "hril_network.h"
+#include "hril_notification.h"
+#include "hril_request.h"
 #include "hril_sim.h"
 #include "hril_sms.h"
 #include "telephony_log_wrapper.h"
@@ -240,7 +242,7 @@ bool TestSmsInterface(std::shared_ptr<HRilManager> manager)
 }
 
 /**
- * @tc.number   Telephony_HrilManager_001
+ * @tc.number   Telephony_HrilManager_Call_001
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
@@ -517,6 +519,42 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Network_002, Function | MediumTest | 
 }
 
 /**
+ * @tc.number   Telephony_HrilManager_Network_003
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_HrilManager_Network_003, Function | MediumTest | Level3)
+{
+    auto manager = std::make_shared<HRilManager>();
+    manager->hrilNetwork_.clear();
+    std::unique_ptr<HRilNetwork> data;
+    manager->hrilNetwork_.push_back(std::move(data));
+
+    struct ReportInfo reportNotification;
+    reportNotification.error = static_cast<HRilErrNumber>(0);
+    reportNotification.notifyId = HNOTI_NETWORK_SIGNAL_STRENGTH_UPDATED;
+    reportNotification.type = HRIL_NOTIFICATION;
+    manager->OnNetworkReport(0, &reportNotification, nullptr, 0);
+    reportNotification.notifyId = HNOTI_NETWORK_RRC_CONNECTION_STATE_UPDATED;
+    manager->OnNetworkReport(0, &reportNotification, nullptr, 0);
+
+    struct ReportInfo reportResponse;
+    reportResponse.error = static_cast<HRilErrNumber>(0);
+    reportResponse.type = HRIL_RESPONSE;
+    ReqDataInfo *operatorRequestInfo = (ReqDataInfo *)malloc(sizeof(ReqDataInfo));
+    operatorRequestInfo->serial = 0;
+    operatorRequestInfo->request = HREQ_NETWORK_GET_OPERATOR_INFO;
+    reportResponse.requestInfo = operatorRequestInfo;
+    manager->OnNetworkReport(0, &reportResponse, nullptr, 0);
+    ReqDataInfo *signalRequestInfo = (ReqDataInfo *)malloc(sizeof(ReqDataInfo));
+    operatorRequestInfo->serial = 0;
+    signalRequestInfo->request = HREQ_NETWORK_GET_SIGNAL_STRENGTH;
+    reportResponse.requestInfo = signalRequestInfo;
+    manager->OnNetworkReport(0, &reportResponse, nullptr, 0);
+    EXPECT_EQ(true, TestNetWorkInterface(manager));
+}
+
+/**
  * @tc.number   Telephony_HrilManager_Sms_001
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -562,7 +600,7 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Sms_002, Function | MediumTest | Leve
 }
 
 /**
- * @tc.number   Telephony_HrilManager_Sms_001
+ * @tc.number   Telephony_HrilManager_HrilBase_001
  * @tc.name     test error branch
  * @tc.desc     Function test
  */

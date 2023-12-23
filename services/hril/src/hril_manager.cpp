@@ -256,42 +256,63 @@ void HRilManager::OnReport(std::vector<std::unique_ptr<T>> &subModules, int32_t 
         return;
     }
     switch (reportInfo->type) {
-        case static_cast<int32_t>(ReportType::HRIL_RESPONSE): {
-            ReqDataInfo *reqInfo = (ReqDataInfo *)reportInfo->requestInfo;
-            if (reqInfo == nullptr) {
-                TELEPHONY_LOGE("OnReport reqInfo is null!!!");
-                return;
-            }
-            TELEPHONY_LOGI("OnReport requestId:%{public}d", reqInfo->request);
-            HRilRadioResponseInfo responseInfo = {};
-            responseInfo.serial = reqInfo->serial;
-            responseInfo.error = (HRilErrType)reportInfo->error;
-            responseInfo.type = HRIL_RESPONSE_REQUEST;
-            if (HRIL_NEED_ACK == reportInfo->ack) {
-                ApplyRunningLock();
-                responseInfo.type = HRIL_RESPONSE_REQUEST_MUST_ACK;
-            }
-            int32_t requestId = reqInfo->request;
-            ReleaseHRilRequest(requestId, reqInfo);
-            subModules[slotId]->template ProcessResponse<T>(requestId, responseInfo, response, responseLen);
+        case static_cast<int32_t>(ReportType::HRIL_RESPONSE):
+            ReportResponse(subModules, slotId, reportInfo, response, responseLen);
             break;
-        }
-        case static_cast<int32_t>(ReportType::HRIL_NOTIFICATION): {
-            int32_t notifyType = HRIL_RESPONSE_NOTICE;
-            auto iter = notificationMap_.find(reportInfo->notifyId);
-            if (iter != notificationMap_.end()) {
-                TELEPHONY_LOGI("OnReport notifyId:%{public}d, value:%{public}d", reportInfo->notifyId, iter->second);
-                if (NEED_LOCK == iter->second) {
-                    ApplyRunningLock();
-                    notifyType = HRIL_RESPONSE_NOTICE_MUST_ACK;
-                }
-            }
-            subModules[slotId]->template ProcessNotify<T>(notifyType, reportInfo, response, responseLen);
-            break;
-        }
+        case static_cast<int32_t>(ReportType::HRIL_NOTIFICATION):
+            ReportNotification(subModules, slotId, reportInfo, response, responseLen);
         default:
             break;
     }
+}
+
+template<typename T>
+void HRilManager::ReportResponse(std::vector<std::unique_ptr<T>> &subModules, int32_t slotId,
+    const ReportInfo *reportInfo, const uint8_t *response, size_t responseLen)
+{
+    ReqDataInfo *reqInfo = (ReqDataInfo *)reportInfo->requestInfo;
+    if (reqInfo == nullptr) {
+        TELEPHONY_LOGE("reqInfo is null!!!");
+        return;
+    }
+    if (reqInfo->request == HREQ_NETWORK_GET_CS_REG_STATUS || reqInfo->request == HREQ_NETWORK_GET_PS_REG_STATUS ||
+        reqInfo->request == HREQ_NETWORK_GET_OPERATOR_INFO) {
+        TELEPHONY_LOGD("requestId:%{public}d", reqInfo->request);
+    } else {
+        TELEPHONY_LOGI("requestId:%{public}d", reqInfo->request);
+    }
+    HRilRadioResponseInfo responseInfo = {};
+    responseInfo.serial = reqInfo->serial;
+    responseInfo.error = (HRilErrType)reportInfo->error;
+    responseInfo.type = HRIL_RESPONSE_REQUEST;
+    if (HRIL_NEED_ACK == reportInfo->ack) {
+        ApplyRunningLock();
+        responseInfo.type = HRIL_RESPONSE_REQUEST_MUST_ACK;
+    }
+    int32_t requestId = reqInfo->request;
+    ReleaseHRilRequest(requestId, reqInfo);
+    subModules[slotId]->template ProcessResponse<T>(requestId, responseInfo, response, responseLen);
+}
+
+template<typename T>
+void HRilManager::ReportNotification(std::vector<std::unique_ptr<T>> &subModules, int32_t slotId,
+    const ReportInfo *reportInfo, const uint8_t *response, size_t responseLen)
+{
+    int32_t notifyType = HRIL_RESPONSE_NOTICE;
+    auto iter = notificationMap_.find(reportInfo->notifyId);
+    if (iter != notificationMap_.end()) {
+        if (reportInfo->notifyId == HNOTI_NETWORK_CS_REG_STATUS_UPDATED ||
+            reportInfo->notifyId == HNOTI_NETWORK_SIGNAL_STRENGTH_UPDATED) {
+            TELEPHONY_LOGD("notifyId:%{public}d, value:%{public}d", reportInfo->notifyId, iter->second);
+        } else {
+            TELEPHONY_LOGI("notifyId:%{public}d, value:%{public}d", reportInfo->notifyId, iter->second);
+        }
+        if (NEED_LOCK == iter->second) {
+            ApplyRunningLock();
+            notifyType = HRIL_RESPONSE_NOTICE_MUST_ACK;
+        }
+    }
+    subModules[slotId]->template ProcessNotify<T>(notifyType, reportInfo, response, responseLen);
 }
 
 void HRilManager::OnCallReport(
