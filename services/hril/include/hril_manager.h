@@ -232,6 +232,12 @@ private:
     template<typename T>
     void OnReport(std::vector<std::unique_ptr<T>> &subModules, int32_t slotId, const ReportInfo *reportInfo,
         const uint8_t *response, size_t responseLen);
+    template<typename T>
+    void ReportResponse(std::vector<std::unique_ptr<T>> &subModules, int32_t slotId, const ReportInfo *reportInfo,
+        const uint8_t *response, size_t responseLen);
+    template<typename T>
+    void ReportNotification(std::vector<std::unique_ptr<T>> &subModules, int32_t slotId, const ReportInfo *reportInfo,
+        const uint8_t *response, size_t responseLen);
     template<typename ClassTypePtr, typename FuncType, typename... ParamTypes>
     inline int32_t TaskSchedule(
         const std::string _module, ClassTypePtr &_obj, FuncType &&_func, ParamTypes &&... _args);
