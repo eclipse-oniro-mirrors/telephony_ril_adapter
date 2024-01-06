@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -261,6 +261,7 @@ void HRilManager::OnReport(std::vector<std::unique_ptr<T>> &subModules, int32_t 
             break;
         case static_cast<int32_t>(ReportType::HRIL_NOTIFICATION):
             ReportNotification(subModules, slotId, reportInfo, response, responseLen);
+            break;
         default:
             break;
     }

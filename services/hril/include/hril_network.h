@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -66,9 +66,13 @@ public:
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t GetNeighboringCellInfoListResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t GetNeighboringCellInfoListResponse_1_2(
+        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t GetCurrentCellInfoResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t GetCurrentCellInfoResponse_1_1(
+        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t GetCurrentCellInfoResponse_1_2(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t GetPhysicalChannelConfigResponse(
         int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
@@ -100,6 +104,8 @@ public:
         int32_t indType, const HRilErrNumber error, const void *response, size_t responseLen);
     int32_t NetworkCurrentCellUpdated_1_1(
         int32_t indType, const HRilErrNumber error, const void *response, size_t responseLen);
+    int32_t NetworkCurrentCellUpdated_1_2(
+        int32_t indType, const HRilErrNumber error, const void *response, size_t responseLen);
     void RegisterNetworkFuncs(const HRilNetworkReq *networkFuncs);
     bool IsNetworkRespOrNotify(uint32_t code);
     int32_t ResidentNetworkUpdated(int32_t indType, HRilErrNumber error, const void *response, size_t responseLen);
@@ -109,21 +115,37 @@ private:
     void ExchangeRilRssiToHdf(const void *response, HDI::Ril::V1_1::Rssi &rssi);
     void BuildOperatorList(
         HDI::Ril::V1_1::AvailableNetworkList &availableNetworkList, const void *response, size_t responseLen);
+    // V1_0
     void FillCellNearbyInfo(HDI::Ril::V1_1::CellNearbyInfo &cellInfo, const CellInfo *cellPtr);
     void FillCellNearbyInfoTdscdma(HDI::Ril::V1_1::CellNearbyInfo &cellInfo, const CellInfo *hrilCellPtr);
     void FillCellNearbyInfoCdma(HDI::Ril::V1_1::CellNearbyInfo &cellInfo, const CellInfo *hrilCellPtr);
     int32_t BuildNeighboringCellList(HDI::Ril::V1_1::CellListNearbyInfo &cellInfoList,
         const void *response, size_t responseLen);
+    // V1_2
+    void FillCellNearbyInfo(HDI::Ril::V1_2::CellNearbyInfo_1_2 &cellInfo, const CellInfo *cellPtr);
+    void FillCellNearbyInfoTdscdma(HDI::Ril::V1_2::CellNearbyInfo_1_2 &cellInfo, const CellInfo *hrilCellPtr);
+    void FillCellNearbyInfoCdma(HDI::Ril::V1_2::CellNearbyInfo_1_2 &cellInfo, const CellInfo *hrilCellPtr);
+    int32_t BuildNeighboringCellList(
+        HDI::Ril::V1_2::CellListNearbyInfo_1_2 &cellInfoList, const void *response, size_t responseLen);
+    // V1_0
     void FillCellInfoType(HDI::Ril::V1_1::CurrentCellInfo &cellInfo, const CurrentCellInfoVendor *hrilCellInfoVendor);
-    void FillCellInformationType(
-        HDI::Ril::V1_1::CurrentCellInfo_1_1 &cellInfo, const CurrentCellInfoVendor *hrilCellInfoVendor);
     void FillCurrentCellInfo(HDI::Ril::V1_1::CurrentCellInfo &cellInfo, const CurrentCellInfoVendor *cellInfoVendor);
-    void FillCurrentCellInformation(
-        HDI::Ril::V1_1::CurrentCellInfo_1_1 &cellInfo, const CurrentCellInfoVendor *cellInfoVendor);
     int32_t BuildCurrentCellList(
         HDI::Ril::V1_1::CellListCurrentInfo &cellInfoList, const void *response, size_t responseLen);
-    int32_t BuildCurrentCellInfoList(
+    // V1_1
+    void FillCellInfoType(
+        HDI::Ril::V1_1::CurrentCellInfo_1_1 &cellInfo, const CurrentCellInfoVendor *hrilCellInfoVendor);
+    void FillCurrentCellInfo(
+        HDI::Ril::V1_1::CurrentCellInfo_1_1 &cellInfo, const CurrentCellInfoVendor *cellInfoVendor);
+    int32_t BuildCurrentCellList(
         HDI::Ril::V1_1::CellListCurrentInfo_1_1 &cellInfoList, const void *response, size_t responseLen);
+    // V1_2
+    void FillCellInfoType(
+        HDI::Ril::V1_2::CurrentCellInfo_1_2 &cellInfo, const CurrentCellInfoVendor *hrilCellInfoVendor);
+    void FillCurrentCellInfo(
+        HDI::Ril::V1_2::CurrentCellInfo_1_2 &cellInfo, const CurrentCellInfoVendor *cellInfoVendor);
+    int32_t BuildCurrentCellList(
+        HDI::Ril::V1_2::CellListCurrentInfo_1_2 &cellInfoList, const void *response, size_t responseLen);
     int32_t BuildNrCellSsbIdsInfo(HDI::Ril::V1_2::NrCellSsbIds &nrCellSsbIds, const void *response, size_t responseLen);
     bool IsNetworkResponse(uint32_t code);
     bool IsNetworkNotification(uint32_t code);

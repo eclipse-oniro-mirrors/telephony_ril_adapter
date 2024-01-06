@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -39,7 +39,7 @@ void HRilNetwork::AddHandlerToMap()
     notiMemberFuncMap_[HNOTI_NETWORK_TIME_ZONE_UPDATED] = &HRilNetwork::NetworkTimeZoneUpdated;
     notiMemberFuncMap_[HNOTI_NETWORK_PS_REG_STATUS_UPDATED] = &HRilNetwork::NetworkPsRegStatusUpdated;
     notiMemberFuncMap_[HNOTI_NETWORK_PHY_CHNL_CFG_UPDATED] = &HRilNetwork::NetworkPhyChnlCfgUpdated;
-    notiMemberFuncMap_[HNOTI_NETWORK_CURRENT_CELL_UPDATED] = &HRilNetwork::NetworkCurrentCellUpdated_1_1;
+    notiMemberFuncMap_[HNOTI_NETWORK_CURRENT_CELL_UPDATED] = &HRilNetwork::NetworkCurrentCellUpdated_1_2;
     notiMemberFuncMap_[HNOTI_NETWORK_RRC_CONNECTION_STATE_UPDATED] = &HRilNetwork::GetRrcConnectionStateUpdated;
     notiMemberFuncMap_[HNOTI_NETWORK_RESIDENT_NETWORK_UPDATED] = &HRilNetwork::ResidentNetworkUpdated;
 
@@ -53,8 +53,9 @@ void HRilNetwork::AddHandlerToMap()
     respMemberFuncMap_[HREQ_NETWORK_SET_NETWORK_SELECTION_MODE] = &HRilNetwork::SetNetworkSelectionModeResponse;
     respMemberFuncMap_[HREQ_NETWORK_SET_PREFERRED_NETWORK] = &HRilNetwork::SetPreferredNetworkResponse;
     respMemberFuncMap_[HREQ_NETWORK_GET_PREFERRED_NETWORK] = &HRilNetwork::GetPreferredNetworkResponse;
-    respMemberFuncMap_[HREQ_NETWORK_GET_NEIGHBORING_CELLINFO_LIST] = &HRilNetwork::GetNeighboringCellInfoListResponse;
-    respMemberFuncMap_[HREQ_NETWORK_GET_CURRENT_CELL_INFO] = &HRilNetwork::GetCurrentCellInfoResponse_1_1;
+    respMemberFuncMap_[HREQ_NETWORK_GET_NEIGHBORING_CELLINFO_LIST] =
+        &HRilNetwork::GetNeighboringCellInfoListResponse_1_2;
+    respMemberFuncMap_[HREQ_NETWORK_GET_CURRENT_CELL_INFO] = &HRilNetwork::GetCurrentCellInfoResponse_1_2;
     respMemberFuncMap_[HREQ_NETWORK_GET_PHYSICAL_CHANNEL_CONFIG] = &HRilNetwork::GetPhysicalChannelConfigResponse;
     respMemberFuncMap_[HREQ_NETWORK_SET_LOCATE_UPDATES] = &HRilNetwork::SetLocateUpdatesResponse;
     respMemberFuncMap_[HREQ_NETWORK_SET_NOTIFICATION_FILTER] = &HRilNetwork::SetNotificationFilterResponse;
@@ -357,6 +358,26 @@ int32_t HRilNetwork::GetNeighboringCellInfoListResponse(
     return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::GetNeighboringCellInfoListResponse, cellInfoList);
 }
 
+int32_t HRilNetwork::GetNeighboringCellInfoListResponse_1_2(
+    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+{
+    HDI::Ril::V1_2::CellListNearbyInfo_1_2 cellInfoList;
+    if (response == nullptr || responseLen != sizeof(CellInfoList)) {
+        TELEPHONY_LOGE("response is invalid");
+        if (responseInfo.error == HRilErrType::NONE) {
+            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
+        }
+    } else {
+        cellInfoList.itemNum = 0;
+        cellInfoList.cellNearbyInfo.clear();
+        if (BuildNeighboringCellList(cellInfoList, response, responseLen) != 0) {
+            TELEPHONY_LOGE("BuildNeighboringCellList failed");
+            return HRIL_ERR_GENERIC_FAILURE;
+        }
+    }
+    return Response(responseInfo, &HDI::Ril::V1_2::IRilCallback::GetNeighboringCellInfoListResponse_1_2, cellInfoList);
+}
+
 int32_t HRilNetwork::GetCurrentCellInfoResponse(
     int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
@@ -382,19 +403,39 @@ int32_t HRilNetwork::GetCurrentCellInfoResponse_1_1(
 {
     HDI::Ril::V1_1::CellListCurrentInfo_1_1 cellList;
     if (response == nullptr || responseLen != sizeof(CurrentCellInfoList)) {
-        TELEPHONY_LOGE("GetCurrentCellInfoResponse_1_1 response is invalid");
+        TELEPHONY_LOGE("response is invalid");
         if (responseInfo.error == HRilErrType::NONE) {
             responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
         }
     } else {
         cellList.itemNum = 0;
         cellList.cellCurrentInfo.clear();
-        if (BuildCurrentCellInfoList(cellList, response, responseLen) != 0) {
-            TELEPHONY_LOGE("GetCurrentCellInfoResponse_1_1 BuildCurrentCellInfoList failed");
+        if (BuildCurrentCellList(cellList, response, responseLen) != 0) {
+            TELEPHONY_LOGE("BuildCurrentCellList failed");
             return HRIL_ERR_GENERIC_FAILURE;
         }
     }
     return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::GetCurrentCellInfoResponse_1_1, cellList);
+}
+
+int32_t HRilNetwork::GetCurrentCellInfoResponse_1_2(
+    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+{
+    HDI::Ril::V1_2::CellListCurrentInfo_1_2 cellList;
+    if (response == nullptr || responseLen != sizeof(CurrentCellInfoList)) {
+        TELEPHONY_LOGE("response is invalid");
+        if (responseInfo.error == HRilErrType::NONE) {
+            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
+        }
+    } else {
+        cellList.itemNum = 0;
+        cellList.cellCurrentInfo.clear();
+        if (BuildCurrentCellList(cellList, response, responseLen) != 0) {
+            TELEPHONY_LOGE("BuildCurrentCellList failed");
+            return HRIL_ERR_GENERIC_FAILURE;
+        }
+    }
+    return Response(responseInfo, &HDI::Ril::V1_2::IRilCallback::GetCurrentCellInfoResponse_1_2, cellList);
 }
 
 int32_t HRilNetwork::GetPhysicalChannelConfigResponse(
@@ -657,6 +698,23 @@ int32_t HRilNetwork::NetworkCurrentCellUpdated(
     return Notify(indType, error, &HDI::Ril::V1_1::IRilCallback::NetworkCurrentCellUpdated, cellList);
 }
 
+int32_t HRilNetwork::NetworkCurrentCellUpdated_1_2(
+    int32_t indType, const HRilErrNumber error, const void *response, size_t responseLen)
+{
+    if (response == nullptr || responseLen != sizeof(CurrentCellInfoList)) {
+        TELEPHONY_LOGE("response is invalid");
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    HDI::Ril::V1_2::CellListCurrentInfo_1_2 cellList;
+    cellList.itemNum = 0;
+    cellList.cellCurrentInfo.clear();
+    if (BuildCurrentCellList(cellList, response, responseLen) != 0) {
+        TELEPHONY_LOGE("BuildCurrentCellInfoList failed");
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
+    return Notify(indType, error, &HDI::Ril::V1_2::IRilCallback::NetworkCurrentCellUpdated_1_2, cellList);
+}
+
 int32_t HRilNetwork::GetRrcConnectionStateUpdated(
     int32_t indType, const HRilErrNumber error, const void *response, size_t responseLen)
 {
@@ -676,14 +734,14 @@ int32_t HRilNetwork::NetworkCurrentCellUpdated_1_1(
     int32_t indType, const HRilErrNumber error, const void *response, size_t responseLen)
 {
     if (response == nullptr || responseLen != sizeof(CurrentCellInfoList)) {
-        TELEPHONY_LOGE("NetworkCurrentCellUpdated_1_1 response is invalid");
+        TELEPHONY_LOGE("response is invalid");
         return HRIL_ERR_INVALID_PARAMETER;
     }
     HDI::Ril::V1_1::CellListCurrentInfo_1_1 cellList;
     cellList.itemNum = 0;
     cellList.cellCurrentInfo.clear();
-    if (BuildCurrentCellInfoList(cellList, response, responseLen) != 0) {
-        TELEPHONY_LOGE("NetworkCurrentCellUpdated_1_1 BuildCurrentCellInfoList failed");
+    if (BuildCurrentCellList(cellList, response, responseLen) != 0) {
+        TELEPHONY_LOGE("BuildCurrentCellList failed");
         return HRIL_ERR_GENERIC_FAILURE;
     }
     return Notify(indType, error, &HDI::Ril::V1_1::IRilCallback::NetworkCurrentCellUpdated_1_1, cellList);
@@ -821,17 +879,112 @@ void HRilNetwork::FillCellNearbyInfoCdma(HDI::Ril::V1_1::CellNearbyInfo &cellInf
     cellInfo.serviceCells.cdma.latitude = hrilCellPtr->ServiceCellParas.cdma.latitude;
 }
 
+void HRilNetwork::FillCellNearbyInfo(HDI::Ril::V1_2::CellNearbyInfo_1_2 &cellInfo, const CellInfo *cellPtr)
+{
+    cellInfo.ratType = cellPtr->ratType;
+    switch (cellPtr->ratType) {
+        case NETWORK_TYPE_GSM:
+            cellInfo.serviceCells.gsm.band = cellPtr->ServiceCellParas.gsm.band;
+            cellInfo.serviceCells.gsm.arfcn = cellPtr->ServiceCellParas.gsm.arfcn;
+            cellInfo.serviceCells.gsm.bsic = cellPtr->ServiceCellParas.gsm.bsic;
+            cellInfo.serviceCells.gsm.cellId = cellPtr->ServiceCellParas.gsm.cellId;
+            cellInfo.serviceCells.gsm.lac = cellPtr->ServiceCellParas.gsm.lac;
+            cellInfo.serviceCells.gsm.rxlev = cellPtr->ServiceCellParas.gsm.rxlev;
+            break;
+        case NETWORK_TYPE_LTE:
+            cellInfo.serviceCells.lte.arfcn = cellPtr->ServiceCellParas.lte.arfcn;
+            cellInfo.serviceCells.lte.pci = cellPtr->ServiceCellParas.lte.pci;
+            cellInfo.serviceCells.lte.rsrp = cellPtr->ServiceCellParas.lte.rsrp;
+            cellInfo.serviceCells.lte.rsrq = cellPtr->ServiceCellParas.lte.rsrq;
+            cellInfo.serviceCells.lte.rxlev = cellPtr->ServiceCellParas.lte.rxlev;
+            break;
+        case NETWORK_TYPE_WCDMA:
+            cellInfo.serviceCells.wcdma.arfcn = cellPtr->ServiceCellParas.wcdma.arfcn;
+            cellInfo.serviceCells.wcdma.psc = cellPtr->ServiceCellParas.wcdma.psc;
+            cellInfo.serviceCells.wcdma.rscp = cellPtr->ServiceCellParas.wcdma.rscp;
+            cellInfo.serviceCells.wcdma.ecno = cellPtr->ServiceCellParas.wcdma.ecno;
+            break;
+        case NETWORK_TYPE_CDMA:
+            FillCellNearbyInfoCdma(cellInfo, cellPtr);
+            break;
+        case NETWORK_TYPE_TDSCDMA:
+            FillCellNearbyInfoTdscdma(cellInfo, cellPtr);
+            break;
+        case NETWORK_TYPE_NR:
+            cellInfo.serviceCells.nr.nrArfcn = cellPtr->ServiceCellParas.nr.nrArfcn;
+            cellInfo.serviceCells.nr.pci = cellPtr->ServiceCellParas.nr.pci;
+            cellInfo.serviceCells.nr.tac = cellPtr->ServiceCellParas.nr.tac;
+            cellInfo.serviceCells.nr.nci = cellPtr->ServiceCellParas.nr.nci;
+            cellInfo.serviceCells.nr.rsrp = cellPtr->ServiceCellParas.nr.rsrp;
+            cellInfo.serviceCells.nr.rsrq = cellPtr->ServiceCellParas.nr.rsrq;
+            break;
+        default:
+            cellInfo.serviceCells.gsm.band = 0;
+            cellInfo.serviceCells.gsm.arfcn = 0;
+            cellInfo.serviceCells.gsm.bsic = 0;
+            cellInfo.serviceCells.gsm.cellId = 0;
+            cellInfo.serviceCells.gsm.lac = 0;
+            cellInfo.serviceCells.gsm.rxlev = 0;
+            break;
+    }
+}
+
+void HRilNetwork::FillCellNearbyInfoTdscdma(HDI::Ril::V1_2::CellNearbyInfo_1_2 &cellInfo, const CellInfo *hrilCellPtr)
+{
+    cellInfo.serviceCells.tdscdma.arfcn = hrilCellPtr->ServiceCellParas.tdscdma.arfcn;
+    cellInfo.serviceCells.tdscdma.syncId = hrilCellPtr->ServiceCellParas.tdscdma.syncId;
+    cellInfo.serviceCells.tdscdma.sc = hrilCellPtr->ServiceCellParas.tdscdma.sc;
+    cellInfo.serviceCells.tdscdma.cellId = hrilCellPtr->ServiceCellParas.tdscdma.cellId;
+    cellInfo.serviceCells.tdscdma.lac = hrilCellPtr->ServiceCellParas.tdscdma.lac;
+    cellInfo.serviceCells.tdscdma.rscp = hrilCellPtr->ServiceCellParas.tdscdma.rscp;
+    cellInfo.serviceCells.tdscdma.drx = hrilCellPtr->ServiceCellParas.tdscdma.drx;
+    cellInfo.serviceCells.tdscdma.rac = hrilCellPtr->ServiceCellParas.tdscdma.rac;
+    cellInfo.serviceCells.tdscdma.cpid = hrilCellPtr->ServiceCellParas.tdscdma.cpid;
+}
+
+void HRilNetwork::FillCellNearbyInfoCdma(HDI::Ril::V1_2::CellNearbyInfo_1_2 &cellInfo, const CellInfo *hrilCellPtr)
+{
+    cellInfo.serviceCells.cdma.systemId = hrilCellPtr->ServiceCellParas.cdma.systemId;
+    cellInfo.serviceCells.cdma.networkId = hrilCellPtr->ServiceCellParas.cdma.networkId;
+    cellInfo.serviceCells.cdma.baseId = hrilCellPtr->ServiceCellParas.cdma.baseId;
+    cellInfo.serviceCells.cdma.zoneId = hrilCellPtr->ServiceCellParas.cdma.zoneId;
+    cellInfo.serviceCells.cdma.pilotPn = hrilCellPtr->ServiceCellParas.cdma.pilotPn;
+    cellInfo.serviceCells.cdma.pilotStrength = hrilCellPtr->ServiceCellParas.cdma.pilotStrength;
+    cellInfo.serviceCells.cdma.channel = hrilCellPtr->ServiceCellParas.cdma.channel;
+    cellInfo.serviceCells.cdma.longitude = hrilCellPtr->ServiceCellParas.cdma.longitude;
+    cellInfo.serviceCells.cdma.latitude = hrilCellPtr->ServiceCellParas.cdma.latitude;
+}
+
 int32_t HRilNetwork::BuildNeighboringCellList(
     HDI::Ril::V1_1::CellListNearbyInfo &cellInfoList, const void *response, size_t responseLen)
 {
     const CellInfoList *temp = reinterpret_cast<const CellInfoList *>(response);
     cellInfoList.itemNum = temp->itemNum;
-    TELEPHONY_LOGI("BuildNeighboringCellList cellInfoList.itemNum = %{public}d", cellInfoList.itemNum);
+    TELEPHONY_LOGI("cellInfoList.itemNum = %{public}d", cellInfoList.itemNum);
     for (int32_t i = 0; i < temp->itemNum; i++) {
         HDI::Ril::V1_1::CellNearbyInfo cellInfo;
         CellInfo *cell = temp->cellNearbyInfo + i;
         if (cell == nullptr) {
-            TELEPHONY_LOGE("BuildNeighboringCellList cell is nullptr");
+            TELEPHONY_LOGE("cell is nullptr");
+            return HRIL_ERR_GENERIC_FAILURE;
+        }
+        FillCellNearbyInfo(cellInfo, cell);
+        cellInfoList.cellNearbyInfo.push_back(cellInfo);
+    }
+    return HRIL_ERR_SUCCESS;
+}
+
+int32_t HRilNetwork::BuildNeighboringCellList(
+    HDI::Ril::V1_2::CellListNearbyInfo_1_2 &cellInfoList, const void *response, size_t responseLen)
+{
+    const CellInfoList *temp = reinterpret_cast<const CellInfoList *>(response);
+    cellInfoList.itemNum = temp->itemNum;
+    TELEPHONY_LOGI("cellInfoList.itemNum = %{public}d", cellInfoList.itemNum);
+    for (int32_t i = 0; i < temp->itemNum; i++) {
+        HDI::Ril::V1_2::CellNearbyInfo_1_2 cellInfo;
+        CellInfo *cell = temp->cellNearbyInfo + i;
+        if (cell == nullptr) {
+            TELEPHONY_LOGE("cell is nullptr");
             return HRIL_ERR_GENERIC_FAILURE;
         }
         FillCellNearbyInfo(cellInfo, cell);
@@ -876,8 +1029,58 @@ void HRilNetwork::FillCellInfoType(
     }
 }
 
-void HRilNetwork::FillCellInformationType(
+void HRilNetwork::FillCellInfoType(
     HDI::Ril::V1_1::CurrentCellInfo_1_1 &cellInfo, const CurrentCellInfoVendor *hrilCellInfoVendor)
+{
+    switch (hrilCellInfoVendor->ratType) {
+        case NETWORK_TYPE_WCDMA:
+            cellInfo.serviceCells.wcdma.arfcn = hrilCellInfoVendor->ServiceCellParas.wcdma.arfcn;
+            cellInfo.serviceCells.wcdma.cellId = hrilCellInfoVendor->ServiceCellParas.wcdma.cellId;
+            cellInfo.serviceCells.wcdma.psc = hrilCellInfoVendor->ServiceCellParas.wcdma.psc;
+            cellInfo.serviceCells.wcdma.lac = hrilCellInfoVendor->ServiceCellParas.wcdma.lac;
+            cellInfo.serviceCells.wcdma.rxlev = hrilCellInfoVendor->ServiceCellParas.wcdma.rxlev;
+            cellInfo.serviceCells.wcdma.rscp = hrilCellInfoVendor->ServiceCellParas.wcdma.rscp;
+            cellInfo.serviceCells.wcdma.ecno = hrilCellInfoVendor->ServiceCellParas.wcdma.ecno;
+            cellInfo.serviceCells.wcdma.ura = hrilCellInfoVendor->ServiceCellParas.wcdma.ura;
+            cellInfo.serviceCells.wcdma.drx = hrilCellInfoVendor->ServiceCellParas.wcdma.drx;
+            break;
+        case NETWORK_TYPE_CDMA:
+            cellInfo.serviceCells.cdma.systemId = hrilCellInfoVendor->ServiceCellParas.cdma.systemId;
+            cellInfo.serviceCells.cdma.networkId = hrilCellInfoVendor->ServiceCellParas.cdma.networkId;
+            cellInfo.serviceCells.cdma.baseId = hrilCellInfoVendor->ServiceCellParas.cdma.baseId;
+            cellInfo.serviceCells.cdma.zoneId = hrilCellInfoVendor->ServiceCellParas.cdma.zoneId;
+            cellInfo.serviceCells.cdma.pilotPn = hrilCellInfoVendor->ServiceCellParas.cdma.pilotPn;
+            cellInfo.serviceCells.cdma.pilotStrength = hrilCellInfoVendor->ServiceCellParas.cdma.pilotStrength;
+            cellInfo.serviceCells.cdma.channel = hrilCellInfoVendor->ServiceCellParas.cdma.channel;
+            cellInfo.serviceCells.cdma.longitude = hrilCellInfoVendor->ServiceCellParas.cdma.longitude;
+            cellInfo.serviceCells.cdma.latitude = hrilCellInfoVendor->ServiceCellParas.cdma.latitude;
+            break;
+        case NETWORK_TYPE_TDSCDMA:
+            cellInfo.serviceCells.tdscdma.arfcn = hrilCellInfoVendor->ServiceCellParas.tdscdma.arfcn;
+            cellInfo.serviceCells.tdscdma.syncId = hrilCellInfoVendor->ServiceCellParas.tdscdma.syncId;
+            cellInfo.serviceCells.tdscdma.sc = hrilCellInfoVendor->ServiceCellParas.tdscdma.sc;
+            cellInfo.serviceCells.tdscdma.cellId = hrilCellInfoVendor->ServiceCellParas.tdscdma.cellId;
+            cellInfo.serviceCells.tdscdma.lac = hrilCellInfoVendor->ServiceCellParas.tdscdma.lac;
+            cellInfo.serviceCells.tdscdma.rscp = hrilCellInfoVendor->ServiceCellParas.tdscdma.rscp;
+            cellInfo.serviceCells.tdscdma.drx = hrilCellInfoVendor->ServiceCellParas.tdscdma.drx;
+            cellInfo.serviceCells.tdscdma.rac = hrilCellInfoVendor->ServiceCellParas.tdscdma.rac;
+            cellInfo.serviceCells.tdscdma.cpid = hrilCellInfoVendor->ServiceCellParas.tdscdma.cpid;
+            break;
+        case NETWORK_TYPE_NR:
+            cellInfo.serviceCells.nr.nrArfcn = hrilCellInfoVendor->ServiceCellParas.nr.nrArfcn;
+            cellInfo.serviceCells.nr.pci = hrilCellInfoVendor->ServiceCellParas.nr.pci;
+            cellInfo.serviceCells.nr.tac = hrilCellInfoVendor->ServiceCellParas.nr.tac;
+            cellInfo.serviceCells.nr.nci = hrilCellInfoVendor->ServiceCellParas.nr.nci;
+            cellInfo.serviceCells.nr.rsrp = hrilCellInfoVendor->ServiceCellParas.nr.rsrp;
+            cellInfo.serviceCells.nr.rsrq = hrilCellInfoVendor->ServiceCellParas.nr.rsrq;
+            break;
+        default:
+            break;
+    }
+}
+
+void HRilNetwork::FillCellInfoType(
+    HDI::Ril::V1_2::CurrentCellInfo_1_2 &cellInfo, const CurrentCellInfoVendor *hrilCellInfoVendor)
 {
     switch (hrilCellInfoVendor->ratType) {
         case NETWORK_TYPE_WCDMA:
@@ -977,7 +1180,7 @@ void HRilNetwork::FillCurrentCellInfo(
     }
 }
 
-void HRilNetwork::FillCurrentCellInformation(
+void HRilNetwork::FillCurrentCellInfo(
     HDI::Ril::V1_1::CurrentCellInfo_1_1 &cellInfo, const CurrentCellInfoVendor *cellInfoVendor)
 {
     cellInfo.ratType = cellInfoVendor->ratType;
@@ -1007,7 +1210,53 @@ void HRilNetwork::FillCurrentCellInformation(
         case NETWORK_TYPE_CDMA:
         case NETWORK_TYPE_TDSCDMA:
         case NETWORK_TYPE_NR:
-            FillCellInformationType(cellInfo, cellInfoVendor);
+            FillCellInfoType(cellInfo, cellInfoVendor);
+            break;
+        default:
+            cellInfo.serviceCells.wcdma.arfcn = 0;
+            cellInfo.serviceCells.wcdma.cellId = 0;
+            cellInfo.serviceCells.wcdma.psc = 0;
+            cellInfo.serviceCells.wcdma.lac = 0;
+            cellInfo.serviceCells.wcdma.rxlev = 0;
+            cellInfo.serviceCells.wcdma.rscp = 0;
+            cellInfo.serviceCells.wcdma.ecno = 0;
+            cellInfo.serviceCells.wcdma.drx = 0;
+            cellInfo.serviceCells.wcdma.ura = 0;
+            break;
+    }
+}
+
+void HRilNetwork::FillCurrentCellInfo(
+    HDI::Ril::V1_2::CurrentCellInfo_1_2 &cellInfo, const CurrentCellInfoVendor *cellInfoVendor)
+{
+    cellInfo.ratType = cellInfoVendor->ratType;
+    cellInfo.mcc = cellInfoVendor->mcc;
+    cellInfo.mnc = cellInfoVendor->mnc;
+    switch (cellInfoVendor->ratType) {
+        case NETWORK_TYPE_GSM:
+            cellInfo.serviceCells.gsm.band = cellInfoVendor->ServiceCellParas.gsm.band;
+            cellInfo.serviceCells.gsm.arfcn = cellInfoVendor->ServiceCellParas.gsm.arfcn;
+            cellInfo.serviceCells.gsm.bsic = cellInfoVendor->ServiceCellParas.gsm.bsic;
+            cellInfo.serviceCells.gsm.cellId = cellInfoVendor->ServiceCellParas.gsm.cellId;
+            cellInfo.serviceCells.gsm.lac = cellInfoVendor->ServiceCellParas.gsm.lac;
+            cellInfo.serviceCells.gsm.rxlev = cellInfoVendor->ServiceCellParas.gsm.rxlev;
+            cellInfo.serviceCells.gsm.rxQuality = cellInfoVendor->ServiceCellParas.gsm.rxQuality;
+            cellInfo.serviceCells.gsm.ta = cellInfoVendor->ServiceCellParas.gsm.ta;
+            break;
+        case NETWORK_TYPE_LTE:
+            cellInfo.serviceCells.lte.arfcn = cellInfoVendor->ServiceCellParas.lte.arfcn;
+            cellInfo.serviceCells.lte.cellId = cellInfoVendor->ServiceCellParas.lte.cellId;
+            cellInfo.serviceCells.lte.pci = cellInfoVendor->ServiceCellParas.lte.pci;
+            cellInfo.serviceCells.lte.tac = cellInfoVendor->ServiceCellParas.lte.tac;
+            cellInfo.serviceCells.lte.rsrp = cellInfoVendor->ServiceCellParas.lte.rsrp;
+            cellInfo.serviceCells.lte.rsrq = cellInfoVendor->ServiceCellParas.lte.rsrq;
+            cellInfo.serviceCells.lte.rssi = cellInfoVendor->ServiceCellParas.lte.rssi;
+            break;
+        case NETWORK_TYPE_WCDMA:
+        case NETWORK_TYPE_CDMA:
+        case NETWORK_TYPE_TDSCDMA:
+        case NETWORK_TYPE_NR:
+            FillCellInfoType(cellInfo, cellInfoVendor);
             break;
         default:
             cellInfo.serviceCells.wcdma.arfcn = 0;
@@ -1042,20 +1291,39 @@ int32_t HRilNetwork::BuildCurrentCellList(HDI::Ril::V1_1::CellListCurrentInfo &c
     return HRIL_ERR_SUCCESS;
 }
 
-int32_t HRilNetwork::BuildCurrentCellInfoList(HDI::Ril::V1_1::CellListCurrentInfo_1_1 &cellInfoList,
-    const void *response, size_t responseLen)
+int32_t HRilNetwork::BuildCurrentCellList(
+    HDI::Ril::V1_1::CellListCurrentInfo_1_1 &cellInfoList, const void *response, size_t responseLen)
 {
     const CurrentCellInfoList *temp = reinterpret_cast<const CurrentCellInfoList *>(response);
     cellInfoList.itemNum = temp->itemNum;
-    TELEPHONY_LOGI("BuildCurrentCellInfoList cellInfoList.itemNum = %{public}d", cellInfoList.itemNum);
+    TELEPHONY_LOGI("cellInfoList.itemNum = %{public}d", cellInfoList.itemNum);
     for (int32_t i = 0; i < temp->itemNum; i++) {
         HDI::Ril::V1_1::CurrentCellInfo_1_1 cellInfo;
         CurrentCellInfoVendor *cell = temp->currentCellInfo + i;
         if (cell == nullptr) {
-            TELEPHONY_LOGE("BuildCurrentCellInfoList cell is nullptr");
+            TELEPHONY_LOGE("cell is nullptr");
             return HRIL_ERR_GENERIC_FAILURE;
         }
-        FillCurrentCellInformation(cellInfo, cell);
+        FillCurrentCellInfo(cellInfo, cell);
+        cellInfoList.cellCurrentInfo.push_back(cellInfo);
+    }
+    return HRIL_ERR_SUCCESS;
+}
+
+int32_t HRilNetwork::BuildCurrentCellList(
+    HDI::Ril::V1_2::CellListCurrentInfo_1_2 &cellInfoList, const void *response, size_t responseLen)
+{
+    const CurrentCellInfoList *temp = reinterpret_cast<const CurrentCellInfoList *>(response);
+    cellInfoList.itemNum = temp->itemNum;
+    TELEPHONY_LOGI("cellInfoList.itemNum = %{public}d", cellInfoList.itemNum);
+    for (int32_t i = 0; i < temp->itemNum; i++) {
+        HDI::Ril::V1_2::CurrentCellInfo_1_2 cellInfo;
+        CurrentCellInfoVendor *cell = temp->currentCellInfo + i;
+        if (cell == nullptr) {
+            TELEPHONY_LOGE("cell is nullptr");
+            return HRIL_ERR_GENERIC_FAILURE;
+        }
+        FillCurrentCellInfo(cellInfo, cell);
         cellInfoList.cellCurrentInfo.push_back(cellInfo);
     }
     return HRIL_ERR_SUCCESS;
