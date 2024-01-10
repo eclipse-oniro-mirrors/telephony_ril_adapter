@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -445,6 +445,48 @@ int32_t RilCallbackTest::NetworkCurrentCellUpdated_1_1(
     return 0;
 }
 
+int32_t RilCallbackTest::NetworkCurrentCellUpdated_1_2(
+    const RilRadioResponseInfo &responseInfo, const CellListCurrentInfo_1_2 &cellListCurrentInfo)
+{
+    PrintResponseInfo("NetworkCurrentCellUpdated_1_2", responseInfo);
+
+    cout << "[cellListCurrentInfo] -->[itemNum] : " << cellListCurrentInfo.itemNum << endl;
+    for (auto cellInfo : cellListCurrentInfo.cellCurrentInfo) {
+        cout << "[cellInfo] -->[ratType] : " << cellInfo.ratType << endl;
+        cout << "[cellInfo] -->[mcc] : " << cellInfo.mcc << endl;
+        cout << "[cellInfo] -->[mnc] : " << cellInfo.mnc << endl;
+        switch (static_cast<RatType>(cellInfo.ratType)) {
+            case RatType::NETWORK_TYPE_LTE:
+                cout << "[cellInfo] -->[arfcn] : " << cellInfo.serviceCells.lte.arfcn << endl;
+                cout << "[cellInfo] -->[rsrp] : " << cellInfo.serviceCells.lte.rsrp << endl;
+                cout << "[cellInfo] -->[rsrq] : " << cellInfo.serviceCells.lte.rsrq << endl;
+                cout << "[cellInfo] -->[rssi] : " << cellInfo.serviceCells.lte.rssi << endl;
+                break;
+            case RatType::NETWORK_TYPE_GSM:
+                cout << "[cellInfo] -->[band] : " << cellInfo.serviceCells.gsm.band << endl;
+                cout << "[cellInfo] -->[arfcn] : " << cellInfo.serviceCells.gsm.arfcn << endl;
+                cout << "[cellInfo] -->[rxlev] : " << cellInfo.serviceCells.gsm.rxlev << endl;
+                cout << "[cellInfo] -->[rxQuality] : " << cellInfo.serviceCells.gsm.rxQuality << endl;
+                break;
+            case RatType::NETWORK_TYPE_WCDMA:
+                cout << "[cellInfo] -->[arfcn] : " << cellInfo.serviceCells.wcdma.arfcn << endl;
+                cout << "[cellInfo] -->[rscp] : " << cellInfo.serviceCells.wcdma.rscp << endl;
+                cout << "[cellInfo] -->[rxlev] : " << cellInfo.serviceCells.wcdma.rxlev << endl;
+                cout << "[cellInfo] -->[ecno] : " << cellInfo.serviceCells.wcdma.ecno << endl;
+                break;
+            case RatType::NETWORK_TYPE_NR:
+                cout << "[cellInfo] -->[nrArfcn] : " << cellInfo.serviceCells.nr.nrArfcn << endl;
+                cout << "[cellInfo] -->[tac] : " << cellInfo.serviceCells.nr.tac << endl;
+                break;
+            default:
+                cout << "NetworkCurrentCellUpdated_1_2 fail, invalid ratType" << endl;
+                break;
+        }
+    }
+
+    return 0;
+}
+
 int32_t RilCallbackTest::ResidentNetworkUpdated(const RilRadioResponseInfo &responseInfo, const std::string &plmn)
 {
     PrintResponseInfo("ResidentNetworkUpdated", responseInfo);
@@ -577,6 +619,47 @@ int32_t RilCallbackTest::GetNeighboringCellInfoListResponse(
     return 0;
 }
 
+int32_t RilCallbackTest::GetNeighboringCellInfoListResponse_1_2(
+    const RilRadioResponseInfo &responseInfo, const CellListNearbyInfo_1_2 &cellInfoList)
+{
+    PrintResponseInfo("GetNeighboringCellInfoListResponse_1_2", responseInfo);
+
+    cout << "[cellInfoList] -->[itemNum] : " << cellInfoList.itemNum << endl;
+    for (auto cellInfo : cellInfoList.cellNearbyInfo) {
+        cout << "[cellInfo] -->[ratType] : " << cellInfo.ratType << endl;
+        switch (static_cast<RatType>(cellInfo.ratType)) {
+            case RatType::NETWORK_TYPE_LTE:
+                cout << "[cellInfo] -->[arfcn] : " << cellInfo.serviceCells.lte.arfcn << endl;
+                cout << "[cellInfo] -->[pci] : " << cellInfo.serviceCells.lte.pci << endl;
+                cout << "[cellInfo] -->[rsrp] : " << cellInfo.serviceCells.lte.rsrp << endl;
+                cout << "[cellInfo] -->[rsrq] : " << cellInfo.serviceCells.lte.rsrq << endl;
+                cout << "[cellInfo] -->[rxlev] : " << cellInfo.serviceCells.lte.rxlev << endl;
+                break;
+            case RatType::NETWORK_TYPE_GSM:
+                cout << "[cellInfo] -->[band] : " << cellInfo.serviceCells.gsm.band << endl;
+                cout << "[cellInfo] -->[arfcn] : " << cellInfo.serviceCells.gsm.arfcn << endl;
+                cout << "[cellInfo] -->[bsic] : " << cellInfo.serviceCells.gsm.bsic << endl;
+                cout << "[cellInfo] -->[rxlev] : " << cellInfo.serviceCells.gsm.rxlev << endl;
+                break;
+            case RatType::NETWORK_TYPE_WCDMA:
+                cout << "[cellInfo] -->[arfcn] : " << cellInfo.serviceCells.wcdma.arfcn << endl;
+                cout << "[cellInfo] -->[psc] : " << cellInfo.serviceCells.wcdma.psc << endl;
+                cout << "[cellInfo] -->[rscp] : " << cellInfo.serviceCells.wcdma.rscp << endl;
+                cout << "[cellInfo] -->[ecno] : " << cellInfo.serviceCells.wcdma.ecno << endl;
+                break;
+            case RatType::NETWORK_TYPE_NR:
+                cout << "[cellInfo] -->[nrArfcn] : " << cellInfo.serviceCells.nr.nrArfcn << endl;
+                cout << "[cellInfo] -->[tac] : " << cellInfo.serviceCells.nr.tac << endl;
+                break;
+            default:
+                cout << "GetNeighboringCellInfoListResponse_1_2 invalid ratType" << endl;
+                break;
+        }
+    }
+
+    return 0;
+}
+
 int32_t RilCallbackTest::GetCurrentCellInfoResponse(
     const RilRadioResponseInfo &responseInfo, const CellListCurrentInfo &cellInfoList)
 {
@@ -658,6 +741,50 @@ int32_t RilCallbackTest::GetCurrentCellInfoResponse_1_1(
                 break;
             default:
                 cout << "RilCallbackTest::GetCurrentCellInfoResponse_1_1 invalid ratType" << endl;
+                break;
+        }
+    }
+
+    return 0;
+}
+
+int32_t RilCallbackTest::GetCurrentCellInfoResponse_1_2(
+    const RilRadioResponseInfo &responseInfo, const CellListCurrentInfo_1_2 &cellListCurrentInfo)
+{
+    PrintResponseInfo("GetCurrentCellInfoResponse_1_2", responseInfo);
+
+    cout << "[cellListCurrentInfo] -->[itemNum] : " << cellListCurrentInfo.itemNum << endl;
+    for (auto cellInfo : cellListCurrentInfo.cellCurrentInfo) {
+        cout << "[cellInfo] -->[ratType] : " << cellInfo.ratType << endl;
+        cout << "[cellInfo] -->[mcc] : " << cellInfo.mcc << endl;
+        cout << "[cellInfo] -->[mnc] : " << cellInfo.mnc << endl;
+        switch (static_cast<RatType>(cellInfo.ratType)) {
+            case RatType::NETWORK_TYPE_LTE:
+                cout << "[cellInfo] -->[arfcn] : " << cellInfo.serviceCells.lte.arfcn << endl;
+                cout << "[cellInfo] -->[rsrp] : " << cellInfo.serviceCells.lte.rsrp << endl;
+                cout << "[cellInfo] -->[rsrq] : " << cellInfo.serviceCells.lte.rsrq << endl;
+                cout << "[cellInfo] -->[rssi] : " << cellInfo.serviceCells.lte.rssi << endl;
+                break;
+            case RatType::NETWORK_TYPE_GSM:
+                cout << "[cellInfo] -->[band] : " << cellInfo.serviceCells.gsm.band << endl;
+                cout << "[cellInfo] -->[arfcn] : " << cellInfo.serviceCells.gsm.arfcn << endl;
+                cout << "[cellInfo] -->[bsic] : " << cellInfo.serviceCells.gsm.bsic << endl;
+                cout << "[cellInfo] -->[cellId] : " << cellInfo.serviceCells.gsm.cellId << endl;
+                cout << "[cellInfo] -->[rxlev] : " << cellInfo.serviceCells.gsm.rxlev << endl;
+                break;
+            case RatType::NETWORK_TYPE_WCDMA:
+                cout << "[cellInfo] -->[arfcn] : " << cellInfo.serviceCells.wcdma.arfcn << endl;
+                cout << "[cellInfo] -->[psc] : " << cellInfo.serviceCells.wcdma.psc << endl;
+                cout << "[cellInfo] -->[rscp] : " << cellInfo.serviceCells.wcdma.rscp << endl;
+                cout << "[cellInfo] -->[ecno] : " << cellInfo.serviceCells.wcdma.ecno << endl;
+                break;
+            case RatType::NETWORK_TYPE_NR:
+                cout << "[cellInfo] -->[nrArfcn] : " << cellInfo.serviceCells.nr.nrArfcn << endl;
+                cout << "[cellInfo] -->[tac] : " << cellInfo.serviceCells.nr.tac << endl;
+                cout << "[cellInfo] -->[nci] : " << cellInfo.serviceCells.nr.nci << endl;
+                break;
+            default:
+                cout << "RilCallbackTest::GetCurrentCellInfoResponse_1_2 invalid ratType" << endl;
                 break;
         }
     }

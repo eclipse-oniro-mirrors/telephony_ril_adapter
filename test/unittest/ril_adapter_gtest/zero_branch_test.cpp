@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License"));
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -499,7 +499,10 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Network_002, Function | MediumTest | 
     EXPECT_NE(HDF_SUCCESS, network->SetPreferredNetworkResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, network->GetPreferredNetworkResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, network->GetNeighboringCellInfoListResponse(0, responseInfo, nullptr, 0));
+    EXPECT_NE(HDF_SUCCESS, network->GetNeighboringCellInfoListResponse_1_2(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, network->GetCurrentCellInfoResponse(0, responseInfo, nullptr, 0));
+    EXPECT_NE(HDF_SUCCESS, network->GetCurrentCellInfoResponse_1_1(0, responseInfo, nullptr, 0));
+    EXPECT_NE(HDF_SUCCESS, network->GetCurrentCellInfoResponse_1_2(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, network->GetPhysicalChannelConfigResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, network->SetLocateUpdatesResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, network->SetNotificationFilterResponse(0, responseInfo, nullptr, 0));
@@ -515,6 +518,7 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Network_002, Function | MediumTest | 
     EXPECT_NE(HDF_SUCCESS, network->NetworkTimeZoneUpdated(0, HRilErrNumber::HRIL_ERR_NULL_POINT, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, network->NetworkPhyChnlCfgUpdated(0, HRilErrNumber::HRIL_ERR_NULL_POINT, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, network->NetworkCurrentCellUpdated(0, HRilErrNumber::HRIL_ERR_NULL_POINT, nullptr, 0));
+    EXPECT_NE(HDF_SUCCESS, network->NetworkCurrentCellUpdated_1_2(0, HRilErrNumber::HRIL_ERR_NULL_POINT, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, network->ResidentNetworkUpdated(0, HRilErrNumber::HRIL_ERR_NULL_POINT, nullptr, 0));
 }
 
