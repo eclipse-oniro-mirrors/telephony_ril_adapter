@@ -63,6 +63,12 @@ ohos_unittest("tel_ril_adapter_gtest") {
     external_deps = [ "hilog:libhilog" ]
   }
   external_deps += [ "ipc:ipc_single" ]
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.hdf_drivers_interface_power) &&
+      global_parts_info.hdf_drivers_interface_power) {
+    external_deps += [ "drivers_interface_power:libpower_proxy_1.1" ]
+    defines += [ "ABILITY_POWER_SUPPORT" ]
+  }
 }
 
 group("unittest") {

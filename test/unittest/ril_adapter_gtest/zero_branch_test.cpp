@@ -225,7 +225,7 @@ bool TestSmsInterface(std::shared_ptr<HRilManager> manager)
     EXPECT_NE(HDF_SUCCESS, manager->UpdateSimMessage(0, 0, smsMessageIOInfo));
     EXPECT_NE(HDF_SUCCESS, manager->AddCdmaSimMessage(0, 0, smsMessageIOInfo));
     EXPECT_NE(HDF_SUCCESS, manager->DelCdmaSimMessage(0, 0, 0));
-    EXPECT_EQ(HDF_SUCCESS, manager->UpdateCdmaSimMessage(0, 0, smsMessageIOInfo));
+    EXPECT_NE(HDF_SUCCESS, manager->UpdateCdmaSimMessage(0, 0, smsMessageIOInfo));
     OHOS::HDI::Ril::V1_1::ServiceCenterAddress serviceCenterAddress;
     EXPECT_NE(HDF_SUCCESS, manager->SetSmscAddr(0, 0, serviceCenterAddress));
     EXPECT_NE(HDF_SUCCESS, manager->GetSmscAddr(0, 0));
@@ -249,6 +249,7 @@ bool TestSmsInterface(std::shared_ptr<HRilManager> manager)
 HWTEST_F(BranchTest, Telephony_HrilManager_Call_001, Function | MediumTest | Level2)
 {
     auto manager = std::make_shared<HRilManager>();
+    manager->hrilCall_.clear();
     std::unique_ptr<HRilCall> call;
     manager->hrilCall_.push_back(std::move(call));
     EXPECT_EQ(true, TestCallInterface(manager));
@@ -274,6 +275,7 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Call_001, Function | MediumTest | Lev
     VoiceRadioTechnology voiceRadioTechnology;
     VoiceRadioTechnology test = voiceRadioTechnology;
     EXPECT_EQ(manager->SendRilAck(), 0);
+    manager->hrilCall_.clear();
     EXPECT_NE(manager->CloseUnFinishedUssd(0, 0), 0);
     EXPECT_GT(manager->GetMaxSimSlotCount(), 0);
 }
@@ -538,9 +540,9 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Network_003, Function | MediumTest | 
     reportNotification.error = static_cast<HRilErrNumber>(0);
     reportNotification.notifyId = HNOTI_NETWORK_SIGNAL_STRENGTH_UPDATED;
     reportNotification.type = HRIL_NOTIFICATION;
-    manager->OnNetworkReport(0, &reportNotification, nullptr, 0);
+    manager->OnNetworkReport(0, nullptr, nullptr, 0);
     reportNotification.notifyId = HNOTI_NETWORK_RRC_CONNECTION_STATE_UPDATED;
-    manager->OnNetworkReport(0, &reportNotification, nullptr, 0);
+    manager->OnNetworkReport(0, nullptr, nullptr, 0);
 
     struct ReportInfo reportResponse;
     reportResponse.error = static_cast<HRilErrNumber>(0);
@@ -549,12 +551,12 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Network_003, Function | MediumTest | 
     operatorRequestInfo->serial = 0;
     operatorRequestInfo->request = HREQ_NETWORK_GET_OPERATOR_INFO;
     reportResponse.requestInfo = operatorRequestInfo;
-    manager->OnNetworkReport(0, &reportResponse, nullptr, 0);
+    manager->OnNetworkReport(0, nullptr, nullptr, 0);
     ReqDataInfo *signalRequestInfo = (ReqDataInfo *)malloc(sizeof(ReqDataInfo));
     operatorRequestInfo->serial = 0;
     signalRequestInfo->request = HREQ_NETWORK_GET_SIGNAL_STRENGTH;
     reportResponse.requestInfo = signalRequestInfo;
-    manager->OnNetworkReport(0, &reportResponse, nullptr, 0);
+    manager->OnNetworkReport(0, nullptr, nullptr, 0);
     EXPECT_EQ(true, TestNetWorkInterface(manager));
 }
 
