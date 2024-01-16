@@ -276,7 +276,8 @@ void HRilManager::ReportResponse(std::vector<std::unique_ptr<T>> &subModules, in
         TELEPHONY_LOGE("reqInfo is null!!!");
         return;
     }
-    if (reqInfo->request == HREQ_NETWORK_GET_CS_REG_STATUS || reqInfo->request == HREQ_NETWORK_GET_PS_REG_STATUS ||
+    if (reqInfo->request == HREQ_SIM_GET_SIM_IO || reqInfo->request == HREQ_NETWORK_GET_SIGNAL_STRENGTH ||
+        reqInfo->request == HREQ_NETWORK_GET_CS_REG_STATUS || reqInfo->request == HREQ_NETWORK_GET_PS_REG_STATUS ||
         reqInfo->request == HREQ_NETWORK_GET_OPERATOR_INFO) {
         TELEPHONY_LOGD("requestId:%{public}d", reqInfo->request);
     } else {
