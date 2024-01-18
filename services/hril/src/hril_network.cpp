@@ -571,7 +571,7 @@ int32_t HRilNetwork::NetworkCsRegStatusUpdated(
     int32_t indType, const HRilErrNumber error, const void *response, size_t responseLen)
 {
     if (response == nullptr || responseLen != sizeof(HRilRegStatusInfo)) {
-        TELEPHONY_LOGE("NetworkCsRegStatusUpdated response is invalid");
+        TELEPHONY_LOGE("response is invalid");
         return HRIL_ERR_INVALID_PARAMETER;
     }
     HDI::Ril::V1_1::CsRegStatusInfo regStatusInfoNotify = {};
@@ -581,7 +581,7 @@ int32_t HRilNetwork::NetworkCsRegStatusUpdated(
     regStatusInfoNotify.lacCode = hrilRegStatusInfo->lacCode;
     regStatusInfoNotify.cellId = hrilRegStatusInfo->cellId;
     regStatusInfoNotify.radioTechnology = static_cast<HDI::Ril::V1_1::RilRadioTech>(hrilRegStatusInfo->actType);
-    TELEPHONY_LOGI("NetworkCsRegStatusUpdated notifyType:%{public}d, regStatus:%{public}d, "
+    TELEPHONY_LOGD("notifyType:%{public}d, regStatus:%{public}d, "
                    "lacCode:%{private}d, cellId:%{private}d, radioTechnology:%{public}d",
         regStatusInfoNotify.notifyType, regStatusInfoNotify.regStatus, regStatusInfoNotify.lacCode,
         regStatusInfoNotify.cellId, regStatusInfoNotify.radioTechnology);
@@ -592,7 +592,7 @@ int32_t HRilNetwork::NetworkPsRegStatusUpdated(
     int32_t indType, const HRilErrNumber error, const void *response, size_t responseLen)
 {
     if (response == nullptr || responseLen != sizeof(HRilRegStatusInfo)) {
-        TELEPHONY_LOGE("NetworkPsRegStatusUpdated response is invalid");
+        TELEPHONY_LOGE("response is invalid");
         return HRIL_ERR_INVALID_PARAMETER;
     }
     HDI::Ril::V1_1::PsRegStatusInfo regStatusInfoNotify = {};
@@ -605,8 +605,8 @@ int32_t HRilNetwork::NetworkPsRegStatusUpdated(
     regStatusInfoNotify.isDcNrRestricted = hrilRegStatusInfo->isDcNrRestricted;
     regStatusInfoNotify.isNrAvailable = hrilRegStatusInfo->isNrAvailable;
     regStatusInfoNotify.isEnDcAvailable = hrilRegStatusInfo->isEnDcAvailable;
-    TELEPHONY_LOGI(
-        "GetPsRegStatusResponse notifyType:%{public}d, regStatus:%{public}d, lacCode:%{private}d, cellId:%{private}d, "
+    TELEPHONY_LOGD(
+        "notifyType:%{public}d, regStatus:%{public}d, lacCode:%{private}d, cellId:%{private}d, "
         "radioTechnology:%{public}d, isDcNrRestricted:%{private}d, isNrAvailable:%{private}d, "
         "isEnDcAvailable:%{private}d",
         regStatusInfoNotify.notifyType, regStatusInfoNotify.regStatus, regStatusInfoNotify.lacCode,

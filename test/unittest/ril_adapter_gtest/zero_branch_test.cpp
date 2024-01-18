@@ -513,8 +513,13 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Network_002, Function | MediumTest | 
     EXPECT_NE(HDF_SUCCESS, network->GetNrOptionModeResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, network->SetNrOptionModeResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, network->GetNrSsbIdResponse(0, responseInfo, nullptr, 0));
+    HRilRegStatusInfo regStatusInfo;
     EXPECT_NE(HDF_SUCCESS, network->NetworkCsRegStatusUpdated(0, HRilErrNumber::HRIL_ERR_NULL_POINT, nullptr, 0));
+    EXPECT_NE(HDF_SUCCESS, network->NetworkCsRegStatusUpdated(0, HRilErrNumber::HRIL_ERR_NULL_POINT,
+                               (const uint8_t *)(&regStatusInfo), sizeof(HRilRegStatusInfo)));
     EXPECT_NE(HDF_SUCCESS, network->NetworkPsRegStatusUpdated(0, HRilErrNumber::HRIL_ERR_NULL_POINT, nullptr, 0));
+    EXPECT_NE(HDF_SUCCESS, network->NetworkPsRegStatusUpdated(0, HRilErrNumber::HRIL_ERR_NULL_POINT,
+                               (const uint8_t *)(&regStatusInfo), sizeof(HRilRegStatusInfo)));
     EXPECT_NE(HDF_SUCCESS, network->SignalStrengthUpdated(0, HRilErrNumber::HRIL_ERR_NULL_POINT, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, network->NetworkTimeUpdated(0, HRilErrNumber::HRIL_ERR_NULL_POINT, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, network->NetworkTimeZoneUpdated(0, HRilErrNumber::HRIL_ERR_NULL_POINT, nullptr, 0));
@@ -621,6 +626,7 @@ HWTEST_F(BranchTest, Telephony_HrilManager_HrilBase_001, Function | MediumTest |
     ASSERT_TRUE(base.ConvertHexStringToBytes(this, 0) == nullptr);
     ASSERT_FALSE(base.ConvertToString(nullptr, ""));
     char *dest = nullptr;
+    base.CopyToCharPoint(&dest, "");
     ASSERT_TRUE(base.ConvertToString(&dest, ""));
 }
 
