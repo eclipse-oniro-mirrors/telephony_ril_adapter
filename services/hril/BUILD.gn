@@ -12,7 +12,6 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("../../../core_service/telephony_core_service.gni")
 
 RIL_ADAPTER = "../../"
 RIL_HRIL = "../../services/hril/src"
@@ -45,8 +44,6 @@ ohos_shared_library("hril") {
     "TELEPHONY_LOG_TAG = \"Hril\"",
     "LOG_DOMAIN = 0xD001F08",
   ]
-
-  defines += telephony_extra_defines
 
   deps = [ "$RIL_ADAPTER/interfaces/innerkits:hril_innerkits" ]
 
