@@ -405,6 +405,8 @@ static constexpr uint32_t HRIL_NETWORKS_SELECT_MODE = 0;
 inline const int32_t HRIL_SYSPARA_SIZE = 128;
 inline constexpr const char *HRIL_DEFAULT_SLOT_COUNT = "1";
 inline constexpr const char *HRIL_TEL_SIM_SLOT_COUNT = "const.telephony.slotCount";
+inline constexpr const char *HRIL_DEFAULT_VSIM_MODEM_COUNT = "0";
+inline constexpr const char *HRIL_VSIM_MODEM_COUNT_STR = "const.telephony.vsimModemCount";
 
 /** Interface token */
 inline const std::u16string HRIL_INTERFACE_TOKEN = u"ohos.telephony.hril";
