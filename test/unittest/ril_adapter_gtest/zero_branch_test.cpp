@@ -55,9 +55,10 @@ void ReStartTelephony()
         if (fgets(buf, MAX_BUF_SIZE, fp) != nullptr) {
             pid = atoi(buf);
         }
+        pclose(fp);
+        fp = nullptr;
     }
     kill(pid, SIGKILL);
-    pclose(fp);
     sleep(WAIT_TELEPHONY_RETART_TIME);
 }
 
