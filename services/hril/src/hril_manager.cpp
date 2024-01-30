@@ -101,12 +101,13 @@ template<typename ClassTypePtr, typename FuncType, typename... ParamTypes>
 inline int32_t HRilManager::TaskSchedule(
     const std::string module, ClassTypePtr &_obj, FuncType &&_func, ParamTypes &&... _args)
 {
-    TELEPHONY_LOGD("%{public}s enter", module.c_str());
-    if (_func == nullptr || _obj == nullptr) {
-        TELEPHONY_LOGE("%{public}s func or obj is null pointer", module.c_str());
+    pthread_mutex_lock(&dispatchMutex);
+    if (_func == nullptr || _obj == nullptr || g_isHrilManagerDestory) {
+        TELEPHONY_LOGE(
+            "%{public}s func or obj is null pointer or destroy %{public}d", module.c_str(), g_isHrilManagerDestory);
+        pthread_mutex_unlock(&dispatchMutex);
         return HDF_FAILURE;
     }
-    pthread_mutex_lock(&dispatchMutex);
     int32_t ret = (_obj.get()->*(_func))(std::forward<ParamTypes>(_args)...);
     pthread_mutex_unlock(&dispatchMutex);
     return ret;
@@ -1003,7 +1004,7 @@ int32_t HRilManager::SendRilAck()
 
 HRilManager::~HRilManager()
 {
-    g_isHrilManagerDestory = true;
+    SetHrilManagerDestroy();
     if (timerCallback_ == nullptr || timerCallback_->event_ == nullptr ||
         timerCallback_->event_->IsNormalDestory()) {
         return;
@@ -1015,6 +1016,13 @@ HRilManager::~HRilManager()
     }
     eventLoop_->join();
     TELEPHONY_LOGI("~HRilManager end");
+}
+
+void HRilManager::SetHrilManagerDestroy()
+{
+    pthread_mutex_lock(&dispatchMutex);
+    g_isHrilManagerDestory = true;
+    pthread_mutex_unlock(&dispatchMutex);
 }
 
 #ifdef __cplusplus

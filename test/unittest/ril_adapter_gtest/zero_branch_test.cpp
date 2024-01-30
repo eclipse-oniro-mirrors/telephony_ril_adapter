@@ -621,6 +621,7 @@ HWTEST_F(BranchTest, Telephony_HrilManager_HrilBase_001, Function | MediumTest |
     EXPECT_EQ(HRIL_ERR_GENERIC_FAILURE, base.ConvertHexStringToInt(nullptr, 0, 0));
     EXPECT_EQ(10, base.ConvertHexCharToInt('a'));
     EXPECT_EQ(0, base.ConvertHexCharToInt('0'));
+    EXPECT_EQ(9, base.ConvertHexCharToInt('9'));
     EXPECT_EQ(HRIL_INVALID_HEX_CHAR, base.ConvertHexCharToInt('z'));
     ASSERT_TRUE(base.ConvertHexStringToBytes(nullptr, 0) == nullptr);
     ASSERT_TRUE(base.ConvertHexStringToBytes(this, 0) == nullptr);
