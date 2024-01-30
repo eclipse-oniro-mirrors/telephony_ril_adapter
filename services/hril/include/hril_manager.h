@@ -241,6 +241,7 @@ private:
     template<typename ClassTypePtr, typename FuncType, typename... ParamTypes>
     inline int32_t TaskSchedule(
         const std::string _module, ClassTypePtr &_obj, FuncType &&_func, ParamTypes &&... _args);
+    void SetHrilManagerDestroy();
 
 private:
     const int32_t hrilSimSlotCount_;
