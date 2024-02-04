@@ -33,6 +33,9 @@
 
 namespace OHOS {
 namespace Telephony {
+inline const int32_t DUAL_SLOT_COUNT = 2;
+inline const int32_t MAX_SLOT_COUNT = 3;
+
 typedef enum : int32_t {
     RIL_REGISTER_IS_NONE = 0,
     RIL_REGISTER_IS_RUNNING,

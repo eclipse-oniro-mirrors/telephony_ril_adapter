@@ -1033,7 +1033,15 @@ int32_t GetSimSlotCount()
 {
     char simSlotCount[HRIL_SYSPARA_SIZE] = { 0 };
     GetParameter(HRIL_TEL_SIM_SLOT_COUNT, HRIL_DEFAULT_SLOT_COUNT, simSlotCount, HRIL_SYSPARA_SIZE);
-    return std::atoi(simSlotCount);
+    int32_t simSlotCountNumber = std::atoi(simSlotCount);
+    char vSimModemCount[HRIL_SYSPARA_SIZE] = { 0 };
+    GetParameter(HRIL_VSIM_MODEM_COUNT_STR, HRIL_DEFAULT_VSIM_MODEM_COUNT, vSimModemCount, HRIL_SYSPARA_SIZE);
+    int32_t vSimModemCountNumber = std::atoi(vSimModemCount);
+    if (simSlotCountNumber == DUAL_SLOT_COUNT && vSimModemCountNumber == MAX_SLOT_COUNT) {
+        simSlotCountNumber = MAX_SLOT_COUNT;
+    }
+    TELEPHONY_LOGI("GetSimSlotCount, %{public}d", simSlotCountNumber);
+    return simSlotCountNumber;
 }
 
 static void HRilBootUpEventLoop()
