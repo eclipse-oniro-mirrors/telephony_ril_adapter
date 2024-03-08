@@ -194,6 +194,18 @@ static int32_t WapPushNotifyMock(const char *s, HRilSmsResponse *smsResponse)
     return HNOTI_SMS_NEW_SMS;
 }
 
+static void ProcessNotifyMock(const char *s, struct ReportInfo reportInfo)
+{
+    HRilSmsResponse response = {0};
+    if ((reportInfo.notifyId = CdmaSmsNotifyMock(s, &response)) > 0) {
+        OnSmsReport(GetSlotId(NULL), reportInfo, (const uint8_t *)&response, sizeof(HRilSmsResponse));
+    }
+    if ((reportInfo.notifyId = WapPushNotifyMock(s, &response)) > 0) {
+        OnSmsReport(GetSlotId(NULL), reportInfo, (const uint8_t *)&response, strlen(response.pdu));
+    }
+    return;
+}
+
 void OnNotifyOps(const char *s, const char *smsPdu)
 {
     if (s == NULL) {
@@ -235,13 +247,7 @@ void OnNotifyOps(const char *s, const char *smsPdu)
     } else if (OnNotifyStkOps(s, str)) {
         TELEPHONY_LOGI("STK notify completed.");
     } else {
-        HRilSmsResponse response = {0};
-        if ((reportInfo.notifyId = CdmaSmsNotifyMock(s, &response)) > 0) {
-            OnSmsReport(GetSlotId(NULL), reportInfo, (const uint8_t *)&response, sizeof(HRilSmsResponse));
-        }
-        if ((reportInfo.notifyId = WapPushNotifyMock(s, &response)) > 0) {
-            OnSmsReport(GetSlotId(NULL), reportInfo, (const uint8_t *)&response, strlen(response.pdu));
-        }
+        ProcessNotifyMock(s, reportInfo);
         OnNotifyNetWorksOps(s, str);
     }
     free(str);
