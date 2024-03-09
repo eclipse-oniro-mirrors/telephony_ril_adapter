@@ -306,9 +306,7 @@ int32_t HRilData::PdpContextListUpdated(
         return HRIL_ERR_INVALID_PARAMETER;
     }
     HDI::Ril::V1_1::DataCallResultList dataCallResultList = {};
-    if (response != nullptr) {
-        SwitchHRilDataListToHal(response, responseLen, dataCallResultList.dcList);
-    }
+    SwitchHRilDataListToHal(response, responseLen, dataCallResultList.dcList);
     dataCallResultList.size = dataCallResultList.dcList.size();
     return Notify(notifyType, error, &HDI::Ril::V1_1::IRilCallback::PdpContextListUpdated, dataCallResultList);
 }
@@ -321,13 +319,11 @@ int32_t HRilData::DataLinkCapabilityUpdated(
         return HRIL_ERR_INVALID_PARAMETER;
     }
     HDI::Ril::V1_1::DataLinkCapability dataLinkCapability = { 0 };
-    if (response != nullptr) {
-        const HRilDataLinkCapability *result = static_cast<const HRilDataLinkCapability *>(response);
-        dataLinkCapability.primaryDownlinkKbps = result->primaryDownlinkKbps;
-        dataLinkCapability.primaryUplinkKbps = result->primaryUplinkKbps;
-        dataLinkCapability.secondaryDownlinkKbps = result->secondaryDownlinkKbps;
-        dataLinkCapability.secondaryUplinkKbps = result->secondaryUplinkKbps;
-    }
+    const HRilDataLinkCapability *result = static_cast<const HRilDataLinkCapability *>(response);
+    dataLinkCapability.primaryDownlinkKbps = result->primaryDownlinkKbps;
+    dataLinkCapability.primaryUplinkKbps = result->primaryUplinkKbps;
+    dataLinkCapability.secondaryDownlinkKbps = result->secondaryDownlinkKbps;
+    dataLinkCapability.secondaryUplinkKbps = result->secondaryUplinkKbps;
     return Notify(notifyType, error, &HDI::Ril::V1_1::IRilCallback::DataLinkCapabilityUpdated, dataLinkCapability);
 }
 
