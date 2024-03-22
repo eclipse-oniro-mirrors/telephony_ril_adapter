@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -323,7 +323,7 @@ void ReqGetSimIO(const ReqDataInfo *requestInfo, const HRilSimIO *data, size_t d
     }
     if (pSim->pin2 != NULL && strcmp(pSim->pin2, "") != 0 && pSim->fileid == FILEID) {
         ret = ReqGetSimIOFDN(pSim, &pResponse, dataLen);
-        if (ret != HRIL_ERR_SUCCESS || !pResponse->success) {
+        if (ret != HRIL_ERR_SUCCESS || pResponse == NULL || !pResponse->success) {
             TELEPHONY_LOGE("FDN is failed");
             HandlerSimIOResult(pResponse, NULL, requestInfo, pLine, &ret);
             return;
@@ -745,6 +745,9 @@ void ReqGetSimPinInputTimesRemain(const ReqDataInfo *requestInfo, HRilPinInputTi
     }
     TELEPHONY_LOGD("ReqGetSimPinInputTimesRemain pLine:%{public}s, result:%{public}s, success:%{public}d", pLine,
         pResponse->result, pResponse->success);
+    if (pinInputTimes == NULL) {
+        return;
+    }
     ret = ParseSimPinInputTimesResult(pLine, pinInputTimes);
     TELEPHONY_LOGD("code:%{public}s, times:%{public}d, puk:%{public}d,"
         " pin:%{public}d, puk2:%{public}d, pin2:%{public}d",
@@ -1361,6 +1364,9 @@ uint8_t FcpFileDescriptorQuery(uint8_t *fcpByte, uint16_t fcpLen, UsimFileDescri
         TELEPHONY_LOGE("resultLen value error");
         return FALSE;
     }
+    if (queryPtr == NULL) {
+        return FALSE;
+    }
     queryPtr->fd = outPtr[0];
     queryPtr->dataCoding = outPtr[1];
     if (resultLen == FIVE_LEN) {
@@ -1388,6 +1394,9 @@ uint8_t FcpFileIdentifierQuery(uint8_t *fcpByte, uint16_t fcpLen, UsimFileIdenti
     uint8_t resultLen = 0;
     uint8_t *outPtr = NULL;
     UsimFileIdentifier *queryPtr = (UsimFileIdentifier *)filledStructPtr;
+    if (queryPtr == NULL) {
+        return FALSE;
+    }
     resultLen = FcpTlvSearchTag(dataPtr, valueLen, FCP_FILE_ID_T, &outPtr);
     if (outPtr == NULL) {
         queryPtr->fileId = 0;

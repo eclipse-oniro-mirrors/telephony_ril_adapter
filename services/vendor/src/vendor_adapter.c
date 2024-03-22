@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -221,7 +221,7 @@ int32_t SetRadioState(HRilRadioState newState, int32_t rst)
     if (oldState != g_radioState) {
         (void)sprintf_s(cmd, MAX_CMD_LENGTH, "AT+CFUN=%u,%d", newState, rst);
         int32_t err = SendCommandLock(cmd, NULL, timeOut, &pResponse);
-        if (err != 0 || !pResponse->success) {
+        if (err != 0 || pResponse == NULL || !pResponse->success) {
             TELEPHONY_LOGE("AT+CFUN send failed");
             FreeResponseInfo(pResponse);
             return -1;
@@ -262,7 +262,7 @@ static int32_t ModemInit(void)
 {
     ResponseInfo *pResponse = NULL;
     int32_t err = SendCommandLock("ATE0Q0V1", NULL, 0, &pResponse);
-    if (err != 0 || !pResponse->success) {
+    if (err != 0 || pResponse == NULL || !pResponse->success) {
         TELEPHONY_LOGE("ATE0Q0V1 send failed");
     }
     FreeResponseInfo(pResponse);

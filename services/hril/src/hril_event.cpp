@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -108,6 +108,9 @@ void HRilEvent::EraseListenEvent(HRilEventMessage &eventMsg, int32_t index)
 
 void HRilEvent::ProcessEvents(fd_set *rfds, int32_t number)
 {
+    if (rfds == nullptr) {
+        return;
+    }
     auto it = listenEventTable_.begin();
     for (; (it != listenEventTable_.end()) && (number > 0); ++it) {
         if (*it != nullptr && FD_ISSET((*it)->fd, rfds)) {

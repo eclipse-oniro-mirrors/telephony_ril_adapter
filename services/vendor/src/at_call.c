@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -427,7 +427,7 @@ void ReqDial(const ReqDataInfo *requestInfo, const HRilDial *data, size_t dataLe
         err = HRIL_ERR_CMD_SEND_FAILURE;
         TELEPHONY_LOGE("ATD send failed");
     } else {
-        if (!pResponse->success) {
+        if (pResponse == NULL || !pResponse->success) {
             TELEPHONY_LOGE("ReqDial return ERROR");
             err = HRIL_ERR_CMD_NO_CARRIER;
         }
@@ -458,7 +458,7 @@ void ReqHangup(const ReqDataInfo *requestInfo, const uint32_t *data, size_t data
         return;
     }
     ret = SendCommandLock(cmd, NULL, 0, &pResponse);
-    if (ret != HRIL_ERR_SUCCESS || !pResponse->success) {
+    if (ret != HRIL_ERR_SUCCESS || pResponse == NULL || !pResponse->success) {
         TELEPHONY_LOGE("AT+CHLD send failed");
         err = HRIL_ERR_GENERIC_FAILURE;
     }
@@ -475,7 +475,7 @@ void ReqReject(const ReqDataInfo *requestInfo)
     int32_t err = HRIL_ERR_SUCCESS;
 
     ret = SendCommandLock("ATH", NULL, 0, &pResponse);
-    if (ret != HRIL_ERR_SUCCESS || !pResponse->success) {
+    if (ret != HRIL_ERR_SUCCESS || pResponse == NULL || !pResponse->success) {
         TELEPHONY_LOGE("ATH send failed");
         err = HRIL_ERR_GENERIC_FAILURE;
     }
@@ -492,7 +492,7 @@ void ReqAnswer(const ReqDataInfo *requestInfo)
     ResponseInfo *pResponse = NULL;
 
     ret = SendCommandLock("ATA", NULL, 0, &pResponse);
-    if (ret != HRIL_ERR_SUCCESS || !pResponse->success) {
+    if (ret != HRIL_ERR_SUCCESS || pResponse == NULL || !pResponse->success) {
         err = HRIL_ERR_GENERIC_FAILURE;
     }
 
@@ -510,7 +510,7 @@ void ReqGetClip(const ReqDataInfo *requestInfo)
 
     err = SendCommandLock("AT+CLIP?", "+CLIP", 0, &pResponse);
     if (err == HRIL_ERR_SUCCESS) {
-        if (!pResponse->success) {
+        if (pResponse == NULL || !pResponse->success) {
             TELEPHONY_LOGE("CLIP return ERROR");
             err = HRIL_ERR_GENERIC_FAILURE;
         } else {
@@ -548,7 +548,7 @@ void ReqSetClip(const ReqDataInfo *requestInfo, int32_t action)
     }
     err = SendCommandLock(cmd, NULL, 0, &pResponse);
     if (err == HRIL_ERR_SUCCESS) {
-        if (!pResponse->success) {
+        if (pResponse == NULL || !pResponse->success) {
             TELEPHONY_LOGE("ReqSetClip return ERROR");
             err = HRIL_ERR_GENERIC_FAILURE;
         }
@@ -570,7 +570,7 @@ void ReqGetClir(const ReqDataInfo *requestInfo)
 
     err = SendCommandLock("AT+CLIR?", "+CLIR", 0, &pResponse);
     if (err == HRIL_ERR_SUCCESS) {
-        if (!pResponse->success) {
+        if (pResponse == NULL || !pResponse->success) {
             TELEPHONY_LOGE("CLIR return ERROR");
             err = HRIL_ERR_GENERIC_FAILURE;
         } else {
@@ -607,7 +607,7 @@ void ReqSetClir(const ReqDataInfo *requestInfo, int32_t action)
         return;
     }
     err = SendCommandLock(cmd, NULL, 0, &pResponse);
-    if (err != HRIL_ERR_SUCCESS || !pResponse->success) {
+    if (err != HRIL_ERR_SUCCESS || pResponse == NULL || !pResponse->success) {
         TELEPHONY_LOGE("ReqSetClir send failed");
         err = HRIL_ERR_GENERIC_FAILURE;
     }
@@ -629,7 +629,7 @@ void ReqStartDtmf(const ReqDataInfo *requestInfo, CallDtmfInfo info)
         return;
     }
     err = SendCommandLock(cmd, NULL, 0, &pResponse);
-    if (err != HRIL_ERR_SUCCESS || !pResponse->success) {
+    if (err != HRIL_ERR_SUCCESS || pResponse == NULL || !pResponse->success) {
         TELEPHONY_LOGE("ReqStartDtmf send failed");
         err = HRIL_ERR_GENERIC_FAILURE;
     }
@@ -660,7 +660,7 @@ void ReqSendDtmf(const ReqDataInfo *requestInfo, CallDtmfInfo info)
             continue;
         }
         err = SendCommandLock(cmd, NULL, 0, &pResponse);
-        if (err != HRIL_ERR_SUCCESS || !pResponse->success) {
+        if (err != HRIL_ERR_SUCCESS || pResponse == NULL || !pResponse->success) {
             TELEPHONY_LOGE("ReqSendDtmf send failed");
             err = HRIL_ERR_GENERIC_FAILURE;
             break;
@@ -684,7 +684,7 @@ void ReqStopDtmf(const ReqDataInfo *requestInfo, CallDtmfInfo info)
         return;
     }
     err = SendCommandLock(cmd, NULL, 0, &pResponse);
-    if (err != HRIL_ERR_SUCCESS || !pResponse->success) {
+    if (err != HRIL_ERR_SUCCESS || pResponse == NULL || !pResponse->success) {
         TELEPHONY_LOGE("ReqStopDtmf send failed");
         err = HRIL_ERR_GENERIC_FAILURE;
     }
@@ -700,7 +700,7 @@ static void HoldCallAndUnHoldCallAtSend(const ReqDataInfo *requestInfo)
     ResponseInfo *pResponse = NULL;
 
     ret = SendCommandLock("AT+CHLD=2", NULL, 0, &pResponse);
-    if (ret != HRIL_ERR_SUCCESS || !pResponse->success) {
+    if (ret != HRIL_ERR_SUCCESS || pResponse == NULL || !pResponse->success) {
         TELEPHONY_LOGE("ATA send failed");
         err = HRIL_ERR_GENERIC_FAILURE;
     }
@@ -783,7 +783,7 @@ void ReqSeparateConference(const ReqDataInfo *requestInfo, int32_t callIndex, in
             TELEPHONY_LOGE("ATA send failed");
             err = HRIL_ERR_CMD_SEND_FAILURE;
         } else {
-            if (!pResponse->success) {
+            if (pResponse == NULL || !pResponse->success) {
                 TELEPHONY_LOGE("ATA send failed");
                 err = HRIL_ERR_GENERIC_FAILURE;
             }
@@ -838,7 +838,7 @@ void ReqCallSupplement(const ReqDataInfo *requestInfo, int32_t type)
         TELEPHONY_LOGE("ReqCallSupplement cmd send failed");
         err = HRIL_ERR_CMD_SEND_FAILURE;
     } else {
-        if (!pResponse->success) {
+        if (pResponse == NULL || !pResponse->success) {
             TELEPHONY_LOGE("cmd send return error");
             err = HRIL_ERR_GENERIC_FAILURE;
         }
@@ -865,7 +865,7 @@ void ReqGetCallWaiting(const ReqDataInfo *requestInfo)
             GetSlotId(requestInfo), reportInfo, (const uint8_t *)&hrilCallWaitResult, sizeof(HRilCallWaitResult));
         return;
     }
-    if (!pResponse->success) {
+    if (pResponse == NULL || !pResponse->success) {
         TELEPHONY_LOGE("Get CCWA return ERROR");
         err = HRIL_ERR_GENERIC_FAILURE;
     } else {
@@ -902,7 +902,7 @@ void ReqSetCallWaiting(const ReqDataInfo *requestInfo, int32_t active)
         TELEPHONY_LOGE("ReqSetCallWaiting return, CCWA send failed");
         err = HRIL_ERR_CMD_SEND_FAILURE;
     } else {
-        if (!pResponse->success) {
+        if (pResponse == NULL || !pResponse->success) {
             err = HRIL_ERR_GENERIC_FAILURE;
         }
     }
@@ -945,7 +945,7 @@ void ReqSetCallTransferInfo(const ReqDataInfo *requestInfo, HRilCFInfo info)
         TELEPHONY_LOGE("CCFC send failed");
         err = HRIL_ERR_CMD_SEND_FAILURE;
     } else {
-        if (!pResponse->success) {
+        if (pResponse == NULL || !pResponse->success) {
             err = HRIL_ERR_GENERIC_FAILURE;
         }
     }
@@ -1065,7 +1065,7 @@ void ReqSetCallRestriction(const ReqDataInfo *requestInfo, CallRestrictionInfo i
         TELEPHONY_LOGE("CLCK send failed");
         err = HRIL_ERR_CMD_SEND_FAILURE;
     } else {
-        if (!pResponse->success) {
+        if (pResponse == NULL || !pResponse->success) {
             err = HRIL_ERR_GENERIC_FAILURE;
         }
     }

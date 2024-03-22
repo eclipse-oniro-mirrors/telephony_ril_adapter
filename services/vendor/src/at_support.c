@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,6 +26,7 @@ static volatile bool g_isNeedATPause = false;
 static volatile const char *g_prefix = NULL;
 static pthread_mutex_t g_commandmutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t g_commandcond = PTHREAD_COND_INITIALIZER;
+static pthread_mutex_t g_atPauseFlagMutex = PTHREAD_MUTEX_INITIALIZER;
 static volatile int32_t g_readerClosed = 0;
 static pthread_t g_reader;
 static void (*g_onTimeout)(void) = NULL;
@@ -371,10 +372,16 @@ void SetWatchFunction(void (*watchFun)(void))
 
 void SetAtPauseFlag(bool isNeedPause)
 {
+    pthread_mutex_lock(&g_atPauseFlagMutex);
     g_isNeedATPause = isNeedPause;
+    pthread_mutex_unlock(&g_atPauseFlagMutex);
 }
 
 bool GetAtPauseFlag(void)
 {
-    return g_isNeedATPause;
+    bool isNeedPause = FALSE;
+    pthread_mutex_lock(&g_atPauseFlagMutex);
+    isNeedPause = g_isNeedATPause;
+    pthread_mutex_unlock(&g_atPauseFlagMutex);
+    return isNeedPause;
 }
