@@ -212,7 +212,9 @@ int32_t HRilSms::SetCBConfig(int32_t serialId, const OHOS::HDI::Ril::V1_1::CBCon
     }
     uint32_t len = sizeof(HRilCBConfigInfo) * configInfo.size();
     result = RequestVendor(serialId, HREQ_SMS_SET_CB_CONFIG, smsFuncs_, &HRilSmsReq::SetCBConfig, info, len);
-    TELEPHONY_LOGI("SetCBConfig result is: %{public}d", result);
+    if (result != HRIL_ERR_SUCCESS) {
+        TELEPHONY_LOGE("SetCBConfig fail, result is: %{public}d", result);
+    }
     delete[] info;
     return result;
 }

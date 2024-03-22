@@ -27,6 +27,7 @@
 #include "telephony_log_wrapper.h"
 #include "v1_2/iril.h"
 #include "v1_2/iril_callback.h"
+#include "hril_notification.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -138,7 +139,9 @@ F HRilBase::GetFunc(std::map<uint32_t, std::any> &funcs, uint32_t code)
     if (itFunc != funcs.end()) {
         return std::any_cast<F>(itFunc->second);
     }
-    TELEPHONY_LOGE("Can not find Request code in func map: %{public}d!", code);
+    if (code != HNOTI_NETWORK_RESTRICTED_STATE_UPDATED) {
+        TELEPHONY_LOGE("Can not find Request code in func map: %{public}d", code);
+    }
     return nullptr;
 }
 
