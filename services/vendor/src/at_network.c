@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -2010,7 +2010,7 @@ int32_t FillNeighboringCellSsbId(const char *str, NrCellSsbIdsVendor *nrSsbIdInf
         return HRIL_ERR_INVALID_RESPONSE;
     }
     nrSsbIdInfo->nbCellCount = tempData;
-    if (nrSsbIdInfo->nbCellCount > MAX_NBCELL_COUNT) {
+    if (nrSsbIdInfo->nbCellCount > MAX_NBCELL_COUNT || nrSsbIdInfo->nbCellSsbList == NULL) {
         TELEPHONY_LOGE("ProcessNrSsbId failed nbCellCount: [%{public}d]", nrSsbIdInfo->nbCellCount);
         return HRIL_ERR_INVALID_RESPONSE;
     }
