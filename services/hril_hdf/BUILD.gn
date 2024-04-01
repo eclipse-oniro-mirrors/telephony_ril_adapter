@@ -30,8 +30,8 @@ ohos_shared_library("hril_hdf") {
   configs = [ "$RIL_ADAPTER/utils:utils_config" ]
 
   deps = [
-    "$RIL_ADAPTER/services/hril:hril",
     "$RIL_ADAPTER/interfaces/innerkits:hril_innerkits",
+    "$RIL_ADAPTER/services/hril:hril",
   ]
 
   external_deps = [

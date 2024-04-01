@@ -17,7 +17,6 @@
 #define OHOS_HRIL_CALL_H
 
 #include "hril_base.h"
-// #include "hril_call_parcel.h"
 
 namespace OHOS {
 namespace Telephony {
