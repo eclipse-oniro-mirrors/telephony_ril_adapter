@@ -41,6 +41,7 @@ ohos_unittest("tel_ril_adapter_gtest") {
   deps = [
     "$SOURCE_DIR/services/hril:hril",
     "$SOURCE_DIR/services/hril_hdf:hril_hdf",
+    "$SOURCE_DIR/interfaces/innerkits:hril_innerkits",
   ]
   defines = [
     "TELEPHONY_LOG_TAG = \"RilAdapterGtest\"",

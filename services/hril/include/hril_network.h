@@ -17,7 +17,7 @@
 #define OHOS_HRIL_NETWORK_H
 
 #include "hril_base.h"
-#include "hril_network_parcel.h"
+// #include "hril_network_parcel.h"
 
 namespace OHOS {
 namespace Telephony {

@@ -17,7 +17,7 @@
 #define OHOS_HRIL_SIM_H
 
 #include "hril_base.h"
-#include "hril_sim_parcel.h"
+// #include "hril_sim_parcel.h"
 
 namespace OHOS {
 namespace Telephony {

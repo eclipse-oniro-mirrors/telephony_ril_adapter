@@ -275,8 +275,6 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Call_001, Function | MediumTest | Lev
     HRilRegOps(nullptr);
     ReleaseRilAdapter();
     OnTimerCallback(nullptr, nullptr, nullptr);
-    VoiceRadioTechnology voiceRadioTechnology;
-    VoiceRadioTechnology test = voiceRadioTechnology;
     EXPECT_EQ(manager->SendRilAck(), 0);
     manager->hrilCall_.clear();
     EXPECT_NE(manager->CloseUnFinishedUssd(0, 0), 0);

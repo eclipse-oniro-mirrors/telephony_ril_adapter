@@ -17,7 +17,7 @@
 #define OHOS_HRIL_MODEM_H
 
 #include "hril_base.h"
-#include "hril_modem_parcel.h"
+// #include "hril_modem_parcel.h"
 
 namespace OHOS {
 namespace Telephony {

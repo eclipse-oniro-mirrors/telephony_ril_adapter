@@ -17,7 +17,7 @@
 #define OHOS_HRIL_SMS_H
 
 #include "hril_base.h"
-#include "hril_sms_parcel.h"
+// #include "hril_sms_parcel.h"
 
 namespace OHOS {
 namespace Telephony {
