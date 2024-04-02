@@ -718,8 +718,8 @@ bool HRilSim::BuildLockStatusResp(const void *response, size_t responseLen, HDI:
     return true;
 }
 
-void HRilSim::ResponseLockStatus(HDI::Ril::V1_1::LockStatusResp &lockStatus, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
-    const void *response, size_t responseLen)
+void HRilSim::ResponseLockStatus(HDI::Ril::V1_1::LockStatusResp &lockStatus,
+    HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     if (!BuildLockStatusResp(response, responseLen, lockStatus)) {
         TELEPHONY_LOGE("Invalid ResponseLockStatus: response is error");
@@ -729,8 +729,8 @@ void HRilSim::ResponseLockStatus(HDI::Ril::V1_1::LockStatusResp &lockStatus, HDI
     }
 }
 
-int32_t HRilSim::BuildSimIOResp(HDI::Ril::V1_1::IccIoResultInfo &result, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
-    const void *response, size_t responseLen)
+int32_t HRilSim::BuildSimIOResp(HDI::Ril::V1_1::IccIoResultInfo &result,
+    HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     if ((response == nullptr && responseLen != 0) ||
         (response != nullptr && responseLen != sizeof(HRilSimIOResponse))) {
