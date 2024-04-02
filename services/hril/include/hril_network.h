@@ -46,49 +46,49 @@ public:
     int32_t GetNrSsbId(int32_t serialId);
 
     int32_t GetSignalStrengthResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+        int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t GetCsRegStatusResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+        int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t GetPsRegStatusResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+        int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t GetOperatorInfoResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+        int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t GetNetworkSearchInformationResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+        int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t GetNetworkSelectionModeResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+        int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t SetNetworkSelectionModeResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+        int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t SetPreferredNetworkResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+        int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t GetPreferredNetworkResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+        int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t GetNeighboringCellInfoListResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+        int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t GetNeighboringCellInfoListResponse_1_2(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+        int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t GetCurrentCellInfoResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+        int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t GetCurrentCellInfoResponse_1_1(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+        int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t GetCurrentCellInfoResponse_1_2(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+        int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t GetPhysicalChannelConfigResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+        int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t SetLocateUpdatesResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+        int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t SetNotificationFilterResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+        int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t SetDeviceStateResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+        int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t SetNrOptionModeResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+        int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t GetNrOptionModeResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+        int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t GetRrcConnectionStateResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+        int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t GetNrSsbIdResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+        int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
 
     int32_t NetworkCsRegStatusUpdated(int32_t indType, HRilErrNumber error, const void *response, size_t responseLen);
     int32_t NetworkPsRegStatusUpdated(int32_t indType, HRilErrNumber error, const void *response, size_t responseLen);

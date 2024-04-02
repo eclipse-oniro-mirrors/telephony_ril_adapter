@@ -46,37 +46,37 @@ public:
     int32_t UpdateCdmaSimMessage(int32_t serialId, const OHOS::HDI::Ril::V1_1::SmsMessageIOInfo &smsMessageIOInfo);
 
     int32_t SendGsmSmsResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+        int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t SendCdmaSmsResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+        int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t AddSimMessageResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+        int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t DelSimMessageResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+        int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t UpdateSimMessageResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+        int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t SetSmscAddrResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+        int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t GetSmscAddrResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+        int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t SetCBConfigResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+        int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t GetCBConfigResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+        int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t SetCdmaCBConfigResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+        int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t GetCdmaCBConfigResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+        int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t SendSmsMoreModeResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+        int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t SendSmsAckResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+        int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t AddCdmaSimMessageResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+        int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t DelCdmaSimMessageResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+        int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t UpdateCdmaSimMessageResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+        int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
 
     int32_t SmsStatusReportNotify(int32_t indType, HRilErrNumber error, const void *response, size_t responseLen);
     int32_t NewSmsStoredOnSimNotify(int32_t indType, HRilErrNumber error, const void *response, size_t responseLen);
@@ -92,7 +92,7 @@ private:
     int32_t RequestWithStrings(int32_t serial, int32_t request, int32_t count, ...);
     HDI::Ril::V1_1::CBConfigReportInfo MakeCBConfigResult(const void *response, const size_t responseLen);
     HDI::Ril::V1_1::SendSmsResultInfo MakeSendSmsResult(
-        HRilRadioResponseInfo &responseInfo, int32_t serial, const void *response, const size_t responseLen);
+        HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, int32_t serial, const void *response, const size_t responseLen);
     void CopyToHRilCdmaCBConfigInfo(
         HRilCdmaCBConfigInfo *list, OHOS::HDI::Ril::V1_1::CdmaCBConfigInfoList cellBroadcastInfoList);
     bool CreateCdmaMessageInfo(HRilCdmaSmsMessageInfo &cdmaSmsInfo, const std::string &pdu);

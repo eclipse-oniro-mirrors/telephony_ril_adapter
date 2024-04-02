@@ -300,7 +300,7 @@ int32_t HRilSim::SendSimMatchedOperatorInfo(
 }
 
 int32_t HRilSim::GetSimIOResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     HDI::Ril::V1_1::IccIoResultInfo result = {};
     int32_t ret = BuildSimIOResp(result, responseInfo, response, responseLen);
@@ -311,7 +311,7 @@ int32_t HRilSim::GetSimIOResponse(
 }
 
 int32_t HRilSim::GetSimStatusResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     HDI::Ril::V1_1::CardStatusInfo rilCardStatus = {};
     if ((response == nullptr && responseLen != 0) ||
@@ -321,8 +321,8 @@ int32_t HRilSim::GetSimStatusResponse(
     }
     if (response == nullptr && responseLen == 0) {
         TELEPHONY_LOGE("response is null");
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
+        if (responseInfo.error == HDI::Ril::V1_1::RilErrType::NONE) {
+            responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_INVALID_RESPONSE;
         }
         return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::GetSimStatusResponse, rilCardStatus);
     }
@@ -334,7 +334,7 @@ int32_t HRilSim::GetSimStatusResponse(
 }
 
 int32_t HRilSim::GetImsiResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     int32_t ret = CheckCharData(response, responseLen);
     if (ret != HRIL_ERR_SUCCESS) {
@@ -344,13 +344,13 @@ int32_t HRilSim::GetImsiResponse(
 }
 
 int32_t HRilSim::GetSimLockStatusResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     int32_t simLockStatus = 0;
     if (response == nullptr || responseLen != sizeof(int32_t)) {
         TELEPHONY_LOGE("GetSimStatusResponse: Invalid response");
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
+        if (responseInfo.error == HDI::Ril::V1_1::RilErrType::NONE) {
+            responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_INVALID_RESPONSE;
         }
         return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::GetSimLockStatusResponse, simLockStatus);
     }
@@ -359,7 +359,7 @@ int32_t HRilSim::GetSimLockStatusResponse(
 }
 
 int32_t HRilSim::SetSimLockResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     HDI::Ril::V1_1::LockStatusResp result = {};
     ResponseLockStatus(result, responseInfo, response, responseLen);
@@ -367,7 +367,7 @@ int32_t HRilSim::SetSimLockResponse(
 }
 
 int32_t HRilSim::ChangeSimPasswordResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     HDI::Ril::V1_1::LockStatusResp result = {};
     ResponseLockStatus(result, responseInfo, response, responseLen);
@@ -375,7 +375,7 @@ int32_t HRilSim::ChangeSimPasswordResponse(
 }
 
 int32_t HRilSim::UnlockPinResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     HDI::Ril::V1_1::LockStatusResp result = {};
     ResponseLockStatus(result, responseInfo, response, responseLen);
@@ -383,7 +383,7 @@ int32_t HRilSim::UnlockPinResponse(
 }
 
 int32_t HRilSim::UnlockPukResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     HDI::Ril::V1_1::LockStatusResp result = {};
     ResponseLockStatus(result, responseInfo, response, responseLen);
@@ -391,7 +391,7 @@ int32_t HRilSim::UnlockPukResponse(
 }
 
 int32_t HRilSim::UnlockPin2Response(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     HDI::Ril::V1_1::LockStatusResp result = {};
     ResponseLockStatus(result, responseInfo, response, responseLen);
@@ -399,7 +399,7 @@ int32_t HRilSim::UnlockPin2Response(
 }
 
 int32_t HRilSim::UnlockPuk2Response(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     HDI::Ril::V1_1::LockStatusResp result = {};
     ResponseLockStatus(result, responseInfo, response, responseLen);
@@ -407,43 +407,43 @@ int32_t HRilSim::UnlockPuk2Response(
 }
 
 int32_t HRilSim::SetActiveSimResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::SetActiveSimResponse);
 }
 
 int32_t HRilSim::SimStkSendTerminalResponseResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::SimStkSendTerminalResponseResponse);
 }
 
 int32_t HRilSim::SimStkSendEnvelopeResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::SimStkSendEnvelopeResponse);
 }
 
 int32_t HRilSim::SimStkSendCallSetupRequestResultResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::SimStkSendCallSetupRequestResultResponse);
 }
 
 int32_t HRilSim::SimStkIsReadyResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::SimStkIsReadyResponse);
 }
 
 int32_t HRilSim::GetRadioProtocolResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     HDI::Ril::V1_1::RadioProtocol radioProtocol = {};
     if (response == nullptr || responseLen != sizeof(HRilRadioProtocol)) {
         TELEPHONY_LOGE("GetRadioProtocolResponse response is invalid");
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
+        if (responseInfo.error == HDI::Ril::V1_1::RilErrType::NONE) {
+            responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_INVALID_RESPONSE;
         }
     } else {
         BuildRadioProtocol(radioProtocol, response);
@@ -456,13 +456,13 @@ int32_t HRilSim::GetRadioProtocolResponse(
 }
 
 int32_t HRilSim::SetRadioProtocolResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     HDI::Ril::V1_1::RadioProtocol radioProtocol = {};
     if (response == nullptr || responseLen != sizeof(HRilRadioProtocol)) {
         TELEPHONY_LOGE("SetRadioProtocolResponse response is invalid");
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
+        if (responseInfo.error == HDI::Ril::V1_1::RilErrType::NONE) {
+            responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_INVALID_RESPONSE;
         }
     } else {
         BuildRadioProtocol(radioProtocol, response);
@@ -475,7 +475,7 @@ int32_t HRilSim::SetRadioProtocolResponse(
 }
 
 int32_t HRilSim::SimOpenLogicalChannelResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     HDI::Ril::V1_1::OpenLogicalChannelResponse pOpenLogicalChannelResponse = {};
     if (response == nullptr || responseLen != sizeof(HRilOpenLogicalChannelResponse)) {
@@ -492,13 +492,13 @@ int32_t HRilSim::SimOpenLogicalChannelResponse(
 }
 
 int32_t HRilSim::SimCloseLogicalChannelResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::SimCloseLogicalChannelResponse);
 }
 
 int32_t HRilSim::SimTransmitApduLogicalChannelResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     HDI::Ril::V1_1::IccIoResultInfo result = {};
     int32_t ret = BuildSimIOResp(result, responseInfo, response, responseLen);
@@ -509,7 +509,7 @@ int32_t HRilSim::SimTransmitApduLogicalChannelResponse(
 }
 
 int32_t HRilSim::SimTransmitApduBasicChannelResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     HDI::Ril::V1_1::IccIoResultInfo result = {};
     int32_t ret = BuildSimIOResp(result, responseInfo, response, responseLen);
@@ -520,7 +520,7 @@ int32_t HRilSim::SimTransmitApduBasicChannelResponse(
 }
 
 int32_t HRilSim::SimAuthenticationResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     HDI::Ril::V1_1::IccIoResultInfo result = {};
     int32_t ret = BuildSimIOResp(result, responseInfo, response, responseLen);
@@ -531,7 +531,7 @@ int32_t HRilSim::SimAuthenticationResponse(
 }
 
 int32_t HRilSim::UnlockSimLockResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     HDI::Ril::V1_1::LockStatusResp result = {};
     ResponseLockStatus(result, responseInfo, response, responseLen);
@@ -539,13 +539,13 @@ int32_t HRilSim::UnlockSimLockResponse(
 }
 
 HDI::Ril::V1_1::IccIoResultInfo HRilSim::ProcessIccIoResponse(
-    HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     HDI::Ril::V1_1::IccIoResultInfo result = {};
     if (response == nullptr || responseLen != sizeof(HRilSimIOResponse)) {
         TELEPHONY_LOGI("Invalid response: response is nullptr");
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
+        if (responseInfo.error == HDI::Ril::V1_1::RilErrType::NONE) {
+            responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_INVALID_RESPONSE;
         }
         result.response = std::string("");
         return result;
@@ -558,7 +558,7 @@ HDI::Ril::V1_1::IccIoResultInfo HRilSim::ProcessIccIoResponse(
 }
 
 int32_t HRilSim::SendSimMatchedOperatorInfoResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     return Response(responseInfo, &HDI::Ril::V1_2::IRilCallback::SendSimMatchedOperatorInfoResponse);
 }
@@ -718,18 +718,18 @@ bool HRilSim::BuildLockStatusResp(const void *response, size_t responseLen, HDI:
     return true;
 }
 
-void HRilSim::ResponseLockStatus(HDI::Ril::V1_1::LockStatusResp &lockStatus, HRilRadioResponseInfo &responseInfo,
+void HRilSim::ResponseLockStatus(HDI::Ril::V1_1::LockStatusResp &lockStatus, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
     const void *response, size_t responseLen)
 {
     if (!BuildLockStatusResp(response, responseLen, lockStatus)) {
         TELEPHONY_LOGE("Invalid ResponseLockStatus: response is error");
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
+        if (responseInfo.error == HDI::Ril::V1_1::RilErrType::NONE) {
+            responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_INVALID_RESPONSE;
         }
     }
 }
 
-int32_t HRilSim::BuildSimIOResp(HDI::Ril::V1_1::IccIoResultInfo &result, HRilRadioResponseInfo &responseInfo,
+int32_t HRilSim::BuildSimIOResp(HDI::Ril::V1_1::IccIoResultInfo &result, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
     const void *response, size_t responseLen)
 {
     if ((response == nullptr && responseLen != 0) ||
@@ -739,8 +739,8 @@ int32_t HRilSim::BuildSimIOResp(HDI::Ril::V1_1::IccIoResultInfo &result, HRilRad
     }
     if (response == nullptr && responseLen == 0) {
         TELEPHONY_LOGE("BuildSimIOResp response is null");
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
+        if (responseInfo.error == HDI::Ril::V1_1::RilErrType::NONE) {
+            responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_INVALID_RESPONSE;
         }
     }
     result = ProcessIccIoResponse(responseInfo, response, responseLen);

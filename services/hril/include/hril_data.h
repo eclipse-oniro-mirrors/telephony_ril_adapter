@@ -33,40 +33,40 @@ public:
         int32_t serialId, const OHOS::HDI::Ril::V1_1::DataPerformanceInfo &dataPerformanceInfo);
     int32_t SendDataSleepMode(int32_t serialId, const OHOS::HDI::Ril::V1_1::DataSleepInfo &dataSleepInfo);
     int32_t ActivatePdpContextResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+        int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t DeactivatePdpContextResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+        int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t GetPdpContextListResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+        int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t SetInitApnInfoResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+        int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t PdpContextListUpdated(
         int32_t notifyType, const HRilErrNumber error, const void *response, size_t responseLen);
     int32_t DataLinkCapabilityUpdated(
         int32_t notifyType, const HRilErrNumber error, const void *response, size_t responseLen);
     int32_t ProcessDataResponse(
-        int32_t code, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+        int32_t code, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t ProcessDataRequest(int32_t code, struct HdfSBuf *data);
     int32_t ProcessDataNotify(const struct ReportInfo *reportInfo, const void *response, size_t responseLen);
     int32_t GetLinkCapability(int32_t serialId);
     int32_t GetLinkCapabilityResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+        int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t GetLinkBandwidthInfo(int32_t serialId, int32_t cid);
     int32_t GetLinkBandwidthInfoResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+        int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t SetLinkBandwidthReportingRule(
         int32_t serialId, const OHOS::HDI::Ril::V1_1::DataLinkBandwidthReportingRule &linkBandwidthRule);
     int32_t SetLinkBandwidthReportingRuleResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+        int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t SetDataProfileInfo(int32_t serialId, const OHOS::HDI::Ril::V1_1::DataProfilesInfo &dataProfilesInfo);
     int32_t SetDataProfileInfoResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+        int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t SetDataPermitted(int32_t serialId, int32_t dataPermitted);
     int32_t SetDataPermittedResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+        int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t CleanAllConnections(int32_t serialId);
     int32_t CleanAllConnectionsResponse(
-        int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+        int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     bool IsDataRespOrNotify(uint32_t code);
 
     bool IsDataResponse(uint32_t code);

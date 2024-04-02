@@ -186,13 +186,13 @@ int32_t HRilNetwork::GetNrSsbId(int32_t serialId)
 }
 
 int32_t HRilNetwork::GetSignalStrengthResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     HDI::Ril::V1_1::Rssi rssi = {};
     if (response == nullptr || responseLen != sizeof(HRilRssi)) {
         TELEPHONY_LOGE("GetSignalStrengthResponse response is invalid");
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
+        if (responseInfo.error == HDI::Ril::V1_1::RilErrType::NONE) {
+            responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_INVALID_RESPONSE;
         }
     } else {
         ExchangeRilRssiToHdf(response, rssi);
@@ -201,13 +201,13 @@ int32_t HRilNetwork::GetSignalStrengthResponse(
 }
 
 int32_t HRilNetwork::GetCsRegStatusResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     HDI::Ril::V1_1::CsRegStatusInfo csRegStatusInfo = {};
     if (response == nullptr || responseLen != sizeof(HRilRegStatusInfo)) {
         TELEPHONY_LOGE("GetCsRegStatusResponse response is invalid");
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
+        if (responseInfo.error == HDI::Ril::V1_1::RilErrType::NONE) {
+            responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_INVALID_RESPONSE;
         }
     } else {
         const HRilRegStatusInfo *hrilRegStatusInfo = static_cast<const HRilRegStatusInfo *>(response);
@@ -225,13 +225,13 @@ int32_t HRilNetwork::GetCsRegStatusResponse(
 }
 
 int32_t HRilNetwork::GetPsRegStatusResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     HDI::Ril::V1_1::PsRegStatusInfo psRegStatusInfo = {};
     if (response == nullptr || responseLen != sizeof(HRilRegStatusInfo)) {
         TELEPHONY_LOGE("GetPsRegStatusResponse response is invalid");
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
+        if (responseInfo.error == HDI::Ril::V1_1::RilErrType::NONE) {
+            responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_INVALID_RESPONSE;
         }
     } else {
         const HRilRegStatusInfo *hrilRegStatusInfo = static_cast<const HRilRegStatusInfo *>(response);
@@ -255,13 +255,13 @@ int32_t HRilNetwork::GetPsRegStatusResponse(
 }
 
 int32_t HRilNetwork::GetOperatorInfoResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     HDI::Ril::V1_1::OperatorInfo operatorInfoResult = {};
     if (response == nullptr || responseLen == 0) {
         TELEPHONY_LOGE("GetOperatorInfoResponse response is invalid");
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
+        if (responseInfo.error == HDI::Ril::V1_1::RilErrType::NONE) {
+            responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_INVALID_RESPONSE;
         }
     } else {
         char **resp = static_cast<char **>(const_cast<void *>(response));
@@ -276,13 +276,13 @@ int32_t HRilNetwork::GetOperatorInfoResponse(
 }
 
 int32_t HRilNetwork::GetNetworkSearchInformationResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     HDI::Ril::V1_1::AvailableNetworkList availableNetworkList = {};
     if (response == nullptr || responseLen == 0) {
         TELEPHONY_LOGE("GetNetworkSearchInformationResponse response is invalid");
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
+        if (responseInfo.error == HDI::Ril::V1_1::RilErrType::NONE) {
+            responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_INVALID_RESPONSE;
         }
     } else {
         availableNetworkList.itemNum = 0;
@@ -293,13 +293,13 @@ int32_t HRilNetwork::GetNetworkSearchInformationResponse(
 }
 
 int32_t HRilNetwork::GetNetworkSelectionModeResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     HDI::Ril::V1_1::SetNetworkModeInfo selectModeInfo = {};
     if (response == nullptr || responseLen != sizeof(int32_t)) {
         TELEPHONY_LOGE("GetNetworkSelectionModeResponse response is invalid");
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
+        if (responseInfo.error == HDI::Ril::V1_1::RilErrType::NONE) {
+            responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_INVALID_RESPONSE;
         }
     } else {
         int32_t *resp = static_cast<int32_t *>(const_cast<void *>(response));
@@ -310,25 +310,25 @@ int32_t HRilNetwork::GetNetworkSelectionModeResponse(
 }
 
 int32_t HRilNetwork::SetNetworkSelectionModeResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::SetNetworkSelectionModeResponse);
 }
 
 int32_t HRilNetwork::SetPreferredNetworkResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::SetPreferredNetworkResponse);
 }
 
 int32_t HRilNetwork::GetPreferredNetworkResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     HDI::Ril::V1_1::PreferredNetworkTypeInfo preferredNetworkTypeInfo = {};
     if (response == nullptr || responseLen != sizeof(int32_t)) {
         TELEPHONY_LOGE("GetPreferredNetworkResponse response is invalid");
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
+        if (responseInfo.error == HDI::Ril::V1_1::RilErrType::NONE) {
+            responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_INVALID_RESPONSE;
         }
     } else {
         int32_t *resp = static_cast<int32_t *>(const_cast<void *>(response));
@@ -339,13 +339,13 @@ int32_t HRilNetwork::GetPreferredNetworkResponse(
 }
 
 int32_t HRilNetwork::GetNeighboringCellInfoListResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     HDI::Ril::V1_1::CellListNearbyInfo cellInfoList;
     if (response == nullptr || responseLen != sizeof(CellInfoList)) {
         TELEPHONY_LOGE("GetNeighboringCellInfoListResponse response is invalid");
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
+        if (responseInfo.error == HDI::Ril::V1_1::RilErrType::NONE) {
+            responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_INVALID_RESPONSE;
         }
     } else {
         cellInfoList.itemNum = 0;
@@ -359,13 +359,13 @@ int32_t HRilNetwork::GetNeighboringCellInfoListResponse(
 }
 
 int32_t HRilNetwork::GetNeighboringCellInfoListResponse_1_2(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     HDI::Ril::V1_2::CellListNearbyInfo_1_2 cellInfoList;
     if (response == nullptr || responseLen != sizeof(CellInfoList)) {
         TELEPHONY_LOGE("response is invalid");
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
+        if (responseInfo.error == HDI::Ril::V1_1::RilErrType::NONE) {
+            responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_INVALID_RESPONSE;
         }
     } else {
         cellInfoList.itemNum = 0;
@@ -379,13 +379,13 @@ int32_t HRilNetwork::GetNeighboringCellInfoListResponse_1_2(
 }
 
 int32_t HRilNetwork::GetCurrentCellInfoResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     HDI::Ril::V1_1::CellListCurrentInfo cellList;
     if (response == nullptr || responseLen != sizeof(CurrentCellInfoList)) {
         TELEPHONY_LOGE("GetCurrentCellInfoResponse response is invalid");
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
+        if (responseInfo.error == HDI::Ril::V1_1::RilErrType::NONE) {
+            responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_INVALID_RESPONSE;
         }
     } else {
         cellList.itemNum = 0;
@@ -399,13 +399,13 @@ int32_t HRilNetwork::GetCurrentCellInfoResponse(
 }
 
 int32_t HRilNetwork::GetCurrentCellInfoResponse_1_1(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     HDI::Ril::V1_1::CellListCurrentInfo_1_1 cellList;
     if (response == nullptr || responseLen != sizeof(CurrentCellInfoList)) {
         TELEPHONY_LOGE("response is invalid");
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
+        if (responseInfo.error == HDI::Ril::V1_1::RilErrType::NONE) {
+            responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_INVALID_RESPONSE;
         }
     } else {
         cellList.itemNum = 0;
@@ -419,13 +419,13 @@ int32_t HRilNetwork::GetCurrentCellInfoResponse_1_1(
 }
 
 int32_t HRilNetwork::GetCurrentCellInfoResponse_1_2(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     HDI::Ril::V1_2::CellListCurrentInfo_1_2 cellList;
     if (response == nullptr || responseLen != sizeof(CurrentCellInfoList)) {
         TELEPHONY_LOGE("response is invalid");
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
+        if (responseInfo.error == HDI::Ril::V1_1::RilErrType::NONE) {
+            responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_INVALID_RESPONSE;
         }
     } else {
         cellList.itemNum = 0;
@@ -439,13 +439,13 @@ int32_t HRilNetwork::GetCurrentCellInfoResponse_1_2(
 }
 
 int32_t HRilNetwork::GetPhysicalChannelConfigResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     HDI::Ril::V1_1::ChannelConfigInfoList phyChnlCfgList = {};
     if (response == nullptr || responseLen != sizeof(HRilChannelConfigList)) {
         TELEPHONY_LOGE("GetPhysicalChannelConfigResponse response is invalid");
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
+        if (responseInfo.error == HDI::Ril::V1_1::RilErrType::NONE) {
+            responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_INVALID_RESPONSE;
         }
     } else {
         phyChnlCfgList.itemNum = 0;
@@ -485,37 +485,37 @@ int32_t HRilNetwork::GetPhysicalChannelConfigResponse(
 }
 
 int32_t HRilNetwork::SetLocateUpdatesResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::SetLocateUpdatesResponse);
 }
 
 int32_t HRilNetwork::SetNotificationFilterResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::SetNotificationFilterResponse);
 }
 
 int32_t HRilNetwork::SetDeviceStateResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::SetDeviceStateResponse);
 }
 
 int32_t HRilNetwork::SetNrOptionModeResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::SetNrOptionModeResponse);
 }
 
 int32_t HRilNetwork::GetNrOptionModeResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     int32_t nrOptionMode = 0;
     if (response == nullptr || responseLen != sizeof(int32_t)) {
         TELEPHONY_LOGE("GetNrOptionModeResponse response is invalid");
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
+        if (responseInfo.error == HDI::Ril::V1_1::RilErrType::NONE) {
+            responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_INVALID_RESPONSE;
         }
     } else {
         nrOptionMode = *(static_cast<const int32_t *>(response));
@@ -525,13 +525,13 @@ int32_t HRilNetwork::GetNrOptionModeResponse(
 }
 
 int32_t HRilNetwork::GetRrcConnectionStateResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     int32_t rrcConnectionState = 0;
     if (response == nullptr || responseLen != sizeof(int32_t)) {
         TELEPHONY_LOGE("GetRrcConnectionStateResponse response is invalid");
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
+        if (responseInfo.error == HDI::Ril::V1_1::RilErrType::NONE) {
+            responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_INVALID_RESPONSE;
         }
     } else {
         rrcConnectionState = *(static_cast<const int32_t *>(response));
@@ -541,13 +541,13 @@ int32_t HRilNetwork::GetRrcConnectionStateResponse(
 }
 
 int32_t HRilNetwork::GetNrSsbIdResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     HDI::Ril::V1_2::NrCellSsbIds nrCellSsbIds;
     if (response == nullptr || responseLen != sizeof(NrCellSsbIdsVendor)) {
         TELEPHONY_LOGE("Response is invalid");
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
+        if (responseInfo.error == HDI::Ril::V1_1::RilErrType::NONE) {
+            responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_INVALID_RESPONSE;
         }
     } else {
         nrCellSsbIds.arfcn = 0;
