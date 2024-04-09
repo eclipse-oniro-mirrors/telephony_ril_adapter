@@ -543,7 +543,6 @@ HDI::Ril::V1_1::IccIoResultInfo HRilSim::ProcessIccIoResponse(
 {
     HDI::Ril::V1_1::IccIoResultInfo result = {};
     if (response == nullptr || responseLen != sizeof(HRilSimIOResponse)) {
-        TELEPHONY_LOGI("Invalid response: response is nullptr");
         if (responseInfo.error == HDI::Ril::V1_1::RilErrType::NONE) {
             responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_INVALID_RESPONSE;
         }

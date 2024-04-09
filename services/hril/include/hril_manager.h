@@ -256,6 +256,7 @@ private:
     std::vector<std::unique_ptr<HRilData>> hrilData_;
     std::unordered_map<int32_t, std::list<ReqDataInfo *>> requestList_;
     static std::unordered_map<int32_t, int32_t> notificationMap_;
+    static std::unordered_map<int32_t, std::string> requestMap_;
     std::mutex requestListLock_;
 };
 

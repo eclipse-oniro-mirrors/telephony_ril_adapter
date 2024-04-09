@@ -216,7 +216,7 @@ int32_t HRilNetwork::GetCsRegStatusResponse(
         csRegStatusInfo.lacCode = hrilRegStatusInfo->lacCode;
         csRegStatusInfo.cellId = hrilRegStatusInfo->cellId;
         csRegStatusInfo.radioTechnology = static_cast<HDI::Ril::V1_1::RilRadioTech>(hrilRegStatusInfo->actType);
-        TELEPHONY_LOGI("GetCsRegStatusResponse notifyType:%{public}d, regStatus:%{public}d, "
+        TELEPHONY_LOGD("GetCsRegStatusResponse notifyType:%{public}d, regStatus:%{public}d, "
                        "lacCode:%{private}d, cellId:%{private}d, radioTechnology:%{public}d",
             csRegStatusInfo.notifyType, csRegStatusInfo.regStatus, csRegStatusInfo.lacCode, csRegStatusInfo.cellId,
             csRegStatusInfo.radioTechnology);
@@ -243,7 +243,7 @@ int32_t HRilNetwork::GetPsRegStatusResponse(
         psRegStatusInfo.isDcNrRestricted = hrilRegStatusInfo->isDcNrRestricted;
         psRegStatusInfo.isNrAvailable = hrilRegStatusInfo->isNrAvailable;
         psRegStatusInfo.isEnDcAvailable = hrilRegStatusInfo->isEnDcAvailable;
-        TELEPHONY_LOGI(
+        TELEPHONY_LOGD(
             "GetPsRegStatusResponse notifyType:%{public}d, regStatus:%{public}d, lacCode:%{private}d, "
             "cellId:%{private}d, technology:%{public}d, isDcNrRestricted:%{private}d, isNrAvailable:%{private}d, "
             "isEnDcAvailable:%{private}d",
@@ -1315,7 +1315,7 @@ int32_t HRilNetwork::BuildCurrentCellList(
 {
     const CurrentCellInfoList *temp = reinterpret_cast<const CurrentCellInfoList *>(response);
     cellInfoList.itemNum = temp->itemNum;
-    TELEPHONY_LOGI("cellInfoList.itemNum = %{public}d", cellInfoList.itemNum);
+    TELEPHONY_LOGD("cellInfoList.itemNum = %{public}d", cellInfoList.itemNum);
     for (int32_t i = 0; i < temp->itemNum; i++) {
         HDI::Ril::V1_2::CurrentCellInfo_1_2 cellInfo;
         CurrentCellInfoVendor *cell = temp->currentCellInfo + i;
