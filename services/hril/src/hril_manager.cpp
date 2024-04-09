@@ -36,6 +36,9 @@ std::shared_ptr<HRilManager> HRilManager::manager_ = g_manager;
 std::unordered_map<int32_t, int32_t> HRilManager::notificationMap_ = {
 #include "hril_notification_map.h"
 };
+std::unordered_map<int32_t, std::string> HRilManager::requestMap_ = {
+#include "hril_request_map.h"
+};
 
 #ifdef ABILITY_POWER_SUPPORT
 constexpr int32_t RUNNINGLOCK_TIMEOUTMS_LASTING = -1;
@@ -277,12 +280,11 @@ void HRilManager::ReportResponse(std::vector<std::unique_ptr<T>> &subModules, in
         TELEPHONY_LOGE("reqInfo is null!!!");
         return;
     }
-    if (reqInfo->request == HREQ_SIM_GET_SIM_IO || reqInfo->request == HREQ_NETWORK_GET_SIGNAL_STRENGTH ||
-        reqInfo->request == HREQ_NETWORK_GET_CS_REG_STATUS || reqInfo->request == HREQ_NETWORK_GET_PS_REG_STATUS ||
-        reqInfo->request == HREQ_NETWORK_GET_OPERATOR_INFO) {
-        TELEPHONY_LOGD("requestId:%{public}d", reqInfo->request);
+    auto iter = requestMap_.find(reqInfo->request);
+    if (iter != requestMap_.end()) {
+        TELEPHONY_LOGI("requestId:%{public}d, event:%{public}s", reqInfo->request, iter->second.c_str());
     } else {
-        TELEPHONY_LOGI("requestId:%{public}d", reqInfo->request);
+        TELEPHONY_LOGD("requestId:%{public}d", reqInfo->request);
     }
     HRilRadioResponseInfo responseInfo = {};
     responseInfo.serial = reqInfo->serial;
@@ -305,7 +307,9 @@ void HRilManager::ReportNotification(std::vector<std::unique_ptr<T>> &subModules
     auto iter = notificationMap_.find(reportInfo->notifyId);
     if (iter != notificationMap_.end()) {
         if (reportInfo->notifyId == HNOTI_NETWORK_CS_REG_STATUS_UPDATED ||
-            reportInfo->notifyId == HNOTI_NETWORK_SIGNAL_STRENGTH_UPDATED) {
+            reportInfo->notifyId == HNOTI_NETWORK_SIGNAL_STRENGTH_UPDATED ||
+            reportInfo->notifyId == HNOTI_CALL_EMERGENCY_NUMBER_REPORT ||
+            reportInfo->notifyId == HNOTI_MODEM_DSDS_MODE_UPDATED) {
             TELEPHONY_LOGD("notifyId:%{public}d, value:%{public}d", reportInfo->notifyId, iter->second);
         } else {
             TELEPHONY_LOGI("notifyId:%{public}d, value:%{public}d", reportInfo->notifyId, iter->second);
