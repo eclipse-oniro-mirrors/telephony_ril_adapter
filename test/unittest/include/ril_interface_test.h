@@ -29,6 +29,7 @@ namespace Telephony {
 class RilInterfaceTest {
 public:
     void GetImeiStressTest(int32_t slotId);
+    void GetImeiSvStressTest(int32_t slotId);
     void RilCmDialStressTest(int32_t slotId);
     void SetRadioStateStressTest(int32_t slotId);
     void GetCallListTest(int32_t slotId);
@@ -68,6 +69,7 @@ public:
     void SetRadioStateTest(int32_t slotId);
     void GetRadioStateTest(int32_t slotId);
     void GetImeiTest(int32_t slotId);
+    void GetImeiSvTest(int32_t slotId);
     void GetRilCmCellInfoListTest(int32_t slotId);
     void GetRilCurrentCellInfoTest(int32_t slotId);
     void GetRilNetworkSearchInfoTest(int32_t slotId);
@@ -75,6 +77,7 @@ public:
     void GetRilPreferredNetwrokTest(int32_t slotId);
     void GetPhysicalChannelConfigTest(int32_t slotId);
     void GetRilImeiTest(int32_t slotId);
+    void GetRilImeiSvTest(int32_t slotId);
     void ShutDownTest(int32_t slotId);
     void GetMeidTest(int32_t slotId);
     void GetVoiceRadioTechnologyTest(int32_t slotId);

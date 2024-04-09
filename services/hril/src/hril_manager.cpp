@@ -369,7 +369,7 @@ HRilManager::HRilManager() : hrilSimSlotCount_(GetSimSlotCount())
     timerCallback_ = std::make_unique<HRilTimerCallback>();
 }
 
-void HRilManager::SetRilCallback(sptr<OHOS::HDI::Ril::V1_2::IRilCallback> callback)
+void HRilManager::SetRilCallback(sptr<OHOS::HDI::Ril::V1_3::IRilCallback> callback)
 {
     TELEPHONY_LOGD("SetRilCallback");
     for (int32_t slotId = HRIL_SIM_SLOT_0; slotId < hrilSimSlotCount_; slotId++) {
@@ -655,6 +655,11 @@ int32_t HRilManager::GetRadioState(int32_t slotId, int32_t serialId)
 int32_t HRilManager::GetImei(int32_t slotId, int32_t serialId)
 {
     return TaskSchedule(MODULE_HRIL_MODEM, hrilModem_[slotId], &HRilModem::GetImei, serialId);
+}
+
+int32_t HRilManager::GetImeiSv(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(MODULE_HRIL_MODEM, hrilModem_[slotId], &HRilModem::GetImeiSv, serialId);
 }
 
 int32_t HRilManager::GetMeid(int32_t slotId, int32_t serialId)

@@ -418,6 +418,9 @@ typedef enum {
     /** Gets the international mobile equipment identity (IMEI). */
     HREQ_MODEM_GET_IMEI,
 
+    /** Gets the international mobile equipment identity (IMEISV). */
+    HREQ_MODEM_GET_IMEISV,
+
     /** Gets the mobile equipment identifier (MEID). */
     HREQ_MODEM_GET_MEID,
 

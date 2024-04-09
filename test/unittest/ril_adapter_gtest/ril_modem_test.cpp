@@ -18,10 +18,10 @@
 
 namespace OHOS {
 namespace Telephony {
-using namespace OHOS::HDI::Ril::V1_2;
+using namespace OHOS::HDI::Ril::V1_3;
 using namespace testing::ext;
 namespace {
-sptr<OHOS::HDI::Ril::V1_2::IRil> g_rilInterface = nullptr;
+sptr<OHOS::HDI::Ril::V1_3::IRil> g_rilInterface = nullptr;
 }
 
 void RILModemTest::SetUpTestCase()
@@ -163,6 +163,38 @@ HWTEST_F(RILModemTest, Telephony_DriverSystem_GetImei_V1_0200, Function | Medium
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
     ASSERT_TRUE(RilTestUtil::GetBoolResult(HdiId::HREQ_MODEM_GET_IMEI));
+}
+
+/**
+ * @tc.number   Telephony_DriverSystem_GetImeiSv_V1_0100
+ * @tc.name     Get imeiSv
+ * @tc.desc     Function test
+ */
+HWTEST_F(RILModemTest, Telephony_DriverSystem_GetImeiSv_V1_0100, Function | MediumTest | Level3)
+{
+    if (!RilTestUtil::IsReady(SLOTID_1)) {
+        return;
+    }
+    int32_t ret = g_rilInterface->GetImeiSv(SLOTID_1, RilTestUtil::GetSerialId());
+    RilTestUtil::WaitFor(WAIT_TIME_SECOND);
+    EXPECT_EQ(SUCCESS, ret);
+    ASSERT_TRUE(RilTestUtil::GetBoolResult(HdiId::HREQ_MODEM_GET_IMEISV));
+}
+
+/**
+ * @tc.number   Telephony_DriverSystem_GetImeiSv_V1_0200
+ * @tc.name     Get imeiSv
+ * @tc.desc     Function test
+ */
+HWTEST_F(RILModemTest, Telephony_DriverSystem_GetImeiSv_V1_0200, Function | MediumTest | Level3)
+{
+    if (!RilTestUtil::IsReady(SLOTID_2)) {
+        return;
+    }
+    int32_t ret = g_rilInterface->GetImeiSv(SLOTID_2, RilTestUtil::GetSerialId());
+    RilTestUtil::WaitFor(WAIT_TIME_SECOND);
+    EXPECT_EQ(SUCCESS, ret);
+    ASSERT_TRUE(RilTestUtil::GetBoolResult(HdiId::HREQ_MODEM_GET_IMEISV));
 }
 
 /**

@@ -32,6 +32,7 @@ ohos_executable("ril_adapter_test") {
     external_deps = [
       "c_utils:utils",
       "drivers_interface_ril:libril_proxy_1.2",
+      "drivers_interface_ril:libril_proxy_1.3",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
       "ipc:ipc_single",

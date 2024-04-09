@@ -18,8 +18,8 @@
 using namespace std;
 namespace OHOS {
 namespace Telephony {
-using namespace OHOS::HDI::Ril::V1_2;
-sptr<OHOS::HDI::Ril::V1_2::IRil> g_rilInterface = nullptr;
+using namespace OHOS::HDI::Ril::V1_3;
+sptr<OHOS::HDI::Ril::V1_3::IRil> g_rilInterface = nullptr;
 constexpr int32_t DEFAULT_CHOICE = -1;
 constexpr int32_t MENU_OFFSET = 1;
 constexpr int32_t WAIT_TIME = 500000;
@@ -183,6 +183,7 @@ typedef enum {
     HREQ_MODEM_SET_RADIO_STATUS,
     HREQ_MODEM_GET_RADIO_STATUS,
     HREQ_MODEM_GET_IMEI,
+    HREQ_MODEM_GET_IMEISV,
     HREQ_MODEM_GET_MEID,
     HREQ_MODEM_GET_BASEBAND_VERSION,
     HREQ_MODEM_GET_VOICE_RADIO,
@@ -817,6 +818,22 @@ void RilInterfaceTest::GetImeiStressTest(int32_t slotId)
     cout << "RilInterfaceTest::GetImeiStressTest --> GetImeiStressTest finished" << endl << endl;
 }
 
+void RilInterfaceTest::GetImeiSvTest(int32_t slotId)
+{
+    cout << "RilInterfaceTest::GetImeiSvTest -->" << endl;
+    int32_t ret = g_rilInterface->GetImeiSv(slotId, GetSerialId());
+    cout << "RilInterfaceTest::GetImeiSvTest finish ret : " << ret << endl << endl;
+}
+
+void RilInterfaceTest::GetImeiSvStressTest(int32_t slotId)
+{
+    cout << "RilInterfaceTest::GetImeiSvStressTest -->" << endl;
+    for (int32_t i = 0; i < STRESS_TEST_NUM; i++) {
+        g_rilInterface->GetImeiSv(slotId, GetSerialId());
+    }
+    cout << "RilInterfaceTest::GetImeiSvStressTest --> GetImeiSvStressTest finished" << endl << endl;
+}
+
 void RilInterfaceTest::GetMeidTest(int32_t slotId)
 {
     cout << "RilInterfaceTest::GetMeidTest -->" << endl;
@@ -1376,6 +1393,7 @@ void RilInterfaceTest::OnInitStressInterface()
 {
     stressMemberFuncMap_[HREQ_CALL_DIAL] = &RilInterfaceTest::RilCmDialStressTest;
     stressMemberFuncMap_[HREQ_MODEM_GET_IMEI] = &RilInterfaceTest::GetImeiStressTest;
+    stressMemberFuncMap_[HREQ_MODEM_GET_IMEISV] = &RilInterfaceTest::GetImeiSvStressTest;
     stressMemberFuncMap_[HREQ_MODEM_SET_RADIO_STATUS] = &RilInterfaceTest::SetRadioStateStressTest;
 }
 
@@ -1493,6 +1511,7 @@ void RilInterfaceTest::OnInitModemProcessInterface()
     memberFuncMap_[HREQ_MODEM_SET_RADIO_STATUS] = &RilInterfaceTest::SetRadioStateTest;
     memberFuncMap_[HREQ_MODEM_GET_RADIO_STATUS] = &RilInterfaceTest::GetRadioStateTest;
     memberFuncMap_[HREQ_MODEM_GET_IMEI] = &RilInterfaceTest::GetImeiTest;
+    memberFuncMap_[HREQ_MODEM_GET_IMEISV] = &RilInterfaceTest::GetImeiSvTest;
     memberFuncMap_[HREQ_MODEM_GET_MEID] = &RilInterfaceTest::GetMeidTest;
     memberFuncMap_[HREQ_MODEM_GET_VOICE_RADIO] = &RilInterfaceTest::GetVoiceRadioTechnologyTest;
     memberFuncMap_[HREQ_MODEM_GET_BASEBAND_VERSION] = &RilInterfaceTest::GetBasebandVersionTest;
@@ -1542,6 +1561,7 @@ static int32_t PrintStressMenu()
     cout << "----> [" << HREQ_CALL_DIAL << "] ---->[ HREQ_CALL_DIAL ]" << endl;
     cout << "----> [" << HREQ_MODEM_SET_RADIO_STATUS << "] ---->[ HREQ_MODEM_SET_RADIO_STATUS ]" << endl;
     cout << "----> [" << HREQ_MODEM_GET_IMEI << "] ---->[ HREQ_MODEM_GET_IMEI ]" << endl;
+    cout << "----> [" << HREQ_MODEM_GET_IMEISV << "] ---->[ HREQ_MODEM_GET_IMEISV ]" << endl;
 
     int32_t choice = InputInt32(HREQ_CALL_BASE, HREQ_MODEM_EXIT - 1, "Command");
     cout << "---->You choose: " << choice << endl;
@@ -1704,6 +1724,7 @@ static int32_t PrintModemMenu()
     cout << "----> [" << HREQ_MODEM_SET_RADIO_STATUS << "] ---->[ HREQ_MODEM_SET_RADIO_STATUS ]" << endl;
     cout << "----> [" << HREQ_MODEM_GET_RADIO_STATUS << "] ---->[ HREQ_MODEM_GET_RADIO_STATUS ]" << endl;
     cout << "----> [" << HREQ_MODEM_GET_IMEI << "] ---->[ HREQ_MODEM_GET_IMEI ]" << endl;
+    cout << "----> [" << HREQ_MODEM_GET_IMEISV << "] ---->[ HREQ_MODEM_GET_IMEISV ]" << endl;
     cout << "----> [" << HREQ_MODEM_GET_MEID << "] ---->[ HREQ_MODEM_GET_MEID ]" << endl;
     cout << "----> [" << HREQ_MODEM_GET_VOICE_RADIO << "] ---->[ HREQ_MODEM_GET_VOICE_RADIO ]" << endl;
     cout << "----> [" << HREQ_MODEM_GET_BASEBAND_VERSION << "] ---->[ HREQ_MODEM_GET_BASEBAND_VERSION ]" << endl;
@@ -1753,7 +1774,7 @@ static int32_t SwitchMenu(TestMenu module, bool *loopFlag)
 int32_t main()
 {
     cout << "---->Ril Adapter Test Enter" << endl;
-    g_rilInterface = OHOS::HDI::Ril::V1_2::IRil::Get();
+    g_rilInterface = OHOS::HDI::Ril::V1_3::IRil::Get();
     if (g_rilInterface == nullptr) {
         cout << "g_rilInterface is null" << endl;
         return 0;

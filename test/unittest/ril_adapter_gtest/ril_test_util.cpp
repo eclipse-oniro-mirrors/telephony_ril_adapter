@@ -71,7 +71,7 @@ void RilTestUtil::Init()
         TELEPHONY_LOGE("RilTestUtil has init");
         return;
     }
-    rilInterface_ = OHOS::HDI::Ril::V1_2::IRil::Get();
+    rilInterface_ = OHOS::HDI::Ril::V1_3::IRil::Get();
     hasVoiceCapable_ = HasVoiceCapability();
     slotCount_ = GetMaxSimCount();
     if (rilInterface_ == nullptr) {
@@ -79,7 +79,7 @@ void RilTestUtil::Init()
         return;
     }
     callback_ = new RilCallbackTest();
-    rilInterface_->SetCallback(callback_);
+    rilInterface_->SetCallback1_3(callback_);
     rilInterface_->GetSimStatus(SLOTID_1, RilTestUtil::GetSerialId());
     WaitFor(WAIT_TIME_SECOND);
     rilInterface_->GetSimStatus(SLOTID_2, RilTestUtil::GetSerialId());
@@ -147,7 +147,7 @@ bool RilTestUtil::IsReadyInner(int32_t slotId)
     return callback_->IsReady(slotId);
 }
 
-sptr<OHOS::HDI::Ril::V1_2::IRil> RilTestUtil::GetRilInterface()
+sptr<OHOS::HDI::Ril::V1_3::IRil> RilTestUtil::GetRilInterface()
 {
     return rilTestUtil_.rilInterface_;
 }
