@@ -68,6 +68,7 @@ typedef struct {
     void (*SetRadioState)(const ReqDataInfo *requestInfo, int32_t fun, int32_t rst);
     void (*GetRadioState)(const ReqDataInfo *requestInfo);
     void (*GetImei)(const ReqDataInfo *requestInfo);
+    void (*GetImeiSv)(const ReqDataInfo *requestInfo);
     void (*GetMeid)(const ReqDataInfo *requestInfo);
     void (*GetVoiceRadioTechnology)(const ReqDataInfo *requestInfo);
     void (*GetBasebandVersion)(const ReqDataInfo *requestInfo);

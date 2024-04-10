@@ -66,7 +66,7 @@ public:
     void OnNetworkReport(int32_t slotId, const ReportInfo *reportInfo, const uint8_t *response, size_t responseLen);
     void OnSimReport(int32_t slotId, const ReportInfo *reportInfo, const uint8_t *response, size_t responseLen);
     void OnSmsReport(int32_t slotId, const ReportInfo *reportInfo, const uint8_t *response, size_t responseLen);
-    void SetRilCallback(const sptr<OHOS::HDI::Ril::V1_2::IRilCallback> callback);
+    void SetRilCallback(const sptr<OHOS::HDI::Ril::V1_3::IRilCallback> callback);
 
     // Call
     int32_t SetEmergencyCallList(
@@ -133,6 +133,7 @@ public:
     int32_t SetRadioState(int32_t slotId, int32_t serialId, int32_t fun, int32_t rst);
     int32_t GetRadioState(int32_t slotId, int32_t serialId);
     int32_t GetImei(int32_t slotId, int32_t serialId);
+    int32_t GetImeiSv(int32_t slotId, int32_t serialId);
     int32_t GetMeid(int32_t slotId, int32_t serialId);
     int32_t GetVoiceRadioTechnology(int32_t slotId, int32_t serialId);
     int32_t GetBasebandVersion(int32_t slotId, int32_t serialId);
