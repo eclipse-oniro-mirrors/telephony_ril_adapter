@@ -29,6 +29,7 @@ public:
     int32_t SetRadioState(int32_t serialId, int32_t fun, int32_t rst);
     int32_t GetRadioState(int32_t serialId);
     int32_t GetImei(int32_t serialId);
+    int32_t GetImeiSv(int32_t serialId);
     int32_t GetMeid(int32_t serialId);
     int32_t GetVoiceRadioTechnology(int32_t serialId);
     int32_t GetBasebandVersion(int32_t serialId);
@@ -39,6 +40,8 @@ public:
     int32_t GetRadioStateResponse(int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const void *response, size_t responseLen);
     int32_t GetImeiResponse(int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+        const void *response, size_t responseLen);
+    int32_t GetImeiSvResponse(int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const void *response, size_t responseLen);
     int32_t GetMeidResponse(int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const void *response, size_t responseLen);

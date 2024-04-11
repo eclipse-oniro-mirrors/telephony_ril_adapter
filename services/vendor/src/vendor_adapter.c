@@ -175,6 +175,7 @@ static const HRilModemReq g_modemReqOps = {
     .SetRadioState = ReqSetRadioState,
     .GetRadioState = ReqGetRadioState,
     .GetImei = ReqGetImei,
+    .GetImeiSv = ReqGetImeiSv,
     .GetMeid = ReqGetMeid,
     .GetVoiceRadioTechnology = ReqGetVoiceRadioTechnology,
 };

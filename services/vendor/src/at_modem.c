@@ -165,6 +165,18 @@ void ReqGetImei(const ReqDataInfo *requestInfo)
     ResponseModemReport(requestInfo->slotId, requestInfo, HRIL_ERR_SUCCESS, &respDataAck);
 }
 
+void ReqGetImeiSv(const ReqDataInfo *requestInfo)
+{
+    if (requestInfo == NULL) {
+        return;
+    }
+    ResponseInfo *responseInfo = NULL;
+    struct ReportInfo reportInfo;
+    reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
+    OnModemReport(requestInfo->slotId, reportInfo, NULL, 0);
+    FreeResponseInfo(responseInfo);
+}
+
 void ReqGetMeid(const ReqDataInfo *requestInfo)
 {
     if (requestInfo == NULL) {

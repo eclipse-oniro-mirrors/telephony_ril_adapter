@@ -158,7 +158,7 @@ HDI::Ril::V1_1::RilRadioResponseInfo HRilBase::BuildIHRilRadioResponseInfo(
     return iResponseInfo;
 }
 
-void HRilBase::SetRilCallback(const sptr<HDI::Ril::V1_2::IRilCallback> &callback)
+void HRilBase::SetRilCallback(const sptr<HDI::Ril::V1_3::IRilCallback> &callback)
 {
     callback_ = callback;
 }

@@ -1428,6 +1428,14 @@ int32_t RilCallbackTest::GetImeiResponse(const RilRadioResponseInfo &responseInf
     return 0;
 }
 
+int32_t RilCallbackTest::GetImeiSvResponse(const RilRadioResponseInfo &responseInfo, const std::string &imeiSv)
+{
+    hdiId_ = HdiId::HREQ_MODEM_GET_IMEISV;
+    resultInfo_ = responseInfo;
+    NotifyAll();
+    return 0;
+}
+
 int32_t RilCallbackTest::GetMeidResponse(const RilRadioResponseInfo &responseInfo, const std::string &meid)
 {
     TELEPHONY_LOGI("GetMeidResponse meid : %{public}s", meid.c_str());

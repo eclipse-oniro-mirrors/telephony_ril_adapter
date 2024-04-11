@@ -45,6 +45,11 @@ int32_t HRilModem::GetImei(int32_t serialId)
     return RequestVendor(serialId, HREQ_MODEM_GET_IMEI, modemFuncs_, &HRilModemReq::GetImei);
 }
 
+int32_t HRilModem::GetImeiSv(int32_t serialId)
+{
+    return RequestVendor(serialId, HREQ_MODEM_GET_IMEISV, modemFuncs_, &HRilModemReq::GetImeiSv);
+}
+
 int32_t HRilModem::GetMeid(int32_t serialId)
 {
     return RequestVendor(serialId, HREQ_MODEM_GET_MEID, modemFuncs_, &HRilModemReq::GetMeid);
@@ -145,6 +150,21 @@ int32_t HRilModem::GetImeiResponse(
     return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::GetImeiResponse, std::string((const char *)response));
 }
 
+int32_t HRilModem::GetImeiSvResponse(
+    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+{
+    if ((response == nullptr && responseLen != 0) || (responseLen % sizeof(char)) != 0) {
+        TELEPHONY_LOGE("GetImeiSvResponse:Invalid parameter, responseLen:%{public}zu", responseLen);
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null");
+        return HRIL_ERR_NULL_POINT;
+    }
+    return Response(
+        responseInfo, &HDI::Ril::V1_3::IRilCallback::GetImeiSvResponse, std::string((const char *)response));
+}
+
 int32_t HRilModem::GetMeidResponse(
     int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
@@ -229,6 +249,7 @@ void HRilModem::AddHandlerToMap()
     respMemberFuncMap_[HREQ_MODEM_SET_RADIO_STATUS] = &HRilModem::SetRadioStateResponse;
     respMemberFuncMap_[HREQ_MODEM_GET_RADIO_STATUS] = &HRilModem::GetRadioStateResponse;
     respMemberFuncMap_[HREQ_MODEM_GET_IMEI] = &HRilModem::GetImeiResponse;
+    respMemberFuncMap_[HREQ_MODEM_GET_IMEISV] = &HRilModem::GetImeiSvResponse;
     respMemberFuncMap_[HREQ_MODEM_GET_MEID] = &HRilModem::GetMeidResponse;
     respMemberFuncMap_[HREQ_MODEM_GET_VOICE_RADIO] = &HRilModem::GetVoiceRadioTechnologyResponse;
     respMemberFuncMap_[HREQ_MODEM_GET_BASEBAND_VERSION] = &HRilModem::GetBasebandVersionResponse;

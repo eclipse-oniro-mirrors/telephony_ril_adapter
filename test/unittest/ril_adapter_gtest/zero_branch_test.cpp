@@ -152,6 +152,7 @@ bool TestModemInterface(std::shared_ptr<HRilManager> manager)
     EXPECT_NE(HDF_SUCCESS, manager->SetRadioState(0, 0, 0, 1));
     EXPECT_NE(HDF_SUCCESS, manager->GetRadioState(0, 0));
     EXPECT_NE(HDF_SUCCESS, manager->GetImei(0, 0));
+    EXPECT_NE(HDF_SUCCESS, manager->GetImeiSv(0, 0));
     EXPECT_NE(HDF_SUCCESS, manager->GetMeid(0, 0));
     EXPECT_NE(HDF_SUCCESS, manager->GetVoiceRadioTechnology(0, 0));
     EXPECT_NE(HDF_SUCCESS, manager->GetBasebandVersion(0, 0));
@@ -579,6 +580,7 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Modem_002, Function | MediumTest | Le
     EXPECT_NE(HDF_SUCCESS, modem->SetRadioStateResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, modem->GetRadioStateResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, modem->GetImeiResponse(0, responseInfo, nullptr, 0));
+    EXPECT_NE(HDF_SUCCESS, modem->GetImeiSvResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, modem->GetMeidResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, modem->GetVoiceRadioTechnologyResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, modem->GetBasebandVersionResponse(0, responseInfo, nullptr, 0));
@@ -607,6 +609,8 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Modem_003, Function | MediumTest | Le
     EXPECT_NE(HDF_SUCCESS, modem->GetRadioStateResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, modem->GetImeiResponse(0, responseInfo, nullptr, 1));
     EXPECT_NE(HDF_SUCCESS, modem->GetImeiResponse(0, responseInfo, nullptr, 0));
+    EXPECT_NE(HDF_SUCCESS, modem->GetImeiSvResponse(0, responseInfo, nullptr, 1));
+    EXPECT_NE(HDF_SUCCESS, modem->GetImeiSvResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, modem->GetMeidResponse(0, responseInfo, nullptr, 1));
     EXPECT_NE(HDF_SUCCESS, modem->GetMeidResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, modem->GetBasebandVersionResponse(0, responseInfo, nullptr, 1));
@@ -630,6 +634,8 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Modem_003, Function | MediumTest | Le
     char *str = const_cast<char *>(NUMBER);
     EXPECT_NE(HDF_SUCCESS, modem->GetImeiResponse(0, responseInfo, str, 1));
     EXPECT_NE(HDF_SUCCESS, modem->GetImeiResponse(0, responseInfo, str, sizeof(NUMBER)));
+    EXPECT_NE(HDF_SUCCESS, modem->GetImeiSvResponse(0, responseInfo, str, 1));
+    EXPECT_NE(HDF_SUCCESS, modem->GetImeiSvResponse(0, responseInfo, str, sizeof(NUMBER)));
     EXPECT_NE(HDF_SUCCESS, modem->GetMeidResponse(0, responseInfo, str, 1));
     EXPECT_NE(HDF_SUCCESS, modem->GetMeidResponse(0, responseInfo, str, sizeof(NUMBER)));
     EXPECT_NE(HDF_SUCCESS, modem->GetBasebandVersionResponse(0, responseInfo, str, 1));

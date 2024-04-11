@@ -1255,6 +1255,14 @@ int32_t RilCallbackTest::GetImeiResponse(const RilRadioResponseInfo &responseInf
     return 0;
 }
 
+int32_t RilCallbackTest::GetImeiSvResponse(const RilRadioResponseInfo &responseInfo, const std::string &imeiSv)
+{
+    PrintResponseInfo("GetImeiSvResponse", responseInfo);
+    cout << "[imeiSv] : " << imeiSv << endl;
+    cout << endl;
+    return 0;
+}
+
 int32_t RilCallbackTest::GetMeidResponse(const RilRadioResponseInfo &responseInfo, const std::string &meid)
 {
     PrintResponseInfo("GetMeidResponse", responseInfo);

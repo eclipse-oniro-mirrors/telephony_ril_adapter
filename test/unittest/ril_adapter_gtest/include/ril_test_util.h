@@ -21,7 +21,7 @@
 
 namespace OHOS {
 namespace Telephony {
-using namespace OHOS::HDI::Ril::V1_2;
+using namespace OHOS::HDI::Ril::V1_3;
 inline const int32_t BANDWIDTH_HYSTERESIS_MS = 3000;
 inline const int32_t BANDWIDTH_HYSTERESIS_KBPS = 50;
 inline const int32_t MAX_UPLINK_LINK_BANDWIDTH[] = { 100, 500, 1000, 5000, 10000, 20000, 50000, 100000, 200000 };
@@ -48,7 +48,7 @@ public:
     static bool HasVoiceCapability();
     static bool IsReady(int32_t slotId);
     static RilTestUtil &GetInstance();
-    static sptr<OHOS::HDI::Ril::V1_2::IRil> GetRilInterface();
+    static sptr<OHOS::HDI::Ril::V1_3::IRil> GetRilInterface();
     static sptr<RilCallbackTest> GetCallback();
     void Init();
 
@@ -64,7 +64,7 @@ private:
 private:
     int slotCount_;
     bool hasVoiceCapable_ = true;
-    sptr<OHOS::HDI::Ril::V1_2::IRil> rilInterface_ = nullptr;
+    sptr<OHOS::HDI::Ril::V1_3::IRil> rilInterface_ = nullptr;
     sptr<RilCallbackTest> callback_;
     bool isInit_ = false;
     static RilTestUtil rilTestUtil_;
