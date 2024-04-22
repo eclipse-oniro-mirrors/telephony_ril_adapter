@@ -16,6 +16,7 @@
 #include "hril_manager.h"
 
 #include "hril_base.h"
+#include "hril_event_map.h"
 #include "hril_notification.h"
 #include "hril_request.h"
 #include "parameter.h"
@@ -35,9 +36,6 @@ static pthread_mutex_t dispatchMutex = PTHREAD_MUTEX_INITIALIZER;
 std::shared_ptr<HRilManager> HRilManager::manager_ = g_manager;
 std::unordered_map<int32_t, int32_t> HRilManager::notificationMap_ = {
 #include "hril_notification_map.h"
-};
-std::unordered_map<int32_t, std::string> HRilManager::requestMap_ = {
-#include "hril_request_map.h"
 };
 
 #ifdef ABILITY_POWER_SUPPORT
@@ -280,8 +278,8 @@ void HRilManager::ReportResponse(std::vector<std::unique_ptr<T>> &subModules, in
         TELEPHONY_LOGE("reqInfo is null!!!");
         return;
     }
-    auto iter = requestMap_.find(reqInfo->request);
-    if (iter != requestMap_.end()) {
+    auto iter = requestEventMap_.find(reqInfo->request);
+    if (iter != requestEventMap_.end()) {
         TELEPHONY_LOGI("requestId:%{public}d, event:%{public}s", reqInfo->request, iter->second.c_str());
     } else {
         TELEPHONY_LOGD("requestId:%{public}d", reqInfo->request);
@@ -305,14 +303,15 @@ void HRilManager::ReportNotification(std::vector<std::unique_ptr<T>> &subModules
 {
     int32_t notifyType = HRIL_RESPONSE_NOTICE;
     auto iter = notificationMap_.find(reportInfo->notifyId);
+    auto event = notificationEventMap_.find(reportInfo->notifyId);
     if (iter != notificationMap_.end()) {
         if (reportInfo->notifyId == HNOTI_NETWORK_CS_REG_STATUS_UPDATED ||
             reportInfo->notifyId == HNOTI_NETWORK_SIGNAL_STRENGTH_UPDATED ||
             reportInfo->notifyId == HNOTI_CALL_EMERGENCY_NUMBER_REPORT ||
             reportInfo->notifyId == HNOTI_MODEM_DSDS_MODE_UPDATED) {
-            TELEPHONY_LOGD("notifyId:%{public}d, value:%{public}d", reportInfo->notifyId, iter->second);
+            TELEPHONY_LOGD("notifyId:%{public}d, event:%{public}s", reportInfo->notifyId, event->second.c_str());
         } else {
-            TELEPHONY_LOGI("notifyId:%{public}d, value:%{public}d", reportInfo->notifyId, iter->second);
+            TELEPHONY_LOGI("notifyId:%{public}d, event:%{public}s", reportInfo->notifyId, event->second.c_str());
         }
         if (NEED_LOCK == iter->second) {
             ApplyRunningLock();
