@@ -111,19 +111,19 @@ int32_t HRilModem::DsdsModeUpdated(
 }
 
 int32_t HRilModem::ShutDownResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::ShutDownResponse);
 }
 
 int32_t HRilModem::SetRadioStateResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::SetRadioStateResponse);
 }
 
 int32_t HRilModem::GetRadioStateResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     if ((response == nullptr && responseLen != 0) || (responseLen % sizeof(int32_t)) != 0) {
         TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
@@ -137,7 +137,7 @@ int32_t HRilModem::GetRadioStateResponse(
 }
 
 int32_t HRilModem::GetImeiResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     if ((response == nullptr && responseLen != 0) || (responseLen % sizeof(char)) != 0) {
         TELEPHONY_LOGE("GetImeiResponse:Invalid parameter, responseLen:%{public}zu", responseLen);
@@ -151,7 +151,7 @@ int32_t HRilModem::GetImeiResponse(
 }
 
 int32_t HRilModem::GetImeiSvResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     if ((response == nullptr && responseLen != 0) || (responseLen % sizeof(char)) != 0) {
         TELEPHONY_LOGE("GetImeiSvResponse:Invalid parameter, responseLen:%{public}zu", responseLen);
@@ -166,7 +166,7 @@ int32_t HRilModem::GetImeiSvResponse(
 }
 
 int32_t HRilModem::GetMeidResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     if ((response == nullptr && responseLen != 0) || (responseLen % sizeof(char)) != 0) {
         TELEPHONY_LOGE("GetMeidResponse:Invalid parameter, responseLen:%{public}zu", responseLen);
@@ -180,13 +180,13 @@ int32_t HRilModem::GetMeidResponse(
 }
 
 int32_t HRilModem::GetVoiceRadioTechnologyResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     HDI::Ril::V1_1::VoiceRadioTechnology voiceRadioTech = {};
     if (response == nullptr) {
         TELEPHONY_LOGE("GetVoiceRadioTechnologyResponse Invalid response: nullptr");
-        if (responseInfo.error == HRilErrType::NONE) {
-            responseInfo.error = HRilErrType::HRIL_ERR_INVALID_RESPONSE;
+        if (responseInfo.error == HDI::Ril::V1_1::RilErrType::NONE) {
+            responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_INVALID_RESPONSE;
         }
     } else {
         BuildIVoiceRadioTechnology(voiceRadioTech, *(const HRilVoiceRadioInfo *)response);
@@ -209,7 +209,7 @@ void HRilModem::BuildIVoiceRadioTechnology(
 }
 
 int32_t HRilModem::GetBasebandVersionResponse(
-    int32_t requestNum, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
     if ((response == nullptr && responseLen != 0) || (responseLen % sizeof(char)) != 0) {
         TELEPHONY_LOGE("GetBasebandVersionResponse:Invalid parameter, responseLen:%{public}zu", responseLen);

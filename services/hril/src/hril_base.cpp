@@ -146,7 +146,8 @@ ReqDataInfo *HRilBase::CreateHRilRequest(int32_t serial, int32_t request)
     return HRilManager::manager_->CreateHRilRequest(serial, slotId_, request);
 }
 
-HDI::Ril::V1_1::RilRadioResponseInfo HRilBase::BuildIHRilRadioResponseInfo(const HRilRadioResponseInfo &responseInfo)
+HDI::Ril::V1_1::RilRadioResponseInfo HRilBase::BuildIHRilRadioResponseInfo(
+    const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)
 {
     HDI::Ril::V1_1::RilRadioResponseInfo iResponseInfo = { 0 };
     iResponseInfo.slotId = GetSlotId();

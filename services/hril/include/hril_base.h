@@ -42,7 +42,7 @@ public:
     // The "reply" event processing entry.
     template<typename T>
     int32_t ProcessResponse(
-        int32_t code, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+        int32_t code, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     // The "Active reporting" event processing entry.
     template<typename T>
     int32_t ProcessNotify(
@@ -58,7 +58,8 @@ protected:
     uint8_t *ConvertHexStringToBytes(const void *response, size_t responseLen);
     bool ConvertToString(char **dest, const std::string &src);
     void CopyToCharPoint(char **a, const std::string &temp);
-    HDI::Ril::V1_1::RilRadioResponseInfo BuildIHRilRadioResponseInfo(const HRilRadioResponseInfo &responseInfo);
+    HDI::Ril::V1_1::RilRadioResponseInfo BuildIHRilRadioResponseInfo(
+        const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo);
     inline void SafeFrees() {}
     template<typename M, typename... Ms>
     inline void SafeFrees(M &m, Ms &...ms)
@@ -71,7 +72,8 @@ protected:
     }
 
     template<typename FuncType, typename... ParamTypes>
-    inline int32_t Response(HRilRadioResponseInfo &responseInfo, FuncType &&_func, ParamTypes &&... _args);
+    inline int32_t Response(
+        HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, FuncType &&_func, ParamTypes &&... _args);
     template<typename FuncType, typename... ParamTypes>
     inline int32_t Notify(int32_t notifyType, const HRilErrNumber error, FuncType &&_func, ParamTypes &&... _args);
     int32_t ConvertHexStringToInt(char **response, int32_t index, int32_t length);
@@ -147,10 +149,10 @@ F HRilBase::GetFunc(std::map<uint32_t, std::any> &funcs, uint32_t code)
 
 template<typename T>
 int32_t HRilBase::ProcessResponse(
-    int32_t code, HRilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+    int32_t code, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    using RespFunc = int32_t (T::*)(
-        int32_t requestNum, HRilRadioResponseInfo & responseInfo, const void *response, size_t responseLen);
+    using RespFunc = int32_t (T::*)(int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo & responseInfo,
+        const void *response, size_t responseLen);
     auto func = GetFunc<RespFunc>(respMemberFuncMap_, code);
     if (func != nullptr) {
         return (static_cast<T *>(this)->*func)(code, responseInfo, response, responseLen);
@@ -176,7 +178,8 @@ int32_t HRilBase::ProcessNotify(
 }
 
 template<typename FuncType, typename... ParamTypes>
-inline int32_t HRilBase::Response(HRilRadioResponseInfo &responseInfo, FuncType &&_func, ParamTypes &&... _args)
+inline int32_t HRilBase::Response(HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, FuncType &&_func,
+    ParamTypes &&... _args)
 {
     if (callback_ == nullptr || _func == nullptr) {
         TELEPHONY_LOGE("callback_ or _func is null");

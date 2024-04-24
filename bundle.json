@@ -56,14 +56,20 @@
                         "header_files": []
                     },
                     "name":"//base/telephony/ril_adapter/services/hril_hdf:hril_hdf"
-                }
-                ,
+                },
                 {
                     "header": {
                         "header_base" : "//base/telephony/ril_adapter/services/hril/include",
                         "header_files": []
                     },
                     "name":"//base/telephony/ril_adapter/services/hril:hril"
+                },
+                {
+                    "header": {
+                        "header_base" : "//base/telephony/ril_adapter/interfaces/innerkits/include",
+                        "header_files": []
+                    },
+                    "name" : "//base/telephony/ril_adapter/interfaces/innerkits:hril_innerkits"
                 }
             ],
             "test": [

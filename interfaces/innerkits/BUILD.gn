@@ -14,7 +14,6 @@
 import("//build/ohos.gni")
 
 RIL_ADAPTER = "../../"
-RIL_FRAMEWORKS = "../../frameworks/src"
 
 config("hril_config") {
   include_dirs = [ "$RIL_ADAPTER/interfaces/innerkits/include" ]
@@ -35,13 +34,6 @@ config("hril_config") {
 }
 
 ohos_shared_library("hril_innerkits") {
-  all_dependent_configs = [
-    ":hril_config",
-    "$RIL_ADAPTER/utils:utils_config",
-  ]
-
-  sources = [ "$RIL_FRAMEWORKS/hril_base_parcel.cpp" ]
-
   public_configs = [
     ":hril_config",
     "$RIL_ADAPTER/utils:utils_config",
@@ -57,7 +49,7 @@ ohos_shared_library("hril_innerkits") {
     "hilog:libhilog",
   ]
 
-  relative_install_dir = "chipset-pub-sdk"
+  install_images = [ chipset_base_dir ]
 
   part_name = "ril_adapter"
   subsystem_name = "telephony"

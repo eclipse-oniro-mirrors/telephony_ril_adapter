@@ -284,13 +284,13 @@ void HRilManager::ReportResponse(std::vector<std::unique_ptr<T>> &subModules, in
     } else {
         TELEPHONY_LOGD("requestId:%{public}d", reqInfo->request);
     }
-    HRilRadioResponseInfo responseInfo = {};
+    HDI::Ril::V1_1::RilRadioResponseInfo responseInfo = {};
     responseInfo.serial = reqInfo->serial;
-    responseInfo.error = (HRilErrType)reportInfo->error;
-    responseInfo.type = HRIL_RESPONSE_REQUEST;
+    responseInfo.error = (HDI::Ril::V1_1::RilErrType)reportInfo->error;
+    responseInfo.type = HDI::Ril::V1_1::RIL_RESPONSE_REQUEST;
     if (HRIL_NEED_ACK == reportInfo->ack) {
         ApplyRunningLock();
-        responseInfo.type = HRIL_RESPONSE_REQUEST_MUST_ACK;
+        responseInfo.type = HDI::Ril::V1_1::RIL_RESPONSE_REQUEST_MUST_ACK;
     }
     int32_t requestId = reqInfo->request;
     ReleaseHRilRequest(requestId, reqInfo);
@@ -301,7 +301,7 @@ template<typename T>
 void HRilManager::ReportNotification(std::vector<std::unique_ptr<T>> &subModules, int32_t slotId,
     const ReportInfo *reportInfo, const uint8_t *response, size_t responseLen)
 {
-    int32_t notifyType = HRIL_RESPONSE_NOTICE;
+    int32_t notifyType = HDI::Ril::V1_1::RIL_RESPONSE_NOTICE;
     auto iter = notificationMap_.find(reportInfo->notifyId);
     auto event = notificationEventMap_.find(reportInfo->notifyId);
     if (iter != notificationMap_.end()) {
@@ -315,7 +315,7 @@ void HRilManager::ReportNotification(std::vector<std::unique_ptr<T>> &subModules
         }
         if (NEED_LOCK == iter->second) {
             ApplyRunningLock();
-            notifyType = HRIL_RESPONSE_NOTICE_MUST_ACK;
+            notifyType = HDI::Ril::V1_1::RIL_RESPONSE_NOTICE_MUST_ACK;
         }
     }
     subModules[slotId]->template ProcessNotify<T>(notifyType, reportInfo, response, responseLen);

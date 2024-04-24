@@ -39,6 +39,7 @@ ohos_unittest("tel_ril_adapter_gtest") {
     "$SOURCE_DIR/services/hril_hdf/include",
   ]
   deps = [
+    "$SOURCE_DIR/interfaces/innerkits:hril_innerkits",
     "$SOURCE_DIR/services/hril:hril",
     "$SOURCE_DIR/services/hril_hdf:hril_hdf",
   ]

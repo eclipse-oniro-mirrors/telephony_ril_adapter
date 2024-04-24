@@ -276,8 +276,6 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Call_001, Function | MediumTest | Lev
     HRilRegOps(nullptr);
     ReleaseRilAdapter();
     OnTimerCallback(nullptr, nullptr, nullptr);
-    VoiceRadioTechnology voiceRadioTechnology;
-    VoiceRadioTechnology test = voiceRadioTechnology;
     EXPECT_EQ(manager->SendRilAck(), 0);
     manager->hrilCall_.clear();
     EXPECT_NE(manager->CloseUnFinishedUssd(0, 0), 0);
@@ -293,7 +291,7 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Call_002, Function | MediumTest | Lev
 {
     auto manager = std::make_shared<HRilManager>();
     auto call = std::make_unique<HRilCall>(0);
-    HRilRadioResponseInfo responseInfo;
+    HDI::Ril::V1_1::RilRadioResponseInfo responseInfo;
     EXPECT_NE(HDF_SUCCESS, call->GetCallListResponse(0, responseInfo, nullptr, 1));
     EXPECT_NE(HDF_SUCCESS, call->DialResponse(0, responseInfo, nullptr, 1));
     EXPECT_NE(HDF_SUCCESS, call->HangupResponse(0, responseInfo, nullptr, 1));
@@ -346,7 +344,7 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Call_002, Function | MediumTest | Lev
 HWTEST_F(BranchTest, Telephony_HrilManager_Call_003, Function | MediumTest | Level2)
 {
     auto call = std::make_unique<HRilCall>(0);
-    HRilRadioResponseInfo responseInfo;
+    HDI::Ril::V1_1::RilRadioResponseInfo responseInfo;
     EXPECT_NE(HDF_SUCCESS, call->GetCallListResponse(0, responseInfo, nullptr, 1));
     EXPECT_NE(HDF_SUCCESS, call->GetCallListResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, call->GetClipResponse(0, responseInfo, nullptr, 1));
@@ -392,7 +390,7 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Call_003, Function | MediumTest | Lev
 HWTEST_F(BranchTest, Telephony_HrilManager_Call_004, Function | MediumTest | Level2)
 {
     auto call = std::make_unique<HRilCall>(0);
-    HRilRadioResponseInfo responseInfo;
+    HDI::Ril::V1_1::RilRadioResponseInfo responseInfo;
     EXPECT_NE(HDF_SUCCESS, call->GetCallPreferenceModeResponse(0, responseInfo, nullptr, 1));
     EXPECT_NE(HDF_SUCCESS, call->GetCallPreferenceModeResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, call->GetMuteResponse(0, responseInfo, nullptr, 1));
@@ -483,7 +481,7 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Data_002, Function | MediumTest | Lev
 {
     auto manager = std::make_shared<HRilManager>();
     auto data = std::make_unique<HRilData>(0);
-    HRilRadioResponseInfo responseInfo;
+    HDI::Ril::V1_1::RilRadioResponseInfo responseInfo;
     EXPECT_NE(HDF_SUCCESS, data->ActivatePdpContextResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, data->DeactivatePdpContextResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, data->GetPdpContextListResponse(0, responseInfo, nullptr, 0));
@@ -507,7 +505,7 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Data_003, Function | MediumTest | Lev
 {
     auto data = std::make_unique<HRilData>(0);
     HRilErrNumber err = HRilErrNumber::HRIL_ERR_NULL_POINT;
-    HRilRadioResponseInfo responseInfo;
+    HDI::Ril::V1_1::RilRadioResponseInfo responseInfo;
     EXPECT_NE(HDF_SUCCESS, data->ActivatePdpContextResponse(0, responseInfo, nullptr, 1));
     EXPECT_NE(HDF_SUCCESS, data->ActivatePdpContextResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, data->GetPdpContextListResponse(0, responseInfo, nullptr, 1));
@@ -577,7 +575,7 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Modem_002, Function | MediumTest | Le
 {
     auto manager = std::make_shared<HRilManager>();
     auto modem = std::make_unique<HRilModem>(0);
-    HRilRadioResponseInfo responseInfo;
+    HDI::Ril::V1_1::RilRadioResponseInfo responseInfo;
     EXPECT_NE(HDF_SUCCESS, modem->ShutDownResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, modem->SetRadioStateResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, modem->GetRadioStateResponse(0, responseInfo, nullptr, 0));
@@ -600,7 +598,7 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Modem_003, Function | MediumTest | Le
 {
     auto modem = std::make_unique<HRilModem>(0);
     HRilErrNumber err = HRilErrNumber::HRIL_ERR_NULL_POINT;
-    HRilRadioResponseInfo responseInfo;
+    HDI::Ril::V1_1::RilRadioResponseInfo responseInfo;
     EXPECT_NE(HDF_SUCCESS, modem->RadioStateUpdated(0, err, nullptr, 1));
     EXPECT_NE(HDF_SUCCESS, modem->RadioStateUpdated(0, err, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, modem->VoiceRadioTechUpdated(0, err, nullptr, 1));
@@ -617,9 +615,9 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Modem_003, Function | MediumTest | Le
     EXPECT_NE(HDF_SUCCESS, modem->GetMeidResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, modem->GetBasebandVersionResponse(0, responseInfo, nullptr, 1));
     EXPECT_NE(HDF_SUCCESS, modem->GetBasebandVersionResponse(0, responseInfo, nullptr, 0));
-    responseInfo.error = HRilErrType::HRIL_ERR_GENERIC_FAILURE;
+    responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_GENERIC_FAILURE;
     EXPECT_NE(HDF_SUCCESS, modem->GetVoiceRadioTechnologyResponse(0, responseInfo, nullptr, 0));
-    responseInfo.error = HRilErrType::NONE;
+    responseInfo.error = HDI::Ril::V1_1::RilErrType::NONE;
     EXPECT_NE(HDF_SUCCESS, modem->GetVoiceRadioTechnologyResponse(0, responseInfo, nullptr, 0));
     int32_t in = 1;
     EXPECT_NE(HDF_SUCCESS, modem->RadioStateUpdated(0, err, &in, 1));
@@ -669,7 +667,7 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Sim_002, Function | MediumTest | Leve
 {
     auto manager = std::make_shared<HRilManager>();
     auto sim = std::make_unique<HRilSim>(0);
-    HRilRadioResponseInfo responseInfo;
+    HDI::Ril::V1_1::RilRadioResponseInfo responseInfo;
     EXPECT_NE(HDF_SUCCESS, sim->GetSimIOResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, sim->GetSimStatusResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, sim->GetImsiResponse(0, responseInfo, nullptr, 0));
@@ -728,7 +726,7 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Network_002, Function | MediumTest | 
 {
     auto manager = std::make_shared<HRilManager>();
     auto network = std::make_unique<HRilNetwork>(0);
-    HRilRadioResponseInfo responseInfo;
+    HDI::Ril::V1_1::RilRadioResponseInfo responseInfo;
     EXPECT_NE(HDF_SUCCESS, network->GetSignalStrengthResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, network->GetCsRegStatusResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, network->GetPsRegStatusResponse(0, responseInfo, nullptr, 0));
@@ -815,13 +813,13 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Network_003, Function | MediumTest | 
 HWTEST_F(BranchTest, Telephony_HrilManager_Network_004, Function | MediumTest | Level3)
 {
     auto network = std::make_unique<HRilNetwork>(0);
-    HRilRadioResponseInfo responseInfo;
-    responseInfo.error = HRilErrType::HRIL_ERR_GENERIC_FAILURE;
+    HDI::Ril::V1_1::RilRadioResponseInfo responseInfo;
+    responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_GENERIC_FAILURE;
     EXPECT_NE(HDF_SUCCESS, network->GetNrSsbIdResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, network->GetCurrentCellInfoResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, network->GetCurrentCellInfoResponse_1_1(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, network->GetCurrentCellInfoResponse_1_2(0, responseInfo, nullptr, 0));
-    responseInfo.error = HRilErrType::NONE;
+    responseInfo.error = HDI::Ril::V1_1::RilErrType::NONE;
     EXPECT_NE(HDF_SUCCESS, network->GetNrSsbIdResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, network->GetCurrentCellInfoResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, network->GetCurrentCellInfoResponse_1_1(0, responseInfo, nullptr, 0));
@@ -898,7 +896,7 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Network_005, Function | MediumTest | 
 HWTEST_F(BranchTest, Telephony_HrilManager_Network_006, Function | MediumTest | Level3)
 {
     auto network = std::make_unique<HRilNetwork>(0);
-    HRilRadioResponseInfo responseInfo;
+    HDI::Ril::V1_1::RilRadioResponseInfo responseInfo;
     CellInfo cellInfo;
     HDI::Ril::V1_1::CellNearbyInfo cellNearbyInfo;
     HDI::Ril::V1_2::CellNearbyInfo_1_2 cellNearbyInfo_1_2;
@@ -923,10 +921,10 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Network_006, Function | MediumTest | 
     cellInfo.ratType = NETWORK_TYPE_UNKNOWN;
     network->FillCellNearbyInfo(cellNearbyInfo, &cellInfo);
     network->FillCellNearbyInfo(cellNearbyInfo_1_2, &cellInfo);
-    responseInfo.error = HRilErrType::HRIL_ERR_GENERIC_FAILURE;
+    responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_GENERIC_FAILURE;
     EXPECT_NE(HDF_SUCCESS, network->GetNeighboringCellInfoListResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, network->GetNeighboringCellInfoListResponse_1_2(0, responseInfo, nullptr, 0));
-    responseInfo.error = HRilErrType::NONE;
+    responseInfo.error = HDI::Ril::V1_1::RilErrType::NONE;
     EXPECT_NE(HDF_SUCCESS, network->GetNeighboringCellInfoListResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, network->GetNeighboringCellInfoListResponse_1_2(0, responseInfo, nullptr, 0));
     CellInfoList list = { 1, nullptr };
@@ -988,15 +986,15 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Network_007, Function | MediumTest | 
 HWTEST_F(BranchTest, Telephony_HrilManager_Network_008, Function | MediumTest | Level3)
 {
     auto network = std::make_unique<HRilNetwork>(0);
-    HRilRadioResponseInfo responseInfo;
-    responseInfo.error = HRilErrType::HRIL_ERR_GENERIC_FAILURE;
+    HDI::Ril::V1_1::RilRadioResponseInfo responseInfo;
+    responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_GENERIC_FAILURE;
     EXPECT_NE(HDF_SUCCESS, network->GetSignalStrengthResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, network->GetCsRegStatusResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, network->GetPsRegStatusResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, network->GetOperatorInfoResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, network->GetNetworkSearchInformationResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, network->GetNetworkSelectionModeResponse(0, responseInfo, nullptr, 0));
-    responseInfo.error = HRilErrType::NONE;
+    responseInfo.error = HDI::Ril::V1_1::RilErrType::NONE;
     EXPECT_NE(HDF_SUCCESS, network->GetSignalStrengthResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, network->GetCsRegStatusResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, network->GetPsRegStatusResponse(0, responseInfo, nullptr, 0));
@@ -1033,13 +1031,13 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Network_008, Function | MediumTest | 
 HWTEST_F(BranchTest, Telephony_HrilManager_Network_009, Function | MediumTest | Level3)
 {
     auto network = std::make_unique<HRilNetwork>(0);
-    HRilRadioResponseInfo responseInfo;
-    responseInfo.error = HRilErrType::HRIL_ERR_GENERIC_FAILURE;
+    HDI::Ril::V1_1::RilRadioResponseInfo responseInfo;
+    responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_GENERIC_FAILURE;
     EXPECT_NE(HDF_SUCCESS, network->GetPreferredNetworkResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, network->GetPhysicalChannelConfigResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, network->GetRrcConnectionStateResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, network->GetNrOptionModeResponse(0, responseInfo, nullptr, 0));
-    responseInfo.error = HRilErrType::NONE;
+    responseInfo.error = HDI::Ril::V1_1::RilErrType::NONE;
     EXPECT_NE(HDF_SUCCESS, network->GetPreferredNetworkResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, network->GetPhysicalChannelConfigResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, network->GetRrcConnectionStateResponse(0, responseInfo, nullptr, 0));
@@ -1093,7 +1091,7 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Sms_002, Function | MediumTest | Leve
 {
     auto manager = std::make_shared<HRilManager>();
     auto sms = std::make_unique<HRilSms>(0);
-    HRilRadioResponseInfo responseInfo;
+    HDI::Ril::V1_1::RilRadioResponseInfo responseInfo;
     EXPECT_NE(HDF_SUCCESS, sms->SendGsmSmsResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, sms->SendCdmaSmsResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, sms->AddSimMessageResponse(0, responseInfo, nullptr, 0));
@@ -1212,11 +1210,11 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Sms_004, Function | MediumTest | Leve
 HWTEST_F(BranchTest, Telephony_HrilManager_Sms_005, Function | MediumTest | Level3)
 {
     auto sms = std::make_unique<HRilSms>(0);
-    HRilRadioResponseInfo responseInfo;
+    HDI::Ril::V1_1::RilRadioResponseInfo responseInfo;
     HRilErrNumber err = HRilErrNumber::HRIL_ERR_NULL_POINT;
-    responseInfo.error = HRilErrType::HRIL_ERR_GENERIC_FAILURE;
+    responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_GENERIC_FAILURE;
     EXPECT_NE(HDF_SUCCESS, sms->GetSmscAddrResponse(0, responseInfo, nullptr, 0));
-    responseInfo.error = HRilErrType::NONE;
+    responseInfo.error = HDI::Ril::V1_1::RilErrType::NONE;
     EXPECT_NE(HDF_SUCCESS, sms->GetSmscAddrResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, sms->GetCBConfigResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, sms->GetCdmaCBConfigResponse(0, responseInfo, nullptr, 0));
@@ -1264,11 +1262,11 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Sms_005, Function | MediumTest | Leve
 HWTEST_F(BranchTest, Telephony_HrilManager_Sms_006, Function | MediumTest | Level3)
 {
     auto sms = std::make_unique<HRilSms>(0);
-    HRilRadioResponseInfo responseInfo;
+    HDI::Ril::V1_1::RilRadioResponseInfo responseInfo;
     HRilErrNumber err = HRilErrNumber::HRIL_ERR_NULL_POINT;
-    responseInfo.error = HRilErrType::HRIL_ERR_GENERIC_FAILURE;
+    responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_GENERIC_FAILURE;
     sms->MakeSendSmsResult(responseInfo, 0, nullptr, 0);
-    responseInfo.error = HRilErrType::NONE;
+    responseInfo.error = HDI::Ril::V1_1::RilErrType::NONE;
     sms->MakeSendSmsResult(responseInfo, 0, nullptr, 0);
     EXPECT_EQ(HDF_SUCCESS, sms->NewSmsStoredOnSimNotify(1, err, nullptr, 0));
     ASSERT_FALSE(sms->RequestWithInts(nullptr, nullptr, 0, 0));
