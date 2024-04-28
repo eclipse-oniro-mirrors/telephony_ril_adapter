@@ -200,10 +200,6 @@ void ReqSendCdmaSms(const ReqDataInfo *requestInfo, const char *data, size_t dat
         FreeResponseInfo(responseInfo);
         return;
     }
-    responseInfo = (ResponseInfo *)malloc(sizeof(ResponseInfo));
-    if (responseInfo == NULL) {
-        err = HRIL_ERR_GENERIC_FAILURE;
-    }
     err = SendCommandLock("AT+COPS?", "COPS?", 0, &responseInfo);
     if (err != 0 || (responseInfo != NULL && !responseInfo->success)) {
         TELEPHONY_LOGE("AT+COPS? send failed");
@@ -271,6 +267,9 @@ static void WriteSimMessage(const ReqDataInfo *requestInfo, const HRilSmsWriteSm
     }
     msg = ((HRilSmsWriteSms *)data);
     if (msg->smsc == NULL || (strcmp(msg->smsc, "") == 0)) {
+        if (msg->smsc != NULL) {
+            free(msg->smsc);
+        }
         msg->smsc = (char *)malloc(strlen("00") + 1);
         if (strcpy_s(msg->smsc, strlen("00") + 1, "00") != EOK) {
             TELEPHONY_LOGE("Set smsc failed");
@@ -369,6 +368,9 @@ bool CheckSimMessageValid(
         return false;
     }
     if (msg->smsc == NULL || (strcmp(msg->smsc, "") == 0)) {
+        if (msg->smsc != NULL) {
+            free(msg->smsc);
+        }
         msg->smsc = (char *)malloc(strlen("00") + 1);
         if (strcpy_s(msg->smsc, strlen("00") + 1, "00") != EOK) {
             TELEPHONY_LOGE("Set smsc failed");
