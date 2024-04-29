@@ -40,7 +40,7 @@ std::unordered_map<int32_t, int32_t> HRilManager::notificationMap_ = {
 
 #ifdef ABILITY_POWER_SUPPORT
 constexpr int32_t RUNNINGLOCK_TIMEOUTMS_LASTING = -1;
-using namespace OHOS::HDI::Power::V1_1;
+using namespace OHOS::HDI::Power::V1_2;
 #endif
 
 static bool IsHrilManagerValid()
@@ -157,11 +157,11 @@ void HRilManager::RegisterSmsFuncs(int32_t slotId, const HRilSmsReq *smsFuncs)
 }
 
 #ifdef ABILITY_POWER_SUPPORT
-static OHOS::HDI::Power::V1_1::RunningLockInfo FillRunningLockInfo(const std::string &name, int32_t timeoutMs)
+static OHOS::HDI::Power::V1_2::RunningLockInfo FillRunningLockInfo(const std::string &name, int32_t timeoutMs)
 {
-    OHOS::HDI::Power::V1_1::RunningLockInfo filledInfo {};
+    OHOS::HDI::Power::V1_2::RunningLockInfo filledInfo {};
     filledInfo.name = name;
-    filledInfo.type = OHOS::HDI::Power::V1_1::RunningLockType::RUNNINGLOCK_BACKGROUND_PHONE;
+    filledInfo.type = OHOS::HDI::Power::V1_2::RunningLockType::RUNNINGLOCK_BACKGROUND_PHONE;
     filledInfo.timeoutMs = timeoutMs;
     filledInfo.uid = static_cast<int32_t>(getuid());
     filledInfo.pid = static_cast<int32_t>(getpid());
@@ -184,7 +184,7 @@ static void RunningLockCallback(uint8_t *param)
         return;
     }
     g_manager->runningLockCount_ = 0;
-    OHOS::HDI::Power::V1_1::RunningLockInfo filledInfo = FillRunningLockInfo(
+    OHOS::HDI::Power::V1_2::RunningLockInfo filledInfo = FillRunningLockInfo(
         RUNNINGLOCK_NAME, RUNNINGLOCK_TIMEOUTMS_LASTING);
     g_manager->powerInterface_->UnholdRunningLock(filledInfo);
     TELEPHONY_LOGD("RunningLockCallback, UnLock");
@@ -201,7 +201,7 @@ void HRilManager::ApplyRunningLock(void)
 
     std::lock_guard<std::mutex> lockRequest(mutexRunningLock_);
     if (powerInterface_ != nullptr) {
-        OHOS::HDI::Power::V1_1::RunningLockInfo filledInfo = FillRunningLockInfo(
+        OHOS::HDI::Power::V1_2::RunningLockInfo filledInfo = FillRunningLockInfo(
             RUNNINGLOCK_NAME, RUNNINGLOCK_TIMEOUTMS_LASTING);
         powerInterface_->HoldRunningLock(filledInfo);
         struct timeval tv = { 0, RUNNING_LOCK_DEFAULT_TIMEOUT_US };
@@ -237,7 +237,7 @@ void HRilManager::ReleaseRunningLock(void)
         runningLockCount_--;
     } else {
         runningLockCount_ = 0;
-        OHOS::HDI::Power::V1_1::RunningLockInfo filledInfo = FillRunningLockInfo(
+        OHOS::HDI::Power::V1_2::RunningLockInfo filledInfo = FillRunningLockInfo(
             RUNNINGLOCK_NAME, RUNNINGLOCK_TIMEOUTMS_LASTING);
         powerInterface_->UnholdRunningLock(filledInfo);
         TELEPHONY_LOGD("ReleaseRunningLock UnLock");

@@ -33,7 +33,7 @@ ohos_fuzztest("ResidentNetworkUpdatedFuzzTest") {
   ]
 
   external_deps = [
-    "drivers_interface_power:libpower_proxy_1.1",
+    "drivers_interface_power:libpower_proxy_1.2",
     "drivers_interface_ril:ril_idl_headers",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",

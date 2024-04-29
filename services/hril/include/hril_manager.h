@@ -28,7 +28,7 @@
 #include "hril_sms.h"
 #include "hril_timer_callback.h"
 #ifdef ABILITY_POWER_SUPPORT
-#include "v1_1/ipower_interface.h"
+#include "v1_2/ipower_interface.h"
 #endif
 
 namespace OHOS {
@@ -222,7 +222,7 @@ public:
 
 public:
 #ifdef ABILITY_POWER_SUPPORT
-    sptr<OHOS::HDI::Power::V1_1::IPowerInterface> powerInterface_ { nullptr };
+    sptr<OHOS::HDI::Power::V1_2::IPowerInterface> powerInterface_ { nullptr };
 #endif
     std::unique_ptr<HRilTimerCallback> timerCallback_ = nullptr;
     std::unique_ptr<std::thread> eventLoop_ = nullptr;
