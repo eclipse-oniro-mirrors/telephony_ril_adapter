@@ -649,13 +649,11 @@ void HRilSim::CopyToHRilSimIO(std::unique_ptr<HRilSimIO> &rilSimIO, const OHOS::
     rilSimIO->p1 = simIO.p1;
     rilSimIO->p2 = simIO.p2;
     rilSimIO->p3 = simIO.p3;
-    TELEPHONY_LOGD("CopyToHRilSimIO.data: %{public}s, path: %{public}s, pin2: %{public}s", simIO.data.c_str(),
-        simIO.path.c_str(), simIO.pin2.c_str());
+    TELEPHONY_LOGD("CopyToHRilSimIO.data: %{public}zu, path: %{public}zu, pin2: %{public}zu", simIO.data.length(),
+        simIO.path.length(), simIO.pin2.length());
     CopyToCharPoint(&(rilSimIO->data), simIO.data);
     CopyToCharPoint(&(rilSimIO->pathid), simIO.path);
     CopyToCharPoint(&(rilSimIO->pin2), simIO.pin2);
-    TELEPHONY_LOGD("CopyToHRilSimIO.result: %{public}s, pathid: %{public}s, pin2: %{public}s", rilSimIO->data,
-        rilSimIO->pathid, rilSimIO->pin2);
 }
 
 void HRilSim::CopyToHRilSimLock(
