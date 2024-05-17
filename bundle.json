@@ -27,6 +27,7 @@
         "ram": "1MB",
         "deps": {
             "components": [
+                "bounds_checking_function",
                 "c_utils",
                 "drivers_interface_power",
                 "drivers_interface_ril",

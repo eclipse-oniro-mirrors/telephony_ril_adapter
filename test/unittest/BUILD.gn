@@ -30,6 +30,7 @@ ohos_executable("ril_adapter_test") {
   deps = []
   if (is_standard_system) {
     external_deps = [
+      "bounds_checking_function:libsec_shared",
       "c_utils:utils",
       "drivers_interface_ril:libril_proxy_1.2",
       "drivers_interface_ril:libril_proxy_1.3",

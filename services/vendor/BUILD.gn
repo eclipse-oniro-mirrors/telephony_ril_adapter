@@ -38,6 +38,7 @@ ohos_shared_library("ril_vendor") {
   deps = [ "$RIL_ADAPTER/interfaces/innerkits:hril_innerkits" ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "c_utils:utils",
     "hilog:libhilog",
     "init:libbegetutil",
