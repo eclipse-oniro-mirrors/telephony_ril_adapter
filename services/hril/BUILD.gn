@@ -48,6 +48,7 @@ ohos_shared_library("hril") {
   deps = [ "$RIL_ADAPTER/interfaces/innerkits:hril_innerkits" ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "c_utils:utils",
     "drivers_interface_ril:libril_proxy_1.3",
     "hdf_core:libhdf_ipc_adapter",

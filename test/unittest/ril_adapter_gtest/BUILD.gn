@@ -52,6 +52,7 @@ ohos_unittest("tel_ril_adapter_gtest") {
   configs = [ "$SOURCE_DIR/utils:utils_config" ]
   if (is_standard_system) {
     external_deps = [
+      "bounds_checking_function:libsec_shared",
       "c_utils:utils",
       "drivers_interface_power:libpower_proxy_1.2",
       "drivers_interface_ril:libril_proxy_1.2",
