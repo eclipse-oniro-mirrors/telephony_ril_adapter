@@ -204,7 +204,7 @@ void ReqSendCdmaSms(const ReqDataInfo *requestInfo, const char *data, size_t dat
     if (err != 0 || (responseInfo != NULL && !responseInfo->success)) {
         TELEPHONY_LOGE("AT+COPS? send failed");
         HandlerSmsResult(&response, &reportInfo, requestInfo, &err, responseInfo);
-        FreeResponseInfo(responseInfo);
+        // responseInfo freed in HandlerSmsResult
         return;
     }
     err = SendCommandLock("AT$QCMGF=0", "$QCMGF=0", 0, &responseInfo);
