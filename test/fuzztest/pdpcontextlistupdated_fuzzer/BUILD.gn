@@ -33,6 +33,7 @@ ohos_fuzztest("PdpContextListUpdatedFuzzTest") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "drivers_interface_power:libpower_proxy_1.2",
     "drivers_interface_ril:ril_idl_headers",
     "hdf_core:libhdf_host",
