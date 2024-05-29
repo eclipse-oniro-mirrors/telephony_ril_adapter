@@ -1313,6 +1313,7 @@ HWTEST_F(BranchTest, Telephony_HrilManager_HRilEvent_001, Function | MediumTest 
     event->ProcessTimerList();
     fd_set rfds;
     event->TimerEventInit();
+    eventMsg.fd = 1;
     event->AddEventMessage(eventMsg);
     event->ProcessEvents(&rfds, 1);
     event->ProcessPendingList();
