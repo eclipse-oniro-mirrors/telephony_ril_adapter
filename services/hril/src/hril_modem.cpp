@@ -168,15 +168,22 @@ int32_t HRilModem::GetImeiSvResponse(
 int32_t HRilModem::GetMeidResponse(
     int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
+    std::string meidResponse = "";
     if ((response == nullptr && responseLen != 0) || (responseLen % sizeof(char)) != 0) {
         TELEPHONY_LOGE("GetMeidResponse:Invalid parameter, responseLen:%{public}zu", responseLen);
-        return HRIL_ERR_INVALID_PARAMETER;
+        if (responseInfo.error == HDI::Ril::V1_1::RilErrType::NONE) {
+            responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_INVALID_RESPONSE;
+        }
     }
     if (response == nullptr) {
         TELEPHONY_LOGE("response is null");
-        return HRIL_ERR_NULL_POINT;
+        if (responseInfo.error == HDI::Ril::V1_1::RilErrType::NONE) {
+            responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_NULL_POINT;
+        }
+    } else {
+        meidResponse = std::string((const char *)response);
     }
-    return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::GetMeidResponse, std::string((const char *)response));
+    return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::GetMeidResponse, meidResponse);
 }
 
 int32_t HRilModem::GetVoiceRadioTechnologyResponse(
