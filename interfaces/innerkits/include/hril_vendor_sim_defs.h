@@ -151,6 +151,10 @@ typedef struct {
      * SIM card status:
      */
     HRilSimState simState;
+    /**
+     * SIM card iccid:
+     */
+    char *iccid;
 } HRilCardState;
 
 /**

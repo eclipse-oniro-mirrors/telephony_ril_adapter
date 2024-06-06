@@ -131,6 +131,19 @@ int32_t RilCallbackTest::GetSimStatusResponse(
     return 0;
 }
 
+int32_t RilCallbackTest::GetSimCardStatusResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+    const HDI::Ril::V1_3::SimCardStatusInfo &result)
+{
+    TELEPHONY_LOGI("GetBoolResult GetSimCardStatus result : slotId = %{public}d, simType = %{public}d,"
+        "simState = %{public}d", responseInfo.slotId, result.simType, result.simState);
+    simState_[responseInfo.slotId] = result.simState;
+    TELEPHONY_LOGI("IsReady %{public}d %{public}d", responseInfo.slotId, simState_[responseInfo.slotId]);
+    hdiId_ = HdiId::HREQ_SIM_GET_SIM_STATUS;
+    resultInfo_ = responseInfo;
+    NotifyAll();
+    return 0;
+}
+
 int32_t RilCallbackTest::GetSimIOResponse(const RilRadioResponseInfo &responseInfo, const IccIoResultInfo &result)
 {
     TELEPHONY_LOGI("GetBoolResult GetSimIO result : sw1 = %{public}d, sw2 = %{public}d, response = %{public}s",

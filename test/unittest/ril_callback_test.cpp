@@ -97,6 +97,16 @@ int32_t RilCallbackTest::GetSimStatusResponse(const RilRadioResponseInfo &respon
     return 0;
 }
 
+int32_t RilCallbackTest::GetSimCardStatusResponse(const RilRadioResponseInfo &responseInfo,
+    const SimCardStatusInfo &result)
+{
+    PrintResponseInfo("GetSimCardStatusResponse", responseInfo);
+    cout << "[SimCardStatusInfo] -->[index] : " << result.index << " -->[simType] : " << result.simType
+         << " -->[simState] : " << result.simState;
+    cout << endl << endl;
+    return 0;
+}
+
 int32_t RilCallbackTest::GetSimIOResponse(const RilRadioResponseInfo &responseInfo, const IccIoResultInfo &result)
 {
     PrintResponseInfo("GetSimIOResponse", responseInfo);
