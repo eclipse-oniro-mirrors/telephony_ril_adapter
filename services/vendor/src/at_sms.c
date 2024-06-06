@@ -287,14 +287,12 @@ static void WriteSimMessage(const ReqDataInfo *requestInfo, const HRilSmsWriteSm
     }
     int32_t tmp = GenerateCommand(smsPdu, MAX_CMD_LENGTH, "%s%s", msg->smsc, msg->pdu);
     if (tmp < 0) {
-        TELEPHONY_LOGE("GenerateCommand failed, err = %{public}d\n", tmp);
         SimMessageError(&reportInfo, requestInfo, &tmp, responseInfo);
         return;
     }
     err = SendCommandSmsLock(cmd, smsPdu, "+CMGW:", 0, &responseInfo);
     ret = memset_s(cmd, MAX_CMD_LENGTH, 0, MAX_CMD_LENGTH);
     if (err != 0 || (responseInfo != NULL && !responseInfo->success) || ret != EOK) {
-        TELEPHONY_LOGE("ExecuteCommand failed");
         err = HRIL_ERR_GENERIC_FAILURE;
         SimMessageError(&reportInfo, requestInfo, &err, responseInfo);
         return;
