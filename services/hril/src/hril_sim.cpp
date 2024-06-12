@@ -332,7 +332,6 @@ int32_t HRilSim::GetSimCardStatusResponse(
         rilCardStatus.simType = curPtr->simType;
         rilCardStatus.simState = curPtr->simState;
         rilCardStatus.iccid = (curPtr->iccid == nullptr) ? "" :  curPtr->iccid;
-        TELEPHONY_LOGI("rilCardStatus.iccid = %{public}s", rilCardStatus.iccid.c_str());
     }
     return Response(responseInfo, &HDI::Ril::V1_3::IRilCallback::GetSimCardStatusResponse, rilCardStatus);
 }

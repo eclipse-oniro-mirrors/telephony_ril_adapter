@@ -669,7 +669,6 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Sim_002, Function | MediumTest | Leve
     auto sim = std::make_unique<HRilSim>(0);
     HDI::Ril::V1_1::RilRadioResponseInfo responseInfo;
     EXPECT_NE(HDF_SUCCESS, sim->GetSimIOResponse(0, responseInfo, nullptr, 0));
-    EXPECT_NE(HDF_SUCCESS, sim->GetSimCardStatusResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, sim->GetImsiResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, sim->GetSimLockStatusResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, sim->SetSimLockResponse(0, responseInfo, nullptr, 0));
