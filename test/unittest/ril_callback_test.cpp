@@ -19,7 +19,7 @@
 
 namespace OHOS {
 namespace Telephony {
-using namespace OHOS::HDI::Ril::V1_2;
+using namespace OHOS::HDI::Ril::V1_3;
 using namespace std;
 
 enum class RatType {
@@ -92,6 +92,16 @@ int32_t RilCallbackTest::GetSimStatusResponse(const RilRadioResponseInfo &respon
 {
     PrintResponseInfo("GetSimStatusResponse", responseInfo);
     cout << "[CardStatusInfo] -->[index] : " << result.index << " -->[simType] : " << result.simType
+         << " -->[simState] : " << result.simState;
+    cout << endl << endl;
+    return 0;
+}
+
+int32_t RilCallbackTest::GetSimCardStatusResponse(const RilRadioResponseInfo &responseInfo,
+    const SimCardStatusInfo &result)
+{
+    PrintResponseInfo("GetSimCardStatusResponse", responseInfo);
+    cout << "[SimCardStatusInfo] -->[index] : " << result.index << " -->[simType] : " << result.simType
          << " -->[simState] : " << result.simState;
     cout << endl << endl;
     return 0;
