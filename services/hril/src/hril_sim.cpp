@@ -39,7 +39,7 @@ void HRilSim::AddHandlerToMap()
 {
     // response
     respMemberFuncMap_[HREQ_SIM_GET_SIM_IO] = &HRilSim::GetSimIOResponse;
-    respMemberFuncMap_[HREQ_SIM_GET_SIM_STATUS] = &HRilSim::GetSimStatusResponse;
+    respMemberFuncMap_[HREQ_SIM_GET_SIM_STATUS] = &HRilSim::GetSimCardStatusResponse;
     respMemberFuncMap_[HREQ_SIM_GET_IMSI] = &HRilSim::GetImsiResponse;
     respMemberFuncMap_[HREQ_SIM_GET_SIM_LOCK_STATUS] = &HRilSim::GetSimLockStatusResponse;
     respMemberFuncMap_[HREQ_SIM_SET_SIM_LOCK] = &HRilSim::SetSimLockResponse;
@@ -310,10 +310,10 @@ int32_t HRilSim::GetSimIOResponse(
     return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::GetSimIOResponse, result);
 }
 
-int32_t HRilSim::GetSimStatusResponse(
+int32_t HRilSim::GetSimCardStatusResponse(
     int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    HDI::Ril::V1_1::CardStatusInfo rilCardStatus = {};
+    HDI::Ril::V1_3::SimCardStatusInfo rilCardStatus = {};
     if ((response == nullptr && responseLen != 0) ||
         (response != nullptr && responseLen != sizeof(HRilCardState))) {
         TELEPHONY_LOGE("Invalid response: Vendor exception!");
@@ -324,13 +324,16 @@ int32_t HRilSim::GetSimStatusResponse(
         if (responseInfo.error == HDI::Ril::V1_1::RilErrType::NONE) {
             responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_INVALID_RESPONSE;
         }
-        return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::GetSimStatusResponse, rilCardStatus);
+        return Response(responseInfo, &HDI::Ril::V1_3::IRilCallback::GetSimCardStatusResponse, rilCardStatus);
     }
     const HRilCardState *curPtr = static_cast<const HRilCardState *>(response);
-    rilCardStatus.index = curPtr->index;
-    rilCardStatus.simType = curPtr->simType;
-    rilCardStatus.simState = curPtr->simState;
-    return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::GetSimStatusResponse, rilCardStatus);
+    if (curPtr != nullptr) {
+        rilCardStatus.index = curPtr->index;
+        rilCardStatus.simType = curPtr->simType;
+        rilCardStatus.simState = curPtr->simState;
+        rilCardStatus.iccid = (curPtr->iccid == nullptr) ? "" :  curPtr->iccid;
+    }
+    return Response(responseInfo, &HDI::Ril::V1_3::IRilCallback::GetSimCardStatusResponse, rilCardStatus);
 }
 
 int32_t HRilSim::GetImsiResponse(
