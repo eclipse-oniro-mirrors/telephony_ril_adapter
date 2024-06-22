@@ -79,13 +79,24 @@ void HRilEvent::ProcessTimerList()
 
 void HRilEvent::ProcessPendingList()
 {
-    std::lock_guard<std::mutex> mutexLock(listLock_);
-    std::list<HRilEventMessage>::iterator eventIt = pendingList_.begin();
-    while (eventIt != pendingList_.end()) {
-        if (eventIt->func != nullptr) {
-            eventIt->func(eventIt->fd, 0, eventIt->param);
+    HRilEventMessage evMsg = {};
+    while (1) {
+        std::unique_lock<std::mutex> mutexLock(listLock_);
+        std::list<HRilEventMessage>::iterator eventIt = pendingList_.begin();
+        if (eventIt == pendingList_.end()) {
+            break;
         }
-        eventIt = pendingList_.erase(eventIt);
+        evMsg.fd = eventIt->fd;
+        evMsg.func = eventIt->func;
+        evMsg.index = eventIt->index;
+        evMsg.param = eventIt->param;
+        evMsg.timeout = eventIt->timeout;
+        pendingList_.erase(eventIt);
+        mutexLock.unlock();
+
+        if (evMsg.func != nullptr) {
+            evMsg.func(evMsg.fd, 0, evMsg.param);
+        }
     }
 }
 
@@ -140,6 +151,7 @@ void HRilEvent::TimerEventInit()
 
 void HRilEvent::AddTimerEvent(HRilEventMessage &eventMsg, const struct timeval &tv)
 {
+    std::lock_guard<std::mutex> mutexLock(listLock_);
     struct timeval now;
     eventMsg.fd = IVNALID_FD; // make sure fd is invalid
 
