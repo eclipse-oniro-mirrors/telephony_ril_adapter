@@ -84,7 +84,8 @@ void HRilEvent::ProcessPendingList()
         std::unique_lock<std::mutex> mutexLock(listLock_);
         std::list<HRilEventMessage>::iterator eventIt = pendingList_.begin();
         if (eventIt == pendingList_.end()) {
-            break;
+            mutexLock.unlock();
+            return;
         }
         evMsg.fd = eventIt->fd;
         evMsg.func = eventIt->func;
