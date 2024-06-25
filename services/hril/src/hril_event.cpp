@@ -77,22 +77,29 @@ void HRilEvent::ProcessTimerList()
     }
 }
 
+bool HRilEvent::GetEventMessageFromPendingList(HRilEventMessage *eventMsg)
+{
+    std::lock_guard<std::mutex> mutexLock(listLock_);
+    std::list<HRilEventMessage>::iterator eventIt = pendingList_.begin();
+    if (eventIt == pendingList_.end()) {
+        return false;
+    }
+    eventMsg->fd = eventIt->fd;
+    eventMsg->func = eventIt->func;
+    eventMsg->index = eventIt->index;
+    eventMsg->param = eventIt->param;
+    eventMsg->timeout = eventIt->timeout;
+    pendingList_.erase(eventIt);
+    return true;
+}
+
 void HRilEvent::ProcessPendingList()
 {
     HRilEventMessage evMsg = {};
     while (1) {
-        std::unique_lock<std::mutex> mutexLock(listLock_);
-        std::list<HRilEventMessage>::iterator eventIt = pendingList_.begin();
-        if (eventIt == pendingList_.end()) {
+        if (!GetEventMessageFromPendingList(&evMsg)) {
             break;
         }
-        evMsg.fd = eventIt->fd;
-        evMsg.func = eventIt->func;
-        evMsg.index = eventIt->index;
-        evMsg.param = eventIt->param;
-        evMsg.timeout = eventIt->timeout;
-        pendingList_.erase(eventIt);
-        mutexLock.unlock();
 
         if (evMsg.func != nullptr) {
             evMsg.func(evMsg.fd, 0, evMsg.param);
@@ -208,6 +215,12 @@ void HRilEvent::RemoveEventMessage(HRilEventMessage &eventMsg)
     EraseListenEvent(eventMsg, eventMsg.index);
 }
 
+void HRilEvent::CopyReadFds(fd_set *rfds)
+{
+    std::lock_guard<std::mutex> mutexLock(listLock_);
+    (void)memcpy_s(rfds, sizeof(fd_set), &readFds_, sizeof(fd_set));
+}
+
 void HRilEvent::EventMessageLoop()
 {
     int32_t ret;
@@ -217,9 +230,7 @@ void HRilEvent::EventMessageLoop()
 
     TELEPHONY_LOGD("****** EventMessageLoop start ******");
     while (1) {
-        std::unique_lock<std::mutex> mutexLock(listLock_);
-        (void)memcpy_s(&rfds, sizeof(fd_set), &readFds_, sizeof(fd_set));
-        mutexLock.unlock();
+        CopyReadFds(&rfds);
         if (!GetNextTimeOut(timeout)) {
             // Enter blocking wait without setting a timer.
             TELEPHONY_LOGD("Enter blocking wait without setting a timer.");
