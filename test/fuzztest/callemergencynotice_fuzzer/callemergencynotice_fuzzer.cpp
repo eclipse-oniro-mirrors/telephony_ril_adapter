@@ -34,16 +34,21 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     HRilErrNumber error = static_cast<HRilErrNumber>(size);
     HRilEmergencyInfo info;
-    info.index = static_cast<int32_t>(size);
-    info.total = static_cast<int32_t>(size);
+    int32_t offset = 0;
+    info.index = static_cast<int32_t>(*data + offset);
+    offset += sizeof(int32_t);
+    info.total = static_cast<int32_t>(*data + offset);
+    offset += sizeof(int32_t);
     info.eccNum = const_cast<char *>(NUMBER);
-    info.category = static_cast<int32_t>(size);
-    info.simpresent = static_cast<int32_t>(size);
+    info.category = static_cast<int32_t>(*data + offset);
+    offset += sizeof(int32_t);
+    info.simpresent = static_cast<int32_t>(*data + offset);
+    offset += sizeof(int32_t);
     info.mcc = const_cast<char *>(NUMBER);
-    info.abnormalService = static_cast<int32_t>(size);
+    info.abnormalService = static_cast<int32_t>(*data + offset);
     struct ReportInfo report;
     report.error = error;
     report.notifyId = HNOTI_CALL_EMERGENCY_NUMBER_REPORT;

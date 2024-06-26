@@ -34,11 +34,13 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     HRilSmsResponse response;
-    response.msgRef = static_cast<int32_t>(size);
+    int32_t offset = 0;
+    response.msgRef = static_cast<int32_t>(*data + offset);
+    offset += sizeof(int32_t);
     response.pdu = const_cast<char *>(NUMBER);
-    response.errCode = static_cast<int32_t>(size);
+    response.errCode = static_cast<int32_t>(*data + offset);
 
     struct ReportInfo report;
     report.error = static_cast<HRilErrNumber>(size);
