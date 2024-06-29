@@ -77,7 +77,7 @@ void HRilEvent::ProcessTimerList()
     }
 }
 
-bool HRilEvent::GetEventMessageFromPendingList(HRilEventMessage *eventMsg)
+bool HRilEvent::HasEventMessageFromPendingList(HRilEventMessage *eventMsg)
 {
     std::lock_guard<std::mutex> mutexLock(listLock_);
     std::list<HRilEventMessage>::iterator eventIt = pendingList_.begin();
@@ -96,11 +96,7 @@ bool HRilEvent::GetEventMessageFromPendingList(HRilEventMessage *eventMsg)
 void HRilEvent::ProcessPendingList()
 {
     HRilEventMessage evMsg = {};
-    while (1) {
-        if (!GetEventMessageFromPendingList(&evMsg)) {
-            break;
-        }
-
+    while (HasEventMessageFromPendingList(&evMsg)) {
         if (evMsg.func != nullptr) {
             evMsg.func(evMsg.fd, 0, evMsg.param);
         }
