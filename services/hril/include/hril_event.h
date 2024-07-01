@@ -57,6 +57,8 @@ private:
     void ProcessPendingList();
     void EraseListenEvent(HRilEventMessage &eventMsg, int32_t index);
     void ProcessEvents(fd_set *rfds, int32_t number);
+    bool HasEventMessageFromPendingList(HRilEventMessage *eventMsg);
+    void CopyReadFds(fd_set *rfds);
 
     std::mutex listLock_;
     std::list<HRilEventMessage> timerList_;

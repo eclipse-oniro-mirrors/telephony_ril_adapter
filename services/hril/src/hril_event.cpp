@@ -37,6 +37,7 @@ void HRilEvent::GetNowTime(struct timeval &tv)
 
 bool HRilEvent::GetNextTimeOut(struct timeval &tv)
 {
+    std::lock_guard<std::mutex> mutexLock(listLock_);
     std::list<HRilEventMessage>::iterator eventIt = timerList_.begin();
     if (eventIt == timerList_.end() || timerList_.empty()) {
         return false;
@@ -76,14 +77,29 @@ void HRilEvent::ProcessTimerList()
     }
 }
 
+bool HRilEvent::HasEventMessageFromPendingList(HRilEventMessage *eventMsg)
+{
+    std::lock_guard<std::mutex> mutexLock(listLock_);
+    std::list<HRilEventMessage>::iterator eventIt = pendingList_.begin();
+    if (eventIt == pendingList_.end()) {
+        return false;
+    }
+    eventMsg->fd = eventIt->fd;
+    eventMsg->func = eventIt->func;
+    eventMsg->index = eventIt->index;
+    eventMsg->param = eventIt->param;
+    eventMsg->timeout = eventIt->timeout;
+    pendingList_.erase(eventIt);
+    return true;
+}
+
 void HRilEvent::ProcessPendingList()
 {
-    std::list<HRilEventMessage>::iterator eventIt = pendingList_.begin();
-    while (eventIt != pendingList_.end()) {
-        if (eventIt->func != nullptr) {
-            eventIt->func(eventIt->fd, 0, eventIt->param);
+    HRilEventMessage evMsg = {};
+    while (HasEventMessageFromPendingList(&evMsg)) {
+        if (evMsg.func != nullptr) {
+            evMsg.func(evMsg.fd, 0, evMsg.param);
         }
-        eventIt = pendingList_.erase(eventIt);
     }
 }
 
@@ -111,6 +127,7 @@ void HRilEvent::ProcessEvents(fd_set *rfds, int32_t number)
     if (rfds == nullptr) {
         return;
     }
+    std::lock_guard<std::mutex> mutexLock(listLock_);
     auto it = listenEventTable_.begin();
     for (; (it != listenEventTable_.end()) && (number > 0); ++it) {
         if (*it != nullptr && FD_ISSET((*it)->fd, rfds)) {
@@ -125,6 +142,7 @@ void HRilEvent::ProcessEvents(fd_set *rfds, int32_t number)
 
 void HRilEvent::TimerEventInit()
 {
+    std::lock_guard<std::mutex> mutexLock(listLock_);
     FD_ZERO(&readFds_);
     timerList_.clear();
     pendingList_.clear();
@@ -193,6 +211,12 @@ void HRilEvent::RemoveEventMessage(HRilEventMessage &eventMsg)
     EraseListenEvent(eventMsg, eventMsg.index);
 }
 
+void HRilEvent::CopyReadFds(fd_set *rfds)
+{
+    std::lock_guard<std::mutex> mutexLock(listLock_);
+    (void)memcpy_s(rfds, sizeof(fd_set), &readFds_, sizeof(fd_set));
+}
+
 void HRilEvent::EventMessageLoop()
 {
     int32_t ret;
@@ -202,7 +226,7 @@ void HRilEvent::EventMessageLoop()
 
     TELEPHONY_LOGD("****** EventMessageLoop start ******");
     while (1) {
-        (void)memcpy_s(&rfds, sizeof(fd_set), &readFds_, sizeof(fd_set));
+        CopyReadFds(&rfds);
         if (!GetNextTimeOut(timeout)) {
             // Enter blocking wait without setting a timer.
             TELEPHONY_LOGD("Enter blocking wait without setting a timer.");
