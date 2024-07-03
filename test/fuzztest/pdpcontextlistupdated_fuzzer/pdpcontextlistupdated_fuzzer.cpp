@@ -38,23 +38,30 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
 
     HRilDataCallResponse response;
-    response.reason = static_cast<int32_t>(size) % REASON_TYPE;
-    response.retryTime = static_cast<int32_t>(size) % RETRY_TIME;
-    response.cid = static_cast<int32_t>(size);
-    response.active = static_cast<int32_t>(size) % ACTIVE_NUM;
+    int32_t offset = 0;
+    response.reason = static_cast<int32_t>(*data + offset) % REASON_TYPE;
+    offset += sizeof(int32_t);
+    response.retryTime = static_cast<int32_t>(*data + offset) % RETRY_TIME;
+    offset += sizeof(int32_t);
+    response.cid = static_cast<int32_t>(*data + offset);
+    offset += sizeof(int32_t);
+    response.active = static_cast<int32_t>(*data + offset) % ACTIVE_NUM;
+    offset += sizeof(int32_t);
     response.type = const_cast<char *>(NUMBER);
     response.netPortName = const_cast<char *>(NUMBER);
     response.address = const_cast<char *>(NUMBER);
     response.dns = const_cast<char *>(NUMBER);
     response.dnsSec = const_cast<char *>(NUMBER);
     response.gateway = const_cast<char *>(NUMBER);
-    response.maxTransferUnit = static_cast<int32_t>(size);
+    response.maxTransferUnit = static_cast<int32_t>(*data + offset);
+    offset += sizeof(int32_t);
     response.pCscfPrimAddr = const_cast<char *>(NUMBER);
     response.pCscfSecAddr = const_cast<char *>(NUMBER);
-    response.pduSessionId = static_cast<int32_t>(size);
+    response.pduSessionId = static_cast<int32_t>(*data + offset);
+    offset += sizeof(int32_t);
 
     struct ReportInfo report;
     report.error = static_cast<HRilErrNumber>(size);
@@ -63,10 +70,13 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     HRilManager::manager_->OnDataReport(slotId, &report, (const uint8_t *)&response, sizeof(HRilDataCallResponse));
 
     HRilDataLinkCapability linkCapability;
-    linkCapability.primaryDownlinkKbps = static_cast<int32_t>(size) * KILO_BIT;
-    linkCapability.primaryUplinkKbps = static_cast<int32_t>(size) * KILO_BIT;
-    linkCapability.secondaryDownlinkKbps = static_cast<int32_t>(size) * KILO_BIT;
-    linkCapability.secondaryUplinkKbps = static_cast<int32_t>(size) * KILO_BIT;
+    linkCapability.primaryDownlinkKbps = static_cast<int32_t>(*data + offset) * KILO_BIT;
+    offset += sizeof(int32_t);
+    linkCapability.primaryUplinkKbps = static_cast<int32_t>(*data + offset) * KILO_BIT;
+    offset += sizeof(int32_t);
+    linkCapability.secondaryDownlinkKbps = static_cast<int32_t>(*data + offset) * KILO_BIT;
+    offset += sizeof(int32_t);
+    linkCapability.secondaryUplinkKbps = static_cast<int32_t>(*data + offset) * KILO_BIT;
     report.notifyId = HNOTI_DATA_LINK_CAPABILITY_UPDATED;
     HRilManager::manager_->OnDataReport(
         slotId, &report, (const uint8_t *)&linkCapability, sizeof(HRilDataLinkCapability));

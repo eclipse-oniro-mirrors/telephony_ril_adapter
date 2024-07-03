@@ -34,9 +34,9 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     HRilUssdNoticeInfo info;
-    info.m = static_cast<int32_t>(size);
+    info.m = *(reinterpret_cast<const int32_t *>(data));
     info.str = const_cast<char *>(NUMBER);
     struct ReportInfo report;
     report.error = static_cast<HRilErrNumber>(size);
