@@ -59,7 +59,9 @@ public:
         int32_t serialId, const OHOS::HDI::Ril::V1_2::NcfgOperatorInfo &ncfgOperatorInfo);
 
 private:
-    void AddHandlerToMap();
+    void AddBasicHandlerToMap();
+    void AddSimLockHandlerToMap();
+    void AddStkHandlerToMap();
     void AddNotificationHandlerToMap();
     int32_t GetSimIOResponse(int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const void *response, size_t responseLen);

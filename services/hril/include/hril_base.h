@@ -93,14 +93,18 @@ protected:
         int32_t serial, int32_t requestId, ReqFuncSet reqFuncSet, FuncPointer func, ValueTypes &&... vals);
 
 protected:
-    std::map<uint32_t, std::any> respMemberFuncMap_;
-    std::map<uint32_t, std::any> notiMemberFuncMap_;
+    using RespFunc = std::function<int32_t(int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+        const void *response, size_t responseLen)>;
+    using NotiFunc =
+        std::function<int32_t(int32_t notifyType, HRilErrNumber error, const void *response, size_t responseLen)>;
+    std::map<uint32_t, RespFunc> respMemberFuncMap_;
+    std::map<uint32_t, NotiFunc> notiMemberFuncMap_;
     sptr<HDI::Ril::V1_3::IRilCallback> callback_ = nullptr;
 
 private:
     // Get the function pointer of the event handler.
     template<typename F>
-    F GetFunc(std::map<uint32_t, std::any> &funcs, uint32_t code);
+    F GetFunc(std::map<uint32_t, F> &funcs, uint32_t code);
 
 private:
     int32_t slotId_;
@@ -135,11 +139,11 @@ int32_t HRilBase::RequestVendor(
 }
 
 template<typename F>
-F HRilBase::GetFunc(std::map<uint32_t, std::any> &funcs, uint32_t code)
+F HRilBase::GetFunc(std::map<uint32_t, F> &funcs, uint32_t code)
 {
     auto itFunc = funcs.find(code);
     if (itFunc != funcs.end()) {
-        return std::any_cast<F>(itFunc->second);
+        return itFunc->second;
     }
     if (code != HNOTI_NETWORK_RESTRICTED_STATE_UPDATED) {
         TELEPHONY_LOGE("Can not find Request code in func map: %{public}d", code);
@@ -151,11 +155,9 @@ template<typename T>
 int32_t HRilBase::ProcessResponse(
     int32_t code, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    using RespFunc = int32_t (T::*)(int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo & responseInfo,
-        const void *response, size_t responseLen);
     auto func = GetFunc<RespFunc>(respMemberFuncMap_, code);
     if (func != nullptr) {
-        return (static_cast<T *>(this)->*func)(code, responseInfo, response, responseLen);
+        return func(code, responseInfo, response, responseLen);
     }
     return HRIL_ERR_INVALID_PARAMETER;
 }
@@ -167,12 +169,11 @@ int32_t HRilBase::ProcessNotify(
     if (reportInfo == nullptr) {
         return HRIL_ERR_INVALID_PARAMETER;
     }
-    using NotiFunc = int32_t (T::*)(int32_t notifyType, HRilErrNumber error, const void *response, size_t responseLen);
     int32_t code = reportInfo->notifyId;
     HRilErrNumber error = (HRilErrNumber)reportInfo->error;
     auto func = GetFunc<NotiFunc>(notiMemberFuncMap_, code);
     if (func != nullptr) {
-        return (static_cast<T *>(this)->*func)(notifyType, error, response, responseLen);
+        return func(notifyType, error, response, responseLen);
     }
     return HRIL_ERR_INVALID_PARAMETER;
 }

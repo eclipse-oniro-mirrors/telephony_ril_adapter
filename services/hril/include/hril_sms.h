@@ -86,6 +86,7 @@ public:
 
 private:
     void AddHandlerToMap();
+    void AddNotificationToMap();
     bool IsSmsResponse(uint32_t code);
     bool IsSmsNotification(uint32_t code);
     int32_t RequestWithInts(int32_t **p, ReqDataInfo *requestInfo, int32_t argCount, ...);

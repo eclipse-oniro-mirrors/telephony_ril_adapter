@@ -22,7 +22,9 @@ namespace Telephony {
 HRilSim::HRilSim(int32_t slotId) : HRilBase(slotId)
 {
     AddNotificationHandlerToMap();
-    AddHandlerToMap();
+    AddBasicHandlerToMap();
+    AddSimLockHandlerToMap();
+    AddStkHandlerToMap();
 }
 
 bool HRilSim::IsSimRespOrNotify(uint32_t code)
@@ -35,47 +37,123 @@ void HRilSim::RegisterSimFuncs(const HRilSimReq *simFuncs)
     simFuncs_ = simFuncs;
 }
 
-void HRilSim::AddHandlerToMap()
+void HRilSim::AddBasicHandlerToMap()
 {
     // response
-    respMemberFuncMap_[HREQ_SIM_GET_SIM_IO] = &HRilSim::GetSimIOResponse;
-    respMemberFuncMap_[HREQ_SIM_GET_SIM_STATUS] = &HRilSim::GetSimCardStatusResponse;
-    respMemberFuncMap_[HREQ_SIM_GET_IMSI] = &HRilSim::GetImsiResponse;
-    respMemberFuncMap_[HREQ_SIM_GET_SIM_LOCK_STATUS] = &HRilSim::GetSimLockStatusResponse;
-    respMemberFuncMap_[HREQ_SIM_SET_SIM_LOCK] = &HRilSim::SetSimLockResponse;
-    respMemberFuncMap_[HREQ_SIM_CHANGE_SIM_PASSWORD] = &HRilSim::ChangeSimPasswordResponse;
-    respMemberFuncMap_[HREQ_SIM_UNLOCK_PIN] = &HRilSim::UnlockPinResponse;
-    respMemberFuncMap_[HREQ_SIM_UNLOCK_PUK] = &HRilSim::UnlockPukResponse;
-    respMemberFuncMap_[HREQ_SIM_UNLOCK_PIN2] = &HRilSim::UnlockPin2Response;
-    respMemberFuncMap_[HREQ_SIM_UNLOCK_PUK2] = &HRilSim::UnlockPuk2Response;
-    respMemberFuncMap_[HREQ_SIM_SET_ACTIVE_SIM] = &HRilSim::SetActiveSimResponse;
-    respMemberFuncMap_[HREQ_SIM_STK_SEND_TERMINAL_RESPONSE] = &HRilSim::SimStkSendTerminalResponseResponse;
-    respMemberFuncMap_[HREQ_SIM_STK_SEND_ENVELOPE] = &HRilSim::SimStkSendEnvelopeResponse;
-    respMemberFuncMap_[HREQ_SIM_STK_SEND_CALL_SETUP_REQUEST_RESULT] =
-        &HRilSim::SimStkSendCallSetupRequestResultResponse;
-    respMemberFuncMap_[HREQ_SIM_STK_IS_READY] = &HRilSim::SimStkIsReadyResponse;
-    respMemberFuncMap_[HREQ_SIM_GET_RADIO_PROTOCOL] = &HRilSim::GetRadioProtocolResponse;
-    respMemberFuncMap_[HREQ_SIM_SET_RADIO_PROTOCOL] = &HRilSim::SetRadioProtocolResponse;
-    respMemberFuncMap_[HREQ_SIM_OPEN_LOGICAL_CHANNEL] = &HRilSim::SimOpenLogicalChannelResponse;
-    respMemberFuncMap_[HREQ_SIM_CLOSE_LOGICAL_CHANNEL] = &HRilSim::SimCloseLogicalChannelResponse;
-    respMemberFuncMap_[HREQ_SIM_TRANSMIT_APDU_LOGICAL_CHANNEL] = &HRilSim::SimTransmitApduLogicalChannelResponse;
-    respMemberFuncMap_[HREQ_SIM_TRANSMIT_APDU_BASIC_CHANNEL] = &HRilSim::SimTransmitApduBasicChannelResponse;
-    respMemberFuncMap_[HREQ_SIM_AUTHENTICATION] = &HRilSim::SimAuthenticationResponse;
-    respMemberFuncMap_[HREQ_SIM_UNLOCK_SIM_LOCK] = &HRilSim::UnlockSimLockResponse;
-    respMemberFuncMap_[HREQ_SIM_SEND_NCFG_OPER_INFO] = &HRilSim::SendSimMatchedOperatorInfoResponse;
+    respMemberFuncMap_[HREQ_SIM_GET_SIM_IO] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return GetSimIOResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_SIM_GET_SIM_STATUS] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return GetSimCardStatusResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_SIM_GET_IMSI] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return GetImsiResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_SIM_SET_ACTIVE_SIM] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return SetActiveSimResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_SIM_GET_RADIO_PROTOCOL] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return GetRadioProtocolResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_SIM_SET_RADIO_PROTOCOL] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return SetRadioProtocolResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_SIM_OPEN_LOGICAL_CHANNEL] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return SimOpenLogicalChannelResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_SIM_CLOSE_LOGICAL_CHANNEL] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return SimCloseLogicalChannelResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_SIM_TRANSMIT_APDU_LOGICAL_CHANNEL] = [this](int32_t requestNum,
+        HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen) {
+        return SimTransmitApduLogicalChannelResponse(requestNum, responseInfo, response, responseLen);
+    };
+    respMemberFuncMap_[HREQ_SIM_TRANSMIT_APDU_BASIC_CHANNEL] = [this](int32_t requestNum,
+        HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen) {
+        return SimTransmitApduBasicChannelResponse(requestNum, responseInfo, response, responseLen);
+    };
+    respMemberFuncMap_[HREQ_SIM_SEND_NCFG_OPER_INFO] = [this](int32_t requestNum,
+        HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen) {
+        return SendSimMatchedOperatorInfoResponse(requestNum, responseInfo, response, responseLen);
+    };
+}
+
+void HRilSim::AddSimLockHandlerToMap()
+{
+    respMemberFuncMap_[HREQ_SIM_GET_SIM_LOCK_STATUS] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return GetSimLockStatusResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_SIM_SET_SIM_LOCK] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return SetSimLockResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_SIM_CHANGE_SIM_PASSWORD] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return ChangeSimPasswordResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_SIM_UNLOCK_PIN] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return UnlockPinResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_SIM_UNLOCK_PUK] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return UnlockPukResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_SIM_UNLOCK_PIN2] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return UnlockPin2Response(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_SIM_UNLOCK_PUK2] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return UnlockPuk2Response(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_SIM_AUTHENTICATION] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return SimAuthenticationResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_SIM_UNLOCK_SIM_LOCK] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return UnlockSimLockResponse(requestNum, responseInfo, response, responseLen); };
+}
+
+void HRilSim::AddStkHandlerToMap()
+{
+    respMemberFuncMap_[HREQ_SIM_STK_SEND_TERMINAL_RESPONSE] = [this](int32_t requestNum,
+        HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen) {
+        return SimStkSendTerminalResponseResponse(requestNum, responseInfo, response, responseLen);
+    };
+    respMemberFuncMap_[HREQ_SIM_STK_SEND_ENVELOPE] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return SimStkSendEnvelopeResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_SIM_STK_SEND_CALL_SETUP_REQUEST_RESULT] = [this](int32_t requestNum,
+        HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen) {
+        return SimStkSendCallSetupRequestResultResponse(requestNum, responseInfo, response, responseLen);
+    };
+    respMemberFuncMap_[HREQ_SIM_STK_IS_READY] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return SimStkIsReadyResponse(requestNum, responseInfo, response, responseLen); };
 }
 
 void HRilSim::AddNotificationHandlerToMap()
 {
     // Notification
-    notiMemberFuncMap_[HNOTI_SIM_STATUS_CHANGED] = &HRilSim::SimStateUpdated;
-    notiMemberFuncMap_[HNOTI_SIM_STK_SESSION_END_NOTIFY] = &HRilSim::SimStkSessionEndNotify;
-    notiMemberFuncMap_[HNOTI_SIM_STK_PROACTIVE_NOTIFY] = &HRilSim::SimStkProactiveNotify;
-    notiMemberFuncMap_[HNOTI_SIM_STK_ALPHA_NOTIFY] = &HRilSim::SimStkAlphaNotify;
-    notiMemberFuncMap_[HNOTI_SIM_STK_EVENT_NOTIFY] = &HRilSim::SimStkEventNotify;
-    notiMemberFuncMap_[HNOTI_SIM_STK_CALL_SETUP_NOTIFY] = &HRilSim::SimStkCallSetupNotify;
-    notiMemberFuncMap_[HNOTI_SIM_REFRESH_NOTIFY] = &HRilSim::SimRefreshNotify;
-    notiMemberFuncMap_[HNOTI_SIM_RADIO_PROTOCOL_UPDATED] = &HRilSim::SimRadioProtocolUpdated;
+    notiMemberFuncMap_[HNOTI_SIM_STATUS_CHANGED] =
+        [this](int32_t notifyType, HRilErrNumber error, const void *response,
+        size_t responseLen) { return SimStateUpdated(notifyType, error, response, responseLen); };
+    notiMemberFuncMap_[HNOTI_SIM_STK_SESSION_END_NOTIFY] =
+        [this](int32_t notifyType, HRilErrNumber error, const void *response,
+        size_t responseLen) { return SimStkSessionEndNotify(notifyType, error, response, responseLen); };
+    notiMemberFuncMap_[HNOTI_SIM_STK_PROACTIVE_NOTIFY] =
+        [this](int32_t notifyType, HRilErrNumber error, const void *response,
+        size_t responseLen) { return SimStkProactiveNotify(notifyType, error, response, responseLen); };
+    notiMemberFuncMap_[HNOTI_SIM_STK_ALPHA_NOTIFY] =
+        [this](int32_t notifyType, HRilErrNumber error, const void *response,
+        size_t responseLen) { return SimStkAlphaNotify(notifyType, error, response, responseLen); };
+    notiMemberFuncMap_[HNOTI_SIM_STK_EVENT_NOTIFY] =
+        [this](int32_t notifyType, HRilErrNumber error, const void *response,
+        size_t responseLen) { return SimStkEventNotify(notifyType, error, response, responseLen); };
+    notiMemberFuncMap_[HNOTI_SIM_STK_CALL_SETUP_NOTIFY] =
+        [this](int32_t notifyType, HRilErrNumber error, const void *response,
+        size_t responseLen) { return SimStkCallSetupNotify(notifyType, error, response, responseLen); };
+    notiMemberFuncMap_[HNOTI_SIM_REFRESH_NOTIFY] =
+        [this](int32_t notifyType, HRilErrNumber error, const void *response,
+        size_t responseLen) { return SimRefreshNotify(notifyType, error, response, responseLen); };
+    notiMemberFuncMap_[HNOTI_SIM_RADIO_PROTOCOL_UPDATED] =
+        [this](int32_t notifyType, HRilErrNumber error, const void *response,
+        size_t responseLen) { return SimRadioProtocolUpdated(notifyType, error, response, responseLen); };
 }
 
 int32_t HRilSim::GetSimIO(int32_t serialId, const OHOS::HDI::Ril::V1_1::SimIoRequestInfo &simIO)

@@ -23,7 +23,9 @@ namespace Telephony {
 HRilCall::HRilCall(int32_t slotId) : HRilBase(slotId)
 {
     AddCallNotificationToMap();
-    AddCallResponseToMap();
+    AddCallBasicResponseToMap();
+    AddCallSupplementResponseToMap();
+    AddCallAdditionalResponseToMap();
 }
 
 HRilCall::~HRilCall()
@@ -49,54 +51,148 @@ bool HRilCall::IsCallRespOrNotify(uint32_t code)
 void HRilCall::AddCallNotificationToMap()
 {
     // Notification
-    notiMemberFuncMap_[HNOTI_CALL_STATE_UPDATED] = &HRilCall::CallStateUpdated;
-    notiMemberFuncMap_[HNOTI_CALL_USSD_REPORT] = &HRilCall::CallUssdNotice;
-    notiMemberFuncMap_[HNOTI_CALL_SRVCC_STATUS_REPORT] = &HRilCall::CallSrvccStatusNotice;
-    notiMemberFuncMap_[HNOTI_CALL_RINGBACK_VOICE_REPORT] = &HRilCall::CallRingbackVoiceNotice;
-    notiMemberFuncMap_[HNOTI_CALL_EMERGENCY_NUMBER_REPORT] = &HRilCall::CallEmergencyNotice;
-    notiMemberFuncMap_[HNOTI_CALL_SS_REPORT] = &HRilCall::CallSsNotice;
-    notiMemberFuncMap_[HNOTI_CALL_RSRVCC_STATUS_REPORT] = &HRilCall::CallRsrvccStatusNotify;
+    notiMemberFuncMap_[HNOTI_CALL_STATE_UPDATED] =
+        [this](int32_t notifyType, HRilErrNumber error, const void *response,
+        size_t responseLen) { return CallStateUpdated(notifyType, error, response, responseLen); };
+    notiMemberFuncMap_[HNOTI_CALL_USSD_REPORT] =
+        [this](int32_t notifyType, HRilErrNumber error, const void *response,
+        size_t responseLen) { return CallUssdNotice(notifyType, error, response, responseLen); };
+    notiMemberFuncMap_[HNOTI_CALL_SRVCC_STATUS_REPORT] =
+        [this](int32_t notifyType, HRilErrNumber error, const void *response,
+        size_t responseLen) { return CallSrvccStatusNotice(notifyType, error, response, responseLen); };
+    notiMemberFuncMap_[HNOTI_CALL_RINGBACK_VOICE_REPORT] =
+        [this](int32_t notifyType, HRilErrNumber error, const void *response,
+        size_t responseLen) { return CallRingbackVoiceNotice(notifyType, error, response, responseLen); };
+    notiMemberFuncMap_[HNOTI_CALL_EMERGENCY_NUMBER_REPORT] =
+        [this](int32_t notifyType, HRilErrNumber error, const void *response,
+        size_t responseLen) { return CallEmergencyNotice(notifyType, error, response, responseLen); };
+    notiMemberFuncMap_[HNOTI_CALL_SS_REPORT] =
+        [this](int32_t notifyType, HRilErrNumber error, const void *response,
+        size_t responseLen) { return CallSsNotice(notifyType, error, response, responseLen); };
+    notiMemberFuncMap_[HNOTI_CALL_RSRVCC_STATUS_REPORT] =
+        [this](int32_t notifyType, HRilErrNumber error, const void *response,
+        size_t responseLen) { return CallRsrvccStatusNotify(notifyType, error, response, responseLen); };
 }
 
-void HRilCall::AddCallResponseToMap()
+void HRilCall::AddCallBasicResponseToMap()
 {
     // Response
-    respMemberFuncMap_[HREQ_CALL_GET_CALL_LIST] = &HRilCall::GetCallListResponse;
-    respMemberFuncMap_[HREQ_CALL_DIAL] = &HRilCall::DialResponse;
-    respMemberFuncMap_[HREQ_CALL_HANGUP] = &HRilCall::HangupResponse;
-    respMemberFuncMap_[HREQ_CALL_REJECT] = &HRilCall::RejectResponse;
-    respMemberFuncMap_[HREQ_CALL_ANSWER] = &HRilCall::AnswerResponse;
-    respMemberFuncMap_[HREQ_CALL_HOLD_CALL] = &HRilCall::HoldCallResponse;
-    respMemberFuncMap_[HREQ_CALL_UNHOLD_CALL] = &HRilCall::UnHoldCallResponse;
-    respMemberFuncMap_[HREQ_CALL_SWITCH_CALL] = &HRilCall::SwitchCallResponse;
-    respMemberFuncMap_[HREQ_CALL_GET_CLIP] = &HRilCall::GetClipResponse;
-    respMemberFuncMap_[HREQ_CALL_SET_CLIP] = &HRilCall::SetClipResponse;
-    respMemberFuncMap_[HREQ_CALL_COMBINE_CONFERENCE] = &HRilCall::CombineConferenceResponse;
-    respMemberFuncMap_[HREQ_CALL_SEPARATE_CONFERENCE] = &HRilCall::SeparateConferenceResponse;
-    respMemberFuncMap_[HREQ_CALL_CALL_SUPPLEMENT] = &HRilCall::CallSupplementResponse;
-    respMemberFuncMap_[HREQ_CALL_GET_CALL_WAITING] = &HRilCall::GetCallWaitingResponse;
-    respMemberFuncMap_[HREQ_CALL_SET_CALL_WAITING] = &HRilCall::SetCallWaitingResponse;
-    respMemberFuncMap_[HREQ_CALL_GET_CALL_TRANSFER_INFO] = &HRilCall::GetCallTransferInfoResponse;
-    respMemberFuncMap_[HREQ_CALL_SET_CALL_TRANSFER_INFO] = &HRilCall::SetCallTransferInfoResponse;
-    respMemberFuncMap_[HREQ_CALL_GET_CALL_RESTRICTION] = &HRilCall::GetCallRestrictionResponse;
-    respMemberFuncMap_[HREQ_CALL_SET_CALL_RESTRICTION] = &HRilCall::SetCallRestrictionResponse;
-    respMemberFuncMap_[HREQ_CALL_GET_CLIR] = &HRilCall::GetClirResponse;
-    respMemberFuncMap_[HREQ_CALL_SET_CLIR] = &HRilCall::SetClirResponse;
-    respMemberFuncMap_[HREQ_CALL_START_DTMF] = &HRilCall::StartDtmfResponse;
-    respMemberFuncMap_[HREQ_CALL_SEND_DTMF] = &HRilCall::SendDtmfResponse;
-    respMemberFuncMap_[HREQ_CALL_STOP_DTMF] = &HRilCall::StopDtmfResponse;
-    respMemberFuncMap_[HREQ_CALL_GET_CALL_PREFERENCE] = &HRilCall::GetCallPreferenceModeResponse;
-    respMemberFuncMap_[HREQ_CALL_SET_CALL_PREFERENCE] = &HRilCall::SetCallPreferenceModeResponse;
-    respMemberFuncMap_[HREQ_CALL_SET_USSD] = &HRilCall::SetUssdResponse;
-    respMemberFuncMap_[HREQ_CALL_GET_USSD] = &HRilCall::GetUssdResponse;
-    respMemberFuncMap_[HREQ_CALL_SET_MUTE] = &HRilCall::SetMuteResponse;
-    respMemberFuncMap_[HREQ_CALL_GET_MUTE] = &HRilCall::GetMuteResponse;
-    respMemberFuncMap_[HREQ_CALL_GET_EMERGENCY_LIST] = &HRilCall::GetEmergencyCallListResponse;
-    respMemberFuncMap_[HREQ_CALL_SET_EMERGENCY_LIST] = &HRilCall::SetEmergencyCallListResponse;
-    respMemberFuncMap_[HREQ_CALL_GET_FAIL_REASON] = &HRilCall::GetCallFailReasonResponse;
-    respMemberFuncMap_[HREQ_CALL_SET_BARRING_PASSWORD] = &HRilCall::SetBarringPasswordResponse;
-    respMemberFuncMap_[HREQ_CALL_CLOSE_UNFINISHED_USSD] = &HRilCall::CloseUnFinishedUssdResponse;
-    respMemberFuncMap_[HREQ_SET_VONR_SWITCH] = &HRilCall::SetVonrSwitchResponse;
+    respMemberFuncMap_[HREQ_CALL_GET_CALL_LIST] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return GetCallListResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_CALL_DIAL] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return DialResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_CALL_HANGUP] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return HangupResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_CALL_REJECT] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return RejectResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_CALL_ANSWER] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return AnswerResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_CALL_HOLD_CALL] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return HoldCallResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_CALL_UNHOLD_CALL] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return UnHoldCallResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_CALL_SWITCH_CALL] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return SwitchCallResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_CALL_COMBINE_CONFERENCE] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return CombineConferenceResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_CALL_SEPARATE_CONFERENCE] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return SeparateConferenceResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_CALL_GET_EMERGENCY_LIST] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return GetEmergencyCallListResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_CALL_SET_EMERGENCY_LIST] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return SetEmergencyCallListResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_CALL_GET_FAIL_REASON] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return GetCallFailReasonResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_CALL_SET_BARRING_PASSWORD] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return SetBarringPasswordResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_CALL_CLOSE_UNFINISHED_USSD] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return CloseUnFinishedUssdResponse(requestNum, responseInfo, response, responseLen); };
+}
+
+void HRilCall::AddCallSupplementResponseToMap()
+{
+    respMemberFuncMap_[HREQ_CALL_GET_CLIP] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return GetClipResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_CALL_SET_CLIP] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return SetClipResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_CALL_CALL_SUPPLEMENT] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return CallSupplementResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_CALL_GET_CALL_WAITING] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return GetCallWaitingResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_CALL_SET_CALL_WAITING] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return SetCallWaitingResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_CALL_GET_CALL_TRANSFER_INFO] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return GetCallTransferInfoResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_CALL_SET_CALL_TRANSFER_INFO] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return SetCallTransferInfoResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_CALL_GET_CALL_RESTRICTION] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return GetCallRestrictionResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_CALL_SET_CALL_RESTRICTION] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return SetCallRestrictionResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_CALL_GET_CLIR] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return GetClirResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_CALL_SET_CLIR] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return SetClirResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_CALL_GET_CALL_PREFERENCE] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return GetCallPreferenceModeResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_CALL_SET_CALL_PREFERENCE] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return SetCallPreferenceModeResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_CALL_SET_USSD] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return SetUssdResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_CALL_GET_USSD] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return GetUssdResponse(requestNum, responseInfo, response, responseLen); };
+}
+
+void HRilCall::AddCallAdditionalResponseToMap()
+{
+    respMemberFuncMap_[HREQ_CALL_START_DTMF] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return StartDtmfResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_CALL_SEND_DTMF] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return SendDtmfResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_CALL_STOP_DTMF] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return StopDtmfResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_CALL_SET_MUTE] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return SetMuteResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_CALL_GET_MUTE] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return GetMuteResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_SET_VONR_SWITCH] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return SetVonrSwitchResponse(requestNum, responseInfo, response, responseLen); };
 }
 
 int32_t HRilCall::GetCallList(int32_t serialId)
