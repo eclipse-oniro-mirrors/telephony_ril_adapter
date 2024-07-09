@@ -84,8 +84,8 @@ std::shared_ptr<HRilTimerCallbackMessage> HRilTimerCallback::HRilSetTimerCallbac
     }
 
     HRilEventMessage eventMsg = { 0 };
-    auto funcCallback = std::bind(
-        &HRilTimerCallback::TimerCallback, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    auto funcCallback =
+        [this](int32_t fd, int16_t events, std::shared_ptr<void> param) { this->TimerCallback(fd, events, param); };
     event_->SetTimerEvent(eventMsg, event_->IVNALID_FD, false, funcCallback, pCbMsg);
     event_->AddTimerEvent(eventMsg, timeout);
     OnTriggerEvent();
@@ -110,8 +110,8 @@ void HRilTimerCallback::EventLoop()
     triggerWriteFd_ = pipedes[1];
 
     fcntl(triggerReadFd_, F_SETFL, O_NONBLOCK);
-    auto func = std::bind(&HRilTimerCallback::FdTriggerCallback, this, std::placeholders::_1, std::placeholders::_2,
-        std::placeholders::_3);
+    auto func =
+        [this](int32_t fd, int16_t events, std::shared_ptr<void> param) { this->FdTriggerCallback(fd, events, param); };
     event_->SetTimerEvent(fdTriggerEvent_, triggerReadFd_, true, func, NULL);
     event_->AddEventMessage(fdTriggerEvent_);
     event_->EventMessageLoop();

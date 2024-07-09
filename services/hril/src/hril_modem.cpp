@@ -248,18 +248,41 @@ bool HRilModem::IsModemRespOrNotify(uint32_t code)
 void HRilModem::AddHandlerToMap()
 {
     // indication
-    notiMemberFuncMap_[HNOTI_MODEM_RADIO_STATE_UPDATED] = &HRilModem::RadioStateUpdated;
-    notiMemberFuncMap_[HNOTI_MODEM_VOICE_TECH_UPDATED] = &HRilModem::VoiceRadioTechUpdated;
-    notiMemberFuncMap_[HNOTI_MODEM_DSDS_MODE_UPDATED] = &HRilModem::DsdsModeUpdated;
+    notiMemberFuncMap_[HNOTI_MODEM_RADIO_STATE_UPDATED] =
+        [this](int32_t notifyType, HRilErrNumber error, const void *response,
+        size_t responseLen) { return RadioStateUpdated(notifyType, error, response, responseLen); };
+    notiMemberFuncMap_[HNOTI_MODEM_VOICE_TECH_UPDATED] =
+        [this](int32_t notifyType, HRilErrNumber error, const void *response,
+        size_t responseLen) { return VoiceRadioTechUpdated(notifyType, error, response, responseLen); };
+    notiMemberFuncMap_[HNOTI_MODEM_DSDS_MODE_UPDATED] =
+        [this](int32_t notifyType, HRilErrNumber error, const void *response,
+        size_t responseLen) { return DsdsModeUpdated(notifyType, error, response, responseLen); };
     // response
-    respMemberFuncMap_[HREQ_MODEM_SHUT_DOWN] = &HRilModem::ShutDownResponse;
-    respMemberFuncMap_[HREQ_MODEM_SET_RADIO_STATUS] = &HRilModem::SetRadioStateResponse;
-    respMemberFuncMap_[HREQ_MODEM_GET_RADIO_STATUS] = &HRilModem::GetRadioStateResponse;
-    respMemberFuncMap_[HREQ_MODEM_GET_IMEI] = &HRilModem::GetImeiResponse;
-    respMemberFuncMap_[HREQ_MODEM_GET_IMEISV] = &HRilModem::GetImeiSvResponse;
-    respMemberFuncMap_[HREQ_MODEM_GET_MEID] = &HRilModem::GetMeidResponse;
-    respMemberFuncMap_[HREQ_MODEM_GET_VOICE_RADIO] = &HRilModem::GetVoiceRadioTechnologyResponse;
-    respMemberFuncMap_[HREQ_MODEM_GET_BASEBAND_VERSION] = &HRilModem::GetBasebandVersionResponse;
+    respMemberFuncMap_[HREQ_MODEM_SHUT_DOWN] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return ShutDownResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_MODEM_SET_RADIO_STATUS] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return SetRadioStateResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_MODEM_GET_RADIO_STATUS] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return GetRadioStateResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_MODEM_GET_IMEI] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return GetImeiResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_MODEM_GET_IMEISV] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return GetImeiSvResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_MODEM_GET_MEID] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return GetMeidResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_MODEM_GET_VOICE_RADIO] = [this](int32_t requestNum,
+        HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen) {
+        return GetVoiceRadioTechnologyResponse(requestNum, responseInfo, response, responseLen);
+    };
+    respMemberFuncMap_[HREQ_MODEM_GET_BASEBAND_VERSION] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return GetBasebandVersionResponse(requestNum, responseInfo, response, responseLen); };
 }
 
 void HRilModem::RegisterModemFuncs(const HRilModemReq *modemFuncs)

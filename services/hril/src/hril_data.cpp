@@ -48,19 +48,44 @@ bool HRilData::IsDataRespOrNotify(uint32_t code)
 void HRilData::AddHandlerToMap()
 {
     // Notification
-    notiMemberFuncMap_[HNOTI_DATA_PDP_CONTEXT_LIST_UPDATED] = &HRilData::PdpContextListUpdated;
-    notiMemberFuncMap_[HNOTI_DATA_LINK_CAPABILITY_UPDATED] = &HRilData::DataLinkCapabilityUpdated;
+    notiMemberFuncMap_[HNOTI_DATA_PDP_CONTEXT_LIST_UPDATED] =
+        [this](int32_t notifyType, HRilErrNumber error, const void *response,
+        size_t responseLen) { return PdpContextListUpdated(notifyType, error, response, responseLen); };
+    notiMemberFuncMap_[HNOTI_DATA_LINK_CAPABILITY_UPDATED] =
+        [this](int32_t notifyType, HRilErrNumber error, const void *response,
+        size_t responseLen) { return DataLinkCapabilityUpdated(notifyType, error, response, responseLen); };
     // response
-    respMemberFuncMap_[HREQ_DATA_SET_INIT_APN_INFO] = &HRilData::SetInitApnInfoResponse;
-    respMemberFuncMap_[HREQ_DATA_SET_DATA_PROFILE_INFO] = &HRilData::SetDataProfileInfoResponse;
-    respMemberFuncMap_[HREQ_DATA_ACTIVATE_PDP_CONTEXT] = &HRilData::ActivatePdpContextResponse;
-    respMemberFuncMap_[HREQ_DATA_DEACTIVATE_PDP_CONTEXT] = &HRilData::DeactivatePdpContextResponse;
-    respMemberFuncMap_[HREQ_DATA_GET_PDP_CONTEXT_LIST] = &HRilData::GetPdpContextListResponse;
-    respMemberFuncMap_[HREQ_DATA_GET_LINK_BANDWIDTH_INFO] = &HRilData::GetLinkBandwidthInfoResponse;
-    respMemberFuncMap_[HREQ_DATA_SET_LINK_BANDWIDTH_REPORTING_RULE] = &HRilData::SetLinkBandwidthReportingRuleResponse;
-    respMemberFuncMap_[HREQ_DATA_SET_DATA_PERMITTED] = &HRilData::SetDataPermittedResponse;
-    respMemberFuncMap_[HREQ_DATA_GET_LINK_CAPABILITY] = &HRilData::GetLinkCapabilityResponse;
-    respMemberFuncMap_[HREQ_DATA_CLEAN_ALL_CONNECTIONS] = &HRilData::CleanAllConnectionsResponse;
+    respMemberFuncMap_[HREQ_DATA_SET_INIT_APN_INFO] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return SetInitApnInfoResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_DATA_SET_DATA_PROFILE_INFO] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return SetDataProfileInfoResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_DATA_ACTIVATE_PDP_CONTEXT] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return ActivatePdpContextResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_DATA_DEACTIVATE_PDP_CONTEXT] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return DeactivatePdpContextResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_DATA_GET_PDP_CONTEXT_LIST] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return GetPdpContextListResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_DATA_GET_LINK_BANDWIDTH_INFO] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return GetLinkBandwidthInfoResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_DATA_SET_LINK_BANDWIDTH_REPORTING_RULE] = [this](int32_t requestNum,
+        HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen) {
+        return SetLinkBandwidthReportingRuleResponse(requestNum, responseInfo, response, responseLen);
+    };
+    respMemberFuncMap_[HREQ_DATA_SET_DATA_PERMITTED] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return SetDataPermittedResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_DATA_GET_LINK_CAPABILITY] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return GetLinkCapabilityResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_DATA_CLEAN_ALL_CONNECTIONS] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return CleanAllConnectionsResponse(requestNum, responseInfo, response, responseLen); };
 }
 
 void HRilData::SwitchRilDataToHal(const HRilDataCallResponse *response, HDI::Ril::V1_1::SetupDataCallResultInfo &result)

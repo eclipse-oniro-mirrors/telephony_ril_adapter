@@ -41,6 +41,7 @@ constexpr const char *COMMA_STR = ",";
 HRilSms::HRilSms(int32_t slotId) : HRilBase(slotId)
 {
     AddHandlerToMap();
+    AddNotificationToMap();
 }
 
 bool HRilSms::IsSmsRespOrNotify(uint32_t code)
@@ -56,29 +57,74 @@ void HRilSms::RegisterSmsFuncs(const HRilSmsReq *smsFuncs)
 void HRilSms::AddHandlerToMap()
 {
     // Response
-    respMemberFuncMap_[HREQ_SMS_SEND_GSM_SMS] = &HRilSms::SendGsmSmsResponse;
-    respMemberFuncMap_[HREQ_SMS_SEND_SMS_MORE_MODE] = &HRilSms::SendSmsMoreModeResponse;
-    respMemberFuncMap_[HREQ_SMS_SEND_SMS_ACK] = &HRilSms::SendSmsAckResponse;
-    respMemberFuncMap_[HREQ_SMS_ADD_SIM_MESSAGE] = &HRilSms::AddSimMessageResponse;
-    respMemberFuncMap_[HREQ_SMS_DEL_SIM_MESSAGE] = &HRilSms::DelSimMessageResponse;
-    respMemberFuncMap_[HREQ_SMS_UPDATE_SIM_MESSAGE] = &HRilSms::UpdateSimMessageResponse;
-    respMemberFuncMap_[HREQ_SMS_SET_SMSC_ADDR] = &HRilSms::SetSmscAddrResponse;
-    respMemberFuncMap_[HREQ_SMS_GET_SMSC_ADDR] = &HRilSms::GetSmscAddrResponse;
-    respMemberFuncMap_[HREQ_SMS_SET_CB_CONFIG] = &HRilSms::SetCBConfigResponse;
-    respMemberFuncMap_[HREQ_SMS_GET_CB_CONFIG] = &HRilSms::GetCBConfigResponse;
-    respMemberFuncMap_[HREQ_SMS_GET_CDMA_CB_CONFIG] = &HRilSms::GetCdmaCBConfigResponse;
-    respMemberFuncMap_[HREQ_SMS_SET_CDMA_CB_CONFIG] = &HRilSms::SetCdmaCBConfigResponse;
-    respMemberFuncMap_[HREQ_SMS_SEND_CDMA_SMS] = &HRilSms::SendCdmaSmsResponse;
-    respMemberFuncMap_[HREQ_SMS_ADD_CDMA_SIM_MESSAGE] = &HRilSms::AddCdmaSimMessageResponse;
-    respMemberFuncMap_[HREQ_SMS_DEL_CDMA_SIM_MESSAGE] = &HRilSms::DelCdmaSimMessageResponse;
-    respMemberFuncMap_[HREQ_SMS_UPDATE_CDMA_SIM_MESSAGE] = &HRilSms::UpdateCdmaSimMessageResponse;
+    respMemberFuncMap_[HREQ_SMS_SEND_GSM_SMS] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return SendGsmSmsResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_SMS_SEND_SMS_MORE_MODE] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return SendSmsMoreModeResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_SMS_SEND_SMS_ACK] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return SendSmsAckResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_SMS_ADD_SIM_MESSAGE] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return AddSimMessageResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_SMS_DEL_SIM_MESSAGE] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return DelSimMessageResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_SMS_UPDATE_SIM_MESSAGE] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return UpdateSimMessageResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_SMS_SET_SMSC_ADDR] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return SetSmscAddrResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_SMS_GET_SMSC_ADDR] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return GetSmscAddrResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_SMS_SET_CB_CONFIG] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return SetCBConfigResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_SMS_GET_CB_CONFIG] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return GetCBConfigResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_SMS_GET_CDMA_CB_CONFIG] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return GetCdmaCBConfigResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_SMS_SET_CDMA_CB_CONFIG] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return SetCdmaCBConfigResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_SMS_SEND_CDMA_SMS] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return SendCdmaSmsResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_SMS_ADD_CDMA_SIM_MESSAGE] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return AddCdmaSimMessageResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_SMS_DEL_CDMA_SIM_MESSAGE] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return DelCdmaSimMessageResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_SMS_UPDATE_CDMA_SIM_MESSAGE] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return UpdateCdmaSimMessageResponse(requestNum, responseInfo, response, responseLen); };
+}
 
+void HRilSms::AddNotificationToMap()
+{
     // Notification
-    notiMemberFuncMap_[HNOTI_SMS_NEW_SMS] = &HRilSms::NewSmsNotify;
-    notiMemberFuncMap_[HNOTI_SMS_NEW_CDMA_SMS] = &HRilSms::NewCdmaSmsNotify;
-    notiMemberFuncMap_[HNOTI_SMS_STATUS_REPORT] = &HRilSms::SmsStatusReportNotify;
-    notiMemberFuncMap_[HNOTI_SMS_NEW_SMS_STORED_ON_SIM] = &HRilSms::NewSmsStoredOnSimNotify;
-    notiMemberFuncMap_[HNOTI_CB_CONFIG_REPORT] = &HRilSms::CBConfigNotify;
+    notiMemberFuncMap_[HNOTI_SMS_NEW_SMS] =
+        [this](int32_t notifyType, HRilErrNumber error, const void *response,
+        size_t responseLen) { return NewSmsNotify(notifyType, error, response, responseLen); };
+    notiMemberFuncMap_[HNOTI_SMS_NEW_CDMA_SMS] =
+        [this](int32_t notifyType, HRilErrNumber error, const void *response,
+        size_t responseLen) { return NewCdmaSmsNotify(notifyType, error, response, responseLen); };
+    notiMemberFuncMap_[HNOTI_SMS_STATUS_REPORT] =
+        [this](int32_t notifyType, HRilErrNumber error, const void *response,
+        size_t responseLen) { return SmsStatusReportNotify(notifyType, error, response, responseLen); };
+    notiMemberFuncMap_[HNOTI_SMS_NEW_SMS_STORED_ON_SIM] =
+        [this](int32_t notifyType, HRilErrNumber error, const void *response,
+        size_t responseLen) { return NewSmsStoredOnSimNotify(notifyType, error, response, responseLen); };
+    notiMemberFuncMap_[HNOTI_CB_CONFIG_REPORT] =
+        [this](int32_t notifyType, HRilErrNumber error, const void *response,
+        size_t responseLen) { return CBConfigNotify(notifyType, error, response, responseLen); };
 }
 
 int32_t HRilSms::SendGsmSms(int32_t serialId, const OHOS::HDI::Ril::V1_1::GsmSmsMessageInfo &gsmSmsMessageInfo)

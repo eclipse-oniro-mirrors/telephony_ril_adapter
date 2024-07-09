@@ -27,43 +27,112 @@ enum class NetworkParameter : int32_t {
 
 HRilNetwork::HRilNetwork(int32_t slotId) : HRilBase(slotId)
 {
-    AddHandlerToMap();
+    AddNotificationToMap();
+    AddBasicHandlerToMap();
+    AddNetworkSearchHandlerToMap();
 }
 
-void HRilNetwork::AddHandlerToMap()
+void HRilNetwork::AddNotificationToMap()
 {
     // indication
-    notiMemberFuncMap_[HNOTI_NETWORK_CS_REG_STATUS_UPDATED] = &HRilNetwork::NetworkCsRegStatusUpdated;
-    notiMemberFuncMap_[HNOTI_NETWORK_SIGNAL_STRENGTH_UPDATED] = &HRilNetwork::SignalStrengthUpdated;
-    notiMemberFuncMap_[HNOTI_NETWORK_TIME_UPDATED] = &HRilNetwork::NetworkTimeUpdated;
-    notiMemberFuncMap_[HNOTI_NETWORK_TIME_ZONE_UPDATED] = &HRilNetwork::NetworkTimeZoneUpdated;
-    notiMemberFuncMap_[HNOTI_NETWORK_PS_REG_STATUS_UPDATED] = &HRilNetwork::NetworkPsRegStatusUpdated;
-    notiMemberFuncMap_[HNOTI_NETWORK_PHY_CHNL_CFG_UPDATED] = &HRilNetwork::NetworkPhyChnlCfgUpdated;
-    notiMemberFuncMap_[HNOTI_NETWORK_CURRENT_CELL_UPDATED] = &HRilNetwork::NetworkCurrentCellUpdated_1_2;
-    notiMemberFuncMap_[HNOTI_NETWORK_RRC_CONNECTION_STATE_UPDATED] = &HRilNetwork::GetRrcConnectionStateUpdated;
-    notiMemberFuncMap_[HNOTI_NETWORK_RESIDENT_NETWORK_UPDATED] = &HRilNetwork::ResidentNetworkUpdated;
+    notiMemberFuncMap_[HNOTI_NETWORK_CS_REG_STATUS_UPDATED] =
+        [this](int32_t notifyType, HRilErrNumber error, const void *response,
+        size_t responseLen) { return NetworkCsRegStatusUpdated(notifyType, error, response, responseLen); };
+    notiMemberFuncMap_[HNOTI_NETWORK_SIGNAL_STRENGTH_UPDATED] =
+        [this](int32_t notifyType, HRilErrNumber error, const void *response,
+        size_t responseLen) { return SignalStrengthUpdated(notifyType, error, response, responseLen); };
+    notiMemberFuncMap_[HNOTI_NETWORK_TIME_UPDATED] =
+        [this](int32_t notifyType, HRilErrNumber error, const void *response,
+        size_t responseLen) { return NetworkTimeUpdated(notifyType, error, response, responseLen); };
+    notiMemberFuncMap_[HNOTI_NETWORK_TIME_ZONE_UPDATED] =
+        [this](int32_t notifyType, HRilErrNumber error, const void *response,
+        size_t responseLen) { return NetworkTimeZoneUpdated(notifyType, error, response, responseLen); };
+    notiMemberFuncMap_[HNOTI_NETWORK_PS_REG_STATUS_UPDATED] =
+        [this](int32_t notifyType, HRilErrNumber error, const void *response,
+        size_t responseLen) { return NetworkPsRegStatusUpdated(notifyType, error, response, responseLen); };
+    notiMemberFuncMap_[HNOTI_NETWORK_PHY_CHNL_CFG_UPDATED] =
+        [this](int32_t notifyType, HRilErrNumber error, const void *response,
+        size_t responseLen) { return NetworkPhyChnlCfgUpdated(notifyType, error, response, responseLen); };
+    notiMemberFuncMap_[HNOTI_NETWORK_CURRENT_CELL_UPDATED] =
+        [this](int32_t notifyType, HRilErrNumber error, const void *response,
+        size_t responseLen) { return NetworkCurrentCellUpdated_1_2(notifyType, error, response, responseLen); };
+    notiMemberFuncMap_[HNOTI_NETWORK_RRC_CONNECTION_STATE_UPDATED] =
+        [this](int32_t notifyType, HRilErrNumber error, const void *response,
+        size_t responseLen) { return GetRrcConnectionStateUpdated(notifyType, error, response, responseLen); };
+    notiMemberFuncMap_[HNOTI_NETWORK_RESIDENT_NETWORK_UPDATED] =
+        [this](int32_t notifyType, HRilErrNumber error, const void *response,
+        size_t responseLen) { return ResidentNetworkUpdated(notifyType, error, response, responseLen); };
+}
 
+void HRilNetwork::AddBasicHandlerToMap()
+{
     // Response
-    respMemberFuncMap_[HREQ_NETWORK_GET_SIGNAL_STRENGTH] = &HRilNetwork::GetSignalStrengthResponse;
-    respMemberFuncMap_[HREQ_NETWORK_GET_CS_REG_STATUS] = &HRilNetwork::GetCsRegStatusResponse;
-    respMemberFuncMap_[HREQ_NETWORK_GET_PS_REG_STATUS] = &HRilNetwork::GetPsRegStatusResponse;
-    respMemberFuncMap_[HREQ_NETWORK_GET_OPERATOR_INFO] = &HRilNetwork::GetOperatorInfoResponse;
-    respMemberFuncMap_[HREQ_NETWORK_GET_NETWORK_SEARCH_INFORMATION] = &HRilNetwork::GetNetworkSearchInformationResponse;
-    respMemberFuncMap_[HREQ_NETWORK_GET_NETWORK_SELECTION_MODE] = &HRilNetwork::GetNetworkSelectionModeResponse;
-    respMemberFuncMap_[HREQ_NETWORK_SET_NETWORK_SELECTION_MODE] = &HRilNetwork::SetNetworkSelectionModeResponse;
-    respMemberFuncMap_[HREQ_NETWORK_SET_PREFERRED_NETWORK] = &HRilNetwork::SetPreferredNetworkResponse;
-    respMemberFuncMap_[HREQ_NETWORK_GET_PREFERRED_NETWORK] = &HRilNetwork::GetPreferredNetworkResponse;
-    respMemberFuncMap_[HREQ_NETWORK_GET_NEIGHBORING_CELLINFO_LIST] =
-        &HRilNetwork::GetNeighboringCellInfoListResponse_1_2;
-    respMemberFuncMap_[HREQ_NETWORK_GET_CURRENT_CELL_INFO] = &HRilNetwork::GetCurrentCellInfoResponse_1_2;
-    respMemberFuncMap_[HREQ_NETWORK_GET_PHYSICAL_CHANNEL_CONFIG] = &HRilNetwork::GetPhysicalChannelConfigResponse;
-    respMemberFuncMap_[HREQ_NETWORK_SET_LOCATE_UPDATES] = &HRilNetwork::SetLocateUpdatesResponse;
-    respMemberFuncMap_[HREQ_NETWORK_SET_NOTIFICATION_FILTER] = &HRilNetwork::SetNotificationFilterResponse;
-    respMemberFuncMap_[HREQ_NETWORK_SET_DEVICE_STATE] = &HRilNetwork::SetDeviceStateResponse;
-    respMemberFuncMap_[HREQ_NETWORK_SET_NR_OPTION_MODE] = &HRilNetwork::SetNrOptionModeResponse;
-    respMemberFuncMap_[HREQ_NETWORK_GET_NR_OPTION_MODE] = &HRilNetwork::GetNrOptionModeResponse;
-    respMemberFuncMap_[HREQ_NETWORK_GET_RRC_CONNECTION_STATE] = &HRilNetwork::GetRrcConnectionStateResponse;
-    respMemberFuncMap_[HREQ_NETWORK_GET_NR_SSBID_INFO] = &HRilNetwork::GetNrSsbIdResponse;
+    respMemberFuncMap_[HREQ_NETWORK_GET_SIGNAL_STRENGTH] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return GetSignalStrengthResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_NETWORK_GET_CS_REG_STATUS] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return GetCsRegStatusResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_NETWORK_GET_PS_REG_STATUS] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return GetPsRegStatusResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_NETWORK_GET_OPERATOR_INFO] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return GetOperatorInfoResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_NETWORK_SET_LOCATE_UPDATES] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return SetLocateUpdatesResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_NETWORK_SET_NOTIFICATION_FILTER] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return SetNotificationFilterResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_NETWORK_SET_DEVICE_STATE] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return SetDeviceStateResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_NETWORK_SET_NR_OPTION_MODE] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return SetNrOptionModeResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_NETWORK_GET_NR_OPTION_MODE] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return GetNrOptionModeResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_NETWORK_GET_RRC_CONNECTION_STATE] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return GetRrcConnectionStateResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_NETWORK_GET_NR_SSBID_INFO] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return GetNrSsbIdResponse(requestNum, responseInfo, response, responseLen); };
+}
+
+void HRilNetwork::AddNetworkSearchHandlerToMap()
+{
+    respMemberFuncMap_[HREQ_NETWORK_GET_NETWORK_SEARCH_INFORMATION] = [this](int32_t requestNum,
+        HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen) {
+        return GetNetworkSearchInformationResponse(requestNum, responseInfo, response, responseLen);
+    };
+    respMemberFuncMap_[HREQ_NETWORK_GET_NETWORK_SELECTION_MODE] = [this](int32_t requestNum,
+        HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen) {
+        return GetNetworkSelectionModeResponse(requestNum, responseInfo, response, responseLen);
+    };
+    respMemberFuncMap_[HREQ_NETWORK_SET_NETWORK_SELECTION_MODE] = [this](int32_t requestNum,
+        HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen) {
+        return SetNetworkSelectionModeResponse(requestNum, responseInfo, response, responseLen);
+    };
+    respMemberFuncMap_[HREQ_NETWORK_SET_PREFERRED_NETWORK] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return SetPreferredNetworkResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_NETWORK_GET_PREFERRED_NETWORK] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return GetPreferredNetworkResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_NETWORK_GET_NEIGHBORING_CELLINFO_LIST] = [this](int32_t requestNum,
+        HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen) {
+        return GetNeighboringCellInfoListResponse_1_2(requestNum, responseInfo, response, responseLen);
+    };
+    respMemberFuncMap_[HREQ_NETWORK_GET_CURRENT_CELL_INFO] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return GetCurrentCellInfoResponse_1_2(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_NETWORK_GET_PHYSICAL_CHANNEL_CONFIG] = [this](int32_t requestNum,
+        HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen) {
+        return GetPhysicalChannelConfigResponse(requestNum, responseInfo, response, responseLen);
+    };
 }
 
 int32_t HRilNetwork::GetSignalStrength(int32_t serialId)

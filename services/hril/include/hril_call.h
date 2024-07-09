@@ -161,7 +161,9 @@ private:
     void CopyToHRilEmergencyInfoArray(
         HRilEmergencyInfo *emergencyInfoCalls, std::vector<HDI::Ril::V1_1::EmergencyCall> calls);
     void AddCallNotificationToMap();
-    void AddCallResponseToMap();
+    void AddCallBasicResponseToMap();
+    void AddCallSupplementResponseToMap();
+    void AddCallAdditionalResponseToMap();
 
 private:
     const HRilCallReq *callFuncs_ = nullptr;

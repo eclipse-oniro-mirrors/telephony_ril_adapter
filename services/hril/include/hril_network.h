@@ -110,7 +110,9 @@ public:
     int32_t ResidentNetworkUpdated(int32_t indType, HRilErrNumber error, const void *response, size_t responseLen);
 
 private:
-    void AddHandlerToMap();
+    void AddNotificationToMap();
+    void AddBasicHandlerToMap();
+    void AddNetworkSearchHandlerToMap();
     void ExchangeRilRssiToHdf(const void *response, HDI::Ril::V1_1::Rssi &rssi);
     void BuildOperatorList(
         HDI::Ril::V1_1::AvailableNetworkList &availableNetworkList, const void *response, size_t responseLen);
