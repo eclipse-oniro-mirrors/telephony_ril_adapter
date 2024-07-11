@@ -27,6 +27,7 @@ public:
 
     int32_t DeactivatePdpContext(int32_t serialId, const OHOS::HDI::Ril::V1_1::UniInfo &uniInfo);
     int32_t ActivatePdpContext(int32_t serialId, const OHOS::HDI::Ril::V1_1::DataCallInfo &dataCallInfo);
+    int32_t ActivatePdpContext1_3(int32_t serialId, const OHOS::HDI::Ril::V1_3::DataCallInfo1_3 &dataCallInfo1_3);
     int32_t GetPdpContextList(int32_t serialId, const OHOS::HDI::Ril::V1_1::UniInfo &uniInfo);
     int32_t SetInitApnInfo(int32_t serialId, const OHOS::HDI::Ril::V1_1::DataProfileDataInfo &dataProfileDataInfo);
     int32_t SendDataPerformanceMode(
