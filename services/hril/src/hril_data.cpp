@@ -152,7 +152,8 @@ int32_t HRilData::ActivatePdpContext(int32_t serialId, const OHOS::HDI::Ril::V1_
         serialId, HREQ_DATA_ACTIVATE_PDP_CONTEXT, dataFuncs_, &HRilDataReq::ActivatePdpContext, &dataInfo);
 }
 
-int32_t HRilData::ActivatePdpContext1_3(int32_t serialId, const OHOS::HDI::Ril::V1_3::DataCallInfo1_3 &dataCallInfo1_3)
+int32_t HRilData::ActivatePdpContextWithApnTypes(int32_t serialId,
+    const OHOS::HDI::Ril::V1_3::DataCallInfoWithApnTypes &dataCallInfo)
 {
     return HRIL_ERR_SUCCESS;
 }
