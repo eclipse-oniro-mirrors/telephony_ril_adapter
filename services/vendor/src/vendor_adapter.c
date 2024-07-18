@@ -270,6 +270,7 @@ static int32_t ModemInit(void)
     /* Network registration events */
     err = SendCommandLock("AT+CREG=2", NULL, 0, &pResponse);
     if (err != 0 || !pResponse->success) {
+        FreeResponseInfo(pResponse);
         SendCommandLock("AT+CREG=2", NULL, 0, &pResponse);
     }
     FreeResponseInfo(pResponse);
@@ -277,6 +278,7 @@ static int32_t ModemInit(void)
     /* GPRS registration events */
     err = SendCommandLock("AT+CGREG=2", NULL, 0, &pResponse);
     if (err != 0 || !pResponse->success) {
+        FreeResponseInfo(pResponse);
         SendCommandLock("AT+CGREG=2", NULL, 0, &pResponse);
     }
     FreeResponseInfo(pResponse);
