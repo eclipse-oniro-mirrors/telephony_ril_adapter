@@ -577,6 +577,13 @@ int32_t HRilManager::ActivatePdpContext(
     return TaskSchedule(MODULE_HRIL_DATA, hrilData_[slotId], &HRilData::ActivatePdpContext, serialId, dataCallInfo);
 }
 
+int32_t HRilManager::ActivatePdpContextWithApnTypes(
+    int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_3::DataCallInfoWithApnTypes &dataCallInfo)
+{
+    return TaskSchedule(MODULE_HRIL_DATA, hrilData_[slotId], &HRilData::ActivatePdpContextWithApnTypes,
+        serialId, dataCallInfo);
+}
+
 int32_t HRilManager::DeactivatePdpContext(
     int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_1::UniInfo &uniInfo)
 {
