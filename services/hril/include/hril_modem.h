@@ -55,6 +55,7 @@ public:
     void AddHandlerToMap();
     bool IsModemRespOrNotify(uint32_t code);
     void RegisterModemFuncs(const HRilModemReq *modemFuncs);
+    int32_t GetLastRadioState();
 
 private:
     bool IsModemResponse(uint32_t code);
@@ -62,6 +63,7 @@ private:
     void BuildIVoiceRadioTechnology(
         HDI::Ril::V1_1::VoiceRadioTechnology &voiceRadioTech, const HRilVoiceRadioInfo &hRiadioInfo);
     const HRilModemReq *modemFuncs_ = nullptr;
+    int32_t radioState_ = -1;
 };
 } // namespace Telephony
 } // namespace OHOS

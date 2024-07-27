@@ -76,7 +76,8 @@ int32_t HRilModem::RadioStateUpdated(
         TELEPHONY_LOGE("response is null");
         return HRIL_ERR_NULL_POINT;
     }
-    return Notify(indType, error, &HDI::Ril::V1_1::IRilCallback::RadioStateUpdated, *(const int32_t *)response);
+    radioState_ = *(const int32_t *)response;
+    return Notify(indType, error, &HDI::Ril::V1_1::IRilCallback::RadioStateUpdated, radioState_);
 }
 
 int32_t HRilModem::VoiceRadioTechUpdated(
@@ -288,6 +289,11 @@ void HRilModem::AddHandlerToMap()
 void HRilModem::RegisterModemFuncs(const HRilModemReq *modemFuncs)
 {
     modemFuncs_ = modemFuncs;
+}
+
+int32_t HRilModem::GetLastRadioState()
+{
+    return radioState_;
 }
 } // namespace Telephony
 } // namespace OHOS
