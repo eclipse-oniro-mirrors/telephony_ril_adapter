@@ -378,6 +378,10 @@ void HRilManager::SetRilCallback(sptr<OHOS::HDI::Ril::V1_3::IRilCallback> callba
         hrilSim_[slotId]->SetRilCallback(callback);
         hrilSms_[slotId]->SetRilCallback(callback);
         hrilData_[slotId]->SetRilCallback(callback);
+        HDI::Ril::V1_1::RilRadioResponseInfo responseInfo = { 0 };
+        responseInfo.slotId = slotId;
+        responseInfo.type = HDI::Ril::V1_1::RIL_RESPONSE_NOTICE;
+        callback->RadioStateUpdated(responseInfo, hrilModem_[slotId]->GetLastRadioState());
     }
 }
 
