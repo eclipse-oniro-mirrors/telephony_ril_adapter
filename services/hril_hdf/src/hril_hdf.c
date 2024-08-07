@@ -28,7 +28,6 @@
 #define RIL_VENDOR_LIB_PATH "const.sys.radio.vendorlib.path"
 #define BASE_HEX 16
 
-const char *VENDOR_LIB_PATH = "const.telephony.ril.vendorlib.path";
 static void *g_dlHandle = NULL;
 static struct HRilReport g_reportOps = {
     OnCallReport,
