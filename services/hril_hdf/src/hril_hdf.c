@@ -25,7 +25,7 @@
 #include "stdlib.h"
 #include "telephony_log_c.h"
 
-#define RIL_VENDOR_LIB_PATH "persist.sys.radio.vendorlib.path"
+#define RIL_VENDOR_LIB_PATH "const.sys.radio.vendorlib.path"
 #define BASE_HEX 16
 
 const char *VENDOR_LIB_PATH = "const.telephony.ril.vendorlib.path";
