@@ -96,6 +96,7 @@ typedef struct {
 
 void ReqSetInitApnInfo(const ReqDataInfo *requestInfo, const HRilDataInfo *data);
 void ReqActivatePdpContext(const ReqDataInfo *requestInfo, const HRilDataInfo *data);
+void ReqActivatePdpContextWithApnTypes(const ReqDataInfo *requestInfo, const HRilDataInfoWithApnTypes *data);
 void ReqDeactivatePdpContext(const ReqDataInfo *requestInfo, const HRilDataInfo *data);
 void ReqGetPdpContextList(const ReqDataInfo *requestInfo);
 void ReqGetLinkBandwidthInfo(const ReqDataInfo *requestInfo, const int32_t cid);

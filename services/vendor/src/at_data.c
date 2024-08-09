@@ -717,6 +717,22 @@ void ReqActivatePdpContext(const ReqDataInfo *requestInfo, const HRilDataInfo *d
     InquirePdpContextList(cid, requestInfo);
 }
 
+void ReqActivatePdpContextWithApnTypes(const ReqDataInfo *requestInfo, const HRilDataInfoWithApnTypes *data)
+{
+    TELEPHONY_LOGI("Call V1_1 ReqActivatePdpContext");
+    HRilDataInfo pDataInfo;
+    pDataInfo.cid = data->cid;
+    pDataInfo.reason = data->reason;
+    pDataInfo.roamingEnable = data->roamingEnable;
+    pDataInfo.verType = data->verType;
+    pDataInfo.userName = data->userName;
+    pDataInfo.password = data->password;
+    pDataInfo.apn = data->apn;
+    pDataInfo.type = data->type;
+    pDataInfo.roamingType = data->roamingType;
+    ReqActivatePdpContext(requestInfo, &pDataInfo);
+}
+
 void ReqDeactivatePdpContext(const ReqDataInfo *requestInfo, const HRilDataInfo *data)
 {
     const HRilDataInfo *pDataInfo = data;

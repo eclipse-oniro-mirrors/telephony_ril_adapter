@@ -167,6 +167,60 @@ typedef struct {
     char *roamingType;
 } HRilDataInfo;
 
+typedef struct {
+    /**
+     * Specifies a particular PDP context definition. The parameter is local to
+     * the TE-MT interface and is used in other PDP context-related commands.
+     */
+    int32_t cid;
+
+    /** Reason for the data request. */
+    int32_t reason;
+
+    /** Radio Access Technology */
+    int32_t rat;
+
+    /** Roaming Enable. eg: 1--enable, 0--disnable */
+    int32_t roamingEnable;
+
+    /**
+     * Authentication protocol used for this PDP context.
+     * 0: None. Used to indicate that no authentication protocol is used for this
+     *    PDP context. Username and password are removed if previously specified.
+     * 1: PAP
+     * 2: CHAP
+     */
+    int32_t verType;
+
+    /** User name for access to the IP network. */
+    char *userName;
+
+    /** Password for access to the IP network. */
+    char *password;
+
+    /** Access Point Name */
+    char *apn;
+
+    /**
+     * PDP_type values from 3GPP TS 27.007 section 10.1.1.
+     * Specifies the type of packet data protocol. The default value is
+     * manufacturer specific.
+     */
+    char *type;
+
+    /**
+     * PDP_type values from 3GPP TS 27.007 section 10.1.1.
+     * Specifies the type of packet data protocol. The default value is
+     * manufacturer specific.
+     */
+    char *roamingType;
+
+    /**
+     * Supported apn types bitmap
+     */
+    int32_t supportedApnTypesBitmap;
+} HRilDataInfoWithApnTypes;
+
 /**
  * @brief Defines the band width information.
  */
@@ -436,6 +490,16 @@ typedef struct {
      * @see ReqDataInfo
      */
     void (*CleanAllConnections)(const ReqDataInfo *requestInfo);
+
+    /**
+     * @brief Activates the packet data protocol (PDP) context with apnTypes.
+     *
+     * @param requestInfo Request data info, for details, see {@link
+     * ReqDataInfo}.
+     * @param data Indicates the data information.
+     * @see ReqDataInfo | HRilDataInfoWithApnTypes
+     */
+    void (*ActivatePdpContextWithApnTypes)(const ReqDataInfo *requestInfo, const HRilDataInfoWithApnTypes *data);
 } HRilDataReq;
 #ifdef __cplusplus
 }

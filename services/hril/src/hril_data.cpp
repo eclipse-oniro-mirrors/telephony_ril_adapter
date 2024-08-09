@@ -20,6 +20,10 @@
 
 namespace OHOS {
 namespace Telephony {
+namespace {
+const int32_t HRILOPS_ACTIVE_VERSION = 13;
+}
+
 HRilData::HRilData(int32_t slotId) : HRilBase(slotId)
 {
     AddHandlerToMap();
@@ -153,9 +157,35 @@ int32_t HRilData::ActivatePdpContext(int32_t serialId, const OHOS::HDI::Ril::V1_
 }
 
 int32_t HRilData::ActivatePdpContextWithApnTypes(int32_t serialId,
-    const OHOS::HDI::Ril::V1_3::DataCallInfoWithApnTypes &dataCallInfo)
+    const OHOS::HDI::Ril::V1_3::DataCallInfoWithApnTypes &dataCallInfoWithApnTypes, const int32_t version)
 {
-    return HRIL_ERR_SUCCESS;
+    if (version < HRILOPS_ACTIVE_VERSION) {
+        TELEPHONY_LOGI("Call V1_1 ActivatePdpContext");
+        OHOS::HDI::Ril::V1_1::DataCallInfo dataCallInfo;
+        dataCallInfo.dataProfileInfo.apn = dataCallInfoWithApnTypes.dataProfileInfo.apn;
+        dataCallInfo.dataProfileInfo.protocol = dataCallInfoWithApnTypes.dataProfileInfo.protocol;
+        dataCallInfo.dataProfileInfo.roamingProtocol = dataCallInfoWithApnTypes.dataProfileInfo.roamingProtocol;
+        dataCallInfo.dataProfileInfo.userName = dataCallInfoWithApnTypes.dataProfileInfo.userName;
+        dataCallInfo.dataProfileInfo.password = dataCallInfoWithApnTypes.dataProfileInfo.password;
+        dataCallInfo.dataProfileInfo.authenticationType = dataCallInfoWithApnTypes.dataProfileInfo.authenticationType;
+        dataCallInfo.isRoaming = dataCallInfoWithApnTypes.isRoaming;
+        dataCallInfo.roamingAllowed = dataCallInfoWithApnTypes.roamingAllowed;
+        dataCallInfo.radioTechnology = dataCallInfoWithApnTypes.radioTechnology;
+        return ActivatePdpContext(serialId, dataCallInfo);
+    }
+    TELEPHONY_LOGI("Call V1_3 ActivatePdpContextWithApnTypes");
+    HRilDataInfoWithApnTypes dataInfoWithApnTypes;
+    dataInfoWithApnTypes.apn = StringToCString(dataCallInfoWithApnTypes.dataProfileInfo.apn);
+    dataInfoWithApnTypes.type = StringToCString(dataCallInfoWithApnTypes.dataProfileInfo.protocol);
+    dataInfoWithApnTypes.roamingType = StringToCString(dataCallInfoWithApnTypes.dataProfileInfo.roamingProtocol);
+    dataInfoWithApnTypes.userName = StringToCString(dataCallInfoWithApnTypes.dataProfileInfo.userName);
+    dataInfoWithApnTypes.password = StringToCString(dataCallInfoWithApnTypes.dataProfileInfo.password);
+    dataInfoWithApnTypes.verType = dataCallInfoWithApnTypes.dataProfileInfo.authenticationType;
+    dataInfoWithApnTypes.rat = dataCallInfoWithApnTypes.radioTechnology;
+    dataInfoWithApnTypes.roamingEnable = dataCallInfoWithApnTypes.roamingAllowed ? 1 : 0;
+    dataInfoWithApnTypes.supportedApnTypesBitmap = dataCallInfoWithApnTypes.dataProfileInfo.supportedApnTypesBitmap;
+    return RequestVendor(serialId, HREQ_DATA_ACTIVATE_PDP_CONTEXT, dataFuncs_,
+        &HRilDataReq::ActivatePdpContextWithApnTypes, &dataInfoWithApnTypes);
 }
 
 int32_t HRilData::GetPdpContextList(int32_t serialId, const OHOS::HDI::Ril::V1_1::UniInfo &uniInfo)
