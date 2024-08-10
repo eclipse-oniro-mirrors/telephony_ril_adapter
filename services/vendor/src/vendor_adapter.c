@@ -169,6 +169,7 @@ static const HRilDataReq g_dataReqOps = {
     .SetDataPermitted = ReqSetDataPermitted,
     .GetLinkCapability = ReqGetLinkCapability,
     .CleanAllConnections = ReqCleanAllConnections,
+    .ActivatePdpContextWithApnTypes = ReqActivatePdpContextWithApnTypes,
 };
 
 static const HRilModemReq g_modemReqOps = {

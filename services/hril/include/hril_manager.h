@@ -233,6 +233,7 @@ public:
     std::atomic_uint runningLockCount_ = 0;
     std::atomic_int runningSerialNum_ = 0;
     static std::shared_ptr<HRilManager> manager_;
+    int32_t hrilOpsVersion_ = 0;
 
 private:
     template<typename T>

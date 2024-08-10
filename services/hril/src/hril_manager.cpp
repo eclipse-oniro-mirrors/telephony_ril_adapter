@@ -588,7 +588,7 @@ int32_t HRilManager::ActivatePdpContextWithApnTypes(
     int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_3::DataCallInfoWithApnTypes &dataCallInfo)
 {
     return TaskSchedule(MODULE_HRIL_DATA, hrilData_[slotId], &HRilData::ActivatePdpContextWithApnTypes,
-        serialId, dataCallInfo);
+        serialId, dataCallInfo, hrilOpsVersion_);
 }
 
 int32_t HRilManager::DeactivatePdpContext(
@@ -1110,6 +1110,7 @@ void HRilRegOps(const HRilOps *hrilOps)
         return;
     }
     rilRegisterStatus = RIL_REGISTER_IS_RUNNING;
+    g_manager->hrilOpsVersion_ = hrilOps->version;
     (void)memcpy_s(&callBacks, sizeof(HRilOps), hrilOps, sizeof(HRilOps));
     for (int32_t slotId = HRIL_SIM_SLOT_0; slotId < g_manager->GetMaxSimSlotCount(); slotId++) {
         if (callBacks.smsOps != nullptr) {
