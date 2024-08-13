@@ -587,6 +587,7 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Modem_002, Function | MediumTest | Le
     EXPECT_NE(HDF_SUCCESS, modem->RadioStateUpdated(0, HRilErrNumber::HRIL_ERR_NULL_POINT, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, modem->VoiceRadioTechUpdated(0, HRilErrNumber::HRIL_ERR_NULL_POINT, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, modem->DsdsModeUpdated(0, HRilErrNumber::HRIL_ERR_NULL_POINT, nullptr, 0));
+    EXPECT_NE(HDF_SUCCESS, modem->SetActiveSimResponse(0, responseInfo, nullptr, 0));
 }
 
 /**
