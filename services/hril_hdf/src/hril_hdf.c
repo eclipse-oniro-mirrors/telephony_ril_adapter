@@ -24,8 +24,13 @@
 #include "parameter.h"
 #include "stdlib.h"
 #include "telephony_log_c.h"
+#include "securec.h"
 
 #define RIL_VENDOR_LIB_PATH "const.sys.radio.vendorlib.path"
+#define VIRTUAL_MODEM_SWITCH  "const.booster.virtual_modem_switch"
+#define VIRTUAL_MODEM_DEFAULT_SWITCH  "false"
+#define TEL_SIM_SLOT_COUNT "const.telephony.slotCount"
+#define DEFAULT_SLOT_COUNT "1"
 #define BASE_HEX 16
 
 static void *g_dlHandle = NULL;
@@ -41,7 +46,19 @@ static struct HRilReport g_reportOps = {
 
 static int32_t GetVendorLibPath(char *path)
 {
-    int32_t code = GetParameter(RIL_VENDOR_LIB_PATH, "", path, PARAMETER_SIZE);
+    int32_t code = -1;
+    code = GetParameter(RIL_VENDOR_LIB_PATH, "", path, PARAMETER_SIZE);
+    char simSlotCount[PARAMETER_SIZE] = {0};
+    GetParameter(TEL_SIM_SLOT_COUNT, DEFAULT_SLOT_COUNT, simSlotCount, PARAMETER_SIZE);
+    int32_t slotCount = atoi(simSlotCount);
+    char virtualModemSwitch[PARAMETER_SIZE] = {0};
+    GetParameter(VIRTUAL_MODEM_SWITCH, VIRTUAL_MODEM_DEFAULT_SWITCH, virtualModemSwitch, PARAMETER_SIZE);
+    if (slotCount == 0 && strcmp(virtualModemSwitch, "true") == 0) {
+        if (strcpy_s(path, PARAMETER_SIZE, "libril_msgtransfer.z.so") == EOK) {
+            TELEPHONY_LOGI("virtualModemSwitch on set path libril_msgtransfer.z.so");
+            code = 1;
+        }
+    }
     if (code > 0) {
         return HDF_SUCCESS;
     }

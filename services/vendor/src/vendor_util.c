@@ -25,6 +25,9 @@
 #define SUPPORT_SLOT_ID "persist.sys.support.slotid"
 #define DEFAULT_SLOT_COUNT "1"
 #define TEL_SIM_SLOT_COUNT "const.telephony.slotCount"
+#define VIRTUAL_MODEM_SWITCH "const.booster.virtual_modem_switch"
+#define VIRTUAL_MODEM_DEFAULT_SWITCH "false"
+#define SYSPARA_SIZE 128
 
 #define G_RESP_ERRORS 7
 #define G_RESP_SUCCESS 2
@@ -490,7 +493,14 @@ int32_t GetSimSlotCount(void)
 {
     char simSlotCount[PARAMETER_SIZE] = {0};
     GetParameter(TEL_SIM_SLOT_COUNT, DEFAULT_SLOT_COUNT, simSlotCount, PARAMETER_SIZE);
-    return atoi(simSlotCount);
+    int32_t simSlotCountNumber = atoi(simSlotCount);
+    char virtualModemSwitch[SYSPARA_SIZE] = {0};
+    GetParameter(VIRTUAL_MODEM_SWITCH, VIRTUAL_MODEM_DEFAULT_SWITCH, virtualModemSwitch, SYSPARA_SIZE);
+    if (strcmp(virtualModemSwitch, "true") == 0 && simSlotCountNumber == 0) {
+        TELEPHONY_LOGI("virtualModemSwitch on. set simSlotCountNumber 1");
+        simSlotCountNumber = 1;
+    }
+    return simSlotCountNumber;
 }
 
 int32_t GetSlotId(const ReqDataInfo *requestInfo)

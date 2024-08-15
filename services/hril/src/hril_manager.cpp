@@ -15,6 +15,7 @@
 
 #include "hril_manager.h"
 
+#include <cstring>
 #include "hril_base.h"
 #include "hril_event_map.h"
 #include "hril_notification.h"
@@ -1056,6 +1057,13 @@ int32_t GetSimSlotCount()
     char simSlotCount[HRIL_SYSPARA_SIZE] = { 0 };
     GetParameter(HRIL_TEL_SIM_SLOT_COUNT, HRIL_DEFAULT_SLOT_COUNT, simSlotCount, HRIL_SYSPARA_SIZE);
     int32_t simSlotCountNumber = std::atoi(simSlotCount);
+    char virtualModemSwitch[HRIL_SYSPARA_SIZE] = {0};
+    GetParameter(HRIL_VIRTUAL_MODEM_SWITCH, HRIL_VIRTUAL_MODEM_DEFAULT_SWITCH, virtualModemSwitch,
+        HRIL_SYSPARA_SIZE);
+    if (strcmp(virtualModemSwitch, "true") == 0 && simSlotCountNumber == 0) {
+        TELEPHONY_LOGI("virtualModemSwitch on. set simSlotCountNumber 1");
+        simSlotCountNumber = 1;
+    }
     char vSimModemCount[HRIL_SYSPARA_SIZE] = { 0 };
     GetParameter(HRIL_VSIM_MODEM_COUNT_STR, HRIL_DEFAULT_VSIM_MODEM_COUNT, vSimModemCount, HRIL_SYSPARA_SIZE);
     int32_t vSimModemCountNumber = std::atoi(vSimModemCount);

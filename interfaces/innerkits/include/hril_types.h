@@ -190,6 +190,8 @@ static constexpr uint32_t HRIL_NETWORKS_SELECT_MODE = 0;
 inline const int32_t HRIL_SYSPARA_SIZE = 128;
 inline constexpr const char *HRIL_DEFAULT_SLOT_COUNT = "1";
 inline constexpr const char *HRIL_TEL_SIM_SLOT_COUNT = "const.telephony.slotCount";
+inline constexpr const char *HRIL_VIRTUAL_MODEM_SWITCH = "const.booster.virtual_modem_switch";
+inline constexpr const char *HRIL_VIRTUAL_MODEM_DEFAULT_SWITCH = "false";
 inline constexpr const char *HRIL_DEFAULT_VSIM_MODEM_COUNT = "0";
 inline constexpr const char *HRIL_VSIM_MODEM_COUNT_STR = "const.telephony.vsimModemCount";
 
