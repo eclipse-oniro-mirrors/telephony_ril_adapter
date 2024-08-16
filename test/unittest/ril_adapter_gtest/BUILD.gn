@@ -22,6 +22,7 @@ ohos_unittest("tel_ril_adapter_gtest") {
   module_out_path = part_name + "/" + test_module
 
   sources = [
+    "ril_adapter_service_test.cpp",
     "ril_call_test.cpp",
     "ril_callback_test.cpp",
     "ril_data_test.cpp",
