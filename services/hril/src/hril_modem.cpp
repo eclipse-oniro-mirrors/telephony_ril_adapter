@@ -246,6 +246,12 @@ bool HRilModem::IsModemRespOrNotify(uint32_t code)
     return IsModemResponse(code) || IsModemNotification(code);
 }
 
+int32_t HRilModem::SetActiveSimResponse(
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+{
+    return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::SetActiveSimResponse);
+}
+
 void HRilModem::AddHandlerToMap()
 {
     // indication
@@ -265,6 +271,9 @@ void HRilModem::AddHandlerToMap()
     respMemberFuncMap_[HREQ_MODEM_SET_RADIO_STATUS] =
         [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
         size_t responseLen) { return SetRadioStateResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_SIM_SET_ACTIVE_SIM] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return SetActiveSimResponse(requestNum, responseInfo, response, responseLen); };
     respMemberFuncMap_[HREQ_MODEM_GET_RADIO_STATUS] =
         [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
         size_t responseLen) { return GetRadioStateResponse(requestNum, responseInfo, response, responseLen); };
