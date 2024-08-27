@@ -35,6 +35,7 @@ ohos_shared_library("hril_hdf") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
