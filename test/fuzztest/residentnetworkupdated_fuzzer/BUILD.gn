@@ -42,6 +42,7 @@ ohos_fuzztest("ResidentNetworkUpdatedFuzzTest") {
     "hilog:libhilog",
     "ipc:ipc_single",
     "samgr:samgr_proxy",
+    "c_utils:utils"
   ]
   defines = [
     "TELEPHONY_LOG_TAG = \"RilAdapterFuzzTest\"",
