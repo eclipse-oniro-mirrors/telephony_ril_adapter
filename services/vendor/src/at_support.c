@@ -54,12 +54,17 @@ int32_t ATStartReadLoop(int32_t fd, OnNotify func)
     int32_t ret = 0;
     g_atFd = fd;
     g_onNotifyFunc = func;
-    pthread_attr_t t;
-    pthread_attr_init(&t);
-    pthread_attr_setdetachstate(&t, PTHREAD_CREATE_DETACHED);
-    ret = pthread_create(&g_reader, &t, (void *(*)(void *))ReaderLoop, &t);
+    pthread_attr_t *t = (pthread_attr_t *)malloc(sizeof(pthread_attr_t));
+    if (t == NULL) {
+        TELEPHONY_LOGE("malloc failed");
+        return VENDOR_ERR_PROCESS;
+    }
+    pthread_attr_init(t);
+    pthread_attr_setdetachstate(t, PTHREAD_CREATE_DETACHED);
+    ret = pthread_create(&g_reader, t, (void *(*)(void *))ReaderLoop, t);
     if (ret < 0) {
         TELEPHONY_LOGE("create pthread error code： %{public}d", ret);
+        free(t);
         return VENDOR_ERR_PROCESS;
     }
     pthread_setname_np(g_reader, "ril_reader_loop");
@@ -238,7 +243,9 @@ int32_t SendCommandLock(const char *command, const char *prefix, long long timeo
         }
         g_isNeedATPause = false;
         alarm(0);
-        FreeResponseInfo((ResponseInfo *)*outResponse);
+        if (*outResponse != NULL) {
+            FreeResponseInfo((ResponseInfo *)*outResponse);
+        }
         *outResponse = NULL;
     }
     g_prefix = prefix;
