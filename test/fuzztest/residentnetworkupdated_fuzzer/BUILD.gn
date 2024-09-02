@@ -34,6 +34,7 @@ ohos_fuzztest("ResidentNetworkUpdatedFuzzTest") {
 
   external_deps = [
     "bounds_checking_function:libsec_shared",
+    "c_utils:utils",
     "drivers_interface_power:libpower_proxy_1.2",
     "drivers_interface_ril:ril_idl_headers",
     "hdf_core:libhdf_host",
@@ -42,7 +43,6 @@ ohos_fuzztest("ResidentNetworkUpdatedFuzzTest") {
     "hilog:libhilog",
     "ipc:ipc_single",
     "samgr:samgr_proxy",
-    "c_utils:utils"
   ]
   defines = [
     "TELEPHONY_LOG_TAG = \"RilAdapterFuzzTest\"",
