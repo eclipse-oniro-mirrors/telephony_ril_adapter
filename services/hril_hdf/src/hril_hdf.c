@@ -156,7 +156,7 @@ static void LoadVendor(void)
         TELEPHONY_LOGI("use default vendor lib.");
         rilLibPath = g_usbModemVendorInfo[DEFAULT_MODE_INDEX].libPath;
     }
-    if (rilLibPath == NULL) {
+    if (rilLibPath == NULL || rilLibPath[0] == '\0') {
         TELEPHONY_LOGE("dynamic library path is empty");
         return;
     }
