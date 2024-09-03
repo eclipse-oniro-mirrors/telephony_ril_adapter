@@ -111,6 +111,36 @@ int32_t HRilModem::DsdsModeUpdated(
         indType, error, &HDI::Ril::V1_1::IRilCallback::DsdsModeUpdated, *(static_cast<const int32_t *>(response)));
 }
 
+int32_t HRilModem::NcfgFinishedResult(
+    int32_t indType, HRilErrNumber error, const void *response, size_t responseLen)
+{
+    if ((response == nullptr && responseLen != 0) || (responseLen % sizeof(int32_t)) != 0) {
+        TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null");
+        return HRIL_ERR_NULL_POINT;
+    }
+    return Notify(
+        indType, error, &HDI::Ril::V1_3::IRilCallback::NcfgFinishedResult, *(static_cast<const int32_t *>(response)));
+}
+
+int32_t HRilModem::RestartRildNvMatch(
+    int32_t indType, HRilErrNumber error, const void *response, size_t responseLen)
+{
+    if ((response == nullptr && responseLen != 0) || (responseLen % sizeof(int32_t)) != 0) {
+        TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is null");
+        return HRIL_ERR_NULL_POINT;
+    }
+    return Notify(
+        indType, error, &HDI::Ril::V1_3::IRilCallback::RestartRildNvMatch, *(static_cast<const int32_t *>(response)));
+}
+
 int32_t HRilModem::ShutDownResponse(
     int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
@@ -264,6 +294,12 @@ void HRilModem::AddHandlerToMap()
     notiMemberFuncMap_[HNOTI_MODEM_DSDS_MODE_UPDATED] =
         [this](int32_t notifyType, HRilErrNumber error, const void *response,
         size_t responseLen) { return DsdsModeUpdated(notifyType, error, response, responseLen); };
+    notiMemberFuncMap_[HNOTI_NCFG_FINISHED_RESULT] =
+        [this](int32_t notifyType, HRilErrNumber error, const void *response,
+        size_t responseLen) { return NcfgFinishedResult(notifyType, error, response, responseLen); };
+    notiMemberFuncMap_[HNOTI_RESTART_RILD_NV_MATCH] =
+        [this](int32_t notifyType, HRilErrNumber error, const void *response,
+        size_t responseLen) { return RestartRildNvMatch(notifyType, error, response, responseLen); };
     // response
     respMemberFuncMap_[HREQ_MODEM_SHUT_DOWN] =
         [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,

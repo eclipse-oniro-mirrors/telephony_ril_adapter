@@ -1405,6 +1405,18 @@ int32_t RilCallbackTest::DsdsModeUpdated(const RilRadioResponseInfo &responseInf
     return 0;
 }
 
+int32_t RilCallbackTest::NcfgFinishedResult(const RilRadioResponseInfo &responseInfo, int32_t state)
+{
+    TELEPHONY_LOGI("NcfgFinishedResult state : %{public}d", state);
+    return 0;
+}
+
+int32_t RilCallbackTest::RestartRildNvMatch(const RilRadioResponseInfo &responseInfo, int32_t state)
+{
+    TELEPHONY_LOGI("RestartRildNvMatch state : %{public}d", state);
+    return 0;
+}
+
 int32_t RilCallbackTest::ShutDownResponse(const RilRadioResponseInfo &responseInfo)
 {
     TELEPHONY_LOGI("ShutDownResponse");

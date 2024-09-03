@@ -1229,6 +1229,22 @@ int32_t RilCallbackTest::DsdsModeUpdated(const RilRadioResponseInfo &responseInf
     return 0;
 }
 
+int32_t RilCallbackTest::NcfgFinishedResult(const RilRadioResponseInfo &responseInfo, int32_t state)
+{
+    PrintResponseInfo("NcfgFinishedResult", responseInfo);
+    cout << "[state] : " << state << endl;
+    cout << endl;
+    return 0;
+}
+
+int32_t RilCallbackTest::RestartRildNvMatch(const RilRadioResponseInfo &responseInfo, int32_t state)
+{
+    PrintResponseInfo("RestartRildNvMatch", responseInfo);
+    cout << "[state] : " << state << endl;
+    cout << endl;
+    return 0;
+}
+
 int32_t RilCallbackTest::ShutDownResponse(const RilRadioResponseInfo &responseInfo)
 {
     PrintResponseInfo("ShutDownResponse", responseInfo);
