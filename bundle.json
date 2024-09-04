@@ -34,7 +34,8 @@
                 "hdf_core",
                 "hilog",
                 "init",
-                "ipc"
+                "ipc",
+                "samgr"
             ]
         },
         "build": {
