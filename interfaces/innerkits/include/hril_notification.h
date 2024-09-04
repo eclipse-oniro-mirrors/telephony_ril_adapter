@@ -156,10 +156,10 @@ typedef enum {
     HNOTI_MODEM_DSDS_MODE_UPDATED,
 
     /** Called when nv refreshed. */
-    HNOTI_NCFG_FINISHED_RESULT,
+    HNOTI_MODEM_NCFG_FINISHED_RESULT,
 
     /** Called when restart rild nv match. */
-    HNOTI_RESTART_RILD_NV_MATCH,
+    HNOTI_MODEM_RESTART_RILD_NV_MATCH,
 
     HNOTI_COMMON_END = 1599,
 } HRilNotification;

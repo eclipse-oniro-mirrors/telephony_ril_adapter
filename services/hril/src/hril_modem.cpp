@@ -294,10 +294,10 @@ void HRilModem::AddHandlerToMap()
     notiMemberFuncMap_[HNOTI_MODEM_DSDS_MODE_UPDATED] =
         [this](int32_t notifyType, HRilErrNumber error, const void *response,
         size_t responseLen) { return DsdsModeUpdated(notifyType, error, response, responseLen); };
-    notiMemberFuncMap_[HNOTI_NCFG_FINISHED_RESULT] =
+    notiMemberFuncMap_[HNOTI_MODEM_NCFG_FINISHED_RESULT] =
         [this](int32_t notifyType, HRilErrNumber error, const void *response,
         size_t responseLen) { return NcfgFinishedResult(notifyType, error, response, responseLen); };
-    notiMemberFuncMap_[HNOTI_RESTART_RILD_NV_MATCH] =
+    notiMemberFuncMap_[HNOTI_MODEM_RESTART_RILD_NV_MATCH] =
         [this](int32_t notifyType, HRilErrNumber error, const void *response,
         size_t responseLen) { return RestartRildNvMatch(notifyType, error, response, responseLen); };
     // response
