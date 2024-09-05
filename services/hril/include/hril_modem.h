@@ -52,6 +52,8 @@ public:
     int32_t RadioStateUpdated(int32_t indType, HRilErrNumber error, const void *response, size_t responseLen);
     int32_t VoiceRadioTechUpdated(int32_t indType, HRilErrNumber error, const void *response, size_t responseLen);
     int32_t DsdsModeUpdated(int32_t indType, HRilErrNumber error, const void *response, size_t responseLen);
+    int32_t NcfgFinishedResult(int32_t indType, HRilErrNumber error, const void *response, size_t responseLen);
+    int32_t RestartRildNvMatch(int32_t indType, HRilErrNumber error, const void *response, size_t responseLen);
     void AddHandlerToMap();
     bool IsModemRespOrNotify(uint32_t code);
     void RegisterModemFuncs(const HRilModemReq *modemFuncs);
