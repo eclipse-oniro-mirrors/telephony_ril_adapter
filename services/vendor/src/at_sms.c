@@ -599,9 +599,21 @@ void ReqGetCBConfig(const ReqDataInfo *requestInfo)
 void SetCellBroadcastInfo(HRilCBConfigInfo *cellBroadcast, int32_t locate, char *startMid, char *endMid, char *startDcs,
     char *endDcs, bool dcssEmpty, int32_t mode)
 {
+    if (cellBroadcast == NULL || locate < 0) {
+        TELEPHONY_LOGE("cellBroadcast is null");
+        return;
+    }
+    if (startMid == NULL || endMid == NULL) {
+        TELEPHONY_LOGE("startMid or endMid is null");
+        return;
+    }
     cellBroadcast[locate].startOfServiceId = atoi(startMid);
     cellBroadcast[locate].endOfServiceId = atoi(endMid);
     if (!dcssEmpty) {
+        if (startDcs == NULL || endDcs == NULL) {
+            TELEPHONY_LOGE("startDcs or endDcs is null");
+            return;
+        }
         cellBroadcast[locate].startOfCodeScheme = atoi(startDcs);
         cellBroadcast[locate].endOfCodeScheme = atoi(endDcs);
     }
