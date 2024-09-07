@@ -145,8 +145,8 @@ static void IsResponseOtherCases(
         TELEPHONY_LOGE("g_commandmutex is null");
         return;
     }
+    pthread_mutex_unlock(g_commandmutex);
     if (g_onNotifyFunc != NULL) {
-        pthread_mutex_unlock(g_commandmutex);
         g_onNotifyFunc(responseLine, pdu);
     }
 }
