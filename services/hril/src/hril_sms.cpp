@@ -851,7 +851,7 @@ int32_t HRilSms::RequestWithStrings(int32_t serial, int32_t request, int32_t cou
     if (memset_s(pBuff, len, 0, len) != EOK) {
         TELEPHONY_LOGE("RequestWithInts memset_s failed");
         SafeFrees(pBuff);
-        return false;
+        return HRIL_ERR_NULL_POINT;
     }
     va_list list;
     va_start(list, count);
