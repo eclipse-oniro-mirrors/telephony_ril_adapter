@@ -57,7 +57,7 @@ int32_t ATStartReadLoop(int32_t fd, OnNotify func)
     pthread_attr_t t;
     pthread_attr_init(&t);
     pthread_attr_setdetachstate(&t, PTHREAD_CREATE_DETACHED);
-    ret = pthread_create(&g_reader, &t, (void *(*)(void *))ReaderLoop, &t);
+    ret = pthread_create(&g_reader, &t, (void *(*)(void *))ReaderLoop, NULL);
     if (ret < 0) {
         TELEPHONY_LOGE("create pthread error code： %{public}d", ret);
         return VENDOR_ERR_PROCESS;
