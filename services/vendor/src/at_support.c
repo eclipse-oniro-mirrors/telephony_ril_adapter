@@ -238,10 +238,10 @@ int32_t SendCommandLock(const char *command, const char *prefix, long long timeo
         }
         g_isNeedATPause = false;
         alarm(0);
-        if (*outResponse != NULL) {
+        if (outResponse != NULL && *outResponse != NULL) {
             FreeResponseInfo((ResponseInfo *)*outResponse);
+            *outResponse = NULL;
         }
-        *outResponse = NULL;
     }
     g_prefix = prefix;
     err = SendCommandNoLock(command, timeout, outResponse);
