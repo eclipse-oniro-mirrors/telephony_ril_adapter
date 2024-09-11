@@ -863,30 +863,37 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Network_005, Function | MediumTest | 
     network->FillCurrentCellInfo(cellInfo, &infoVendor);
     network->FillCurrentCellInfo(cellInfo_1_1, &infoVendor);
     network->FillCurrentCellInfo(cellInfo_1_2, &infoVendor);
+    EXPECT_EQ(cellInfo.ratType, NETWORK_TYPE_GSM);
     infoVendor.ratType = NETWORK_TYPE_LTE;
     network->FillCurrentCellInfo(cellInfo, &infoVendor);
     network->FillCurrentCellInfo(cellInfo_1_1, &infoVendor);
     network->FillCurrentCellInfo(cellInfo_1_2, &infoVendor);
+    EXPECT_EQ(cellInfo.ratType, NETWORK_TYPE_LTE);
     infoVendor.ratType = NETWORK_TYPE_WCDMA;
     network->FillCurrentCellInfo(cellInfo, &infoVendor);
     network->FillCurrentCellInfo(cellInfo_1_1, &infoVendor);
     network->FillCurrentCellInfo(cellInfo_1_2, &infoVendor);
+    EXPECT_EQ(cellInfo.ratType, NETWORK_TYPE_WCDMA);
     infoVendor.ratType = NETWORK_TYPE_CDMA;
     network->FillCurrentCellInfo(cellInfo, &infoVendor);
     network->FillCurrentCellInfo(cellInfo_1_1, &infoVendor);
     network->FillCurrentCellInfo(cellInfo_1_2, &infoVendor);
+    EXPECT_EQ(cellInfo.ratType, NETWORK_TYPE_CDMA);
     infoVendor.ratType = NETWORK_TYPE_TDSCDMA;
     network->FillCurrentCellInfo(cellInfo, &infoVendor);
     network->FillCurrentCellInfo(cellInfo_1_1, &infoVendor);
     network->FillCurrentCellInfo(cellInfo_1_2, &infoVendor);
+    EXPECT_EQ(cellInfo.ratType, NETWORK_TYPE_TDSCDMA);
     infoVendor.ratType = NETWORK_TYPE_NR;
     network->FillCurrentCellInfo(cellInfo, &infoVendor);
     network->FillCurrentCellInfo(cellInfo_1_1, &infoVendor);
     network->FillCurrentCellInfo(cellInfo_1_2, &infoVendor);
+    EXPECT_EQ(cellInfo.ratType, NETWORK_TYPE_NR);
     infoVendor.ratType = NETWORK_TYPE_UNKNOWN;
     network->FillCurrentCellInfo(cellInfo, &infoVendor);
     network->FillCurrentCellInfo(cellInfo_1_1, &infoVendor);
     network->FillCurrentCellInfo(cellInfo_1_2, &infoVendor);
+    EXPECT_EQ(cellInfo.ratType, NETWORK_TYPE_UNKNOWN);
 }
 
 /**
@@ -1287,7 +1294,8 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Sms_006, Function | MediumTest | Leve
     reportInfo.data = const_cast<char *>(NUMBER);
     reportInfo.pdu = const_cast<char *>(NUMBER);
     reportInfo.dcs = const_cast<char *>(NUMBER);
-    sms->MakeCBConfigResult(&reportInfo, sizeof(HRilCBConfigReportInfo));
+    HDI::Ril::V1_1::CBConfigReportInfo result = sms->MakeCBConfigResult(&reportInfo, sizeof(HRilCBConfigReportInfo));
+    EXPECT_EQ(false, result.data.empty());
 }
 
 /**
@@ -1301,8 +1309,6 @@ HWTEST_F(BranchTest, Telephony_HrilManager_HRilEvent_001, Function | MediumTest 
     struct timeval now;
     struct timeval timeout = { 0, MAIL_DELAY_TIME };
     event->GetNowTime(now);
-    event->SetNormalDestory(true);
-    ASSERT_TRUE(event->IsNormalDestory());
     ASSERT_FALSE(event->GetNextTimeOut(now));
 
     HRilEventMessage eventMsg = { 0 };
@@ -1318,6 +1324,8 @@ HWTEST_F(BranchTest, Telephony_HrilManager_HRilEvent_001, Function | MediumTest 
     event->AddEventMessage(eventMsg);
     event->ProcessEvents(&rfds, 1);
     event->ProcessPendingList();
+    event->SetNormalDestory(true);
+    ASSERT_TRUE(event->IsNormalDestory());
 }
 
 /**
@@ -1367,6 +1375,7 @@ HWTEST_F(BranchTest, Telephony_HrilManager_HRilManager_001, Function | MediumTes
     OnSmsReport(slotId, report, (const uint8_t *)&smsResponse, sizeof(HRilSmsResponse));
     manager->hrilNetwork_.clear();
     manager->RegisterNetworkFuncs(0, nullptr);
+    EXPECT_NE(-1, manager->GetMaxSimSlotCount());
 }
 
 /**
