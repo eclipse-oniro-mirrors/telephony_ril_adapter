@@ -19,6 +19,7 @@
 #include <any>
 #include <cstdlib>
 #include <map>
+#include <mutex>
 #include <securec.h>
 
 #include "hdf_remote_service.h"
@@ -105,9 +106,14 @@ private:
     // Get the function pointer of the event handler.
     template<typename F>
     F GetFunc(std::map<uint32_t, F> &funcs, uint32_t code);
-
 private:
     int32_t slotId_;
+    std::mutex mutex_;
+    sptr<HDI::Ril::V1_3::IRilCallback> GetRilCallback()
+    {
+        std::lock_guard<std::mutex> mutexLock(mutex_);
+        return callback_;
+    }
 };
 
 template<typename ReqFuncSet, typename FuncPointer, typename... ValueTypes>
@@ -116,7 +122,8 @@ int32_t HRilBase::RequestVendor(
 {
     if (reqFuncSet == nullptr || (reqFuncSet->*func) == nullptr) {
         TELEPHONY_LOGE("reqFunSet or reqFuncSet->*fun is null");
-        if (callback_ == nullptr) {
+        auto callback = GetRilCallback();
+        if (callback == nullptr) {
             TELEPHONY_LOGE("callback is null");
             return HRIL_ERR_NULL_POINT;
         }
@@ -124,7 +131,7 @@ int32_t HRilBase::RequestVendor(
         responseInfo.slotId = GetSlotId();
         responseInfo.serial = serial;
         responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_VENDOR_NOT_IMPLEMENT;
-        callback_->CommonErrorResponse(responseInfo);
+        callback->CommonErrorResponse(responseInfo);
         return HRIL_ERR_NULL_POINT;
     }
 
@@ -182,25 +189,27 @@ template<typename FuncType, typename... ParamTypes>
 inline int32_t HRilBase::Response(HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, FuncType &&_func,
     ParamTypes &&... _args)
 {
-    if (callback_ == nullptr || _func == nullptr) {
+    auto callback = GetRilCallback();
+    if (callback == nullptr || _func == nullptr) {
         TELEPHONY_LOGE("callback_ or _func is null");
         return HRIL_ERR_NULL_POINT;
     }
-    (callback_->*(_func))(BuildIHRilRadioResponseInfo(responseInfo), std::forward<ParamTypes>(_args)...);
+    (callback->*(_func))(BuildIHRilRadioResponseInfo(responseInfo), std::forward<ParamTypes>(_args)...);
     return HRIL_ERR_SUCCESS;
 }
 
 template<typename FuncType, typename... ParamTypes>
 inline int32_t HRilBase::Notify(int32_t notifyType, const HRilErrNumber error, FuncType &&_func, ParamTypes &&... _args)
 {
-    if (callback_ == nullptr) {
+    auto callback = GetRilCallback();
+    if (callback == nullptr) {
         TELEPHONY_LOGE("callback_ is null");
         return HRIL_ERR_NULL_POINT;
     }
     HDI::Ril::V1_1::RilRadioResponseInfo mResponseInfo = { 0 };
     mResponseInfo.slotId = GetSlotId();
     mResponseInfo.type = (HDI::Ril::V1_1::RilResponseTypes)notifyType;
-    (callback_->*(_func))(mResponseInfo, std::forward<ParamTypes>(_args)...);
+    (callback->*(_func))(mResponseInfo, std::forward<ParamTypes>(_args)...);
     return HRIL_ERR_SUCCESS;
 }
 } // namespace Telephony
