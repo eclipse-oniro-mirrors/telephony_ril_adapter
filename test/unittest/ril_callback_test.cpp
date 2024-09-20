@@ -285,7 +285,7 @@ int32_t RilCallbackTest::SendSimMatchedOperatorInfoResponse(const RilRadioRespon
     return 0;
 }
 
-// Network
+// NetworkSearch
 int32_t RilCallbackTest::NetworkCsRegStatusUpdated(
     const RilRadioResponseInfo &responseInfo, const CsRegStatusInfo &csRegStatusInfo)
 {
