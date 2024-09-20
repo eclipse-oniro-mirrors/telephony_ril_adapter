@@ -1483,7 +1483,7 @@ void RilInterfaceTest::OnInitDataProcessInterface()
 
 void RilInterfaceTest::OnInitNetworkProcessInterface()
 {
-    // network
+    // networksearch
     memberFuncMap_[HREQ_NETWORK_GET_SIGNAL_STRENGTH] = &RilInterfaceTest::GetRilCmSignalIntensityTest;
     memberFuncMap_[HREQ_NETWORK_GET_CS_REG_STATUS] = &RilInterfaceTest::GetRilCmCsRegStatusTest;
     memberFuncMap_[HREQ_NETWORK_GET_PS_REG_STATUS] = &RilInterfaceTest::GetRilCmPsRegStatusTest;
