@@ -220,7 +220,7 @@ static int32_t ReqGetSimIOFDNWrite(HRilSimIO *pSim, ResponseInfo **ppResponse, s
         return VENDOR_FAIL;
     }
     int32_t ret = SendCommandLock(cmd, "+CLCK", 0, ppResponse);
-    if (ret != 0 || (ppResponse != NULL && !(*ppResponse)->success)) {
+    if (ret != 0 || (ppResponse != NULL && (*ppResponse != NULL) && !(*ppResponse)->success)) {
         TELEPHONY_LOGE("AT+CLCK failed");
         return HRIL_ERR_CMD_SEND_FAILURE;
     }
@@ -231,7 +231,7 @@ static int32_t ReqGetSimIOFDNWrite(HRilSimIO *pSim, ResponseInfo **ppResponse, s
         return VENDOR_FAIL;
     }
     ret = SendCommandLock(cmd, "+CRSM", 0, ppResponse);
-    if (ret != 0 || (ppResponse != NULL && !(*ppResponse)->success)) {
+    if (ret != 0 || (ppResponse != NULL && (*ppResponse != NULL) && !(*ppResponse)->success)) {
         return HRIL_ERR_CMD_SEND_FAILURE;
     }
     tmp = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CLCK=\"%s\",%d,\"%s\"", "FD", 0, pSim->pin2);
@@ -239,7 +239,7 @@ static int32_t ReqGetSimIOFDNWrite(HRilSimIO *pSim, ResponseInfo **ppResponse, s
         return VENDOR_FAIL;
     }
     ret = SendCommandLock(cmd, "+CLCK", 0, ppResponse);
-    if (ret != 0 || !(*ppResponse)->success) {
+    if (ret != 0 || (ppResponse != NULL && (*ppResponse != NULL) && !(*ppResponse)->success)) {
         TELEPHONY_LOGE("AT+CLCK failed");
         return HRIL_ERR_CMD_SEND_FAILURE;
     }
