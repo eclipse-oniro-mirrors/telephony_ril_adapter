@@ -34,6 +34,8 @@ ohos_shared_library("hril_hdf") {
     "$RIL_ADAPTER/services/hril:hril",
   ]
 
+  cflags_cc = [ "-fstack-protector-strong" ]
+
   external_deps = [
     "bounds_checking_function:libsec_shared",
     "hdf_core:libhdf_host",

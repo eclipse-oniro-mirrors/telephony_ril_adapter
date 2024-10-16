@@ -44,6 +44,8 @@ ohos_shared_library("hril_innerkits") {
     "LOG_DOMAIN = 0xD001F08",
   ]
 
+  cflags_cc = [ "-fstack-protector-strong" ]
+
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
