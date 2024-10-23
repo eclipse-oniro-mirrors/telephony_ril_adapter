@@ -46,6 +46,7 @@ public:
     HRilManager();
     virtual ~HRilManager();
 
+    static HRilManager &GetInstance();
     int32_t GetMaxSimSlotCount();
 
     virtual ReqDataInfo *CreateHRilRequest(int32_t serial, int32_t slotId, int32_t request) override;
@@ -232,7 +233,6 @@ public:
     std::mutex mutexRunningLock_;
     std::atomic_uint runningLockCount_ = 0;
     std::atomic_int runningSerialNum_ = 0;
-    static std::shared_ptr<HRilManager> manager_;
 
 private:
     template<typename T>

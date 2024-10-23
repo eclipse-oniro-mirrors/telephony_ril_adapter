@@ -53,7 +53,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     report.error = error;
     report.notifyId = HNOTI_CALL_EMERGENCY_NUMBER_REPORT;
     report.type = HRIL_NOTIFICATION;
-    HRilManager::manager_->OnCallReport(slotId, &report, (const uint8_t *)&info, sizeof(HRilEmergencyInfo));
+    HRilManager::GetInstance().OnCallReport(slotId, &report, (const uint8_t *)&info, sizeof(HRilEmergencyInfo));
     return;
 }
 } // namespace OHOS

@@ -46,7 +46,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     report.error = static_cast<HRilErrNumber>(size);
     report.notifyId = HNOTI_SMS_NEW_SMS;
     report.type = HRIL_NOTIFICATION;
-    HRilManager::manager_->OnSmsReport(slotId, &report, (const uint8_t *)&response, sizeof(HRilSmsResponse));
+    HRilManager::GetInstance().OnSmsReport(slotId, &report, (const uint8_t *)&response, sizeof(HRilSmsResponse));
     return;
 }
 } // namespace OHOS

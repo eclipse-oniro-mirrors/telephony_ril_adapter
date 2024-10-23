@@ -42,7 +42,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     report.error = static_cast<HRilErrNumber>(size);
     report.notifyId = HNOTI_CALL_USSD_REPORT;
     report.type = HRIL_NOTIFICATION;
-    HRilManager::manager_->OnCallReport(slotId, &report, (const uint8_t *)&info, sizeof(HRilUssdNoticeInfo));
+    HRilManager::GetInstance().OnCallReport(slotId, &report, (const uint8_t *)&info, sizeof(HRilUssdNoticeInfo));
     return;
 }
 } // namespace OHOS

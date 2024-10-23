@@ -139,11 +139,7 @@ void HRilBase::CopyToCharPoint(char **dest, const std::string &src)
 
 ReqDataInfo *HRilBase::CreateHRilRequest(int32_t serial, int32_t request)
 {
-    if (HRilManager::manager_ == nullptr) {
-        TELEPHONY_LOGE("manager_ is nullptr");
-        return nullptr;
-    }
-    return HRilManager::manager_->CreateHRilRequest(serial, slotId_, request);
+    return HRilManager::GetInstance().CreateHRilRequest(serial, slotId_, request);
 }
 
 HDI::Ril::V1_1::RilRadioResponseInfo HRilBase::BuildIHRilRadioResponseInfo(
