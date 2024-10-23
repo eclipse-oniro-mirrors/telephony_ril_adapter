@@ -32,9 +32,7 @@ constexpr const char *MODULE_HRIL_NETWORK = "hrilNetwork";
 constexpr const char *MODULE_HRIL_SMS = "hrilSms";
 const std::string RUNNINGLOCK_NAME = "HRilRunningLock";
 static bool g_isHrilManagerDestory = false;
-static std::shared_ptr<HRilManager> g_manager = std::make_shared<HRilManager>();
 static pthread_mutex_t dispatchMutex = PTHREAD_MUTEX_INITIALIZER;
-std::shared_ptr<HRilManager> HRilManager::manager_ = g_manager;
 std::unordered_map<int32_t, int32_t> HRilManager::notificationMap_ = {
 #include "hril_notification_map.h"
 };
@@ -46,10 +44,16 @@ using namespace OHOS::HDI::Power::V1_2;
 
 static bool IsHrilManagerValid()
 {
-    if (g_isHrilManagerDestory || g_manager == nullptr) {
+    if (g_isHrilManagerDestory) {
         return false;
     }
     return true;
+}
+
+HRilManager &HRilManager::GetInstance()
+{
+    static HRilManager hrilManager;
+    return hrilManager;
 }
 
 int32_t HRilManager::GetMaxSimSlotCount()
@@ -178,16 +182,17 @@ static void RunningLockCallback(uint8_t *param)
     int serialNum = *reinterpret_cast<int *>(param);
     delete param;
     param = nullptr;
-    std::lock_guard<std::mutex> lockRequest(g_manager->mutexRunningLock_);
+    std::lock_guard<std::mutex> lockRequest(HRilManager::GetInstance().mutexRunningLock_);
     TELEPHONY_LOGD("RunningLockCallback, serialNum:%{public}d, runningSerialNum_:%{public}d", serialNum,
-        static_cast<int>(g_manager->runningSerialNum_));
-    if (g_manager->powerInterface_ == nullptr || serialNum != static_cast<int>(g_manager->runningSerialNum_)) {
+        static_cast<int>(HRilManager::GetInstance().runningSerialNum_));
+    if (HRilManager::GetInstance().powerInterface_ == nullptr ||
+        serialNum != static_cast<int>(HRilManager::GetInstance().runningSerialNum_)) {
         return;
     }
-    g_manager->runningLockCount_ = 0;
+    HRilManager::GetInstance().runningLockCount_ = 0;
     OHOS::HDI::Power::V1_2::RunningLockInfo filledInfo = FillRunningLockInfo(
         RUNNINGLOCK_NAME, RUNNINGLOCK_TIMEOUTMS_LASTING);
-    g_manager->powerInterface_->UnholdRunningLock(filledInfo);
+    HRilManager::GetInstance().powerInterface_->UnholdRunningLock(filledInfo);
     TELEPHONY_LOGD("RunningLockCallback, UnLock");
 }
 #endif
@@ -1076,32 +1081,32 @@ int32_t GetSimSlotCount()
 
 static void HRilBootUpEventLoop()
 {
-    if (!IsHrilManagerValid() || g_manager->timerCallback_ == nullptr) {
+    if (!IsHrilManagerValid() || HRilManager::GetInstance().timerCallback_ == nullptr) {
         return;
     }
-    g_manager->timerCallback_->EventLoop();
+    HRilManager::GetInstance().timerCallback_->EventLoop();
 }
 
 void HRilInit(void)
 {
     if (!IsHrilManagerValid()) {
-        TELEPHONY_LOGE("HRilInit: g_manager is nullptr");
+        TELEPHONY_LOGE("HRilInit: hrilManager is invalid");
         return;
     }
 #ifdef ABILITY_POWER_SUPPORT
-    if (g_manager->powerInterface_ == nullptr) {
-        g_manager->powerInterface_ = IPowerInterface::Get();
-        if (g_manager->powerInterface_ == nullptr) {
+    if (HRilManager::GetInstance().powerInterface_ == nullptr) {
+        HRilManager::GetInstance().powerInterface_ = IPowerInterface::Get();
+        if (HRilManager::GetInstance().powerInterface_ == nullptr) {
             TELEPHONY_LOGE("failed to get power hdi interface");
         }
     }
 #endif
-    if (g_manager->eventLoop_ != nullptr) {
+    if (HRilManager::GetInstance().eventLoop_ != nullptr) {
         TELEPHONY_LOGD("eventLoop_ has exit");
         return;
     }
-    g_manager->eventLoop_ = std::make_unique<std::thread>(HRilBootUpEventLoop);
-    pthread_setname_np(g_manager->eventLoop_.get()->native_handle(), "hril_eventLoop");
+    HRilManager::GetInstance().eventLoop_ = std::make_unique<std::thread>(HRilBootUpEventLoop);
+    pthread_setname_np(HRilManager::GetInstance().eventLoop_.get()->native_handle(), "hril_eventLoop");
 }
 
 void HRilRegOps(const HRilOps *hrilOps)
@@ -1118,26 +1123,26 @@ void HRilRegOps(const HRilOps *hrilOps)
         return;
     }
     rilRegisterStatus = RIL_REGISTER_IS_RUNNING;
-    g_manager->hrilOpsVersion_ = hrilOps->version;
+    HRilManager::GetInstance().hrilOpsVersion_ = hrilOps->version;
     (void)memcpy_s(&callBacks, sizeof(HRilOps), hrilOps, sizeof(HRilOps));
-    for (int32_t slotId = HRIL_SIM_SLOT_0; slotId < g_manager->GetMaxSimSlotCount(); slotId++) {
+    for (int32_t slotId = HRIL_SIM_SLOT_0; slotId < HRilManager::GetInstance().GetMaxSimSlotCount(); slotId++) {
         if (callBacks.smsOps != nullptr) {
-            g_manager->RegisterSmsFuncs(slotId, callBacks.smsOps);
+            HRilManager::GetInstance().RegisterSmsFuncs(slotId, callBacks.smsOps);
         }
         if (callBacks.callOps != nullptr) {
-            g_manager->RegisterCallFuncs(slotId, callBacks.callOps);
+            HRilManager::GetInstance().RegisterCallFuncs(slotId, callBacks.callOps);
         }
         if (callBacks.dataOps != nullptr) {
-            g_manager->RegisterDataFuncs(slotId, callBacks.dataOps);
+            HRilManager::GetInstance().RegisterDataFuncs(slotId, callBacks.dataOps);
         }
         if (callBacks.modemOps != nullptr) {
-            g_manager->RegisterModemFuncs(slotId, callBacks.modemOps);
+            HRilManager::GetInstance().RegisterModemFuncs(slotId, callBacks.modemOps);
         }
         if (callBacks.networkOps != nullptr) {
-            g_manager->RegisterNetworkFuncs(slotId, callBacks.networkOps);
+            HRilManager::GetInstance().RegisterNetworkFuncs(slotId, callBacks.networkOps);
         }
         if (callBacks.simOps != nullptr) {
-            g_manager->RegisterSimFuncs(slotId, callBacks.simOps);
+            HRilManager::GetInstance().RegisterSimFuncs(slotId, callBacks.simOps);
         }
     }
 }
@@ -1148,7 +1153,7 @@ void OnCallReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *r
         TELEPHONY_LOGE("HrilManager is nullptr, id:%{public}d", slotId);
         return;
     }
-    g_manager->OnCallReport(slotId, &reportInfo, response, responseLen);
+    HRilManager::GetInstance().OnCallReport(slotId, &reportInfo, response, responseLen);
 }
 
 void OnDataReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen)
@@ -1157,7 +1162,7 @@ void OnDataReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *r
         TELEPHONY_LOGE("HrilManager is nullptr, id:%{public}d", slotId);
         return;
     }
-    g_manager->OnDataReport(slotId, &reportInfo, response, responseLen);
+    HRilManager::GetInstance().OnDataReport(slotId, &reportInfo, response, responseLen);
 }
 
 void OnModemReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen)
@@ -1166,7 +1171,7 @@ void OnModemReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *
         TELEPHONY_LOGE("HrilManager is nullptr, id:%{public}d", slotId);
         return;
     }
-    g_manager->OnModemReport(slotId, &reportInfo, response, responseLen);
+    HRilManager::GetInstance().OnModemReport(slotId, &reportInfo, response, responseLen);
 }
 
 void OnNetworkReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen)
@@ -1175,7 +1180,7 @@ void OnNetworkReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t
         TELEPHONY_LOGE("HrilManager is nullptr, id:%{public}d", slotId);
         return;
     }
-    g_manager->OnNetworkReport(slotId, &reportInfo, response, responseLen);
+    HRilManager::GetInstance().OnNetworkReport(slotId, &reportInfo, response, responseLen);
 }
 
 void OnSimReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen)
@@ -1184,7 +1189,7 @@ void OnSimReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *re
         TELEPHONY_LOGE("HrilManager is nullptr, id:%{public}d", slotId);
         return;
     }
-    g_manager->OnSimReport(slotId, &reportInfo, response, responseLen);
+    HRilManager::GetInstance().OnSimReport(slotId, &reportInfo, response, responseLen);
 }
 
 void OnSmsReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *response, size_t responseLen)
@@ -1193,16 +1198,16 @@ void OnSmsReport(int32_t slotId, struct ReportInfo reportInfo, const uint8_t *re
         TELEPHONY_LOGE("HrilManager is nullptr, id:%{public}d", slotId);
         return;
     }
-    g_manager->OnSmsReport(slotId, &reportInfo, response, responseLen);
+    HRilManager::GetInstance().OnSmsReport(slotId, &reportInfo, response, responseLen);
 }
 
 void OnTimerCallback(HRilCallbackFun func, uint8_t *param, const struct timeval *tv)
 {
-    if (!IsHrilManagerValid() || g_manager->timerCallback_ == nullptr) {
+    if (!IsHrilManagerValid() || HRilManager::GetInstance().timerCallback_ == nullptr) {
         TELEPHONY_LOGE("HrilManager or timerCallback is nullptr");
         return;
     }
-    g_manager->timerCallback_->HRilSetTimerCallbackInfo(func, param, tv);
+    HRilManager::GetInstance().timerCallback_->HRilSetTimerCallbackInfo(func, param, tv);
 }
 
 #ifdef __cplusplus

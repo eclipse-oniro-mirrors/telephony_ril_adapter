@@ -67,7 +67,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     report.error = static_cast<HRilErrNumber>(size);
     report.notifyId = HNOTI_DATA_PDP_CONTEXT_LIST_UPDATED;
     report.type = HRIL_NOTIFICATION;
-    HRilManager::manager_->OnDataReport(slotId, &report, (const uint8_t *)&response, sizeof(HRilDataCallResponse));
+    HRilManager::GetInstance().OnDataReport(slotId, &report, (const uint8_t *)&response, sizeof(HRilDataCallResponse));
 
     HRilDataLinkCapability linkCapability;
     linkCapability.primaryDownlinkKbps = static_cast<int32_t>(*data + offset) * KILO_BIT;
@@ -78,7 +78,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     offset += sizeof(int32_t);
     linkCapability.secondaryUplinkKbps = static_cast<int32_t>(*data + offset) * KILO_BIT;
     report.notifyId = HNOTI_DATA_LINK_CAPABILITY_UPDATED;
-    HRilManager::manager_->OnDataReport(
+    HRilManager::GetInstance().OnDataReport(
         slotId, &report, (const uint8_t *)&linkCapability, sizeof(HRilDataLinkCapability));
     return;
 }

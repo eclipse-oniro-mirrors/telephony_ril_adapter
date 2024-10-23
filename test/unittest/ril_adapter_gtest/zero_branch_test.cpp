@@ -1406,10 +1406,8 @@ HWTEST_F(BranchTest, Telephony_HrilManager_HrilBase_001, Function | MediumTest |
  */
 HWTEST_F(BranchTest, Telephony_HrilManager_CreateHRilRequest_001, Function | MediumTest | Level3)
 {
-    auto &hrilData = HRilManager::manager_->hrilData_[0];
+    auto &hrilData = HRilManager::GetInstance().hrilData_[0];
     EXPECT_NE(hrilData->CreateHRilRequest(0, 0), nullptr);
-    HRilManager::manager_ = nullptr;
-    EXPECT_EQ(hrilData->CreateHRilRequest(0, 0), nullptr);
 }
 
 } // namespace Telephony
