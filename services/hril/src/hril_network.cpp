@@ -714,7 +714,7 @@ int32_t HRilNetwork::NetworkTimeUpdated(
         nitzRecvTime = tv.tv_sec * NANO_TO_SECOND + tv.tv_nsec;
     }
     std::string str = ";" + std::to_string(nitzRecvTime);
-    std::string nitzStr = (char *) response;
+    std::string nitzStr = (char *)response;
     nitzStr += str;
     return Notify(indType, error, &HDI::Ril::V1_1::IRilCallback::NetworkTimeUpdated, (const char *)(nitzStr.data()));
 }
