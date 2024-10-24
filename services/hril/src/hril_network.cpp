@@ -15,6 +15,8 @@
 
 #include "hril_network.h"
 
+#include <sys/time.h>
+
 #include "hril_notification.h"
 #include "hril_request.h"
 
@@ -24,6 +26,7 @@ enum class NetworkParameter : int32_t {
     RESPONSE_VALUE = 3,
     INVALID_RESPONSE_VALUE = 11,
 };
+const int64_t NANO_TO_SECOND = 1000000000;
 
 HRilNetwork::HRilNetwork(int32_t slotId) : HRilBase(slotId)
 {
@@ -703,7 +706,17 @@ int32_t HRilNetwork::NetworkTimeUpdated(
         TELEPHONY_LOGE("NetworkTimeUpdated response is invalid");
         return HRIL_ERR_INVALID_PARAMETER;
     }
-    return Notify(indType, error, &HDI::Ril::V1_1::IRilCallback::NetworkTimeUpdated, (const char *)response);
+    int64_t nitzRecvTime = 0;
+    struct timespec tv {};
+    if (clock_gettime(CLOCK_BOOTTIME, &tv) < 0) {
+        nitzRecvTime = 0;
+    } else {
+        nitzRecvTime = tv.tv_sec * NANO_TO_SECOND + tv.tv_nsec;
+    }
+    std::string str = ";" + std::to_string(nitzRecvTime);
+    std::string nitzStr = (char *)response;
+    nitzStr += str;
+    return Notify(indType, error, &HDI::Ril::V1_1::IRilCallback::NetworkTimeUpdated, (const char *)(nitzStr.data()));
 }
 
 int32_t HRilNetwork::NetworkTimeZoneUpdated(
