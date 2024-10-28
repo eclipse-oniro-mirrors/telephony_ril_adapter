@@ -41,7 +41,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     report.error = static_cast<HRilErrNumber>(size);
     report.notifyId = HNOTI_SIM_STK_PROACTIVE_NOTIFY;
     report.type = HRIL_NOTIFICATION;
-    HRilManager::manager_->OnSimReport(slotId, &report, response, sizeof(char));
+    HRilManager::GetInstance().OnSimReport(slotId, &report, response, sizeof(char));
     return;
 }
 } // namespace OHOS

@@ -39,7 +39,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     report.error = static_cast<HRilErrNumber>(size);
     report.notifyId = HNOTI_NETWORK_RESIDENT_NETWORK_UPDATED;
     report.type = HRIL_NOTIFICATION;
-    HRilManager::manager_->OnNetworkReport(slotId, &report, (const uint8_t *)plmn, size);
+    HRilManager::GetInstance().OnNetworkReport(slotId, &report, (const uint8_t *)plmn, size);
     return;
 }
 } // namespace OHOS
