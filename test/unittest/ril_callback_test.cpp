@@ -1635,5 +1635,6 @@ int32_t RilCallbackTest::CommonErrorResponse(const RilRadioResponseInfo &respons
     PrintResponseInfo("SendSmsAckResponse", responseInfo);
     return 0;
 }
+
 } // namespace Telephony
 } // namespace OHOS
