@@ -1863,8 +1863,8 @@ int32_t RilCallbackTest::SendSmsAckResponse(const RilRadioResponseInfo &response
 
 int32_t RilCallbackTest::CommonErrorResponse(const RilRadioResponseInfo &responseInfo)
 {
-    TELEPHONY_LOGI(
-        "RilCallbackTest::CommonErrorResponse type:%{public}d error: %{public}d", responseInfo.type, responseInfo.error);
+    TELEPHONY_LOGI("RilCallbackTest::CommonErrorResponse type:%{public}d error: %{public}d",
+        responseInfo.type, responseInfo.error);
     return 0;
 }
 } // namespace Telephony
