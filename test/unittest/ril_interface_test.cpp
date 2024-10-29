@@ -58,6 +58,7 @@ constexpr int32_t MAX_DOWNLINK_LINK_BANDWIDTH[] = {
     500000,
     1000000,
 };
+
 typedef enum {
     HREQ_CALL_BASE = 0,
     HREQ_CALL_GET_CALL_LIST,
