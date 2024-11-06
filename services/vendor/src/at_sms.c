@@ -33,7 +33,7 @@ int32_t ProcessCellBroadcast(char *pBuff, HRilCBConfigReportInfo *response)
     int32_t ret;
     int32_t count = 0;
 
-    if (pBuff == NULL || response == NULL) {
+    if (pBuff == NULL || response == NULL || strlen(pBuff) == 0) {
         return -1;
     }
     tmp = pBuff;

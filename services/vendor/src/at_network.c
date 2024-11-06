@@ -16,6 +16,7 @@
 #include "at_network.h"
 
 #include <signal.h>
+#include <string.h>
 
 #include "hril_notification.h"
 #include "vendor_report.h"
@@ -70,7 +71,7 @@ static int32_t GetResponseErrorCode(ResponseInfo *pResponseInfo)
 {
     char *pLine = NULL;
     int32_t ret = HRIL_ERR_GENERIC_FAILURE;
-    if (pResponseInfo && pResponseInfo->result) {
+    if (pResponseInfo && pResponseInfo->result && strlen(pResponseInfo->result) != 0) {
         pLine = pResponseInfo->result;
         SkipATPrefix(&pLine);
         NextInt(&pLine, &ret);
