@@ -36,7 +36,7 @@ static char *FindEndOfLine(char *cur)
     if (endLine == NULL) {
         return NULL;
     }
-    if (endLine[0] == '>' && endLine[1] == ' ' && endLine[count] == '\0') {
+    if (((int32_t)strlen(endLine) >= count) && (endLine[0] == '>' && endLine[1] == ' ' && endLine[count] == '\0')) {
         return endLine + count;
     }
     while (*endLine != '\0' && *endLine != '\r' && *endLine != '\n') {

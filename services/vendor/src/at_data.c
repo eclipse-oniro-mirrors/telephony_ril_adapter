@@ -550,6 +550,11 @@ static void DataReportMessage(int32_t cid, const ReqDataInfo *requestInfo, Modem
                 break;
             }
         }
+        if (index == validNum) {
+            OnDataReport(slotId, reportInfo, (const uint8_t *)pDataCalls, validNum * sizeof(HRilDataCallResponse));
+            FreeDataCallResponse(pDataCalls, validNum);
+            return;
+        }
         OnDataReport(slotId, reportInfo, (const uint8_t *)&pDataCalls[index], sizeof(HRilDataCallResponse));
     } else {
         /* Change notice */
