@@ -17,6 +17,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 
 #include "hril_manager.h"
 #include "hril_sms.h"
@@ -24,14 +25,20 @@
 
 using namespace OHOS::Telephony;
 namespace OHOS {
-constexpr int32_t SLOT_NUM = 2;
+
+int32_t GetRandomInt(int min, int max, const uint8_t *data, size_t size)
+{
+    FuzzedDataProvider fdp(data, size);
+    return fdp.ConsumeIntegralInRange<int32_t>(min, max);
+}
 
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 {
     if (data == nullptr || size == 0) {
         return;
     }
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t maxCnt = HRilManager::GetInstance().GetMaxSimSlotCount();
+    int32_t slotId = GetRandomInt(0, maxCnt, data, size);
     OHOS::HDI::Ril::V1_1::SmsMessageIOInfo message;
     std::string pdu(reinterpret_cast<const char *>(data), size);
     message.pdu = pdu;
