@@ -17,6 +17,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 
 #include "hril_data.h"
 #include "hril_manager.h"
@@ -25,12 +26,19 @@
 
 using namespace OHOS::Telephony;
 namespace OHOS {
-constexpr int32_t SLOT_NUM = 2;
+constexpr int32_t MIN_SLOT_ID = -1;
+constexpr int32_t MAX_SLOT_ID = 4;
 constexpr int32_t REASON_TYPE = 2;
 constexpr int32_t RETRY_TIME = 2;
 constexpr int32_t ACTIVE_NUM = 2;
 constexpr int32_t KILO_BIT = 1000;
 constexpr const char *NUMBER = "123";
+
+int32_t GetRandomInt(int min, int max, const uint8_t *data, size_t size)
+{
+    FuzzedDataProvider fdp(data, size);
+    return fdp.ConsumeIntegralInRange<int32_t>(min, max);
+}
 
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 {
@@ -38,7 +46,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
+    int32_t slotId = GetRandomInt(MIN_SLOT_ID, MAX_SLOT_ID, data, size);
 
     HRilDataCallResponse response;
     int32_t offset = 0;
@@ -63,8 +71,11 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     response.pduSessionId = static_cast<int32_t>(*data + offset);
     offset += sizeof(int32_t);
 
+    int32_t minErrCode = -1;
+    int32_t maxErrCode = static_cast<int32_t>(HRIL_ERR_HDF_IPC_FAILURE) + 1;
+    HRilErrNumber error = static_cast<HRilErrNumber>(GetRandomInt(minErrCode, maxErrCode, data, size));
     struct ReportInfo report;
-    report.error = static_cast<HRilErrNumber>(size);
+    report.error = error;
     report.notifyId = HNOTI_DATA_PDP_CONTEXT_LIST_UPDATED;
     report.type = HRIL_NOTIFICATION;
     HRilManager::GetInstance().OnDataReport(slotId, &report, (const uint8_t *)&response, sizeof(HRilDataCallResponse));
