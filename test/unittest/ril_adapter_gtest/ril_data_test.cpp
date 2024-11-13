@@ -484,5 +484,6 @@ HWTEST_F(RilDataTest, Telephony_DriverSystem_SetDataProfileInfo_V1_0200, Functio
     EXPECT_EQ(SUCCESS, ret);
     ASSERT_TRUE(RilTestUtil::GetBoolResult(HdiId::HREQ_DATA_SET_DATA_PROFILE_INFO));
 }
+
 } // namespace Telephony
 } // namespace OHOS
