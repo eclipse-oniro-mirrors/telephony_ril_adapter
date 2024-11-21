@@ -258,7 +258,7 @@ private:
     std::vector<std::unique_ptr<HRilSim>> hrilSim_;
     std::vector<std::unique_ptr<HRilSms>> hrilSms_;
     std::vector<std::unique_ptr<HRilData>> hrilData_;
-    std::unordered_map<int32_t, std::list<ReqDataInfo *>> requestList_;
+    std::unordered_map<int32_t, std::vector<ReqDataInfo *>> requestList_;
     static std::unordered_map<int32_t, int32_t> notificationMap_;
     std::mutex requestListLock_;
 };
