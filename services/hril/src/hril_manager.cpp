@@ -75,12 +75,12 @@ ReqDataInfo *HRilManager::CreateHRilRequest(int32_t serial, int32_t slotId, int3
     std::lock_guard<std::mutex> lockRequest(requestListLock_);
     auto iter = requestList_.find(request);
     if (iter != requestList_.end()) {
-        std::list<ReqDataInfo *> &reqDataSet = iter->second;
+        std::vector<ReqDataInfo *> &reqDataSet = iter->second;
         reqDataSet.push_back(requestInfo);
-        TELEPHONY_LOGD("CreateHRilRequest requestId=%{public}d, list size: %{public}zu", request, reqDataSet.size());
+        TELEPHONY_LOGD("CreateHRilRequest requestId=%{public}d, vector size: %{public}zu", request, reqDataSet.size());
     } else {
         TELEPHONY_LOGD("CreateHRilRequest create requestList, requestId=%{public}d", request);
-        std::list<ReqDataInfo *> reqDataSet;
+        std::vector<ReqDataInfo *> reqDataSet;
         reqDataSet.push_back(requestInfo);
         requestList_.emplace(request, reqDataSet);
     }
@@ -92,7 +92,7 @@ void HRilManager::ReleaseHRilRequest(int32_t request, ReqDataInfo *requestInfo)
     std::lock_guard<std::mutex> lockRequest(requestListLock_);
     auto iter = requestList_.find(request);
     if (iter != requestList_.end()) {
-        std::list<ReqDataInfo *> &reqDataSet = iter->second;
+        std::vector<ReqDataInfo *> &reqDataSet = iter->second;
         auto it = find(reqDataSet.begin(), reqDataSet.end(), requestInfo);
         if (it != reqDataSet.end()) {
             if (*it != nullptr) {
