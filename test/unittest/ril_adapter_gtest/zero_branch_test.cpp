@@ -1409,5 +1409,6 @@ HWTEST_F(BranchTest, Telephony_HrilManager_CreateHRilRequest_001, Function | Med
     auto &hrilData = HRilManager::GetInstance().hrilData_[0];
     EXPECT_NE(hrilData->CreateHRilRequest(0, 0), nullptr);
 }
+
 } // namespace Telephony
 } // namespace OHOS
