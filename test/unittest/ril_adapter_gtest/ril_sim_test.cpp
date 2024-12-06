@@ -955,6 +955,5 @@ HWTEST_F(RILSimTest, Telephony_DriverSystem_UnlockSimLock_V1_0200, Function | Me
 #endif
     ASSERT_TRUE(true);
 }
-
 } // namespace Telephony
 } // namespace OHOS
