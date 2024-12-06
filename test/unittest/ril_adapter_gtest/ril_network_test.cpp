@@ -20,6 +20,7 @@ namespace OHOS {
 namespace Telephony {
 using namespace OHOS::HDI::Ril::V1_2;
 using namespace testing::ext;
+
 namespace {
 sptr<OHOS::HDI::Ril::V1_2::IRil> g_rilInterface = nullptr;
 }
