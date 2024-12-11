@@ -162,7 +162,9 @@ int32_t HRilSim::GetSimIO(int32_t serialId, const OHOS::HDI::Ril::V1_1::SimIoReq
     CopyToHRilSimIO(rilSimIO, simIO);
     int32_t ret = RequestVendor(
         serialId, HREQ_SIM_GET_SIM_IO, simFuncs_, &HRilSimReq::GetSimIO, rilSimIO.get(), sizeof(*rilSimIO));
-    SafeFrees(rilSimIO->data, rilSimIO->pathid, rilSimIO->pin2);
+    SafeFrees(rilSimIO->data);
+    SafeFrees(rilSimIO->pathid);
+    SafeFrees(rilSimIO->pin2);
     return ret;
 }
 
@@ -182,7 +184,8 @@ int32_t HRilSim::GetSimLockStatus(int32_t serialId, const OHOS::HDI::Ril::V1_1::
     CopyToHRilSimLock(rilSimLock, simLockInfo);
     int32_t ret = RequestVendor(serialId, HREQ_SIM_GET_SIM_LOCK_STATUS, simFuncs_, &HRilSimReq::GetSimLockStatus,
         rilSimLock.get(), sizeof(*rilSimLock));
-    SafeFrees(rilSimLock->fac, rilSimLock->passwd);
+    SafeFrees(rilSimLock->fac);
+    SafeFrees(rilSimLock->passwd);
     return ret;
 }
 
@@ -192,7 +195,8 @@ int32_t HRilSim::SetSimLock(int32_t serialId, const OHOS::HDI::Ril::V1_1::SimLoc
     CopyToHRilSimLock(rilSimLock, simLockInfo);
     int32_t ret = RequestVendor(
         serialId, HREQ_SIM_SET_SIM_LOCK, simFuncs_, &HRilSimReq::SetSimLock, rilSimLock.get(), sizeof(*rilSimLock));
-    SafeFrees(rilSimLock->fac, rilSimLock->passwd);
+    SafeFrees(rilSimLock->fac);
+    SafeFrees(rilSimLock->passwd);
     return ret;
 }
 
@@ -202,7 +206,9 @@ int32_t HRilSim::ChangeSimPassword(int32_t serialId, const OHOS::HDI::Ril::V1_1:
     CopyToHRilSimPassword(rilSimPassword, simPassword);
     int32_t ret = RequestVendor(serialId, HREQ_SIM_CHANGE_SIM_PASSWORD, simFuncs_, &HRilSimReq::ChangeSimPassword,
         rilSimPassword.get(), sizeof(*rilSimPassword));
-    SafeFrees(rilSimPassword->fac, rilSimPassword->oldPassword, rilSimPassword->newPassword);
+    SafeFrees(rilSimPassword->fac);
+    SafeFrees(rilSimPassword->oldPassword);
+    SafeFrees(rilSimPassword->newPassword);
     return ret;
 }
 
@@ -222,7 +228,8 @@ int32_t HRilSim::UnlockPuk(int32_t serialId, const std::string &puk, const std::
     char *pinPoint = nullptr;
     CopyToCharPoint(&pinPoint, pin);
     int32_t ret = RequestVendor(serialId, HREQ_SIM_UNLOCK_PUK, simFuncs_, &HRilSimReq::UnlockPuk, pukPoint, pinPoint);
-    SafeFrees(pukPoint, pinPoint);
+    SafeFrees(pukPoint);
+    SafeFrees(pinPoint);
     return ret;
 }
 
@@ -243,7 +250,8 @@ int32_t HRilSim::UnlockPuk2(int32_t serialId, const std::string &puk2, const std
     CopyToCharPoint(&pin2Point, pin2);
     int32_t ret =
         RequestVendor(serialId, HREQ_SIM_UNLOCK_PUK2, simFuncs_, &HRilSimReq::UnlockPuk2, puk2Point, pin2Point);
-    SafeFrees(puk2Point, pin2Point);
+    SafeFrees(puk2Point);
+    SafeFrees(pin2Point);
     return ret;
 }
 
@@ -351,7 +359,8 @@ int32_t HRilSim::SimAuthentication(
     CopyToHRilSimAuthentication(rilSimAuthInfo, simAuthInfo);
     int32_t ret = RequestVendor(serialId, HREQ_SIM_AUTHENTICATION, simFuncs_, &HRilSimReq::SimAuthentication,
         rilSimAuthInfo.get(), sizeof(*rilSimAuthInfo));
-    SafeFrees(rilSimAuthInfo->aid, rilSimAuthInfo->data);
+    SafeFrees(rilSimAuthInfo->aid);
+    SafeFrees(rilSimAuthInfo->data);
     return ret;
 }
 
@@ -373,7 +382,9 @@ int32_t HRilSim::SendSimMatchedOperatorInfo(
     CopyToHRilNcfgOperatorInfo(rilNcfgOperatorInfo, ncfgOperatorInfo);
     int32_t ret = RequestVendor(serialId, HREQ_SIM_SEND_NCFG_OPER_INFO, simFuncs_,
         &HRilSimReq::SendSimMatchedOperatorInfo, rilNcfgOperatorInfo.get(), sizeof(*rilNcfgOperatorInfo));
-    SafeFrees(rilNcfgOperatorInfo->operName, rilNcfgOperatorInfo->operKey, rilNcfgOperatorInfo->reserve);
+    SafeFrees(rilNcfgOperatorInfo->operName);
+    SafeFrees(rilNcfgOperatorInfo->operKey);
+    SafeFrees(rilNcfgOperatorInfo->reserve);
     return ret;
 }
 

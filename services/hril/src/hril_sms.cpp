@@ -159,7 +159,8 @@ int32_t HRilSms::AddSimMessage(int32_t serialId, const OHOS::HDI::Ril::V1_1::Sms
     int32_t result = RequestVendor(
         serialId, HREQ_SMS_ADD_SIM_MESSAGE, smsFuncs_, &HRilSmsReq::AddSimMessage, &msg, sizeof(HRilSmsWriteSms));
     TELEPHONY_LOGI("AddSimMessage result is: %{public}d", result);
-    SafeFrees(msg.pdu, msg.smsc);
+    SafeFrees(msg.pdu);
+    SafeFrees(msg.smsc);
     return result;
 }
 
@@ -201,7 +202,8 @@ int32_t HRilSms::UpdateSimMessage(int32_t serialId, const OHOS::HDI::Ril::V1_1::
     int32_t result = RequestVendor(
         serialId, HREQ_SMS_UPDATE_SIM_MESSAGE, smsFuncs_, &HRilSmsReq::UpdateSimMessage, &msg, sizeof(HRilSmsWriteSms));
     TELEPHONY_LOGI("UpdateSimMessage result is: %{public}d", result);
-    SafeFrees(msg.pdu, msg.smsc);
+    SafeFrees(msg.pdu);
+    SafeFrees(msg.smsc);
     return result;
 }
 
