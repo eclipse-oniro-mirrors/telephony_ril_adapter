@@ -61,15 +61,14 @@ protected:
     void CopyToCharPoint(char **a, const std::string &temp);
     HDI::Ril::V1_1::RilRadioResponseInfo BuildIHRilRadioResponseInfo(
         const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo);
-    inline void SafeFrees() {}
-    template<typename M, typename... Ms>
-    inline void SafeFrees(M &m, Ms &...ms)
+
+    template<typename M>
+    inline void SafeFrees(M &m)
     {
         if (m != nullptr) {
             free(m);
             m = nullptr;
         }
-        SafeFrees(ms...);
     }
 
     template<typename FuncType, typename... ParamTypes>
