@@ -1072,7 +1072,9 @@ int32_t GetSimSlotCount()
     char vSimModemCount[HRIL_SYSPARA_SIZE] = { 0 };
     GetParameter(HRIL_VSIM_MODEM_COUNT_STR, HRIL_DEFAULT_VSIM_MODEM_COUNT, vSimModemCount, HRIL_SYSPARA_SIZE);
     int32_t vSimModemCountNumber = std::atoi(vSimModemCount);
-    if (simSlotCountNumber == DUAL_SLOT_COUNT && vSimModemCountNumber == MAX_SLOT_COUNT) {
+	// two modem device also has 3 slot (2sim + 1vsim)
+    if (simSlotCountNumber == DUAL_SLOT_COUNT &&
+        (vSimModemCountNumber == MAX_SLOT_COUNT || vSimModemCountNumber == DUAL_SLOT_COUNT)) {
         simSlotCountNumber = MAX_SLOT_COUNT;
     }
     TELEPHONY_LOGI("GetSimSlotCount, %{public}d", simSlotCountNumber);
