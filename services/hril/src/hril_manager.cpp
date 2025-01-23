@@ -207,9 +207,11 @@ void HRilManager::ApplyRunningLock(void)
 
     std::lock_guard<std::mutex> lockRequest(mutexRunningLock_);
     if (powerInterface_ != nullptr) {
-        OHOS::HDI::Power::V1_2::RunningLockInfo filledInfo = FillRunningLockInfo(
-            RUNNINGLOCK_NAME, RUNNINGLOCK_TIMEOUTMS_LASTING);
-        powerInterface_->HoldRunningLock(filledInfo);
+        if (runningLockCount_ == 0) {
+            OHOS::HDI::Power::V1_2::RunningLockInfo filledInfo = FillRunningLockInfo(
+                RUNNINGLOCK_NAME, RUNNINGLOCK_TIMEOUTMS_LASTING);
+            powerInterface_->HoldRunningLock(filledInfo);
+        }
         struct timeval tv = { 0, RUNNING_LOCK_DEFAULT_TIMEOUT_US };
         runningLockCount_++;
         runningSerialNum_++;
