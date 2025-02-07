@@ -19,7 +19,7 @@
 
 namespace OHOS {
 namespace Telephony {
-using namespace OHOS::HDI::Ril::V1_3;
+using namespace OHOS::HDI::Ril::V1_4;
 using namespace std;
 
 enum class RatType {
@@ -971,6 +971,14 @@ int32_t RilCallbackTest::SetEmergencyCallListResponse(const RilRadioResponseInfo
 int32_t RilCallbackTest::GetCallListResponse(const RilRadioResponseInfo &responseInfo, const CallInfoList &callList)
 {
     PrintResponseInfo("GetCallListResponse", responseInfo);
+    cout << "[CallInfoList] -->[callSize] : " << callList.callSize << endl;
+    return 0;
+}
+
+int32_t RilCallbackTest::GetCallListResponseExt(
+    const RilRadioResponseInfo &responseInfo, const CallInfoExtList &callList)
+{
+    PrintResponseInfo("GetCallListResponseExt", responseInfo);
     cout << "[CallInfoList] -->[callSize] : " << callList.callSize << endl;
     return 0;
 }

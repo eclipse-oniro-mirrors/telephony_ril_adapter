@@ -19,7 +19,7 @@
 #include "condition_variable"
 #include "map"
 #include "mutex"
-#include "v1_3/iril.h"
+#include "v1_4/iril.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -240,7 +240,7 @@ enum class SimMessageStatus {
     SIM_MESSAGE_STATUS_SENT = 3,
 };
 
-class RilCallbackTest : public HDI::Ril::V1_3::IRilCallback {
+class RilCallbackTest : public HDI::Ril::V1_4::IRilCallback {
 public:
     void NotifyAll();
     void WaitFor(int32_t timeoutSecond);
@@ -265,6 +265,8 @@ public:
         const HDI::Ril::V1_1::EmergencyInfoList &emergencyInfoList) override;
     int32_t GetCallListResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_1::CallInfoList &callList) override;
+    int32_t GetCallListResponseExt(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_4::CallInfoExtList &callList) override;
     int32_t DialResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
     int32_t HangupResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
     int32_t RejectResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;

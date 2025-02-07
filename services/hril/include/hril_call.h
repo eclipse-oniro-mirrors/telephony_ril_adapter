@@ -70,6 +70,8 @@ public:
 
     int32_t GetCallListResponse(int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const void *response, size_t responseLen);
+    int32_t GetCallListResponseExt(int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+        const void *response, size_t responseLen);
     int32_t DialResponse(int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
         size_t responseLen);
     int32_t HangupResponse(int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
@@ -152,6 +154,8 @@ public:
     int32_t CallRsrvccStatusNotify(int32_t notifyType, HRilErrNumber error, const void *response, size_t responseLen);
     void BuildICallList(
         HDI::Ril::V1_1::CallInfoList &callInfoList, const void *response, size_t responseLen);
+    void BuildICallList(
+        HDI::Ril::V1_4::CallInfoExtList &callInfoList, const void *response, size_t responseLen);
     void BuildIEmergencyCallList(
         HDI::Ril::V1_1::EmergencyInfoList &emergencyCallInfoList, const void *response, size_t responseLen);
     void BuildICallForwardQueryInfoList(HDI::Ril::V1_1::CallForwardQueryInfoList &cFQueryList,

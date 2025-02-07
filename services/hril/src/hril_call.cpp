@@ -79,7 +79,7 @@ void HRilCall::AddCallBasicResponseToMap()
     // Response
     respMemberFuncMap_[HREQ_CALL_GET_CALL_LIST] =
         [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
-        size_t responseLen) { return GetCallListResponse(requestNum, responseInfo, response, responseLen); };
+        size_t responseLen) { return GetCallListResponseExt(requestNum, responseInfo, response, responseLen); };
     respMemberFuncMap_[HREQ_CALL_DIAL] =
         [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
         size_t responseLen) { return DialResponse(requestNum, responseInfo, response, responseLen); };
@@ -437,6 +437,35 @@ void HRilCall::BuildICallList(
     }
 }
 
+void HRilCall::BuildICallList(
+    HDI::Ril::V1_4::CallInfoExtList &callInfoList, const void *response, size_t responseLen)
+{
+    size_t num = responseLen / sizeof(HRilCallInfo);
+    HDI::Ril::V1_4::CallInfoExt callInfoExt;
+    callInfoList.callSize = num;
+    for (size_t i = 0; i < num; i++) {
+        HRilCallInfo *curPtr = ((HRilCallInfo *)response + i);
+        if (curPtr != nullptr) {
+            callInfoExt.index = curPtr->index;
+            callInfoExt.dir = curPtr->dir;
+            callInfoExt.state = curPtr->state;
+            callInfoExt.mode = curPtr->mode;
+            callInfoExt.mpty = curPtr->mpty;
+            callInfoExt.voiceDomain = curPtr->voiceDomain;
+            callInfoExt.callType = curPtr->callType;
+            callInfoExt.number = (curPtr->number == nullptr) ? "" : curPtr->number;
+            callInfoExt.type = curPtr->type;
+            callInfoExt.alpha = (curPtr->alpha == nullptr) ? "" : curPtr->alpha;
+            callInfoExt.name = curPtr->name;
+            callInfoExt.namePresentation = curPtr->namePresentation;
+            callInfoList.calls.push_back(callInfoExt);
+        } else {
+            TELEPHONY_LOGE("BuildCallList: Invalid curPtr");
+            break;
+        }
+    }
+}
+
 int32_t HRilCall::GetCallListResponse(
     int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
@@ -449,6 +478,20 @@ int32_t HRilCall::GetCallListResponse(
         BuildICallList(callList, response, responseLen);
     }
     return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::GetCallListResponse, callList);
+}
+
+int32_t HRilCall::GetCallListResponseExt(
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+{
+    if ((response == nullptr && responseLen != 0) || (responseLen % sizeof(HRilCallInfo)) != 0) {
+        TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    HDI::Ril::V1_4::CallInfoExtList callList = {};
+    if (response != nullptr) {
+        BuildICallList(callList, response, responseLen);
+    }
+    return Response(responseInfo, &HDI::Ril::V1_4::IRilCallback::GetCallListResponseExt, callList);
 }
 
 int32_t HRilCall::DialResponse(
