@@ -205,7 +205,7 @@ void HRilEvent::RemoveEventMessage(HRilEventMessage &eventMsg)
 {
     std::lock_guard<std::mutex> mutexLock(listLock_);
     if (eventMsg.index < 0 || eventMsg.index >= LISTEN_FD_EVENTS_MAX) {
-        TELEPHONY_LOGE("Invalid event message! index:%{pubulic}d", eventMsg.index);
+        TELEPHONY_LOGE("Invalid event message! index:%{public}d", eventMsg.index);
         return;
     }
     EraseListenEvent(eventMsg, eventMsg.index);
