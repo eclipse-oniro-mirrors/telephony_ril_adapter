@@ -21,11 +21,11 @@
 #include "condition_variable"
 #include "map"
 #include "mutex"
-#include "v1_3/iril.h"
+#include "v1_4/iril.h"
 
 namespace OHOS {
 namespace Telephony {
-class RilCallbackTest : public HDI::Ril::V1_3::IRilCallback {
+class RilCallbackTest : public HDI::Ril::V1_4::IRilCallback {
 public:
     void PrintResponseInfo(const std::string &method, const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo);
 
@@ -47,6 +47,8 @@ public:
         const HDI::Ril::V1_1::EmergencyInfoList &emergencyInfoList) override;
     int32_t GetCallListResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_1::CallInfoList &callList) override;
+    int32_t GetCallListResponseExt(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_4::CallInfoExtList &callList) override;
     int32_t DialResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
     int32_t HangupResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
     int32_t RejectResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;

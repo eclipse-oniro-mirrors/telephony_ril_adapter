@@ -26,8 +26,8 @@
 #include "hdf_sbuf_ipc.h"
 #include "hril_types.h"
 #include "telephony_log_wrapper.h"
-#include "v1_3/iril.h"
-#include "v1_3/iril_callback.h"
+#include "v1_4/iril.h"
+#include "v1_4/iril_callback.h"
 #include "hril_notification.h"
 
 namespace OHOS {
@@ -48,7 +48,7 @@ public:
     template<typename T>
     int32_t ProcessNotify(
         int32_t notifyType, const struct ReportInfo *reportInfo, const void *response, size_t responseLen);
-    void SetRilCallback(const sptr<HDI::Ril::V1_3::IRilCallback> &callback);
+    void SetRilCallback(const sptr<HDI::Ril::V1_4::IRilCallback> &callback);
     std::string StringToHex(const char *data, int byteLength);
 
 protected:
@@ -99,7 +99,7 @@ protected:
         std::function<int32_t(int32_t notifyType, HRilErrNumber error, const void *response, size_t responseLen)>;
     std::map<uint32_t, RespFunc> respMemberFuncMap_;
     std::map<uint32_t, NotiFunc> notiMemberFuncMap_;
-    sptr<HDI::Ril::V1_3::IRilCallback> callback_ = nullptr;
+    sptr<HDI::Ril::V1_4::IRilCallback> callback_ = nullptr;
 
 private:
     // Get the function pointer of the event handler.
@@ -108,7 +108,7 @@ private:
 private:
     int32_t slotId_;
     std::mutex mutex_;
-    sptr<HDI::Ril::V1_3::IRilCallback> GetRilCallback()
+    sptr<HDI::Ril::V1_4::IRilCallback> GetRilCallback()
     {
         std::lock_guard<std::mutex> mutexLock(mutex_);
         return callback_;

@@ -19,7 +19,7 @@
 
 namespace OHOS {
 namespace Telephony {
-using namespace OHOS::HDI::Ril::V1_2;
+using namespace OHOS::HDI::Ril::V1_4;
 void RilCallbackTest::NotifyAll()
 {
     std::unique_lock<std::mutex> callbackLock(callbackMutex_);
@@ -1065,6 +1065,16 @@ int32_t RilCallbackTest::SetEmergencyCallListResponse(const RilRadioResponseInfo
 }
 
 int32_t RilCallbackTest::GetCallListResponse(const RilRadioResponseInfo &responseInfo, const CallInfoList &callList)
+{
+    TELEPHONY_LOGI("GetBoolResult CallInfoList callSize : %{public}d", callList.callSize);
+    hdiId_ = HdiId::HREQ_CALL_GET_CALL_LIST;
+    resultInfo_ = responseInfo;
+    NotifyAll();
+    return 0;
+}
+
+int32_t RilCallbackTest::GetCallListResponseExt(
+    const RilRadioResponseInfo &responseInfo, const CallInfoExtList &callList)
 {
     TELEPHONY_LOGI("GetBoolResult CallInfoList callSize : %{public}d", callList.callSize);
     hdiId_ = HdiId::HREQ_CALL_GET_CALL_LIST;

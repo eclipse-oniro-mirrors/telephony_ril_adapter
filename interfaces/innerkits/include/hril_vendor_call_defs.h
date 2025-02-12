@@ -84,6 +84,20 @@ typedef struct {
      * select TE character set +CSCS
      */
     char *alpha;
+
+    /**
+     * Indicates remote party name
+    */
+    char *name;
+
+    /**
+     * Identifies the CNAP display name;
+     * - 0: Allowed
+     * - 1: Restricted
+     * - 2: Not Specified/Unkonwn
+     * - 3: Payphone
+     */
+    int32_t namePresentation;
 } HRilCallInfo;
 
 /**

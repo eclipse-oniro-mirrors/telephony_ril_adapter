@@ -18,8 +18,8 @@
 using namespace std;
 namespace OHOS {
 namespace Telephony {
-using namespace OHOS::HDI::Ril::V1_3;
-sptr<OHOS::HDI::Ril::V1_3::IRil> g_rilInterface = nullptr;
+using namespace OHOS::HDI::Ril::V1_4;
+sptr<OHOS::HDI::Ril::V1_4::IRil> g_rilInterface = nullptr;
 constexpr int32_t DEFAULT_CHOICE = -1;
 constexpr int32_t MENU_OFFSET = 1;
 constexpr int32_t WAIT_TIME = 500000;
@@ -1775,7 +1775,7 @@ static int32_t SwitchMenu(TestMenu module, bool *loopFlag)
 int32_t main()
 {
     cout << "---->Ril Adapter Test Enter" << endl;
-    g_rilInterface = OHOS::HDI::Ril::V1_3::IRil::Get();
+    g_rilInterface = OHOS::HDI::Ril::V1_4::IRil::Get();
     if (g_rilInterface == nullptr) {
         cout << "g_rilInterface is null" << endl;
         return 0;
