@@ -428,11 +428,19 @@ int32_t HRilSim::GetSimCardStatusResponse(
 int32_t HRilSim::GetImsiResponse(
     int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
+    // default imsi is empty
+    std::string imsi = "";
     int32_t ret = CheckCharData(response, responseLen);
-    if (ret != HRIL_ERR_SUCCESS) {
-        return ret;
+    if (ret == HRIL_ERR_SUCCESS) {
+        imsi = static_cast<const char*>(response);
+    } else {
+        // Ignore the error of obtaining IMSI to prevent IMSI data from being reported to the upstream.
+        // Any scenario where IMSI retrieval fails requires reporting an empty IMSI to support retries.
+        TELEPHONY_LOGE("get imsi err: %{public}d", responseInfo.error);
+        responseInfo.error = HDI::Ril::V1_1::RilErrType::NONE;
     }
-    return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::GetImsiResponse, (const char *)response);
+ 
+    return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::GetImsiResponse, imsi);
 }
 
 int32_t HRilSim::GetSimLockStatusResponse(
