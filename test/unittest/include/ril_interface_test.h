@@ -113,6 +113,11 @@ public:
     void GetLinkBandwidthInfoTest(int32_t slotId);
     void GetLinkCapabilityTest(int32_t slotId);
     void CleanAllConnectionsTest(int32_t slotId);
+    void SendUrspDecodeResultTest(int32_t slotId);
+    void SendUePolicySectionIdentifierTest(int32_t slotId);
+    void SendImsRsdListTest(int32_t slotId);
+    void GetNetworkSliceAllowedNssaiTest(int32_t slotId);
+    void GetNetworkSliceEhplmnTest(int32_t slotId);
     void UnLockPINTest(int32_t slotId);
     void UnLockPIN2Test(int32_t slotId);
     void UnLockPUKTest(int32_t slotId);

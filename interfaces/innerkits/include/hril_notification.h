@@ -109,6 +109,15 @@ typedef enum {
     /** Reporting the data link capability.*/
     HNOTI_DATA_LINK_CAPABILITY_UPDATED,
 
+    /** Networkslice ursp report.*/
+    HNOTI_DATA_NETWORKSLICE_URSP_RPT,
+
+    /** Networkslice nssai report.*/
+    HNOTI_DATA_NETWORKSLICE_ALLOWED_NSSAI_RPT,
+
+    /** Networkslice ehplmn report.*/
+    HNOTI_DATA_NETWORKSLICE_EHPLMN_RPT,
+    
     HNOTI_NETWORK_BASE = 1400,
 
     /** Called when CS registered status is updated. */

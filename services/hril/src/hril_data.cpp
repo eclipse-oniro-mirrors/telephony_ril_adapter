@@ -27,6 +27,7 @@ const int32_t HRILOPS_ACTIVE_VERSION = 13;
 HRilData::HRilData(int32_t slotId) : HRilBase(slotId)
 {
     AddHandlerToMap();
+    AddHandlerToMapForSlice();
 }
 
 HRilData::~HRilData()
@@ -58,6 +59,7 @@ void HRilData::AddHandlerToMap()
     notiMemberFuncMap_[HNOTI_DATA_LINK_CAPABILITY_UPDATED] =
         [this](int32_t notifyType, HRilErrNumber error, const void *response,
         size_t responseLen) { return DataLinkCapabilityUpdated(notifyType, error, response, responseLen); };
+        
     // response
     respMemberFuncMap_[HREQ_DATA_SET_INIT_APN_INFO] =
         [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
@@ -90,6 +92,19 @@ void HRilData::AddHandlerToMap()
     respMemberFuncMap_[HREQ_DATA_CLEAN_ALL_CONNECTIONS] =
         [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
         size_t responseLen) { return CleanAllConnectionsResponse(requestNum, responseInfo, response, responseLen); };
+}
+
+void HRilData::AddHandlerToMapForSlice()
+{
+    notiMemberFuncMap_[HNOTI_DATA_NETWORKSLICE_URSP_RPT] =
+        [this](int32_t notifyType, HRilErrNumber error, const void *response,
+        size_t responseLen) { return NetworkSliceUrspRpt(notifyType, error, response, responseLen); };
+    notiMemberFuncMap_[HNOTI_DATA_NETWORKSLICE_ALLOWED_NSSAI_RPT] =
+        [this](int32_t notifyType, HRilErrNumber error, const void *response,
+        size_t responseLen) { return NetworkSliceAllowedNssaiRpt(notifyType, error, response, responseLen); };
+    notiMemberFuncMap_[HNOTI_DATA_NETWORKSLICE_EHPLMN_RPT] =
+        [this](int32_t notifyType, HRilErrNumber error, const void *response,
+        size_t responseLen) { return NetworkSliceEhplmnRpt(notifyType, error, response, responseLen); };
 }
 
 void HRilData::SwitchRilDataToHal(const HRilDataCallResponse *response, HDI::Ril::V1_1::SetupDataCallResultInfo &result)
@@ -440,5 +455,166 @@ void HRilData::RegisterDataFuncs(const HRilDataReq *dataFuncs)
 {
     dataFuncs_ = dataFuncs;
 }
+
+int32_t HRilData::NetworkSliceUrspRpt(
+    int32_t notifyType, const HRilErrNumber error, const void *response, size_t responseLen)
+{
+    if ((response == nullptr) || (responseLen == 0)) {
+        TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    HDI::Ril::V1_4::NetworkSliceUrspInfo networksliceUrspInfo;
+    uint8_t *temp = (uint8_t *)response;
+    for (size_t i = 0; i < responseLen; i++) {
+        networksliceUrspInfo.urspInfo.push_back(*temp);
+        temp++;
+    }
+    return Notify(notifyType, error, &HDI::Ril::V1_4::IRilCallback::NetworkSliceUrspRpt, networksliceUrspInfo);
+}
+
+int32_t HRilData::NetworkSliceAllowedNssaiRpt(
+    int32_t notifyType, const HRilErrNumber error, const void *response, size_t responseLen)
+{
+    if ((response == nullptr) || (responseLen == 0)) {
+        TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    HDI::Ril::V1_4::NetworkSliceAllowedNssaiInfo networksliceAllowedNssaiInfo;
+    uint8_t *temp = (uint8_t *)response;
+    for (size_t i = 0; i < responseLen; i++) {
+        networksliceAllowedNssaiInfo.allowednssaiInfo.push_back(*temp);
+        temp++;
+    }
+    return Notify(notifyType, error,
+        &HDI::Ril::V1_4::IRilCallback::NetworkSliceAllowedNssaiRpt, networksliceAllowedNssaiInfo);
+}
+
+int32_t HRilData::NetworkSliceEhplmnRpt(
+    int32_t notifyType, const HRilErrNumber error, const void *response, size_t responseLen)
+{
+    if ((response == nullptr) || (responseLen == 0)) {
+        TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
+    HDI::Ril::V1_4::NetworkSliceEhplmnInfo networkSliceEhplmnInfo;
+    uint8_t *temp = (uint8_t *)response;
+    for (size_t i = 0; i < responseLen; i++) {
+        networkSliceEhplmnInfo.ehplmnInfo.push_back(*temp);
+        temp++;
+    }
+    return Notify(notifyType, error,
+        &HDI::Ril::V1_4::IRilCallback::NetworkSliceEhplmnRpt, networkSliceEhplmnInfo);
+}
+
+int32_t HRilData::SendUrspDecodeResult(int32_t serialId,
+    const OHOS::HDI::Ril::V1_4::UePolicyDecodeResult &uePolicyDecodeResult)
+{
+    HRilUePolicyDecodeResult hriluePolicyDecodeResult;
+    hriluePolicyDecodeResult.uePolicyDecodeResultInfoSize = uePolicyDecodeResult.uePolicyDecodeResultInfo.size();
+    hriluePolicyDecodeResult.uePolicyDecodeResultInfo =
+        new unsigned char[hriluePolicyDecodeResult.uePolicyDecodeResultInfoSize];
+    for (int32_t i = 0; i < hriluePolicyDecodeResult.uePolicyDecodeResultInfoSize; i++) {
+        hriluePolicyDecodeResult.uePolicyDecodeResultInfo[i] = uePolicyDecodeResult.uePolicyDecodeResultInfo[i];
+    }
+    int32_t result = RequestVendor(serialId, HREQ_DATA_SEND_UEPOLICY_DECODE_RESULT, dataFuncs_,
+        &HRilDataReq::SendUrspDecodeResult, &hriluePolicyDecodeResult);
+    delete[] hriluePolicyDecodeResult.uePolicyDecodeResultInfo;
+    return result;
+}
+
+int32_t HRilData::SendUePolicySectionIdentifier(int32_t serialId,
+    const OHOS::HDI::Ril::V1_4::UePolicySectionIdentifier &uePolicySectionIdentifier)
+{
+    HRilUePolicySectionIdentifier hRilUePolicySectionIdentifier;
+    hRilUePolicySectionIdentifier.uePolicySectionIdentifierInfoSize =
+        uePolicySectionIdentifier.uePolicySectionIdentifierInfo.size();
+    hRilUePolicySectionIdentifier.uePolicySectionIdentifierInfo =
+        new unsigned char[hRilUePolicySectionIdentifier.uePolicySectionIdentifierInfoSize];
+    for (int32_t i = 0; i < hRilUePolicySectionIdentifier.uePolicySectionIdentifierInfoSize; i++) {
+        hRilUePolicySectionIdentifier.uePolicySectionIdentifierInfo[i] =
+            uePolicySectionIdentifier.uePolicySectionIdentifierInfo[i];
+    }
+    int32_t result = RequestVendor(serialId, HREQ_DATA_SEND_UE_SECTION_IDENTIFIER, dataFuncs_,
+        &HRilDataReq::SendUePolicySectionIdentifier, &hRilUePolicySectionIdentifier);
+    delete[] hRilUePolicySectionIdentifier.uePolicySectionIdentifierInfo;
+    return result;
+}
+
+int32_t HRilData::SendImsRsdList(int32_t serialId, const OHOS::HDI::Ril::V1_4::ImsRsdList &imsRsdList)
+{
+    HRilImsRsdList hRilImsRsdList;
+    hRilImsRsdList.imsRsdListInfoSize = imsRsdList.imsRsdListInfo.size();
+    hRilImsRsdList.imsRsdListInfo = new unsigned char[hRilImsRsdList.imsRsdListInfoSize];
+    for (int32_t i = 0; i < hRilImsRsdList.imsRsdListInfoSize; i++) {
+        hRilImsRsdList.imsRsdListInfo[i] = imsRsdList.imsRsdListInfo[i];
+    }
+    int32_t result = RequestVendor(serialId, HREQ_DATA_SEND_IMS_RSD_LIST, dataFuncs_,
+        &HRilDataReq::SendImsRsdList, &hRilImsRsdList);
+    delete[] hRilImsRsdList.imsRsdListInfo;
+    return result;
+}
+
+int32_t HRilData::GetNetworkSliceAllowedNssai(int32_t serialId,
+    const OHOS::HDI::Ril::V1_4::SyncAllowedNssaiInfo &dsyncAllowedNssaiInfo)
+{
+    HRilSyncAllowedNssaiInfo hRilsyncAllowedNssaiInfo;
+    hRilsyncAllowedNssaiInfo.syncAllowedNssaiInfoSize = dsyncAllowedNssaiInfo.syncAllowedNssaiInfo.size();
+    hRilsyncAllowedNssaiInfo.syncAllowedNssaiInfo =
+        new unsigned char[hRilsyncAllowedNssaiInfo.syncAllowedNssaiInfoSize];
+    for (int32_t i = 0; i < hRilsyncAllowedNssaiInfo.syncAllowedNssaiInfoSize; i++) {
+        hRilsyncAllowedNssaiInfo.syncAllowedNssaiInfo[i] = dsyncAllowedNssaiInfo.syncAllowedNssaiInfo[i];
+    }
+    int32_t result = RequestVendor(serialId, HREQ_DATA_SYNC_ALLOWED_NSSAI_WITH_MODEM, dataFuncs_,
+        &HRilDataReq::GetNetworkSliceAllowedNssai, &hRilsyncAllowedNssaiInfo);
+    delete[] hRilsyncAllowedNssaiInfo.syncAllowedNssaiInfo;
+    return result;
+}
+
+int32_t HRilData::GetNetworkSliceEhplmn(int32_t serialId)
+{
+    int32_t result = RequestVendor(serialId, HREQ_DATA_SYNC_EHPLMN_WITH_MODEM, dataFuncs_,
+        &HRilDataReq::GetNetworkSliceEhplmn);
+    return result;
+}
+
+int32_t HRilData::ActivatePdpContextWithApnTypesforSlice(int32_t serialId,
+    const OHOS::HDI::Ril::V1_4::DataCallInfoWithApnTypesforSlice &dataCallInfoWithApnTypesforslice,
+    const int32_t version)
+{
+    if (version < HRILOPS_ACTIVE_VERSION) {
+        TELEPHONY_LOGI("Call V1_1 ActivatePdpContext");
+        OHOS::HDI::Ril::V1_1::DataCallInfo dataCallInfo;
+        dataCallInfo.dataProfileInfo.apn = dataCallInfoWithApnTypesforslice.dataProfileInfo.apn;
+        dataCallInfo.dataProfileInfo.protocol = dataCallInfoWithApnTypesforslice.dataProfileInfo.protocol;
+        dataCallInfo.dataProfileInfo.roamingProtocol = dataCallInfoWithApnTypesforslice.dataProfileInfo.roamingProtocol;
+        dataCallInfo.dataProfileInfo.userName = dataCallInfoWithApnTypesforslice.dataProfileInfo.userName;
+        dataCallInfo.dataProfileInfo.password = dataCallInfoWithApnTypesforslice.dataProfileInfo.password;
+        dataCallInfo.dataProfileInfo.authenticationType =
+            dataCallInfoWithApnTypesforslice.dataProfileInfo.authenticationType;
+        dataCallInfo.isRoaming = dataCallInfoWithApnTypesforslice.isRoaming;
+        dataCallInfo.roamingAllowed = dataCallInfoWithApnTypesforslice.roamingAllowed;
+        dataCallInfo.radioTechnology = dataCallInfoWithApnTypesforslice.radioTechnology;
+        return ActivatePdpContext(serialId, dataCallInfo);
+    }
+    TELEPHONY_LOGI("Call V1_4 ActivatePdpContextWithApnTypesforSlice");
+    HRilDataInfoWithApnTypesforSlice dataInfoWithApnTypesforSlice;
+    dataInfoWithApnTypesforSlice.apn = StringToCString(dataCallInfoWithApnTypesforslice.dataProfileInfo.apn);
+    dataInfoWithApnTypesforSlice.type = StringToCString(dataCallInfoWithApnTypesforslice.dataProfileInfo.protocol);
+    dataInfoWithApnTypesforSlice.roamingType =
+        StringToCString(dataCallInfoWithApnTypesforslice.dataProfileInfo.roamingProtocol);
+    dataInfoWithApnTypesforSlice.userName = StringToCString(dataCallInfoWithApnTypesforslice.dataProfileInfo.userName);
+    dataInfoWithApnTypesforSlice.password = StringToCString(dataCallInfoWithApnTypesforslice.dataProfileInfo.password);
+    dataInfoWithApnTypesforSlice.verType = dataCallInfoWithApnTypesforslice.dataProfileInfo.authenticationType;
+    dataInfoWithApnTypesforSlice.rat = dataCallInfoWithApnTypesforslice.radioTechnology;
+    dataInfoWithApnTypesforSlice.roamingEnable = dataCallInfoWithApnTypesforslice.roamingAllowed ? 1 : 0;
+    dataInfoWithApnTypesforSlice.supportedApnTypesBitmap =
+        dataCallInfoWithApnTypesforslice.dataProfileInfo.supportedApnTypesBitmap;
+    std::string sscmode = std::to_string(dataCallInfoWithApnTypesforslice.dataProfileInfo.sscMode);
+    dataInfoWithApnTypesforSlice.sscmode = StringToCString(sscmode);
+    dataInfoWithApnTypesforSlice.snssai = StringToCString(dataCallInfoWithApnTypesforslice.dataProfileInfo.snssai);
+    return RequestVendor(serialId, HREQ_DATA_ACTIVATE_PDP_CONTEXT, dataFuncs_,
+        &HRilDataReq::ActivatePdpContextWithApnTypesforSlice, &dataInfoWithApnTypesforSlice);
+}
+
 } // namespace Telephony
 } // namespace OHOS

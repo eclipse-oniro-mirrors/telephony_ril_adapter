@@ -136,6 +136,11 @@ enum class HdiId {
     HREQ_DATA_SET_DATA_PERMITTED,
     HREQ_DATA_GET_LINK_CAPABILITY,
     HREQ_DATA_CLEAN_ALL_CONNECTIONS,
+    HREQ_DATA_SEND_UEPOLICY_DECODE_RESULT,
+    HREQ_DATA_SEND_UE_SECTION_IDENTIFIER,
+    HREQ_DATA_SEND_IMS_RSD_LIST,
+    HREQ_DATA_SYNC_ALLOWED_NSSAI_WITH_MODEM,
+    HREQ_DATA_SYNC_EHPLMN_WITH_MODEM,
 
     HREQ_NETWORK_BASE = 400,
     HREQ_NETWORK_GET_SIGNAL_STRENGTH,
@@ -246,7 +251,6 @@ public:
     void WaitFor(int32_t timeoutSecond);
     bool GetBoolResult(HdiId hdiId_);
     void Clean();
-
     // Call
     int32_t CallStateUpdated(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
     int32_t CallRingbackVoiceNotice(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
@@ -307,7 +311,6 @@ public:
     int32_t SetBarringPasswordResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
     int32_t CloseUnFinishedUssdResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
     int32_t SetVonrSwitchResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
-
     // Data
     int32_t PdpContextListUpdated(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_1::DataCallResultList &dataCallResultList) override;
@@ -329,7 +332,12 @@ public:
     int32_t CleanAllConnectionsResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
     int32_t NcfgFinishedResult(const HDI::Ril::V1_3::RilRadioResponseInfo &responseInfo, int32_t state) override;
     int32_t RestartRildNvMatch(const HDI::Ril::V1_3::RilRadioResponseInfo &responseInfo, int32_t state) override;
-
+    int32_t NetworkSliceUrspRpt(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_4::NetworkSliceUrspInfo &networkSliceUrspInfo) override;
+    int32_t NetworkSliceAllowedNssaiRpt(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_4::NetworkSliceAllowedNssaiInfo &networkSliceAllowedNssaiInfo) override;
+    int32_t NetworkSliceEhplmnRpt(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_4::NetworkSliceEhplmnInfo &networkSliceEhplmnInfo) override;
     // Modem
     int32_t RadioStateUpdated(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, int32_t state) override;
     int32_t VoiceRadioTechUpdated(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
@@ -346,7 +354,6 @@ public:
         const HDI::Ril::V1_1::VoiceRadioTechnology &voiceRadioTechnology) override;
     int32_t GetBasebandVersionResponse(
         const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const std::string &basebandVersion) override;
-
     // Sim notice
     int32_t SimStateUpdated(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
     int32_t SimStkSessionEndNotify(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
@@ -410,7 +417,6 @@ public:
     int32_t UnlockSimLockResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_1::LockStatusResp &lockStatus) override;
     int32_t SendSimMatchedOperatorInfoResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
-
     // Network
     int32_t NetworkCsRegStatusUpdated(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_1::CsRegStatusInfo &csRegStatusInfo) override;
@@ -471,7 +477,6 @@ public:
         const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, int32_t state) override;
     int32_t GetNrSsbIdResponse(const HDI::Ril::V1_2::RilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_2::NrCellSsbIds &nrCellSsbIds) override;
-
     // Sms
     int32_t NewSmsNotify(const HDI::Ril::V1_1::HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_1::SmsMessageInfo &smsMessageInfo) override;
@@ -505,7 +510,6 @@ public:
     int32_t SendSmsMoreModeResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_1::SendSmsResultInfo &sendSmsResultInfo) override;
     int32_t SendSmsAckResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
-
     int32_t CommonErrorResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
     int32_t GetSerialId()
     {
@@ -520,12 +524,10 @@ public:
     {
         return currentChannelId_;
     }
-
     std::string GetSmscAddr()
     {
         return smscAddr_;
     }
-
 private:
     std::map<int32_t, int32_t> simState_;
     std::mutex callbackMutex_;

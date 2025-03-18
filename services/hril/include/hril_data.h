@@ -46,6 +46,12 @@ public:
         int32_t notifyType, const HRilErrNumber error, const void *response, size_t responseLen);
     int32_t DataLinkCapabilityUpdated(
         int32_t notifyType, const HRilErrNumber error, const void *response, size_t responseLen);
+    int32_t NetworkSliceUrspRpt(
+        int32_t notifyType, const HRilErrNumber error, const void *response, size_t responseLen);
+    int32_t NetworkSliceAllowedNssaiRpt(
+        int32_t notifyType, const HRilErrNumber error, const void *response, size_t responseLen);
+    int32_t NetworkSliceEhplmnRpt(
+        int32_t notifyType, const HRilErrNumber error, const void *response, size_t responseLen);
     int32_t ProcessDataResponse(
         int32_t code, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
     int32_t ProcessDataRequest(int32_t code, struct HdfSBuf *data);
@@ -75,8 +81,19 @@ public:
 
     bool IsDataNotification(uint32_t code);
     void AddHandlerToMap();
+    void AddHandlerToMapForSlice();
     void RegisterDataFuncs(const HRilDataReq *dataFuncs);
-
+    int32_t SendUrspDecodeResult(int32_t serialId,
+        const OHOS::HDI::Ril::V1_4::UePolicyDecodeResult &uePolicyDecodeResult);
+    int32_t SendUePolicySectionIdentifier(
+        int32_t serialId, const OHOS::HDI::Ril::V1_4::UePolicySectionIdentifier &uePolicySectionIdentifier);
+    int32_t SendImsRsdList(int32_t serialId, const OHOS::HDI::Ril::V1_4::ImsRsdList &imsRsdList);
+    int32_t GetNetworkSliceAllowedNssai(
+        int32_t serialId, const OHOS::HDI::Ril::V1_4::SyncAllowedNssaiInfo &syncAllowedNssai);
+    int32_t GetNetworkSliceEhplmn(int32_t serialId);
+    int32_t ActivatePdpContextWithApnTypesforSlice(int32_t serialId,
+        const OHOS::HDI::Ril::V1_4::DataCallInfoWithApnTypesforSlice &dataCallInfoWithApnTypesforslice,
+        const int32_t version);
 private:
     void SwitchHRilDataListToHal(
         const void *response, size_t responseLen, std::vector<HDI::Ril::V1_1::SetupDataCallResultInfo> &dcResultList);

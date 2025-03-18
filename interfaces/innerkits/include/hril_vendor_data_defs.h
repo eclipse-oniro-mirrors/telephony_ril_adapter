@@ -221,6 +221,64 @@ typedef struct {
     int32_t supportedApnTypesBitmap;
 } HRilDataInfoWithApnTypes;
 
+typedef struct {
+    /**
+     * Specifies a particular PDP context definition. The parameter is local to
+     * the TE-MT interface and is used in other PDP context-related commands.
+     */
+    int32_t cid;
+
+    /** Reason for the data request. */
+    int32_t reason;
+
+    /** Radio Access Technology */
+    int32_t rat;
+
+    /** Roaming Enable. eg: 1--enable, 0--disnable */
+    int32_t roamingEnable;
+
+    /**
+     * Authentication protocol used for this PDP context.
+     * 0: None. Used to indicate that no authentication protocol is used for this
+     *    PDP context. Username and password are removed if previously specified.
+     * 1: PAP
+     * 2: CHAP
+     */
+    int32_t verType;
+
+    /** User name for access to the IP network. */
+    char *userName;
+
+    /** Password for access to the IP network. */
+    char *password;
+
+    /** Access Point Name */
+    char *apn;
+
+    /**
+     * PDP_type values from 3GPP TS 27.007 section 10.1.1.
+     * Specifies the type of packet data protocol. The default value is
+     * manufacturer specific.
+     */
+    char *type;
+
+    /**
+     * PDP_type values from 3GPP TS 27.007 section 10.1.1.
+     * Specifies the type of packet data protocol. The default value is
+     * manufacturer specific.
+     */
+    char *roamingType;
+
+    /**
+     * Supported apn types bitmap
+     */
+    int32_t supportedApnTypesBitmap;
+
+    char *sscmode;
+
+    char *snssai;
+} HRilDataInfoWithApnTypesforSlice;
+
 /**
  * @brief Defines the band width information.
  */
@@ -370,6 +428,26 @@ typedef struct {
     int32_t secondaryUplinkKbps;
 } HRilDataLinkCapability;
 
+typedef struct {
+    int uePolicyDecodeResultInfoSize;
+    unsigned char *uePolicyDecodeResultInfo;
+} HRilUePolicyDecodeResult;
+ 
+typedef struct {
+    int32_t uePolicySectionIdentifierInfoSize;
+    unsigned char *uePolicySectionIdentifierInfo;
+} HRilUePolicySectionIdentifier;
+
+typedef struct {
+    int32_t imsRsdListInfoSize;
+    unsigned char *imsRsdListInfo;
+} HRilImsRsdList;
+
+typedef struct {
+    int32_t syncAllowedNssaiInfoSize;
+    unsigned char *syncAllowedNssaiInfo;
+} HRilSyncAllowedNssaiInfo;
+
 /**
  * @brief Defines the data request method.
  */
@@ -500,6 +578,62 @@ typedef struct {
      * @see ReqDataInfo | HRilDataInfoWithApnTypes
      */
     void (*ActivatePdpContextWithApnTypes)(const ReqDataInfo *requestInfo, const HRilDataInfoWithApnTypes *data);
+
+    /**
+     * @brief Send UePolicy Complete.
+     *
+     * @param requestInfo Request data info, for details, see {@link
+     * ReqDataInfo}.
+     * @see ReqDataInfo
+     */
+    void (*SendUrspDecodeResult)(const ReqDataInfo *requestInfo, const HRilUePolicyDecodeResult *data);
+ 
+    /**
+     * @brief Send Ue State Indication.
+     *
+     * @param requestInfo Request data info, for details, see {@link
+     * ReqDataInfo}.
+     * @see ReqDataInfo
+     */
+    void (*SendUePolicySectionIdentifier)(const ReqDataInfo *requestInfo, const HRilUePolicySectionIdentifier *data);
+
+    /**
+     * @brief Send Ue State Indication.
+     *
+     * @param requestInfo Request data info, for details, see {@link
+     * ReqDataInfo}.
+     * @see ReqDataInfo
+     */
+    void (*SendImsRsdList)(const ReqDataInfo *requestInfo, const HRilImsRsdList *data);
+
+    /**
+     * @brief Sync Allowed Nssai WithModem.
+     *
+     * @param requestInfo Request data info, for details, see {@link
+     * ReqDataInfo}.
+     * @see ReqDataInfo
+     */
+    void (*GetNetworkSliceAllowedNssai)(const ReqDataInfo *requestInfo, const HRilSyncAllowedNssaiInfo *data);
+
+    /**
+     * @brief Sync Ehplmn WithModem.
+     *
+     * @param requestInfo Request data info, for details, see {@link
+     * ReqDataInfo}.
+     * @see ReqDataInfo
+     */
+    void (*GetNetworkSliceEhplmn)(const ReqDataInfo *requestInfo);
+
+    /**
+     * @brief Activates the packet data protocol (PDP) context with apnTypes for slice.
+     *
+     * @param requestInfo Request data info, for details, see {@link
+     * ReqDataInfo}.
+     * @param data Indicates the data information.
+     * @see ReqDataInfo | HRilDataInfoWithApnTypesforSlice
+     */
+    void (*ActivatePdpContextWithApnTypesforSlice)(const ReqDataInfo *requestInfo,
+        const HRilDataInfoWithApnTypesforSlice *data);
 } HRilDataReq;
 #ifdef __cplusplus
 }

@@ -111,7 +111,12 @@ public:
     int32_t CleanAllConnectionsResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
     int32_t NcfgFinishedResult(const HDI::Ril::V1_3::RilRadioResponseInfo &responseInfo, int32_t state) override;
     int32_t RestartRildNvMatch(const HDI::Ril::V1_3::RilRadioResponseInfo &responseInfo, int32_t state) override;
-
+    int32_t NetworkSliceUrspRpt(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_4::NetworkSliceUrspInfo &networkSliceUrspInfo) override;
+    int32_t NetworkSliceAllowedNssaiRpt(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_4::NetworkSliceAllowedNssaiInfo &networkSliceAllowedNssaiInfo) override;
+    int32_t NetworkSliceEhplmnRpt(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_4::NetworkSliceEhplmnInfo &networkSliceEhplmnInfo) override;
     // Modem
     int32_t RadioStateUpdated(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, int32_t state) override;
     int32_t VoiceRadioTechUpdated(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,

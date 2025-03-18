@@ -378,7 +378,7 @@ HRilManager::HRilManager() : hrilSimSlotCount_(GetSimSlotCount())
 
 void HRilManager::SetRilCallback(sptr<OHOS::HDI::Ril::V1_4::IRilCallback> callback)
 {
-    TELEPHONY_LOGD("SetRilCallback");
+    TELEPHONY_LOGI("SetRilCallback");
     for (int32_t slotId = HRIL_SIM_SLOT_0; slotId < hrilSimSlotCount_; slotId++) {
         hrilCall_[slotId]->SetRilCallback(callback);
         hrilModem_[slotId]->SetRilCallback(callback);
@@ -662,6 +662,44 @@ int32_t HRilManager::CleanAllConnections(int32_t slotId, int32_t serialId)
     return TaskSchedule(MODULE_HRIL_DATA, hrilData_[slotId], &HRilData::CleanAllConnections, serialId);
 }
 
+int32_t HRilManager::SendUrspDecodeResult(int32_t slotId,
+    int32_t serialId, const OHOS::HDI::Ril::V1_4::UePolicyDecodeResult &uePolicyDecodeResult)
+{
+    return TaskSchedule(MODULE_HRIL_DATA, hrilData_[slotId], &HRilData::SendUrspDecodeResult,
+        serialId, uePolicyDecodeResult);
+}
+ 
+int32_t HRilManager::SendUePolicySectionIdentifier(int32_t slotId,
+    int32_t serialId, const OHOS::HDI::Ril::V1_4::UePolicySectionIdentifier &uePolicySectionIdentifier)
+{
+    return TaskSchedule(MODULE_HRIL_DATA, hrilData_[slotId], &HRilData::SendUePolicySectionIdentifier,
+        serialId, uePolicySectionIdentifier);
+}
+
+int32_t HRilManager::SendImsRsdList(int32_t slotId,
+    int32_t serialId, const OHOS::HDI::Ril::V1_4::ImsRsdList &imsRsdList)
+{
+    return TaskSchedule(MODULE_HRIL_DATA, hrilData_[slotId], &HRilData::SendImsRsdList, serialId, imsRsdList);
+}
+
+int32_t HRilManager::GetNetworkSliceAllowedNssai(int32_t slotId, int32_t serialId,
+    const OHOS::HDI::Ril::V1_4::SyncAllowedNssaiInfo &dsyncAllowedNssaiInfo)
+{
+    return TaskSchedule(MODULE_HRIL_DATA, hrilData_[slotId], &HRilData::GetNetworkSliceAllowedNssai,
+        serialId, dsyncAllowedNssaiInfo);
+}
+
+int32_t HRilManager::GetNetworkSliceEhplmn(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(MODULE_HRIL_DATA, hrilData_[slotId], &HRilData::GetNetworkSliceEhplmn, serialId);
+}
+
+int32_t HRilManager::ActivatePdpContextWithApnTypesforSlice(
+    int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_4::DataCallInfoWithApnTypesforSlice &dataCallInfo)
+{
+    return TaskSchedule(MODULE_HRIL_DATA, hrilData_[slotId], &HRilData::ActivatePdpContextWithApnTypesforSlice,
+        serialId, dataCallInfo, hrilOpsVersion_);
+}
 // Modem
 int32_t HRilManager::SetRadioState(int32_t slotId, int32_t serialId, int32_t fun, int32_t rst)
 {

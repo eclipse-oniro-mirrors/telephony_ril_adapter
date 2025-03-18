@@ -144,6 +144,17 @@ bool TestDataInterface(std::shared_ptr<HRilManager> manager)
     OHOS::HDI::Ril::V1_1::DataSleepInfo dataSleepInfo;
     EXPECT_NE(HDF_SUCCESS, manager->SendDataSleepMode(0, 0, dataSleepInfo));
     EXPECT_NE(HDF_SUCCESS, manager->CleanAllConnections(0, 0));
+    OHOS::HDI::Ril::V1_4::UePolicyDecodeResult uePolicyDecodeResult;
+    EXPECT_NE(HDF_SUCCESS, manager->SendUrspDecodeResult(0, 0, uePolicyDecodeResult));
+    OHOS::HDI::Ril::V1_4::UePolicySectionIdentifier uePolicySectionIdentifier;
+    EXPECT_NE(HDF_SUCCESS, manager->SendUePolicySectionIdentifier(0, 0, uePolicySectionIdentifier));
+    OHOS::HDI::Ril::V1_4::ImsRsdList imsRsdList;
+    EXPECT_NE(HDF_SUCCESS, manager->SendImsRsdList(0, 0, imsRsdList));
+    OHOS::HDI::Ril::V1_4::SyncAllowedNssaiInfo dsyncAllowedNssaiInfo;
+    EXPECT_NE(HDF_SUCCESS, manager->GetNetworkSliceAllowedNssai(0, 0, dsyncAllowedNssaiInfo));
+    EXPECT_NE(HDF_SUCCESS, manager->GetNetworkSliceEhplmn(0, 0));
+    OHOS::HDI::Ril::V1_4::DataCallInfoWithApnTypesforSlice dataCallInfoWithApnTypesforslice;
+    EXPECT_NE(HDF_SUCCESS, manager->ActivatePdpContextWithApnTypesforSlice(0, 0, dataCallInfoWithApnTypesforslice));
     return true;
 }
 
@@ -494,6 +505,9 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Data_002, Function | MediumTest | Lev
     EXPECT_NE(HDF_SUCCESS, data->SetDataPermittedResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, data->GetLinkCapabilityResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, data->CleanAllConnectionsResponse(0, responseInfo, nullptr, 0));
+    EXPECT_NE(HDF_SUCCESS, data->NetworkSliceUrspRpt(0, HRilErrNumber::HRIL_ERR_NULL_POINT, nullptr, 0));
+    EXPECT_NE(HDF_SUCCESS, data->NetworkSliceAllowedNssaiRpt(0, HRilErrNumber::HRIL_ERR_NULL_POINT, nullptr, 0));
+    EXPECT_NE(HDF_SUCCESS, data->NetworkSliceEhplmnRpt(0, HRilErrNumber::HRIL_ERR_NULL_POINT, nullptr, 0));
 }
 
 /**
@@ -548,13 +562,33 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Data_003, Function | MediumTest | Lev
     HRilLinkBandwidthInfo info;
     EXPECT_NE(HDF_SUCCESS, data->GetLinkBandwidthInfoResponse(0, responseInfo, &info, 1));
     EXPECT_NE(HDF_SUCCESS, data->GetLinkBandwidthInfoResponse(0, responseInfo, &info, sizeof(HRilLinkBandwidthInfo)));
+    const void *responsetemp = nullptr;
+    uint8_t responseBuffer[] = {0x01, 0x02};
+    size_t responseLen = 0;
+    responsetemp = responseBuffer;
+    responseLen = sizeof(responseBuffer) / sizeof(responseBuffer[0]);
+    EXPECT_NE(HDF_SUCCESS, data->NetworkSliceUrspRpt(0, err, responsetemp, responseLen));
+    EXPECT_NE(HDF_SUCCESS, data->NetworkSliceAllowedNssaiRpt(0, err, responsetemp, responseLen));
+    EXPECT_NE(HDF_SUCCESS, data->NetworkSliceEhplmnRpt(0, err, responsetemp, responseLen));
+    std::vector<uint8_t> buffer = {1};
+    OHOS::HDI::Ril::V1_4::UePolicyDecodeResult uePolicyDecodeResult;
+    uePolicyDecodeResult.uePolicyDecodeResultInfo = buffer;
+    EXPECT_NE(HDF_SUCCESS, data->SendUrspDecodeResult(0, uePolicyDecodeResult));
+    OHOS::HDI::Ril::V1_4::UePolicySectionIdentifier uePolicySectionIdentifier;
+    uePolicySectionIdentifier.uePolicySectionIdentifierInfo = buffer;
+    EXPECT_NE(HDF_SUCCESS, data->SendUePolicySectionIdentifier(0, uePolicySectionIdentifier));
+    OHOS::HDI::Ril::V1_4::ImsRsdList imsRsdList;
+    imsRsdList.imsRsdListInfo = buffer;
+    EXPECT_NE(HDF_SUCCESS, data->SendImsRsdList(0, imsRsdList));
+    OHOS::HDI::Ril::V1_4::SyncAllowedNssaiInfo dsyncAllowedNssaiInfo;
+    dsyncAllowedNssaiInfo.syncAllowedNssaiInfo = buffer;
+    EXPECT_NE(HDF_SUCCESS, data->GetNetworkSliceAllowedNssai(0, dsyncAllowedNssaiInfo));
+    EXPECT_NE(HDF_SUCCESS, data->GetNetworkSliceEhplmn(0));
+    OHOS::HDI::Ril::V1_4::DataCallInfoWithApnTypesforSlice dataCallInfoWithApnTypesforslice;
+    EXPECT_NE(HDF_SUCCESS, data->ActivatePdpContextWithApnTypesforSlice(0, dataCallInfoWithApnTypesforslice, 10));
+    EXPECT_NE(HDF_SUCCESS, data->ActivatePdpContextWithApnTypesforSlice(0, dataCallInfoWithApnTypesforslice, 14));
 }
 
-/**
- * @tc.number   Telephony_HrilManager_Modem_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
 HWTEST_F(BranchTest, Telephony_HrilManager_Modem_001, Function | MediumTest | Level2)
 {
     auto manager = std::make_shared<HRilManager>();

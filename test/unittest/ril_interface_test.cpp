@@ -156,6 +156,11 @@ typedef enum {
     HREQ_DATA_SET_DATA_PERMITTED,
     HREQ_DATA_GET_LINK_CAPABILITY,
     HREQ_DATA_CLEAN_ALL_CONNECTIONS,
+    HREQ_DATA_SEND_UEPOLICY_DECODE_RESULT,
+    HREQ_DATA_SEND_UE_SECTION_IDENTIFIER,
+    HREQ_DATA_SEND_IMS_RSD_LIST,
+    HREQ_DATA_SYNC_ALLOWED_NSSAI_WITH_MODEM,
+    HREQ_DATA_SYNC_EHPLMN_WITH_MODEM,
 
     HREQ_NETWORK_BASE = 400,
     HREQ_NETWORK_GET_SIGNAL_STRENGTH,
@@ -1092,6 +1097,58 @@ void RilInterfaceTest::SetLinkBandwidthReportingRuleTest(int32_t slotId)
     cout << "SetLinkBandwidthReportingRuleTest finished ret : " << ret << endl << endl;
 }
 
+void RilInterfaceTest::SendUrspDecodeResultTest(int32_t slotId)
+{
+    cout << "RilInterfaceTest::SendUrspDecodeResultTest -->" << endl;
+    int32_t serialId = GetSerialId();
+    UePolicyDecodeResult duePolicyDecodeResult;
+    int buffer = 0;
+    duePolicyDecodeResult.uePolicyDecodeResultInfo.push_back(buffer);
+    int32_t ret = g_rilInterface->SendUrspDecodeResult(slotId, serialId, duePolicyDecodeResult);
+    cout << "SendUrspDecodeResultTest finished ret : " << ret << endl << endl;
+}
+
+void RilInterfaceTest::SendUePolicySectionIdentifierTest(int32_t slotId)
+{
+    cout << "RilInterfaceTest::SendUePolicySectionIdentifierTest -->" << endl;
+    int32_t serialId = GetSerialId();
+    UePolicySectionIdentifier duePolicySectionIdentifier;
+    int buffer = 0;
+    duePolicySectionIdentifier.uePolicySectionIdentifierInfo.push_back(buffer);
+    int32_t ret = g_rilInterface->SendUePolicySectionIdentifier(slotId, serialId, duePolicySectionIdentifier);
+    cout << "SendUePolicySectionIdentifierTest finished ret : " << ret << endl << endl;
+}
+
+void RilInterfaceTest::SendImsRsdListTest(int32_t slotId)
+{
+    cout << "RilInterfaceTest::SendImsRsdListTest -->" << endl;
+    int32_t serialId = GetSerialId();
+    ImsRsdList dImsRsdList;
+    int buffer = 0;
+    dImsRsdList.imsRsdListInfo.push_back(buffer);
+    int32_t ret = g_rilInterface->SendImsRsdList(slotId, serialId, dImsRsdList);
+    cout << "SendImsRsdListTest finished ret : " << ret << endl << endl;
+}
+
+void RilInterfaceTest::GetNetworkSliceAllowedNssaiTest(int32_t slotId)
+{
+    cout << "RilInterfaceTest::GetNetworkSliceAllowedNssaiTest -->" << endl;
+    int32_t serialId = GetSerialId();
+    SyncAllowedNssaiInfo dSyncAllowedNssaiInfo;
+    int buffer = 0;
+    dSyncAllowedNssaiInfo.syncAllowedNssaiInfo.push_back(buffer);
+    int32_t ret = g_rilInterface->GetNetworkSliceAllowedNssai(slotId, serialId, dSyncAllowedNssaiInfo);
+    cout << "GetNetworkSliceAllowedNssaiTest finished ret : " << ret << endl << endl;
+}
+
+void RilInterfaceTest::GetNetworkSliceEhplmnTest(int32_t slotId)
+{
+    cout << "RilInterfaceTest::GetNetworkSliceEhplmnTest -->" << endl;
+    int32_t serialId = GetSerialId();
+    int32_t ret = g_rilInterface->GetNetworkSliceEhplmn(slotId, serialId);
+    cout << "GetNetworkSliceEhplmnTest finished ret : " << ret << endl << endl;
+}
+
 void RilInterfaceTest::OnProcessInput(int32_t what)
 {
     if (g_rilInterface == nullptr) {
@@ -1480,6 +1537,11 @@ void RilInterfaceTest::OnInitDataProcessInterface()
     memberFuncMap_[HREQ_DATA_SET_DATA_PERMITTED] = &RilInterfaceTest::SetDataPermittedTest;
     memberFuncMap_[HREQ_DATA_GET_LINK_CAPABILITY] = &RilInterfaceTest::GetLinkCapabilityTest;
     memberFuncMap_[HREQ_DATA_CLEAN_ALL_CONNECTIONS] = &RilInterfaceTest::CleanAllConnectionsTest;
+    memberFuncMap_[HREQ_DATA_SEND_UEPOLICY_DECODE_RESULT] = &RilInterfaceTest::SendUrspDecodeResultTest;
+    memberFuncMap_[HREQ_DATA_SEND_UE_SECTION_IDENTIFIER] = &RilInterfaceTest::SendUePolicySectionIdentifierTest;
+    memberFuncMap_[HREQ_DATA_SEND_IMS_RSD_LIST] = &RilInterfaceTest::SendImsRsdListTest;
+    memberFuncMap_[HREQ_DATA_SYNC_ALLOWED_NSSAI_WITH_MODEM] = &RilInterfaceTest::GetNetworkSliceAllowedNssaiTest;
+    memberFuncMap_[HREQ_DATA_SYNC_EHPLMN_WITH_MODEM] = &RilInterfaceTest::GetNetworkSliceEhplmnTest;
 }
 
 void RilInterfaceTest::OnInitNetworkProcessInterface()
