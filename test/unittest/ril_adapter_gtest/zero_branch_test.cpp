@@ -562,6 +562,17 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Data_003, Function | MediumTest | Lev
     HRilLinkBandwidthInfo info;
     EXPECT_NE(HDF_SUCCESS, data->GetLinkBandwidthInfoResponse(0, responseInfo, &info, 1));
     EXPECT_NE(HDF_SUCCESS, data->GetLinkBandwidthInfoResponse(0, responseInfo, &info, sizeof(HRilLinkBandwidthInfo)));
+}
+
+/**
+ * @tc.number   Telephony_HrilManager_Data_004
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_HrilManager_Data_004, Function | MediumTest | Level2)
+{
+    auto data = std::make_unique<HRilData>(0);
+    HRilErrNumber err = HRilErrNumber::HRIL_ERR_NULL_POINT;
     const void *responsetemp = nullptr;
     uint8_t responseBuffer[] = {0x01, 0x02};
     size_t responseLen = 0;
