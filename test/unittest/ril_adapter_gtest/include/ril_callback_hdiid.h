@@ -16,10 +16,9 @@
 #ifndef OHOS_RIL_CALLBACK_HDIID_H
 #define OHOS_RIL_CALLBACK_HDIID_H
 
-namespace OHOS{
-namespace Telephony{
-enum class HdiId
-{
+namespace OHOS {
+namespace Telephony {
+enum class HdiId {
     HREQ_NONE = -1,
     HREQ_CALL_BASE = 0,
     HREQ_CALL_GET_CALL_LIST,
