@@ -50,7 +50,6 @@ public:
         int32_t notifyType, const struct ReportInfo *reportInfo, const void *response, size_t responseLen);
     void SetRilCallback(const sptr<HDI::Ril::V1_4::IRilCallback> &callback);
     std::string StringToHex(const char *data, int byteLength);
-
 protected:
     HRilBase(int32_t slotId) : slotId_(slotId) {}
     virtual ~HRilBase() {}

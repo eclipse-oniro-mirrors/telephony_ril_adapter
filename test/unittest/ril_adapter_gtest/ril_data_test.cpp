@@ -18,10 +18,10 @@
 
 namespace OHOS {
 namespace Telephony {
-using namespace OHOS::HDI::Ril::V1_2;
+using namespace OHOS::HDI::Ril::V1_4;
 using namespace testing::ext;
 namespace {
-sptr<OHOS::HDI::Ril::V1_2::IRil> g_rilInterface = nullptr;
+sptr<OHOS::HDI::Ril::V1_4::IRil> g_rilInterface = nullptr;
 }
 
 void RilDataTest::SetUpTestCase()
@@ -483,6 +483,103 @@ HWTEST_F(RilDataTest, Telephony_DriverSystem_SetDataProfileInfo_V1_0200, Functio
     RilTestUtil::WaitFor(WAIT_TIME_SECOND_LONG);
     EXPECT_EQ(SUCCESS, ret);
     ASSERT_TRUE(RilTestUtil::GetBoolResult(HdiId::HREQ_DATA_SET_DATA_PROFILE_INFO));
+}
+
+/**
+ * @tc.number   Telephony_DriverSystem_SendUrspDecodeResult_V1_0100
+ * @tc.name     Send Ursp Decode Result
+ * @tc.desc     Function test
+ */
+HWTEST_F(RilDataTest, Telephony_DriverSystem_SendUrspDecodeResult_V1_0100, Function | MediumTest | Level3)
+{
+    if (!RilTestUtil::IsReady(SLOTID_1)) {
+        return;
+    }
+    int32_t serialId = RilTestUtil::GetSerialId();
+    UePolicyDecodeResult duePolicyDecodeResult;
+    int buffer = 0;
+    duePolicyDecodeResult.uePolicyDecodeResultInfo.push_back(buffer);
+    int32_t ret = g_rilInterface->SendUrspDecodeResult(SLOTID_1, serialId, duePolicyDecodeResult);
+    RilTestUtil::WaitFor(WAIT_TIME_SECOND);
+    EXPECT_EQ(SUCCESS, ret);
+    ASSERT_TRUE(RilTestUtil::GetBoolResult(HdiId::HREQ_DATA_SEND_UEPOLICY_DECODE_RESULT));
+}
+
+/**
+ * @tc.number   Telephony_DriverSystem_SendUePolicySectionIdentifier_V1_0100
+ * @tc.name     Send UePolicy Section Identifier
+ * @tc.desc     Function test
+ */
+HWTEST_F(RilDataTest, Telephony_DriverSystem_SendUePolicySectionIdentifier_V1_0100, Function | MediumTest | Level3)
+{
+    if (!RilTestUtil::IsReady(SLOTID_1)) {
+        return;
+    }
+    int32_t serialId = RilTestUtil::GetSerialId();
+    UePolicySectionIdentifier duePolicySectionIdentifier;
+    int buffer = 0;
+    duePolicySectionIdentifier.uePolicySectionIdentifierInfo.push_back(buffer);
+    int32_t ret = g_rilInterface->SendUePolicySectionIdentifier(SLOTID_1, serialId, duePolicySectionIdentifier);
+    RilTestUtil::WaitFor(WAIT_TIME_SECOND);
+    EXPECT_EQ(SUCCESS, ret);
+    ASSERT_TRUE(RilTestUtil::GetBoolResult(HdiId::HREQ_DATA_SEND_UE_SECTION_IDENTIFIER));
+}
+
+/**
+ * @tc.number   Telephony_DriverSystem_SendImsRsdList_V1_0100
+ * @tc.name     Send ImsRsdList
+ * @tc.desc     Function test
+ */
+HWTEST_F(RilDataTest, Telephony_DriverSystem_SendImsRsdList_V1_0100, Function | MediumTest | Level3)
+{
+    if (!RilTestUtil::IsReady(SLOTID_1)) {
+        return;
+    }
+    int32_t serialId = RilTestUtil::GetSerialId();
+    ImsRsdList dImsRsdList;
+    int buffer = 0;
+    dImsRsdList.imsRsdListInfo.push_back(buffer);
+    int32_t ret = g_rilInterface->SendImsRsdList(SLOTID_1, serialId, dImsRsdList);
+    RilTestUtil::WaitFor(WAIT_TIME_SECOND);
+    EXPECT_EQ(SUCCESS, ret);
+    ASSERT_TRUE(RilTestUtil::GetBoolResult(HdiId::HREQ_DATA_SEND_IMS_RSD_LIST));
+}
+
+/**
+ * @tc.number   Telephony_DriverSystem_GetNetworkSliceAllowedNssai_V1_0100
+ * @tc.name     Get NetworkSlice AllowedNssai
+ * @tc.desc     Function test
+ */
+HWTEST_F(RilDataTest, Telephony_DriverSystem_GetNetworkSliceAllowedNssai_V1_0100, Function | MediumTest | Level3)
+{
+    if (!RilTestUtil::IsReady(SLOTID_1)) {
+        return;
+    }
+    int32_t serialId = RilTestUtil::GetSerialId();
+    SyncAllowedNssaiInfo dSyncAllowedNssaiInfo;
+    int buffer = 0;
+    dSyncAllowedNssaiInfo.syncAllowedNssaiInfo.push_back(buffer);
+    int32_t ret = g_rilInterface->GetNetworkSliceAllowedNssai(SLOTID_1, serialId, dSyncAllowedNssaiInfo);
+    RilTestUtil::WaitFor(WAIT_TIME_SECOND);
+    EXPECT_EQ(SUCCESS, ret);
+    ASSERT_TRUE(RilTestUtil::GetBoolResult(HdiId::HREQ_DATA_SYNC_ALLOWED_NSSAI_WITH_MODEM));
+}
+
+/**
+ * @tc.number   Telephony_DriverSystem_GetNetworkSliceEhplmn_V1_0100
+ * @tc.name     Get NetworkSlice AllowedNssai
+ * @tc.desc     Function test
+ */
+HWTEST_F(RilDataTest, Telephony_DriverSystem_GetNetworkSliceEhplmn_V1_0100, Function | MediumTest | Level3)
+{
+    if (!RilTestUtil::IsReady(SLOTID_1)) {
+        return;
+    }
+    int32_t serialId = RilTestUtil::GetSerialId();
+    int32_t ret = g_rilInterface->GetNetworkSliceEhplmn(SLOTID_1, serialId);
+    RilTestUtil::WaitFor(WAIT_TIME_SECOND);
+    EXPECT_EQ(SUCCESS, ret);
+    ASSERT_TRUE(RilTestUtil::GetBoolResult(HdiId::HREQ_DATA_SYNC_ALLOWED_NSSAI_WITH_MODEM));
 }
 
 } // namespace Telephony

@@ -171,7 +171,16 @@ public:
     int32_t UnlockSimLock(int32_t slotId, int32_t serialId, int32_t lockType, const std::string &key);
     int32_t SendSimMatchedOperatorInfo(
         int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_2::NcfgOperatorInfo &ncfgOperatorInfo);
-
+    int32_t SendUrspDecodeResult(int32_t slotId, int32_t serialId,
+        const OHOS::HDI::Ril::V1_4::UePolicyDecodeResult &uePolicyDecodeResult);
+    int32_t SendUePolicySectionIdentifier(int32_t slotId, int32_t serialId,
+        const OHOS::HDI::Ril::V1_4::UePolicySectionIdentifier &uePolicySectionIdentifier);
+    int32_t SendImsRsdList(int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_4::ImsRsdList &imsRsdList);
+    int32_t GetNetworkSliceAllowedNssai(int32_t slotId, int32_t serialId,
+        const OHOS::HDI::Ril::V1_4::SyncAllowedNssaiInfo &dsyncAllowedNssaiInfo);
+    int32_t GetNetworkSliceEhplmn(int32_t slotId, int32_t serialId);
+    int32_t ActivatePdpContextWithApnTypesforSlice(
+        int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_4::DataCallInfoWithApnTypesforSlice &dataCallInfo);
     // Network
     int32_t GetSignalStrength(int32_t slotId, int32_t serialId);
     int32_t GetCsRegStatus(int32_t slotId, int32_t serialId);

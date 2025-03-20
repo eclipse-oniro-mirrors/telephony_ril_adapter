@@ -20,6 +20,7 @@
 #include "map"
 #include "mutex"
 #include "v1_4/iril.h"
+#include "ril_callback_hdiid.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -39,137 +40,6 @@ const std::string TEST_ID_LIST = "0,1,320-478,922";
 const std::string TEST_DCS_LIST = "0-3,5";
 const int32_t TEST_MODE = 0;
 const bool TEST_RESULT = true;
-
-enum class HdiId {
-    HREQ_NONE = -1,
-    HREQ_CALL_BASE = 0,
-    HREQ_CALL_GET_CALL_LIST,
-    HREQ_CALL_DIAL,
-    HREQ_CALL_HANGUP,
-    HREQ_CALL_REJECT,
-    HREQ_CALL_ANSWER,
-    HREQ_CALL_HOLD_CALL, // call hold value 6
-    HREQ_CALL_UNHOLD_CALL, // call active value 6
-    HREQ_CALL_SWITCH_CALL,
-    HREQ_CALL_COMBINE_CONFERENCE,
-    HREQ_CALL_SEPARATE_CONFERENCE, // Keep all other calls except the xth call
-    HREQ_CALL_CALL_SUPPLEMENT,
-    HREQ_CALL_SEND_DTMF,
-    HREQ_CALL_START_DTMF,
-    HREQ_CALL_STOP_DTMF,
-    HREQ_CALL_SET_CLIP,
-    HREQ_CALL_GET_CLIP,
-    HREQ_CALL_GET_CALL_WAITING,
-    HREQ_CALL_SET_CALL_WAITING,
-    HREQ_CALL_GET_CALL_RESTRICTION,
-    HREQ_CALL_SET_CALL_RESTRICTION,
-    HREQ_CALL_GET_CALL_TRANSFER_INFO,
-    HREQ_CALL_SET_CALL_TRANSFER_INFO,
-    HREQ_CALL_GET_CLIR,
-    HREQ_CALL_SET_CLIR,
-    HREQ_CALL_GET_CALL_PREFERENCE,
-    HREQ_CALL_SET_CALL_PREFERENCE,
-    HREQ_CALL_SET_USSD,
-    HREQ_CALL_GET_USSD,
-    HREQ_CALL_SET_MUTE,
-    HREQ_CALL_GET_MUTE,
-    HREQ_CALL_GET_EMERGENCY_LIST,
-    HREQ_CALL_SET_EMERGENCY_LIST,
-    HREQ_CALL_GET_FAIL_REASON,
-    HREQ_CALL_SET_BARRING_PASSWORD,
-    HREQ_CALL_CLOSE_UNFINISHED_USSD,
-    HREQ_SET_VONR_SWITCH,
-
-    HREQ_SMS_BASE = 100,
-    HREQ_SMS_SEND_GSM_SMS,
-    HREQ_SMS_SEND_CDMA_SMS,
-    HREQ_SMS_ADD_SIM_MESSAGE,
-    HREQ_SMS_DEL_SIM_MESSAGE,
-    HREQ_SMS_UPDATE_SIM_MESSAGE,
-    HREQ_SMS_SEND_SMS_MORE_MODE,
-    HREQ_SMS_SEND_SMS_ACK,
-    HREQ_SMS_SET_SMSC_ADDR,
-    HREQ_SMS_GET_SMSC_ADDR,
-    HREQ_SMS_SET_CB_CONFIG,
-    HREQ_SMS_GET_CB_CONFIG,
-    HREQ_SMS_GET_CDMA_CB_CONFIG,
-    HREQ_SMS_SET_CDMA_CB_CONFIG,
-    HREQ_SMS_ADD_CDMA_SIM_MESSAGE,
-    HREQ_SMS_DEL_CDMA_SIM_MESSAGE,
-    HREQ_SMS_UPDATE_CDMA_SIM_MESSAGE,
-
-    HREQ_SIM_BASE = 200,
-    HREQ_SIM_GET_SIM_STATUS,
-    HREQ_SIM_GET_IMSI,
-    HREQ_SIM_GET_SIM_IO,
-    HREQ_SIM_GET_SIM_LOCK_STATUS,
-    HREQ_SIM_SET_SIM_LOCK,
-    HREQ_SIM_CHANGE_SIM_PASSWORD,
-    HREQ_SIM_UNLOCK_PIN,
-    HREQ_SIM_UNLOCK_PUK,
-    HREQ_SIM_GET_SIM_PIN_INPUT_TIMES,
-    HREQ_SIM_UNLOCK_PIN2,
-    HREQ_SIM_UNLOCK_PUK2,
-    HREQ_SIM_GET_SIM_PIN2_INPUT_TIMES,
-    HREQ_SIM_SET_ACTIVE_SIM,
-    HREQ_SIM_RADIO_PROTOCOL,
-    HREQ_SIM_STK_SEND_TERMINAL_RESPONSE,
-    HREQ_SIM_STK_SEND_ENVELOPE,
-    HREQ_SIM_STK_SEND_CALL_SETUP_REQUEST_RESULT,
-    HREQ_SIM_STK_IS_READY,
-    HREQ_SIM_OPEN_LOGICAL_CHANNEL,
-    HREQ_SIM_CLOSE_LOGICAL_CHANNEL,
-    HREQ_SIM_TRANSMIT_APDU_LOGICAL_CHANNEL,
-    HREQ_SIM_TRANSMIT_APDU_BASIC_CHANNEL,
-    HREQ_SIM_AUTHENTICATION,
-    HREQ_SIM_UNLOCK_SIM_LOCK,
-    HREQ_SIM_SEND_NCFG_OPER_INFO,
-
-    HREQ_DATA_BASE = 300,
-    HREQ_DATA_SET_INIT_APN_INFO,
-    HREQ_DATA_DEACTIVATE_PDP_CONTEXT,
-    HREQ_DATA_ACTIVATE_PDP_CONTEXT,
-    HREQ_DATA_GET_PDP_CONTEXT_LIST,
-    HREQ_DATA_GET_LINK_BANDWIDTH_INFO,
-    HREQ_DATA_SET_LINK_BANDWIDTH_REPORTING_RULE,
-    HREQ_DATA_SET_DATA_PROFILE_INFO,
-    HREQ_DATA_SET_DATA_PERMITTED,
-    HREQ_DATA_GET_LINK_CAPABILITY,
-    HREQ_DATA_CLEAN_ALL_CONNECTIONS,
-
-    HREQ_NETWORK_BASE = 400,
-    HREQ_NETWORK_GET_SIGNAL_STRENGTH,
-    HREQ_NETWORK_GET_CS_REG_STATUS,
-    HREQ_NETWORK_GET_PS_REG_STATUS,
-    HREQ_NETWORK_GET_OPERATOR_INFO,
-    HREQ_NETWORK_GET_NETWORK_SEARCH_INFORMATION,
-    HREQ_NETWORK_GET_NETWORK_SELECTION_MODE,
-    HREQ_NETWORK_SET_NETWORK_SELECTION_MODE,
-    HREQ_NETWORK_GET_NEIGHBORING_CELLINFO_LIST,
-    HREQ_NETWORK_GET_CURRENT_CELL_INFO,
-    HREQ_NETWORK_SET_PREFERRED_NETWORK,
-    HREQ_NETWORK_GET_PREFERRED_NETWORK,
-    HREQ_NETWORK_GET_RADIO_CAPABILITY,
-    HREQ_NETWORK_GET_PHYSICAL_CHANNEL_CONFIG,
-    HREQ_NETWORK_SET_LOCATE_UPDATES,
-    HREQ_NETWORK_SET_NOTIFICATION_FILTER,
-    HREQ_NETWORK_SET_DEVICE_STATE,
-    HREQ_NETWORK_SET_NR_OPTION_MODE,
-    HREQ_NETWORK_GET_NR_OPTION_MODE,
-    HREQ_NETWORK_GET_RRC_CONNECTION_STATE,
-    HREQ_NETWORK_GET_NR_SSBID_INFO,
-
-    HREQ_COMMON_BASE = 500,
-    HREQ_MODEM_SHUT_DOWN,
-    HREQ_MODEM_SET_RADIO_STATUS,
-    HREQ_MODEM_GET_RADIO_STATUS,
-    HREQ_MODEM_GET_IMEI,
-    HREQ_MODEM_GET_IMEISV,
-    HREQ_MODEM_GET_MEID,
-    HREQ_MODEM_GET_BASEBAND_VERSION,
-    HREQ_MODEM_GET_VOICE_RADIO,
-    HREQ_MODEM_EXIT = 1000
-};
 
 enum class DeviceStateType { POWER_SAVE_MODE, CHARGING_STATE, LOW_DATA_STATE };
 
@@ -246,7 +116,6 @@ public:
     void WaitFor(int32_t timeoutSecond);
     bool GetBoolResult(HdiId hdiId_);
     void Clean();
-
     // Call
     int32_t CallStateUpdated(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
     int32_t CallRingbackVoiceNotice(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
@@ -307,7 +176,6 @@ public:
     int32_t SetBarringPasswordResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
     int32_t CloseUnFinishedUssdResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
     int32_t SetVonrSwitchResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
-
     // Data
     int32_t PdpContextListUpdated(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_1::DataCallResultList &dataCallResultList) override;
@@ -329,7 +197,12 @@ public:
     int32_t CleanAllConnectionsResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
     int32_t NcfgFinishedResult(const HDI::Ril::V1_3::RilRadioResponseInfo &responseInfo, int32_t state) override;
     int32_t RestartRildNvMatch(const HDI::Ril::V1_3::RilRadioResponseInfo &responseInfo, int32_t state) override;
-
+    int32_t NetworkSliceUrspRpt(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_4::NetworkSliceUrspInfo &networkSliceUrspInfo) override;
+    int32_t NetworkSliceAllowedNssaiRpt(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_4::NetworkSliceAllowedNssaiInfo &networkSliceAllowedNssaiInfo) override;
+    int32_t NetworkSliceEhplmnRpt(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_4::NetworkSliceEhplmnInfo &networkSliceEhplmnInfo) override;
     // Modem
     int32_t RadioStateUpdated(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, int32_t state) override;
     int32_t VoiceRadioTechUpdated(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
@@ -346,7 +219,6 @@ public:
         const HDI::Ril::V1_1::VoiceRadioTechnology &voiceRadioTechnology) override;
     int32_t GetBasebandVersionResponse(
         const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const std::string &basebandVersion) override;
-
     // Sim notice
     int32_t SimStateUpdated(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
     int32_t SimStkSessionEndNotify(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
@@ -410,7 +282,6 @@ public:
     int32_t UnlockSimLockResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_1::LockStatusResp &lockStatus) override;
     int32_t SendSimMatchedOperatorInfoResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
-
     // Network
     int32_t NetworkCsRegStatusUpdated(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_1::CsRegStatusInfo &csRegStatusInfo) override;
@@ -471,7 +342,6 @@ public:
         const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, int32_t state) override;
     int32_t GetNrSsbIdResponse(const HDI::Ril::V1_2::RilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_2::NrCellSsbIds &nrCellSsbIds) override;
-
     // Sms
     int32_t NewSmsNotify(const HDI::Ril::V1_1::HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_1::SmsMessageInfo &smsMessageInfo) override;
@@ -505,7 +375,6 @@ public:
     int32_t SendSmsMoreModeResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_1::SendSmsResultInfo &sendSmsResultInfo) override;
     int32_t SendSmsAckResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
-
     int32_t CommonErrorResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
     int32_t GetSerialId()
     {
@@ -520,12 +389,10 @@ public:
     {
         return currentChannelId_;
     }
-
     std::string GetSmscAddr()
     {
         return smscAddr_;
     }
-
 private:
     std::map<int32_t, int32_t> simState_;
     std::mutex callbackMutex_;
