@@ -584,36 +584,45 @@ typedef struct {
      *
      * @param requestInfo Request data info, for details, see {@link
      * ReqDataInfo}.
+     * @param data Indicates the data information.
+     * @param dataLen
      * @see ReqDataInfo
      */
-    void (*SendUrspDecodeResult)(const ReqDataInfo *requestInfo, const HRilUePolicyDecodeResult *data);
+    void (*SendUrspDecodeResult)(const ReqDataInfo *requestInfo, const HRilUePolicyDecodeResult *data, size_t dataLen);
  
     /**
-     * @brief Send Ue State Indication.
+     * @brief Send Ue Policy Section Identifier.
      *
      * @param requestInfo Request data info, for details, see {@link
      * ReqDataInfo}.
+     * @param data Indicates the data information.
+     * @param dataLen
      * @see ReqDataInfo
      */
-    void (*SendUePolicySectionIdentifier)(const ReqDataInfo *requestInfo, const HRilUePolicySectionIdentifier *data);
+    void (*SendUePolicySectionIdentifier)(const ReqDataInfo *requestInfo, const HRilUePolicySectionIdentifier *data,
+        size_t dataLen);
 
     /**
-     * @brief Send Ue State Indication.
+     * @brief Send Ims RsdList.
      *
      * @param requestInfo Request data info, for details, see {@link
      * ReqDataInfo}.
-     * @see ReqDataInfo
+     * @param data Indicates the data information.
+     * @param dataLen
      */
-    void (*SendImsRsdList)(const ReqDataInfo *requestInfo, const HRilImsRsdList *data);
+    void (*SendImsRsdList)(const ReqDataInfo *requestInfo, const HRilImsRsdList *data, size_t dataLen);
 
     /**
      * @brief Sync Allowed Nssai WithModem.
      *
      * @param requestInfo Request data info, for details, see {@link
      * ReqDataInfo}.
+     * @param data Indicates the data information.
+     * @param dataLen
      * @see ReqDataInfo
      */
-    void (*GetNetworkSliceAllowedNssai)(const ReqDataInfo *requestInfo, const HRilSyncAllowedNssaiInfo *data);
+    void (*GetNetworkSliceAllowedNssai)(const ReqDataInfo *requestInfo, const HRilSyncAllowedNssaiInfo *data,
+        size_t dataLen);
 
     /**
      * @brief Sync Ehplmn WithModem.
@@ -630,10 +639,11 @@ typedef struct {
      * @param requestInfo Request data info, for details, see {@link
      * ReqDataInfo}.
      * @param data Indicates the data information.
+     * @param dataLen
      * @see ReqDataInfo | HRilDataInfoWithApnTypesforSlice
      */
     void (*ActivatePdpContextWithApnTypesforSlice)(const ReqDataInfo *requestInfo,
-        const HRilDataInfoWithApnTypesforSlice *data);
+        const HRilDataInfoWithApnTypesforSlice *data, size_t dataLen);
 } HRilDataReq;
 #ifdef __cplusplus
 }

@@ -1696,6 +1696,51 @@ int32_t RilCallbackTest::NetworkSliceEhplmnRpt(const RilRadioResponseInfo &respo
     return 0;
 }
 
+int32_t RilCallbackTest::SendUrspDecodeResultResponse(const RilRadioResponseInfo &responseInfo)
+{
+    TELEPHONY_LOGI("RilCallbackTest::SendUrspDecodeResultResponse error:%{public}d", responseInfo.error);
+    hdiId_ = HdiId::HREQ_DATA_SEND_UEPOLICY_DECODE_RESULT;
+    resultInfo_ = responseInfo;
+    NotifyAll();
+    return 0;
+}
+
+int32_t RilCallbackTest::SendUePolicySectionIdentifierResponse(const RilRadioResponseInfo &responseInfo)
+{
+    TELEPHONY_LOGI("RilCallbackTest::SendUePolicySectionIdentifierResponse error:%{public}d", responseInfo.error);
+    hdiId_ = HdiId::HREQ_DATA_SEND_UE_SECTION_IDENTIFIER;
+    resultInfo_ = responseInfo;
+    NotifyAll();
+    return 0;
+}
+
+int32_t RilCallbackTest::GetNetworkSliceAllowedNssaiResponse(const RilRadioResponseInfo &responseInfo)
+{
+    TELEPHONY_LOGI("RilCallbackTest::GetNetworkSliceAllowedNssaiResponse error:%{public}d", responseInfo.error);
+    hdiId_ = HdiId::HREQ_DATA_SYNC_ALLOWED_NSSAI_WITH_MODEM;
+    resultInfo_ = responseInfo;
+    NotifyAll();
+    return 0;
+}
+
+int32_t RilCallbackTest::GetNetworkSliceEhplmnResponse(const RilRadioResponseInfo &responseInfo)
+{
+    TELEPHONY_LOGI("RilCallbackTest::GetNetworkSliceEhplmnResponse error:%{public}d", responseInfo.error);
+    hdiId_ = HdiId::HREQ_DATA_SYNC_EHPLMN_WITH_MODEM;
+    resultInfo_ = responseInfo;
+    NotifyAll();
+    return 0;
+}
+
+int32_t RilCallbackTest::SendImsRsdListResponse(const RilRadioResponseInfo &responseInfo)
+{
+    TELEPHONY_LOGI("RilCallbackTest::SendImsRsdListResponse error:%{public}d", responseInfo.error);
+    hdiId_ = HdiId::HREQ_DATA_SEND_IMS_RSD_LIST;
+    resultInfo_ = responseInfo;
+    NotifyAll();
+    return 0;
+}
+
 // Sms
 int32_t RilCallbackTest::NewSmsNotify(
     const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const SmsMessageInfo &smsMessageInfo)

@@ -94,6 +94,17 @@ public:
     int32_t ActivatePdpContextWithApnTypesforSlice(int32_t serialId,
         const OHOS::HDI::Ril::V1_4::DataCallInfoWithApnTypesforSlice &dataCallInfoWithApnTypesforslice,
         const int32_t version);
+    int32_t SendUrspDecodeResultResponse(int32_t requestNum,
+        HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t SendUePolicySectionIdentifierResponse(int32_t requestNum,
+        HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t SendImsRsdListResponse(int32_t requestNum,
+        HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t GetNetworkSliceAllowedNssaiResponse(int32_t requestNum,
+        HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+    int32_t GetNetworkSliceEhplmnResponse(int32_t requestNum,
+        HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen);
+
 private:
     void SwitchHRilDataListToHal(
         const void *response, size_t responseLen, std::vector<HDI::Ril::V1_1::SetupDataCallResultInfo> &dcResultList);
