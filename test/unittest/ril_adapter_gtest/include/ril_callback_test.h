@@ -203,6 +203,11 @@ public:
         const HDI::Ril::V1_4::NetworkSliceAllowedNssaiInfo &networkSliceAllowedNssaiInfo) override;
     int32_t NetworkSliceEhplmnRpt(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_4::NetworkSliceEhplmnInfo &networkSliceEhplmnInfo) override;
+    int32_t SendUrspDecodeResultResponse(const HDI::Ril::V1_3::RilRadioResponseInfo &responseInfo);
+    int32_t SendUePolicySectionIdentifierResponse(const HDI::Ril::V1_3::RilRadioResponseInfo &responseInfo);
+    int32_t GetNetworkSliceAllowedNssaiResponse(const HDI::Ril::V1_3::RilRadioResponseInfo &responseInfo);
+    int32_t GetNetworkSliceEhplmnResponse(const HDI::Ril::V1_3::RilRadioResponseInfo &responseInfo);
+    int32_t SendImsRsdListResponse(const HDI::Ril::V1_3::RilRadioResponseInfo &responseInfo);
     // Modem
     int32_t RadioStateUpdated(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, int32_t state) override;
     int32_t VoiceRadioTechUpdated(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,

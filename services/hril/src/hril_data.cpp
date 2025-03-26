@@ -105,6 +105,27 @@ void HRilData::AddHandlerToMapForSlice()
     notiMemberFuncMap_[HNOTI_DATA_NETWORKSLICE_EHPLMN_RPT] =
         [this](int32_t notifyType, HRilErrNumber error, const void *response,
         size_t responseLen) { return NetworkSliceEhplmnRpt(notifyType, error, response, responseLen); };
+    respMemberFuncMap_[HREQ_DATA_SEND_UEPOLICY_DECODE_RESULT] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) {
+            return SendUrspDecodeResultResponse(requestNum, responseInfo, response, responseLen);
+        };
+    respMemberFuncMap_[HREQ_DATA_SEND_UE_SECTION_IDENTIFIER] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) {
+            return SendUePolicySectionIdentifierResponse(requestNum, responseInfo, response, responseLen);
+        };
+    respMemberFuncMap_[HREQ_DATA_SEND_IMS_RSD_LIST] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return SendImsRsdListResponse(requestNum, responseInfo, response, responseLen); };
+    respMemberFuncMap_[HREQ_DATA_SYNC_ALLOWED_NSSAI_WITH_MODEM] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) {
+            return GetNetworkSliceAllowedNssaiResponse(requestNum, responseInfo, response, responseLen);
+        };
+    respMemberFuncMap_[HREQ_DATA_SYNC_EHPLMN_WITH_MODEM] =
+        [this](int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response,
+        size_t responseLen) { return GetNetworkSliceEhplmnResponse(requestNum, responseInfo, response, responseLen); };
 }
 
 void HRilData::SwitchRilDataToHal(const HRilDataCallResponse *response, HDI::Ril::V1_1::SetupDataCallResultInfo &result)
@@ -614,6 +635,36 @@ int32_t HRilData::ActivatePdpContextWithApnTypesforSlice(int32_t serialId,
     dataInfoWithApnTypesforSlice.snssai = StringToCString(dataCallInfoWithApnTypesforslice.dataProfileInfo.snssai);
     return RequestVendor(serialId, HREQ_DATA_ACTIVATE_PDP_CONTEXT, dataFuncs_,
         &HRilDataReq::ActivatePdpContextWithApnTypesforSlice, &dataInfoWithApnTypesforSlice);
+}
+
+int32_t HRilData::SendUrspDecodeResultResponse(
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+{
+    return HRIL_ERR_SUCCESS;
+}
+
+int32_t HRilData::SendUePolicySectionIdentifierResponse(
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+{
+    return HRIL_ERR_SUCCESS;
+}
+
+int32_t HRilData::SendImsRsdListResponse(
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+{
+    return HRIL_ERR_SUCCESS;
+}
+
+int32_t HRilData::GetNetworkSliceAllowedNssaiResponse(
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+{
+    return HRIL_ERR_SUCCESS;
+}
+
+int32_t HRilData::GetNetworkSliceEhplmnResponse(
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+{
+    return HRIL_ERR_SUCCESS;
 }
 
 } // namespace Telephony
