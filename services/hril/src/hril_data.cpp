@@ -538,7 +538,7 @@ int32_t HRilData::SendUrspDecodeResult(int32_t serialId,
         hriluePolicyDecodeResult.uePolicyDecodeResultInfo[i] = uePolicyDecodeResult.uePolicyDecodeResultInfo[i];
     }
     int32_t result = RequestVendor(serialId, HREQ_DATA_SEND_UEPOLICY_DECODE_RESULT, dataFuncs_,
-        &HRilDataReq::SendUrspDecodeResult, &hriluePolicyDecodeResult, sizeof(hriluePolicyDecodeResult));
+        &HRilDataReq::SendUrspDecodeResult, &hriluePolicyDecodeResult);
     delete[] hriluePolicyDecodeResult.uePolicyDecodeResultInfo;
     return result;
 }
@@ -556,8 +556,7 @@ int32_t HRilData::SendUePolicySectionIdentifier(int32_t serialId,
             uePolicySectionIdentifier.uePolicySectionIdentifierInfo[i];
     }
     int32_t result = RequestVendor(serialId, HREQ_DATA_SEND_UE_SECTION_IDENTIFIER, dataFuncs_,
-        &HRilDataReq::SendUePolicySectionIdentifier, &hRilUePolicySectionIdentifier,
-        sizeof(hRilUePolicySectionIdentifier));
+        &HRilDataReq::SendUePolicySectionIdentifier, &hRilUePolicySectionIdentifier);
     delete[] hRilUePolicySectionIdentifier.uePolicySectionIdentifierInfo;
     return result;
 }
@@ -571,7 +570,7 @@ int32_t HRilData::SendImsRsdList(int32_t serialId, const OHOS::HDI::Ril::V1_4::I
         hRilImsRsdList.imsRsdListInfo[i] = imsRsdList.imsRsdListInfo[i];
     }
     int32_t result = RequestVendor(serialId, HREQ_DATA_SEND_IMS_RSD_LIST, dataFuncs_,
-        &HRilDataReq::SendImsRsdList, &hRilImsRsdList, sizeof(hRilImsRsdList));
+        &HRilDataReq::SendImsRsdList, &hRilImsRsdList);
     delete[] hRilImsRsdList.imsRsdListInfo;
     return result;
 }
@@ -587,7 +586,7 @@ int32_t HRilData::GetNetworkSliceAllowedNssai(int32_t serialId,
         hRilsyncAllowedNssaiInfo.syncAllowedNssaiInfo[i] = dsyncAllowedNssaiInfo.syncAllowedNssaiInfo[i];
     }
     int32_t result = RequestVendor(serialId, HREQ_DATA_SYNC_ALLOWED_NSSAI_WITH_MODEM, dataFuncs_,
-        &HRilDataReq::GetNetworkSliceAllowedNssai, &hRilsyncAllowedNssaiInfo, sizeof(hRilsyncAllowedNssaiInfo));
+        &HRilDataReq::GetNetworkSliceAllowedNssai, &hRilsyncAllowedNssaiInfo);
     delete[] hRilsyncAllowedNssaiInfo.syncAllowedNssaiInfo;
     return result;
 }
@@ -635,8 +634,7 @@ int32_t HRilData::ActivatePdpContextWithApnTypesforSlice(int32_t serialId,
     dataInfoWithApnTypesforSlice.sscmode = StringToCString(sscmode);
     dataInfoWithApnTypesforSlice.snssai = StringToCString(dataCallInfoWithApnTypesforslice.dataProfileInfo.snssai);
     return RequestVendor(serialId, HREQ_DATA_ACTIVATE_PDP_CONTEXT, dataFuncs_,
-        &HRilDataReq::ActivatePdpContextWithApnTypesforSlice, &dataInfoWithApnTypesforSlice,
-        sizeof(dataInfoWithApnTypesforSlice));
+        &HRilDataReq::ActivatePdpContextWithApnTypesforSlice, &dataInfoWithApnTypesforSlice);
 }
 
 int32_t HRilData::SendUrspDecodeResultResponse(
