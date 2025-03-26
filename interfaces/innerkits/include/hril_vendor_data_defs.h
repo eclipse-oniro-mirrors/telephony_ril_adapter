@@ -584,27 +584,25 @@ typedef struct {
      *
      * @param requestInfo Request data info, for details, see {@link
      * ReqDataInfo}.
-     * @param data Indicates the data information.
      * @see ReqDataInfo
      */
     void (*SendUrspDecodeResult)(const ReqDataInfo *requestInfo, const HRilUePolicyDecodeResult *data);
  
     /**
-     * @brief Send Ue Policy Section Identifier.
+     * @brief Send Ue State Indication.
      *
      * @param requestInfo Request data info, for details, see {@link
      * ReqDataInfo}.
-     * @param data Indicates the data information.
      * @see ReqDataInfo
      */
     void (*SendUePolicySectionIdentifier)(const ReqDataInfo *requestInfo, const HRilUePolicySectionIdentifier *data);
 
     /**
-     * @brief Send Ims RsdList.
+     * @brief Send Ue State Indication.
      *
      * @param requestInfo Request data info, for details, see {@link
      * ReqDataInfo}.
-     * @param data Indicates the data information.
+     * @see ReqDataInfo
      */
     void (*SendImsRsdList)(const ReqDataInfo *requestInfo, const HRilImsRsdList *data);
 
@@ -613,7 +611,6 @@ typedef struct {
      *
      * @param requestInfo Request data info, for details, see {@link
      * ReqDataInfo}.
-     * @param data Indicates the data information.
      * @see ReqDataInfo
      */
     void (*GetNetworkSliceAllowedNssai)(const ReqDataInfo *requestInfo, const HRilSyncAllowedNssaiInfo *data);
