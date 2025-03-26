@@ -18,7 +18,7 @@ ohos_unittest("tel_ril_adapter_gtest") {
   install_enable = true
   subsystem_name = "telephony"
   part_name = "ril_adapter"
-  test_module = "tel_ril_adapter_gtest"
+  test_module = "ril_adapter"
   module_out_path = part_name + "/" + test_module
 
   sources = [
