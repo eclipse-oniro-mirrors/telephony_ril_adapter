@@ -254,6 +254,12 @@ typedef enum {
     /** Sets the protocol stack for the primary and secondary SIM cards. */
     HREQ_SIM_SET_RADIO_PROTOCOL,
 
+    /** Gets the primary SIM cards slot. */
+    HREQ_SIM_GET_PRIMARY_SLOT,
+ 
+    /** Sets the primary SIM cards slot. */
+    HREQ_SIM_SET_PRIMARY_SLOT,
+
     /**
      * Sends the TerminalResponse instruction of the SIM application toolkit
      * (STK).
