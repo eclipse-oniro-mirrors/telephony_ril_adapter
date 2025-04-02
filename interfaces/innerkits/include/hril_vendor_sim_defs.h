@@ -409,7 +409,7 @@ typedef struct {
     *
     * @param requestInfo Request data info, for details, see {@link
     * ReqDataInfo}.
-    * @see setPrimarySlot
+    * @see ReqDataInfo
     */
     void (*GetPrimarySlot)(const ReqDataInfo *requestInfo);
 
