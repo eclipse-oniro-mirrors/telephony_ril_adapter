@@ -424,7 +424,7 @@ typedef struct {
     * - 2 indicates set slot2 as the primary slot
     * @see ReqDataInfo
     */
-    void (*setPrimarySlot)(const ReqDataInfo *requestInfo, int32_t data);
+    void (*SetPrimarySlot)(const ReqDataInfo *requestInfo, int32_t data);
 } HRilSimReq;
 #ifdef __cplusplus
 }
