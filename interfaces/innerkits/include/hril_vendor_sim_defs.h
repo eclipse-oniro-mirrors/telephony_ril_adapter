@@ -398,6 +398,33 @@ typedef struct {
      * @see ReqDataInfo
      */
     void (*SetSimPowerState)(const ReqDataInfo *requestInfo, int32_t state);
+    
+    /**
+    * @brief Get primary slot index.
+    *
+    * The response para is an integer.The valus is the primary slot ID, value as following:
+    * - 0 indicates slot0 is the primary slot
+    * - 1 indicates slot1 is the primary slot
+    * - 2 indicates slot2 is the primary slot
+    *
+    * @param requestInfo Request data info, for details, see {@link
+    * ReqDataInfo}.
+    * @see ReqDataInfo
+    */
+    void (*GetPrimarySlot)(const ReqDataInfo *requestInfo);
+
+    /**
+    * @brief Set primary slot index.
+    *
+    * @param requestInfo Request data info, for details, see {@link
+    * ReqDataInfo}.
+    * @param data The primary slot ID to be set, value as following:
+    * - 0 indicates set slot0 as the primary slot
+    * - 1 indicates set slot1 as the primary slot
+    * - 2 indicates set slot2 as the primary slot
+    * @see ReqDataInfo
+    */
+    void (*SetPrimarySlot)(const ReqDataInfo *requestInfo, int32_t data);
 } HRilSimReq;
 #ifdef __cplusplus
 }
