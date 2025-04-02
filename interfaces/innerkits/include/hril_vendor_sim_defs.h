@@ -401,7 +401,7 @@ typedef struct {
     
     /**
     * @brief Get primary slot index.
-    * 
+    *
     * The response para is an integer.The valus is the primary slot ID, value as following:
     * - 0 indicates slot0 is the primary slot
     * - 1 indicates slot1 is the primary slot
