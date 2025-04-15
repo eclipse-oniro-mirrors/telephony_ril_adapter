@@ -1674,6 +1674,28 @@ int32_t RilCallbackTest::CleanAllConnectionsResponse(const RilRadioResponseInfo 
     return 0;
 }
 
+int32_t RilCallbackTest::NetworkSliceUrspRpt(const RilRadioResponseInfo &responseInfo,
+    const NetworkSliceUrspInfo &networkSliceUrspInfo)
+{
+    TELEPHONY_LOGI("RilCallbackTest::NetworkSliceUrspRpt:%{public}d", (int)networkSliceUrspInfo.urspInfo.size());
+    return 0;
+}
+
+int32_t RilCallbackTest::NetworkSliceAllowedNssaiRpt(const RilRadioResponseInfo &responseInfo,
+    const NetworkSliceAllowedNssaiInfo &networkSliceAllowedNssaiInfo)
+{
+    TELEPHONY_LOGI("RilCallbackTest::NetworkSliceAllowedNssaiRpt:%{public}d",
+        (int)networkSliceAllowedNssaiInfo.allowednssaiInfo.size());
+    return 0;
+}
+
+int32_t RilCallbackTest::NetworkSliceEhplmnRpt(const RilRadioResponseInfo &responseInfo,
+    const NetworkSliceEhplmnInfo &networkSliceEhplmnInfo)
+{
+    TELEPHONY_LOGI("RilCallbackTest::NetworkSliceEhplmnRpt:%{public}d", (int)networkSliceEhplmnInfo.ehplmnInfo.size());
+    return 0;
+}
+
 // Sms
 int32_t RilCallbackTest::NewSmsNotify(
     const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const SmsMessageInfo &smsMessageInfo)

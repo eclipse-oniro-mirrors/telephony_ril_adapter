@@ -1484,6 +1484,30 @@ int32_t RilCallbackTest::CleanAllConnectionsResponse(const RilRadioResponseInfo 
     return 0;
 }
 
+int32_t RilCallbackTest::NetworkSliceUrspRpt(
+    const RilRadioResponseInfo &responseInfo, const NetworkSliceUrspInfo &networkSliceUrspInfo)
+{
+    PrintResponseInfo("NetworkSliceUrspRpt", responseInfo);
+    cout << "[NetworkSliceUrspInfo_size]" << networkSliceUrspInfo.urspInfo.size() << endl;
+    return 0;
+}
+
+int32_t RilCallbackTest::NetworkSliceAllowedNssaiRpt(
+    const RilRadioResponseInfo &responseInfo, const NetworkSliceAllowedNssaiInfo &networkSliceAllowedNssaiInfo)
+{
+    PrintResponseInfo("NetworkSliceAllowedNssaiRpt", responseInfo);
+    cout << "[NetworkSliceAllowedNssaiInfo_size]" << networkSliceAllowedNssaiInfo.allowednssaiInfo.size() << endl;
+    return 0;
+}
+
+int32_t RilCallbackTest::NetworkSliceEhplmnRpt(
+    const RilRadioResponseInfo &responseInfo, const NetworkSliceEhplmnInfo &networkSliceEhplmnInfo)
+{
+    PrintResponseInfo("NetworkSliceEhplmnRpt", responseInfo);
+    cout << "[NetworkSliceEhplmnInfo_size]" << networkSliceEhplmnInfo.ehplmnInfo.size() << endl;
+    return 0;
+}
+
 // Sms
 int32_t RilCallbackTest::NewSmsNotify(
     const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const SmsMessageInfo &smsMessageInfo)
