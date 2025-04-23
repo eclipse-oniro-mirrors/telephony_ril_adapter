@@ -44,9 +44,7 @@ void RILSmsTest::TearDown() {}
  */
 HWTEST_F(RILSmsTest, Telephony_DriverSystem_AddSimMessage_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     SmsMessageIOInfo msgIoInfo;
     msgIoInfo.smscPdu = TEST_SMSC_PDU;
     msgIoInfo.pdu = TEST_STORAGE_PDU;
@@ -64,9 +62,7 @@ HWTEST_F(RILSmsTest, Telephony_DriverSystem_AddSimMessage_V1_0100, Function | Me
  */
 HWTEST_F(RILSmsTest, Telephony_DriverSystem_AddSimMessage_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     SmsMessageIOInfo msgIoInfo;
     msgIoInfo.smscPdu = TEST_SMSC_PDU;
     msgIoInfo.pdu = TEST_STORAGE_PDU;
@@ -84,9 +80,7 @@ HWTEST_F(RILSmsTest, Telephony_DriverSystem_AddSimMessage_V1_0200, Function | Me
  */
 HWTEST_F(RILSmsTest, Telephony_DriverSystem_UpdateSimMessage_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     SmsMessageIOInfo msgIoInfo;
     msgIoInfo.smscPdu = TEST_SMSC_PDU;
     msgIoInfo.pdu = TEST_STORAGE_PDU;
@@ -105,9 +99,7 @@ HWTEST_F(RILSmsTest, Telephony_DriverSystem_UpdateSimMessage_V1_0100, Function |
  */
 HWTEST_F(RILSmsTest, Telephony_DriverSystem_UpdateSimMessage_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     SmsMessageIOInfo msgIoInfo;
     msgIoInfo.smscPdu = TEST_SMSC_PDU;
     msgIoInfo.pdu = TEST_STORAGE_PDU;
@@ -126,9 +118,7 @@ HWTEST_F(RILSmsTest, Telephony_DriverSystem_UpdateSimMessage_V1_0200, Function |
  */
 HWTEST_F(RILSmsTest, Telephony_DriverSystem_DelSimMessage_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     int32_t index = 0;
     int32_t ret = g_rilInterface->DelSimMessage(SLOTID_1, RilTestUtil::GetSerialId(), index);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND_LONG);
@@ -143,9 +133,7 @@ HWTEST_F(RILSmsTest, Telephony_DriverSystem_DelSimMessage_V1_0100, Function | Me
  */
 HWTEST_F(RILSmsTest, Telephony_DriverSystem_DelSimMessage_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     int32_t index = 0;
     int32_t ret = g_rilInterface->DelSimMessage(SLOTID_2, RilTestUtil::GetSerialId(), index);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND_LONG);
@@ -160,9 +148,7 @@ HWTEST_F(RILSmsTest, Telephony_DriverSystem_DelSimMessage_V1_0200, Function | Me
  */
 HWTEST_F(RILSmsTest, Telephony_DriverSystem_AddCdmaSimMessage_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     SmsMessageIOInfo msgIoInfo;
     msgIoInfo.smscPdu = TEST_SMSC_PDU;
     msgIoInfo.pdu = TEST_STORAGE_PDU;
@@ -180,9 +166,7 @@ HWTEST_F(RILSmsTest, Telephony_DriverSystem_AddCdmaSimMessage_V1_0100, Function 
  */
 HWTEST_F(RILSmsTest, Telephony_DriverSystem_AddCdmaSimMessage_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     SmsMessageIOInfo msgIoInfo;
     msgIoInfo.smscPdu = TEST_SMSC_PDU;
     msgIoInfo.pdu = TEST_STORAGE_PDU;
@@ -200,9 +184,7 @@ HWTEST_F(RILSmsTest, Telephony_DriverSystem_AddCdmaSimMessage_V1_0200, Function 
  */
 HWTEST_F(RILSmsTest, Telephony_DriverSystem_UpdateCdmaSimMessage_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     SmsMessageIOInfo msgIoInfo;
     msgIoInfo.smscPdu = TEST_SMSC_PDU;
     msgIoInfo.pdu = TEST_STORAGE_PDU;
@@ -221,9 +203,7 @@ HWTEST_F(RILSmsTest, Telephony_DriverSystem_UpdateCdmaSimMessage_V1_0100, Functi
  */
 HWTEST_F(RILSmsTest, Telephony_DriverSystem_UpdateCdmaSimMessage_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     SmsMessageIOInfo msgIoInfo;
     msgIoInfo.smscPdu = TEST_SMSC_PDU;
     msgIoInfo.pdu = TEST_STORAGE_PDU;
@@ -242,9 +222,7 @@ HWTEST_F(RILSmsTest, Telephony_DriverSystem_UpdateCdmaSimMessage_V1_0200, Functi
  */
 HWTEST_F(RILSmsTest, Telephony_DriverSystem_DelCdmaSimMessage_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     int32_t index = 0;
     int32_t ret = g_rilInterface->DelCdmaSimMessage(SLOTID_1, RilTestUtil::GetSerialId(), index);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND_LONG);
@@ -259,9 +237,7 @@ HWTEST_F(RILSmsTest, Telephony_DriverSystem_DelCdmaSimMessage_V1_0100, Function 
  */
 HWTEST_F(RILSmsTest, Telephony_DriverSystem_DelCdmaSimMessage_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     int32_t index = 0;
     int32_t ret = g_rilInterface->DelCdmaSimMessage(SLOTID_2, RilTestUtil::GetSerialId(), index);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND_LONG);
@@ -276,9 +252,7 @@ HWTEST_F(RILSmsTest, Telephony_DriverSystem_DelCdmaSimMessage_V1_0200, Function 
  */
 HWTEST_F(RILSmsTest, Telephony_DriverSystem_GetSmscAddr_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     int32_t ret = g_rilInterface->GetSmscAddr(SLOTID_1, RilTestUtil::GetSerialId());
     RilTestUtil::WaitFor(WAIT_TIME_SECOND_LONG);
     EXPECT_EQ(SUCCESS, ret);
@@ -292,9 +266,7 @@ HWTEST_F(RILSmsTest, Telephony_DriverSystem_GetSmscAddr_V1_0100, Function | Medi
  */
 HWTEST_F(RILSmsTest, Telephony_DriverSystem_GetSmscAddr_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     int32_t ret = g_rilInterface->GetSmscAddr(SLOTID_2, RilTestUtil::GetSerialId());
     RilTestUtil::WaitFor(WAIT_TIME_SECOND_LONG);
     EXPECT_EQ(SUCCESS, ret);
@@ -308,9 +280,7 @@ HWTEST_F(RILSmsTest, Telephony_DriverSystem_GetSmscAddr_V1_0200, Function | Medi
  */
 HWTEST_F(RILSmsTest, Telephony_DriverSystem_SetSmscAddr_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     ServiceCenterAddress address;
     address.address = RilTestUtil::GetCallback()->GetSmscAddr();
     address.tosca = TEST_TOSCA;
@@ -327,9 +297,7 @@ HWTEST_F(RILSmsTest, Telephony_DriverSystem_SetSmscAddr_V1_0100, Function | Medi
  */
 HWTEST_F(RILSmsTest, Telephony_DriverSystem_SetSmscAddr_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     ServiceCenterAddress address;
     address.address = RilTestUtil::GetCallback()->GetSmscAddr();
     address.tosca = TEST_TOSCA;
@@ -346,9 +314,7 @@ HWTEST_F(RILSmsTest, Telephony_DriverSystem_SetSmscAddr_V1_0200, Function | Medi
  */
 HWTEST_F(RILSmsTest, Telephony_DriverSystem_SetCBConfig_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     CBConfigInfo info;
     info.mode = 1;
     info.mids = TEST_ID_LIST;
@@ -366,9 +332,7 @@ HWTEST_F(RILSmsTest, Telephony_DriverSystem_SetCBConfig_V1_0100, Function | Medi
  */
 HWTEST_F(RILSmsTest, Telephony_DriverSystem_SetCBConfig_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     CBConfigInfo info;
     info.mode = 1;
     info.mids = TEST_ID_LIST;
@@ -386,9 +350,7 @@ HWTEST_F(RILSmsTest, Telephony_DriverSystem_SetCBConfig_V1_0200, Function | Medi
  */
 HWTEST_F(RILSmsTest, Telephony_DriverSystem_GetCBConfig_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     int32_t ret = g_rilInterface->GetCBConfig(SLOTID_1, RilTestUtil::GetSerialId());
     RilTestUtil::WaitFor(WAIT_TIME_SECOND_LONG);
     EXPECT_EQ(SUCCESS, ret);
@@ -402,9 +364,7 @@ HWTEST_F(RILSmsTest, Telephony_DriverSystem_GetCBConfig_V1_0100, Function | Medi
  */
 HWTEST_F(RILSmsTest, Telephony_DriverSystem_GetCBConfig_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     int32_t ret = g_rilInterface->GetCBConfig(SLOTID_2, RilTestUtil::GetSerialId());
     RilTestUtil::WaitFor(WAIT_TIME_SECOND_LONG);
     EXPECT_EQ(SUCCESS, ret);
@@ -418,9 +378,7 @@ HWTEST_F(RILSmsTest, Telephony_DriverSystem_GetCBConfig_V1_0200, Function | Medi
  */
 HWTEST_F(RILSmsTest, Telephony_DriverSystem_SetCdmaCBConfig_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     CdmaCBConfigInfoList broadcastInfoList = {};
     int32_t ret = g_rilInterface->SetCdmaCBConfig(SLOTID_1, RilTestUtil::GetSerialId(), broadcastInfoList);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND_LONG);
@@ -435,9 +393,7 @@ HWTEST_F(RILSmsTest, Telephony_DriverSystem_SetCdmaCBConfig_V1_0100, Function | 
  */
 HWTEST_F(RILSmsTest, Telephony_DriverSystem_SetCdmaCBConfig_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     CdmaCBConfigInfoList broadcastInfoList = {};
     int32_t ret = g_rilInterface->SetCdmaCBConfig(SLOTID_2, RilTestUtil::GetSerialId(), broadcastInfoList);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND_LONG);
@@ -452,9 +408,7 @@ HWTEST_F(RILSmsTest, Telephony_DriverSystem_SetCdmaCBConfig_V1_0200, Function | 
  */
 HWTEST_F(RILSmsTest, Telephony_DriverSystem_GetCdmaCBConfig_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     int32_t ret = g_rilInterface->GetCdmaCBConfig(SLOTID_1, RilTestUtil::GetSerialId());
     RilTestUtil::WaitFor(WAIT_TIME_SECOND_LONG);
     EXPECT_EQ(SUCCESS, ret);
@@ -468,9 +422,7 @@ HWTEST_F(RILSmsTest, Telephony_DriverSystem_GetCdmaCBConfig_V1_0100, Function | 
  */
 HWTEST_F(RILSmsTest, Telephony_DriverSystem_GetCdmaCBConfig_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     int32_t ret = g_rilInterface->GetCdmaCBConfig(SLOTID_2, RilTestUtil::GetSerialId());
     RilTestUtil::WaitFor(WAIT_TIME_SECOND_LONG);
     EXPECT_EQ(SUCCESS, ret);
@@ -484,9 +436,7 @@ HWTEST_F(RILSmsTest, Telephony_DriverSystem_GetCdmaCBConfig_V1_0200, Function | 
  */
 HWTEST_F(RILSmsTest, Telephony_DriverSystem_SendSmsMoreMode_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     GsmSmsMessageInfo msg;
     msg.smscPdu = TEST_SMSC_PDU;
     msg.pdu = TEST_SEND_PDU;
@@ -503,9 +453,7 @@ HWTEST_F(RILSmsTest, Telephony_DriverSystem_SendSmsMoreMode_V1_0100, Function | 
  */
 HWTEST_F(RILSmsTest, Telephony_DriverSystem_SendSmsMoreMode_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     GsmSmsMessageInfo msg;
     msg.smscPdu = TEST_SMSC_PDU;
     msg.pdu = TEST_SEND_PDU;
@@ -522,9 +470,7 @@ HWTEST_F(RILSmsTest, Telephony_DriverSystem_SendSmsMoreMode_V1_0200, Function | 
  */
 HWTEST_F(RILSmsTest, Telephony_DriverSystem_SendSmsAck_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     ModeData data;
     data.result = TEST_RESULT;
     data.mode = TEST_MODE;
@@ -541,9 +487,7 @@ HWTEST_F(RILSmsTest, Telephony_DriverSystem_SendSmsAck_V1_0100, Function | Mediu
  */
 HWTEST_F(RILSmsTest, Telephony_DriverSystem_SendSmsAck_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     ModeData data;
     data.result = TEST_RESULT;
     data.mode = TEST_MODE;
@@ -560,9 +504,7 @@ HWTEST_F(RILSmsTest, Telephony_DriverSystem_SendSmsAck_V1_0200, Function | Mediu
  */
 HWTEST_F(RILSmsTest, Telephony_DriverSystem_SendGsmSms_V1_0100, Function | MediumTest | Level2)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     GsmSmsMessageInfo msg;
     msg.smscPdu = TEST_SMSC_PDU;
     msg.pdu = TEST_SEND_PDU;
@@ -579,9 +521,7 @@ HWTEST_F(RILSmsTest, Telephony_DriverSystem_SendGsmSms_V1_0100, Function | Mediu
  */
 HWTEST_F(RILSmsTest, Telephony_DriverSystem_SendGsmSms_V1_0200, Function | MediumTest | Level2)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     GsmSmsMessageInfo msg;
     msg.smscPdu = TEST_SMSC_PDU;
     msg.pdu = TEST_SEND_PDU;
@@ -598,9 +538,7 @@ HWTEST_F(RILSmsTest, Telephony_DriverSystem_SendGsmSms_V1_0200, Function | Mediu
  */
 HWTEST_F(RILSmsTest, Telephony_DriverSystem_SendCdmaSms_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     SendCdmaSmsMessageInfo msg;
     msg.smscPdu = TEST_CDMA_PDU;
     int32_t ret = g_rilInterface->SendCdmaSms(SLOTID_1, RilTestUtil::GetSerialId(), msg);
@@ -616,9 +554,7 @@ HWTEST_F(RILSmsTest, Telephony_DriverSystem_SendCdmaSms_V1_0100, Function | Medi
  */
 HWTEST_F(RILSmsTest, Telephony_DriverSystem_SendCdmaSms_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     SendCdmaSmsMessageInfo msg;
     msg.smscPdu = TEST_CDMA_PDU;
     int32_t ret = g_rilInterface->SendCdmaSms(SLOTID_2, RilTestUtil::GetSerialId(), msg);
