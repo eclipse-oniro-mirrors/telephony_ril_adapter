@@ -44,9 +44,9 @@ void RILSimTest::TearDown() {}
  */
 HWTEST_F(RILSimTest, Telephony_DriverSystem_GetSimStatus_V1_0100, Function | MediumTest | Level2)
 {
-    if (g_rilInterface == nullptr || !RilTestUtil::HasVoiceCapability() || !RilTestUtil::IsValidSlotId(SLOTID_1)) {
-        return;
-    }
+    ASSERT_NE(g_rilInterface, nullptr);
+    ASSERT_TRUE(RilTestUtil::HasVoiceCapability());
+    ASSERT_TRUE(RilTestUtil::IsValidSlotId(SLOTID_1));
     int32_t ret = g_rilInterface->GetSimStatus(SLOTID_1, RilTestUtil::GetSerialId());
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -60,9 +60,9 @@ HWTEST_F(RILSimTest, Telephony_DriverSystem_GetSimStatus_V1_0100, Function | Med
  */
 HWTEST_F(RILSimTest, Telephony_DriverSystem_GetSimStatus_V1_0200, Function | MediumTest | Level2)
 {
-    if (g_rilInterface == nullptr || !RilTestUtil::HasVoiceCapability() || !RilTestUtil::IsValidSlotId(SLOTID_2)) {
-        return;
-    }
+    ASSERT_NE(g_rilInterface, nullptr);
+    ASSERT_TRUE(RilTestUtil::HasVoiceCapability());
+    ASSERT_TRUE(RilTestUtil::IsValidSlotId(SLOTID_2));
     int32_t ret = g_rilInterface->GetSimStatus(SLOTID_2, RilTestUtil::GetSerialId());
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -76,9 +76,7 @@ HWTEST_F(RILSimTest, Telephony_DriverSystem_GetSimStatus_V1_0200, Function | Med
  */
 HWTEST_F(RILSimTest, Telephony_DriverSystem_GetSimIO_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     SimIoRequestInfo msg;
     msg.command = 0xc0;
     msg.fileId = 0x2FE2;
@@ -101,9 +99,7 @@ HWTEST_F(RILSimTest, Telephony_DriverSystem_GetSimIO_V1_0100, Function | MediumT
  */
 HWTEST_F(RILSimTest, Telephony_DriverSystem_GetSimIO_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     SimIoRequestInfo msg;
     msg.command = 0xC0;
     // ICCID
@@ -127,9 +123,7 @@ HWTEST_F(RILSimTest, Telephony_DriverSystem_GetSimIO_V1_0200, Function | MediumT
  */
 HWTEST_F(RILSimTest, Telephony_DriverSystem_GetImsi_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     int32_t ret = g_rilInterface->GetImsi(SLOTID_1, RilTestUtil::GetSerialId());
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -143,9 +137,7 @@ HWTEST_F(RILSimTest, Telephony_DriverSystem_GetImsi_V1_0100, Function | MediumTe
  */
 HWTEST_F(RILSimTest, Telephony_DriverSystem_GetImsi_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     int32_t ret = g_rilInterface->GetImsi(SLOTID_2, RilTestUtil::GetSerialId());
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -159,9 +151,7 @@ HWTEST_F(RILSimTest, Telephony_DriverSystem_GetImsi_V1_0200, Function | MediumTe
  */
 HWTEST_F(RILSimTest, Telephony_DriverSystem_SetActiveSim_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     int32_t enable = 1;
     int32_t index = 1; // ENTITY_CARD
     int32_t ret = g_rilInterface->SetActiveSim(SLOTID_1, RilTestUtil::GetSerialId(), index, enable);
@@ -177,9 +167,7 @@ HWTEST_F(RILSimTest, Telephony_DriverSystem_SetActiveSim_V1_0100, Function | Med
  */
 HWTEST_F(RILSimTest, Telephony_DriverSystem_SetActiveSim_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     int32_t enable = 1;
     int32_t index = 1; // ENTITY_CARD
     int32_t ret = g_rilInterface->SetActiveSim(SLOTID_2, RilTestUtil::GetSerialId(), index, enable);
@@ -195,9 +183,7 @@ HWTEST_F(RILSimTest, Telephony_DriverSystem_SetActiveSim_V1_0200, Function | Med
  */
 HWTEST_F(RILSimTest, Telephony_DriverSystem_SimStkSendTerminalResponse_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     std::string cmd = "send terminal response";
     int32_t ret = g_rilInterface->SimStkSendTerminalResponse(SLOTID_1, RilTestUtil::GetSerialId(), cmd);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
@@ -212,9 +198,7 @@ HWTEST_F(RILSimTest, Telephony_DriverSystem_SimStkSendTerminalResponse_V1_0100, 
  */
 HWTEST_F(RILSimTest, Telephony_DriverSystem_SimStkSendTerminalResponse_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     std::string cmd = "send terminal response";
     int32_t ret = g_rilInterface->SimStkSendTerminalResponse(SLOTID_2, RilTestUtil::GetSerialId(), cmd);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
@@ -229,9 +213,7 @@ HWTEST_F(RILSimTest, Telephony_DriverSystem_SimStkSendTerminalResponse_V1_0200, 
  */
 HWTEST_F(RILSimTest, Telephony_DriverSystem_SimStkSendEnvelope_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     std::string cmd = "send envelope";
     int32_t ret = g_rilInterface->SimStkSendEnvelope(SLOTID_1, RilTestUtil::GetSerialId(), cmd);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
@@ -246,9 +228,7 @@ HWTEST_F(RILSimTest, Telephony_DriverSystem_SimStkSendEnvelope_V1_0100, Function
  */
 HWTEST_F(RILSimTest, Telephony_DriverSystem_SimStkSendEnvelope_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     std::string cmd = "send envelope";
     int32_t ret = g_rilInterface->SimStkSendEnvelope(SLOTID_2, RilTestUtil::GetSerialId(), cmd);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
@@ -264,9 +244,7 @@ HWTEST_F(RILSimTest, Telephony_DriverSystem_SimStkSendEnvelope_V1_0200, Function
 HWTEST_F(
     RILSimTest, Telephony_DriverSystem_SimStkSendCallSetupRequestResult_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     int32_t ret = g_rilInterface->SimStkSendCallSetupRequestResult(SLOTID_1, RilTestUtil::GetSerialId(), true);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -281,9 +259,7 @@ HWTEST_F(
 HWTEST_F(
     RILSimTest, Telephony_DriverSystem_SimStkSendCallSetupRequestResult_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     int32_t ret = g_rilInterface->SimStkSendCallSetupRequestResult(SLOTID_2, RilTestUtil::GetSerialId(), true);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -297,9 +273,7 @@ HWTEST_F(
  */
 HWTEST_F(RILSimTest, Telephony_DriverSystem_SimStkIsReady_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     int32_t ret = g_rilInterface->SimStkIsReady(SLOTID_1, RilTestUtil::GetSerialId());
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -313,9 +287,7 @@ HWTEST_F(RILSimTest, Telephony_DriverSystem_SimStkIsReady_V1_0100, Function | Me
  */
 HWTEST_F(RILSimTest, Telephony_DriverSystem_SimStkIsReady_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     int32_t ret = g_rilInterface->SimStkIsReady(SLOTID_2, RilTestUtil::GetSerialId());
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -329,9 +301,7 @@ HWTEST_F(RILSimTest, Telephony_DriverSystem_SimStkIsReady_V1_0200, Function | Me
  */
 HWTEST_F(RILSimTest, Telephony_DriverSystem_SetRadioProtocol_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     RadioProtocol protocol;
     protocol.slotId = SLOTID_1;
     int32_t ret = g_rilInterface->SetRadioProtocol(SLOTID_1, RilTestUtil::GetSerialId(), protocol);
@@ -347,9 +317,7 @@ HWTEST_F(RILSimTest, Telephony_DriverSystem_SetRadioProtocol_V1_0100, Function |
  */
 HWTEST_F(RILSimTest, Telephony_DriverSystem_SetRadioProtocol_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     RadioProtocol protocol;
     protocol.slotId = SLOTID_2;
     int32_t ret = g_rilInterface->SetRadioProtocol(SLOTID_2, RilTestUtil::GetSerialId(), protocol);
@@ -365,9 +333,7 @@ HWTEST_F(RILSimTest, Telephony_DriverSystem_SetRadioProtocol_V1_0200, Function |
  */
 HWTEST_F(RILSimTest, Telephony_DriverSystem_SimOpenLogicalChannel_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     std::string appID = "A00000015141434C00"; // ARAM_AID
     int32_t p2 = 0;
     int32_t ret = g_rilInterface->SimOpenLogicalChannel(SLOTID_1, RilTestUtil::GetSerialId(), appID, p2);
@@ -383,9 +349,7 @@ HWTEST_F(RILSimTest, Telephony_DriverSystem_SimOpenLogicalChannel_V1_0100, Funct
  */
 HWTEST_F(RILSimTest, Telephony_DriverSystem_SimTransmitApduLogicalChannel_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     ApduSimIORequestInfo reqInfo;
     reqInfo.channelId = RilTestUtil::GetCallback()->GetCurrentChannelId();
     reqInfo.type = 0x80; // CLA
@@ -407,9 +371,7 @@ HWTEST_F(RILSimTest, Telephony_DriverSystem_SimTransmitApduLogicalChannel_V1_010
  */
 HWTEST_F(RILSimTest, Telephony_DriverSystem_SimCloseLogicalChannel_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     int32_t ret = g_rilInterface->SimCloseLogicalChannel(
         SLOTID_1, RilTestUtil::GetSerialId(), RilTestUtil::GetCallback()->GetCurrentChannelId());
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
@@ -424,9 +386,7 @@ HWTEST_F(RILSimTest, Telephony_DriverSystem_SimCloseLogicalChannel_V1_0100, Func
  */
 HWTEST_F(RILSimTest, Telephony_DriverSystem_SimOpenLogicalChannel_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     std::string appID = "A00000015141434C00"; // ARAM_AID
     int32_t p2 = 0;
     int32_t ret = g_rilInterface->SimOpenLogicalChannel(SLOTID_2, RilTestUtil::GetSerialId(), appID, p2);
@@ -442,9 +402,7 @@ HWTEST_F(RILSimTest, Telephony_DriverSystem_SimOpenLogicalChannel_V1_0200, Funct
  */
 HWTEST_F(RILSimTest, Telephony_DriverSystem_SimTransmitApduLogicalChannel_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     ApduSimIORequestInfo reqInfo;
     reqInfo.channelId = RilTestUtil::GetCallback()->GetCurrentChannelId();
     reqInfo.type = 0x80; // CLA
@@ -466,9 +424,7 @@ HWTEST_F(RILSimTest, Telephony_DriverSystem_SimTransmitApduLogicalChannel_V1_020
  */
 HWTEST_F(RILSimTest, Telephony_DriverSystem_SimCloseLogicalChannel_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     int32_t ret = g_rilInterface->SimCloseLogicalChannel(
         SLOTID_2, RilTestUtil::GetSerialId(), RilTestUtil::GetCallback()->GetCurrentChannelId());
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
@@ -483,9 +439,7 @@ HWTEST_F(RILSimTest, Telephony_DriverSystem_SimCloseLogicalChannel_V1_0200, Func
  */
 HWTEST_F(RILSimTest, Telephony_DriverSystem_SimTransmitApduBasicChannel_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     ApduSimIORequestInfo reqInfo;
     reqInfo.type = 0x80; // CLA
     reqInfo.instruction = 0xCA; // COMMAND;
@@ -506,9 +460,7 @@ HWTEST_F(RILSimTest, Telephony_DriverSystem_SimTransmitApduBasicChannel_V1_0100,
  */
 HWTEST_F(RILSimTest, Telephony_DriverSystem_SimTransmitApduBasicChannel_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     ApduSimIORequestInfo reqInfo;
     reqInfo.type = 0x80; // CLA
     reqInfo.instruction = 0xCA; // COMMAND;
@@ -529,9 +481,7 @@ HWTEST_F(RILSimTest, Telephony_DriverSystem_SimTransmitApduBasicChannel_V1_0200,
  */
 HWTEST_F(RILSimTest, Telephony_DriverSystem_SimAuthentication_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     SimAuthenticationRequestInfo simAuthInfo;
     simAuthInfo.serial = SIM_AUTH_EAP_AKA_TYPE;
     simAuthInfo.aid = "USIM_AID";
@@ -549,9 +499,7 @@ HWTEST_F(RILSimTest, Telephony_DriverSystem_SimAuthentication_V1_0100, Function 
  */
 HWTEST_F(RILSimTest, Telephony_DriverSystem_SimAuthentication_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     SimAuthenticationRequestInfo simAuthInfo;
     simAuthInfo.serial = SIM_AUTH_EAP_AKA_TYPE;
     simAuthInfo.aid = "USIM_AID";
@@ -570,9 +518,7 @@ HWTEST_F(RILSimTest, Telephony_DriverSystem_SimAuthentication_V1_0200, Function 
 HWTEST_F(RILSimTest, Telephony_DriverSystem_GetSimLockStatus_V1_0100, Function | MediumTest | Level3)
 {
 #ifdef TEL_TEST_PIN_PUK
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     SimLockInfo simLockInfo;
     simLockInfo.fac = "SC"; // FAC_PIN_LOCK
     simLockInfo.mode = 2; // MODE
@@ -594,9 +540,7 @@ HWTEST_F(RILSimTest, Telephony_DriverSystem_GetSimLockStatus_V1_0100, Function |
 HWTEST_F(RILSimTest, Telephony_DriverSystem_GetSimLockStatus_V1_0200, Function | MediumTest | Level3)
 {
 #ifdef TEL_TEST_PIN_PUK
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     SimLockInfo simLockInfo;
     simLockInfo.fac = "SC"; // FAC_PIN_LOCK
     simLockInfo.mode = 2; // MODE
@@ -617,9 +561,7 @@ HWTEST_F(RILSimTest, Telephony_DriverSystem_GetSimLockStatus_V1_0200, Function |
  */
 HWTEST_F(RILSimTest, Telephony_DriverSystem_SendSimMatchedOperatorInfo_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     NcfgOperatorInfo ncfgOperatorInfo;
     ncfgOperatorInfo.operName = "operName";
     ncfgOperatorInfo.operKey = "operKey";
@@ -638,9 +580,7 @@ HWTEST_F(RILSimTest, Telephony_DriverSystem_SendSimMatchedOperatorInfo_V1_0100, 
  */
 HWTEST_F(RILSimTest, Telephony_DriverSystem_SendSimMatchedOperatorInfo_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     NcfgOperatorInfo ncfgOperatorInfo;
     ncfgOperatorInfo.operName = "operName";
     ncfgOperatorInfo.operKey = "operKey";
@@ -660,9 +600,7 @@ HWTEST_F(RILSimTest, Telephony_DriverSystem_SendSimMatchedOperatorInfo_V1_0200, 
 HWTEST_F(RILSimTest, Telephony_DriverSystem_SetSimLock_V1_0100, Function | MediumTest | Level3)
 {
 #ifdef TEL_TEST_PIN_PUK
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     SimLockInfo simLockInfo;
     simLockInfo.fac = "SC"; // FAC_PIN_LOCK
     simLockInfo.mode = 2; // MODE
@@ -685,9 +623,7 @@ HWTEST_F(RILSimTest, Telephony_DriverSystem_SetSimLock_V1_0100, Function | Mediu
 HWTEST_F(RILSimTest, Telephony_DriverSystem_SetSimLock_V1_0200, Function | MediumTest | Level3)
 {
 #ifdef TEL_TEST_PIN_PUK
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     SimLockInfo simLockInfo;
     simLockInfo.fac = "SC"; // FAC_PIN_LOCK
     simLockInfo.mode = 2; // MODE
@@ -710,9 +646,7 @@ HWTEST_F(RILSimTest, Telephony_DriverSystem_SetSimLock_V1_0200, Function | Mediu
 HWTEST_F(RILSimTest, Telephony_DriverSystem_ChangeSimPassword_V1_0100, Function | MediumTest | Level3)
 {
 #ifdef TEL_TEST_PIN_PUK
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     ISimPasswordInfo simPassword;
     simPassword.fac = "SC"; // FAC_PIN_LOCK
     simPassword.oldPassword = "1234";
@@ -734,9 +668,7 @@ HWTEST_F(RILSimTest, Telephony_DriverSystem_ChangeSimPassword_V1_0100, Function 
 HWTEST_F(RILSimTest, Telephony_DriverSystem_ChangeSimPassword_V1_0200, Function | MediumTest | Level3)
 {
 #ifdef TEL_TEST_PIN_PUK
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     ISimPasswordInfo simPassword;
     simPassword.fac = "SC"; // FAC_PIN_LOCK
     simPassword.oldPassword = "1234";
@@ -758,9 +690,7 @@ HWTEST_F(RILSimTest, Telephony_DriverSystem_ChangeSimPassword_V1_0200, Function 
 HWTEST_F(RILSimTest, Telephony_DriverSystem_UnlockPin_V1_0100, Function | MediumTest | Level3)
 {
 #ifdef TEL_TEST_PIN_PUK
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     std::string pin = "1234";
     int32_t ret = g_rilInterface->UnlockPin(SLOTID_1, RilTestUtil::GetSerialId(), pin);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
@@ -778,9 +708,7 @@ HWTEST_F(RILSimTest, Telephony_DriverSystem_UnlockPin_V1_0100, Function | Medium
 HWTEST_F(RILSimTest, Telephony_DriverSystem_UnlockPin_V1_0200, Function | MediumTest | Level3)
 {
 #ifdef TEL_TEST_PIN_PUK
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     std::string pin = "1234";
     int32_t ret = g_rilInterface->UnlockPin(SLOTID_2, RilTestUtil::GetSerialId(), pin);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
@@ -798,9 +726,7 @@ HWTEST_F(RILSimTest, Telephony_DriverSystem_UnlockPin_V1_0200, Function | Medium
 HWTEST_F(RILSimTest, Telephony_DriverSystem_UnlockPuk_V1_0100, Function | MediumTest | Level3)
 {
 #ifdef TEL_TEST_PIN_PUK
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     std::string puk = "42014264";
     std::string pin = "1234";
     int32_t ret = g_rilInterface->UnlockPuk(SLOTID_1, RilTestUtil::GetSerialId(), puk, pin);
@@ -819,9 +745,7 @@ HWTEST_F(RILSimTest, Telephony_DriverSystem_UnlockPuk_V1_0100, Function | Medium
 HWTEST_F(RILSimTest, Telephony_DriverSystem_UnlockPuk_V1_0200, Function | MediumTest | Level3)
 {
 #ifdef TEL_TEST_PIN_PUK
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     std::string puk = "42014264";
     std::string pin = "1234";
     int32_t ret = g_rilInterface->UnlockPuk(SLOTID_2, RilTestUtil::GetSerialId(), puk, pin);
@@ -840,9 +764,7 @@ HWTEST_F(RILSimTest, Telephony_DriverSystem_UnlockPuk_V1_0200, Function | Medium
 HWTEST_F(RILSimTest, Telephony_DriverSystem_UnlockPin2_V1_0100, Function | MediumTest | Level3)
 {
 #ifdef TEL_TEST_PIN_PUK
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     std::string pin2 = "1234";
     int32_t ret = g_rilInterface->UnlockPin2(SLOTID_1, RilTestUtil::GetSerialId(), pin2);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
@@ -860,9 +782,7 @@ HWTEST_F(RILSimTest, Telephony_DriverSystem_UnlockPin2_V1_0100, Function | Mediu
 HWTEST_F(RILSimTest, Telephony_DriverSystem_UnlockPin2_V1_0200, Function | MediumTest | Level3)
 {
 #ifdef TEL_TEST_PIN_PUK
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     std::string pin2 = "1234";
     int32_t ret = g_rilInterface->UnlockPin2(SLOTID_2, RilTestUtil::GetSerialId(), pin2);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
@@ -880,9 +800,7 @@ HWTEST_F(RILSimTest, Telephony_DriverSystem_UnlockPin2_V1_0200, Function | Mediu
 HWTEST_F(RILSimTest, Telephony_DriverSystem_UnlockPuk2_V1_0100, Function | MediumTest | Level3)
 {
 #ifdef TEL_TEST_PIN_PUK
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     std::string puk2 = "42014264";
     std::string pin2 = "1234";
     int32_t ret = g_rilInterface->UnlockPuk2(SLOTID_1, RilTestUtil::GetSerialId(), puk2, pin2);
@@ -901,9 +819,7 @@ HWTEST_F(RILSimTest, Telephony_DriverSystem_UnlockPuk2_V1_0100, Function | Mediu
 HWTEST_F(RILSimTest, Telephony_DriverSystem_UnlockPuk2_V1_0200, Function | MediumTest | Level3)
 {
 #ifdef TEL_TEST_PIN_PUK
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     std::string puk2 = "42014264";
     std::string pin2 = "1234";
     int32_t ret = g_rilInterface->UnlockPuk2(SLOTID_2, RilTestUtil::GetSerialId(), puk2, pin2);
@@ -922,9 +838,7 @@ HWTEST_F(RILSimTest, Telephony_DriverSystem_UnlockPuk2_V1_0200, Function | Mediu
 HWTEST_F(RILSimTest, Telephony_DriverSystem_UnlockSimLock_V1_0100, Function | MediumTest | Level3)
 {
 #ifdef TEL_TEST_PIN_PUK
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     int32_t lockType = 0;
     std::string key = "1234"; // PN_PIN_LOCK
     int32_t ret = g_rilInterface->UnlockSimLock(SLOTID_1, RilTestUtil::GetSerialId(), lockType, key);
@@ -943,9 +857,7 @@ HWTEST_F(RILSimTest, Telephony_DriverSystem_UnlockSimLock_V1_0100, Function | Me
 HWTEST_F(RILSimTest, Telephony_DriverSystem_UnlockSimLock_V1_0200, Function | MediumTest | Level3)
 {
 #ifdef TEL_TEST_PIN_PUK
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     int32_t lockType = 0;
     std::string key = "1234"; // PN_PIN_LOCK
     int32_t ret = g_rilInterface->UnlockSimLock(SLOTID_2, RilTestUtil::GetSerialId(), lockType, key);

@@ -45,9 +45,7 @@ void RilCallTest::TearDown() {}
  */
 HWTEST_F(RilCallTest, SendRilAck, Function | MediumTest | Level1)
 {
-    if (g_rilInterface == nullptr) {
-        return;
-    }
+    ASSERT_NE(g_rilInterface, nullptr);
     int32_t ret = g_rilInterface->SendRilAck();
     EXPECT_EQ(SUCCESS, ret);
 }
@@ -59,9 +57,7 @@ HWTEST_F(RilCallTest, SendRilAck, Function | MediumTest | Level1)
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_GetEmergencyCallList_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     int32_t ret = g_rilInterface->GetEmergencyCallList(SLOTID_1, RilTestUtil::GetSerialId());
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -75,9 +71,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_GetEmergencyCallList_V1_0100, Funct
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_GetEmergencyCallList_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     int32_t ret = g_rilInterface->GetEmergencyCallList(SLOTID_2, RilTestUtil::GetSerialId());
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -91,9 +85,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_GetEmergencyCallList_V1_0200, Funct
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_SetEmergencyCallList_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     EmergencyInfoList emergencyInfoList;
     EmergencyCall emergencyInfo = {};
     emergencyInfo.index = 1;
@@ -117,9 +109,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_SetEmergencyCallList_V1_0100, Funct
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_SetEmergencyCallList_V2_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     EmergencyInfoList emergencyInfoList;
     EmergencyCall emergencyInfo = {};
     emergencyInfo.index = 1;
@@ -143,9 +133,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_SetEmergencyCallList_V2_0100, Funct
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_GetCallList_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     int32_t ret = g_rilInterface->GetCallList(SLOTID_1, RilTestUtil::GetSerialId());
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -159,9 +147,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_GetCallList_V1_0100, Function | Med
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_GetCallList_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     int32_t ret = g_rilInterface->GetCallList(SLOTID_2, RilTestUtil::GetSerialId());
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -175,9 +161,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_GetCallList_V1_0200, Function | Med
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_Dial_V1_0100, Function | MediumTest | Level2)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     DialInfo dialInfo = {};
     dialInfo.address = "10086";
     dialInfo.clir = 0;
@@ -194,9 +178,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_Dial_V1_0100, Function | MediumTest
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_Dial_V1_0200, Function | MediumTest | Level2)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     DialInfo dialInfo = {};
     dialInfo.address = "10086";
     dialInfo.clir = 0;
@@ -213,9 +195,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_Dial_V1_0200, Function | MediumTest
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_Reject_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     int32_t ret = g_rilInterface->Reject(SLOTID_1, RilTestUtil::GetSerialId());
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -229,9 +209,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_Reject_V1_0100, Function | MediumTe
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_Reject_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     int32_t ret = g_rilInterface->Reject(SLOTID_2, RilTestUtil::GetSerialId());
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -245,9 +223,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_Reject_V1_0200, Function | MediumTe
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_Hangup_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     int32_t ret = g_rilInterface->Hangup(SLOTID_1, RilTestUtil::GetSerialId(), 0);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -261,9 +237,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_Hangup_V1_0100, Function | MediumTe
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_Hangup_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     int32_t ret = g_rilInterface->Hangup(SLOTID_2, RilTestUtil::GetSerialId(), 0);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -277,9 +251,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_Hangup_V1_0200, Function | MediumTe
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_Answer_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     int32_t ret = g_rilInterface->Answer(SLOTID_1, RilTestUtil::GetSerialId());
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -293,9 +265,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_Answer_V1_0100, Function | MediumTe
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_Answer_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     int32_t ret = g_rilInterface->Answer(SLOTID_2, RilTestUtil::GetSerialId());
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -309,9 +279,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_Answer_V1_0200, Function | MediumTe
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_HoldCall_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     int32_t ret = g_rilInterface->HoldCall(SLOTID_1, RilTestUtil::GetSerialId());
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -325,9 +293,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_HoldCall_V1_0100, Function | Medium
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_HoldCall_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     int32_t ret = g_rilInterface->HoldCall(SLOTID_2, RilTestUtil::GetSerialId());
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -341,9 +307,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_HoldCall_V1_0200, Function | Medium
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_UnHoldCall_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     int32_t ret = g_rilInterface->UnHoldCall(SLOTID_1, RilTestUtil::GetSerialId());
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -357,9 +321,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_UnHoldCall_V1_0100, Function | Medi
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_UnHoldCall_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     int32_t ret = g_rilInterface->UnHoldCall(SLOTID_2, RilTestUtil::GetSerialId());
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -373,9 +335,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_UnHoldCall_V1_0200, Function | Medi
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_SwitchCall_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     int32_t ret = g_rilInterface->SwitchCall(SLOTID_1, RilTestUtil::GetSerialId());
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -389,9 +349,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_SwitchCall_V1_0100, Function | Medi
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_SwitchCall_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     int32_t ret = g_rilInterface->SwitchCall(SLOTID_2, RilTestUtil::GetSerialId());
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -405,9 +363,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_SwitchCall_V1_0200, Function | Medi
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_CombineConference_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     int32_t ret = g_rilInterface->CombineConference(SLOTID_1, RilTestUtil::GetSerialId(), 0);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -421,9 +377,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_CombineConference_V1_0100, Function
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_CombineConference_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     int32_t ret = g_rilInterface->CombineConference(SLOTID_2, RilTestUtil::GetSerialId(), 0);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -437,9 +391,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_CombineConference_V1_0200, Function
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_SeparateConference_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     int32_t ret = g_rilInterface->SeparateConference(SLOTID_1, RilTestUtil::GetSerialId(), 1, 0);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -453,9 +405,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_SeparateConference_V1_0100, Functio
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_SeparateConference_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     int32_t ret = g_rilInterface->SeparateConference(SLOTID_2, RilTestUtil::GetSerialId(), 1, 0);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -469,9 +419,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_SeparateConference_V1_0200, Functio
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_GetCallWaiting_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     int32_t ret = g_rilInterface->GetCallWaiting(SLOTID_1, RilTestUtil::GetSerialId());
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -485,9 +433,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_GetCallWaiting_V1_0100, Function | 
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_GetCallWaiting_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     int32_t ret = g_rilInterface->GetCallWaiting(SLOTID_2, RilTestUtil::GetSerialId());
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -501,9 +447,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_GetCallWaiting_V1_0200, Function | 
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_SetCallWaiting_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     int32_t ret = g_rilInterface->SetCallWaiting(SLOTID_1, RilTestUtil::GetSerialId(), 0);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -517,9 +461,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_SetCallWaiting_V1_0100, Function | 
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_SetCallWaiting_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     int32_t ret = g_rilInterface->SetCallWaiting(SLOTID_2, RilTestUtil::GetSerialId(), 0);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -533,9 +475,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_SetCallWaiting_V1_0200, Function | 
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_GetCallTransferInfo_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     int32_t ret = g_rilInterface->GetCallTransferInfo(SLOTID_1, RilTestUtil::GetSerialId(), 1);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -549,9 +489,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_GetCallTransferInfo_V1_0100, Functi
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_GetCallTransferInfo_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     int32_t ret = g_rilInterface->GetCallTransferInfo(SLOTID_2, RilTestUtil::GetSerialId(), 1);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -565,9 +503,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_GetCallTransferInfo_V1_0200, Functi
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_SetCallTransferInfo_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     CallForwardSetInfo callForwardSetInfo = {};
     callForwardSetInfo.reason = 1;
     callForwardSetInfo.mode = 1;
@@ -586,9 +522,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_SetCallTransferInfo_V1_0100, Functi
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_SetCallTransferInfo_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     CallForwardSetInfo callForwardSetInfo = {};
     callForwardSetInfo.reason = 1;
     callForwardSetInfo.mode = 1;
@@ -607,9 +541,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_SetCallTransferInfo_V1_0200, Functi
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_GetCallRestriction_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     std::string fac = "AO";
     int32_t ret = g_rilInterface->GetCallRestriction(SLOTID_1, RilTestUtil::GetSerialId(), fac);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
@@ -624,9 +556,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_GetCallRestriction_V1_0100, Functio
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_GetCallRestriction_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     std::string fac = "AO";
     int32_t ret = g_rilInterface->GetCallRestriction(SLOTID_2, RilTestUtil::GetSerialId(), fac);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
@@ -641,9 +571,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_GetCallRestriction_V1_0200, Functio
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_SetCallRestriction_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     CallRestrictionInfo callRestrictionInfo = {};
     callRestrictionInfo.fac = "AO";
     callRestrictionInfo.mode = 1;
@@ -661,9 +589,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_SetCallRestriction_V1_0100, Functio
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_SetCallRestriction_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     CallRestrictionInfo callRestrictionInfo = {};
     callRestrictionInfo.fac = "AO";
     callRestrictionInfo.mode = 1;
@@ -681,9 +607,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_SetCallRestriction_V1_0200, Functio
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_GetClip_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     int32_t ret = g_rilInterface->GetClip(SLOTID_1, RilTestUtil::GetSerialId());
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -697,9 +621,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_GetClip_V1_0100, Function | MediumT
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_GetClip_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     int32_t ret = g_rilInterface->GetClip(SLOTID_2, RilTestUtil::GetSerialId());
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -713,9 +635,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_GetClip_V1_0200, Function | MediumT
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_SetClip_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     int32_t ret = g_rilInterface->SetClip(SLOTID_1, RilTestUtil::GetSerialId(), 1);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -729,9 +649,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_SetClip_V1_0100, Function | MediumT
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_SetClip_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     int32_t ret = g_rilInterface->SetClip(SLOTID_2, RilTestUtil::GetSerialId(), 1);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -745,9 +663,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_SetClip_V1_0200, Function | MediumT
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_GetClir_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     int32_t ret = g_rilInterface->GetClir(SLOTID_1, RilTestUtil::GetSerialId());
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -761,9 +677,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_GetClir_V1_0100, Function | MediumT
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_GetClir_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     int32_t ret = g_rilInterface->GetClir(SLOTID_2, RilTestUtil::GetSerialId());
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -777,9 +691,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_GetClir_V1_0200, Function | MediumT
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_SetClir_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     int32_t ret = g_rilInterface->SetClir(SLOTID_1, RilTestUtil::GetSerialId(), 1);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -793,9 +705,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_SetClir_V1_0100, Function | MediumT
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_SetClir_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     int32_t ret = g_rilInterface->SetClir(SLOTID_2, RilTestUtil::GetSerialId(), 1);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -809,9 +719,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_SetClir_V1_0200, Function | MediumT
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_SetCallPreferenceMode_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     int32_t ret = g_rilInterface->SetCallPreferenceMode(SLOTID_1, RilTestUtil::GetSerialId(), 1);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -825,9 +733,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_SetCallPreferenceMode_V1_0100, Func
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_SetCallPreferenceMode_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     int32_t ret = g_rilInterface->SetCallPreferenceMode(SLOTID_2, RilTestUtil::GetSerialId(), 1);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -841,9 +747,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_SetCallPreferenceMode_V1_0200, Func
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_GetCallPreferenceMode_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     int32_t ret = g_rilInterface->GetCallPreferenceMode(SLOTID_1, RilTestUtil::GetSerialId());
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -857,9 +761,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_GetCallPreferenceMode_V1_0100, Func
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_GetCallPreferenceMode_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     int32_t ret = g_rilInterface->GetCallPreferenceMode(SLOTID_2, RilTestUtil::GetSerialId());
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -873,9 +775,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_GetCallPreferenceMode_V1_0200, Func
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_SetUssd_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     int32_t ret = g_rilInterface->SetUssd(SLOTID_1, RilTestUtil::GetSerialId(), "12345678");
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -889,9 +789,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_SetUssd_V1_0100, Function | MediumT
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_SetUssd_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     int32_t ret = g_rilInterface->SetUssd(SLOTID_2, RilTestUtil::GetSerialId(), "12345678");
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -905,9 +803,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_SetUssd_V1_0200, Function | MediumT
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_GetUssd_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     int32_t ret = g_rilInterface->GetUssd(SLOTID_1, RilTestUtil::GetSerialId());
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -921,9 +817,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_GetUssd_V1_0100, Function | MediumT
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_GetUssd_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     int32_t ret = g_rilInterface->GetUssd(SLOTID_2, RilTestUtil::GetSerialId());
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -937,9 +831,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_GetUssd_V1_0200, Function | MediumT
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_SetMute_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     int32_t ret = g_rilInterface->SetMute(SLOTID_1, RilTestUtil::GetSerialId(), 1);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -953,9 +845,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_SetMute_V1_0100, Function | MediumT
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_SetMute_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     int32_t ret = g_rilInterface->SetMute(SLOTID_2, RilTestUtil::GetSerialId(), 1);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -969,9 +859,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_SetMute_V1_0200, Function | MediumT
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_GetMute_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     int32_t ret = g_rilInterface->GetMute(SLOTID_1, RilTestUtil::GetSerialId());
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -985,9 +873,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_GetMute_V1_0100, Function | MediumT
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_GetMute_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     int32_t ret = g_rilInterface->GetMute(SLOTID_2, RilTestUtil::GetSerialId());
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -1001,9 +887,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_GetMute_V1_0200, Function | MediumT
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_GetCallFailReason_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     int32_t ret = g_rilInterface->GetCallFailReason(SLOTID_1, RilTestUtil::GetSerialId());
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -1017,9 +901,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_GetCallFailReason_V1_0100, Function
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_GetCallFailReason_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     int32_t ret = g_rilInterface->GetCallFailReason(SLOTID_2, RilTestUtil::GetSerialId());
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -1033,9 +915,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_GetCallFailReason_V1_0200, Function
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_CallSupplement_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     int32_t ret = g_rilInterface->CallSupplement(SLOTID_1, RilTestUtil::GetSerialId(), 1);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -1049,9 +929,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_CallSupplement_V1_0100, Function | 
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_CallSupplement_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     int32_t ret = g_rilInterface->CallSupplement(SLOTID_2, RilTestUtil::GetSerialId(), 1);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -1065,9 +943,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_CallSupplement_V1_0200, Function | 
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_SendDtmf_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     DtmfInfo dtmfInfo = {};
     dtmfInfo.callId = 0;
     dtmfInfo.dtmfKey = "#";
@@ -1087,9 +963,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_SendDtmf_V1_0100, Function | Medium
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_SendDtmf_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     DtmfInfo dtmfInfo = {};
     dtmfInfo.callId = 0;
     dtmfInfo.dtmfKey = "#";
@@ -1109,9 +983,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_SendDtmf_V1_0200, Function | Medium
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_StartDtmf_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     DtmfInfo dtmfInfo = {};
     dtmfInfo.callId = 0;
     dtmfInfo.dtmfKey = "#";
@@ -1128,9 +1000,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_StartDtmf_V1_0100, Function | Mediu
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_StartDtmf_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     DtmfInfo dtmfInfo = {};
     dtmfInfo.callId = 0;
     dtmfInfo.dtmfKey = "#";
@@ -1147,9 +1017,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_StartDtmf_V1_0200, Function | Mediu
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_StopDtmf_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     DtmfInfo dtmfInfo = {};
     dtmfInfo.callId = 0;
     dtmfInfo.dtmfKey = "#";
@@ -1166,9 +1034,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_StopDtmf_V1_0100, Function | Medium
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_StopDtmf_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     DtmfInfo dtmfInfo = {};
     dtmfInfo.callId = 0;
     dtmfInfo.dtmfKey = "#";
@@ -1185,9 +1051,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_StopDtmf_V1_0200, Function | Medium
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_SetBarringPassword_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     SetBarringInfo setBarringInfo = {};
     setBarringInfo.fac = "AB";
     setBarringInfo.oldPassword = "1234";
@@ -1205,9 +1069,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_SetBarringPassword_V1_0100, Functio
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_SetBarringPassword_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     SetBarringInfo setBarringInfo = {};
     setBarringInfo.fac = "AB";
     setBarringInfo.oldPassword = "1234";
@@ -1225,9 +1087,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_SetBarringPassword_V1_0200, Functio
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_CloseUnFinishedUssd_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     int32_t ret = g_rilInterface->CloseUnFinishedUssd(SLOTID_1, RilTestUtil::GetSerialId());
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -1241,9 +1101,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_CloseUnFinishedUssd_V1_0100, Functi
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_CloseUnFinishedUssd_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     int32_t ret = g_rilInterface->CloseUnFinishedUssd(SLOTID_2, RilTestUtil::GetSerialId());
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -1257,9 +1115,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_CloseUnFinishedUssd_V1_0200, Functi
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_SetVonrSwitch_V1_0100, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_1)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     int32_t ret = g_rilInterface->SetVonrSwitch(SLOTID_1, RilTestUtil::GetSerialId(), 0);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -1273,9 +1129,7 @@ HWTEST_F(RilCallTest, Telephony_DriverSystem_SetVonrSwitch_V1_0100, Function | M
  */
 HWTEST_F(RilCallTest, Telephony_DriverSystem_SetVonrSwitch_V1_0200, Function | MediumTest | Level3)
 {
-    if (!RilTestUtil::IsReady(SLOTID_2)) {
-        return;
-    }
+    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
     int32_t ret = g_rilInterface->SetVonrSwitch(SLOTID_2, RilTestUtil::GetSerialId(), 0);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
