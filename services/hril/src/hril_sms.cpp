@@ -287,9 +287,9 @@ bool HRilSms::GetHRilCBConfigInfo(
         }
         HRilCBConfigInfo info;
         info.startOfServiceId = std::stol(startMid, 0, HEXADECIMAL);
-        info.endOfServiceId = std::stol(endMid, 0, HEADECIMAL);
-        info.startOfCodeScheme = std::stol(startDcs, 0, HEADECIMAL);
-        info.endOfCodeScheme = std::stol(endDcs, 0, HEADECIMAL);
+        info.endOfServiceId = std::stol(endMid, 0, HEXADECIMAL);
+        info.startOfCodeScheme = std::stol(startDcs, 0, HEXADECIMAL);
+        info.endOfCodeScheme = std::stol(endDcs, 0, HEXADECIMAL);
         info.selected = broadcastInfo.mode;
         cellBroadcastInfo.push_back(info);
     }
