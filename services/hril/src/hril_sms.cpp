@@ -286,10 +286,10 @@ bool HRilSms::GetHRilCBConfigInfo(
             return false;
         }
         HRilCBConfigInfo info;
-        info.startOfServiceId = std::stoi(startMid);
-        info.endOfServiceId = std::stoi(endMid);
-        info.startOfCodeScheme = std::stoi(startDcs);
-        info.endOfCodeScheme = std::stoi(endDcs);
+        info.startOfServiceId = std::stol(startMid, 0, HEXADECIMAL);
+        info.endOfServiceId = std::stol(endMid, 0, HEADECIMAL);
+        info.startOfCodeScheme = std::stol(startDcs, 0, HEADECIMAL);
+        info.endOfCodeScheme = std::stol(endDcs, 0, HEADECIMAL);
         info.selected = broadcastInfo.mode;
         cellBroadcastInfo.push_back(info);
     }
@@ -403,16 +403,16 @@ bool HRilSms::CreateCdmaMessageInfo(HRilCdmaSmsMessageInfo &cdmaSmsInfo, const s
         TELEPHONY_LOGE("pdu is invalid");
         return false;
     }
-    cdmaSmsInfo.serviceId = stoi(pdu.substr(0, INT_LEN), 0, HEXADECIMAL);
-    cdmaSmsInfo.isExist = stoi(pdu.substr(INT_LEN + BYTE_LEN * NUM_3, BYTE_LEN), 0, HEXADECIMAL);
-    cdmaSmsInfo.type = stoi(pdu.substr(INT_LEN + INT_LEN, INT_LEN), 0, HEXADECIMAL);
+    cdmaSmsInfo.serviceId = std::stol(pdu.substr(0, INT_LEN), 0, HEXADECIMAL);
+    cdmaSmsInfo.isExist = std::stoi(pdu.substr(INT_LEN + BYTE_LEN * NUM_3, BYTE_LEN), 0, HEXADECIMAL);
+    cdmaSmsInfo.type = std::stoi(pdu.substr(INT_LEN + INT_LEN, INT_LEN), 0, HEXADECIMAL);
     int32_t index = INT_LEN * NUM_3;
     // adress
-    cdmaSmsInfo.address.digitMode = stoi(pdu.substr(index, BYTE_LEN), 0, HEXADECIMAL);
-    cdmaSmsInfo.address.mode = stoi(pdu.substr(index + BYTE_LEN, BYTE_LEN), 0, HEXADECIMAL);
-    cdmaSmsInfo.address.type = stoi(pdu.substr(index + BYTE_LEN * NUM_2, BYTE_LEN), 0, HEXADECIMAL);
-    cdmaSmsInfo.address.plan = stoi(pdu.substr(index + BYTE_LEN * NUM_3, BYTE_LEN), 0, HEXADECIMAL);
-    cdmaSmsInfo.address.number = stoi(pdu.substr(index + BYTE_LEN * NUM_4, BYTE_LEN), 0, HEXADECIMAL);
+    cdmaSmsInfo.address.digitMode = std::stol(pdu.substr(index, BYTE_LEN), 0, HEXADECIMAL);
+    cdmaSmsInfo.address.mode = std::stol(pdu.substr(index + BYTE_LEN, BYTE_LEN), 0, HEXADECIMAL);
+    cdmaSmsInfo.address.type = std::stol(pdu.substr(index + BYTE_LEN * NUM_2, BYTE_LEN), 0, HEXADECIMAL);
+    cdmaSmsInfo.address.plan = std::stol(pdu.substr(index + BYTE_LEN * NUM_3, BYTE_LEN), 0, HEXADECIMAL);
+    cdmaSmsInfo.address.number = std::stol(pdu.substr(index + BYTE_LEN * NUM_4, BYTE_LEN), 0, HEXADECIMAL);
     std::string addByte = pdu.substr(index + BYTE_LEN * NUM_5, BYTE_LEN * cdmaSmsInfo.address.number);
     char *addressByte = reinterpret_cast<char *>(cdmaSmsInfo.address.bytes);
     if (strcpy_s(addressByte, cdmaSmsInfo.address.number + 1, addByte.c_str()) != EOK) {
@@ -421,9 +421,9 @@ bool HRilSms::CreateCdmaMessageInfo(HRilCdmaSmsMessageInfo &cdmaSmsInfo, const s
     }
     index += BYTE_LEN * NUM_5 + BYTE_LEN * cdmaSmsInfo.address.number;
     // subAdress
-    cdmaSmsInfo.subAddress.type = stoi(pdu.substr(index, BYTE_LEN), 0, HEXADECIMAL);
-    cdmaSmsInfo.subAddress.odd = stoi(pdu.substr(index + BYTE_LEN, BYTE_LEN), 0, HEXADECIMAL);
-    cdmaSmsInfo.subAddress.number = stoi(pdu.substr(index + BYTE_LEN * NUM_2, BYTE_LEN), 0, HEXADECIMAL);
+    cdmaSmsInfo.subAddress.type = std::stol(pdu.substr(index, BYTE_LEN), 0, HEXADECIMAL);
+    cdmaSmsInfo.subAddress.odd = std::stol(pdu.substr(index + BYTE_LEN, BYTE_LEN), 0, HEXADECIMAL);
+    cdmaSmsInfo.subAddress.number = std::stol(pdu.substr(index + BYTE_LEN * NUM_2, BYTE_LEN), 0, HEXADECIMAL);
     std::string subAddByte = pdu.substr(index + BYTE_LEN * NUM_3, BYTE_LEN * cdmaSmsInfo.subAddress.number);
     char *subAddressByte = reinterpret_cast<char *>(cdmaSmsInfo.subAddress.bytes);
     if (strcpy_s(subAddressByte, cdmaSmsInfo.subAddress.number + 1, subAddByte.c_str()) != EOK) {
@@ -454,21 +454,21 @@ bool HRilSms::CheckCdmaPduLength(HRilCdmaSmsMessageInfo &cdmaSmsInfo, const std:
         TELEPHONY_LOGE("pdu invalid.");
         return false;
     }
-    cdmaSmsInfo.address.number = stoi(pdu.substr(index - BYTE_LEN, BYTE_LEN), 0, HEXADECIMAL);
+    cdmaSmsInfo.address.number = std::stol(pdu.substr(index - BYTE_LEN, BYTE_LEN), 0, HEXADECIMAL);
     index += BYTE_LEN * cdmaSmsInfo.address.number + BYTE_LEN * NUM_3;
     if (pdu.length() < static_cast<size_t>(index)) {
         TELEPHONY_LOGE("pdu length invalid.");
         return false;
     }
     // subAdress
-    cdmaSmsInfo.subAddress.number = stoi(pdu.substr(index - BYTE_LEN, BYTE_LEN), 0, HEXADECIMAL);
+    cdmaSmsInfo.subAddress.number = std::stol(pdu.substr(index - BYTE_LEN, BYTE_LEN), 0, HEXADECIMAL);
     index += BYTE_LEN * cdmaSmsInfo.subAddress.number + BYTE_LEN;
     if (pdu.length() < static_cast<size_t>(index)) {
         TELEPHONY_LOGE("pdu length invalid.");
         return false;
     }
     // bearer Data
-    cdmaSmsInfo.size = stoi(pdu.substr(index - BYTE_LEN, BYTE_LEN), 0, HEXADECIMAL);
+    cdmaSmsInfo.size = std::stol(pdu.substr(index - BYTE_LEN, BYTE_LEN), 0, HEXADECIMAL);
     index += BYTE_LEN * cdmaSmsInfo.size;
     if (pdu.length() < static_cast<size_t>(index)) {
         TELEPHONY_LOGE("pdu length invalid.");
