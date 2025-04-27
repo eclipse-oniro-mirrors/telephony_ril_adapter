@@ -432,7 +432,7 @@ bool HRilSms::CreateCdmaMessageInfo(HRilCdmaSmsMessageInfo &cdmaSmsInfo, const s
     }
     index += BYTE_LEN * NUM_3 + BYTE_LEN * cdmaSmsInfo.subAddress.number;
     // bearer Data
-    cdmaSmsInfo.size = stoi(pdu.substr(index, BYTE_LEN), nullptr, HEXADECIMAL);
+    cdmaSmsInfo.size = strtol(pdu.substr(index, BYTE_LEN), nullptr, HEXADECIMAL);
     std::string byte = pdu.substr(index + BYTE_LEN, BYTE_LEN * cdmaSmsInfo.size);
     char *byteInfo = reinterpret_cast<char *>(cdmaSmsInfo.bytes);
     if (strcpy_s(byteInfo, cdmaSmsInfo.size + 1, byte.c_str()) != EOK) {
