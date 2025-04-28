@@ -424,7 +424,8 @@ bool HRilSms::CreateCdmaMessageInfo(HRilCdmaSmsMessageInfo &cdmaSmsInfo, const s
     // subAdress
     cdmaSmsInfo.subAddress.type = strtol(pdu.substr(index, BYTE_LEN).c_str(), nullptr, HEXADECIMAL);
     cdmaSmsInfo.subAddress.odd = strtol(pdu.substr(index + BYTE_LEN, BYTE_LEN).c_str(), nullptr, HEXADECIMAL);
-    cdmaSmsInfo.subAddress.number = strtol(pdu.substr(index + BYTE_LEN * NUM_2, BYTE_LEN).c_str(), nullptr, HEXADECIMAL);
+    cdmaSmsInfo.subAddress.number = strtol(
+        pdu.substr(index + BYTE_LEN * NUM_2, BYTE_LEN).c_str(), nullptr, HEXADECIMAL);
     std::string subAddByte = pdu.substr(index + BYTE_LEN * NUM_3, BYTE_LEN * cdmaSmsInfo.subAddress.number);
     char *subAddressByte = reinterpret_cast<char *>(cdmaSmsInfo.subAddress.bytes);
     if (strcpy_s(subAddressByte, cdmaSmsInfo.subAddress.number + 1, subAddByte.c_str()) != EOK) {
