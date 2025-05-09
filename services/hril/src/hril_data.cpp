@@ -531,7 +531,7 @@ int32_t HRilData::SendUrspDecodeResult(int32_t serialId,
     const OHOS::HDI::Ril::V1_4::UePolicyDecodeResult &uePolicyDecodeResult)
 {
     HRilUePolicyDecodeResult hriluePolicyDecodeResult;
-    hriluePolicyDecodeResult.uePolicyDecodeResultInfoSize = uePolicyDecodeResult.uePolicyDecodeResultInfo.size();
+    hriluePolicyDecodeResult.uePolicyDecodeResultInfoSize = (int)uePolicyDecodeResult.uePolicyDecodeResultInfo.size();
     hriluePolicyDecodeResult.uePolicyDecodeResultInfo =
         new unsigned char[hriluePolicyDecodeResult.uePolicyDecodeResultInfoSize];
     for (int32_t i = 0; i < hriluePolicyDecodeResult.uePolicyDecodeResultInfoSize; i++) {
@@ -548,7 +548,7 @@ int32_t HRilData::SendUePolicySectionIdentifier(int32_t serialId,
 {
     HRilUePolicySectionIdentifier hRilUePolicySectionIdentifier;
     hRilUePolicySectionIdentifier.uePolicySectionIdentifierInfoSize =
-        uePolicySectionIdentifier.uePolicySectionIdentifierInfo.size();
+        (int)uePolicySectionIdentifier.uePolicySectionIdentifierInfo.size();
     hRilUePolicySectionIdentifier.uePolicySectionIdentifierInfo =
         new unsigned char[hRilUePolicySectionIdentifier.uePolicySectionIdentifierInfoSize];
     for (int32_t i = 0; i < hRilUePolicySectionIdentifier.uePolicySectionIdentifierInfoSize; i++) {
@@ -564,7 +564,7 @@ int32_t HRilData::SendUePolicySectionIdentifier(int32_t serialId,
 int32_t HRilData::SendImsRsdList(int32_t serialId, const OHOS::HDI::Ril::V1_4::ImsRsdList &imsRsdList)
 {
     HRilImsRsdList hRilImsRsdList;
-    hRilImsRsdList.imsRsdListInfoSize = imsRsdList.imsRsdListInfo.size();
+    hRilImsRsdList.imsRsdListInfoSize = (int)imsRsdList.imsRsdListInfo.size();
     hRilImsRsdList.imsRsdListInfo = new unsigned char[hRilImsRsdList.imsRsdListInfoSize];
     for (int32_t i = 0; i < hRilImsRsdList.imsRsdListInfoSize; i++) {
         hRilImsRsdList.imsRsdListInfo[i] = imsRsdList.imsRsdListInfo[i];
@@ -579,7 +579,7 @@ int32_t HRilData::GetNetworkSliceAllowedNssai(int32_t serialId,
     const OHOS::HDI::Ril::V1_4::SyncAllowedNssaiInfo &dsyncAllowedNssaiInfo)
 {
     HRilSyncAllowedNssaiInfo hRilsyncAllowedNssaiInfo;
-    hRilsyncAllowedNssaiInfo.syncAllowedNssaiInfoSize = dsyncAllowedNssaiInfo.syncAllowedNssaiInfo.size();
+    hRilsyncAllowedNssaiInfo.syncAllowedNssaiInfoSize = (int)dsyncAllowedNssaiInfo.syncAllowedNssaiInfo.size();
     hRilsyncAllowedNssaiInfo.syncAllowedNssaiInfo =
         new unsigned char[hRilsyncAllowedNssaiInfo.syncAllowedNssaiInfoSize];
     for (int32_t i = 0; i < hRilsyncAllowedNssaiInfo.syncAllowedNssaiInfoSize; i++) {
