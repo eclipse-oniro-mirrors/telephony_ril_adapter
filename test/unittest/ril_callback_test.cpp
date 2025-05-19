@@ -19,7 +19,7 @@
 
 namespace OHOS {
 namespace Telephony {
-using namespace OHOS::HDI::Ril::V1_4;
+using namespace OHOS::HDI::Ril::V1_5;
 using namespace std;
 
 enum class RatType {
@@ -282,6 +282,20 @@ int32_t RilCallbackTest::UnlockSimLockResponse(
 int32_t RilCallbackTest::SendSimMatchedOperatorInfoResponse(const RilRadioResponseInfo &responseInfo)
 {
     PrintResponseInfo("SendSimMatchedOperatorInfoResponse", responseInfo);
+    return 0;
+}
+
+int32_t RilCallbackTest::GetPrimarySlotResponse(const RilRadioResponseInfo &responseInfo, int32_t primarySlot)
+{
+    PrintResponseInfo("GetPrimarySlotResponse", responseInfo);
+    cout << "[primarySlot]: " << primarySlot;
+    cout << endl << endl;
+    return 0;
+}
+
+int32_t RilCallbackTest::SetPrimarySlotResponse(const RilRadioResponseInfo &responseInfo)
+{
+    PrintResponseInfo("SetPrimarySlotResponse", responseInfo);
     return 0;
 }
 

@@ -35,6 +35,7 @@ ohos_executable("ril_adapter_test") {
       "drivers_interface_ril:libril_proxy_1.2",
       "drivers_interface_ril:libril_proxy_1.3",
       "drivers_interface_ril:libril_proxy_1.4",
+      "drivers_interface_ril:libril_proxy_1.5",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
       "ipc:ipc_single",

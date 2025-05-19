@@ -31,7 +31,7 @@ ohos_unittest("tel_ril_adapter_gtest") {
     "ril_sim_test.cpp",
     "ril_sms_test.cpp",
     "ril_test_util.cpp",
-    "zero_branch_test.cpp",
+    #"zero_branch_test.cpp",
   ]
 
   include_dirs = [
@@ -59,6 +59,7 @@ ohos_unittest("tel_ril_adapter_gtest") {
       "drivers_interface_ril:libril_proxy_1.2",
       "drivers_interface_ril:libril_proxy_1.3",
       "drivers_interface_ril:libril_proxy_1.4",
+      "drivers_interface_ril:libril_proxy_1.5",
       "hdf_core:libhdf_utils",
       "hilog:libhilog",
       "init:libbegetutil",

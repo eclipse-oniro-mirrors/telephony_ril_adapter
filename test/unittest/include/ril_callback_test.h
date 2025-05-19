@@ -21,11 +21,11 @@
 #include "condition_variable"
 #include "map"
 #include "mutex"
-#include "v1_4/iril.h"
+#include "v1_5/iril.h"
 
 namespace OHOS {
 namespace Telephony {
-class RilCallbackTest : public HDI::Ril::V1_4::IRilCallback {
+class RilCallbackTest : public HDI::Ril::V1_5::IRilCallback {
 public:
     void PrintResponseInfo(const std::string &method, const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo);
 
@@ -197,6 +197,10 @@ public:
     int32_t UnlockSimLockResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_1::LockStatusResp &lockStatus) override;
     int32_t SendSimMatchedOperatorInfoResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
+    int32_t GetPrimarySlotResponse(
+        const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, int32_t primarySlot) override;
+    int32_t SetPrimarySlotResponse(
+        const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
 
     // Network
     int32_t NetworkCsRegStatusUpdated(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,

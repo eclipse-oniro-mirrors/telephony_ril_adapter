@@ -18,8 +18,8 @@
 using namespace std;
 namespace OHOS {
 namespace Telephony {
-using namespace OHOS::HDI::Ril::V1_4;
-sptr<OHOS::HDI::Ril::V1_4::IRil> g_rilInterface = nullptr;
+using namespace OHOS::HDI::Ril::V1_5;
+sptr<OHOS::HDI::Ril::V1_5::IRil> g_rilInterface = nullptr;
 constexpr int32_t DEFAULT_CHOICE = -1;
 constexpr int32_t MENU_OFFSET = 1;
 constexpr int32_t WAIT_TIME = 500000;
@@ -142,6 +142,8 @@ typedef enum {
     HREQ_SIM_AUTHENTICATION,
     HREQ_SIM_UNLOCK_SIM_LOCK,
     HREQ_SIM_SEND_NCFG_OPER_INFO,
+    HREQ_SIM_GET_PRIMARY_SLOT,
+    HREQ_SIM_SET_PRIMARY_SLOT,
 
     HREQ_DATA_BASE = 300,
     HREQ_DATA_SET_INIT_APN_INFO,
@@ -1837,7 +1839,7 @@ static int32_t SwitchMenu(TestMenu module, bool *loopFlag)
 int32_t main()
 {
     cout << "---->Ril Adapter Test Enter" << endl;
-    g_rilInterface = OHOS::HDI::Ril::V1_4::IRil::Get();
+    g_rilInterface = OHOS::HDI::Ril::V1_5::IRil::Get();
     if (g_rilInterface == nullptr) {
         cout << "g_rilInterface is null" << endl;
         return 0;

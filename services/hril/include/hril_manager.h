@@ -67,7 +67,7 @@ public:
     void OnNetworkReport(int32_t slotId, const ReportInfo *reportInfo, const uint8_t *response, size_t responseLen);
     void OnSimReport(int32_t slotId, const ReportInfo *reportInfo, const uint8_t *response, size_t responseLen);
     void OnSmsReport(int32_t slotId, const ReportInfo *reportInfo, const uint8_t *response, size_t responseLen);
-    void SetRilCallback(const sptr<OHOS::HDI::Ril::V1_4::IRilCallback> callback);
+    void SetRilCallback(const sptr<OHOS::HDI::Ril::V1_5::IRilCallback> callback);
 
     // Call
     int32_t SetEmergencyCallList(
@@ -181,6 +181,9 @@ public:
     int32_t GetNetworkSliceEhplmn(int32_t slotId, int32_t serialId);
     int32_t ActivatePdpContextWithApnTypesforSlice(
         int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_4::DataCallInfoWithApnTypesforSlice &dataCallInfo);
+    int32_t GetPrimarySlot(int32_t slotId, int32_t serialId);
+    int32_t SetPrimarySlot(int32_t slotId, int32_t serialId);
+
     // Network
     int32_t GetSignalStrength(int32_t slotId, int32_t serialId);
     int32_t GetCsRegStatus(int32_t slotId, int32_t serialId);
