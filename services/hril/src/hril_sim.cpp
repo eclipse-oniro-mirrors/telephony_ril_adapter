@@ -879,7 +879,7 @@ void HRilSim::BuildRadioProtocol(HDI::Ril::V1_1::RadioProtocol &radioProtocol, c
 int32_t HRilSim::ConvertRadioProtocolTech(int32_t tech)
 {
     uint32_t radioProtocolTech = HRIL_RADIO_PROTOCOL_TECH_UNKNOWN;
-    for (uint32_t radioTech = RADIO_TECHNOLOGY_GSM; radioTech <= RADIO_TECHNOLOGY_NR; radioTech) {
+    for (uint32_t radioTech = RADIO_TECHNOLOGY_GSM; radioTech <= RADIO_TECHNOLOGY_NR; radioTech++) {
         uint32_t protocolTech = 1 << radioTech;
         if ((static_cast<uint32_t>(tech) & protocolTech) != 0) {
             radioProtocolTech |= protocolTech;
