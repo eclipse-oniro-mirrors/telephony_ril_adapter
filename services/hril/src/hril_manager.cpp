@@ -1122,7 +1122,7 @@ int32_t GetSimSlotCount()
     char vSimModemCount[HRIL_SYSPARA_SIZE] = { 0 };
     GetParameter(HRIL_VSIM_MODEM_COUNT_STR, HRIL_DEFAULT_VSIM_MODEM_COUNT, vSimModemCount, HRIL_SYSPARA_SIZE);
     int32_t vSimModemCountNumber = std::atoi(vSimModemCount);
-	// two modem device also has 3 slot (2sim  1vsim)
+	// two modem device also has 3 slot (2sim + 1vsim)
     if (simSlotCountNumber == DUAL_SLOT_COUNT &&
         (vSimModemCountNumber == MAX_SLOT_COUNT || vSimModemCountNumber == DUAL_SLOT_COUNT)) {
         simSlotCountNumber = MAX_SLOT_COUNT;
@@ -1177,7 +1177,7 @@ void HRilRegOps(const HRilOps *hrilOps)
     rilRegisterStatus = RIL_REGISTER_IS_RUNNING;
     HRilManager::GetInstance().hrilOpsVersion_ = hrilOps->version;
     (void)memcpy_s(&callBacks, sizeof(HRilOps), hrilOps, sizeof(HRilOps));
-    for (int32_t slotId = HRIL_SIM_SLOT_0; slotId < HRilManager::GetInstance().GetMaxSimSlotCount(); slotId) {
+    for (int32_t slotId = HRIL_SIM_SLOT_0; slotId < HRilManager::GetInstance().GetMaxSimSlotCount(); slotId++) {
         if (callBacks.smsOps != nullptr) {
             HRilManager::GetInstance().RegisterSmsFuncs(slotId, callBacks.smsOps);
         }
