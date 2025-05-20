@@ -53,7 +53,6 @@ void BranchTest::SetUpTestCase() {}
 
 void ReStartTelephony()
 {
-    std::cout << "ReStartTelephony start" << std::endl;
     FILE *fp;
     char buf[MAX_BUF_SIZE];
     std::string cmd = "pidof telephony";
@@ -65,11 +64,8 @@ void ReStartTelephony()
         pclose(fp);
         fp = nullptr;
     }
-    std::cout << "ReStartTelephony before kill" << std::endl;
     kill(pid, SIGKILL);
-    std::cout << "ReStartTelephony before sleep" << std::endl;
     sleep(WAIT_TELEPHONY_RETART_TIME);
-    std::cout << "ReStartTelephony end" << std::endl;
 }
 
 void BranchTest::TearDownTestCase()
@@ -1044,7 +1040,6 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Network_007, Function | MediumTest | 
  */
 HWTEST_F(BranchTest, Telephony_HrilManager_Network_008, Function | MediumTest | Level3)
 {
-    /*
     auto network = std::make_unique<HRilNetwork>(0);
     HDI::Ril::V1_1::RilRadioResponseInfo responseInfo;
     responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_GENERIC_FAILURE;
@@ -1081,7 +1076,6 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Network_008, Function | MediumTest | 
     int32_t selectMode = 1;
     EXPECT_NE(HDF_SUCCESS, network->GetNetworkSelectionModeResponse(0, responseInfo, &selectMode, 0));
     EXPECT_NE(HDF_SUCCESS, network->GetNetworkSelectionModeResponse(0, responseInfo, &selectMode, sizeof(int32_t)));
-    */
 }
 
 /**
