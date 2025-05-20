@@ -559,7 +559,8 @@ int32_t HRilData::GetNetworkSliceAllowedNssai(int32_t serialId,
     const OHOS::HDI::Ril::V1_4::SyncAllowedNssaiInfo &dsyncAllowedNssaiInfo)
 {
     HRilSyncAllowedNssaiInfo hRilsyncAllowedNssaiInfo;
-    hRilsyncAllowedNssaiInfo.syncAllowedNssaiInfoSize = static_cast<int>(dsyncAllowedNssaiInfo.syncAllowedNssaiInfo.size());
+    hRilsyncAllowedNssaiInfo.syncAllowedNssaiInfoSize =
+        static_cast<int>(dsyncAllowedNssaiInfo.syncAllowedNssaiInfo.size());
     hRilsyncAllowedNssaiInfo.syncAllowedNssaiInfo =
         new unsigned char[hRilsyncAllowedNssaiInfo.syncAllowedNssaiInfoSize];
     for (int32_t i = 0; i < hRilsyncAllowedNssaiInfo.syncAllowedNssaiInfoSize; i++) {
