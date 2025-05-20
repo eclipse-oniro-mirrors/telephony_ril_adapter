@@ -31,7 +31,7 @@ ohos_unittest("tel_ril_adapter_gtest") {
     "ril_sim_test.cpp",
     "ril_sms_test.cpp",
     "ril_test_util.cpp",
-    #"zero_branch_test.cpp",
+    "zero_branch_test.cpp",
   ]
 
   include_dirs = [
