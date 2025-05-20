@@ -213,8 +213,8 @@ void HRilManager::ApplyRunningLock(void)
             powerInterface_->HoldRunningLock(filledInfo);
         }
         struct timeval tv = { 0, RUNNING_LOCK_DEFAULT_TIMEOUT_US };
-        runningLockCount_;
-        runningSerialNum_;
+        runningLockCount_++;
+        runningSerialNum_++;
         uint8_t *serialNum = reinterpret_cast<uint8_t *>(new int(runningSerialNum_));
         timerCallback_->HRilSetTimerCallbackInfo(RunningLockCallback, serialNum, &tv);
         TELEPHONY_LOGD("ApplyRunningLock, runningLockCount_:%{public}d, runningSerialNum_:%{public}d",
@@ -365,7 +365,7 @@ void HRilManager::OnSmsReport(int32_t slotId, const ReportInfo *reportInfo, cons
 
 HRilManager::HRilManager() : hrilSimSlotCount_(GetSimSlotCount())
 {
-    for (int32_t slotId = HRIL_SIM_SLOT_0; slotId < hrilSimSlotCount_; slotId) {
+    for (int32_t slotId = HRIL_SIM_SLOT_0; slotId < hrilSimSlotCount_; slotId++) {
         hrilCall_.push_back(std::make_unique<HRilCall>(slotId));
         hrilModem_.push_back(std::make_unique<HRilModem>(slotId));
         hrilNetwork_.push_back(std::make_unique<HRilNetwork>(slotId));
@@ -379,7 +379,7 @@ HRilManager::HRilManager() : hrilSimSlotCount_(GetSimSlotCount())
 void HRilManager::SetRilCallback(sptr<OHOS::HDI::Ril::V1_5::IRilCallback> callback)
 {
     TELEPHONY_LOGI("SetRilCallback");
-    for (int32_t slotId = HRIL_SIM_SLOT_0; slotId < hrilSimSlotCount_; slotId) {
+    for (int32_t slotId = HRIL_SIM_SLOT_0; slotId < hrilSimSlotCount_; slotId++) {
         hrilCall_[slotId]->SetRilCallback(callback);
         hrilModem_[slotId]->SetRilCallback(callback);
         hrilNetwork_[slotId]->SetRilCallback(callback);
