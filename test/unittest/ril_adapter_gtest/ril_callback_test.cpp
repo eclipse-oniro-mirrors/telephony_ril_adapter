@@ -380,7 +380,7 @@ int32_t RilCallbackTest::GetPrimarySlotResponse(const RilRadioResponseInfo &resp
 
 int32_t RilCallbackTest::SetPrimarySlotResponse(const RilRadioResponseInfo &responseInfo)
 {
-    TELEPHONY_LOGI("GetBoolResult GetPrimarySlotResponse result");
+    TELEPHONY_LOGI("GetBoolResult SetPrimarySlotResponse result");
     hdiId_ = HdiId::HREQ_SIM_SET_PRIMARY_SLOT;
     resultInfo_ = responseInfo;
     NotifyAll();
