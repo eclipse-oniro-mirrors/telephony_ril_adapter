@@ -903,7 +903,7 @@ int32_t HRilSim::GetPrimarySlotResponse(
 {
     int32_t primarySlotId = 0;
     if (response == nullptr || responseLen != sizeof(int32_t)) {
-        TELEPHONY_LOGE("GetSimStatusResponse: Invalid response");
+        TELEPHONY_LOGE("GetPrimarySlotResponse: Invalid response");
         if (responseInfo.error == HDI::Ril::V1_1::RilErrType::NONE) {
             responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_INVALID_RESPONSE;
         }
