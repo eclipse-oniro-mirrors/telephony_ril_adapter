@@ -76,6 +76,14 @@ void HRilSim::AddBasicHandlerToMap()
         HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen) {
         return SendSimMatchedOperatorInfoResponse(requestNum, responseInfo, response, responseLen);
     };
+    respMemberFuncMap_[HREQ_SIM_GET_PRIMARY_SLOT] = [this](int32_t requestNum,
+        HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen) {
+        return GetPrimarySlotResponse(requestNum, responseInfo, response, responseLen);
+    };
+    respMemberFuncMap_[HREQ_SIM_SET_PRIMARY_SLOT] = [this](int32_t requestNum,
+        HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen) {
+        return SetPrimarySlotResponse(requestNum, responseInfo, response, responseLen);
+    };
 }
 
 void HRilSim::AddSimLockHandlerToMap()
@@ -878,6 +886,38 @@ int32_t HRilSim::ConvertRadioProtocolTech(int32_t tech)
         }
     }
     return static_cast<int32_t>(radioProtocolTech);
+}
+
+int32_t HRilSim::GetPrimarySlot(int32_t serialId)
+{
+    return RequestVendor(serialId, HREQ_SIM_GET_PRIMARY_SLOT, simFuncs_, &HRilSimReq::GetPrimarySlot);
+}
+
+int32_t HRilSim::SetPrimarySlot(int32_t serialId)
+{
+    return RequestVendor(serialId, HREQ_SIM_SET_PRIMARY_SLOT, simFuncs_, &HRilSimReq::SetPrimarySlot, GetSlotId());
+}
+
+int32_t HRilSim::GetPrimarySlotResponse(
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+{
+    int32_t primarySlotId = 0;
+    if (response == nullptr || responseLen != sizeof(int32_t)) {
+        TELEPHONY_LOGE("GetPrimarySlotResponse: Invalid response");
+        if (responseInfo.error == HDI::Ril::V1_1::RilErrType::NONE) {
+            responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_INVALID_RESPONSE;
+        }
+        return Response(responseInfo, &HDI::Ril::V1_5::IRilCallback::GetPrimarySlotResponse, primarySlotId);
+    }
+    primarySlotId = *(static_cast<const int32_t *>(response));
+    TELEPHONY_LOGI("HRilSim::GetPrimarySlotResponse, primarySlotId:%{public}d", primarySlotId);
+    return Response(responseInfo, &HDI::Ril::V1_5::IRilCallback::GetPrimarySlotResponse, primarySlotId);
+}
+
+int32_t HRilSim::SetPrimarySlotResponse(
+    int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
+{
+    return Response(responseInfo, &HDI::Ril::V1_5::IRilCallback::SetPrimarySlotResponse);
 }
 } // namespace Telephony
 } // namespace OHOS

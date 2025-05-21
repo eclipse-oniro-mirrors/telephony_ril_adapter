@@ -738,6 +738,8 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Sim_002, Function | MediumTest | Leve
     EXPECT_NE(HDF_SUCCESS, sim->SimAuthenticationResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, sim->UnlockSimLockResponse(0, responseInfo, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, sim->SendSimMatchedOperatorInfoResponse(0, responseInfo, nullptr, 0));
+    EXPECT_NE(HDF_SUCCESS, sim->GetPrimarySlotResponse(0, responseInfo, nullptr, 0));
+    EXPECT_NE(HDF_SUCCESS, sim->SetPrimarySlotResponse(0, responseInfo, nullptr, 0));
 
     EXPECT_NE(HDF_SUCCESS, sim->SimStateUpdated(0, HRilErrNumber::HRIL_ERR_NULL_POINT, nullptr, 0));
     EXPECT_NE(HDF_SUCCESS, sim->SimStkSessionEndNotify(0, HRilErrNumber::HRIL_ERR_NULL_POINT, nullptr, 0));

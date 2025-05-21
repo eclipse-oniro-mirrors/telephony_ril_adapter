@@ -154,7 +154,7 @@ HDI::Ril::V1_1::RilRadioResponseInfo HRilBase::BuildIHRilRadioResponseInfo(
     return iResponseInfo;
 }
 
-void HRilBase::SetRilCallback(const sptr<HDI::Ril::V1_4::IRilCallback> &callback)
+void HRilBase::SetRilCallback(const sptr<HDI::Ril::V1_5::IRilCallback> &callback)
 {
     std::lock_guard<std::mutex> mutexLock(mutex_);
     callback_ = callback;

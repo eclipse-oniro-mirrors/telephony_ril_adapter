@@ -57,6 +57,8 @@ public:
     int32_t UnlockSimLock(int32_t serialId, int32_t lockType, const std::string &key);
     int32_t SendSimMatchedOperatorInfo(
         int32_t serialId, const OHOS::HDI::Ril::V1_2::NcfgOperatorInfo &ncfgOperatorInfo);
+    int32_t GetPrimarySlot(int32_t serialId);
+    int32_t SetPrimarySlot(int32_t serialId);
 
 private:
     void AddBasicHandlerToMap();
@@ -112,6 +114,10 @@ private:
     HDI::Ril::V1_1::IccIoResultInfo ProcessIccIoResponse(HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const void *response, size_t responseLen);
     int32_t SendSimMatchedOperatorInfoResponse(int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+        const void *response, size_t responseLen);
+    int32_t GetPrimarySlotResponse(int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+        const void *response, size_t responseLen);
+    int32_t SetPrimarySlotResponse(int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const void *response, size_t responseLen);
 
     int32_t SimStateUpdated(int32_t notifyType, const HRilErrNumber error, const void *response, size_t responseLen);

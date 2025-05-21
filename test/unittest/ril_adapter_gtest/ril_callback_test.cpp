@@ -19,7 +19,7 @@
 
 namespace OHOS {
 namespace Telephony {
-using namespace OHOS::HDI::Ril::V1_4;
+using namespace OHOS::HDI::Ril::V1_5;
 void RilCallbackTest::NotifyAll()
 {
     std::unique_lock<std::mutex> callbackLock(callbackMutex_);
@@ -364,6 +364,24 @@ int32_t RilCallbackTest::SendSimMatchedOperatorInfoResponse(const HDI::Ril::V1_1
 {
     TELEPHONY_LOGI("GetBoolResult SendSimMatchedOperatorInfo result");
     hdiId_ = HdiId::HREQ_SIM_SEND_NCFG_OPER_INFO;
+    resultInfo_ = responseInfo;
+    NotifyAll();
+    return 0;
+}
+
+int32_t RilCallbackTest::GetPrimarySlotResponse(const RilRadioResponseInfo &responseInfo, int32_t primarySlot)
+{
+    TELEPHONY_LOGI("GetBoolResult GetPrimarySlotResponse result : primarySlot = %{public}d", primarySlot);
+    hdiId_ = HdiId::HREQ_SIM_GET_PRIMARY_SLOT;
+    resultInfo_ = responseInfo;
+    NotifyAll();
+    return 0;
+}
+
+int32_t RilCallbackTest::SetPrimarySlotResponse(const RilRadioResponseInfo &responseInfo)
+{
+    TELEPHONY_LOGI("GetBoolResult SetPrimarySlotResponse result");
+    hdiId_ = HdiId::HREQ_SIM_SET_PRIMARY_SLOT;
     resultInfo_ = responseInfo;
     NotifyAll();
     return 0;

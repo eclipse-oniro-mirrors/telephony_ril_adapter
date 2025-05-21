@@ -376,7 +376,7 @@ HRilManager::HRilManager() : hrilSimSlotCount_(GetSimSlotCount())
     timerCallback_ = std::make_unique<HRilTimerCallback>();
 }
 
-void HRilManager::SetRilCallback(sptr<OHOS::HDI::Ril::V1_4::IRilCallback> callback)
+void HRilManager::SetRilCallback(sptr<OHOS::HDI::Ril::V1_5::IRilCallback> callback)
 {
     TELEPHONY_LOGI("SetRilCallback");
     for (int32_t slotId = HRIL_SIM_SLOT_0; slotId < hrilSimSlotCount_; slotId++) {
@@ -869,6 +869,16 @@ int32_t HRilManager::SendSimMatchedOperatorInfo(
 {
     return TaskSchedule(
         MODULE_HRIL_SIM, hrilSim_[slotId], &HRilSim::SendSimMatchedOperatorInfo, serialId, ncfgOperatorInfo);
+}
+
+int32_t HRilManager::GetPrimarySlot(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(MODULE_HRIL_SIM, hrilSim_[slotId], &HRilSim::GetPrimarySlot, serialId);
+}
+
+int32_t HRilManager::SetPrimarySlot(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(MODULE_HRIL_SIM, hrilSim_[slotId], &HRilSim::SetPrimarySlot, serialId);
 }
 
 // Network
