@@ -284,7 +284,7 @@ static int32_t InitCallListCmdBuffer(const ResponseInfo *pResponse, int32_t *cal
     HRilCallInfo *pCallsTmp = NULL;
 
     if (pResponse == NULL || pCalls == NULL || callNum == NULL) {
-        TELEPHONY_LOGE("params: %{public}p,%{public}p,%{public}p", pResponse, callNum, pCalls);
+        TELEPHONY_LOGE("params: invalid");
         return HRIL_ERR_NULL_POINT;
     }
 
@@ -1354,7 +1354,7 @@ static int32_t InitGetEmergencyCallList(const ResponseInfo *pResponse, int32_t *
     HRilEmergencyInfo *pEmergencyCallsTmp = NULL;
 
     if (pResponse == NULL || pEmergencyCalls == NULL || callNum == NULL) {
-        TELEPHONY_LOGE("params: %{public}p,%{public}p,%{public}p", pResponse, callNum, pEmergencyCalls);
+        TELEPHONY_LOGE("params: invalid");
         return HRIL_ERR_NULL_POINT;
     }
 
