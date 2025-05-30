@@ -587,14 +587,19 @@ int32_t HRilSim::SimOpenLogicalChannelResponse(
 {
     HDI::Ril::V1_1::OpenLogicalChannelResponse pOpenLogicalChannelResponse = {};
     if (response == nullptr || responseLen != sizeof(HRilOpenLogicalChannelResponse)) {
-        TELEPHONY_LOGE("Invalid response: response is nullptr");
-        return HRIL_ERR_INVALID_PARAMETER;
+        TELEPHONY_LOGE("Invalid response, respose invalid channelId");
+        responseInfo.error = HDI::Ril::V1_1::RilErrType::NONE;
+        pOpenLogicalChannelResponse.sw1 = -1; // invalid sw1 -1
+        pOpenLogicalChannelResponse.sw2 = -1; // invalid sw2 -1
+        pOpenLogicalChannelResponse.channelId = -1; // invalid channel Id -1
+        pOpenLogicalChannelResponse.response = "";
+    } else {
+        const HRilOpenLogicalChannelResponse *pRilResponse = static_cast<const HRilOpenLogicalChannelResponse *>(response);
+        pOpenLogicalChannelResponse.sw1 = pRilResponse->sw1;
+        pOpenLogicalChannelResponse.sw2 = pRilResponse->sw2;
+        pOpenLogicalChannelResponse.channelId = pRilResponse->channelId;
+        pOpenLogicalChannelResponse.response = (pRilResponse->response == nullptr) ? "" :  pRilResponse->response;
     }
-    const HRilOpenLogicalChannelResponse *pRilResponse = static_cast<const HRilOpenLogicalChannelResponse *>(response);
-    pOpenLogicalChannelResponse.sw1 = pRilResponse->sw1;
-    pOpenLogicalChannelResponse.sw2 = pRilResponse->sw2;
-    pOpenLogicalChannelResponse.channelId = pRilResponse->channelId;
-    pOpenLogicalChannelResponse.response = (pRilResponse->response == nullptr) ? "" :  pRilResponse->response;
     return Response(
         responseInfo, &HDI::Ril::V1_1::IRilCallback::SimOpenLogicalChannelResponse, pOpenLogicalChannelResponse);
 }
