@@ -594,7 +594,7 @@ int32_t HRilSim::SimOpenLogicalChannelResponse(
         pOpenLogicalChannelResponse.channelId = -1; // invalid channel Id -1
         pOpenLogicalChannelResponse.response = "";
     } else {
-        const HRilOpenLogicalChannelResponse *pRilResponse = 
+        const HRilOpenLogicalChannelResponse *pRilResponse =
             static_cast<const HRilOpenLogicalChannelResponse *>(response);
         pOpenLogicalChannelResponse.sw1 = pRilResponse->sw1;
         pOpenLogicalChannelResponse.sw2 = pRilResponse->sw2;
