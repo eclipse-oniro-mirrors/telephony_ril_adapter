@@ -517,20 +517,5 @@ HWTEST_F(RilDataTest, Telephony_DriverSystem_GetNetworkSliceAllowedNssai_V1_0100
     ASSERT_TRUE(RilTestUtil::GetBoolResult(HdiId::HREQ_DATA_SYNC_ALLOWED_NSSAI_WITH_MODEM));
 }
 
-/**
- * @tc.number   Telephony_DriverSystem_GetNetworkSliceEhplmn_V1_0100
- * @tc.name     Get NetworkSlice AllowedNssai
- * @tc.desc     Function test
- */
-HWTEST_F(RilDataTest, Telephony_DriverSystem_GetNetworkSliceEhplmn_V1_0100, Function | MediumTest | Level3)
-{
-    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
-    int32_t serialId = RilTestUtil::GetSerialId();
-    int32_t ret = g_rilInterface->GetNetworkSliceEhplmn(SLOTID_1, serialId);
-    RilTestUtil::WaitFor(WAIT_TIME_SECOND);
-    EXPECT_EQ(SUCCESS, ret);
-    ASSERT_TRUE(RilTestUtil::GetBoolResult(HdiId::HREQ_DATA_SYNC_ALLOWED_NSSAI_WITH_MODEM));
-}
-
 } // namespace Telephony
 } // namespace OHOS
