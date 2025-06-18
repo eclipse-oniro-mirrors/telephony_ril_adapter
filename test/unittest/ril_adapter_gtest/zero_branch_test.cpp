@@ -1462,7 +1462,7 @@ void MT_DelSimMessage(const ReqDataInfo *requestInfo, const int32_t *data, size_
     return;
 }
 
-void MT_SetCdmaCBConfig(const ReqDataInfo *requestInfo, const HRilCdmaCBConfigInfo *data, const int32_t *data, size_t dataLen)
+void MT_SetCdmaCBConfig(const ReqDataInfo *requestInfo, const HRilCdmaCBConfigInfo *data, size_t dataLen)
 {
     return;
 }
@@ -1472,7 +1472,7 @@ void MT_SendSmsAck(const ReqDataInfo *requestInfo, const int32_t *data, size_t d
     return;
 }
 
-void MT_SendGsmSms(const ReqDataInfo *requestInfo, const int32_t *data, size_t dataLen)
+void MT_SendGsmSms(const ReqDataInfo *requestInfo, const char *const *data, size_t dataLen)
 {
     return;
 }
@@ -1492,7 +1492,8 @@ HWTEST_F(BranchTest, Telephony_HrilManager_CreateHRilRequest_002, Function | Med
         .SetCdmaCBConfig = nullptr,
         .SendSmsAck = nullptr,
         .SendGsmSms = nullptr,
-    }
+        .DelCdmaSimMessage = nullptr,
+    };
     sms->RegisterSmsFuncs(&smsFuncs);
     EXPECT_NE(HDF_SUCCESS, sms->SetCdmaCBConfig(0, cdmaCBConfigInfoList));
     EXPECT_NE(HDF_SUCCESS, sms->DelCdmaSimMessage(0, 0));
@@ -1504,6 +1505,7 @@ HWTEST_F(BranchTest, Telephony_HrilManager_CreateHRilRequest_002, Function | Med
         .SetCdmaCBConfig = MT_SetCdmaCBConfig,
         .SendSmsAck = MT_SendSmsAck,
         .SendGsmSms = MT_SendGsmSms,
+        .DelCdmaSimMessage = MT_DelCdmaSimMessage,
     };
     EXPECT_EQ(HDF_SUCCESS, sms->DelSimMessage(0, 0));
     sms->SendSmsAck(0, modeData);
@@ -1515,7 +1517,7 @@ HWTEST_F(BranchTest, Telephony_HrilManager_CreateHRilRequest_002, Function | Med
     int32_t count = 300;
     std::string str(count, '1');
     HRilCdmaSmsMessageInfo cdmaMessageInfo;
-    ASSEERT_TRUE(sms->CheckCdmaPduLength(cdmaMessageInfo, str));
+    ASSERT_TRUE(sms->CheckCdmaPduLength(cdmaMessageInfo, str));
     sms->CreateCdmaMessageInfo(cdmaMessageInfo, str);
 
 }
