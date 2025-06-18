@@ -1486,7 +1486,7 @@ HWTEST_F(BranchTest, Telephony_HrilManager_CreateHRilRequest_002, Function | Med
 {
     auto sms = std::make_unique<HRilSms>(0);
     OHOS::HDI::Ril::V1_1::CdmaCBConfigInfoList cdmaCBConfigInfoList;
-    OHOS::HDI::Ril::v1_1::ModeData modeData;
+    OHOS::HDI::Ril::V1_1::ModeData modeData;
     HRilSmsReq smsFuncs = {
         .DelSimMessage = nullptr,
         .SetCdmaCBConfig = nullptr,
@@ -1519,7 +1519,6 @@ HWTEST_F(BranchTest, Telephony_HrilManager_CreateHRilRequest_002, Function | Med
     HRilCdmaSmsMessageInfo cdmaMessageInfo;
     ASSERT_TRUE(sms->CheckCdmaPduLength(cdmaMessageInfo, str));
     sms->CreateCdmaMessageInfo(cdmaMessageInfo, str);
-
 }
 } // namespace Telephony
 } // namespace OHOS
