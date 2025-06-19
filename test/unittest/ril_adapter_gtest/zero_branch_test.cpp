@@ -40,6 +40,7 @@ constexpr const char *NUMBER = "123";
 constexpr const char *COMMA_STR = ",";
 constexpr const int32_t MAIL_DELAY_TIME = 50 * 1000;
 constexpr const int32_t NUM_TWO = 2;
+constexpr int32_t HRILBASE_RESPONSE_SIZE = 5;
 }
 
 class BranchTest : public testing::Test {
@@ -1697,11 +1698,7 @@ HWTEST_F(BranchTest, Telephony_HrilManager_HRilEvent_002, Function | MediumTest 
 HWTEST_F(BranchTest, Telephony_HrilManager_HrilBase_002, Function | MediumTest | Level3)
 {
     HRilBase base { 0 };
-    int size = 5;
-    char* response[size];
-    for (int i = 0; i < size; i++) {
-        response[i] = nullptr;
-    }
+    char* response[HRILBASE_RESPONSE_SIZE] = { nullptr };
     char mystring[] = "abc";
     response[0] = mystring;
     EXPECT_EQ(HRIL_ERR_GENERIC_FAILURE, base.ConvertHexStringToInt(response, 0, 0));
