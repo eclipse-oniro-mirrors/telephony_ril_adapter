@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#define private public
+#include "hril_sim.h"
 #include "ril_sim_test.h"
 #include "ril_test_util.h"
 
@@ -866,6 +868,521 @@ HWTEST_F(RILSimTest, Telephony_DriverSystem_UnlockSimLock_V1_0200, Function | Me
     ASSERT_TRUE(RilTestUtil::GetBoolResult(HdiId::HREQ_SIM_UNLOCK_SIM_LOCK));
 #endif
     ASSERT_TRUE(true);
+}
+
+/**
+* @tc.name  : GetRadioProtocolResponse_ShouldSetError_WhenResponseIsNull
+* @tc.number: GetRadioProtocolResponse_Test_001
+* @tc.desc  : Function test
+*/
+HWTEST_F(RILSimTest, GetRadioProtocolResponse_ShouldSetError_001, Function | MediumTest | Level3)
+{
+    int32_t requestNum = 1;
+    HDI::Ril::V1_1::RilRadioResponseInfo responseInfo = {};
+    const void* response = nullptr;
+    size_t responseLen = 0;
+    
+    int32_t slotId = 0;
+    auto hrilSim = std::make_shared<HRilSim>(slotId);
+    int32_t ret = hrilSim->GetRadioProtocolResponse(requestNum, responseInfo, response, responseLen);
+    EXPECT_NE(SUCCESS, ret);
+    EXPECT_EQ(responseInfo.error, HDI::Ril::V1_1::RilErrType::RIL_ERR_INVALID_RESPONSE);
+}
+
+/**
+* @tc.name  : GetRadioProtocolResponse_ShouldSetError_WhenResponseLenIsInvalid
+* @tc.number: GetRadioProtocolResponse_Test_002
+* @tc.desc  : Function test
+*/
+HWTEST_F(RILSimTest, GetRadioProtocolResponse_ShouldSetError_002, Function | MediumTest | Level3)
+{
+    int32_t requestNum = 1;
+    HDI::Ril::V1_1::RilRadioResponseInfo responseInfo = {};
+    int dummyResponse = 0;
+    const void* response = &dummyResponse;
+    size_t responseLen = sizeof(dummyResponse);
+
+    int32_t slotId = 0;
+    auto hrilSim = std::make_shared<HRilSim>(slotId);
+    int32_t ret = hrilSim->GetRadioProtocolResponse(requestNum, responseInfo, response, responseLen);
+    EXPECT_NE(SUCCESS, ret);
+    EXPECT_EQ(responseInfo.error, HDI::Ril::V1_1::RilErrType::RIL_ERR_INVALID_RESPONSE);
+}
+
+/**
+* @tc.name  : GetRadioProtocolResponse_ShouldProcessResponse_WhenResponseIsValid
+* @tc.number: GetRadioProtocolResponse_Test_003
+* @tc.desc  : Function test
+*/
+HWTEST_F(RILSimTest, GetRadioProtocolResponse_ShouldSetError_003, Function | MediumTest | Level3) {
+    int32_t requestNum = 1;
+    HDI::Ril::V1_1::RilRadioResponseInfo responseInfo = {};
+    HRilRadioProtocol radioProtocol = {};
+    const void* response = &radioProtocol;
+    size_t responseLen = sizeof(radioProtocol);
+
+    int32_t slotId = 0;
+    auto hrilSim = std::make_shared<HRilSim>(slotId);
+    int32_t ret = hrilSim->GetRadioProtocolResponse(requestNum, responseInfo, response, responseLen);
+    EXPECT_NE(SUCCESS, ret);
+    EXPECT_EQ(responseInfo.error, HDI::Ril::V1_1::RilErrType::NONE);
+}
+
+/**
+* @tc.name  : SimStkProactiveNotify_ShouldReturnSuccess_WhenCheckCharDataSucceeds
+* @tc.number: SimStkProactiveNotify_Test_001
+* @tc.desc  : Function test
+*/
+HWTEST_F(RILSimTest, SimStkProactiveNotify_ShouldReturnSuccess_001, Function | MediumTest | Level3)
+{
+    int32_t notifyType = 1;
+    HRilErrNumber error = HRIL_ERR_SUCCESS;
+    const char* response = "valid response";
+    size_t responseLen = strlen(response);
+
+    int32_t slotId = 0;
+    auto hrilSim = std::make_shared<HRilSim>(slotId);
+    int32_t ret = hrilSim->SimStkProactiveNotify(notifyType, error, response, responseLen);
+    EXPECT_NE(SUCCESS, ret);
+    EXPECT_NE(ret, HRIL_ERR_SUCCESS);
+}
+
+/**
+* @tc.name  : SimStkProactiveNotify_ShouldReturnFailure_WhenCheckCharDataFails
+* @tc.number: SimStkProactiveNotify_Test_002
+* @tc.desc  : Function test
+*/
+HWTEST_F(RILSimTest, SimStkProactiveNotify_ShouldReturnSuccess_002, Function | MediumTest | Level3)
+{
+    int32_t notifyType = 1;
+    HRilErrNumber error = HRIL_ERR_SUCCESS;
+    const char* response = nullptr; // Invalid response
+    size_t responseLen = 0;
+
+    int32_t slotId = 0;
+    auto hrilSim = std::make_shared<HRilSim>(slotId);
+    int32_t ret = hrilSim->SimStkProactiveNotify(notifyType, error, response, responseLen);
+    EXPECT_NE(SUCCESS, ret);
+    EXPECT_NE(ret, HRIL_ERR_SUCCESS);
+}
+
+/**
+* @tc.name  : SimStkAlphaNotify_ShouldReturnSuccess_WhenCheckCharDataSucceeds
+* @tc.number: SimStkAlphaNotify_Test_001
+* @tc.desc  : Function test
+*/
+HWTEST_F(RILSimTest, SimStkProactiveNotify_ShouldReturnSuccess_003, Function | MediumTest | Level3)
+{
+    int32_t notifyType = 1;
+    HRilErrNumber error = HRIL_ERR_SUCCESS;
+    const char* response = "valid response";
+    size_t responseLen = strlen(response);
+
+    int32_t slotId = 0;
+    auto hrilSim = std::make_shared<HRilSim>(slotId);
+    int32_t ret = hrilSim->SimStkProactiveNotify(notifyType, error, response, responseLen);
+    EXPECT_NE(SUCCESS, ret);
+    EXPECT_NE(ret, HRIL_ERR_SUCCESS);
+}
+
+/**
+* @tc.name  : SimStkAlphaNotify_ShouldReturnFailure_WhenCheckCharDataFails
+* @tc.number: SimStkAlphaNotify_Test_002
+* @tc.desc  : Function test
+*/
+HWTEST_F(RILSimTest, SimStkProactiveNotify_ShouldReturnSuccess_004, Function | MediumTest | Level3)
+{
+    int32_t notifyType = 1;
+    HRilErrNumber error = HRIL_ERR_SUCCESS;
+    const char* response = nullptr; // Invalid response
+    size_t responseLen = 0;
+
+    int32_t slotId = 0;
+    auto hrilSim = std::make_shared<HRilSim>(slotId);
+    int32_t ret = hrilSim->SimStkProactiveNotify(notifyType, error, response, responseLen);
+    EXPECT_NE(SUCCESS, ret);
+    EXPECT_NE(ret, HRIL_ERR_SUCCESS);
+}
+
+/**
+* @tc.name  : SimStkEventNotify_ShouldReturnSuccess_WhenCheckCharDataSucceeds
+* @tc.number: SimStkEventNotify_Test_001
+* @tc.desc  : Function test
+*/
+HWTEST_F(RILSimTest, SimStkEventNotify_ShouldReturnSuccess_001, Function | MediumTest | Level3)
+{
+    int32_t notifyType = 1;
+    HRilErrNumber error = HRIL_ERR_SUCCESS;
+    const char* response = "valid response";
+    size_t responseLen = strlen(response);
+
+    int32_t slotId = 0;
+    auto hrilSim = std::make_shared<HRilSim>(slotId);
+    int32_t ret = hrilSim->SimStkEventNotify(notifyType, error, response, responseLen);
+    EXPECT_NE(SUCCESS, ret);
+    EXPECT_NE(ret, HRIL_ERR_SUCCESS);
+}
+
+/**
+* @tc.name  : SimStkEventNotify_ShouldReturnFailure_WhenCheckCharDataFails
+* @tc.number: SimStkEventNotify_Test_002
+* @tc.desc  : Function test
+*/
+HWTEST_F(RILSimTest, SimStkEventNotify_ShouldReturnFailure_002, Function | MediumTest | Level3)
+{
+    int32_t notifyType = 1;
+    HRilErrNumber error = HRIL_ERR_SUCCESS;
+    const char* response = nullptr; // Invalid response
+    size_t responseLen = 0;
+
+    int32_t slotId = 0;
+    auto hrilSim = std::make_shared<HRilSim>(slotId);
+    int32_t ret = hrilSim->SimStkEventNotify(notifyType, error, response, responseLen);
+    EXPECT_NE(SUCCESS, ret);
+    EXPECT_NE(ret, HRIL_ERR_SUCCESS);
+}
+
+/**
+* @tc.name  : SimRadioProtocolUpdated_ShouldReturnFailure_WhenResponseIsNull
+* @tc.number: SimRadioProtocolUpdated_Test_001
+* @tc.desc  : Test SimRadioProtocolUpdated function when response is null
+*/
+HWTEST_F(RILSimTest, SimRadioProtocolUpdated_001, Function | MediumTest | Level3)
+{
+    int32_t notifyType = 1;
+    HRilErrNumber error = HRIL_ERR_SUCCESS;
+    const void* response = nullptr;
+    size_t responseLen = 0;
+
+    int32_t slotId = 0;
+    auto hrilSim = std::make_shared<HRilSim>(slotId);
+    int32_t ret = hrilSim->SimRadioProtocolUpdated(notifyType, error, response, responseLen);
+    EXPECT_NE(SUCCESS, ret);
+    EXPECT_EQ(ret, HRIL_ERR_INVALID_PARAMETER);
+}
+
+/**
+* @tc.name  : SimRadioProtocolUpdated_ShouldReturnFailure_WhenResponseLenIsInvalid
+* @tc.number: SimRadioProtocolUpdated_Test_002
+* @tc.desc  : Test SimRadioProtocolUpdated function when response length is invalid
+*/
+HWTEST_F(RILSimTest, SimRadioProtocolUpdated_002, Function | MediumTest | Level3)
+{
+    int32_t notifyType = 1;
+    HRilErrNumber error = HRIL_ERR_SUCCESS;
+    HRilRadioProtocol radioProtocol = {};
+    const void* response = &radioProtocol;
+    size_t responseLen = sizeof(radioProtocol) - 1; // Invalid length
+
+    int32_t slotId = 0;
+    auto hrilSim = std::make_shared<HRilSim>(slotId);
+    int32_t ret = hrilSim->SimRadioProtocolUpdated(notifyType, error, response, responseLen);
+    EXPECT_NE(SUCCESS, ret);
+    EXPECT_EQ(ret, HRIL_ERR_INVALID_PARAMETER);
+}
+
+/**
+* @tc.name  : SimRadioProtocolUpdated_ShouldProcessResponse_WhenResponseIsValid
+* @tc.number: SimRadioProtocolUpdated_Test_003
+* @tc.desc  : Test SimRadioProtocolUpdated function when response is valid
+*/
+HWTEST_F(RILSimTest, SimRadioProtocolUpdated_003, Function | MediumTest | Level3)
+{
+    int32_t notifyType = 1;
+    HRilErrNumber error = HRIL_ERR_SUCCESS;
+    HRilRadioProtocol radioProtocol = {};
+    const void* response = &radioProtocol;
+    size_t responseLen = sizeof(radioProtocol);
+
+    int32_t slotId = 0;
+    auto hrilSim = std::make_shared<HRilSim>(slotId);
+    int32_t ret = hrilSim->SimRadioProtocolUpdated(notifyType, error, response, responseLen);
+    EXPECT_NE(SUCCESS, ret);
+    EXPECT_NE(ret, HRIL_ERR_SUCCESS);
+}
+
+/**
+* @tc.name  : GetSimIOResponse_Success
+* @tc.number: GetSimIOResponse_Test_001
+* @tc.desc  : Function test
+*/
+HWTEST_F(RILSimTest, GetSimIOResponse_Success, Function | MediumTest | Level3)
+{
+    HDI::Ril::V1_1::RilRadioResponseInfo responseInfo;
+    const void* response = nullptr; // 假设有效响应
+    size_t responseLen = 0; // 假设有效长度
+    int32_t slotId = 0;
+    auto hrilSim = std::make_shared<HRilSim>(slotId);
+    int32_t ret = hrilSim->GetSimIOResponse(1, responseInfo, response, responseLen);
+    EXPECT_NE(ret, HRIL_ERR_SUCCESS);
+}
+
+/**
+* @tc.name  : GetSimIOResponse_BuildSimIOResp_Fails
+* @tc.number: GetSimIOResponse_Test_002
+* @tc.desc  : Function test
+*/
+HWTEST_F(RILSimTest, GetSimIOResponse_BuildSimIOResp_Fails, Function | MediumTest | Level3)
+{
+    HDI::Ril::V1_1::RilRadioResponseInfo responseInfo;
+    const void* response = nullptr;
+    size_t responseLen = 0;
+    int32_t slotId = 0;
+    auto hrilSim = std::make_shared<HRilSim>(slotId);
+    int32_t ret = hrilSim->GetSimIOResponse(1, responseInfo, response, responseLen);
+    EXPECT_NE(ret, HRIL_ERR_SUCCESS);
+}
+
+/**
+* @tc.name  : GetSimCardStatusResponse_Success
+* @tc.number: GetSimCardStatusResponse_Test_001
+* @tc.desc  : Function test
+*/
+HWTEST_F(RILSimTest, GetSimCardStatusResponse_001, Function | MediumTest | Level3)
+{
+    HDI::Ril::V1_1::RilRadioResponseInfo responseInfo;
+    HRilCardState cardState = {};
+    const void* response = &cardState;
+    size_t responseLen = sizeof(HRilCardState);
+    int32_t slotId = 0;
+    auto hrilSim = std::make_shared<HRilSim>(slotId);
+    int32_t ret = hrilSim->GetSimCardStatusResponse(1, responseInfo, response, responseLen);
+    EXPECT_NE(ret, HRIL_ERR_SUCCESS);
+}
+
+/**
+* @tc.name  : GetSimCardStatusResponse_ResponseNull_ResponseLenZero
+* @tc.number: GetSimCardStatusResponse_Test_002
+* @tc.desc  : Function test
+*/
+HWTEST_F(RILSimTest, GetSimCardStatusResponse_002, Function | MediumTest | Level3)
+{
+    HDI::Ril::V1_1::RilRadioResponseInfo responseInfo;
+    const void* response = nullptr;
+    size_t responseLen = 0;
+    int32_t slotId = 0;
+    auto hrilSim = std::make_shared<HRilSim>(slotId);
+    int32_t ret = hrilSim->GetSimCardStatusResponse(1, responseInfo, response, responseLen);
+    EXPECT_NE(SUCCESS, ret);
+    EXPECT_EQ(responseInfo.error, HDI::Ril::V1_1::RilErrType::RIL_ERR_INVALID_RESPONSE);
+}
+
+/**
+* @tc.name  : GetSimCardStatusResponse_ResponseNull_ResponseLenNonZero
+* @tc.number: GetSimCardStatusResponse_Test_003
+* @tc.desc  : Function test
+*/
+HWTEST_F(RILSimTest, GetSimCardStatusResponse_003, Function | MediumTest | Level3)
+{
+    HDI::Ril::V1_1::RilRadioResponseInfo responseInfo;
+    const void* response = nullptr;
+    size_t responseLen = 1;
+    int32_t slotId = 0;
+    auto hrilSim = std::make_shared<HRilSim>(slotId);
+    int32_t ret = hrilSim->GetSimCardStatusResponse(1, responseInfo, response, responseLen);
+    EXPECT_EQ(ret, HRIL_ERR_INVALID_PARAMETER);
+}
+
+/**
+* @tc.name  : GetSimCardStatusResponse_ResponseNonNull_ResponseLenInvalid
+* @tc.number: GetSimCardStatusResponse_Test_004
+* @tc.desc  : Function test
+*/
+HWTEST_F(RILSimTest, GetSimCardStatusResponse_004, Function | MediumTest | Level3)
+{
+    HDI::Ril::V1_1::RilRadioResponseInfo responseInfo;
+    HRilCardState cardState = {};
+    const void* response = &cardState;
+    size_t responseLen = 1; // 无效长度
+    int32_t slotId = 0;
+    auto hrilSim = std::make_shared<HRilSim>(slotId);
+    int32_t ret = hrilSim->GetSimCardStatusResponse(1, responseInfo, response, responseLen);
+    EXPECT_EQ(ret, HRIL_ERR_INVALID_PARAMETER);
+}
+
+/**
+* @tc.name  : BuildLockStatusResp
+* @tc.number: BuildLockStatusResp_Test
+* @tc.desc  : Function test
+*/
+HWTEST_F(RILSimTest, BuildLockStatusResp, Function | MediumTest | Level3)
+{
+    LockStatusResp lockStatus;
+    int32_t slotId = 0;
+    auto hrilSim = std::make_shared<HRilSim>(slotId);
+    EXPECT_FALSE(hrilSim->BuildLockStatusResp(nullptr, 0, lockStatus));
+}
+
+/**
+* @tc.name  : InvalidResponseLen
+* @tc.number: InvalidResponseLen_Test
+* @tc.desc  : Function test
+*/
+HWTEST_F(RILSimTest, InvalidResponseLen, Function | MediumTest | Level3)
+{
+    HRilLockStatus resp = {0};
+    LockStatusResp lockStatus;
+    int32_t slotId = 0;
+    auto hrilSim = std::make_shared<HRilSim>(slotId);
+    EXPECT_FALSE(hrilSim->BuildLockStatusResp(&resp, sizeof(HRilLockStatus) + 1, lockStatus));
+}
+
+/**
+* @tc.name  : ValidResponse
+* @tc.number: ValidResponse_test_001
+* @tc.desc  : Function test
+*/
+HWTEST_F(RILSimTest, ValidResponse_001, Function | MediumTest | Level3)
+{
+    HRilLockStatus resp = {HRIL_ERR_SUCCESS, 5};
+    LockStatusResp lockStatus;
+    int32_t slotId = 0;
+    auto hrilSim = std::make_shared<HRilSim>(slotId);
+    EXPECT_TRUE(hrilSim->BuildLockStatusResp(&resp, sizeof(HRilLockStatus), lockStatus));
+    EXPECT_EQ(lockStatus.result, HRIL_ERR_SUCCESS);
+    EXPECT_EQ(lockStatus.remain, 5);
+}
+
+/**
+* @tc.name  : InvalidResponse
+* @tc.number: InvalidResponse_test_002
+* @tc.desc  : Function test
+*/
+HWTEST_F(RILSimTest, InvalidResponse_002, Function | MediumTest | Level3)
+{
+    LockStatusResp lockStatus;
+    RilRadioResponseInfo responseInfo = {RilErrType::NONE};
+    int32_t slotId = 0;
+    auto hrilSim = std::make_shared<HRilSim>(slotId);
+    hrilSim->ResponseLockStatus(lockStatus, responseInfo, nullptr, 0);
+    EXPECT_EQ(responseInfo.error, RilErrType::RIL_ERR_INVALID_RESPONSE);
+}
+
+/**
+* @tc.name  : InvalidResponse
+* @tc.number: InvalidResponse_test_003
+* @tc.desc  : Function test
+*/
+HWTEST_F(RILSimTest, ValidResponse_003, Function | MediumTest | Level3)
+{
+    HRilLockStatus resp = {HRIL_ERR_SUCCESS, 5};
+    LockStatusResp lockStatus;
+    RilRadioResponseInfo responseInfo = {RilErrType::NONE};
+    int32_t slotId = 0;
+    auto hrilSim = std::make_shared<HRilSim>(slotId);
+    hrilSim->ResponseLockStatus(lockStatus, responseInfo, &resp, sizeof(HRilLockStatus));
+    EXPECT_EQ(lockStatus.result, HRIL_ERR_SUCCESS);
+    EXPECT_EQ(lockStatus.remain, 5);
+    EXPECT_EQ(responseInfo.error, RilErrType::NONE);
+}
+
+/**
+* @tc.name  : BuildSimIOResp
+* @tc.number: BuildSimIOResp_test_001
+* @tc.desc  : Function test
+*/
+HWTEST_F(RILSimTest, BuildSimIOResp_001, Function | MediumTest | Level3)
+{
+    IccIoResultInfo result;
+    RilRadioResponseInfo responseInfo = {RilErrType::NONE};
+    int32_t slotId = 0;
+    auto hrilSim = std::make_shared<HRilSim>(slotId);
+    EXPECT_EQ(hrilSim->BuildSimIOResp(result, responseInfo, nullptr, 1), HRIL_ERR_INVALID_PARAMETER);
+}
+
+/**
+* @tc.name  : BuildSimIOResp
+* @tc.number: BuildSimIOResp_test_002
+* @tc.desc  : Function test
+*/
+HWTEST_F(RILSimTest, BuildSimIOResp_002, Function | MediumTest | Level3)
+{
+    HRilSimIOResponse resp = {0};
+    IccIoResultInfo result;
+    RilRadioResponseInfo responseInfo = {RilErrType::NONE};
+    int32_t slotId = 0;
+    auto hrilSim = std::make_shared<HRilSim>(slotId);
+    auto buildresult = hrilSim->BuildSimIOResp(result, responseInfo, &resp, sizeof(HRilSimIOResponse) + 1);
+    EXPECT_EQ(buildresult, HRIL_ERR_INVALID_PARAMETER);
+}
+
+/**
+* @tc.name  : BuildSimIOResp
+* @tc.number: BuildSimIOResp_test_003
+* @tc.desc  : Function test
+*/
+HWTEST_F(RILSimTest, BuildSimIOResp_003, Function | MediumTest | Level3)
+{
+    IccIoResultInfo result;
+    RilRadioResponseInfo responseInfo = {RilErrType::NONE};
+    int32_t slotId = 0;
+    auto hrilSim = std::make_shared<HRilSim>(slotId);
+    EXPECT_NE(hrilSim->BuildSimIOResp(result, responseInfo, nullptr, 0), HRIL_ERR_NULL_POINT);
+}
+
+/**
+* @tc.name  : BuildSimIOResp
+* @tc.number: BuildSimIOResp_test_004
+* @tc.desc  : Function test
+*/
+HWTEST_F(RILSimTest, BuildSimIOResp_004, Function | MediumTest | Level3)
+{
+    HRilSimIOResponse resp = {0};
+    IccIoResultInfo result;
+    RilRadioResponseInfo responseInfo = {RilErrType::NONE};
+    int32_t slotId = 0;
+    auto hrilSim = std::make_shared<HRilSim>(slotId);
+    EXPECT_EQ(hrilSim->BuildSimIOResp(result, responseInfo, &resp, sizeof(HRilSimIOResponse)), HRIL_ERR_SUCCESS);
+}
+
+/**
+* @tc.name  : CheckCharData
+* @tc.number: CheckCharData_test_001
+* @tc.desc  : Function test
+*/
+HWTEST_F(RILSimTest, CheckCharData_001, Function | MediumTest | Level3)
+{
+    int32_t slotId = 0;
+    auto hrilSim = std::make_shared<HRilSim>(slotId);
+    EXPECT_EQ(hrilSim->CheckCharData(nullptr, 1), HRIL_ERR_INVALID_PARAMETER);
+}
+
+/**
+* @tc.name  : CheckCharData
+* @tc.number: CheckCharData_test_002
+* @tc.desc  : Function test
+*/
+HWTEST_F(RILSimTest, CheckCharData_002, Function | MediumTest | Level3)
+{
+    char data[] = "test";
+    int32_t slotId = 0;
+    auto hrilSim = std::make_shared<HRilSim>(slotId);
+    EXPECT_NE(hrilSim->CheckCharData(data, 3), HRIL_ERR_INVALID_PARAMETER);
+}
+
+/**
+* @tc.name  : CheckCharData
+* @tc.number: CheckCharData_test_003
+* @tc.desc  : Function test
+*/
+HWTEST_F(RILSimTest, CheckCharData_003, Function | MediumTest | Level3)
+{
+    int32_t slotId = 0;
+    auto hrilSim = std::make_shared<HRilSim>(slotId);
+    EXPECT_EQ(hrilSim->CheckCharData(nullptr, 0), HRIL_ERR_NULL_POINT);
+}
+
+/**
+* @tc.name  : CheckCharData
+* @tc.number: CheckCharData_test_004
+* @tc.desc  : Function test
+*/
+HWTEST_F(RILSimTest, CheckCharData_004, Function | MediumTest | Level3)
+{
+    char data[] = "test";
+    int32_t slotId = 0;
+    auto hrilSim = std::make_shared<HRilSim>(slotId);
+    EXPECT_EQ(hrilSim->CheckCharData(data, 4), HRIL_ERR_SUCCESS);
 }
 } // namespace Telephony
 } // namespace OHOS
