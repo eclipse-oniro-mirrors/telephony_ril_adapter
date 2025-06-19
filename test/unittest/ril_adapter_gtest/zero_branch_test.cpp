@@ -40,6 +40,7 @@ constexpr const char *NUMBER = "123";
 constexpr const char *COMMA_STR = ",";
 constexpr const int32_t MAIL_DELAY_TIME = 50 * 1000;
 constexpr const int32_t NUM_TWO = 2;
+constexpr int32_t HRILBASE_RESPONSE_SIZE = 5;
 }
 
 class BranchTest : public testing::Test {
@@ -278,6 +279,9 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Call_001, Function | MediumTest | Lev
     manager->RegisterCallFuncs(0, nullptr);
     manager->ApplyRunningLock();
     manager->ReleaseRunningLock();
+    manager->runningLockCount_ = 2;
+    manager->ReleaseRunningLock();
+    manager->ApplyRunningLock();
     manager->OnCallReport(0, nullptr, nullptr, 0);
     manager->OnDataReport(0, nullptr, nullptr, 0);
     manager->OnModemReport(0, nullptr, nullptr, 0);
@@ -291,6 +295,25 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Call_001, Function | MediumTest | Lev
     manager->hrilCall_.clear();
     EXPECT_NE(manager->CloseUnFinishedUssd(0, 0), 0);
     EXPECT_GT(manager->GetMaxSimSlotCount(), 0);
+    manager->RegisterNetworkFuncs(0, nullptr);
+    manager->ApplyRunningLock();
+    manager->ReleaseRunningLock();
+    InitRilAdapter();
+    const struct ReportInfo g_report = { 0 };
+    OnCallReport(0, g_report, nullptr, 0);
+    OnDataReport(0, g_report, nullptr, 0);
+    OnModemReport(0, g_report, nullptr, 0);
+    OnNetworkReport(0, g_report, nullptr, 0);
+    OnSimReport(0, g_report, nullptr, 0);
+    OnSmsReport(0, g_report, nullptr, 0);
+ 
+    manager->OnCallReport(0, &g_report, nullptr, 0);
+    manager->OnDataReport(0, &g_report, nullptr, 0);
+    manager->OnModemReport(0, &g_report, nullptr, 0);
+    manager->OnNetworkReport(0, &g_report, nullptr, 0);
+    manager->OnSimReport(0, &g_report, nullptr, 0);
+    manager->OnSmsReport(0, &g_report, nullptr, 0);
+    InitRilAdapter();
 }
 
 /**
@@ -465,6 +488,103 @@ HWTEST_F(BranchTest, Telephony_HrilManager_Call_005, Function | MediumTest | Lev
     emgInfo.mcc = const_cast<char *>(NUMBER);
     EXPECT_NE(HDF_SUCCESS, call->CallEmergencyNotice(0, err, &emgInfo, 1));
     EXPECT_NE(HDF_SUCCESS, call->CallEmergencyNotice(0, err, &emgInfo, sizeof(HRilEmergencyInfo)));
+}
+
+/**
+ * @tc.number   Telephony_HrilManager_Call_006
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_HrilManager_Call_006, Function | MediumTest | Level2)
+{
+    auto manager = std::make_shared<HRilManager>();
+    manager->SetHrilManagerDestroy();
+    std::unique_ptr<HRilCall> call;
+    manager->hrilCall_.push_back(std::move(call));
+    EXPECT_EQ(true, TestCallInterface(manager));
+    int32_t slotId = 0;
+    HRilUssdNoticeInfo ussdNoticeInfo;
+    ussdNoticeInfo.m = 1;
+    ussdNoticeInfo.str = const_cast<char *>(NUMBER);
+    struct ReportInfo report;
+    report.error = static_cast<HRilErrNumber>(1);
+    report.notifyId = HNOTI_CALL_USSD_REPORT;
+    report.type = HRIL_RESPONSE;
+    OnCallReport(slotId, report, (const uint8_t *)&ussdNoticeInfo, sizeof(HRilUssdNoticeInfo));
+    HRilDataCallResponse dataCallResponse;
+    dataCallResponse.type = const_cast<char *>(NUMBER);
+    dataCallResponse.netPortName = const_cast<char *>(NUMBER);
+    dataCallResponse.address = const_cast<char *>(NUMBER);
+    dataCallResponse.dns = const_cast<char *>(NUMBER);
+    dataCallResponse.dnsSec = const_cast<char *>(NUMBER);
+    dataCallResponse.gateway = const_cast<char *>(NUMBER);
+    dataCallResponse.pCscfPrimAddr = const_cast<char *>(NUMBER);
+    dataCallResponse.pCscfSecAddr = const_cast<char *>(NUMBER);
+    report.notifyId = HNOTI_DATA_PDP_CONTEXT_LIST_UPDATED;
+    OnDataReport(slotId, report, (const uint8_t *)&dataCallResponse, sizeof(HRilDataCallResponse));
+    HRilDsdsMode dsdsMode = HRIL_DSDS_MODE_V2;
+    report.notifyId = HNOTI_MODEM_DSDS_MODE_UPDATED;
+    OnModemReport(slotId, report, (const uint8_t *)&dsdsMode, sizeof(HRilDsdsMode));
+    const char *plmn = NUMBER;
+    report.notifyId = HNOTI_NETWORK_RESIDENT_NETWORK_UPDATED;
+    OnNetworkReport(slotId, report, (const uint8_t *)&plmn, sizeof(*plmn));
+    const uint8_t *responseSim;
+    report.notifyId = HNOTI_SIM_STK_PROACTIVE_NOTIFY;
+    OnSimReport(slotId, report, responseSim, 0);
+    HRilSmsResponse smsResponse;
+    smsResponse.pdu = const_cast<char *>(NUMBER);
+    report.notifyId = HNOTI_SMS_NEW_SMS;
+    OnSmsReport(slotId, report, (const uint8_t *)&smsResponse, sizeof(HRilSmsResponse));
+    InitRilAdapter();
+    report.type = HRIL_RESPONSE;
+    OnCallReport(slotId, report, (const uint8_t *)&ussdNoticeInfo, sizeof(HRilUssdNoticeInfo));
+    OnDataReport(slotId, report, (const uint8_t *)&dataCallResponse, sizeof(HRilDataCallResponse));
+    OnModemReport(slotId, report, (const uint8_t *)&dsdsMode, sizeof(HRilDsdsMode));
+    OnNetworkReport(slotId, report, (const uint8_t *)&plmn, sizeof(*plmn));
+    OnSimReport(slotId, report, responseSim, 0);
+    OnSmsReport(slotId, report, (const uint8_t *)&smsResponse, sizeof(HRilSmsResponse));
+    InitRilAdapter();
+}
+ 
+/**
+ * @tc.number   Telephony_HrilManager_Call_007
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_HrilManager_Call_007, Function | MediumTest | Level2)
+{
+    int32_t slotId = 0;
+    auto manager = std::make_shared<HRilManager>();
+    manager->RegisterCallFuncs(0, nullptr);
+    manager->hrilCall_.clear();
+    std::unique_ptr<HRilCall> call;
+    manager->hrilCall_.push_back(std::move(call));
+    EXPECT_EQ(true, TestCallInterface(manager));
+    ReqDataInfo *requestInfo = manager->CreateHRilRequest(0, 0, 0);
+    manager->ReleaseHRilRequest(0, requestInfo);
+    manager->RegisterCallFuncs(0, nullptr);
+    manager->ApplyRunningLock();
+    manager->ReleaseRunningLock();
+    HRilRegOps(nullptr);
+    ReleaseRilAdapter();
+    OnTimerCallback(nullptr, nullptr, nullptr);
+    EXPECT_EQ(manager->SendRilAck(), 0);
+    manager->hrilCall_.clear();
+    EXPECT_NE(manager->CloseUnFinishedUssd(0, 0), 0);
+    EXPECT_GT(manager->GetMaxSimSlotCount(), 0);
+    manager->RegisterNetworkFuncs(0, nullptr);
+    manager->ApplyRunningLock();
+    manager->ReleaseRunningLock();
+    InitRilAdapter();
+    manager->RegisterNetworkFuncs(0, nullptr);
+    struct ReportInfo report = {0};
+    OnCallReport(slotId, report, nullptr, 0);
+    OnDataReport(slotId, report, nullptr, 0);
+    OnModemReport(slotId, report, nullptr, 0);
+    OnNetworkReport(slotId, report, nullptr, 0);
+    OnSimReport(slotId, report, nullptr, 0);
+    OnSmsReport(slotId, report, nullptr, 0);
+    InitRilAdapter();
 }
 
 /**
@@ -1373,6 +1493,19 @@ HWTEST_F(BranchTest, Telephony_HrilManager_HRilEvent_001, Function | MediumTest 
     event->ProcessPendingList();
     event->SetNormalDestory(true);
     ASSERT_TRUE(event->IsNormalDestory());
+    eventMsg.index = -1;
+    event->RemoveEventMessage(eventMsg);
+    eventMsg.index = 10;
+    event->RemoveEventMessage(eventMsg);
+    eventMsg.index = 5;
+    event->RemoveEventMessage(eventMsg);
+    int32_t index = 0;
+    event->nfds_ = 1;
+    event->EraseListenEvent(eventMsg, index);
+    event->nfds_ = 2;
+    event->EraseListenEvent(eventMsg, index);
+    eventMsg.fd = 2;
+    event->AddEventMessage(eventMsg);
 }
 
 /**
@@ -1421,6 +1554,9 @@ HWTEST_F(BranchTest, Telephony_HrilManager_HRilManager_001, Function | MediumTes
     report.notifyId = HNOTI_SMS_NEW_SMS;
     OnSmsReport(slotId, report, (const uint8_t *)&smsResponse, sizeof(HRilSmsResponse));
     manager->hrilNetwork_.clear();
+    manager->RegisterSimFuncs(0, nullptr);
+    std::unique_ptr<HRilSim> data;
+    manager->hrilSim_.push_back(std::move(data));
     manager->RegisterNetworkFuncs(0, nullptr);
     EXPECT_NE(-1, manager->GetMaxSimSlotCount());
 }
@@ -1519,6 +1655,56 @@ HWTEST_F(BranchTest, Telephony_HrilManager_CreateHRilRequest_002, Function | Med
     HRilCdmaSmsMessageInfo cdmaMessageInfo;
     ASSERT_TRUE(sms->CheckCdmaPduLength(cdmaMessageInfo, str));
     sms->CreateCdmaMessageInfo(cdmaMessageInfo, str);
+}
+
+/**
+ * @tc.number   Telephony_HrilManager_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_HrilManager_001, Function | MediumTest | Level2)
+{
+    auto manager = std::make_shared<HRilManager>();
+    auto event = std::make_unique<HRilEvent>();
+    manager->RegisterSimFuncs(0, nullptr);
+    manager->hrilSms_.clear();
+    std::unique_ptr<HRilSim> data;
+    manager->hrilSim_.push_back(std::move(data));
+    manager->RegisterSimFuncs(0, nullptr);
+    manager->ReleaseHRilRequest(0, nullptr);
+    EXPECT_NE(manager->hrilSim_[0], nullptr);
+}
+ 
+/**
+ * @tc.number   Telephony_HrilManager_HRilEvent_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_HrilManager_HRilEvent_002, Function | MediumTest | Level3)
+{
+    auto event = std::make_unique<HRilEvent>();
+    HRilEventMessage eventMsg = { 0 };
+    event->pendingList_.push_back(eventMsg);
+    EXPECT_EQ(event->HasEventMessageFromPendingList(&eventMsg), true);
+    fd_set *rfds = nullptr;
+    event->ProcessEvents(rfds, 1);
+}
+ 
+/**
+ * @tc.number   Telephony_HrilManager_HrilBase_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_HrilManager_HrilBase_002, Function | MediumTest | Level3)
+{
+    HRilBase base { 0 };
+    char* response[HRILBASE_RESPONSE_SIZE] = { nullptr };
+    char mystring[] = "abc";
+    response[0] = mystring;
+    EXPECT_EQ(HRIL_ERR_GENERIC_FAILURE, base.ConvertHexStringToInt(response, 0, 0));
+    EXPECT_EQ(HRIL_ERR_GENERIC_FAILURE, base.ConvertHexStringToInt(response, 5, 1));
+    EXPECT_EQ(HRIL_INVALID_HEX_CHAR, base.ConvertHexCharToInt('Z'));
+    ASSERT_TRUE(base.ConvertToString(response, "abc"));
 }
 } // namespace Telephony
 } // namespace OHOS
