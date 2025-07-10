@@ -288,7 +288,8 @@ void HRilManager::ReportResponse(std::vector<std::unique_ptr<T>> &subModules, in
     }
     auto iter = requestEventMap_.find(reqInfo->request);
     if (iter != requestEventMap_.end()) {
-        TELEPHONY_LOGI("requestId:%{public}d, event:%{public}s", reqInfo->request, iter->second.c_str());
+        TELEPHONY_LOGI("cytest requestId:%{public}d, event:%{public}s, slotId:%{public}d",
+            reqInfo->request, iter->second.c_str(), slotId);
     } else {
         TELEPHONY_LOGD("requestId:%{public}d", reqInfo->request);
     }
