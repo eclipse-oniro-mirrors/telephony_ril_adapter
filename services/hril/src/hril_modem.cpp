@@ -170,7 +170,6 @@ int32_t HRilModem::GetRadioStateResponse(
 int32_t HRilModem::GetImeiResponse(
     int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    TELEPHONY_LOGE("enter GetImeiResponse");
     std::string imeiResponse = "";
     if ((response == nullptr && responseLen != 0) || (responseLen % sizeof(char)) != 0) {
         TELEPHONY_LOGE("GetImeiResponse:Invalid parameter, responseLen:%{public}zu", responseLen);
@@ -192,8 +191,7 @@ int32_t HRilModem::GetImeiResponse(
 int32_t HRilModem::GetImeiSvResponse(
     int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    TELEPHONY_LOGE("enter GetImeiSvResponse");
-    std::string imeisvResponse = "";
+    std::string imeiSvResponse = "";
     if ((response == nullptr && responseLen != 0) || (responseLen % sizeof(char)) != 0) {
         TELEPHONY_LOGE("GetImeiSvResponse:Invalid parameter, responseLen:%{public}zu", responseLen);
         if (responseInfo.error == HDI::Ril::V1_1::RilErrType::NONE) {
@@ -206,16 +204,15 @@ int32_t HRilModem::GetImeiSvResponse(
             responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_NULL_POINT;
         }
     } else {
-        imeisvResponse = std::string((const char *)response);
+        imeiSvResponse = std::string((const char *)response);
     }
     return Response(
-        responseInfo, &HDI::Ril::V1_3::IRilCallback::GetImeiSvResponse, imeisvResponse);
+        responseInfo, &HDI::Ril::V1_3::IRilCallback::GetImeiSvResponse, imeiSvResponse);
 }
 
 int32_t HRilModem::GetMeidResponse(
     int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    TELEPHONY_LOGE("enter GetMeidResponse");
     std::string meidResponse = "";
     if ((response == nullptr && responseLen != 0) || (responseLen % sizeof(char)) != 0) {
         TELEPHONY_LOGE("GetMeidResponse:Invalid parameter, responseLen:%{public}zu", responseLen);
