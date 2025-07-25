@@ -1694,11 +1694,13 @@ void ReqGetNetworkSelectionMode(const ReqDataInfo *requestInfo)
 static int32_t IntToNetTypeCmd(int32_t value, char *dst, int32_t dstMaxSize)
 {
     int32_t len = MAX_CMD_LENGTH - 1;
-    (void)strcat_s(dst, len, "AT^SYSCFGEX=\"");
     const int32_t MAX_PREFERRED_NET_ENUM = 99;
     const int32_t MIN_CHAR_ARRAY_SIZE = 50;
     const int32_t CONVERT_FAIL = -1;
     const int32_t DECIMAL = 10;
+    if (strcat_s(dst, len, "AT^SYSCFGEX=\"") < 0) {
+        return CONVERT_FAIL;
+    }
     if ((value > MAX_PREFERRED_NET_ENUM) || (value < 0) || (dstMaxSize < MIN_CHAR_ARRAY_SIZE)) {
         return CONVERT_FAIL;
     }
