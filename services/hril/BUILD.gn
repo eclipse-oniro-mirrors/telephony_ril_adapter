@@ -21,6 +21,7 @@ config("ril_hril_config") {
 }
 
 ohos_shared_library("hril") {
+  branch_protector_ret = "pac_ret"
   sources = [
     "$RIL_HRIL/hril_base.cpp",
     "$RIL_HRIL/hril_call.cpp",
@@ -47,7 +48,7 @@ ohos_shared_library("hril") {
 
   deps = [ "$RIL_ADAPTER/interfaces/innerkits:hril_innerkits" ]
 
-  cflags_cc = [ "-fstack-protector-strong" ]
+  cflags_cc = []
 
   external_deps = [
     "bounds_checking_function:libsec_shared",

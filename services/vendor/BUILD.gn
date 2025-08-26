@@ -16,6 +16,7 @@ RIL_ADAPTER = "../.."
 RIL_VENDOR = "$RIL_ADAPTER/services/vendor/src"
 
 ohos_shared_library("ril_vendor") {
+  branch_protector_ret = "pac_ret"
   sources = [
     "$RIL_VENDOR/at_call.c",
     "$RIL_VENDOR/at_data.c",
@@ -37,7 +38,7 @@ ohos_shared_library("ril_vendor") {
   ]
   deps = [ "$RIL_ADAPTER/interfaces/innerkits:hril_innerkits" ]
 
-  cflags_cc = [ "-fstack-protector-strong" ]
+  cflags_cc = []
 
   external_deps = [
     "bounds_checking_function:libsec_shared",
