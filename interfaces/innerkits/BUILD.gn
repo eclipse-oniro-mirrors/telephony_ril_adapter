@@ -34,6 +34,8 @@ config("hril_config") {
 }
 
 ohos_shared_library("hril_innerkits") {
+  branch_protector_ret = "pac_ret"
+
   public_configs = [
     ":hril_config",
     "$RIL_ADAPTER/utils:utils_config",
@@ -44,7 +46,7 @@ ohos_shared_library("hril_innerkits") {
     "LOG_DOMAIN = 0xD001F08",
   ]
 
-  cflags_cc = [ "-fstack-protector-strong" ]
+  cflags_cc = []
 
   external_deps = [
     "c_utils:utils",

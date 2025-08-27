@@ -21,6 +21,8 @@ config("ril_hril_hdf_config") {
 }
 
 ohos_shared_library("hril_hdf") {
+  branch_protector_ret = "pac_ret"
+  
   sources = [ "$HRIL_HDF_ROOT/src/hril_hdf.c" ]
 
   version_script = "$HRIL_HDF_ROOT/libhril_hdf.versionscript"
@@ -34,7 +36,7 @@ ohos_shared_library("hril_hdf") {
     "$RIL_ADAPTER/services/hril:hril",
   ]
 
-  cflags_cc = [ "-fstack-protector-strong" ]
+  cflags_cc = []
 
   external_deps = [
     "bounds_checking_function:libsec_shared",
