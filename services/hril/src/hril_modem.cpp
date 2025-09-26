@@ -158,11 +158,15 @@ int32_t HRilModem::GetRadioStateResponse(
 {
     if ((response == nullptr && responseLen != 0) || (responseLen % sizeof(int32_t)) != 0) {
         TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
-        return HRIL_ERR_INVALID_PARAMETER;
+        if (responseInfo.error == HDI::Ril::V1_1::RilErrType::NONE) {
+            responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_INVALID_RESPONSE;
+        }
     }
     if (response == nullptr) {
         TELEPHONY_LOGE("response is null");
-        return HRIL_ERR_NULL_POINT;
+        if (responseInfo.error == HDI::Ril::V1_1::RilErrType::NONE) {
+            responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_INVALID_RESPONSE;
+        }
     }
     return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::GetRadioStateResponse, *(const int32_t *)response);
 }
@@ -265,11 +269,15 @@ int32_t HRilModem::GetBasebandVersionResponse(
 {
     if ((response == nullptr && responseLen != 0) || (responseLen % sizeof(char)) != 0) {
         TELEPHONY_LOGE("GetBasebandVersionResponse:Invalid parameter, responseLen:%{public}zu", responseLen);
-        return HRIL_ERR_INVALID_PARAMETER;
+        if (responseInfo.error == HDI::Ril::V1_1::RilErrType::NONE) {
+            responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_INVALID_RESPONSE;
+        }
     }
     if (response == nullptr) {
         TELEPHONY_LOGE("response is null");
-        return HRIL_ERR_NULL_POINT;
+        if (responseInfo.error == HDI::Ril::V1_1::RilErrType::NONE) {
+            responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_NULL_POINT;
+        }
     }
     return Response(
         responseInfo, &HDI::Ril::V1_1::IRilCallback::GetBasebandVersionResponse, std::string((const char *)response));
