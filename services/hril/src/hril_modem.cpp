@@ -165,8 +165,9 @@ int32_t HRilModem::GetRadioStateResponse(
     if (response == nullptr) {
         TELEPHONY_LOGE("response is null");
         if (responseInfo.error == HDI::Ril::V1_1::RilErrType::NONE) {
-            responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_INVALID_RESPONSE;
+            responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_NULL_POINT;
         }
+        return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::GetRadioStateResponse, 0);
     }
     return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::GetRadioStateResponse, *(const int32_t *)response);
 }
@@ -278,6 +279,8 @@ int32_t HRilModem::GetBasebandVersionResponse(
         if (responseInfo.error == HDI::Ril::V1_1::RilErrType::NONE) {
             responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_NULL_POINT;
         }
+        return Response(
+            responseInfo, &HDI::Ril::V1_1::IRilCallback::GetBasebandVersionResponse, std::string(""));
     }
     return Response(
         responseInfo, &HDI::Ril::V1_1::IRilCallback::GetBasebandVersionResponse, std::string((const char *)response));
