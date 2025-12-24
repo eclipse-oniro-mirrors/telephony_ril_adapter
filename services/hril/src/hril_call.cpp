@@ -456,7 +456,7 @@ void HRilCall::BuildICallList(
             callInfoExt.number = (curPtr->number == nullptr) ? "" : curPtr->number;
             callInfoExt.type = curPtr->type;
             callInfoExt.alpha = (curPtr->alpha == nullptr) ? "" : curPtr->alpha;
-            callInfoExt.name = curPtr->name;
+            callInfoExt.name = (curPtr->name == nullptr) ? "" : curPtr->name;
             callInfoExt.namePresentation = curPtr->namePresentation;
             callInfoList.calls.push_back(callInfoExt);
         } else {
