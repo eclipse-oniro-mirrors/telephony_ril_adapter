@@ -161,6 +161,8 @@ public:
     int32_t GetRadioProtocol(int32_t slotId, int32_t serialId);
     int32_t SetRadioProtocol(int32_t slotId, int32_t serialId, const HDI::Ril::V1_1::RadioProtocol &radioProtocol);
     int32_t SimOpenLogicalChannel(int32_t slotId, int32_t serialId, const std::string &appID, int32_t p2);
+    int32_t SimOpenLogicalChannelWithPort(int32_t slotId, int32_t serialId, const std::string &appID, int32_t p2,
+        int32_t portIndex);
     int32_t SimCloseLogicalChannel(int32_t slotId, int32_t serialId, int32_t channelId);
     int32_t SimTransmitApduLogicalChannel(
         int32_t slotId, int32_t serialId, const OHOS::HDI::Ril::V1_1::ApduSimIORequestInfo &apduSimIO);

@@ -310,6 +310,11 @@ typedef enum {
     /** Set SIM card power state. */
     HREQ_SIM_SET_SIM_POWER_STATE,
 
+    /**
+     * Opens the logical channel with port of the application protocol data unit (APDU).
+     */
+    HREQ_SIM_OPEN_LOGICAL_CHANNEL_WITH_PORT,
+
     HREQ_DATA_BASE = 300,
 
     /** Sets an apn to initial attach network. */

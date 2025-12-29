@@ -836,6 +836,13 @@ int32_t HRilManager::SimOpenLogicalChannel(int32_t slotId, int32_t serialId, con
     return TaskSchedule(MODULE_HRIL_SIM, hrilSim_[slotId], &HRilSim::SimOpenLogicalChannel, serialId, appID, p2);
 }
 
+int32_t HRilManager::SimOpenLogicalChannelWithPort(int32_t slotId, int32_t serialId, const std::string &appID,
+    int32_t p2, int32_t portIndex)
+{
+    return TaskSchedule(MODULE_HRIL_SIM, hrilSim_[slotId], &HRilSim::SimOpenLogicalChannelWithPort, serialId,
+        appID, p2, portIndex);
+}
+
 int32_t HRilManager::SimCloseLogicalChannel(int32_t slotId, int32_t serialId, int32_t channelId)
 {
     return TaskSchedule(MODULE_HRIL_SIM, hrilSim_[slotId], &HRilSim::SimCloseLogicalChannel, serialId, channelId);

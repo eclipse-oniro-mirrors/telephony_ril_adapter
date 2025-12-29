@@ -425,6 +425,8 @@ typedef struct {
     * @see ReqDataInfo
     */
     void (*SetPrimarySlot)(const ReqDataInfo *requestInfo, int32_t data);
+    void (*SimOpenLogicalChannelWithPort)(const ReqDataInfo *requestInfo, const char *appID, int32_t p2,
+        int32_t portIndex);
 } HRilSimReq;
 #ifdef __cplusplus
 }
