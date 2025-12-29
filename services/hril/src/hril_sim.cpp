@@ -335,12 +335,14 @@ int32_t HRilSim::SimOpenLogicalChannel(int32_t serialId, const std::string &appI
     return ret;
 }
 
-int32_t HRilSim::SimOpenLogicalChannelWithPort(int32_t serialId, const std::string &appID, int32_t p2, int32_t portIndex)
+int32_t HRilSim::SimOpenLogicalChannelWithPort(int32_t serialId, const std::string &appID, int32_t p2,
+    int32_t portIndex)
 {
     char *appIDPoint = nullptr;
     CopyToCharPoint(&appIDPoint, appID);
     int32_t ret = RequestVendor(
-        serialId, HREQ_SIM_OPEN_LOGICAL_CHANNEL_WITH_PORT, simFuncs_, &HRilSimReq::SimOpenLogicalChannelWithPort, appIDPoint, p2, portIndex);
+        serialId, HREQ_SIM_OPEN_LOGICAL_CHANNEL_WITH_PORT, simFuncs_, &HRilSimReq::SimOpenLogicalChannelWithPort,
+            appIDPoint, p2, portIndex);
     SafeFrees(appIDPoint);
     return ret;
 }
