@@ -22,6 +22,7 @@ namespace OHOS {
 namespace Telephony {
 namespace {
 const int32_t HRILOPS_ACTIVE_VERSION = 13;
+const int32_t MAX_LINK_KBPS_SIZE = 100;
 }
 
 HRilData::HRilData(int32_t slotId) : HRilBase(slotId)
@@ -299,6 +300,10 @@ int32_t HRilData::GetLinkBandwidthInfo(int32_t serialId, int32_t cid)
 int32_t HRilData::SetLinkBandwidthReportingRule(
     int32_t serialId, const OHOS::HDI::Ril::V1_1::DataLinkBandwidthReportingRule &linkBandwidthRule)
 {
+    if (linkBandwidthRule.maximumUplinkKbpsSize > MAX_LINK_KBPS_SIZE ||
+        linkBandwidthRule.maximumDownlinkKbpsSize > MAX_LINK_KBPS_SIZE) {
+        return HRIL_ERR_INVALID_PARAMETER;
+    }
     HRilLinkBandwidthReportingRule hLinkBandwidthRule;
     hLinkBandwidthRule.rat = (RatType)linkBandwidthRule.rat;
     hLinkBandwidthRule.delayMs = linkBandwidthRule.delayMs;
@@ -349,7 +354,7 @@ int32_t HRilData::DeactivatePdpContextResponse(
 int32_t HRilData::ActivatePdpContextResponse(
     int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    if ((response == nullptr && responseLen != 0) || (responseLen % sizeof(HRilDataCallResponse)) != 0) {
+    if (response == nullptr || responseLen == 0 || (responseLen % sizeof(HRilDataCallResponse)) != 0) {
         TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
         return HRIL_ERR_INVALID_PARAMETER;
     }
@@ -411,7 +416,7 @@ int32_t HRilData::PdpContextListUpdated(
 int32_t HRilData::DataLinkCapabilityUpdated(
     int32_t notifyType, const HRilErrNumber error, const void *response, size_t responseLen)
 {
-    if ((response == nullptr) || (responseLen % sizeof(HRilDataLinkCapability)) != 0) {
+    if ((response == nullptr) || (responseLen % sizeof(HRilDataLinkCapability)) != 0 || responseLen == 0) {
         TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
         return HRIL_ERR_INVALID_PARAMETER;
     }
@@ -427,7 +432,7 @@ int32_t HRilData::DataLinkCapabilityUpdated(
 int32_t HRilData::GetLinkCapabilityResponse(
     int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    if ((response == nullptr && responseLen != 0) || (responseLen % sizeof(HRilDataLinkCapability)) != 0) {
+    if (response == nullptr || responseLen == 0 || (responseLen % sizeof(HRilDataLinkCapability)) != 0) {
         TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
         return HRIL_ERR_INVALID_PARAMETER;
     }
@@ -445,7 +450,7 @@ int32_t HRilData::GetLinkCapabilityResponse(
 int32_t HRilData::GetLinkBandwidthInfoResponse(
     int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    if ((response == nullptr && responseLen != 0) || (responseLen % sizeof(HRilLinkBandwidthInfo)) != 0) {
+    if (response == nullptr || responseLen == 0 || (responseLen % sizeof(HRilLinkBandwidthInfo)) != 0) {
         TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
         return HRIL_ERR_INVALID_PARAMETER;
     }
