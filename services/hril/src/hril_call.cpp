@@ -527,7 +527,8 @@ int32_t HRilCall::HoldCallResponse(
 int32_t HRilCall::GetClipResponse(
     int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    if ((response == nullptr && responseLen != 0) || (responseLen % sizeof(HRilGetClipResult)) != 0) {
+    if ((response == nullptr && responseLen != 0) ||
+        (response != nullptr && responseLen != sizeof(HRilGetClipResult))) {
         TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
         return HRIL_ERR_INVALID_PARAMETER;
     }
@@ -580,7 +581,8 @@ int32_t HRilCall::CallSupplementResponse(
 int32_t HRilCall::GetCallWaitingResponse(
     int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    if ((response == nullptr && responseLen != 0) || (responseLen % sizeof(HRilCallWaitResult)) != 0) {
+    if ((response == nullptr && responseLen != 0) ||
+        (response != nullptr && responseLen != sizeof(HRilCallWaitResult))) {
         TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
         return HRIL_ERR_INVALID_PARAMETER;
     }
@@ -648,7 +650,8 @@ int32_t HRilCall::SetCallTransferInfoResponse(
 int32_t HRilCall::GetClirResponse(
     int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    if ((response == nullptr && responseLen != 0) || (responseLen % sizeof(HRilGetCallClirResult)) != 0) {
+    if ((response == nullptr && responseLen != 0) ||
+        (response != nullptr && responseLen != sizeof(HRilGetCallClirResult))) {
         TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
         return HRIL_ERR_INVALID_PARAMETER;
     }
@@ -671,7 +674,8 @@ int32_t HRilCall::SetClirResponse(
 int32_t HRilCall::GetCallRestrictionResponse(
     int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    if ((response == nullptr && responseLen != 0) || (responseLen % sizeof(HRilCallRestrictionResult)) != 0) {
+    if ((response == nullptr && responseLen != 0) ||
+        (response != nullptr && responseLen != sizeof(HRilCallRestrictionResult))) {
         TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
         return HRIL_ERR_INVALID_PARAMETER;
     }
@@ -718,7 +722,7 @@ int32_t HRilCall::StopDtmfResponse(
 int32_t HRilCall::GetCallPreferenceModeResponse(
     int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    if ((response == nullptr && responseLen != 0) || (responseLen % sizeof(int32_t)) != 0) {
+    if ((response == nullptr && responseLen != 0) || (response != nullptr && responseLen != sizeof(int32_t))) {
         TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
         return HRIL_ERR_INVALID_PARAMETER;
     }
@@ -744,7 +748,7 @@ int32_t HRilCall::SetUssdResponse(
 int32_t HRilCall::GetMuteResponse(
     int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    if ((response == nullptr && responseLen != 0) || (responseLen % sizeof(int32_t)) != 0) {
+    if ((response == nullptr && responseLen != 0) || (response != nullptr && responseLen != sizeof(int32_t))) {
         TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
         return HRIL_ERR_INVALID_PARAMETER;
     }
@@ -764,7 +768,7 @@ int32_t HRilCall::SetMuteResponse(
 int32_t HRilCall::GetUssdResponse(
     int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    if ((response == nullptr && responseLen != 0) || (responseLen % sizeof(int32_t)) != 0) {
+    if ((response == nullptr && responseLen != 0) || (response != nullptr && responseLen != sizeof(int32_t))) {
         TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
         return HRIL_ERR_INVALID_PARAMETER;
     }
@@ -778,7 +782,7 @@ int32_t HRilCall::GetUssdResponse(
 int32_t HRilCall::GetCallFailReasonResponse(
     int32_t requestNum, HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const void *response, size_t responseLen)
 {
-    if ((response == nullptr && responseLen != 0) || (responseLen % sizeof(int32_t)) != 0) {
+    if ((response == nullptr && responseLen != 0) || (response != nullptr && responseLen != sizeof(int32_t))) {
         TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
         return HRIL_ERR_INVALID_PARAMETER;
     }
@@ -844,21 +848,21 @@ void HRilCall::CopyToHRilEmergencyInfoArray(
         auto call = calls.at(i);
         emergencyInfoCalls[i].index = call.index;
         emergencyInfoCalls[i].total = call.total;
+        emergencyInfoCalls[i].eccNum = nullptr;
         char *eccNum = new char[call.eccNum.size() + 1];
         if (strcpy_s(eccNum, call.eccNum.size() + 1, call.eccNum.c_str()) == EOK) {
             emergencyInfoCalls[i].eccNum = eccNum;
         } else {
             delete[] eccNum;
-            eccNum = nullptr;
         }
         emergencyInfoCalls[i].category = static_cast<int32_t>(call.eccType);
         emergencyInfoCalls[i].simpresent = call.simpresent;
+        emergencyInfoCalls[i].mcc = nullptr;
         char *mcc = new char[call.mcc.size() + 1];
         if (strcpy_s(mcc, call.mcc.size() + 1, call.mcc.c_str()) == EOK) {
             emergencyInfoCalls[i].mcc = mcc;
         } else {
             delete[] mcc;
-            mcc = nullptr;
         }
         emergencyInfoCalls[i].abnormalService = call.abnormalService;
     }
@@ -891,7 +895,7 @@ int32_t HRilCall::CallStateUpdated(
 int32_t HRilCall::CallUssdNotice(
     int32_t notifyType, const HRilErrNumber error, const void *response, size_t responseLen)
 {
-    if ((response == nullptr) || (responseLen % sizeof(HRilUssdNoticeInfo)) != 0) {
+    if (response == nullptr || responseLen != sizeof(HRilUssdNoticeInfo)) {
         TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
         return HRIL_ERR_INVALID_PARAMETER;
     }
@@ -904,7 +908,7 @@ int32_t HRilCall::CallUssdNotice(
 
 int32_t HRilCall::CallSsNotice(int32_t notifyType, const HRilErrNumber error, const void *response, size_t responseLen)
 {
-    if ((response == nullptr) || (responseLen % sizeof(HRilSsNoticeInfo)) != 0) {
+    if (response == nullptr || responseLen != sizeof(HRilSsNoticeInfo)) {
         TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
         return HRIL_ERR_INVALID_PARAMETER;
     }
@@ -920,7 +924,7 @@ int32_t HRilCall::CallSsNotice(int32_t notifyType, const HRilErrNumber error, co
 int32_t HRilCall::CallSrvccStatusNotice(
     int32_t notifyType, HRilErrNumber error, const void *response, size_t responseLen)
 {
-    if ((response == nullptr) || (responseLen % sizeof(HRilCallSrvccStatus)) != 0) {
+    if (response == nullptr || responseLen != sizeof(HRilCallSrvccStatus)) {
         TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
         return HRIL_ERR_INVALID_PARAMETER;
     }
@@ -933,7 +937,7 @@ int32_t HRilCall::CallSrvccStatusNotice(
 int32_t HRilCall::CallRingbackVoiceNotice(
     int32_t notifyType, HRilErrNumber error, const void *response, size_t responseLen)
 {
-    if ((response == nullptr) || (responseLen % sizeof(int32_t)) != 0) {
+    if (response == nullptr || responseLen != sizeof(int32_t)) {
         TELEPHONY_LOGE("Invalid parameter, responseLen:%{public}zu", responseLen);
         return HRIL_ERR_INVALID_PARAMETER;
     }
