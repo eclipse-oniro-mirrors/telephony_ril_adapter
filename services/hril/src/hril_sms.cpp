@@ -210,7 +210,7 @@ int32_t HRilSms::UpdateSimMessage(int32_t serialId, const OHOS::HDI::Ril::V1_1::
 
 int32_t HRilSms::SetSmscAddr(int32_t serialId, const OHOS::HDI::Ril::V1_1::ServiceCenterAddress &serCenterAddress)
 {
-    HRilServiceCenterAddress address;
+    HRilServiceCenterAddress address = {};
     size_t len = 0;
     len = strlen(serCenterAddress.address.c_str()) + 1;
     address.tosca = serCenterAddress.tosca;
@@ -739,23 +739,28 @@ int32_t HRilSms::NewSmsStoredOnSimNotify(
 int32_t HRilSms::NewSmsNotify(int32_t indType, const HRilErrNumber error, const void *response, size_t responseLen)
 {
     HRilSmsResponse *smsResponse = nullptr;
-    if (response == nullptr || responseLen == 0) {
+    if (response == nullptr || responseLen < sizeof(HRilSmsResponse)) {
         TELEPHONY_LOGE("NewSmsNotify: invalid response");
         return HDF_FAILURE;
     } else {
         smsResponse = (HRilSmsResponse *)response;
     }
-    uint8_t *bytes = ConvertHexStringToBytes(smsResponse->pdu, responseLen);
+    if (smsResponse->pdu == nullptr) {
+        TELEPHONY_LOGE("NewSmsNotify: smsResponse->pdu is nullptr");
+        return HRIL_ERR_GENERIC_FAILURE;
+    }
+    size_t pduStrLen = strlen(smsResponse->pdu);
+    uint8_t *bytes = ConvertHexStringToBytes(smsResponse->pdu, pduStrLen);
     if (bytes == nullptr) {
         TELEPHONY_LOGE("NewSmsNotify: ConvertHexStringToBytes failed");
         return HRIL_ERR_GENERIC_FAILURE;
     }
     HDI::Ril::V1_1::SmsMessageInfo smsMessageInfo;
-    const size_t NEW_SMS_SIZE = responseLen / HEX_WIDTH;
+    const size_t NEW_SMS_SIZE = pduStrLen / HEX_WIDTH;
     smsMessageInfo.size = NEW_SMS_SIZE;
     smsMessageInfo.indicationType = indType;
     uint8_t *temp = bytes;
-    for (int32_t i = 0; i < static_cast<int32_t>(smsMessageInfo.size); i++) {
+    for (int32_t i = 0; i < NEW_SMS_SIZE; i++) {
         smsMessageInfo.pdu.push_back(*temp);
         temp++;
     }
@@ -766,7 +771,7 @@ int32_t HRilSms::NewSmsNotify(int32_t indType, const HRilErrNumber error, const 
 int32_t HRilSms::NewCdmaSmsNotify(int32_t indType, const HRilErrNumber error, const void *response, size_t responseLen)
 {
     HRilSmsResponse *message = nullptr;
-    if (response == nullptr || responseLen == 0) {
+    if (response == nullptr || responseLen < sizeof(HRilSmsResponse)) {
         TELEPHONY_LOGE("invalid response");
         return HRIL_ERR_GENERIC_FAILURE;
     } else {
@@ -811,7 +816,7 @@ bool HRilSms::IsSmsNotification(uint32_t code)
 int32_t HRilSms::RequestWithInts(int32_t **p, ReqDataInfo *requestInfo, int32_t argCount, ...)
 {
     size_t len = sizeof(int32_t);
-    if (len <= 0 || argCount <= 0) {
+    if (p == nullptr || requestInfo == nullptr || argCount <= 0) {
         return false;
     }
     *p = static_cast<int32_t *>(malloc(argCount * len));
