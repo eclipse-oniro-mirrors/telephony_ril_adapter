@@ -49,7 +49,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     report.notifyId = HNOTI_MODEM_RADIO_STATE_UPDATED;
     report.type = HRIL_NOTIFICATION;
     
-    // OnModemReport expects a pointer to the payload. 
+    // OnModemReport expects a pointer to the payload.
     // RadioStateUpdated expects an int32_t pointer.
     HRilManager::GetInstance().OnModemReport(slotId, &report, (const uint8_t *)&response, sizeof(int32_t));
     return;
