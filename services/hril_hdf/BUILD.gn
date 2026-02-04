@@ -51,6 +51,12 @@ ohos_shared_library("hril_hdf") {
     "LOG_DOMAIN = 0xD001F08",
   ]
 
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   install_images = [ chipset_base_dir ]
   part_name = "ril_adapter"
   subsystem_name = "telephony"
