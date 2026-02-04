@@ -47,6 +47,12 @@ ohos_shared_library("ril_vendor") {
     "init:libbegetutil",
   ]
 
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    cfi_no_nvcall = true
+  }
+
   install_images = [ chipset_base_dir ]
   part_name = "ril_adapter"
   subsystem_name = "telephony"

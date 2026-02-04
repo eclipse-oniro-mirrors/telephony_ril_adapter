@@ -55,6 +55,12 @@ ohos_shared_library("hril_innerkits") {
 
   install_images = [ chipset_base_dir ]
 
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    cfi_no_nvcall = true
+  }
+
   part_name = "ril_adapter"
   subsystem_name = "telephony"
 }
