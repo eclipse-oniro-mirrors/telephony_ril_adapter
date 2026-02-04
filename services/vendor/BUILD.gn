@@ -50,7 +50,7 @@ ohos_shared_library("ril_vendor") {
   sanitize = {
     cfi = true
     cfi_cross_dso = true
-    debug = false
+    cfi_no_nvcall = true
   }
 
   install_images = [ chipset_base_dir ]
