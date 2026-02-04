@@ -58,7 +58,7 @@ ohos_shared_library("hril_innerkits") {
   sanitize = {
     cfi = true
     cfi_cross_dso = true
-    debug = false
+    cfi_no_nvcall = true
   }
 
   part_name = "ril_adapter"
