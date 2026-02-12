@@ -2057,6 +2057,9 @@ int32_t FillServingCellSsbId(const char *str, NrCellSsbIdsVendor *nrSsbIdInfo)
     int32_t tempData = 0;
     const int32_t SCELL_SSB_LIST = 8;
     char *tempStr = (char *)str;
+    if (nrSsbIdInfo == NULL || nrSsbIdInfo->sCellSsbList == NULL) {
+        return HRIL_ERR_INVALID_RESPONSE;
+    }
     (void)memset_s(nrSsbIdInfo->sCellSsbList, sizeof(SsbIdInfoVendor) * SCELL_SSB_LIST, 0,
         sizeof(SsbIdInfoVendor) * SCELL_SSB_LIST);
     for (int32_t i = 0; i < SCELL_SSB_LIST; i++) {
