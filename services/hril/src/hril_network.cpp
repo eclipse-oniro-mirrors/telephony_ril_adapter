@@ -28,7 +28,7 @@ enum class NetworkParameter : int32_t {
 };
 const int64_t NANO_TO_SECOND = 1000000000;
 const int32_t RESP_NUM = 3;
-const int32_t ITEMNUM_MAX = 20;
+const int32_t ITEMNUM_MAX = 100;
 
 HRilNetwork::HRilNetwork(int32_t slotId) : HRilBase(slotId)
 {
