@@ -1988,7 +1988,7 @@ void NotifyNetWorkTime(int32_t slotId)
         return;
     }
     size_t len = strlen(line) - 1;
-    if (len <= TIME_VALUE_OFFSET) {
+    if (len <= TIME_VALUE_OFFSET || len > TIME_VALUE_LEN + TIME_VALUE_OFFSET) {
         TELEPHONY_LOGE("invalid len!");
         return;
     }
