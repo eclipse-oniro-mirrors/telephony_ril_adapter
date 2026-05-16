@@ -1394,7 +1394,7 @@ static uint8_t FcpFileDescriptorQuery(uint8_t *fcpByte, uint16_t fcpLen, UsimFil
         return FALSE;
     }
     uint8_t valueLen = fcpByte[1];
-    if (valueLen + 2 > fcpLen ) {
+    if (valueLen + 2 > fcpLen) {  //2：tag + len
         return FALSE;
     }
     UsimFileDescriptor *queryPtr = filledStructPtr;
@@ -1433,7 +1433,7 @@ static uint8_t FcpFileIdentifierQuery(uint8_t *fcpByte, uint16_t fcpLen, UsimFil
         return FALSE;
     }
     uint8_t valueLen = fcpByte[1];
-    if (valueLen + 2 > fcpLen ) {
+    if (valueLen + 2 > fcpLen) {  //2：tag + len
         return FALSE;
     }
     UsimFileIdentifier *queryPtr = (UsimFileIdentifier *)filledStructPtr;
