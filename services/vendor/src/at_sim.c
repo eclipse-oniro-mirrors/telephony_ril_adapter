@@ -21,6 +21,38 @@
 #include "vendor_adapter.h"
 #include "vendor_report.h"
 
+typedef enum {
+    FCP_FILE_DES_T = 0x82,
+    FCP_FILE_ID_T = 0x83,
+} UsimFcpTag;
+
+typedef struct {
+    uint8_t fd;
+    uint8_t dataCoding;
+    uint16_t recLen;
+    uint8_t numRec;
+    uint16_t dataSize;
+} UsimFileDescriptor;
+
+typedef struct {
+    uint16_t fileId;
+} UsimFileIdentifier;
+
+static uint8_t *ConvertByteArrayToHexString(uint8_t *byteArray, int byteArrayLen);
+static void ConvertHexStringToByteArray(uint8_t *originHexString, int responseLen, uint8_t *byteArray,
+    int fcpLen);
+static void ConvertUsimFcpToSimRsp(uint8_t **simResponse);
+static void CreateSimRspByte(uint8_t simRspByte[], int responseLen, UsimFileIdentifier *fId,
+    UsimFileDescriptor *fDescriptor);
+static uint8_t FcpFileDescriptorQuery(uint8_t *fcpByte, uint16_t fcpLen, UsimFileDescriptor *filledStructPtr);
+static uint8_t FcpFileIdentifierQuery(uint8_t *fcpByte, uint16_t fcpLen, UsimFileIdentifier *filledStructPtr);
+static uint8_t FcpTlvSearchTag(uint8_t *dataPtr, uint16_t len, UsimFcpTag tag, uint8_t **outPtr);
+static uint8_t IsCyclicFile(uint8_t fd);
+static uint8_t IsDedicatedFile(uint8_t fd);
+static uint8_t IsLinearFixedFile(uint8_t fd);
+static uint8_t IsTransparentFile(uint8_t fd);
+static uint8_t ToByte(char c);
+
 static const int32_t ERR = -1;
 
 static int32_t GetSimType(void)
@@ -350,7 +382,7 @@ void ReqGetSimIO(const ReqDataInfo *requestInfo, const HRilSimIO *data, size_t d
         HandlerSimIOResult(pResponse, NULL, requestInfo, pLine, &ret);
         return;
     }
-    if (GetSimType() == HRIL_SIM_TYPE_USIM && pSim->command == CMD_GET_RESPONSE) {
+    if (GetSimType() == HRIL_SIM_TYPE_USIM && pSim->command == CMD_GET_RESPONSE && simResponse.response != NULL) {
         ConvertUsimFcpToSimRsp((unsigned char **)&(simResponse.response));
     }
     struct ReportInfo reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
@@ -1255,9 +1287,12 @@ void ReqSendSimMatchedOperatorInfo(const ReqDataInfo *requestInfo, HRilNcfgOpera
     OnSimReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
 }
 
-void ConvertUsimFcpToSimRsp(uint8_t **simResponse)
+static void ConvertUsimFcpToSimRsp(uint8_t **simResponse)
 {
     uint16_t fcpLen = strlen((char *)*simResponse) / HALF_LEN;
+    if (fcpLen > GET_RESPONSE_EF_SIZE_BYTES) {
+        return;
+    }
     uint8_t *fcpByte = malloc(fcpLen);
     UsimFileDescriptor fDescriptor = { 0 };
     UsimFileIdentifier fId = { 0 };
@@ -1294,7 +1329,8 @@ void ConvertUsimFcpToSimRsp(uint8_t **simResponse)
     free(fcpByte);
 }
 
-void CreateSimRspByte(uint8_t simRspByte[], int responseLen, UsimFileIdentifier *fId, UsimFileDescriptor *fDescriptor)
+static void CreateSimRspByte(uint8_t simRspByte[], int responseLen, UsimFileIdentifier *fId,
+    UsimFileDescriptor *fDescriptor)
 {
     if (responseLen < RESPONSE_DATA_RECORD_LENGTH + 1) {
         TELEPHONY_LOGE("simRspByte size error");
@@ -1328,7 +1364,7 @@ void CreateSimRspByte(uint8_t simRspByte[], int responseLen, UsimFileIdentifier 
     }
 }
 
-uint8_t FcpTlvSearchTag(uint8_t *dataPtr, uint16_t len, UsimFcpTag tag, uint8_t **outPtr)
+static uint8_t FcpTlvSearchTag(uint8_t *dataPtr, uint16_t len, UsimFcpTag tag, uint8_t **outPtr)
 {
     uint8_t tagLen = 0;
     uint16_t lenVar = len;
@@ -1338,35 +1374,42 @@ uint8_t FcpTlvSearchTag(uint8_t *dataPtr, uint16_t len, UsimFcpTag tag, uint8_t 
             *outPtr += HALF_LEN;
             return *(*outPtr - 1);
         }
+        if (tagLen > lenVar) {
+            break;
+        }
         lenVar -= tagLen;
     }
     *outPtr = NULL;
-    return FALSE;
+    return 0;
 }
 
-uint8_t FcpFileDescriptorQuery(uint8_t *fcpByte, uint16_t fcpLen, UsimFileDescriptor *filledStructPtr)
+static uint8_t FcpFileDescriptorQuery(uint8_t *fcpByte, uint16_t fcpLen, UsimFileDescriptor *filledStructPtr)
 {
     if (fcpByte == NULL || fcpLen < HALF_LEN + 1) {
         TELEPHONY_LOGE("fcpByte size error");
         return FALSE;
     }
-    uint8_t valueLen = fcpByte[1];
-    uint8_t *dataPtr = &fcpByte[HALF_LEN];
     if (fcpByte[0] != FCP_TEMP_T) {
         TELEPHONY_LOGE("fcpByte data error");
         return FALSE;
     }
-    uint8_t resultLen = 0;
-    uint8_t *outPtr = NULL;
+    uint8_t valueLen = fcpByte[1];
+    if (valueLen + 2 > fcpLen ) {
+        return FALSE;
+    }
     UsimFileDescriptor *queryPtr = filledStructPtr;
-    resultLen = FcpTlvSearchTag(dataPtr, valueLen, FCP_FILE_DES_T, &outPtr);
+    if (queryPtr == NULL) {
+        return FALSE;
+    }
+
+    uint8_t *outPtr = NULL;
+    uint8_t *dataPtr = &fcpByte[HALF_LEN];
+    uint8_t resultLen = FcpTlvSearchTag(dataPtr, valueLen, FCP_FILE_DES_T, &outPtr);
     if (!((outPtr != NULL) && ((resultLen == HALF_LEN) || (resultLen == FIVE_LEN)))) {
         TELEPHONY_LOGE("resultLen value error");
         return FALSE;
     }
-    if (queryPtr == NULL) {
-        return FALSE;
-    }
+
     queryPtr->fd = outPtr[0];
     queryPtr->dataCoding = outPtr[1];
     if (resultLen == FIVE_LEN) {
@@ -1379,25 +1422,28 @@ uint8_t FcpFileDescriptorQuery(uint8_t *fcpByte, uint16_t fcpLen, UsimFileDescri
     return TRUE;
 }
 
-uint8_t FcpFileIdentifierQuery(uint8_t *fcpByte, uint16_t fcpLen, UsimFileIdentifier *filledStructPtr)
+static uint8_t FcpFileIdentifierQuery(uint8_t *fcpByte, uint16_t fcpLen, UsimFileIdentifier *filledStructPtr)
 {
     if (fcpByte == NULL || fcpLen < HALF_LEN + 1) {
         TELEPHONY_LOGE("fcpByte size error");
         return FALSE;
     }
-    uint8_t valueLen = fcpByte[1];
-    uint8_t *dataPtr = &fcpByte[HALF_LEN];
     if (fcpByte[0] != FCP_TEMP_T) {
         TELEPHONY_LOGE("fcpByte data error");
         return FALSE;
     }
-    uint8_t resultLen = 0;
-    uint8_t *outPtr = NULL;
+    uint8_t valueLen = fcpByte[1];
+    if (valueLen + 2 > fcpLen ) {
+        return FALSE;
+    }
     UsimFileIdentifier *queryPtr = (UsimFileIdentifier *)filledStructPtr;
     if (queryPtr == NULL) {
         return FALSE;
     }
-    resultLen = FcpTlvSearchTag(dataPtr, valueLen, FCP_FILE_ID_T, &outPtr);
+
+    uint8_t *outPtr = NULL;
+    uint8_t *dataPtr = &fcpByte[HALF_LEN];
+    uint8_t resultLen = FcpTlvSearchTag(dataPtr, valueLen, FCP_FILE_ID_T, &outPtr);
     if (outPtr == NULL) {
         queryPtr->fileId = 0;
         return FALSE;
@@ -1410,27 +1456,28 @@ uint8_t FcpFileIdentifierQuery(uint8_t *fcpByte, uint16_t fcpLen, UsimFileIdenti
     return TRUE;
 }
 
-uint8_t IsCyclicFile(uint8_t fd)
+static uint8_t IsCyclicFile(uint8_t fd)
 {
     return (0x07 & (fd)) == 0x06;
 }
 
-uint8_t IsDedicatedFile(uint8_t fd)
+static uint8_t IsDedicatedFile(uint8_t fd)
 {
     return (0x38 & (fd)) == 0x38;
 }
 
-uint8_t IsLinearFixedFile(uint8_t fd)
+static uint8_t IsLinearFixedFile(uint8_t fd)
 {
     return (0x07 & (fd)) == 0x02;
 }
 
-uint8_t IsTransparentFile(uint8_t fd)
+static uint8_t IsTransparentFile(uint8_t fd)
 {
     return (0x07 & (fd)) == 0x01;
 }
 
-void ConvertHexStringToByteArray(uint8_t *originHexString, int responseLen, uint8_t *byteArray, int fcpLen)
+static void ConvertHexStringToByteArray(uint8_t *originHexString, int responseLen, uint8_t *byteArray,
+    int fcpLen)
 {
     if (responseLen <= 0 || fcpLen <= 0) {
         TELEPHONY_LOGE("originHexString is error, size=%{public}d", responseLen);
@@ -1445,7 +1492,7 @@ void ConvertHexStringToByteArray(uint8_t *originHexString, int responseLen, uint
     }
 }
 
-uint8_t *ConvertByteArrayToHexString(uint8_t *byteArray, int byteArrayLen)
+static uint8_t *ConvertByteArrayToHexString(uint8_t *byteArray, int byteArrayLen)
 {
     uint8_t *buf = malloc(byteArrayLen * HALF_LEN + 1);
     if (buf == NULL) {
@@ -1464,7 +1511,7 @@ uint8_t *ConvertByteArrayToHexString(uint8_t *byteArray, int byteArrayLen)
     return buf;
 }
 
-uint8_t ToByte(char c)
+static uint8_t ToByte(char c)
 {
     if (c >= '0' && c <= '9') {
         return (c - '0');

@@ -54,35 +54,6 @@
 #define TYPE_EF 4
 #define VALID_FILE_STATUS 0x01
 
-typedef enum {
-    FCP_FILE_DES_T = 0x82,
-    FCP_FILE_ID_T = 0x83,
-} UsimFcpTag;
-
-typedef struct {
-    uint8_t fd;
-    uint8_t dataCoding;
-    uint16_t recLen;
-    uint8_t numRec;
-    uint16_t dataSize;
-} UsimFileDescriptor;
-
-
-typedef struct {
-    uint16_t fileId;
-} UsimFileIdentifier;
-
-uint8_t *ConvertByteArrayToHexString(uint8_t *byteArray, int byteArrayLen);
-void ConvertHexStringToByteArray(uint8_t *originHexString, int responseLen, uint8_t *byteArray, int fcpLen);
-void ConvertUsimFcpToSimRsp(uint8_t **simResponse);
-void CreateSimRspByte(uint8_t simRspByte[], int responseLen, UsimFileIdentifier *fId, UsimFileDescriptor *fDescriptor);
-uint8_t FcpFileDescriptorQuery(uint8_t *fcpByte, uint16_t fcpLen, UsimFileDescriptor *filledStructPtr);
-uint8_t FcpFileIdentifierQuery(uint8_t *fcpByte, uint16_t fcpLen, UsimFileIdentifier *filledStructPtr);
-uint8_t FcpTlvSearchTag(uint8_t *dataPtr, uint16_t len, UsimFcpTag tag, uint8_t **outPtr);
-uint8_t IsCyclicFile(uint8_t fd);
-uint8_t IsDedicatedFile(uint8_t fd);
-uint8_t IsLinearFixedFile(uint8_t fd);
-uint8_t IsTransparentFile(uint8_t fd);
 void ReqGetSimStatus(const ReqDataInfo *requestInfo);
 void ReqGetSimIO(const ReqDataInfo *requestInfo, const HRilSimIO *data, size_t dataLen);
 void ReqGetSimImsi(const ReqDataInfo *requestInfo);
@@ -109,5 +80,4 @@ void ReqSimTransmitApduLogicalChannel(const ReqDataInfo *requestInfo, HRilApduSi
 void ReqSimAuthentication(const ReqDataInfo *requestInfo, HRilSimAuthenticationRequestInfo *data, size_t dataLen);
 void ReqUnlockSimLock(const ReqDataInfo *requestInfo, int32_t lockType, const char *password);
 void ReqSendSimMatchedOperatorInfo(const ReqDataInfo *requestInfo, HRilNcfgOperatorInfo *data, size_t dataLen);
-uint8_t ToByte(char c);
 #endif // OHOS_AT_SIM_H
