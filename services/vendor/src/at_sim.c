@@ -38,8 +38,8 @@ typedef struct {
     uint16_t fileId;
 } UsimFileIdentifier;
 
-static uint8_t *ConvertByteArrayToHexString(uint8_t *byteArray, int byteArrayLen);
-static void ConvertHexStringToByteArray(uint8_t *originHexString, int responseLen, uint8_t *byteArray,
+static uint8_t *ConvertByteArrayToHexString(const uint8_t *byteArray, int byteArrayLen);
+static void ConvertHexStringToByteArray(const uint8_t *originHexString, int responseLen, uint8_t *byteArray,
     int fcpLen);
 static void ConvertUsimFcpToSimRsp(uint8_t **simResponse);
 static void CreateSimRspByte(uint8_t simRspByte[], int responseLen, UsimFileIdentifier *fId,
@@ -1394,7 +1394,7 @@ static uint8_t FcpFileDescriptorQuery(uint8_t *fcpByte, uint16_t fcpLen, UsimFil
         return FALSE;
     }
     uint8_t valueLen = fcpByte[1];
-    if (valueLen + 2 > fcpLen) {  //2：tag + len
+    if (valueLen + 2 > fcpLen) {  //2: tag + len
         return FALSE;
     }
     UsimFileDescriptor *queryPtr = filledStructPtr;
@@ -1433,7 +1433,7 @@ static uint8_t FcpFileIdentifierQuery(uint8_t *fcpByte, uint16_t fcpLen, UsimFil
         return FALSE;
     }
     uint8_t valueLen = fcpByte[1];
-    if (valueLen + 2 > fcpLen) {  //2：tag + len
+    if (valueLen + 2 > fcpLen) {  //2: tag + len
         return FALSE;
     }
     UsimFileIdentifier *queryPtr = (UsimFileIdentifier *)filledStructPtr;
@@ -1476,7 +1476,7 @@ static uint8_t IsTransparentFile(uint8_t fd)
     return (0x07 & (fd)) == 0x01;
 }
 
-static void ConvertHexStringToByteArray(uint8_t *originHexString, int responseLen, uint8_t *byteArray,
+static void ConvertHexStringToByteArray(const uint8_t *originHexString, int responseLen, uint8_t *byteArray,
     int fcpLen)
 {
     if (responseLen <= 0 || fcpLen <= 0) {
@@ -1492,7 +1492,7 @@ static void ConvertHexStringToByteArray(uint8_t *originHexString, int responseLe
     }
 }
 
-static uint8_t *ConvertByteArrayToHexString(uint8_t *byteArray, int byteArrayLen)
+static uint8_t *ConvertByteArrayToHexString(const uint8_t *byteArray, int byteArrayLen)
 {
     uint8_t *buf = malloc(byteArrayLen * HALF_LEN + 1);
     if (buf == NULL) {
