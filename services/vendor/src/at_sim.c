@@ -1424,7 +1424,7 @@ static uint8_t FcpFileDescriptorQuery(uint8_t *fcpByte, uint16_t fcpLen, UsimFil
 
 static uint8_t FcpFileIdentifierQuery(uint8_t *fcpByte, uint16_t fcpLen, UsimFileIdentifier *filledStructPtr)
 {
-    if (fcpByte == NULL || fcpLen < HALF_LEN + 1) {
+    if (fcpByte == NULL || fcpLen < 3) {// 3: HALF_LEN + l
         TELEPHONY_LOGE("fcpByte size error");
         return FALSE;
     }
