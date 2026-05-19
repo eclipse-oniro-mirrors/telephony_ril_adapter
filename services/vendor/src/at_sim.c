@@ -1385,6 +1385,10 @@ static uint8_t FcpTlvSearchTag(uint8_t *dataPtr, uint16_t len, UsimFcpTag tag, u
 
 static uint8_t FcpFileDescriptorQuery(uint8_t *fcpByte, uint16_t fcpLen, UsimFileDescriptor *filledStructPtr)
 {
+    UsimFileDescriptor *queryPtr = filledStructPtr;
+    if (queryPtr == NULL) {
+        return FALSE;
+    }
     if (fcpByte == NULL || fcpLen < HALF_LEN + 1) {
         TELEPHONY_LOGE("fcpByte size error");
         return FALSE;
@@ -1397,11 +1401,7 @@ static uint8_t FcpFileDescriptorQuery(uint8_t *fcpByte, uint16_t fcpLen, UsimFil
     if (valueLen + 2 > fcpLen) {  // 2: tag + len
         return FALSE;
     }
-    UsimFileDescriptor *queryPtr = filledStructPtr;
-    if (queryPtr == NULL) {
-        return FALSE;
-    }
-
+    
     uint8_t *outPtr = NULL;
     uint8_t *dataPtr = &fcpByte[HALF_LEN];
     uint8_t resultLen = FcpTlvSearchTag(dataPtr, valueLen, FCP_FILE_DES_T, &outPtr);
