@@ -19,6 +19,8 @@
 #include "hril_request.h"
 namespace OHOS {
 namespace Telephony {
+constexpr size_t IMSI_MAX_LEN = 15;
+
 HRilSim::HRilSim(int32_t slotId) : HRilBase(slotId)
 {
     AddNotificationHandlerToMap();
@@ -455,6 +457,9 @@ int32_t HRilSim::GetImsiResponse(
     // default imsi is empty
     std::string imsi = "";
     int32_t ret = CheckCharData(response, responseLen);
+    if (responseLen > IMSI_MAX_LEN) {
+        responseLen = IMSI_MAX_LEN;
+    }
     if (ret == HRIL_ERR_SUCCESS) {
         imsi = std::string(static_cast<const char*>(response), responseLen);
     } else {
