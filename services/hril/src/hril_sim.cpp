@@ -19,6 +19,8 @@
 #include "hril_request.h"
 namespace OHOS {
 namespace Telephony {
+constexpr size_t IMSI_MAX_LEN = 15;
+
 HRilSim::HRilSim(int32_t slotId) : HRilBase(slotId)
 {
     AddNotificationHandlerToMap();
@@ -455,8 +457,11 @@ int32_t HRilSim::GetImsiResponse(
     // default imsi is empty
     std::string imsi = "";
     int32_t ret = CheckCharData(response, responseLen);
+    if (responseLen > IMSI_MAX_LEN) {
+        responseLen = IMSI_MAX_LEN;
+    }
     if (ret == HRIL_ERR_SUCCESS) {
-        imsi = static_cast<const char*>(response);
+        imsi = std::string(static_cast<const char*>(response), responseLen);
     } else {
         // Ignore the error of obtaining IMSI to prevent IMSI data from being reported to the upstream.
         // Any scenario where IMSI retrieval fails requires reporting an empty IMSI to support retries.
@@ -711,7 +716,8 @@ int32_t HRilSim::SimStkProactiveNotify(
     if (ret != HRIL_ERR_SUCCESS) {
         return ret;
     }
-    return Notify(notifyType, error, &HDI::Ril::V1_1::IRilCallback::SimStkProactiveNotify, (const char *)response);
+    std::string responseStr(static_cast<const char *>(response), responseLen);
+    return Notify(notifyType, error, &HDI::Ril::V1_1::IRilCallback::SimStkProactiveNotify, responseStr);
 }
 
 int32_t HRilSim::SimStkAlphaNotify(
@@ -721,7 +727,8 @@ int32_t HRilSim::SimStkAlphaNotify(
     if (ret != HRIL_ERR_SUCCESS) {
         return ret;
     }
-    return Notify(notifyType, error, &HDI::Ril::V1_1::IRilCallback::SimStkAlphaNotify, (const char *)response);
+    std::string responseStr(static_cast<const char *>(response), responseLen);
+    return Notify(notifyType, error, &HDI::Ril::V1_1::IRilCallback::SimStkAlphaNotify, responseStr);
 }
 
 int32_t HRilSim::SimStkEventNotify(
@@ -731,7 +738,8 @@ int32_t HRilSim::SimStkEventNotify(
     if (ret != HRIL_ERR_SUCCESS) {
         return ret;
     }
-    return Notify(notifyType, error, &HDI::Ril::V1_1::IRilCallback::SimStkEventNotify, (const char *)response);
+    std::string responseStr(static_cast<const char *>(response), responseLen);
+    return Notify(notifyType, error, &HDI::Ril::V1_1::IRilCallback::SimStkEventNotify, responseStr);
 }
 
 int32_t HRilSim::SimStkCallSetupNotify(

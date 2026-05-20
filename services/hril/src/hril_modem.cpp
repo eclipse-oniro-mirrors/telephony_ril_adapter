@@ -20,6 +20,8 @@
 
 namespace OHOS {
 namespace Telephony {
+constexpr size_t IMEI_MAX_LEN = 15;
+
 HRilModem::HRilModem(int32_t slotId) : HRilBase(slotId)
 {
     AddHandlerToMap();
@@ -182,13 +184,16 @@ int32_t HRilModem::GetImeiResponse(
             responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_INVALID_RESPONSE;
         }
     }
+    if (responseLen > IMEI_MAX_LEN) {
+        responseLen = IMEI_MAX_LEN;
+    }
     if (response == nullptr || responseLen == 0) {
         TELEPHONY_LOGE("response is null or responseLen is 0");
         if (responseInfo.error == HDI::Ril::V1_1::RilErrType::NONE) {
             responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_NULL_POINT;
         }
     } else {
-        imeiResponse = std::string((const char *)response);
+        imeiResponse = std::string((const char *)response, responseLen);
     }
     return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::GetImeiResponse, imeiResponse);
 }
@@ -209,7 +214,7 @@ int32_t HRilModem::GetImeiSvResponse(
             responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_NULL_POINT;
         }
     } else {
-        imeiSvResponse = std::string((const char *)response);
+        imeiSvResponse = std::string((const char *)response, responseLen);
     }
     return Response(
         responseInfo, &HDI::Ril::V1_3::IRilCallback::GetImeiSvResponse, imeiSvResponse);
@@ -231,7 +236,7 @@ int32_t HRilModem::GetMeidResponse(
             responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_NULL_POINT;
         }
     } else {
-        meidResponse = std::string((const char *)response);
+        meidResponse = std::string((const char *)response, responseLen);
     }
     return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::GetMeidResponse, meidResponse);
 }
@@ -242,6 +247,13 @@ int32_t HRilModem::GetVoiceRadioTechnologyResponse(
     HDI::Ril::V1_1::VoiceRadioTechnology voiceRadioTech = {};
     if (response == nullptr || responseLen == 0) {
         TELEPHONY_LOGE("GetVoiceRadioTechnologyResponse Invalid response: nullptr or responseLen is 0");
+        if (responseInfo.error == HDI::Ril::V1_1::RilErrType::NONE) {
+            responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_INVALID_RESPONSE;
+        }
+    } else if (responseLen < sizeof(HRilVoiceRadioInfo)) {
+        TELEPHONY_LOGE("GetVoiceRadioTechnologyResponse Invalid response: responseLen "
+            "%{public}zu < sizeof(HRilVoiceRadioInfo) %{public}zu",
+            responseLen, sizeof(HRilVoiceRadioInfo));
         if (responseInfo.error == HDI::Ril::V1_1::RilErrType::NONE) {
             responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_INVALID_RESPONSE;
         }
@@ -282,8 +294,8 @@ int32_t HRilModem::GetBasebandVersionResponse(
         return Response(
             responseInfo, &HDI::Ril::V1_1::IRilCallback::GetBasebandVersionResponse, std::string(""));
     }
-    return Response(
-        responseInfo, &HDI::Ril::V1_1::IRilCallback::GetBasebandVersionResponse, std::string((const char *)response));
+    return Response(responseInfo, &HDI::Ril::V1_1::IRilCallback::GetBasebandVersionResponse,
+        std::string((const char *)response, responseLen));
 }
 
 bool HRilModem::IsModemResponse(uint32_t code)
