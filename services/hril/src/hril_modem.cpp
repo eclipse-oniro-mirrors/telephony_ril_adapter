@@ -20,7 +20,7 @@
 
 namespace OHOS {
 namespace Telephony {
-constexpr size_t IMEI_MAX_LEN = 20;
+constexpr size_t IMEI_MAX_LEN = 15;
 
 HRilModem::HRilModem(int32_t slotId) : HRilBase(slotId)
 {
