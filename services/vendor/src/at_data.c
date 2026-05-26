@@ -397,6 +397,7 @@ static int32_t QueryAllSupportPDNInfos(PDNInfo *pdnInfo)
     Line *pLine = NULL;
     PDNInfo *pdns = pdnInfo;
     ResponseInfo *pResponse = NULL;
+    int32_t pdnCount = 0;
 
     ret = SendCommandLock("AT+CGDCONT?", "+CGDCONT:", 0, &pResponse);
     if (ret != 0 || pResponse == NULL || !pResponse->success) {
@@ -406,7 +407,7 @@ static int32_t QueryAllSupportPDNInfos(PDNInfo *pdnInfo)
         FreeResponseInfo(pResponse);
         return errInfo.errorNo;
     }
-    for (pLine = pResponse->head; pLine != NULL; pLine = pLine->next) {
+    for (pLine = pResponse->head; pLine != NULL && pdnCount < MAX_PDP_NUM; pLine = pLine->next) {
         pStr = pLine->data;
         ret = SkipATPrefix(&pStr);
         if (ret < 0) {
@@ -425,6 +426,7 @@ static int32_t QueryAllSupportPDNInfos(PDNInfo *pdnInfo)
             pdns->cid = INT_DEFAULT_VALUE;
         }
         pdns++;
+        pdnCount++;
     }
     FreeResponseInfo(pResponse);
     return ret;
