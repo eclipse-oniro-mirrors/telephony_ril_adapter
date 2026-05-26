@@ -1137,6 +1137,13 @@ int32_t GetSimSlotCount()
         (vSimModemCountNumber == MAX_SLOT_COUNT || vSimModemCountNumber == DUAL_SLOT_COUNT)) {
         simSlotCountNumber = MAX_SLOT_COUNT;
     }
+
+    char multiDeviceEnable[HRIL_SYSPARA_SIZE] = {0};
+    GetParameter(DISTRIBUTE_MODEM_MULTIDEVICE_ENABLE, "false", multiDeviceEnable, HRIL_SYSPARA_SIZE);
+    if (strcmp(multiDeviceEnable, "true") == 0) {
+        simSlotCountNumber = DC_MD_MAX_SLOT_COUNT;
+    }
+
     TELEPHONY_LOGI("GetSimSlotCount, %{public}d", simSlotCountNumber);
     return simSlotCountNumber;
 }
