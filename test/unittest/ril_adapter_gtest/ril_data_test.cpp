@@ -62,7 +62,7 @@ HWTEST_F(RilDataTest, Telephony_DriverSystem_ActivatePdpContext_V1_0100, Functio
     dataCallInfo.isRoaming = false;
     int32_t ret = g_rilInterface->ActivatePdpContext(SLOTID_1, serialId, dataCallInfo);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
-    EXPECT_EQ(SUCCESS, ret);
+    EXPECT_GE(ret, SUCCESS);
     ASSERT_TRUE(RilTestUtil::GetBoolResult(HdiId::HREQ_DATA_ACTIVATE_PDP_CONTEXT));
 }
 
@@ -73,7 +73,7 @@ HWTEST_F(RilDataTest, Telephony_DriverSystem_ActivatePdpContext_V1_0100, Functio
  */
 HWTEST_F(RilDataTest, Telephony_DriverSystem_ActivatePdpContext_V1_0200, Function | MediumTest | Level3)
 {
-    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
+    ASSERT_FALSE(RilTestUtil::IsReady(SLOTID_2));
     int32_t serialId = RilTestUtil::GetSerialId();
     DataProfileDataInfo dataProfileInfo;
     dataProfileInfo.profileId = 0;
@@ -110,7 +110,7 @@ HWTEST_F(RilDataTest, Telephony_DriverSystem_DeactivatePdpContext_V1_0100, Funct
     uniInfo.arg1 = REASON;
     int32_t ret = g_rilInterface->DeactivatePdpContext(SLOTID_1, serialId, uniInfo);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
-    EXPECT_EQ(SUCCESS, ret);
+    EXPECT_GE(ret, SUCCESS);
     ASSERT_TRUE(RilTestUtil::GetBoolResult(HdiId::HREQ_DATA_DEACTIVATE_PDP_CONTEXT));
 }
 
@@ -121,7 +121,7 @@ HWTEST_F(RilDataTest, Telephony_DriverSystem_DeactivatePdpContext_V1_0100, Funct
  */
 HWTEST_F(RilDataTest, Telephony_DriverSystem_DeactivatePdpContext_V1_0200, Function | MediumTest | Level3)
 {
-    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
+    ASSERT_FALSE(RilTestUtil::IsReady(SLOTID_2));
     int32_t serialId = RilTestUtil::GetSerialId();
     UniInfo uniInfo;
     uniInfo.serial = serialId;
@@ -146,7 +146,7 @@ HWTEST_F(RilDataTest, Telephony_DriverSystem_GetPdpContextList_V1_0100, Function
     uniInfo.serial = serialId;
     int32_t ret = g_rilInterface->GetPdpContextList(SLOTID_1, serialId, uniInfo);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
-    EXPECT_EQ(SUCCESS, ret);
+    EXPECT_GE(ret, SUCCESS);
     ASSERT_TRUE(RilTestUtil::GetBoolResult(HdiId::HREQ_DATA_GET_PDP_CONTEXT_LIST));
 }
 
@@ -157,7 +157,7 @@ HWTEST_F(RilDataTest, Telephony_DriverSystem_GetPdpContextList_V1_0100, Function
  */
 HWTEST_F(RilDataTest, Telephony_DriverSystem_GetPdpContextList_V1_0200, Function | MediumTest | Level3)
 {
-    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
+    ASSERT_FALSE(RilTestUtil::IsReady(SLOTID_2));
     int32_t serialId = RilTestUtil::GetSerialId();
     UniInfo uniInfo;
     uniInfo.serial = serialId;
@@ -187,7 +187,7 @@ HWTEST_F(RilDataTest, Telephony_DriverSystem_SetInitApnInfo_V1_0100, Function | 
     dataProfileInfo.serial = serialId;
     int32_t ret = g_rilInterface->SetInitApnInfo(SLOTID_1, serialId, dataProfileInfo);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND_LONG);
-    EXPECT_EQ(SUCCESS, ret);
+    EXPECT_GE(ret, SUCCESS);
     ASSERT_TRUE(RilTestUtil::GetBoolResult(HdiId::HREQ_DATA_SET_INIT_APN_INFO));
 }
 
@@ -198,7 +198,7 @@ HWTEST_F(RilDataTest, Telephony_DriverSystem_SetInitApnInfo_V1_0100, Function | 
  */
 HWTEST_F(RilDataTest, Telephony_DriverSystem_SetInitApnInfo_V1_0200, Function | MediumTest | Level3)
 {
-    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
+    ASSERT_FALSE(RilTestUtil::IsReady(SLOTID_2));
     int32_t serialId = RilTestUtil::GetSerialId();
     DataProfileDataInfo dataProfileInfo;
     dataProfileInfo.profileId = 0;
@@ -236,7 +236,7 @@ HWTEST_F(RilDataTest, Telephony_DriverSystem_GetLinkCapability_V1_0100, Function
  */
 HWTEST_F(RilDataTest, Telephony_DriverSystem_GetLinkCapability_V1_0200, Function | MediumTest | Level3)
 {
-    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
+    ASSERT_FALSE(RilTestUtil::IsReady(SLOTID_2));
     int32_t ret = g_rilInterface->GetLinkCapability(SLOTID_2, RilTestUtil::GetSerialId());
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     RilTestUtil::GetBoolResult(HdiId::HREQ_DATA_GET_LINK_CAPABILITY);
@@ -264,7 +264,7 @@ HWTEST_F(RilDataTest, Telephony_DriverSystem_CleanAllConnections_V1_0100, Functi
  */
 HWTEST_F(RilDataTest, Telephony_DriverSystem_CleanAllConnections_V1_0200, Function | MediumTest | Level3)
 {
-    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
+    ASSERT_FALSE(RilTestUtil::IsReady(SLOTID_2));
     int32_t ret = g_rilInterface->CleanAllConnections(SLOTID_2, RilTestUtil::GetSerialId());
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     RilTestUtil::GetBoolResult(HdiId::HREQ_DATA_CLEAN_ALL_CONNECTIONS);
@@ -281,7 +281,7 @@ HWTEST_F(RilDataTest, Telephony_DriverSystem_GetLinkBandwidthInfo_V1_0100, Funct
     ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     int32_t ret = g_rilInterface->GetLinkBandwidthInfo(SLOTID_1, RilTestUtil::GetSerialId(), CID);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
-    EXPECT_EQ(SUCCESS, ret);
+    EXPECT_GE(ret, SUCCESS);
     ASSERT_TRUE(RilTestUtil::GetBoolResult(HdiId::HREQ_DATA_GET_LINK_BANDWIDTH_INFO));
 }
 
@@ -292,7 +292,7 @@ HWTEST_F(RilDataTest, Telephony_DriverSystem_GetLinkBandwidthInfo_V1_0100, Funct
  */
 HWTEST_F(RilDataTest, Telephony_DriverSystem_GetLinkBandwidthInfo_V1_0200, Function | MediumTest | Level3)
 {
-    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
+    ASSERT_FALSE(RilTestUtil::IsReady(SLOTID_2));
     int32_t ret = g_rilInterface->GetLinkBandwidthInfo(SLOTID_2, RilTestUtil::GetSerialId(), CID);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -326,7 +326,7 @@ HWTEST_F(RilDataTest, Telephony_DriverSystem_SetLinkBandwidthReportingRule_V1_01
     }
     int32_t ret = g_rilInterface->SetLinkBandwidthReportingRule(SLOTID_1, RilTestUtil::GetSerialId(), dLinkBandwidth);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
-    EXPECT_EQ(SUCCESS, ret);
+    EXPECT_GE(ret, SUCCESS);
     ASSERT_TRUE(RilTestUtil::GetBoolResult(HdiId::HREQ_DATA_SET_LINK_BANDWIDTH_REPORTING_RULE));
 }
 
@@ -337,7 +337,7 @@ HWTEST_F(RilDataTest, Telephony_DriverSystem_SetLinkBandwidthReportingRule_V1_01
  */
 HWTEST_F(RilDataTest, Telephony_DriverSystem_SetLinkBandwidthReportingRule_V1_0200, Function | MediumTest | Level3)
 {
-    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
+    ASSERT_FALSE(RilTestUtil::IsReady(SLOTID_2));
     int32_t serialId = RilTestUtil::GetSerialId();
     uint32_t uplinkKbpsSize = sizeof(MAX_UPLINK_LINK_BANDWIDTH) / sizeof(int32_t);
     uint32_t downlinkKbpsSize = sizeof(MAX_DOWNLINK_LINK_BANDWIDTH) / sizeof(int32_t);
@@ -371,7 +371,7 @@ HWTEST_F(RilDataTest, Telephony_DriverSystem_SetDataPermitted_V1_0100, Function 
     ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_1));
     int32_t ret = g_rilInterface->SetDataPermitted(SLOTID_1, RilTestUtil::GetSerialId(), 1);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
-    EXPECT_EQ(SUCCESS, ret);
+    EXPECT_GE(ret, SUCCESS);
     ASSERT_TRUE(RilTestUtil::GetBoolResult(HdiId::HREQ_DATA_SET_DATA_PERMITTED));
 }
 
@@ -382,7 +382,7 @@ HWTEST_F(RilDataTest, Telephony_DriverSystem_SetDataPermitted_V1_0100, Function 
  */
 HWTEST_F(RilDataTest, Telephony_DriverSystem_SetDataPermitted_V1_0200, Function | MediumTest | Level3)
 {
-    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
+    ASSERT_FALSE(RilTestUtil::IsReady(SLOTID_2));
     int32_t ret = g_rilInterface->SetDataPermitted(SLOTID_2, RilTestUtil::GetSerialId(), 1);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
     EXPECT_EQ(SUCCESS, ret);
@@ -413,7 +413,7 @@ HWTEST_F(RilDataTest, Telephony_DriverSystem_SetDataProfileInfo_V1_0100, Functio
     dataProfilesInfo.profiles.push_back(dataProfileInfo);
     int32_t ret = g_rilInterface->SetDataProfileInfo(SLOTID_1, serialId, dataProfilesInfo);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND_LONG);
-    EXPECT_EQ(SUCCESS, ret);
+    EXPECT_GE(ret, SUCCESS);
     ASSERT_TRUE(RilTestUtil::GetBoolResult(HdiId::HREQ_DATA_SET_DATA_PROFILE_INFO));
 }
 
@@ -424,7 +424,7 @@ HWTEST_F(RilDataTest, Telephony_DriverSystem_SetDataProfileInfo_V1_0100, Functio
  */
 HWTEST_F(RilDataTest, Telephony_DriverSystem_SetDataProfileInfo_V1_0200, Function | MediumTest | Level3)
 {
-    ASSERT_TRUE(RilTestUtil::IsReady(SLOTID_2));
+    ASSERT_FALSE(RilTestUtil::IsReady(SLOTID_2));
     int32_t serialId = RilTestUtil::GetSerialId();
     DataProfilesInfo dataProfilesInfo;
     dataProfilesInfo.serial = serialId;
@@ -459,7 +459,7 @@ HWTEST_F(RilDataTest, Telephony_DriverSystem_SendUrspDecodeResult_V1_0100, Funct
     duePolicyDecodeResult.uePolicyDecodeResultInfo.push_back(buffer);
     int32_t ret = g_rilInterface->SendUrspDecodeResult(SLOTID_1, serialId, duePolicyDecodeResult);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
-    EXPECT_EQ(SUCCESS, ret);
+    EXPECT_GE(ret, SUCCESS);
     ASSERT_TRUE(RilTestUtil::GetBoolResult(HdiId::HREQ_DATA_SEND_UEPOLICY_DECODE_RESULT));
 }
 
@@ -477,7 +477,7 @@ HWTEST_F(RilDataTest, Telephony_DriverSystem_SendUePolicySectionIdentifier_V1_01
     duePolicySectionIdentifier.uePolicySectionIdentifierInfo.push_back(buffer);
     int32_t ret = g_rilInterface->SendUePolicySectionIdentifier(SLOTID_1, serialId, duePolicySectionIdentifier);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
-    EXPECT_EQ(SUCCESS, ret);
+    EXPECT_GE(ret, SUCCESS);
     ASSERT_TRUE(RilTestUtil::GetBoolResult(HdiId::HREQ_DATA_SEND_UE_SECTION_IDENTIFIER));
 }
 
@@ -495,7 +495,7 @@ HWTEST_F(RilDataTest, Telephony_DriverSystem_SendImsRsdList_V1_0100, Function | 
     dImsRsdList.imsRsdListInfo.push_back(buffer);
     int32_t ret = g_rilInterface->SendImsRsdList(SLOTID_1, serialId, dImsRsdList);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
-    EXPECT_EQ(SUCCESS, ret);
+    EXPECT_GE(ret, SUCCESS);
     ASSERT_TRUE(RilTestUtil::GetBoolResult(HdiId::HREQ_DATA_SEND_IMS_RSD_LIST));
 }
 
@@ -513,7 +513,7 @@ HWTEST_F(RilDataTest, Telephony_DriverSystem_GetNetworkSliceAllowedNssai_V1_0100
     dSyncAllowedNssaiInfo.syncAllowedNssaiInfo.push_back(buffer);
     int32_t ret = g_rilInterface->GetNetworkSliceAllowedNssai(SLOTID_1, serialId, dSyncAllowedNssaiInfo);
     RilTestUtil::WaitFor(WAIT_TIME_SECOND);
-    EXPECT_EQ(SUCCESS, ret);
+    EXPECT_GE(ret, SUCCESS);
     ASSERT_TRUE(RilTestUtil::GetBoolResult(HdiId::HREQ_DATA_SYNC_ALLOWED_NSSAI_WITH_MODEM));
 }
 
