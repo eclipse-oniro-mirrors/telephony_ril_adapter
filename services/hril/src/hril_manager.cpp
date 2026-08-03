@@ -291,7 +291,7 @@ void HRilManager::ReportResponse(std::vector<std::unique_ptr<T>> &subModules, in
     }
     auto iter = requestEventMap_.find(reqInfo->request);
     if (iter != requestEventMap_.end()) {
-        TELEPHONY_LOGI("requestId:%{public}d, event:%{public}s, slotId:%{public}d",
+        TELEPHONY_LOGD("requestId:%{public}d, event:%{public}s, slotId:%{public}d",
             reqInfo->request, iter->second.c_str(), slotId);
     } else {
         TELEPHONY_LOGD("requestId:%{public}d", reqInfo->request);
@@ -323,7 +323,7 @@ void HRilManager::ReportNotification(std::vector<std::unique_ptr<T>> &subModules
             reportInfo->notifyId == HNOTI_MODEM_DSDS_MODE_UPDATED) {
             TELEPHONY_LOGD("notifyId:%{public}d, event:%{public}s", reportInfo->notifyId, event->second.c_str());
         } else {
-            TELEPHONY_LOGI("notifyId:%{public}d, event:%{public}s", reportInfo->notifyId, event->second.c_str());
+            TELEPHONY_LOGD("notifyId:%{public}d, event:%{public}s", reportInfo->notifyId, event->second.c_str());
         }
         if (NEED_LOCK == iter->second) {
             ApplyRunningLock();
