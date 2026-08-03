@@ -1057,7 +1057,7 @@ int32_t HRilNetwork::BuildNeighboringCellList(
     (void)responseLen;
     const CellInfoList *temp = reinterpret_cast<const CellInfoList *>(response);
     cellInfoList.itemNum = temp->itemNum;
-    TELEPHONY_LOGI("cellInfoList.itemNum = %{public}d", cellInfoList.itemNum);
+    TELEPHONY_LOGD("cellInfoList.itemNum = %{public}d", cellInfoList.itemNum);
     if (temp->itemNum > ITEMNUM_MAX || temp->cellNearbyInfo == nullptr) {
         return HRIL_ERR_GENERIC_FAILURE;
     }
