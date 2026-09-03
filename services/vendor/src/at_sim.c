@@ -200,7 +200,7 @@ static int32_t ParseUnlockSimLockResult(char *pLine, HRilLockStatus *lockStatus)
     return 0;
 }
 
-static void ReportInvalidParamAndFree(const ReqDataInfo *requestInfo, ResponseInfo *pResponse, int32_t errType)
+static void ReportInvalidParam(const ReqDataInfo *requestInfo, ResponseInfo *pResponse, int32_t errType)
 {
     struct ReportInfo reportInfo = CreateReportInfo(requestInfo, errType, HRIL_RESPONSE, 0);
     OnSimReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
@@ -210,7 +210,7 @@ static void ReportInvalidParamAndFree(const ReqDataInfo *requestInfo, ResponseIn
 static void ClearCmdBuf(char *cmd, size_t cmdLen)
 {
     if (cmd != NULL) {
-        memset_s(cmd, cmdLen, 0x00, cmdLen);
+        (void)memset_s(cmd, cmdLen, 0x00, cmdLen);
     }
 }
 
@@ -386,7 +386,7 @@ void ReqGetSimIO(const ReqDataInfo *requestInfo, const HRilSimIO *data, size_t d
     HRilSimIOResponse simResponse = {0};
     HRilSimIO *pSim = (HRilSimIO *)data;
     if (pSim == NULL) {
-        ReportInvalidParamAndFree(requestInfo, pResponse, HRIL_ERR_INVALID_RESPONSE);
+        ReportInvalidParam(requestInfo, pResponse, HRIL_ERR_INVALID_RESPONSE);
         return;
     }
     if (pSim->pin2 != NULL && strcmp(pSim->pin2, "") != 0 && pSim->fileid == FILEID) {
@@ -543,7 +543,7 @@ void ReqSetSimLock(const ReqDataInfo *requestInfo, const HRilSimClock *data, siz
     HRilSimClock *pSimClck = (HRilSimClock *)data;
     ResponseInfo *pResponse = NULL;
     if (pSimClck == NULL) {
-        ReportInvalidParamAndFree(requestInfo, pResponse, HRIL_ERR_INVALID_RESPONSE);
+        ReportInvalidParam(requestInfo, pResponse, HRIL_ERR_INVALID_RESPONSE);
         return;
     }
     int32_t result = GenerateCommand(
@@ -1288,7 +1288,7 @@ void ReqUnlockSimLock(const ReqDataInfo *requestInfo, int32_t lockType, const ch
         } else {
             ret = HRIL_ERR_GENERIC_FAILURE;
         }
-        ReportInvalidParamAndFree(requestInfo, pResponse, ret);
+        ReportInvalidParam(requestInfo, pResponse, ret);
         return;
     }
     if (pResponse && pResponse->head) {
