@@ -214,7 +214,7 @@ static void ClearCmdBuf(char *cmd, size_t cmdLen)
     }
 }
 
-static void ReportGenericFailureAndFree(const ReqDataInfo *requestInfo, ResponseInfo *pResponse,
+static void ReportGenericFailure(const ReqDataInfo *requestInfo, ResponseInfo *pResponse,
     HRilLockStatus *lockStatus)
 {
     lockStatus->result = HRIL_UNLOCK_OTHER_ERR;
@@ -224,7 +224,7 @@ static void ReportGenericFailureAndFree(const ReqDataInfo *requestInfo, Response
     FreeResponseInfo(pResponse);
 }
 
-static void ReportErrSuccessAndFree(const ReqDataInfo *requestInfo, ResponseInfo *pResponse,
+static void ReportErrSuccess(const ReqDataInfo *requestInfo, ResponseInfo *pResponse,
     HRilLockStatus *lockStatus)
 {
     struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
@@ -594,7 +594,7 @@ void ReqChangeSimPassword(const ReqDataInfo *requestInfo, const HRilSimPassword 
     pSimPassword = (HRilSimPassword *)data;
     HRilLockStatus lockStatus = { HRIL_UNLOCK_OTHER_ERR, -1 };
     if (pSimPassword == NULL) {
-        ReportGenericFailureAndFree(requestInfo, pResponse, &lockStatus);
+        ReportGenericFailure(requestInfo, pResponse, &lockStatus);
         return;
     }
     int32_t result = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CPWD=\"%s\",\"%s\",\"%s\"", pSimPassword->fac,
@@ -643,13 +643,13 @@ void ReqUnlockPin(const ReqDataInfo *requestInfo, const char *pin)
 
     HRilLockStatus lockStatus = {0};
     if (pin == NULL) {
-        ReportGenericFailureAndFree(requestInfo, pResponse, &lockStatus);
+        ReportGenericFailure(requestInfo, pResponse, &lockStatus);
         return;
     }
     int32_t result = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CPIN=\"%s\"", pin);
     if (result <= 0) {
         TELEPHONY_LOGE("GenerateCommand is failed");
-        ReportGenericFailureAndFree(requestInfo, pResponse, &lockStatus);
+        ReportGenericFailure(requestInfo, pResponse, &lockStatus);
         return;
     }
     ret = SendCommandLock(cmd, "+CPIN", 0, &pResponse);
@@ -670,10 +670,10 @@ void ReqUnlockPin(const ReqDataInfo *requestInfo, const char *pin)
                 lockStatus.remain = -1;
                 TELEPHONY_LOGE("AT+CPWD send failed");
             }
-            ReportErrSuccessAndFree(requestInfo, pResponse, &lockStatus);
+            ReportErrSuccess(requestInfo, pResponse, &lockStatus);
             return;
         } else {
-            ReportErrSuccessAndFree(requestInfo, pResponse, &lockStatus);
+            ReportErrSuccess(requestInfo, pResponse, &lockStatus);
             return;
         }
     }
@@ -693,14 +693,14 @@ void ReqUnlockPuk(const ReqDataInfo *requestInfo, const char *puk, const char *p
     ResponseInfo *pResponse = NULL;
     HRilLockStatus lockStatus = {0};
     if (puk == NULL || pin == NULL) {
-        ReportGenericFailureAndFree(requestInfo, pResponse, &lockStatus);
+        ReportGenericFailure(requestInfo, pResponse, &lockStatus);
         return;
     }
 
     int32_t result = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CPIN=\"%s\",\"%s\"", puk, pin);
     if (result <= 0) {
         TELEPHONY_LOGE("GenerateCommand is failed");
-        ReportGenericFailureAndFree(requestInfo, pResponse, &lockStatus);
+        ReportGenericFailure(requestInfo, pResponse, &lockStatus);
         return;
     }
     ret = SendCommandLock(cmd, "+CPIN", 0, &pResponse);
@@ -726,7 +726,7 @@ void ReqUnlockPuk(const ReqDataInfo *requestInfo, const char *puk, const char *p
             FreeResponseInfo(pResponse);
             return;
         } else {
-            ReportGenericFailureAndFree(requestInfo, pResponse, &lockStatus);
+            ReportGenericFailure(requestInfo, pResponse, &lockStatus);
             return;
         }
     }
@@ -838,13 +838,13 @@ void ReqUnlockPin2(const ReqDataInfo *requestInfo, const char *pin2)
 
     HRilLockStatus lockStatus = {0};
     if (pin2 == NULL) {
-        ReportGenericFailureAndFree(requestInfo, pResponse, &lockStatus);
+        ReportGenericFailure(requestInfo, pResponse, &lockStatus);
         return;
     }
     int32_t result = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT^CPIN2=\"%s\"", pin2);
     if (result <= 0) {
         TELEPHONY_LOGE("GenerateCommand is failed");
-        ReportGenericFailureAndFree(requestInfo, pResponse, &lockStatus);
+        ReportGenericFailure(requestInfo, pResponse, &lockStatus);
         return;
     }
     ret = SendCommandLock(cmd, "^CPIN2", 0, &pResponse);
@@ -870,7 +870,7 @@ void ReqUnlockPin2(const ReqDataInfo *requestInfo, const char *pin2)
             FreeResponseInfo(pResponse);
             return;
         } else {
-            ReportGenericFailureAndFree(requestInfo, pResponse, &lockStatus);
+            ReportGenericFailure(requestInfo, pResponse, &lockStatus);
             return;
         }
     }
@@ -890,14 +890,14 @@ void ReqUnlockPuk2(const ReqDataInfo *requestInfo, const char *puk2, const char 
     ResponseInfo *pResponse = NULL;
     HRilLockStatus lockStatus = {0};
     if (puk2 == NULL || pin2 == NULL) {
-        ReportGenericFailureAndFree(requestInfo, pResponse, &lockStatus);
+        ReportGenericFailure(requestInfo, pResponse, &lockStatus);
         return;
     }
 
     int32_t result = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT^CPIN2=\"%s\",\"%s\"", puk2, pin2);
     if (result <= 0) {
         TELEPHONY_LOGE("GenerateCommand is failed");
-        ReportGenericFailureAndFree(requestInfo, pResponse, &lockStatus);
+        ReportGenericFailure(requestInfo, pResponse, &lockStatus);
         return;
     }
     ret = SendCommandLock(cmd, "^CPIN2", 0, &pResponse);
@@ -923,7 +923,7 @@ void ReqUnlockPuk2(const ReqDataInfo *requestInfo, const char *puk2, const char 
             FreeResponseInfo(pResponse);
             return;
         } else {
-            ReportGenericFailureAndFree(requestInfo, pResponse, &lockStatus);
+            ReportGenericFailure(requestInfo, pResponse, &lockStatus);
             return;
         }
     }
@@ -1268,13 +1268,13 @@ void ReqUnlockSimLock(const ReqDataInfo *requestInfo, int32_t lockType, const ch
 
     HRilLockStatus lockStatus = {0};
     if (password == NULL) {
-        ReportGenericFailureAndFree(requestInfo, pResponse, &lockStatus);
+        ReportGenericFailure(requestInfo, pResponse, &lockStatus);
         return;
     }
     int32_t result = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT^UNLOCKSIMLOCK=\"%d\",%s", lockType, password);
     if (result <= 0) {
         TELEPHONY_LOGE("GenerateCommand is failed");
-        ReportGenericFailureAndFree(requestInfo, pResponse, &lockStatus);
+        ReportGenericFailure(requestInfo, pResponse, &lockStatus);
         return;
     }
     int32_t ret = SendCommandLock(cmd, "^UNLOCKSIMLOCK", 0, &pResponse);
@@ -1303,7 +1303,7 @@ void ReqUnlockSimLock(const ReqDataInfo *requestInfo, int32_t lockType, const ch
         } else {
             ret = HRIL_ERR_GENERIC_FAILURE;
         }
-        ReportErrSuccessAndFree(requestInfo, pResponse, &lockStatus);
+        ReportErrSuccess(requestInfo, pResponse, &lockStatus);
         return;
     }
     struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
