@@ -200,6 +200,38 @@ static int32_t ParseUnlockSimLockResult(char *pLine, HRilLockStatus *lockStatus)
     return 0;
 }
 
+static void ReportInvalidParam(const ReqDataInfo *requestInfo, ResponseInfo *pResponse, int32_t errType)
+{
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, errType, HRIL_RESPONSE, 0);
+    OnSimReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
+    FreeResponseInfo(pResponse);
+}
+
+static void ClearCmdBuf(char *cmd, size_t cmdLen)
+{
+    if (cmd != NULL) {
+        (void)memset_s(cmd, cmdLen, 0x00, cmdLen);
+    }
+}
+
+static void ReportGenericFailure(const ReqDataInfo *requestInfo, ResponseInfo *pResponse,
+    HRilLockStatus *lockStatus)
+{
+    lockStatus->result = HRIL_UNLOCK_OTHER_ERR;
+    lockStatus->remain = -1;
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_GENERIC_FAILURE, HRIL_RESPONSE, 0);
+    OnSimReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)lockStatus, sizeof(HRilLockStatus));
+    FreeResponseInfo(pResponse);
+}
+
+static void ReportErrSuccess(const ReqDataInfo *requestInfo, ResponseInfo *pResponse,
+    HRilLockStatus *lockStatus)
+{
+    struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
+    OnSimReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)lockStatus, sizeof(HRilLockStatus));
+    FreeResponseInfo(pResponse);
+}
+
 void ReqGetSimStatus(const ReqDataInfo *requestInfo)
 {
     char *pLine = NULL;
@@ -248,11 +280,13 @@ static int32_t ReqGetSimIOFDNWrite(HRilSimIO *pSim, ResponseInfo **ppResponse, s
     char cmd[MAX_CMD_LENGTH] = {0};
     int32_t tmp = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CLCK=\"%s\",%d,\"%s\"", "FD", 1, pSim->pin2);
     if (tmp < 0) {
+        ClearCmdBuf(cmd, MAX_CMD_LENGTH);
         TELEPHONY_LOGE("GenerateCommand failed");
         return VENDOR_FAIL;
     }
     int32_t ret = SendCommandLock(cmd, "+CLCK", 0, ppResponse);
     if (ret != 0 || (ppResponse != NULL && (*ppResponse != NULL) && !(*ppResponse)->success)) {
+        ClearCmdBuf(cmd, MAX_CMD_LENGTH);
         TELEPHONY_LOGE("AT+CLCK failed");
         return HRIL_ERR_CMD_SEND_FAILURE;
     }
@@ -268,9 +302,11 @@ static int32_t ReqGetSimIOFDNWrite(HRilSimIO *pSim, ResponseInfo **ppResponse, s
     }
     tmp = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CLCK=\"%s\",%d,\"%s\"", "FD", 0, pSim->pin2);
     if (tmp < 0) {
+        ClearCmdBuf(cmd, MAX_CMD_LENGTH);
         return VENDOR_FAIL;
     }
     ret = SendCommandLock(cmd, "+CLCK", 0, ppResponse);
+    ClearCmdBuf(cmd, MAX_CMD_LENGTH);
     if (ret != 0 || (ppResponse != NULL && (*ppResponse != NULL) && !(*ppResponse)->success)) {
         TELEPHONY_LOGE("AT+CLCK failed");
         return HRIL_ERR_CMD_SEND_FAILURE;
@@ -296,10 +332,12 @@ static int32_t ReqGetSimIOFDN(HRilSimIO *pSim, ResponseInfo **ppResponse, size_t
     char cmd[MAX_CMD_LENGTH] = {0};
     int32_t tmp = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CLCK=\"%s\",%d,\"%s\"", "FD", clckRes, pSim->pin2);
     if (tmp < 0) {
+        ClearCmdBuf(cmd, MAX_CMD_LENGTH);
         TELEPHONY_LOGE("GenerateCommand failed");
         return VENDOR_FAIL;
     }
     ret = SendCommandLock(cmd, "+CLCK", 0, ppResponse);
+    ClearCmdBuf(cmd, MAX_CMD_LENGTH);
     if (ret != 0 || (ppResponse != NULL && !(*ppResponse)->success)) {
         TELEPHONY_LOGE("AT+CLCK failed");
         return HRIL_ERR_CMD_SEND_FAILURE;
@@ -348,9 +386,7 @@ void ReqGetSimIO(const ReqDataInfo *requestInfo, const HRilSimIO *data, size_t d
     HRilSimIOResponse simResponse = {0};
     HRilSimIO *pSim = (HRilSimIO *)data;
     if (pSim == NULL) {
-        struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_RESPONSE, HRIL_RESPONSE, 0);
-        OnSimReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
-        FreeResponseInfo(pResponse);
+        ReportInvalidParam(requestInfo, pResponse, HRIL_ERR_INVALID_RESPONSE);
         return;
     }
     if (pSim->pin2 != NULL && strcmp(pSim->pin2, "") != 0 && pSim->fileid == FILEID) {
@@ -507,15 +543,14 @@ void ReqSetSimLock(const ReqDataInfo *requestInfo, const HRilSimClock *data, siz
     HRilSimClock *pSimClck = (HRilSimClock *)data;
     ResponseInfo *pResponse = NULL;
     if (pSimClck == NULL) {
-        struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_RESPONSE, HRIL_RESPONSE, 0);
-        OnSimReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
-        FreeResponseInfo(pResponse);
+        ReportInvalidParam(requestInfo, pResponse, HRIL_ERR_INVALID_RESPONSE);
         return;
     }
     int32_t result = GenerateCommand(
         cmd, MAX_CMD_LENGTH, "AT+CLCK=\"%s\",%d,\"%s\"", pSimClck->fac, pSimClck->mode, pSimClck->passwd);
     TELEPHONY_LOGI("GenerateCommand result is %{public}d", result);
     ret = SendCommandLock(cmd, "+CLCK", 0, &pResponse);
+    ClearCmdBuf(cmd, MAX_CMD_LENGTH);
     HRilLockStatus lockStatus = { HRIL_UNLOCK_OTHER_ERR, -1 };
     if (ret != 0 || (pResponse != NULL && !pResponse->success)) {
         TELEPHONY_LOGE("AT+CLCK send failed dataLen:%{public}zu", dataLen);
@@ -557,17 +592,16 @@ void ReqChangeSimPassword(const ReqDataInfo *requestInfo, const HRilSimPassword 
     int32_t ret;
     ResponseInfo *pResponse = NULL;
     pSimPassword = (HRilSimPassword *)data;
+    HRilLockStatus lockStatus = { HRIL_UNLOCK_OTHER_ERR, -1 };
     if (pSimPassword == NULL) {
-        struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_INVALID_RESPONSE, HRIL_RESPONSE, 0);
-        OnSimReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
-        FreeResponseInfo(pResponse);
+        ReportGenericFailure(requestInfo, pResponse, &lockStatus);
         return;
     }
     int32_t result = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CPWD=\"%s\",\"%s\",\"%s\"", pSimPassword->fac,
         pSimPassword->oldPassword, pSimPassword->newPassword);
     TELEPHONY_LOGI("GenerateCommand result is %{public}d", result);
     ret = SendCommandLock(cmd, "+CPWD", 0, &pResponse);
-    HRilLockStatus lockStatus = { HRIL_UNLOCK_OTHER_ERR, -1 };
+    ClearCmdBuf(cmd, MAX_CMD_LENGTH);
     if (ret != 0 || (pResponse != NULL && !pResponse->success)) {
         TELEPHONY_LOGE("AT+CPWD send failed dataLen:%{public}zu", dataLen);
         if (pResponse && pResponse->result) {
@@ -607,21 +641,25 @@ void ReqUnlockPin(const ReqDataInfo *requestInfo, const char *pin)
     int32_t ret;
     ResponseInfo *pResponse = NULL;
 
+    HRilLockStatus lockStatus = {0};
+    if (pin == NULL) {
+        ReportGenericFailure(requestInfo, pResponse, &lockStatus);
+        return;
+    }
     int32_t result = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CPIN=\"%s\"", pin);
     if (result <= 0) {
         TELEPHONY_LOGE("GenerateCommand is failed");
+        ReportGenericFailure(requestInfo, pResponse, &lockStatus);
+        return;
     }
     ret = SendCommandLock(cmd, "+CPIN", 0, &pResponse);
-    HRilLockStatus lockStatus = {0};
+    ClearCmdBuf(cmd, MAX_CMD_LENGTH);
     if (ret != 0 || (pResponse != NULL && !pResponse->success)) {
         TELEPHONY_LOGE("AT+CPIN send failed");
         if (pResponse && pResponse->result) {
             pLine = pResponse->result;
-            TELEPHONY_LOGD("AT+CPIN send failed pLine1:%{public}s", pLine);
             SkipATPrefix(&pLine);
-            TELEPHONY_LOGD("AT+CPIN send failed pLine2:%{public}s", pLine);
             NextInt(&pLine, &ret);
-            TELEPHONY_LOGD("AT+CPIN send failed ret:%{public}d", ret);
             if (ret == AT_RESPONSE_INCORRECT_PASSWORD) {
                 HRilPinInputTimes pinInputTimes = {0};
                 ReqGetSimPinInputTimesRemain(requestInfo, &pinInputTimes);
@@ -632,17 +670,10 @@ void ReqUnlockPin(const ReqDataInfo *requestInfo, const char *pin)
                 lockStatus.remain = -1;
                 TELEPHONY_LOGE("AT+CPWD send failed");
             }
-            struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
-            OnSimReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&lockStatus, sizeof(lockStatus));
-            FreeResponseInfo(pResponse);
+            ReportErrSuccess(requestInfo, pResponse, &lockStatus);
             return;
         } else {
-            ret = HRIL_ERR_GENERIC_FAILURE;
-            lockStatus.result = HRIL_UNLOCK_OTHER_ERR;
-            lockStatus.remain = -1;
-            struct ReportInfo reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
-            OnSimReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&lockStatus, sizeof(lockStatus));
-            FreeResponseInfo(pResponse);
+            ReportErrSuccess(requestInfo, pResponse, &lockStatus);
             return;
         }
     }
@@ -660,22 +691,26 @@ void ReqUnlockPuk(const ReqDataInfo *requestInfo, const char *puk, const char *p
     char *pLine = NULL;
     int32_t ret;
     ResponseInfo *pResponse = NULL;
+    HRilLockStatus lockStatus = {0};
+    if (puk == NULL || pin == NULL) {
+        ReportGenericFailure(requestInfo, pResponse, &lockStatus);
+        return;
+    }
 
     int32_t result = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT+CPIN=\"%s\",\"%s\"", puk, pin);
     if (result <= 0) {
         TELEPHONY_LOGE("GenerateCommand is failed");
+        ReportGenericFailure(requestInfo, pResponse, &lockStatus);
+        return;
     }
     ret = SendCommandLock(cmd, "+CPIN", 0, &pResponse);
-    HRilLockStatus lockStatus = {0};
+    ClearCmdBuf(cmd, MAX_CMD_LENGTH);
     if (ret != 0 || (pResponse != NULL && !pResponse->success)) {
         TELEPHONY_LOGE("AT+CPIN send failed");
         if (pResponse && pResponse->result) {
             pLine = pResponse->result;
-            TELEPHONY_LOGD("AT+CPIN send failed pLine1:%{public}s", pLine);
             SkipATPrefix(&pLine);
-            TELEPHONY_LOGD("AT+CPIN send failed pLine2:%{public}s", pLine);
             NextInt(&pLine, &ret);
-            TELEPHONY_LOGD("AT+CPIN send failed ret:%{public}d", ret);
             if (ret == AT_RESPONSE_INCORRECT_PASSWORD) {
                 HRilPinInputTimes pinInputTimes = {0};
                 ReqGetSimPinInputTimesRemain(requestInfo, &pinInputTimes);
@@ -691,12 +726,7 @@ void ReqUnlockPuk(const ReqDataInfo *requestInfo, const char *puk, const char *p
             FreeResponseInfo(pResponse);
             return;
         } else {
-            ret = HRIL_ERR_GENERIC_FAILURE;
-            lockStatus.result = HRIL_UNLOCK_OTHER_ERR;
-            lockStatus.remain = -1;
-            struct ReportInfo reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
-            OnSimReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&lockStatus, sizeof(lockStatus));
-            FreeResponseInfo(pResponse);
+            ReportGenericFailure(requestInfo, pResponse, &lockStatus);
             return;
         }
     }
@@ -806,21 +836,25 @@ void ReqUnlockPin2(const ReqDataInfo *requestInfo, const char *pin2)
     int32_t ret;
     ResponseInfo *pResponse = NULL;
 
+    HRilLockStatus lockStatus = {0};
+    if (pin2 == NULL) {
+        ReportGenericFailure(requestInfo, pResponse, &lockStatus);
+        return;
+    }
     int32_t result = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT^CPIN2=\"%s\"", pin2);
     if (result <= 0) {
         TELEPHONY_LOGE("GenerateCommand is failed");
+        ReportGenericFailure(requestInfo, pResponse, &lockStatus);
+        return;
     }
     ret = SendCommandLock(cmd, "^CPIN2", 0, &pResponse);
-    HRilLockStatus lockStatus = {0};
+    ClearCmdBuf(cmd, MAX_CMD_LENGTH);
     if (ret != 0 || (pResponse != NULL && !pResponse->success)) {
         TELEPHONY_LOGE("AT^CPIN2 send failed");
         if (pResponse && pResponse->result) {
             pLine = pResponse->result;
-            TELEPHONY_LOGD("AT^CPIN2 send failed pLine1:%{public}s", pLine);
             SkipATPrefix(&pLine);
-            TELEPHONY_LOGD("AT^CPIN2 send failed pLine2:%{public}s", pLine);
             NextInt(&pLine, &ret);
-            TELEPHONY_LOGD("AT^CPIN2 send failed ret:%{public}d", ret);
             if (ret == AT_RESPONSE_INCORRECT_PASSWORD) {
                 HRilPinInputTimes pinInputTimes = {0};
                 ReqGetSimPinInputTimesRemain(requestInfo, &pinInputTimes);
@@ -836,12 +870,7 @@ void ReqUnlockPin2(const ReqDataInfo *requestInfo, const char *pin2)
             FreeResponseInfo(pResponse);
             return;
         } else {
-            ret = HRIL_ERR_GENERIC_FAILURE;
-            lockStatus.result = HRIL_UNLOCK_OTHER_ERR;
-            lockStatus.remain = -1;
-            struct ReportInfo reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
-            OnSimReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&lockStatus, sizeof(lockStatus));
-            FreeResponseInfo(pResponse);
+            ReportGenericFailure(requestInfo, pResponse, &lockStatus);
             return;
         }
     }
@@ -859,22 +888,26 @@ void ReqUnlockPuk2(const ReqDataInfo *requestInfo, const char *puk2, const char 
     char *pLine = NULL;
     int32_t ret;
     ResponseInfo *pResponse = NULL;
+    HRilLockStatus lockStatus = {0};
+    if (puk2 == NULL || pin2 == NULL) {
+        ReportGenericFailure(requestInfo, pResponse, &lockStatus);
+        return;
+    }
 
     int32_t result = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT^CPIN2=\"%s\",\"%s\"", puk2, pin2);
     if (result <= 0) {
         TELEPHONY_LOGE("GenerateCommand is failed");
+        ReportGenericFailure(requestInfo, pResponse, &lockStatus);
+        return;
     }
     ret = SendCommandLock(cmd, "^CPIN2", 0, &pResponse);
-    HRilLockStatus lockStatus = {0};
+    ClearCmdBuf(cmd, MAX_CMD_LENGTH);
     if (ret != 0 || (pResponse != NULL && !pResponse->success)) {
         TELEPHONY_LOGE("AT^CPIN2 send failed");
         if (pResponse && pResponse->result) {
             pLine = pResponse->result;
-            TELEPHONY_LOGD("AT^CPIN2 send failed pLine1:%{public}s", pLine);
             SkipATPrefix(&pLine);
-            TELEPHONY_LOGD("AT^CPIN2 send failed pLine2:%{public}s", pLine);
             NextInt(&pLine, &ret);
-            TELEPHONY_LOGD("AT^CPIN2 send failed ret:%{public}d", ret);
             if (ret == AT_RESPONSE_INCORRECT_PASSWORD) {
                 HRilPinInputTimes pinInputTimes = {0};
                 ReqGetSimPinInputTimesRemain(requestInfo, &pinInputTimes);
@@ -890,12 +923,7 @@ void ReqUnlockPuk2(const ReqDataInfo *requestInfo, const char *puk2, const char 
             FreeResponseInfo(pResponse);
             return;
         } else {
-            ret = HRIL_ERR_GENERIC_FAILURE;
-            lockStatus.result = HRIL_UNLOCK_OTHER_ERR;
-            lockStatus.remain = -1;
-            struct ReportInfo reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
-            OnSimReport(GetSlotId(requestInfo), reportInfo, (const uint8_t *)&lockStatus, sizeof(lockStatus));
-            FreeResponseInfo(pResponse);
+            ReportGenericFailure(requestInfo, pResponse, &lockStatus);
             return;
         }
     }
@@ -1236,14 +1264,21 @@ void ReqUnlockSimLock(const ReqDataInfo *requestInfo, int32_t lockType, const ch
 {
     char cmd[MAX_CMD_LENGTH] = {0};
     char *pLine = NULL;
-    int32_t ret;
     ResponseInfo *pResponse = NULL;
 
+    HRilLockStatus lockStatus = {0};
+    if (password == NULL) {
+        ReportGenericFailure(requestInfo, pResponse, &lockStatus);
+        return;
+    }
     int32_t result = GenerateCommand(cmd, MAX_CMD_LENGTH, "AT^UNLOCKSIMLOCK=\"%d\",%s", lockType, password);
     if (result <= 0) {
         TELEPHONY_LOGE("GenerateCommand is failed");
+        ReportGenericFailure(requestInfo, pResponse, &lockStatus);
+        return;
     }
-    ret = SendCommandLock(cmd, "^UNLOCKSIMLOCK", 0, &pResponse);
+    int32_t ret = SendCommandLock(cmd, "^UNLOCKSIMLOCK", 0, &pResponse);
+    ClearCmdBuf(cmd, MAX_CMD_LENGTH);
     if (ret != 0 || (pResponse != NULL && !pResponse->success)) {
         TELEPHONY_LOGE("AT^UNLOCKSIMLOCK send failed");
         if (pResponse && pResponse->result) {
@@ -1253,15 +1288,12 @@ void ReqUnlockSimLock(const ReqDataInfo *requestInfo, int32_t lockType, const ch
         } else {
             ret = HRIL_ERR_GENERIC_FAILURE;
         }
-        struct ReportInfo reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
-        OnSimReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
-        FreeResponseInfo(pResponse);
+        ReportInvalidParam(requestInfo, pResponse, ret);
         return;
     }
     if (pResponse && pResponse->head) {
         pLine = pResponse->head->data;
     }
-    HRilLockStatus lockStatus = {0};
     ret = ParseUnlockSimLockResult(pLine, &lockStatus);
     if (ret != 0) {
         if (pResponse && pResponse->result) {
@@ -1271,9 +1303,7 @@ void ReqUnlockSimLock(const ReqDataInfo *requestInfo, int32_t lockType, const ch
         } else {
             ret = HRIL_ERR_GENERIC_FAILURE;
         }
-        struct ReportInfo reportInfo = CreateReportInfo(requestInfo, ret, HRIL_RESPONSE, 0);
-        OnSimReport(GetSlotId(requestInfo), reportInfo, NULL, 0);
-        FreeResponseInfo(pResponse);
+        ReportErrSuccess(requestInfo, pResponse, &lockStatus);
         return;
     }
     struct ReportInfo reportInfo = CreateReportInfo(requestInfo, HRIL_ERR_SUCCESS, HRIL_RESPONSE, 0);
