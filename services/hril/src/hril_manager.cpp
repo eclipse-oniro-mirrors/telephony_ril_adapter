@@ -1126,16 +1126,14 @@ int32_t GetSimSlotCount()
     char virtualModemSwitch[HRIL_SYSPARA_SIZE] = {0};
     GetParameter(HRIL_VIRTUAL_MODEM_SWITCH, HRIL_VIRTUAL_MODEM_DEFAULT_SWITCH, virtualModemSwitch,
         HRIL_SYSPARA_SIZE);
-    if (simSlotCountNumber < DUAL_SLOT_COUNT && strcmp(virtualModemSwitch, "true") == 0) {
-        simSlotCountNumber = DUAL_SLOT_COUNT;
-    }
-    char vSimModemCount[HRIL_SYSPARA_SIZE] = { 0 };
-    GetParameter(HRIL_VSIM_MODEM_COUNT_STR, HRIL_DEFAULT_VSIM_MODEM_COUNT, vSimModemCount, HRIL_SYSPARA_SIZE);
-    int32_t vSimModemCountNumber = std::atoi(vSimModemCount);
-	// two modem device also has 3 slot (2sim + 1vsim)
-    if (simSlotCountNumber == DUAL_SLOT_COUNT &&
-        (vSimModemCountNumber == MAX_SLOT_COUNT || vSimModemCountNumber == DUAL_SLOT_COUNT)) {
-        simSlotCountNumber = MAX_SLOT_COUNT;
+    char productDeviceType[HRIL_SYSPARA_SIZE] = {0};
+    GetParameter(HRIL_PRODUCT_DEVICE_TYPE, "", productDeviceType, HRIL_SYSPARA_SIZE);
+
+    if ((strcmp(productDeviceType, "2in1") == 0 || strcmp(productDeviceType, "tablet") == 0) &&
+        strcmp(virtualModemSwitch, "true") == 0 && simSlotCountNumber < DC_MAX_SLOT_COUNT) {
+        TELEPHONY_LOGI("virtualModemSwitch on, deviceType:%{public}s. set simSlotCountNumber=%{public}d",
+            productDeviceType, DC_MAX_SLOT_COUNT);
+        simSlotCountNumber = DC_MAX_SLOT_COUNT;
     }
 
     char multiDeviceEnable[HRIL_SYSPARA_SIZE] = {0};
