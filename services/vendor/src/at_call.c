@@ -653,10 +653,8 @@ void ReqSendDtmf(const ReqDataInfo *requestInfo, CallDtmfInfo info)
         return;
     }
 
-    while (keyLen < MAX_CMD_LENGTH && info.dtmfKey[keyLen] != '\0') {
-        keyLen++;
-    }
-    if (keyLen >= MAX_CMD_LENGTH || info.stringLength < 0 || (size_t)info.stringLength > keyLen) {
+    keyLen = strlen(info.dtmfKey);
+    if (info.stringLength < 0 || (size_t)info.stringLength > keyLen) {
         err = HRIL_ERR_INVALID_PARAMETER;
         OnCallReportErrorMessages(requestInfo, err, NULL);
         return;
