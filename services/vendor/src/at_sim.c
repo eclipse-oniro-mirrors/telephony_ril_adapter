@@ -1396,20 +1396,24 @@ static void CreateSimRspByte(uint8_t simRspByte[], int responseLen, UsimFileIden
 
 static uint8_t FcpTlvSearchTag(uint8_t *dataPtr, uint16_t len, UsimFcpTag tag, uint8_t **outPtr)
 {
-    uint8_t tagLen = 0;
-    uint16_t lenVar = len;
-    for (*outPtr = dataPtr; lenVar > 0; *outPtr += tagLen) {
-        tagLen = (*(*outPtr + 1) + HALF_LEN);
-        if (**outPtr == (uint8_t)tag) {
-            *outPtr += HALF_LEN;
-            return *(*outPtr - 1);
-        }
-        if (tagLen > lenVar) {
-            break;
-        }
-        lenVar -= tagLen;
+    if (dataPtr == NULL || outPtr == NULL) {
+        return 0;
     }
     *outPtr = NULL;
+    uint16_t offset = 0;
+    while (len - offset >= HALF_LEN) {
+        uint8_t curTag = dataPtr[offset];
+        uint16_t valueLen = dataPtr[offset + 1];
+        uint16_t tagLen = valueLen + HALF_LEN;
+        if (tagLen > len - offset) {
+            break;
+        }
+        if (curTag == (uint8_t)tag) {
+            *outPtr = &dataPtr[offset + HALF_LEN];
+            return (uint8_t)valueLen;
+        }
+        offset += tagLen;
+    }
     return 0;
 }
 

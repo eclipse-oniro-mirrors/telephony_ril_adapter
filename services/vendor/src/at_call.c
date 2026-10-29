@@ -645,9 +645,19 @@ void ReqSendDtmf(const ReqDataInfo *requestInfo, CallDtmfInfo info)
     ResponseInfo *pResponse = NULL;
     int32_t stringLength = 0;
     int32_t ret;
+    size_t keyLen = 0;
 
     if (info.dtmfKey == NULL) {
         err = HRIL_ERR_NULL_POINT;
+        OnCallReportErrorMessages(requestInfo, err, NULL);
+        return;
+    }
+
+    while (keyLen < MAX_CMD_LENGTH && info.dtmfKey[keyLen] != '\0') {
+        keyLen++;
+    }
+    if (keyLen >= MAX_CMD_LENGTH || info.stringLength < 0 || (size_t)info.stringLength > keyLen) {
+        err = HRIL_ERR_INVALID_PARAMETER;
         OnCallReportErrorMessages(requestInfo, err, NULL);
         return;
     }

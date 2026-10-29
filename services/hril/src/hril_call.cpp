@@ -388,7 +388,7 @@ int32_t HRilCall::SendDtmf(int32_t serialId, const OHOS::HDI::Ril::V1_1::DtmfInf
     info.dtmfKey = StringToCString(dtmfInfo.dtmfKey);
     info.onLength = dtmfInfo.onLength;
     info.offLength = dtmfInfo.offLength;
-    info.stringLength = dtmfInfo.stringLength;
+    info.stringLength = static_cast<int32_t>(dtmfInfo.dtmfKey.size());
     return RequestVendor(serialId, HREQ_CALL_SEND_DTMF, callFuncs_, &HRilCallReq::SendDtmf, info);
 }
 
