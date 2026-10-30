@@ -15,6 +15,8 @@
 
 #include "at_call.h"
 
+#include <string.h>
+
 #include "hril_notification.h"
 #include "securec.h"
 #include "vendor_report.h"
