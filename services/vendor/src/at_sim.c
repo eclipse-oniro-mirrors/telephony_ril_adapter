@@ -1416,7 +1416,7 @@ static uint8_t FcpTlvSearchTag(uint8_t *dataPtr, uint16_t len, UsimFcpTag tag, u
                 offset += tagLen;
                 continue;
             }
-            *outPtr = &dataPtr[offset + HALF_LEN];
+            *outPtr = &dataPtr[offset] + HALF_LEN;
             return (uint8_t)valueLen;
         }
         offset += tagLen;
