@@ -25,7 +25,6 @@
 #undef DEFAULT_TIMEOUT
 #define DEFAULT_TIMEOUT 5000
 #define DEFAULT_TIMEOUT_CLCK 50000
-#define MAX_DTMF_KEY_LEN 255
 
 CallNotify g_callNotifyTab[] = {
     {"^CCALLSTATE:", ReportCallStateUpdated},
@@ -656,11 +655,8 @@ void ReqSendDtmf(const ReqDataInfo *requestInfo, CallDtmfInfo info)
         return;
     }
 
-    
-    while (keyLen <= MAX_DTMF_KEY_LEN && info.dtmfKey[keyLen] != '\0') {
-        keyLen++;
-    }
-    if (keyLen > MAX_DTMF_KEY_LEN || info.stringLength < 0 || (size_t)info.stringLength > keyLen) {
+    keyLen = strlen(info.dtmfKey);
+    if (info.stringLength < 0 || (size_t)info.stringLength > keyLen) {
         err = HRIL_ERR_INVALID_PARAMETER;
         OnCallReportErrorMessages(requestInfo, err, NULL);
         return;
