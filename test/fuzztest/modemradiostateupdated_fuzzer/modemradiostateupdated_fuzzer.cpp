@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,10 +18,11 @@
 #include <cstddef>
 #include <cstdint>
 #include <fuzzer/FuzzedDataProvider.h>
+#include <vector>
 
 #include "hril_manager.h"
-#include "hril_notification.h"
 #include "hril_modem.h"
+#include "hril_notification.h"
 #include "system_ability_definition.h"
 
 using namespace OHOS::Telephony;
@@ -29,30 +30,28 @@ namespace OHOS {
 constexpr int32_t MIN_SLOT_ID = -1;
 constexpr int32_t MAX_SLOT_ID = 4;
 
-int32_t GetRandomInt(int min, int max, const uint8_t *data, size_t size)
-{
-    FuzzedDataProvider fdp(data, size);
-    return fdp.ConsumeIntegralInRange<int32_t>(min, max);
-}
-
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 {
-    if (data == nullptr || size == 0) {
-        return;
-    }
+    // A single FuzzedDataProvider is created per input: each semantic field
+    // consumes independent bytes instead of re-reading the same tail byte.
+    FuzzedDataProvider fdp(data, size);
+    int32_t slotId = fdp.ConsumeIntegralInRange<int32_t>(MIN_SLOT_ID, MAX_SLOT_ID);
 
-    int32_t slotId = GetRandomInt(MIN_SLOT_ID, MAX_SLOT_ID, data, size);
-    int32_t response = GetRandomInt(0, 1, data, size); // RadioState: 0 for OFF, 1 for ON
-
-    struct ReportInfo report;
-    report.error = HRilErrNumber::HRIL_ERR_SUCCESS;
+    int32_t minErrCode = -1;
+    int32_t maxErrCode = static_cast<int32_t>(HRIL_ERR_HDF_IPC_FAILURE) + 1;
+    struct ReportInfo report = {};
+    report.error = static_cast<HRilErrNumber>(
+        fdp.ConsumeIntegralInRange<int32_t>(minErrCode, maxErrCode));
     report.notifyId = HNOTI_MODEM_RADIO_STATE_UPDATED;
     report.type = HRIL_NOTIFICATION;
-    
-    // OnModemReport expects a pointer to the payload.
-    // RadioStateUpdated expects an int32_t pointer.
-    HRilManager::GetInstance().OnModemReport(slotId, &report, (const uint8_t *)&response, sizeof(int32_t));
-    return;
+
+    // All remaining bytes form the report payload. An empty payload yields a
+    // null response covering the null branch, 3/5-byte payloads cover the
+    // responseLen % sizeof(int32_t) != 0 branch, and 4-byte payloads carry an
+    // arbitrary radioState through the normal notification path.
+    std::vector<uint8_t> payload = fdp.ConsumeRemainingBytes<uint8_t>();
+    const uint8_t *response = payload.empty() ? nullptr : payload.data();
+    HRilManager::GetInstance().OnModemReport(slotId, &report, response, payload.size());
 }
 } // namespace OHOS
 
@@ -63,4 +62,3 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
     OHOS::DoSomethingInterestingWithMyAPI(data, size);
     return 0;
 }
-

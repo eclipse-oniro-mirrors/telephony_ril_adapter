@@ -1,83 +1,83 @@
 {
-  "name": "@ohos/ril_adapter",
-  "version": "4.0",
-  "description": "telephony ril adapter service",
-  "publishAs": "code-segment",
-  "homePage": "https://gitee.com/openharmony",
-  "repository": "https://gitee.com/openharmony/telephony_ril_adapter",
-  "license": "Apache License 2.0",
-  "language": "",
-  "private": false,
-  "scripts": {},
-  "envs": [],
-  "dirs": [],
-  "author": {},
-  "contributors": [],
-  "segment": {
-    "destPath": "base/telephony/ril_adapter"
-  },
-  "component": {
-    "name": "ril_adapter",
-    "subsystem": "telephony",
-    "features": [],
-    "adapted_system_type": [
-      "standard"
-    ],
-    "rom": "700KB",
-    "ram": "1MB",
-    "deps": {
-      "components": [
-        "bounds_checking_function",
-        "c_utils",
-        "drivers_interface_power",
-        "drivers_interface_ril",
-        "hdf_core",
-        "hilog",
-        "init",
-        "ipc",
-        "samgr"
-      ]
+    "name": "@ohos/ril_adapter",
+    "version": "4.0",
+    "description": "telephony ril adapter service",
+    "publishAs": "code-segment",
+    "homePage": "https://gitee.com/openharmony",
+    "repository": "https://gitee.com/openharmony/telephony_ril_adapter",
+    "license": "Apache License 2.0",
+    "language": "",
+    "private": false,
+    "scripts": {},
+    "envs": [],
+    "dirs": [],
+    "author": {},
+    "contributors": [],
+    "segment": {
+        "destPath": "base/telephony/ril_adapter"
     },
-    "build": {
-      "group_type": {
-        "base_group": [],
-        "fwk_group": [
-          "//base/telephony/ril_adapter/interfaces/innerkits:hril_innerkits"
+    "component": {
+        "name": "ril_adapter",
+        "subsystem": "telephony",
+        "features": [],
+        "adapted_system_type": [
+            "standard"
         ],
-        "service_group": [
-          "//base/telephony/ril_adapter/services/hril:hril",
-          "//base/telephony/ril_adapter/services/hril_hdf:hril_hdf",
-          "//base/telephony/ril_adapter/services/vendor:ril_vendor"
-        ]
-      },
-      "inner_kits": [
-        {
-          "header": {
-            "header_base": "//base/telephony/ril_adapter/services/hril_hdf/include",
-            "header_files": []
-          },
-          "name": "//base/telephony/ril_adapter/services/hril_hdf:hril_hdf"
+        "rom": "700KB",
+        "ram": "1MB",
+        "deps": {
+            "components": [
+                "bounds_checking_function",
+                "c_utils",
+                "drivers_interface_power",
+                "drivers_interface_ril",
+                "hdf_core",
+                "hilog",
+                "init",
+                "ipc",
+                "samgr"
+            ]
         },
-        {
-          "header": {
-            "header_base": "//base/telephony/ril_adapter/services/hril/include",
-            "header_files": []
-          },
-          "name": "//base/telephony/ril_adapter/services/hril:hril"
-        },
-        {
-          "header": {
-            "header_base": "//base/telephony/ril_adapter/interfaces/innerkits/include",
-            "header_files": []
-          },
-          "name": "//base/telephony/ril_adapter/interfaces/innerkits:hril_innerkits"
+        "build": {
+            "group_type": {
+                "base_group": [
+                ],
+                "fwk_group": [
+                    "//base/telephony/ril_adapter/interfaces/innerkits:hril_innerkits"
+                ],
+                "service_group": [
+                    "//base/telephony/ril_adapter/services/hril:hril",
+                    "//base/telephony/ril_adapter/services/hril_hdf:hril_hdf",
+                    "//base/telephony/ril_adapter/services/vendor:ril_vendor"
+                ]
+            },
+            "inner_kits": [
+                {
+                    "header": {
+                        "header_base" : "//base/telephony/ril_adapter/services/hril_hdf/include",
+                        "header_files": []
+                    },
+                    "name":"//base/telephony/ril_adapter/services/hril_hdf:hril_hdf"
+                },
+                {
+                    "header": {
+                        "header_base" : "//base/telephony/ril_adapter/services/hril/include",
+                        "header_files": []
+                    },
+                    "name":"//base/telephony/ril_adapter/services/hril:hril"
+                },
+                {
+                    "header": {
+                        "header_base" : "//base/telephony/ril_adapter/interfaces/innerkits/include",
+                        "header_files": []
+                    },
+                    "name" : "//base/telephony/ril_adapter/interfaces/innerkits:hril_innerkits"
+                }
+            ],
+            "test": [
+                "//base/telephony/ril_adapter/test:unittest",
+                "//base/telephony/ril_adapter/test/fuzztest:fuzztest"
+            ]
         }
-      ],
-      "test": [
-        "//base/telephony/ril_adapter/test:unittest",
-        "//base/telephony/ril_adapter/test/fuzztest:fuzztest",
-        "//base/telephony/ril_adapter/test/fuzztest/modemradiostateupdated_fuzzer:fuzztest"
-      ]
     }
-  }
 }
